@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterForm() {
-  const primaryColor = "#c53030";
+  const primaryColor = '#c53030';
   const navigate = useNavigate();
 
-  const [role, setRole] = useState("student");
+  const [role, setRole] = useState('student');
   const [form, setForm] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    fullName: "",
-    companyName: "",
+    email: '',
+    password: '',
+    confirmPassword: '',
+    fullName: '',
+    companyName: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -22,20 +22,17 @@ export default function RegisterForm() {
   const validate = () => {
     const newErrors = {};
 
-    if (role === "student" && !form.fullName.trim())
-      newErrors.fullName = "Full name is required";
+    if (role === 'student' && !form.fullName.trim()) newErrors.fullName = 'Full name is required';
 
-    if (role === "enterprise" && !form.companyName.trim())
-      newErrors.companyName = "Company name is required";
+    if (role === 'enterprise' && !form.companyName.trim())
+      newErrors.companyName = 'Company name is required';
 
-    if (!form.email.trim())
-      newErrors.email = "Email is required";
+    if (!form.email.trim()) newErrors.email = 'Email is required';
 
-    if (!form.password)
-      newErrors.password = "Password is required";
+    if (!form.password) newErrors.password = 'Password is required';
 
     if (form.password !== form.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = 'Passwords do not match';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -44,30 +41,28 @@ export default function RegisterForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log("Register:", { role, ...form });
+      console.log('Register:', { role, ...form });
     }
   };
 
   return (
-    <div className="w-full h-screen"
+    <div
+      className="w-full h-screen"
       style={{
-        background: `radial-gradient(circle at top left, rgb(254, 202, 202) 0%, rgb(255, 255, 255) 65% )`
-      }} >
+        background: `radial-gradient(circle at top left, rgb(254, 202, 202) 0%, rgb(255, 255, 255) 65% )`,
+      }}
+    >
       <div className="grid grid-cols-1 lg:grid-cols-2 h-full">
-
         {/* LEFT */}
         <div className="flex items-center justify-center px-6">
           <div className="w-full max-w-[480px]">
-
             <img
               src="https://iocv2.rikkei.edu.vn/logo.svg"
               className="mx-auto mb-6 w-[180px]"
               alt=""
             />
 
-            <h1 className="text-center font-bold text-4xl mb-4">
-              REGISTER
-            </h1>
+            <h1 className="text-center font-bold text-4xl mb-4">REGISTER</h1>
 
             <p className="text-center text-gray-500 mb-4 text-sm">
               Create your account to get started.
@@ -75,28 +70,22 @@ export default function RegisterForm() {
 
             {/* ROLE */}
             <div className="flex justify-center gap-6 mb-6">
-              {["student", "enterprise"].map((r) => (
+              {['student', 'enterprise'].map((r) => (
                 <button
                   key={r}
                   type="button"
                   onClick={() => setRole(r)}
                   className={`px-3 py-1.5 rounded-full border text-sm font-medium
-                    ${role === r
-                      ? "text-white"
-                      : "text-gray-600 border-gray-300"
-                    }`}
-                  style={
-                    role === r ? { backgroundColor: primaryColor } : {}
-                  }
+                    ${role === r ? 'text-white' : 'text-gray-600 border-gray-300'}`}
+                  style={role === r ? { backgroundColor: primaryColor } : {}}
                 >
-                  {r === "student" ? "Student" : "Enterprise"}
+                  {r === 'student' ? 'Student' : 'Enterprise'}
                 </button>
               ))}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3">
-
-              {role === "student" && (
+              {role === 'student' && (
                 <Input
                   label="Full Name"
                   name="fullName"
@@ -106,7 +95,7 @@ export default function RegisterForm() {
                 />
               )}
 
-              {role === "enterprise" && (
+              {role === 'enterprise' && (
                 <Input
                   label="Company Name"
                   name="companyName"
@@ -150,27 +139,23 @@ export default function RegisterForm() {
                 Create Account
               </button>
               <div className="mt-4 text-center text-sm text-gray-600">
-                Already have an account?{" "}
+                Already have an account?{' '}
                 <button
                   type="button"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate('/login')}
                   className="font-semibold hover:underline"
                   style={{ color: primaryColor }}
                 >
                   Login
                 </button>
               </div>
-
             </form>
 
-            <p className="text-center text-gray-400 text-sm mt-6">
-              © 2025 Internship OneConnect
-            </p>
+            <p className="text-center text-gray-400 text-sm mt-6">© 2025 Internship OneConnect</p>
           </div>
         </div>
 
         <div className="hidden lg:flex items-center justify-center p-8">
-
           <div
             className="w-full max-w-[700px] h-full max-h-[90vh]
                rounded-[32px] px-10 py-12
@@ -178,14 +163,12 @@ export default function RegisterForm() {
                shadow-xl"
             style={{ backgroundColor: primaryColor }}
           >
-
             <div className="text-center text-white">
-              <h2 className="text-4xl font-extrabold mb-4">
-                Internship OneConnect
-              </h2>
+              <h2 className="text-4xl font-extrabold mb-4">Internship OneConnect</h2>
 
               <p className="text-white/80 text-sm leading-relaxed max-w-[420px] mx-auto">
-                Join an internship program to learn from experts, hone practical skills, and prepare yourself for a successful future career.
+                Join an internship program to learn from experts, hone practical skills, and prepare
+                yourself for a successful future career.
               </p>
             </div>
 
@@ -198,7 +181,6 @@ export default function RegisterForm() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
@@ -214,12 +196,10 @@ function Input({ label, error, ...props }) {
       <input
         {...props}
         className={`w-full px-3 py-1.5 rounded-lg border
-          ${error ? "border-red-500" : "border-gray-300"}
+          ${error ? 'border-red-500' : 'border-gray-300'}
           focus:outline-none focus:ring-2 focus:ring-blue-500`}
       />
-      {error && (
-        <p className="text-red-500 text-sm mt-1">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 }

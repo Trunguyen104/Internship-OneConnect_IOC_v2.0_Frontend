@@ -1,28 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ForgotPassword() {
-  const primaryColor = "#c53030";
+  const primaryColor = '#c53030';
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
-      setError("Email is required");
+      setError('Email is required');
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Invalid email format");
+      setError('Invalid email format');
       return;
     }
 
-    setError("");
+    setError('');
     setSuccess(true);
 
     // call API forgot password ở đây
@@ -37,16 +37,9 @@ export default function ForgotPassword() {
       }}
     >
       <div className="w-full max-w-[420px] px-6">
+        <img src="https://iocv2.rikkei.edu.vn/logo.svg" className="mx-auto mb-6 w-[180px]" alt="" />
 
-        <img
-          src="https://iocv2.rikkei.edu.vn/logo.svg"
-          className="mx-auto mb-6 w-[180px]"
-          alt=""
-        />
-
-        <h1 className="text-center font-bold text-4xl mb-4">
-          Forgot Password
-        </h1>
+        <h1 className="text-center font-bold text-4xl mb-4">Forgot Password</h1>
 
         <p className="text-center text-gray-500 mb-6">
           Enter your email and we’ll send you a reset link.
@@ -54,12 +47,10 @@ export default function ForgotPassword() {
 
         {success ? (
           <div className="text-center">
-            <p className="text-green-600 mb-4">
-              Reset link has been sent to your email.
-            </p>
+            <p className="text-green-600 mb-4">Reset link has been sent to your email.</p>
 
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate('/login')}
               className="font-semibold hover:underline"
               style={{ color: primaryColor }}
             >
@@ -79,13 +70,11 @@ export default function ForgotPassword() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@university.edu"
                 className={`w-full px-3 py-2 rounded-xl border
-                  ${error ? "border-red-500" : "border-gray-300"}
+                  ${error ? 'border-red-500' : 'border-gray-300'}
                   focus:outline-none focus:ring-2 focus:ring-blue-500`}
               />
 
-              {error && (
-                <p className="text-red-500 text-sm mt-1">{error}</p>
-              )}
+              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
             </div>
 
             <button
@@ -99,7 +88,7 @@ export default function ForgotPassword() {
             <div className="mt-4 text-center text-sm">
               <button
                 type="button"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate('/login')}
                 className="hover:underline"
                 style={{ color: primaryColor }}
               >

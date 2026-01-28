@@ -1,1 +1,1 @@
-// quản lí tin 
+// quản lí tin

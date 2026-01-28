@@ -1,1 +1,1 @@
-// quản lí trường 
+// quản lí trường
