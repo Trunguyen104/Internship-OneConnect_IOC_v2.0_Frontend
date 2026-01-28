@@ -5,13 +5,17 @@ import './App.css'
 import { Route, Routes } from 'react-router-dom'
 import LoginForm from './features/auth/LoginForm'
 import RegisterForm from './features/auth/RegisterForm'
+import { useNavigate } from "react-router-dom";
+import ForgotPassword from './features/auth/ForgotPassword'
 
 function App() {
   return (
     <>
     <Routes >
-        <Route index path='/login' element={<LoginForm />} ></Route>
+        <Route index element={<LoginForm />} ></Route>
+        <Route path='/login' element={<LoginForm />} ></Route>
         <Route path='/register' element={<RegisterForm />} ></Route>
+        <Route path='/forgot-password' element={<ForgotPassword />} ></Route>
     </Routes>
     </>
   )
