@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-import { redirect } from "next/navigation";
-
-export default function Page() {
-  redirect("/student/dashboard");
-=======
 import { redirect } from 'next/navigation';
 
-export default function Home() {
+export default function Page() {
   redirect('/login');
->>>>>>> origin/main
 }
