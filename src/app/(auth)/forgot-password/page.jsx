@@ -1,10 +1,10 @@
-import LoginPage from '@/feature/auth/LoginPage';
+import ForgotPasswordPage from '@/feature/auth/ForgotPassword';
 import React from 'react';
 
 export default function page() {
   return (
     <>
-      <LoginPage />
+      <ForgotPasswordPage />
     </>
   );
 }

@@ -1,10 +1,10 @@
-import LoginPage from '@/feature/auth/LoginPage';
+import RegisterPage from '@/feature/auth/RegisterPage';
 import React from 'react';
 
 export default function page() {
   return (
     <>
-      <LoginPage />
+      <RegisterPage />
     </>
   );
 }
