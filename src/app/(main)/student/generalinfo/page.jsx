@@ -1,7 +1,7 @@
 import React from 'react';
 
 function page() {
-  return <div className='bg-gray-50'>pages</div>;
+  return <div>hellllo</div>;
 }
 
 export default page;
