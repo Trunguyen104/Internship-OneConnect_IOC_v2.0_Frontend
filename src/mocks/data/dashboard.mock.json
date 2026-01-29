@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "totalTasks": 43,
+    "inProgress": 1,
+    "done": 4,
+    "overdue": 6
+  },
+  "burndown": [
+    { "date": "2026-01-19", "remaining": 6 },
+    { "date": "2026-01-20", "remaining": 6 },
+    { "date": "2026-01-21", "remaining": 6 },
+    { "date": "2026-01-22", "remaining": 7 },
+    { "date": "2026-01-23", "remaining": 7 },
+    { "date": "2026-01-24", "remaining": 7 },
+    { "date": "2026-01-25", "remaining": 6 },
+    { "date": "2026-01-26", "remaining": 7 },
+    { "date": "2026-01-27", "remaining": 18 },
+    { "date": "2026-01-28", "remaining": 18 },
+    { "date": "2026-01-29", "remaining": 18 }
+  ],
+  "completionRatio": {
+    "onTime": 37,
+    "overdue": 6
+  },
+  "taskStatusDistribution": [
+    { "status": "In Review", "count": 1 },
+    { "status": "In Progress", "count": 1 },
+    { "status": "Done", "count": 4 },
+    { "status": "To Do", "count": 37 }
+  ],
+  "workloadByPerson": [
+    { "name": "Nguyễn Văn Đức", "count": 3 },
+    { "name": "Lê Thuận Phát", "count": 6 },
+    { "name": "Trần Công Minh", "count": 3 },
+    { "name": "Trà Gia Đạt", "count": 10 },
+    { "name": "Lê Duy Khánh", "count": 1 },
+    { "name": "Lưu Gia Bảo", "count": 4 },
+    { "name": "Nguyễn Thị Nhật Tuyền", "count": 5 },
+    { "name": "Nguyễn Trung Nguyên", "count": 1 },
+    { "name": "Unassigned", "count": 10 }
+  ],
+  "studentStatus": [
+    { "status": "Đang thực tập", "count": 120 },
+    { "status": "Đã hoàn thành", "count": 18 },
+    { "status": "Tạm dừng", "count": 4 }
+  ],
+  "studentViolations": [
+    { "type": "Không nộp báo cáo hằng ngày", "count": 2 },
+    { "type": "Nộp muộn logbook", "count": 3 },
+    { "type": "Không tham gia đánh giá", "count": 1 }
+  ]
+}
