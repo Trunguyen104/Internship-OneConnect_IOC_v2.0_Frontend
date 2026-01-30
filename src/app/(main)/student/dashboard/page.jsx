@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 
 function page() {
@@ -5,3 +6,10 @@ function page() {
 }
 
 export default page;
+=======
+import Dashboard from '@/feature/student/Dashboard';
+
+export default function Page() {
+  return <Dashboard />;
+}
+>>>>>>> feature/dashboard
