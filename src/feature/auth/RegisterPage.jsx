@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const primaryColor = '#c53030';
   const router = useRouter();
 
-  const [role, setRole] = useState('student');
+  const [role, setRole] = useState('sinh viên');
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -60,16 +60,16 @@ export default function RegisterPage() {
               alt='IOC Logo'
               width={180}
               height={45}
-              className='block mx-auto mb-6'
+              className='block mx-auto mb-4 mt-2'
             />
 
-            <p className='text-center font-bold text-3xl text-black mb-5'>REGISTER</p>
+            <p className='text-center font-bold text-3xl text-black mb-2.5'>Đăng ký</p>
 
-            <p className='text-center text-gray-500 mb-4'>Create your account to get started.</p>
+            <p className='text-center text-gray-500 mb-4'>Tạo tài khoản của bạn để bắt đầu.</p>
 
             {/* ROLE */}
-            <div className='flex justify-center gap-4 mb-6'>
-              {['student', 'enterprise'].map((r) => (
+            <div className='flex gap-4 mb-5'>
+              {['sinh viên', 'doanh nghiệp'].map((r) => (
                 <button
                   key={r}
                   type='button'
@@ -79,15 +79,15 @@ export default function RegisterPage() {
                   }`}
                   style={role === r ? { backgroundColor: primaryColor } : {}}
                 >
-                  {r === 'student' ? 'Student' : 'Enterprise'}
+                  {r === 'sinh viên' ? 'Sinh viên' : 'Doanh nghiệp'}
                 </button>
               ))}
             </div>
 
             <form onSubmit={handleSubmit}>
-              {role === 'student' && (
+              {role === 'sinh viên' && (
                 <Input
-                  label='Full Name'
+                  label='Họ và tên'
                   name='fullName'
                   value={form.fullName}
                   onChange={handleChange}
@@ -96,9 +96,9 @@ export default function RegisterPage() {
                 />
               )}
 
-              {role === 'enterprise' && (
+              {role === 'doanh nghiệp' && (
                 <Input
-                  label='Company Name'
+                  label='Tên doanh nghiệp'
                   name='companyName'
                   value={form.companyName}
                   onChange={handleChange}
@@ -115,7 +115,7 @@ export default function RegisterPage() {
               />
 
               <Input
-                label='Password'
+                label='Mật khẩu'
                 type='password'
                 name='password'
                 value={form.password}
@@ -124,7 +124,7 @@ export default function RegisterPage() {
               />
 
               <Input
-                label='Confirm Password'
+                label='Xác nhận mật khẩu'
                 type='password'
                 name='confirmPassword'
                 value={form.confirmPassword}
@@ -134,27 +134,27 @@ export default function RegisterPage() {
 
               <button
                 type='submit'
-                className='w-full h-11 rounded-xl text-white font-semibold mt-4'
+                className='w-full h-11 rounded-xl text-white font-semibold mt-3'
                 style={{ backgroundColor: primaryColor }}
               >
-                Create Account
+                Tạo tài khoản
               </button>
 
               <div className='mt-4 text-center text-sm text-gray-600'>
-                Already have an account?{' '}
+                Bạn đã có tài khoản?{' '}
                 <button
                   type='button'
                   onClick={() => router.push('/login')}
                   className='font-semibold hover:underline'
                   style={{ color: primaryColor }}
                 >
-                  Login
+                  Đăng nhập
                 </button>
               </div>
             </form>
 
             <div className='text-center text-gray-500 text-sm mt-4'>
-              © 2025 Internship OneConnect
+              © 2026 Internship OneConnect
             </div>
           </div>
         </div>

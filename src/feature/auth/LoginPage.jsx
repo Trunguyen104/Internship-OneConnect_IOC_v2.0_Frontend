@@ -15,13 +15,13 @@ export default function LoginPage() {
     const newErrors = {};
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = 'Email là bắt buộc';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Invalid email format';
     }
 
     if (!password.trim()) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'Mật khẩu là bắt buộc';
     }
 
     setErrors(newErrors);
@@ -55,14 +55,15 @@ export default function LoginPage() {
               className='block mx-auto mb-8'
             />
 
-            <p className='text-center font-bold text-5xl text-black mb-6'>LOGIN</p>
-            <p className='text-center text-gray-500 mb-6'>Please enter your details to sign in.</p>
+            <p className='text-center font-bold text-4xl text-black mb-4'>Đăng nhập</p>
+            <p className='text-center text-gray-500 mb-8'>
+              Chào mừng quay trở lại! Hãy nhập thông tin đăng nhập của bạn
+            </p>
 
             <form onSubmit={handleSubmit} className='space-y-4'>
-              {/* EMAIL */}
               <div>
                 <label className='block mb-2 text-sm font-medium text-gray-900'>
-                  Email address <span className='text-red-500'>*</span>
+                  Email <span className='text-red-500'>*</span>
                 </label>
 
                 <div className='relative'>
@@ -72,7 +73,7 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder='name@university.edu'
                     className={`
-                      w-full px-4 py-2 rounded-xl
+                      w-full px-4 py-2 rounded-2xl
                       bg-white text-gray-900 placeholder-gray-400
                       border
                       ${errors.email ? 'border-red-500' : 'border-gray-300'}
@@ -92,21 +93,11 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* PASSWORD */}
               <div>
                 <div className='flex justify-between mb-2'>
                   <label className='text-sm font-medium text-gray-900'>
-                    Password <span className='text-red-500'>*</span>
+                    Mật khẩu <span className='text-red-500'>*</span>
                   </label>
-
-                  <button
-                    type='button'
-                    onClick={() => router.push('/forgot-password')}
-                    className='text-sm hover:underline'
-                    style={{ color: primaryColor }}
-                  >
-                    Forgot Password?
-                  </button>
                 </div>
 
                 <div className='relative'>
@@ -115,7 +106,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={`
-                      w-full px-4 py-2 rounded-xl
+                      w-full px-4 py-2 rounded-2xl
                       bg-white text-gray-900
                       border
                       ${errors.password ? 'border-red-500' : 'border-gray-300'}
@@ -136,11 +127,25 @@ export default function LoginPage() {
               </div>
 
               {/* REMEMBER */}
-              <div className='flex items-center'>
-                <input id='remember' type='checkbox' className='w-4 h-4 rounded border-gray-300' />
-                <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
-                  Remember this device
-                </label>
+              <div className='flex justify-between items-center'>
+                <div className='flex justify-content-center'>
+                  <input
+                    id='remember'
+                    type='checkbox'
+                    className='w-4 h-4 rounded border-gray-300'
+                  />
+                  <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
+                    Remember this device
+                  </label>
+                </div>
+                <button
+                  type='button'
+                  onClick={() => router.push('/forgot-password')}
+                  className='flex text-sm hover:underline'
+                  style={{ color: primaryColor }}
+                >
+                  Quên mật khẩu?
+                </button>
               </div>
 
               {/* BUTTON */}
@@ -149,24 +154,24 @@ export default function LoginPage() {
                 className='w-full h-11 rounded-xl text-white font-semibold'
                 style={{ backgroundColor: primaryColor }}
               >
-                Sign In
+                Đăng nhập
               </button>
 
               <div className='text-center text-sm text-gray-600'>
-                Don’t have an account?{' '}
+                Bạn chưa có tài khoản?{' '}
                 <button
                   type='button'
                   onClick={() => router.push('/register')}
                   className='font-semibold hover:underline'
                   style={{ color: primaryColor }}
                 >
-                  Register
+                  Đăng ký
                 </button>
               </div>
             </form>
 
             <div className='text-center text-gray-500 text-sm mt-4'>
-              © 2025 Internship OneConnect
+              © 2026 Internship OneConnect
             </div>
           </div>
         </div>
@@ -183,7 +188,8 @@ export default function LoginPage() {
             <div className='text-center text-white'>
               <h2 className='text-4xl font-extrabold mb-4'>Internship OneConnect</h2>
               <p className='text-white/80 text-sm max-w-105 mx-auto'>
-                Join an internship program to learn from experts, hone practical skills.
+                Tham gia chương trình thực tập để học hỏi từ các chuyên gia, rèn luyện kỹ năng thực
+                tế và chuẩn bị vững vàng cho sự nghiệp tương lai.
               </p>
             </div>
 
