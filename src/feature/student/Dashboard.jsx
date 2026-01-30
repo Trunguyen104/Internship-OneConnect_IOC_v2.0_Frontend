@@ -1,5 +1,6 @@
 'use client';
-
+import StudentTabs from '@/shared/components/StudentTabs';
+import PageShell from '@/shared/components/PageShell';
 import { useEffect, useMemo, useState } from 'react';
 import {
   AreaChart,
@@ -71,17 +72,9 @@ export default function DashboardPage() {
   return (
     <PageShell title='Tổng quan'>
       {/* Top actions */}
-      <div className='flex items-center justify-between mb-4'>
-        <Tabs
-          items={[
-            { key: 'overview', label: 'Tóm tắt' },
-            { key: 'board', label: 'Bảng công việc' },
-            { key: 'backlog', label: 'Backlog' },
-            { key: 'list', label: 'Danh sách công việc' },
-          ]}
-          activeKey='overview'
-        />
-        <button className='text-sm px-4 py-2 rounded-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/15'>
+      <div className='flex flex-wrap items-center justify-between gap-3 mb-4'>
+        <StudentTabs />
+        <button className='shrink-0 text-sm px-4 py-2 rounded-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/15'>
           Xuất CSV
         </button>
       </div>
@@ -243,19 +236,6 @@ export default function DashboardPage() {
 
 /* ---------------- UI atoms ---------------- */
 
-function PageShell({ title, children }) {
-  return (
-    <div className='min-h-screen bg-bg text-text'>
-      <div className='p-4 md:p-6'>
-        <div className='mb-4'>
-          <div className='text-xs text-muted'>Space</div>
-          <h1 className='text-xl font-semibold'>{title}</h1>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
 function Tabs({ items, activeKey }) {
   return (
     <div className='flex flex-wrap gap-2'>
@@ -327,7 +307,6 @@ function ErrorBox({ message }) {
 }
 
 /* ---------------- helpers ---------------- */
-
 function formatShortDate(iso) {
   const [y, m, d] = iso.split('-');
   return `${d}/${m}`;
