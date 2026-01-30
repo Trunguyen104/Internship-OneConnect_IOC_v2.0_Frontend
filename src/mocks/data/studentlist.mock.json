@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Trần Gia Đạt",
+    "email": "dattg.ce190694@gmail.com",
+    "dob": "2005-05-31",
+    "gender": "Nam"
+  },
+  {
+    "id": 2,
+    "name": "Trần Công Minh",
+    "email": "minhtc.ce190895@gmail.com",
+    "dob": "2000-01-01",
+    "gender": "Nam"
+  },
+  {
+    "id": 3,
+    "name": "Lê Thuận Phát",
+    "email": "thuanphat.ce191406@gmail.com",
+    "dob": "2005-05-13",
+    "gender": "Nam"
+  }
+]
