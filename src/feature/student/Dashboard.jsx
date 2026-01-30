@@ -81,7 +81,7 @@ export default function DashboardPage() {
           ]}
           activeKey='overview'
         />
-        <button className='text-sm px-3 py-2 rounded-lg border border-border bg-surface hover:bg-bg'>
+        <button className='text-sm px-4 py-2 rounded-full border border-primary/20 bg-primary/10 text-primary hover:bg-primary/15'>
           Xuất CSV
         </button>
       </div>
@@ -245,27 +245,28 @@ export default function DashboardPage() {
 
 function PageShell({ title, children }) {
   return (
-    <div className='p-4 md:p-6 bg-bg text-text min-h-screen'>
-      <div className='mb-3'>
-        <div className='text-xs text-muted'>Space</div>
-        <h1 className='text-xl font-semibold'>{title}</h1>
+    <div className='min-h-screen bg-bg text-text'>
+      <div className='p-4 md:p-6'>
+        <div className='mb-4'>
+          <div className='text-xs text-muted'>Space</div>
+          <h1 className='text-xl font-semibold'>{title}</h1>
+        </div>
+        {children}
       </div>
-      {children}
     </div>
   );
 }
-
 function Tabs({ items, activeKey }) {
   return (
     <div className='flex flex-wrap gap-2'>
       {items.map((t) => (
         <button
           key={t.key}
-          className={`text-sm px-3 py-2 rounded-lg border border-border ${
-            t.key === activeKey
-              ? 'bg-primary/10 text-primary font-medium'
-              : 'bg-surface hover:bg-bg text-text'
-          }`}
+          className={[
+            'text-sm px-4 py-2 rounded-full border',
+            'border-border/60 bg-surface shadow-sm',
+            t.key === activeKey ? 'bg-primary/10 text-primary border-primary/20' : 'hover:bg-bg',
+          ].join(' ')}
         >
           {t.label}
         </button>
@@ -276,23 +277,30 @@ function Tabs({ items, activeKey }) {
 
 function StatCard({ label, value }) {
   return (
-    <div className='rounded-xl border border-border bg-surface p-4'>
+    <div className='rounded-2xl bg-surface border border-border/60 shadow-sm px-6 py-5'>
       <div className='text-sm text-muted'>{label}</div>
-      <div className='text-3xl font-semibold mt-1'>{value}</div>
+      <div className='text-3xl font-semibold mt-2 leading-none'>{value}</div>
     </div>
   );
 }
 
 function Card({ children, className = '' }) {
   return (
-    <div className={`rounded-xl border border-border bg-surface ${className}`}>{children}</div>
+    <div
+      className={['rounded-2xl bg-surface', 'border border-border/60', 'shadow-sm', className].join(
+        ' ',
+      )}
+    >
+      {children}
+    </div>
   );
 }
 
-function CardHeader({ title }) {
+function CardHeader({ title, right }) {
   return (
-    <div className='px-4 py-3 border-b border-border'>
-      <div className='text-sm font-medium'>{title}</div>
+    <div className='px-5 py-4 border-b border-border/60 flex items-center justify-between'>
+      <div className='text-sm font-semibold'>{title}</div>
+      {right ? <div>{right}</div> : null}
     </div>
   );
 }
