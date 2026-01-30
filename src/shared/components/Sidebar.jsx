@@ -19,9 +19,9 @@ const menuItems = [
   { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/generalinfo' },
   { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
   { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
-  { icon: <UploadOutlined />, label: 'Đánh giá', href: '/evaluate' },
-  { icon: <UserOutlined />, label: 'Bên liên quan', href: '/stakeholder' },
-  { icon: <ShopOutlined />, label: 'Vi phạm', href: '/violation' },
+  { icon: <UploadOutlined />, label: 'Đánh giá', href: '/student/evaluate' },
+  { icon: <UserOutlined />, label: 'Bên liên quan', href: '/student/stakeholder' },
+  { icon: <ShopOutlined />, label: 'Vi phạm', href: '/student/violation' },
 ];
 
 export default function Sidebar() {
