@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   AppstoreOutlined,
   BarChartOutlined,
-  CloudOutlined,
   ShopOutlined,
   TeamOutlined,
   UploadOutlined,
@@ -17,10 +16,9 @@ import {
 
 const menuItems = [
   { icon: <AppstoreOutlined />, label: 'Space', href: '/space' },
-  { icon: <CloudOutlined />, label: 'Dự án', href: '/project' },
   { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/generalinfo' },
   { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
-  { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/report' },
+  { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
   { icon: <UploadOutlined />, label: 'Đánh giá', href: '/evaluate' },
   { icon: <UserOutlined />, label: 'Bên liên quan', href: '/stakeholder' },
   { icon: <ShopOutlined />, label: 'Vi phạm', href: '/violation' },
