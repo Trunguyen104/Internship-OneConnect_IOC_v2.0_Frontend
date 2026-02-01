@@ -15,7 +15,7 @@ import {
 } from '@ant-design/icons';
 
 const menuItems = [
-  { icon: <AppstoreOutlined />, label: 'Space', href: '/space' },
+  { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
   { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/generalinfo' },
   { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
   { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
