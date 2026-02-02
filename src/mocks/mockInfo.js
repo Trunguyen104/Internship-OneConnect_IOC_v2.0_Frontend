@@ -6,6 +6,5 @@ export async function getGeneralInfo() {
     return info;
   }
 
-  // sau này mới dùng API
   // return httpGet('/general-info');
 }
