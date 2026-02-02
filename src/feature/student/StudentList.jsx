@@ -1,5 +1,4 @@
 import Card from '@/shared/components/Card';
-
 const DATA = [
   {
     id: 1,
@@ -115,7 +114,6 @@ export default function StudentList() {
     </section>
   );
 }
-
 function Avatar({ name }) {
   return (
     <div className='flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-600'>
