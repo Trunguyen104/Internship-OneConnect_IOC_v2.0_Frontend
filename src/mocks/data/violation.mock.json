@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "type": "Đi trễ",
+    "description": "Sinh viên đi trễ 15 phút",
+    "violationTime": "2024-12-01T08:15:00",
+    "reporter": "Nguyễn Văn Mentor",
+    "createdAt": "2024-12-01"
+  },
+  {
+    "id": 2,
+    "type": "Không mặc đồng phục",
+    "description": "Không mặc áo đồng phục theo quy định",
+    "violationTime": "2024-12-03T09:00:00",
+    "reporter": "Nguyễn Văn HEHE",
+    "createdAt": "2024-12-03"
+  },
+  {
+    "id": 3,
+    "type": "Vắng mặt",
+    "description": "Vắng mặt không lý do",
+    "violationTime": "2024-12-05T08:00:00",
+    "reporter": "Mentor A",
+    "createdAt": "2024-12-05"
+  }
+]
