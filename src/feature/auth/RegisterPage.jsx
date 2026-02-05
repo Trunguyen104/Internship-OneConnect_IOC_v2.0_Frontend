@@ -6,17 +6,9 @@ import Input from '@/shared/components/Input';
 import Link from 'next/link';
 
 export default function RegisterPage() {
-<<<<<<< HEAD
   const [role, setRole] = useState('student');
 
   const getInitialForm = (role) => ({
-=======
-  const primaryColor = '#c53030';
-  const router = useRouter();
-
-  const [role, setRole] = useState('sinh viên');
-  const [form, setForm] = useState({
->>>>>>> feature/login
     email: '',
     password: '',
     confirmPassword: '',
@@ -97,7 +89,6 @@ export default function RegisterPage() {
             />
 
             <p className='text-center font-bold text-3xl text-black mb-2.5'>Đăng ký</p>
-<<<<<<< HEAD
             <p className='text-center text-gray-500 mb-4'>Tạo tài khoản của bạn để bắt đầu.</p>
 
             <div className='flex gap-4 mb-5'>
@@ -105,14 +96,6 @@ export default function RegisterPage() {
                 { value: 'student', label: 'Sinh viên' },
                 { value: 'enterprise', label: 'Doanh nghiệp' },
               ].map((r) => (
-=======
-
-            <p className='text-center text-gray-500 mb-4'>Tạo tài khoản của bạn để bắt đầu.</p>
-
-            {/* ROLE */}
-            <div className='flex gap-4 mb-5'>
-              {['sinh viên', 'doanh nghiệp'].map((r) => (
->>>>>>> feature/login
                 <button
                   key={r.value}
                   type='button'
@@ -126,17 +109,13 @@ export default function RegisterPage() {
                   }`}
                   style={role === r.value ? { backgroundColor: 'var(--color-danger)' } : {}}
                 >
-<<<<<<< HEAD
                   {r.label}
-=======
-                  {r === 'sinh viên' ? 'Sinh viên' : 'Doanh nghiệp'}
->>>>>>> feature/login
                 </button>
               ))}
             </div>
 
             <form onSubmit={handleSubmit}>
-              {role === 'sinh viên' && (
+              {role === 'student' && (
                 <Input
                   label='Họ và tên'
                   name='fullName'
@@ -146,7 +125,7 @@ export default function RegisterPage() {
                 />
               )}
 
-              {role === 'doanh nghiệp' && (
+              {role === 'enterprise' && (
                 <Input
                   label='Tên doanh nghiệp'
                   name='companyName'
@@ -185,35 +164,19 @@ export default function RegisterPage() {
 
               <button
                 type='submit'
-<<<<<<< HEAD
                 className='w-full h-11 rounded-xl text-white font-semibold mt-3 bg-(--color-danger) hover:bg-(--color-primary-hover) cursor-pointer'
-=======
-                className='w-full h-11 rounded-xl text-white font-semibold mt-3'
-                style={{ backgroundColor: primaryColor }}
->>>>>>> feature/login
               >
                 Tạo tài khoản
               </button>
 
               <div className='mt-4 text-center text-sm text-gray-600'>
                 Bạn đã có tài khoản?{' '}
-<<<<<<< HEAD
                 <Link
                   href='/login'
                   className='font-semibold hover:underline text-(--primary-700) cursor-pointer'
                 >
                   Đăng nhập
                 </Link>
-=======
-                <button
-                  type='button'
-                  onClick={() => router.push('/login')}
-                  className='font-semibold hover:underline'
-                  style={{ color: primaryColor }}
-                >
-                  Đăng nhập
-                </button>
->>>>>>> feature/login
               </div>
             </form>
 
