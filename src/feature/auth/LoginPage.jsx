@@ -45,7 +45,7 @@ export default function LoginPage() {
 
       localStorage.setItem('token', token);
 
-      router.push('/student/generalinfo');
+      router.push('/student/space');
     } catch (error) {
       setErrors({
         password: error.message,

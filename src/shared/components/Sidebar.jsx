@@ -19,10 +19,10 @@ const studentMenu = [
   { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
   { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/general-info' },
   { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
-  { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/report' },
-  { icon: <UploadOutlined />, label: 'Đánh giá', href: '/evaluate' },
-  { icon: <UserOutlined />, label: 'Bên liên quan', href: '/stakeholder' },
-  { icon: <ShopOutlined />, label: 'Vi phạm', href: '/violation' },
+  { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
+  { icon: <UploadOutlined />, label: 'Đánh giá', href: '/student/evaluate' },
+  { icon: <UserOutlined />, label: 'Bên liên quan', href: '/student/stakeholder' },
+  { icon: <ShopOutlined />, label: 'Vi phạm', href: '/student/violation' },
 ];
 
 const profileMenu = [
