@@ -2,6 +2,8 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Input from '@/shared/components/Input';
+import { loginApi } from '@/services/authService';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -9,6 +11,8 @@ export default function LoginPage() {
     email: '',
     password: '',
   });
+
+  const router = useRouter();
 
   const [errors, setErrors] = useState({});
 
@@ -29,10 +33,23 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      console.log('Login success:', { email, password });
+
+    if (!validate()) return;
+
+    try {
+      const token = await loginApi(form);
+
+      console.log('JWT token:', token);
+
+      localStorage.setItem('token', token);
+
+      router.push('/student/generalinfo');
+    } catch (error) {
+      setErrors({
+        password: error.message,
+      });
     }
   };
 
