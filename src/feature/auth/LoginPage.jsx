@@ -2,11 +2,8 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Input from '@/shared/components/Input';
-<<<<<<< HEAD
-=======
 import { loginApi } from '@/services/authService';
 import { useRouter } from 'next/navigation';
->>>>>>> feature/login
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -14,19 +11,14 @@ export default function LoginPage() {
     email: '',
     password: '',
   });
-<<<<<<< HEAD
-=======
 
   const router = useRouter();
->>>>>>> feature/login
 
   const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     if (!form.email.trim()) {
       newErrors.email = 'Email là bắt buộc';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -34,22 +26,6 @@ export default function LoginPage() {
     }
 
     if (!form.password.trim()) {
-=======
-    if (!email.trim()) {
-=======
-    if (!form.email.trim()) {
->>>>>>> feature/login
-      newErrors.email = 'Email là bắt buộc';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Email không hợp lệ';
-    }
-
-<<<<<<< HEAD
-    if (!password.trim()) {
->>>>>>> feature/login
-=======
-    if (!form.password.trim()) {
->>>>>>> feature/login
       newErrors.password = 'Mật khẩu là bắt buộc';
     }
 
@@ -115,16 +91,6 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className='space-y-4'>
               <div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-                <label className='block mb-2 text-sm font-medium text-gray-900'>
-                  Email <span className='text-red-500'>*</span>
-                </label>
-
->>>>>>> feature/login
-=======
->>>>>>> feature/login
                 <div className='relative'>
                   <Input
                     label='Email'
@@ -133,8 +99,6 @@ export default function LoginPage() {
                     value={form.email}
                     onChange={handleChange}
                     placeholder='name@university.edu'
-<<<<<<< HEAD
-<<<<<<< HEAD
                     error={errors.email}
                   />
 
@@ -145,59 +109,15 @@ export default function LoginPage() {
                     value={form.password}
                     onChange={handleChange}
                     error={errors.password}
-=======
-                    className={`
-                      w-full px-4 py-2 rounded-2xl
-                      bg-white text-gray-900 placeholder-gray-400
-                      border
-                      ${errors.email ? 'border-red-500' : 'border-gray-300'}
-                      focus:outline-none focus:ring-2
-                      ${errors.email ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
-                    `}
-=======
-                    error={errors.email}
->>>>>>> feature/login
-                  />
-
-                  <Input
-                    label='Mật khẩu'
-                    name='password'
-                    type='password'
-<<<<<<< HEAD
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`
-                      w-full px-4 py-2 rounded-2xl
-                      bg-white text-gray-900
-                      border
-                      ${errors.password ? 'border-red-500' : 'border-gray-300'}
-                      focus:outline-none focus:ring-2
-                      ${errors.password ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
-                    `}
->>>>>>> feature/login
-=======
-                    value={form.password}
-                    onChange={handleChange}
-                    error={errors.password}
->>>>>>> feature/login
                   />
                 </div>
               </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-              {/* REMEMBER */}
->>>>>>> feature/login
-=======
->>>>>>> feature/login
               <div className='flex justify-between items-center'>
                 <div className='flex justify-content-center'>
                   <input
                     id='remember'
                     type='checkbox'
-<<<<<<< HEAD
-<<<<<<< HEAD
                     className='w-4 h-4 rounded border-gray-300 cursor-pointer'
                   />
                   <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
@@ -210,27 +130,6 @@ export default function LoginPage() {
                 >
                   Quên mật khẩu?
                 </Link>
-=======
-                    className='w-4 h-4 rounded border-gray-300'
-=======
-                    className='w-4 h-4 rounded border-gray-300 cursor-pointer'
->>>>>>> feature/login
-                  />
-                  <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
-                    Ghi nhớ
-                  </label>
-                </div>
-                <Link
-                  href='forgot-password'
-                  className='flex text-sm hover:underline text-(--primary-700) cursor-pointer'
-                >
-                  Quên mật khẩu?
-<<<<<<< HEAD
-                </button>
->>>>>>> feature/login
-=======
-                </Link>
->>>>>>> feature/login
               </div>
 
               <button
@@ -242,32 +141,12 @@ export default function LoginPage() {
 
               <div className='text-center text-sm text-gray-600'>
                 Bạn chưa có tài khoản?{' '}
-<<<<<<< HEAD
-<<<<<<< HEAD
                 <Link
                   href='/register'
                   className='cursor-pointer font-semibold hover:underline text-(--primary-700)'
                 >
                   Đăng ký
                 </Link>
-=======
-                <button
-                  type='button'
-                  onClick={() => router.push('/register')}
-                  className='font-semibold hover:underline'
-                  style={{ color: primaryColor }}
-                >
-                  Đăng ký
-                </button>
->>>>>>> feature/login
-=======
-                <Link
-                  href='/register'
-                  className='cursor-pointer font-semibold hover:underline text-(--primary-700)'
-                >
-                  Đăng ký
-                </Link>
->>>>>>> feature/login
               </div>
             </form>
 

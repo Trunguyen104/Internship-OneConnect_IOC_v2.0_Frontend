@@ -104,26 +104,10 @@
     monospace;
 }
 
-/* @media (prefers-color-scheme: dark) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> feature/login
-    :root {
-      --background: #0a0a0a;
-      --foreground: #ededed;
-    }
-  } */
-<<<<<<< HEAD
-=======
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
->>>>>>> feature/header
-=======
->>>>>>> feature/login
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
 
 body {
   background: var(--background);
