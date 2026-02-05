@@ -6,18 +6,18 @@ import { usePathname } from 'next/navigation';
 import {
   AppstoreOutlined,
   BarChartOutlined,
-  CloudOutlined,
-  ShopOutlined,
   TeamOutlined,
+  VideoCameraOutlined,
   UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
+  ShopOutlined,
   ArrowLeftOutlined,
+  LockOutlined,
 } from '@ant-design/icons';
 
-const menuItems = [
+const studentMenu = [
   { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
-  { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/generalinfo' },
+  { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/general-info' },
   { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
   { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/report' },
   { icon: <UploadOutlined />, label: 'Đánh giá', href: '/evaluate' },
@@ -25,41 +25,42 @@ const menuItems = [
   { icon: <ShopOutlined />, label: 'Vi phạm', href: '/violation' },
 ];
 
+const profileMenu = [
+  { icon: <UserOutlined />, label: 'Thông tin cá nhân', href: '/student/profile' },
+  { icon: <LockOutlined />, label: 'Thay đổi mật khẩu', href: '/student/profile/change-password' },
+];
+
 export default function Sidebar() {
   const pathname = usePathname();
 
+  const isProfile = pathname.startsWith('/student/profile');
+  const menus = isProfile ? profileMenu : studentMenu;
+
   return (
-    <aside className='font-sidebar w-[15.1rem] h-screen bg-gray-50 border-r border-slate-200 sticky top-0 hidden md:flex flex-col'>
-      {/* Logo */}
-      <div className='flex items-center justify-center px-14 py-6'>
-        <Image
-          src='https://iocv2.rikkei.edu.vn/logo.svg'
-          alt='IOC Logo'
-          width={120}
-          height={40}
-          priority
-        />
+    <aside className='w-[15.1rem] h-screen bg-gray-50 border-r border-slate-200 sticky top-0 hidden md:flex flex-col'>
+      <div className='flex justify-center px-14 py-6'>
+        <Image src='https://iocv2.rikkei.edu.vn/logo.svg' alt='IOC Logo' width={120} height={40} />
       </div>
 
-      {/* Back */}
-      <div className='mx-4 mb-4 mt-3 flex items-center gap-2 text-xs font-black text-red-800 cursor-pointer'>
-        <ArrowLeftOutlined className='text-base' />
-        Trở lại trang trước
-      </div>
+      {isProfile && (
+        <Link
+          href='/student/space'
+          className='mx-4 mb-4 flex items-center gap-2 text-xs font-black text-red-800 cursor-pointer'
+        >
+          <ArrowLeftOutlined />
+          Quay lại
+        </Link>
+      )}
 
-      {/* Menu */}
       <nav className='flex-1 space-y-1'>
-        {menuItems.map((item) => {
+        {menus.map((item) => {
           const isActive = pathname === item.href;
 
           return (
             <Link key={item.href} href={item.href} className='block px-3'>
               <div
-                className={`
-                  flex items-center gap-3 px-4 py-2 text-sm font-semibold rounded-xl
-                  transition-colors
-                  ${isActive ? 'bg-[#FEF2F2] text-[#B91C1C]' : 'text-gray-900 hover:bg-blue-50'}
-                `}
+                className={`flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold
+                ${isActive ? 'bg-[#FEF2F2] text-[#B91C1C]' : 'hover:bg-blue-50'}`}
               >
                 <span className='text-lg'>{item.icon}</span>
                 {item.label}
