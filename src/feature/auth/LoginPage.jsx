@@ -15,6 +15,7 @@ export default function LoginPage() {
   const validate = () => {
     const newErrors = {};
 
+<<<<<<< HEAD
     if (!form.email.trim()) {
       newErrors.email = 'Email là bắt buộc';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
@@ -22,6 +23,15 @@ export default function LoginPage() {
     }
 
     if (!form.password.trim()) {
+=======
+    if (!email.trim()) {
+      newErrors.email = 'Email là bắt buộc';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = 'Invalid email format';
+    }
+
+    if (!password.trim()) {
+>>>>>>> feature/login
       newErrors.password = 'Mật khẩu là bắt buộc';
     }
 
@@ -74,6 +84,13 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className='space-y-4'>
               <div>
+<<<<<<< HEAD
+=======
+                <label className='block mb-2 text-sm font-medium text-gray-900'>
+                  Email <span className='text-red-500'>*</span>
+                </label>
+
+>>>>>>> feature/login
                 <div className='relative'>
                   <Input
                     label='Email'
@@ -82,6 +99,7 @@ export default function LoginPage() {
                     value={form.email}
                     onChange={handleChange}
                     placeholder='name@university.edu'
+<<<<<<< HEAD
                     error={errors.email}
                   />
 
@@ -92,15 +110,63 @@ export default function LoginPage() {
                     value={form.password}
                     onChange={handleChange}
                     error={errors.password}
+=======
+                    className={`
+                      w-full px-4 py-2 rounded-2xl
+                      bg-white text-gray-900 placeholder-gray-400
+                      border
+                      ${errors.email ? 'border-red-500' : 'border-gray-300'}
+                      focus:outline-none focus:ring-2
+                      ${errors.email ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
+                    `}
+                  />
+
+                  {errors.email && (
+                    <span
+                      className='absolute right-3 top-1/2 -translate-y-1/2
+                      text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
+                    >
+                      {errors.email}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <div className='flex justify-between mb-2'>
+                  <label className='text-sm font-medium text-gray-900'>
+                    Mật khẩu <span className='text-red-500'>*</span>
+                  </label>
+                </div>
+
+                <div className='relative'>
+                  <input
+                    type='password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`
+                      w-full px-4 py-2 rounded-2xl
+                      bg-white text-gray-900
+                      border
+                      ${errors.password ? 'border-red-500' : 'border-gray-300'}
+                      focus:outline-none focus:ring-2
+                      ${errors.password ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
+                    `}
+>>>>>>> feature/login
                   />
                 </div>
               </div>
 
+<<<<<<< HEAD
+=======
+              {/* REMEMBER */}
+>>>>>>> feature/login
               <div className='flex justify-between items-center'>
                 <div className='flex justify-content-center'>
                   <input
                     id='remember'
                     type='checkbox'
+<<<<<<< HEAD
                     className='w-4 h-4 rounded border-gray-300 cursor-pointer'
                   />
                   <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
@@ -113,6 +179,22 @@ export default function LoginPage() {
                 >
                   Quên mật khẩu?
                 </Link>
+=======
+                    className='w-4 h-4 rounded border-gray-300'
+                  />
+                  <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
+                    Remember this device
+                  </label>
+                </div>
+                <button
+                  type='button'
+                  onClick={() => router.push('/forgot-password')}
+                  className='flex text-sm hover:underline'
+                  style={{ color: primaryColor }}
+                >
+                  Quên mật khẩu?
+                </button>
+>>>>>>> feature/login
               </div>
 
               <button
@@ -124,12 +206,23 @@ export default function LoginPage() {
 
               <div className='text-center text-sm text-gray-600'>
                 Bạn chưa có tài khoản?{' '}
+<<<<<<< HEAD
                 <Link
                   href='/register'
                   className='cursor-pointer font-semibold hover:underline text-(--primary-700)'
                 >
                   Đăng ký
                 </Link>
+=======
+                <button
+                  type='button'
+                  onClick={() => router.push('/register')}
+                  className='font-semibold hover:underline'
+                  style={{ color: primaryColor }}
+                >
+                  Đăng ký
+                </button>
+>>>>>>> feature/login
               </div>
             </form>
 
