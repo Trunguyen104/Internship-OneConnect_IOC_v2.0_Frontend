@@ -2,35 +2,61 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Input from '@/shared/components/Input';
+import Link from 'next/link';
 
 export default function RegisterPage() {
-  const primaryColor = '#c53030';
-  const router = useRouter();
-
   const [role, setRole] = useState('student');
-  const [form, setForm] = useState({
+
+  const getInitialForm = (role) => ({
     email: '',
     password: '',
     confirmPassword: '',
-    fullName: '',
-    companyName: '',
+    fullName: role === 'student' ? '' : '',
+    companyName: role === 'enterprise' ? '' : '',
   });
+
+  const [form, setForm] = useState(getInitialForm('student'));
+
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors({});
   };
 
   const validate = () => {
     const newErrors = {};
-    if (role === 'student' && !form.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (role === 'enterprise' && !form.companyName.trim())
-      newErrors.companyName = 'Company name is required';
-    if (!form.email.trim()) newErrors.email = 'Email is required';
-    if (!form.password) newErrors.password = 'Password is required';
-    if (form.password !== form.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
+
+    if (role === 'student' && !form.fullName.trim()) {
+      newErrors.fullName = 'Họ và tên là bắt buộc';
+    }
+
+    if (role === 'enterprise' && !form.companyName.trim()) {
+      newErrors.companyName = 'Tên doanh nghiệp là bắt buộc';
+    }
+
+    if (!form.email.trim()) {
+      newErrors.email = 'Email là bắt buộc';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'Email không hợp lệ';
+    }
+
+    if (!form.password) {
+      newErrors.password = 'Mật khẩu là bắt buộc';
+    }
+
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
+    } else if (form.password !== form.confirmPassword) {
+      newErrors.confirmPassword = 'Mật khẩu không khớp';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -52,7 +78,6 @@ export default function RegisterPage() {
       }}
     >
       <div className='grid grid-cols-1 lg:grid-cols-2 w-full h-full'>
-        {/* LEFT */}
         <div className='flex items-center justify-center px-4 lg:pr-1'>
           <div className='w-full max-w-125'>
             <Image
@@ -60,26 +85,31 @@ export default function RegisterPage() {
               alt='IOC Logo'
               width={180}
               height={45}
-              className='block mx-auto mb-6'
+              className='block mx-auto mb-4 mt-2'
             />
 
-            <p className='text-center font-bold text-3xl text-black mb-5'>REGISTER</p>
+            <p className='text-center font-bold text-3xl text-black mb-2.5'>Đăng ký</p>
+            <p className='text-center text-gray-500 mb-4'>Tạo tài khoản của bạn để bắt đầu.</p>
 
-            <p className='text-center text-gray-500 mb-4'>Create your account to get started.</p>
-
-            {/* ROLE */}
-            <div className='flex justify-center gap-4 mb-6'>
-              {['student', 'enterprise'].map((r) => (
+            <div className='flex gap-4 mb-5'>
+              {[
+                { value: 'student', label: 'Sinh viên' },
+                { value: 'enterprise', label: 'Doanh nghiệp' },
+              ].map((r) => (
                 <button
-                  key={r}
+                  key={r.value}
                   type='button'
-                  onClick={() => setRole(r)}
-                  className={`px-4 py-1.5 rounded-full border text-sm font-medium ${
-                    role === r ? 'text-white' : 'text-gray-600 border-gray-300'
+                  onClick={() => {
+                    setRole(r.value);
+                    setForm(getInitialForm(r.value));
+                    setErrors({});
+                  }}
+                  className={`px-4 py-1.5 rounded-full border text-sm font-medium cursor-pointer ${
+                    role === r.value ? 'text-white' : 'text-gray-600 border-gray-300'
                   }`}
-                  style={role === r ? { backgroundColor: primaryColor } : {}}
+                  style={role === r.value ? { backgroundColor: 'var(--color-danger)' } : {}}
                 >
-                  {r === 'student' ? 'Student' : 'Enterprise'}
+                  {r.label}
                 </button>
               ))}
             </div>
@@ -87,18 +117,17 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit}>
               {role === 'student' && (
                 <Input
-                  label='Full Name'
+                  label='Họ và tên'
                   name='fullName'
                   value={form.fullName}
                   onChange={handleChange}
                   error={errors.fullName}
-                  className={'text-gray-900'}
                 />
               )}
 
               {role === 'enterprise' && (
                 <Input
-                  label='Company Name'
+                  label='Tên doanh nghiệp'
                   name='companyName'
                   value={form.companyName}
                   onChange={handleChange}
@@ -109,13 +138,14 @@ export default function RegisterPage() {
               <Input
                 label='Email'
                 name='email'
+                type='email'
                 value={form.email}
                 onChange={handleChange}
                 error={errors.email}
               />
 
               <Input
-                label='Password'
+                label='Mật khẩu'
                 type='password'
                 name='password'
                 value={form.password}
@@ -124,7 +154,7 @@ export default function RegisterPage() {
               />
 
               <Input
-                label='Confirm Password'
+                label='Xác nhận mật khẩu'
                 type='password'
                 name='confirmPassword'
                 value={form.confirmPassword}
@@ -134,37 +164,30 @@ export default function RegisterPage() {
 
               <button
                 type='submit'
-                className='w-full h-11 rounded-xl text-white font-semibold mt-4'
-                style={{ backgroundColor: primaryColor }}
+                className='w-full h-11 rounded-xl text-white font-semibold mt-3 bg-(--color-danger) hover:bg-(--color-primary-hover) cursor-pointer'
               >
-                Create Account
+                Tạo tài khoản
               </button>
 
               <div className='mt-4 text-center text-sm text-gray-600'>
-                Already have an account?{' '}
-                <button
-                  type='button'
-                  onClick={() => router.push('/login')}
-                  className='font-semibold hover:underline'
-                  style={{ color: primaryColor }}
+                Bạn đã có tài khoản?{' '}
+                <Link
+                  href='/login'
+                  className='font-semibold hover:underline text-(--primary-700) cursor-pointer'
                 >
-                  Login
-                </button>
+                  Đăng nhập
+                </Link>
               </div>
             </form>
 
             <div className='text-center text-gray-500 text-sm mt-4'>
-              © 2025 Internship OneConnect
+              © 2026 Internship OneConnect
             </div>
           </div>
         </div>
 
-        {/* RIGHT */}
         <div className='hidden lg:flex items-center justify-center p-8'>
-          <div
-            className='w-full max-w-175 h-full max-h-[90vh] rounded-4xl px-10 py-12 flex flex-col items-center justify-between shadow-xl'
-            style={{ backgroundColor: primaryColor }}
-          >
+          <div className='w-full max-w-175 h-full max-h-[90vh] rounded-4xl px-10 py-12 flex flex-col items-center justify-between shadow-xl bg-(--color-danger)'>
             <div className='text-center text-white'>
               <h2 className='text-4xl font-extrabold mb-4'>Internship OneConnect</h2>
               <p className='text-white/80 text-sm max-w-105 mx-auto'>
@@ -181,46 +204,6 @@ export default function RegisterPage() {
             />
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-/* INPUT */
-function Input({ label, error, ...props }) {
-  return (
-    <div className='mb-4'>
-      <label className='block mb-2 text-sm font-medium text-gray-900'>
-        {label} <span className='text-red-500'>*</span>
-      </label>
-
-      <div className='relative'>
-        <input
-          {...props}
-          className={`
-            w-full px-4 py-2 rounded-xl
-            bg-white
-            text-gray-900
-            placeholder-gray-400
-            border
-            ${error ? 'border-red-500' : 'border-gray-300'}
-            focus:outline-none focus:ring-2
-            ${error ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
-          `}
-        />
-
-        {/* ERROR INLINE */}
-        {error && (
-          <span
-            className='
-              absolute right-3 top-1/2 -translate-y-1/2
-              text-xs text-red-600
-              bg-red-50 px-2 py-0.5 rounded-md
-            '
-          >
-            {error}
-          </span>
-        )}
       </div>
     </div>
   );

@@ -1,34 +1,49 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Input from '@/shared/components/Input';
 
 export default function ForgotPasswordPage() {
-  const primaryColor = '#c53030';
-  const router = useRouter();
+  const [form, setForm] = useState({
+    email: '',
+  });
 
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // ✅ xoá TẤT CẢ lỗi khi nhập lại (giống Login / Register)
+    setErrors({});
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!form.email.trim()) {
+      newErrors.email = 'Email là bắt buộc';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'Email không hợp lệ';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!email.trim()) {
-      setError('Email is required');
-      return;
+    if (validate()) {
+      setSuccess(true);
     }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Invalid email format');
-      return;
-    }
-
-    setError('');
-    setSuccess(true);
-
-    // TODO: call API forgot password
   };
 
   return (
@@ -48,76 +63,40 @@ export default function ForgotPasswordPage() {
           className='mx-auto mb-6'
         />
 
-        <h1 className='text-center text-black font-bold text-4xl mb-4'>Forgot Password</h1>
-
-        <p className='text-center text-gray-500 mb-6'>
-          Enter your email and we’ll send you a reset link.
-        </p>
+        <h1 className='text-center text-black font-bold text-4xl mb-4'>Quên mật khẩu</h1>
+        <p className='text-center text-gray-500 mb-6'>Nhập email xác thực của bạn</p>
 
         {success ? (
           <div className='text-center'>
-            <p className='text-green-600 mb-4'>Reset link has been sent to your email.</p>
+            <p className='text-green-600 mb-4'>Đã gửi link đặt lại mật khẩu</p>
 
-            <button
-              onClick={() => router.push('/login')}
-              className='font-semibold hover:underline'
-              style={{ color: primaryColor }}
-            >
-              Back to Login
-            </button>
+            <Link href='/login' className='font-semibold hover:underline text-(--primary-700)'>
+              Quay lại đăng nhập
+            </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* EMAIL */}
-            <div>
-              <label className='block mb-2 text-sm font-medium text-gray-900'>
-                Email address <span className='text-red-500'>*</span>
-              </label>
-
-              <div className='relative'>
-                <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder='name@university.edu'
-                  className={`
-                    w-full px-4 py-2 rounded-xl
-                    bg-white text-gray-900 placeholder-gray-400
-                    border
-                    ${error ? 'border-red-500' : 'border-gray-300'}
-                    focus:outline-none focus:ring-2
-                    ${error ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
-                  `}
-                />
-
-                {error && (
-                  <span
-                    className='absolute right-3 top-1/2 -translate-y-1/2
-                    text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
-                  >
-                    {error}
-                  </span>
-                )}
-              </div>
-            </div>
+          <form onSubmit={handleSubmit}>
+            <Input
+              label='Email'
+              name='email'
+              type='email'
+              value={form.email}
+              onChange={handleChange}
+              placeholder='name@university.edu'
+              error={errors.email}
+            />
 
             <button
               type='submit'
-              className='w-full h-11 rounded-xl text-white font-semibold'
-              style={{ backgroundColor: primaryColor }}
+              className='w-full h-11 rounded-xl text-white font-semibold mt-2 bg-(--color-danger) hover:bg-(--color-primary-hover) cursor-pointer'
             >
-              Send Reset Link
+              Gửi yêu cầu đặt lại
             </button>
 
-            <div className='text-center text-sm'>
-              <button
-                type='button'
-                onClick={() => router.push('/login')}
-                className='hover:underline font-medium'
-                style={{ color: primaryColor }}
-              >
-                Back to Login
-              </button>
+            <div className='text-center text-sm mt-4'>
+              <Link href='/login' className='hover:underline font-medium text-(--primary-700)'>
+                Quay lại đăng nhập
+              </Link>
             </div>
           </form>
         )}
