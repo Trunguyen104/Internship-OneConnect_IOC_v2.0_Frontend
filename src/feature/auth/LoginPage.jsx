@@ -1,27 +1,28 @@
 'use client';
 import Image from 'next/image';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Input from '@/shared/components/Input';
+import Link from 'next/link';
 
 export default function LoginPage() {
-  const primaryColor = '#c53030';
-  const router = useRouter();
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+  });
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
 
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = 'Invalid email format';
+    if (!form.email.trim()) {
+      newErrors.email = 'Email là bắt buộc';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'Email không hợp lệ';
     }
 
-    if (!password.trim()) {
-      newErrors.password = 'Password is required';
+    if (!form.password.trim()) {
+      newErrors.password = 'Mật khẩu là bắt buộc';
     }
 
     setErrors(newErrors);
@@ -33,6 +34,17 @@ export default function LoginPage() {
     if (validate()) {
       console.log('Login success:', { email, password });
     }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors({});
   };
 
   return (
@@ -55,135 +67,86 @@ export default function LoginPage() {
               className='block mx-auto mb-8'
             />
 
-            <p className='text-center font-bold text-5xl text-black mb-6'>LOGIN</p>
-            <p className='text-center text-gray-500 mb-6'>Please enter your details to sign in.</p>
+            <p className='text-center font-bold text-4xl text-black mb-4'>Đăng nhập</p>
+            <p className='text-center text-gray-500 mb-8'>
+              Chào mừng quay trở lại! Hãy nhập thông tin đăng nhập của bạn
+            </p>
 
             <form onSubmit={handleSubmit} className='space-y-4'>
-              {/* EMAIL */}
               <div>
-                <label className='block mb-2 text-sm font-medium text-gray-900'>
-                  Email address <span className='text-red-500'>*</span>
-                </label>
-
                 <div className='relative'>
-                  <input
+                  <Input
+                    label='Email'
+                    name='email'
                     type='email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={form.email}
+                    onChange={handleChange}
                     placeholder='name@university.edu'
-                    className={`
-                      w-full px-4 py-2 rounded-xl
-                      bg-white text-gray-900 placeholder-gray-400
-                      border
-                      ${errors.email ? 'border-red-500' : 'border-gray-300'}
-                      focus:outline-none focus:ring-2
-                      ${errors.email ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
-                    `}
+                    error={errors.email}
                   />
 
-                  {errors.email && (
-                    <span
-                      className='absolute right-3 top-1/2 -translate-y-1/2
-                      text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
-                    >
-                      {errors.email}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* PASSWORD */}
-              <div>
-                <div className='flex justify-between mb-2'>
-                  <label className='text-sm font-medium text-gray-900'>
-                    Password <span className='text-red-500'>*</span>
-                  </label>
-
-                  <button
-                    type='button'
-                    onClick={() => router.push('/forgot-password')}
-                    className='text-sm hover:underline'
-                    style={{ color: primaryColor }}
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-
-                <div className='relative'>
-                  <input
+                  <Input
+                    label='Mật khẩu'
+                    name='password'
                     type='password'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`
-                      w-full px-4 py-2 rounded-xl
-                      bg-white text-gray-900
-                      border
-                      ${errors.password ? 'border-red-500' : 'border-gray-300'}
-                      focus:outline-none focus:ring-2
-                      ${errors.password ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
-                    `}
+                    value={form.password}
+                    onChange={handleChange}
+                    error={errors.password}
                   />
-
-                  {errors.password && (
-                    <span
-                      className='absolute right-3 top-1/2 -translate-y-1/2
-                      text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
-                    >
-                      {errors.password}
-                    </span>
-                  )}
                 </div>
               </div>
 
-              {/* REMEMBER */}
-              <div className='flex items-center'>
-                <input id='remember' type='checkbox' className='w-4 h-4 rounded border-gray-300' />
-                <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
-                  Remember this device
-                </label>
+              <div className='flex justify-between items-center'>
+                <div className='flex justify-content-center'>
+                  <input
+                    id='remember'
+                    type='checkbox'
+                    className='w-4 h-4 rounded border-gray-300 cursor-pointer'
+                  />
+                  <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
+                    Ghi nhớ
+                  </label>
+                </div>
+                <Link
+                  href='forgot-password'
+                  className='flex text-sm hover:underline text-(--primary-700) cursor-pointer'
+                >
+                  Quên mật khẩu?
+                </Link>
               </div>
 
-              {/* BUTTON */}
               <button
                 type='submit'
-                className='w-full h-11 rounded-xl text-white font-semibold'
-                style={{ backgroundColor: primaryColor }}
+                className='cursor-pointer w-full h-11 rounded-xl text-white font-semibold  bg-(--color-danger) hover:bg-(--color-primary-hover)'
               >
-                Sign In
+                Đăng nhập
               </button>
 
               <div className='text-center text-sm text-gray-600'>
-                Don’t have an account?{' '}
-                <button
-                  type='button'
-                  onClick={() => router.push('/register')}
-                  className='font-semibold hover:underline'
-                  style={{ color: primaryColor }}
+                Bạn chưa có tài khoản?{' '}
+                <Link
+                  href='/register'
+                  className='cursor-pointer font-semibold hover:underline text-(--primary-700)'
                 >
-                  Register
-                </button>
+                  Đăng ký
+                </Link>
               </div>
             </form>
 
             <div className='text-center text-gray-500 text-sm mt-4'>
-              © 2025 Internship OneConnect
+              © 2026 Internship OneConnect
             </div>
           </div>
         </div>
 
         {/* RIGHT */}
         <div className='hidden lg:flex items-center justify-center p-8'>
-          <div
-            className='w-full max-w-175 h-full max-h-[90vh]
-              rounded-4xl px-10 py-12
-              flex flex-col items-center justify-between
-              shadow-xl'
-            style={{ backgroundColor: primaryColor }}
-          >
+          <div className='w-full max-w-175 h-full max-h-[90vh] rounded-4xl px-10 py-12 flex flex-col items-center justify-between shadow-xl bg-(--color-danger)'>
             <div className='text-center text-white'>
               <h2 className='text-4xl font-extrabold mb-4'>Internship OneConnect</h2>
               <p className='text-white/80 text-sm max-w-105 mx-auto'>
-                Join an internship program to learn from experts, hone practical skills.
+                Tham gia chương trình thực tập để học hỏi từ các chuyên gia, rèn luyện kỹ năng thực
+                tế và chuẩn bị vững vàng cho sự nghiệp tương lai.
               </p>
             </div>
 
