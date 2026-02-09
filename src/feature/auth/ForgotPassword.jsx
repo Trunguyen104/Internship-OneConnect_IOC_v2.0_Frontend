@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
 
             <button
               type='submit'
-              className='w-full h-11 rounded-xl text-white font-semibold mt-2 bg-(--color-danger) hover:bg-(--color-primary-hover) cursor-pointer'
+              className='w-full h-11 rounded-xl text-white font-semibold mt-2 bg-(--color-primary) hover:bg-(--color-primary-hover) cursor-pointer'
             >
               Gửi yêu cầu đặt lại
             </button>

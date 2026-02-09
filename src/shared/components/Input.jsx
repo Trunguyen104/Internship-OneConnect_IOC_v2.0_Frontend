@@ -1,6 +1,12 @@
 'use client';
 
-export default function Input({ label, error, className = '', ...props }) {
+import { useState } from 'react';
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+
+export default function Input({ label, error, className = '', type, showToggle = true, ...props }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === 'password' && showToggle;
+
   return (
     <div className='mb-4'>
       <label className='block mb-2 text-sm font-medium text-gray-900'>
@@ -10,25 +16,28 @@ export default function Input({ label, error, className = '', ...props }) {
       <div className='relative'>
         <input
           {...props}
+          type={isPassword && showPassword ? 'text' : type}
           className={`
             w-full px-4 py-2 rounded-2xl
-            bg-white text-gray-900 placeholder-gray-400
-            border cursor-text
+            bg-white text-gray-900
+            border
             ${error ? 'border-red-500' : 'border-gray-300'}
-            focus:outline-none focus:ring-2
-            ${error ? 'focus:ring-red-400' : 'focus:ring-blue-400'}
+            ${isPassword ? 'pr-10' : ''}
             ${className}
           `}
         />
 
-        {error && (
-          <span
-            className='absolute right-3 top-1/2 -translate-y-1/2
-            text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-md'
+        {isPassword && (
+          <button
+            type='button'
+            onClick={() => setShowPassword(!showPassword)}
+            className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500'
           >
-            {error}
-          </span>
+            {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          </button>
         )}
+
+        {error && <span className='text-xs text-red-600 mt-1 block'>{error}</span>}
       </div>
     </div>
   );
