@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Input from '@/shared/components/Input';
 import { login } from '@/services/authService';
 import { setAccessToken } from '@/services/authStorage';
@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({
     email: '',
     password: '',
+    rememberMe: false,
   });
 
   const router = useRouter();
@@ -43,16 +44,24 @@ export default function LoginPage() {
 
     try {
       const token = await login(form);
-      setAccessToken(token);
-      toast.success('Đăng nhập thành công');
 
+      if (form.rememberMe) {
+        localStorage.setItem('rememberEmail', form.email);
+        localStorage.setItem('rememberPassword', form.password);
+      } else {
+        localStorage.removeItem('rememberEmail');
+        localStorage.removeItem('rememberPassword');
+      }
+
+      setAccessToken(token, form.rememberMe);
+
+      toast.success('Đăng nhập thành công');
       router.push('/student/space');
     } catch (err) {
       setErrors({ password: err.message });
       toast.error('Đăng nhập thất bại');
     }
   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -63,7 +72,19 @@ export default function LoginPage() {
 
     setErrors({});
   };
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberEmail');
+    const savedPassword = localStorage.getItem('rememberPassword');
 
+    if (savedEmail && savedPassword) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm({
+        email: savedEmail,
+        password: savedPassword,
+        rememberMe: true,
+      });
+    }
+  }, []);
   return (
     <div
       className='w-full h-screen overflow-hidden'
@@ -113,7 +134,21 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className='flex justify-end items-center'>
+              <div className='flex justify-between items-center'>
+                <label className='flex items-center gap-2 text-sm cursor-pointer'>
+                  <input
+                    type='checkbox'
+                    name='rememberMe'
+                    checked={form.rememberMe}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        rememberMe: e.target.checked,
+                      }))
+                    }
+                  />
+                  Ghi nhớ đăng nhập
+                </label>
                 <Link
                   href='forgot-password'
                   className='flex text-sm hover:underline text-(--primary-700) cursor-pointer'
