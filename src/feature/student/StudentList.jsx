@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Card from '@/shared/components/Card';
 import { getStudentList } from '@/mocks/mockStudentList';
+import SearchBar from '@/shared/components/SearchBar';
 
 export default function StudentList() {
   const [students, setStudents] = useState([]);
@@ -26,57 +27,46 @@ export default function StudentList() {
       <h1 className='text-2xl font-bold text-slate-900'>Sinh viên</h1>
 
       <Card>
-        {/* Search */}
-        <div className='p-6 pb-4'>
-          <div className='relative w-70'>
-            <input
-              type='text'
-              placeholder='Tìm kiếm theo tên'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className='w-full rounded-full bg-white py-2 pl-3 pr-4 border border-slate-300 text-sm text-slate-700 placeholder:text-slate-400
-              focus:border-primary focus:ring-2 focus:ring-primary/20'
-            />
-          </div>
-        </div>
+        <SearchBar placeholder='Tìm kiếm theo tên' value={search} onChange={setSearch} />
 
-        {/* Table */}
-        <div className='overflow-x-auto'>
-          <table className='w-full text-left'>
-            <thead className='border-b border-slate-300 text-xs text-slate-400'>
-              <tr>
-                <th className='px-5 py-3'>STT</th>
-                <th className='px-4 py-3'>Avatar</th>
-                <th className='px-1 py-3'>Họ và tên</th>
-                <th className='px-6 py-4'>Email</th>
-                <th className='px-6 py-4'>Ngày sinh</th>
-                <th className='px-6 py-4'>Giới tính</th>
-              </tr>
-            </thead>
-
-            <tbody className='divide-y divide-slate-300 text-gray-800'>
-              {filteredStudents.map((s, i) => (
-                <tr key={s.id}>
-                  <td className='px-7 py-4 text-sm font-medium'>{i + 1}</td>
-                  <td className='px-4 py-4'>
-                    <Avatar name={s.name} />
-                  </td>
-                  <td className='px-1 py-4 text-sm font-medium'>{s.name}</td>
-                  <td className='px-6 py-4 text-sm text-slate-500'>{s.email}</td>
-                  <td className='px-6 py-4 text-sm'>{formatDate(s.dob)}</td>
-                  <td className='px-6 py-4 text-sm'>{s.gender}</td>
-                </tr>
-              ))}
-
-              {filteredStudents.length === 0 && (
+        <div className='overflow-x-auto mt-5'>
+          <div className='max-h-96'>
+            <table className='w-full text-left'>
+              <thead className='border-b border-slate-300 text-xs text-slate-400'>
                 <tr>
-                  <td colSpan={6} className='px-6 py-6 text-center text-sm text-slate-400'>
-                    Không tìm thấy sinh viên
-                  </td>
+                  <th className='px-5 py-3'>STT</th>
+                  <th className='px-4 py-3'>Avatar</th>
+                  <th className='px-1 py-3'>Họ và tên</th>
+                  <th className='px-6 py-4'>Email</th>
+                  <th className='px-6 py-4'>Ngày sinh</th>
+                  <th className='px-6 py-4'>Giới tính</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody className='divide-y divide-slate-300 text-gray-800'>
+                {filteredStudents.map((s, i) => (
+                  <tr key={s.id}>
+                    <td className='px-7 py-4 text-sm font-medium'>{i + 1}</td>
+                    <td className='px-4 py-4'>
+                      <Avatar name={s.name} />
+                    </td>
+                    <td className='px-1 py-4 text-sm font-medium'>{s.name}</td>
+                    <td className='px-6 py-4 text-sm text-slate-500'>{s.email}</td>
+                    <td className='px-6 py-4 text-sm'>{formatDate(s.dob)}</td>
+                    <td className='px-6 py-4 text-sm'>{s.gender}</td>
+                  </tr>
+                ))}
+
+                {filteredStudents.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className='px-6 py-6 text-center text-sm text-slate-400'>
+                      Không tìm thấy sinh viên
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </Card>
     </section>

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import SearchBar from '@/shared/components/SearchBar';
 import Card from '@/shared/components/Card';
-import { SearchOutlined, FilterOutlined, PlusOutlined } from '@ant-design/icons';
 
-/* ===== DATA MẪU CHO TAB VẤN ĐỀ ===== */
 const ISSUE_DATA = [
   {
     id: 1,
@@ -23,11 +23,16 @@ const ISSUE_DATA = [
 ];
 
 export default function StakeholderPage() {
-  const [tab, setTab] = useState('stakeholder'); // stakeholder | issue
+  const [tab, setTab] = useState('stakeholder');
+  const [search, setSearch] = useState('');
 
+  const filteredIssueData = ISSUE_DATA.filter(
+    (i) =>
+      i.title.toLowerCase().includes(search.toLowerCase()) ||
+      i.stakeholder.toLowerCase().includes(search.toLowerCase()),
+  );
   return (
     <section className='space-y-6'>
-      {/* ===== Tabs ===== */}
       <div className='flex items-center gap-3'>
         <button
           onClick={() => setTab('stakeholder')}
@@ -54,45 +59,27 @@ export default function StakeholderPage() {
         </button>
       </div>
 
-      {/* ===== CARD ===== */}
       <Card>
-        {/* ===== SEARCH + ACTION ===== */}
-        <div className='flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between'>
-          <div className='flex items-center gap-3'>
-            <div className='relative w-72'>
-              <input
-                placeholder='Tìm kiếm theo tên'
-                className='w-full rounded-full border border-slate-300 bg-white py-2 pl-4 pr-10
-                text-sm focus:border-primary focus:ring-2 focus:ring-primary/20'
-              />
-              <SearchOutlined className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400' />
+        <div>
+          <div className='flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between'>
+            <SearchBar
+              placeholder='Tìm kiếm theo tên'
+              value={search}
+              onChange={setSearch}
+              showFilter
+              showAction
+              actionLabel={tab === 'issue' ? 'Thêm vấn đề' : 'Thêm bên liên quan'}
+              actionIcon={<PlusOutlined />}
+            />
+          </div>
+
+          {tab === 'stakeholder' && (
+            <div className='px-6 pb-10 pt-4'>
+              <p className='text-sm text-slate-500'>Chưa có bên liên quan nào.</p>
             </div>
-
-            <button className='flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100'>
-              <FilterOutlined />
-              Bộ lọc
-            </button>
-          </div>
-
-          {/* ===== ACTION BUTTON ===== */}
-          {tab === 'issue' && (
-            <button className='flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700'>
-              Thêm vấn đề
-              <PlusOutlined />
-            </button>
           )}
-        </div>
 
-        {/* ===== CONTENT ===== */}
-        {tab === 'stakeholder' && (
-          <div className='px-6 pb-10 pt-4'>
-            <p className='text-sm text-slate-500'>Chưa có bên liên quan nào.</p>
-          </div>
-        )}
-
-        {tab === 'issue' && (
-          <>
-            {/* ===== TABLE ===== */}
+          {tab === 'issue' && (
             <div className='overflow-x-auto'>
               <table className='w-full text-left'>
                 <thead className='border-b border-slate-200 text-xs text-slate-400'>
@@ -105,7 +92,7 @@ export default function StakeholderPage() {
                 </thead>
 
                 <tbody className='divide-y divide-slate-200 text-sm text-slate-800'>
-                  {ISSUE_DATA.map((i) => (
+                  {filteredIssueData.map((i) => (
                     <tr key={i.id}>
                       <td className='px-6 py-4 font-medium'>{i.title}</td>
                       <td className='px-6 py-4'>{i.stakeholder}</td>
@@ -127,22 +114,8 @@ export default function StakeholderPage() {
                 </tbody>
               </table>
             </div>
-
-            {/* ===== FOOTER ===== */}
-            <div className='flex items-center justify-between border-t border-slate-200 px-6 py-4'>
-              <p className='text-sm text-slate-500'>
-                Tổng số bản ghi:{' '}
-                <span className='font-medium text-slate-900'>{ISSUE_DATA.length}</span>
-              </p>
-
-              <div className='flex items-center gap-2'>
-                <button className='rounded-lg border px-3 py-1 text-sm text-slate-500'>‹</button>
-                <button className='rounded-lg bg-primary px-3 py-1 text-sm text-white'>1</button>
-                <button className='rounded-lg border px-3 py-1 text-sm text-slate-500'>›</button>
-              </div>
-            </div>
-          </>
-        )}
+          )}
+        </div>
       </Card>
     </section>
   );

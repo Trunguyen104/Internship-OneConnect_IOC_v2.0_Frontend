@@ -1,12 +1,38 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Card from '@/shared/components/Card';
 import { getViolationList } from '@/mocks/mockViolationList';
+import SearchBar from '@/shared/components/SearchBar';
+import { PlusOutlined } from '@ant-design/icons';
+import Footer from '@/shared/components/Footer';
 
 export default function ViolationList() {
   const [violations, setViolations] = useState([]);
   const [search, setSearch] = useState('');
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const tableRef = useRef(null);
+
+  useEffect(() => {
+    tableRef.current?.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }, [page, pageSize]);
+
+  const filteredViolations = violations.filter(
+    (v) =>
+      v.type.toLowerCase().includes(search.toLowerCase()) ||
+      v.description.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const total = filteredViolations.length;
+  const totalPages = Math.ceil(total / pageSize);
+
+  const paginatedViolations = filteredViolations.slice((page - 1) * pageSize, page * pageSize);
 
   useEffect(() => {
     async function fetchViolations() {
@@ -16,36 +42,20 @@ export default function ViolationList() {
     fetchViolations();
   }, []);
 
-  const filteredViolations = violations.filter(
-    (v) =>
-      v.type.toLowerCase().includes(search.toLowerCase()) ||
-      v.description.toLowerCase().includes(search.toLowerCase()),
-  );
-
   return (
-    <section className='space-y-6'>
+    <section className='flex flex-col h-full space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Vi phạm</h1>
-
       <Card>
-        {/* Search */}
-        <div className='p-6 pb-4'>
-          <div className='relative w-70'>
-            <input
-              type='text'
-              placeholder='Tìm kiếm theo loại hoặc mô tả'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className='w-full rounded-full bg-white py-2 pl-4 pr-4
-              border border-slate-300 text-sm text-slate-700
-              placeholder:text-slate-400
-              focus:border-primary focus:ring-2 focus:ring-primary/20'
-            />
-          </div>
-        </div>
+        <SearchBar
+          placeholder='Tìm kiếm'
+          value={search}
+          onChange={setSearch}
+          showFilter
+          actionIcon={<PlusOutlined />}
+        />
 
-        {/* Table */}
-        <div className='overflow-x-auto'>
-          <table className='w-full text-left'>
+        <div className='overflow-x-auto' ref={tableRef}>
+          <table className='w-full text-left mt-5'>
             <thead className='border-b border-slate-300 text-xs text-slate-400'>
               <tr>
                 <th className='px-6 py-4'>STT</th>
@@ -58,7 +68,7 @@ export default function ViolationList() {
             </thead>
 
             <tbody className='divide-y divide-slate-300 text-gray-800'>
-              {filteredViolations.map((v, i) => (
+              {paginatedViolations.map((v, i) => (
                 <tr key={v.id}>
                   <td className='px-6 py-4 text-sm font-medium'>{i + 1}</td>
                   <td className='px-6 py-4 text-sm font-medium'>{v.type}</td>
@@ -80,11 +90,22 @@ export default function ViolationList() {
           </table>
         </div>
       </Card>
+
+      <Footer
+        total={total}
+        page={page}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
+      />
     </section>
   );
 }
 
-/* Utils */
 function formatDate(date) {
   if (!date) return '-';
   return new Date(`${date}T00:00:00`).toLocaleDateString('vi-VN');

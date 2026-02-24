@@ -1,4 +1,10 @@
+'use client';
+
 import Card from '@/shared/components/Card';
+import SearchBar from '@/shared/components/SearchBar';
+import { useState, useEffect, useRef } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
+import Footer from '@/shared/components/Footer';
 
 const DATA = [
   {
@@ -21,30 +27,187 @@ const DATA = [
     time: '3h',
     submitStatus: 'Chưa nộp',
   },
+  {
+    id: 3,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 4,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 5,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 6,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 7,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 8,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 9,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 10,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 11,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 12,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 13,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 14,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 15,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
+  {
+    id: 16,
+    date: '29/01/2026',
+    student: 'Lê Duy Khánh',
+    status: 'Đang làm',
+    summary: 'Hoàn thiện giao diện báo cáo',
+    issue: 'Fix layout table',
+    time: '2h',
+    submitStatus: 'Đã nộp',
+  },
 ];
 
 export default function DailyReport() {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const filteredData = DATA.filter((r) => r.student.toLowerCase().includes(search.toLowerCase()));
+
+  const total = filteredData.length;
+  const totalPages = Math.ceil(total / pageSize);
+
+  const paginatedData = filteredData.slice((page - 1) * pageSize, page * pageSize);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(1);
+  }, [search]);
+
+  const tableBodyRef = useRef(null);
+
+  useEffect(() => {
+    tableBodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [page, pageSize]);
+
   return (
     <section className='space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Báo cáo hằng ngày</h1>
 
       <Card>
-        {/* Search */}
-        <div className='p-6 pb-4'>
-          <div className='relative w-80'>
-            <input
-              type='text'
-              placeholder='Tìm theo tên sinh viên'
-              className='w-full rounded-full bg-white py-2 pl-3 pr-4
-              border border-slate-300 text-sm text-slate-700
-              placeholder:text-slate-400
-              focus:border-primary focus:ring-2 focus:ring-primary/20'
-            />
-          </div>
+        <div className='mb-5 flex items-center'>
+          <SearchBar
+            placeholder='Tìm kiếm theo tên'
+            value={search}
+            onChange={setSearch}
+            showFilter
+            showAction
+            actionLabel='Tạo báo cáo'
+            actionIcon={<PlusOutlined />}
+          />
         </div>
 
-        {/* Table */}
-        <div className='overflow-x-auto'>
+        <div className='max-h-96 overflow-auto' ref={tableBodyRef}>
           <table className='w-full text-left'>
             <thead className='border-b border-slate-300 text-xs text-slate-400'>
               <tr>
@@ -59,7 +222,7 @@ export default function DailyReport() {
             </thead>
 
             <tbody className='divide-y divide-slate-300 text-slate-800'>
-              {DATA.map((r) => (
+              {paginatedData.map((r) => (
                 <tr key={r.id}>
                   <td className='px-6 py-4 text-sm'>{r.date}</td>
                   <td className='px-6 py-4 text-sm font-medium'>{r.student}</td>
@@ -84,34 +247,28 @@ export default function DailyReport() {
                   </td>
                 </tr>
               ))}
+              {filteredData.length === 0 && (
+                <tr>
+                  <td colSpan={7} className='px-6 py-6 text-center text-sm text-slate-400'>
+                    Không tìm thấy báo cáo
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-
-        {/* Footer: total + pagination */}
-        <div className='flex items-center justify-between border-t border-slate-200 px-6 py-4'>
-          {/* Total */}
-          <p className='text-sm text-slate-500'>
-            Tổng số bản ghi: <span className='font-medium text-slate-900'>2</span>
-          </p>
-
-          {/* Pagination */}
-          <div className='flex items-center gap-1'>
-            <button className='rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-500'>
-              «
-            </button>
-            <button className='rounded-lg bg-primary px-3 py-1 text-sm font-medium text-white'>
-              1
-            </button>
-            <button className='rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700'>
-              2
-            </button>
-            <button className='rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-500'>
-              »
-            </button>
-          </div>
-        </div>
       </Card>
+      <Footer
+        total={total}
+        page={page}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
+      />
     </section>
   );
 }
