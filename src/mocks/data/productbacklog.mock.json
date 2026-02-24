@@ -1,0 +1,146 @@
+{
+  "epics": [
+    {
+      "id": "epic-1",
+      "name": "Onboarding & Account",
+      "description": "Luồng đăng nhập/đăng ký, quên mật khẩu, phân quyền",
+      "owner": { "name": "Nguyen", "avatar": "/images/avatar.png" }
+    },
+    {
+      "id": "epic-2",
+      "name": "Space Overview",
+      "description": "Tóm tắt, dashboard, burndown, export",
+      "owner": { "name": "Nguyen", "avatar": "/images/avatar.png" }
+    },
+    {
+      "id": "epic-3",
+      "name": "Backlog Management",
+      "description": "Sprint Backlog, Product Backlog, Board",
+      "owner": { "name": "Nguyen", "avatar": "/images/avatar.png" }
+    }
+  ],
+  "items": [
+    {
+      "id": "pb-1",
+      "key": "ISSUE-34",
+      "epicId": "epic-3",
+      "title": "Quản lý Product Backlog",
+      "description": "Là Student, tôi muốn quản lý Product Backlog và Sprint Backlog.",
+      "status": "TODO",
+      "priority": "HIGH",
+      "assignees": [{ "name": "Nguyen", "avatar": "/images/avatar.png" }],
+      "points": 5,
+      "comments": []
+    },
+    {
+      "id": "pb-2",
+      "key": "ISSUE-36",
+      "epicId": "epic-3",
+      "title": "Xem danh sách chi tiết thành viên",
+      "description": "Là Student, tôi muốn xem danh sách chi tiết các thành viên.",
+      "status": "IN_REVIEW",
+      "priority": "HIGH",
+      "assignees": [{ "name": "Linh", "avatar": "/images/avatar.png" }],
+      "points": 2,
+      "comments": [
+        { "id": "c1", "author": "Nguyen", "content": "In review", "createdAt": "2 days ago" }
+      ]
+    },
+    {
+      "id": "pb-3",
+      "key": "ISSUE-13",
+      "epicId": "epic-1",
+      "title": "Đăng nhập hệ thống",
+      "description": "Là người dùng, tôi muốn đăng nhập để truy cập hệ thống.",
+      "status": "IN_REVIEW",
+      "priority": "MEDIUM",
+      "assignees": [{ "name": "Nguyen", "avatar": "/images/avatar.png" }],
+      "points": 3,
+      "comments": []
+    },
+    {
+      "id": "pb-4",
+      "key": "ISSUE-37",
+      "epicId": "epic-3",
+      "title": "Quản lý danh sách Bên liên quan",
+      "description": "Là Student, tôi muốn quản lý danh sách các Bên liên quan.",
+      "status": "IN_REVIEW",
+      "priority": "MEDIUM",
+      "assignees": [{ "name": "Thanh", "avatar": "/images/avatar.png" }],
+      "points": 2,
+      "comments": []
+    },
+    {
+      "id": "pb-5",
+      "key": "ISSUE-39",
+      "epicId": "epic-3",
+      "title": "Quản lý Báo cáo định kỳ",
+      "description": "Là Student, tôi muốn tạo, sửa, xem báo cáo định kỳ.",
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assignees": [{ "name": "Nam", "avatar": "/images/avatar.png" }],
+      "points": 2,
+      "comments": []
+    },
+    {
+      "id": "pb-6",
+      "key": "ISSUE-41",
+      "epicId": "epic-2",
+      "title": "Xem thông tin đợt đánh giá",
+      "description": "Là Student, tôi muốn xem thông tin các đợt đánh giá từ Mentor.",
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assignees": [{ "name": "Trang", "avatar": "/images/avatar.png" }],
+      "points": 3,
+      "comments": []
+    },
+    {
+      "id": "pb-7",
+      "key": "ISSUE-38",
+      "epicId": "epic-3",
+      "title": "Quản lý danh sách vi phạm",
+      "description": "Là Student, tôi muốn quản lý danh sách các vấn đề vi phạm.",
+      "status": "IN_PROGRESS",
+      "priority": "MEDIUM",
+      "assignees": [{ "name": "Thanh", "avatar": "/images/avatar.png" }],
+      "points": 2,
+      "comments": []
+    },
+    {
+      "id": "pb-8",
+      "key": "ISSUE-30",
+      "epicId": "epic-2",
+      "title": "Xem chi tiết dự án",
+      "description": "Là Student, tôi muốn xem thông tin chi tiết dự án.",
+      "status": "IN_PROGRESS",
+      "priority": "HIGH",
+      "assignees": [{ "name": "Nguyen", "avatar": "/images/avatar.png" }],
+      "points": 2,
+      "comments": []
+    },
+    {
+      "id": "pb-9",
+      "key": "ISSUE-45",
+      "epicId": "epic-1",
+      "title": "Quên mật khẩu",
+      "description": "Cho phép người dùng khôi phục mật khẩu.",
+      "status": "DONE",
+      "priority": "LOW",
+      "assignees": [{ "name": "Linh", "avatar": "/images/avatar.png" }],
+      "points": 1,
+      "comments": []
+    },
+    {
+      "id": "pb-10",
+      "key": "ISSUE-48",
+      "epicId": "epic-2",
+      "title": "Dashboard tổng quan",
+      "description": "Hiển thị biểu đồ burndown và thống kê tiến độ.",
+      "status": "DONE",
+      "priority": "MEDIUM",
+      "assignees": [{ "name": "Nam", "avatar": "/images/avatar.png" }],
+      "points": 8,
+      "comments": []
+    }
+  ]
+}

@@ -39,7 +39,7 @@ export default function Sidebar() {
   return (
     <aside className='w-[15.1rem] h-screen bg-gray-50 border-r border-slate-200 sticky top-0 hidden md:flex flex-col'>
       <div className='flex justify-center px-14 py-6'>
-        <Image src='https://iocv2.rikkei.edu.vn/logo.svg' alt='IOC Logo' width={120} height={40} />
+        <Image src='/assets/images/logo.svg' alt='IOC Logo' width={120} height={40} />
       </div>
 
       {isProfile && (
