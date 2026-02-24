@@ -2,8 +2,13 @@
 
 import Card from '@/shared/components/Card';
 import { useState } from 'react';
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+// import { ToastProvider } from '@/providers/ToastProvider';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function ChangePass() {
+  const toast = useToast();
+
   const [show, setShow] = useState({
     current: false,
     new: false,
@@ -27,6 +32,53 @@ export default function ChangePass() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+  // const handleSubmit = async () => {
+  //   const res = await fetch('/api/auth/change-password', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(form),
+  //     credentials: 'include',
+  //   });
+
+  //   const text = await res.text();
+  //   console.log(res.status, text);
+
+  //   if (res.ok) {
+  //     toast.success('Đăng nhập thành công');
+  //     alert('Đổi mật khẩu thành công');
+  //   } else {
+  //     alert(text || 'Đổi mật khẩu thất bại');
+  //   }
+  // };
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+        credentials: 'include',
+      });
+
+      const text = await res.text();
+
+      if (res.ok) {
+        toast.success('Đổi mật khẩu thành công');
+        setForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+      } else {
+        toast.error(text || 'Đổi mật khẩu thất bại');
+      }
+    } catch {
+      toast.error('Có lỗi xảy ra');
+    }
+  };
 
   return (
     <>
@@ -35,10 +87,7 @@ export default function ChangePass() {
         <p className='text-sm text-slate-500'>Đặt lại mật khẩu để bảo vệ tài khoản của bạn</p>
       </div>
       <Card>
-        {/* Header */}
-
         <div className='max-w-3xl space-y-8'>
-          {/* Form */}
           <div className='space-y-6'>
             <PasswordField
               label='Mật khẩu hiện tại'
@@ -74,25 +123,14 @@ export default function ChangePass() {
             />
           </div>
 
-          {/* Footer */}
           <div className='pt-6 border-t flex justify-between items-center'>
-            <div className='text-sm text-slate-500 space-y-1'>
-              <p>
-                Ngày tạo tài khoản: <b>22/12/2025</b>
-              </p>
-              <p>
-                Đăng nhập gần nhất: <b>02/02/2026 · 21:11</b>
-              </p>
-            </div>
-
             <button
+              onClick={handleSubmit}
               disabled={!isValid}
               className={`h-11 px-10 rounded-full font-semibold transition
-              ${
-                isValid
-                  ? 'bg-red-500 text-white hover:bg-red-600'
-                  : 'bg-red-200 text-white cursor-not-allowed'
-              }`}
+  ${
+    isValid ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-red-200 text-white cursor-not-allowed'
+  }`}
             >
               Đổi mật khẩu
             </button>
@@ -103,8 +141,39 @@ export default function ChangePass() {
   );
 }
 
-/* ===== Password Field ===== */
+// function PasswordField({ label, name, value, onChange, show, onToggle, hint, error }) {
+//   return (
+//     <div className='space-y-1'>
+//       <label className='text-sm font-semibold text-slate-700'>
+//         {label} <span className='text-red-500'>*</span>
+//       </label>
 
+//       <div className='relative'>
+//         <span className='absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'>🔒</span>
+
+//         <input
+//           name={name}
+//           value={value}
+//           onChange={onChange}
+//           type={show ? 'text' : 'password'}
+//           className='w-full h-11 pl-11 pr-11 rounded-xl border border-slate-300
+//                      focus:ring-2 focus:ring-red-400 focus:border-red-400 outline-none'
+//         />
+
+//         <button
+//           type='button'
+//           onClick={onToggle}
+//           className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600'
+//         >
+//           {show ? '🙈' : '👁️'}
+//         </button>
+//       </div>
+
+//       {hint && <p className='text-xs text-slate-500'>{hint}</p>}
+//       {error && <p className='text-xs text-red-500'>{error}</p>}
+//     </div>
+//   );
+// }
 function PasswordField({ label, name, value, onChange, show, onToggle, hint, error }) {
   return (
     <div className='space-y-1'>
@@ -113,23 +182,28 @@ function PasswordField({ label, name, value, onChange, show, onToggle, hint, err
       </label>
 
       <div className='relative'>
-        <span className='absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'>🔒</span>
-
         <input
           name={name}
           value={value}
           onChange={onChange}
           type={show ? 'text' : 'password'}
-          className='w-full h-11 pl-11 pr-11 rounded-xl border border-slate-300
-                     focus:ring-2 focus:ring-red-400 focus:border-red-400 outline-none'
+          className={`
+            w-full h-11 pl-11 pr-12 rounded-xl border
+            ${error ? 'border-red-400' : 'border-slate-300'}
+            focus:ring-2 focus:ring-(--color-primary)
+            focus:border-(--color-primary)
+            outline-none transition
+          `}
         />
 
+        {/* Toggle eye */}
         <button
           type='button'
           onClick={onToggle}
-          className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600'
+          className='absolute right-4 top-1/2 -translate-y-1/2
+                     text-slate-400 hover:text-slate-600 transition'
         >
-          {show ? '🙈' : '👁️'}
+          {show ? <EyeInvisibleOutlined /> : <EyeOutlined />}
         </button>
       </div>
 

@@ -18,7 +18,7 @@ export default function Evaluation() {
       <h1 className='text-2xl font-bold text-slate-900'>Đánh giá</h1>
 
       <Card>
-        <div className='p-6 border-b border-slate-200'>
+        <div className='p-3 border-b border-slate-200'>
           <h2 className='font-semibold text-slate-800'>Thông tin chung</h2>
         </div>
 
@@ -54,32 +54,10 @@ export default function Evaluation() {
           </table>
         </div>
       </Card>
-
-      {/* Footer */}
-      <div className='flex items-center justify-between text-sm text-slate-600'>
-        <span>
-          Tổng số bản ghi: <b className='text-slate-800'>{evaluations.length}</b>
-        </span>
-
-        <div className='flex items-center gap-3'>
-          <button className='w-9 h-9 rounded-full border text-slate-400' disabled>
-            ‹
-          </button>
-          <button className='w-9 h-9 rounded-full bg-primary text-white'>1</button>
-          <button className='w-9 h-9 rounded-full border text-slate-400'>›</button>
-
-          <select className='ml-4 border rounded-full px-3 py-1'>
-            <option>10/trang</option>
-            <option>20/trang</option>
-            <option>50/trang</option>
-          </select>
-        </div>
-      </div>
     </section>
   );
 }
 
-/* Utils */
 function formatDate(date) {
   return new Date(`${date}T00:00:00`).toLocaleDateString('vi-VN');
 }

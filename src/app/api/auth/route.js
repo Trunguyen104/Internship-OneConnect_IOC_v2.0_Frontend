@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BE_URL = 'http://localhost:5000/api/Auth';
+const BE_URL = 'http://localhost:8080/api/Auth';
 
 /**
  * LOGIN
