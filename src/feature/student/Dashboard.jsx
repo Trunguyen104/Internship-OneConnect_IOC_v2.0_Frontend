@@ -57,20 +57,20 @@ export default function DashboardPage() {
 
   if (err)
     return (
-      <PageShell title='Tổng quan'>
+      <PageShell>
         <ErrorBox message={err} />
       </PageShell>
     );
 
   if (!data)
     return (
-      <PageShell title='Tổng quan'>
+      <PageShell>
         <Loading />
       </PageShell>
     );
 
   return (
-    <PageShell title='Tổng quan'>
+    <PageShell>
       {/* Top actions */}
       <div className='flex flex-wrap items-center justify-between gap-3 mb-4'>
         <StudentTabs />

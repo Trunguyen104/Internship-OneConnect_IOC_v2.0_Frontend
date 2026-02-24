@@ -1,8 +1,6 @@
 'use client';
 import PageShell from '@/shared/components/PageShell';
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import StudentTabs from '@/shared/components/StudentTabs';
 import {
   DndContext,
@@ -87,15 +85,18 @@ export default function BoardPage() {
   const activeTask = activeId ? items.find((x) => x.id === activeId) : null;
 
   return (
-    <PageShell title='Bảng công việc'>
-      <div className='flex items-center justify-between mb-4 gap-4'>
-        <StudentTabs />
-        <div className='flex items-center gap-2'>
+    <PageShell>
+      <div className='flex items-center gap-4 mb-4'>
+        <div className='flex-1 min-w-0'>
+          <StudentTabs />
+        </div>
+
+        {/* <div className='shrink-0 flex items-center gap-2'>
           <Search value={query} onChange={setQuery} />
           <button className='text-sm px-4 py-2 rounded-full border border-border/60 bg-surface shadow-sm hover:bg-bg'>
             Bộ lọc
           </button>
-        </div>
+        </div> */}
       </div>
 
       <DndContext

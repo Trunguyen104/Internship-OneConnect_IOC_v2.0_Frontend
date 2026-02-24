@@ -98,7 +98,7 @@ export default function LoginPage() {
         <div className='flex items-center justify-center px-4 lg:pr-1'>
           <div className='w-full max-w-125'>
             <Image
-              src='https://iocv2.rikkei.edu.vn/logo.svg'
+              src='/assets/images/logo.svg'
               alt='IOC Logo'
               width={200}
               height={60}

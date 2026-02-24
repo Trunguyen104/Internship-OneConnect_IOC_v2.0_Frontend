@@ -1,11 +1,13 @@
-import { getDashboardMock } from "@/mocks/mockServer";
-import { CONFIG } from "@/constants/config";
-import { httpGet } from "@/services/httpClient";
+import { getDashboardMock } from '@/mocks/mockServer';
+import { CONFIG } from '@/constants/config';
+import { httpGet } from '@/services/httpClient';
 
 export async function getDashboardData() {
+  // 1️⃣ Nếu đang dev → dùng mock
   if (CONFIG.useMocks) {
     return getDashboardMock();
   }
 
-  return httpGet("/api/dashboard"); // backend sau này
+  // 2️⃣ Khi backend có → gọi API thật qua proxy Next
+  return httpGet('/dashboard');
 }

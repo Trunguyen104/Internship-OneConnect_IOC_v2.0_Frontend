@@ -1,8 +1,10 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+// src/services/httpClient.js
 
-export async function httpGet(path, options = {}) {
+// Từ giờ luôn gọi qua Next proxy
+const API_BASE = '/api/proxy';
+
+async function request(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
-    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       ...(options.headers || {}),
@@ -11,8 +13,44 @@ export async function httpGet(path, options = {}) {
   });
 
   if (!res.ok) {
-    throw new Error(`HTTP GET error: ${res.status}`);
+    let message = '';
+    try {
+      message = await res.text();
+    } catch {}
+    throw new Error(`API error ${res.status}: ${message}`);
   }
 
-  return res.json();
+  // nếu response không phải JSON (file download...) thì vẫn an toàn
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return res.json();
+  }
+
+  return res;
 }
+
+// ===== helper methods =====
+export const httpGet = (path, options) => request(path, { method: 'GET', ...options });
+
+export const httpPost = (path, body, options = {}) =>
+  request(path, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    ...options,
+  });
+
+export const httpPut = (path, body, options = {}) =>
+  request(path, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+    ...options,
+  });
+
+export const httpDelete = (path, options) => request(path, { method: 'DELETE', ...options });
+
+export default {
+  httpGet,
+  httpPost,
+  httpPut,
+  httpDelete,
+};
