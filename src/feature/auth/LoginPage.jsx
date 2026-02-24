@@ -2,11 +2,15 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import Input from '@/shared/components/Input';
-import { loginApi } from '@/services/authService';
+import { login } from '@/services/authService';
+import { setAccessToken } from '@/services/authStorage';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/providers/ToastProvider';
 import Link from 'next/link';
 
 export default function LoginPage() {
+  const toast = useToast();
+
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -35,21 +39,17 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validate()) return;
 
     try {
-      const token = await loginApi(form);
-
-      console.log('JWT token:', token);
-
-      localStorage.setItem('token', token);
+      const token = await login(form);
+      setAccessToken(token);
+      toast.success('Đăng nhập thành công');
 
       router.push('/student/space');
-    } catch (error) {
-      setErrors({
-        password: error.message,
-      });
+    } catch (err) {
+      setErrors({ password: err.message });
+      toast.error('Đăng nhập thất bại');
     }
   };
 
@@ -113,17 +113,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className='flex justify-between items-center'>
-                <div className='flex justify-content-center'>
-                  <input
-                    id='remember'
-                    type='checkbox'
-                    className='w-4 h-4 rounded border-gray-300 cursor-pointer'
-                  />
-                  <label htmlFor='remember' className='ml-2 text-sm text-gray-900'>
-                    Ghi nhớ
-                  </label>
-                </div>
+              <div className='flex justify-end items-center'>
                 <Link
                   href='forgot-password'
                   className='flex text-sm hover:underline text-(--primary-700) cursor-pointer'
@@ -134,20 +124,10 @@ export default function LoginPage() {
 
               <button
                 type='submit'
-                className='cursor-pointer w-full h-11 rounded-xl text-white font-semibold  bg-(--color-danger) hover:bg-(--color-primary-hover)'
+                className='cursor-pointer w-full h-11 rounded-xl text-white font-semibold  bg-(--color-primary) hover:bg-(--color-primary-hover)'
               >
                 Đăng nhập
               </button>
-
-              <div className='text-center text-sm text-gray-600'>
-                Bạn chưa có tài khoản?{' '}
-                <Link
-                  href='/register'
-                  className='cursor-pointer font-semibold hover:underline text-(--primary-700)'
-                >
-                  Đăng ký
-                </Link>
-              </div>
             </form>
 
             <div className='text-center text-gray-500 text-sm mt-4'>

@@ -1,17 +1,36 @@
-export async function loginApi(data) {
-  const res = await fetch('http://localhost:5000/api/Auth/login', {
+export async function login(data) {
+  const res = await fetch('/api/auth', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
+    credentials: 'include',
   });
 
   if (!res.ok) {
-    throw new Error('Sai email hoặc mật khẩu');
+    const err = await res.json();
+    throw new Error(err.message || 'Login failed');
   }
 
-  const token = await res.text();
+  const { accessToken } = await res.json();
+  return accessToken;
+}
 
-  return token;
+export async function logout() {
+  const res = await fetch(`/api/auth`, {
+    method: 'DELETE',
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Logout failed');
+}
+
+export async function refreshToken() {
+  const res = await fetch(`/api/auth`, {
+    method: 'PUT',
+    credentials: 'include',
+  });
+
+  if (!res.ok) throw new Error('Refresh failed');
+
+  return res.json();
 }
