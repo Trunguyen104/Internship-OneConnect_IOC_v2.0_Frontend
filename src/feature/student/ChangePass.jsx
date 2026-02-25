@@ -32,26 +32,6 @@ export default function ChangePass() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-  // const handleSubmit = async () => {
-  //   const res = await fetch('/api/auth/change-password', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: JSON.stringify(form),
-  //     credentials: 'include',
-  //   });
-
-  //   const text = await res.text();
-  //   console.log(res.status, text);
-
-  //   if (res.ok) {
-  //     toast.success('Đăng nhập thành công');
-  //     alert('Đổi mật khẩu thành công');
-  //   } else {
-  //     alert(text || 'Đổi mật khẩu thất bại');
-  //   }
-  // };
   const handleSubmit = async () => {
     try {
       const res = await fetch('/api/auth/change-password', {
@@ -82,13 +62,13 @@ export default function ChangePass() {
 
   return (
     <>
-      <div>
+      <div className='mb-5'>
         <h1 className='text-2xl font-bold text-slate-900'>Thay đổi mật khẩu</h1>
-        <p className='text-sm text-slate-500'>Đặt lại mật khẩu để bảo vệ tài khoản của bạn</p>
+        <label className='text-sm'>Đặt lại mật khẩu để bảo vệ tài khoản của bạn.</label>
       </div>
       <Card>
-        <div className='max-w-3xl space-y-8'>
-          <div className='space-y-6'>
+        <div className='space-y-8'>
+          <div className='space-y-6 w-full'>
             <PasswordField
               label='Mật khẩu hiện tại'
               name='currentPassword'
@@ -105,7 +85,6 @@ export default function ChangePass() {
               onChange={handleChange}
               show={show.new}
               onToggle={() => setShow({ ...show, new: !show.new })}
-              hint='Ít nhất 8 ký tự, gồm chữ hoa và số'
             />
 
             <PasswordField
@@ -123,11 +102,11 @@ export default function ChangePass() {
             />
           </div>
 
-          <div className='pt-6 border-t flex justify-between items-center'>
+          <div className='pt-6 border-t flex justify-end items-center'>
             <button
               onClick={handleSubmit}
               disabled={!isValid}
-              className={`h-11 px-10 rounded-full font-semibold transition
+              className={`h-10 px-10 rounded-full font-semibold transition cursor-pointer
   ${
     isValid ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-red-200 text-white cursor-not-allowed'
   }`}
@@ -141,62 +120,28 @@ export default function ChangePass() {
   );
 }
 
-// function PasswordField({ label, name, value, onChange, show, onToggle, hint, error }) {
-//   return (
-//     <div className='space-y-1'>
-//       <label className='text-sm font-semibold text-slate-700'>
-//         {label} <span className='text-red-500'>*</span>
-//       </label>
-
-//       <div className='relative'>
-//         <span className='absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'>🔒</span>
-
-//         <input
-//           name={name}
-//           value={value}
-//           onChange={onChange}
-//           type={show ? 'text' : 'password'}
-//           className='w-full h-11 pl-11 pr-11 rounded-xl border border-slate-300
-//                      focus:ring-2 focus:ring-red-400 focus:border-red-400 outline-none'
-//         />
-
-//         <button
-//           type='button'
-//           onClick={onToggle}
-//           className='absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600'
-//         >
-//           {show ? '🙈' : '👁️'}
-//         </button>
-//       </div>
-
-//       {hint && <p className='text-xs text-slate-500'>{hint}</p>}
-//       {error && <p className='text-xs text-red-500'>{error}</p>}
-//     </div>
-//   );
-// }
 function PasswordField({ label, name, value, onChange, show, onToggle, hint, error }) {
   return (
     <div className='space-y-1'>
-      <label className='text-sm font-semibold text-slate-700'>
+      <label className='text-sm font-semibold text-slate-700 mb-4'>
         {label} <span className='text-red-500'>*</span>
       </label>
 
-      <div className='relative'>
+      <div className='relative mt-2'>
         <input
           name={name}
           value={value}
           onChange={onChange}
           type={show ? 'text' : 'password'}
           className={`
-            w-full h-11 pl-11 pr-12 rounded-xl border
+            w-full h-11 pl-5 rounded-xl border
             ${error ? 'border-red-400' : 'border-slate-300'}
-            focus:ring-2 focus:ring-(--color-primary)
-            focus:border-(--color-primary)
+            focus:ring-2 focus:ring-primary
+            focus:border-primary
             outline-none transition
           `}
         />
 
-        {/* Toggle eye */}
         <button
           type='button'
           onClick={onToggle}
