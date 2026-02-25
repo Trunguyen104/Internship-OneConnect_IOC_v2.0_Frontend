@@ -7,9 +7,16 @@ import { useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 
 // bắt lỗi trước khi cho edit
-export default function AvatarUploader({ value, onChange, size = 116 }) {
+export default function AvatarUploader({ value, onChange, size = 116, fullName }) {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+
+  const getInitials = (name) => {
+    if (!name) return '';
+    const words = name.trim().split(' ');
+    if (words.length === 1) return words[0].charAt(0).toUpperCase();
+    return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+  };
 
   const beforeUpload = (file) => {
     const isImage = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -42,21 +49,41 @@ export default function AvatarUploader({ value, onChange, size = 116 }) {
     <ImgCrop rotationSlider>
       <Upload showUploadList={false} beforeUpload={beforeUpload}>
         <div
-          className='flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-slate-300 bg-slate-100 hover:border-red-400'
+          className='group relative flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-slate-300 bg-slate-200 hover:border-red-400'
           style={{ width: size, height: size }}
         >
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={value}
-              alt='avatar'
-              className='h-full w-full object-cover'
-              draggable={false}
-            />
+            <>
+              <img
+                src={value}
+                alt='avatar'
+                className='h-full w-full object-cover'
+                draggable={false}
+              />
+              <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+                <PlusOutlined className='text-xl' />
+                <span className='mt-1 text-xs font-semibold'>Sửa ảnh</span>
+              </div>
+            </>
           ) : (
-            <div className='flex flex-col items-center text-slate-500'>
-              {loading ? <LoadingOutlined /> : <PlusOutlined />}
-              <span className='mt-1 text-xs'>Tải lên</span>
+            <div className='flex h-full w-full flex-col items-center justify-center text-slate-500'>
+              {loading ? (
+                <LoadingOutlined className='text-3xl' />
+              ) : fullName ? (
+                <>
+                  <span className='text-4xl font-bold text-slate-700'>{getInitials(fullName)}</span>
+                  <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
+                    <PlusOutlined className='text-xl' />
+                    <span className='mt-1 text-xs font-semibold'>Tải lên</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <PlusOutlined className='mb-1 text-2xl' />
+                  <span className='text-xs font-medium'>Tải lên</span>
+                </>
+              )}
             </div>
           )}
         </div>
