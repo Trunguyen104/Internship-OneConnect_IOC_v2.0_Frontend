@@ -192,10 +192,11 @@ export default function PersonalInfo() {
                 <label
                   key={skill.name}
                   className={`group flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition
-        ${checked
-                      ? 'border-red-400 bg-red-50 text-red-600'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-red-400 hover:bg-red-50'
-                    }`}
+        ${
+          checked
+            ? 'border-red-400 bg-red-50 text-red-600'
+            : 'border-slate-200 bg-white text-slate-700 hover:border-red-400 hover:bg-red-50'
+        }`}
                 >
                   {selectMode && (
                     <input

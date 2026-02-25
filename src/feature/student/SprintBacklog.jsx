@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import CreateTaskModal from '@/shared/components/CreateTaskModal';
 
 export default function SprintBacklog() {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   // Temporary mock data for UI design
-  const [items] = useState([
+  const [items, setItems] = useState([
     {
       id: 1,
       key: 'ISSUE-13',
@@ -117,6 +120,23 @@ export default function SprintBacklog() {
       className: 'bg-primary/10 text-primary border border-primary/20',
     },
     DONE: { label: 'Done', className: 'bg-green-50 text-green-700 border border-green-200' },
+  };
+
+  const getInitials = (n) => {
+    if (!n) return '?';
+    const words = n.trim().split(' ').filter(Boolean);
+    if (words.length === 0) return '?';
+    if (words.length === 1) return words[0].charAt(0).toUpperCase();
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+  };
+
+  const stringToColor = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 70%, 80%)`;
   };
 
   return (
@@ -260,11 +280,19 @@ export default function SprintBacklog() {
                   {/* 7. Ký hiệu bổ sung (Assignee Icon) */}
                   <div className='w-[50px] flex justify-center'>
                     {it.assigneeIcon ? (
-                      <div className='flex h-7 w-7 items-center justify-center rounded-full bg-bg text-[11px] font-bold text-text border border-border/60'>
-                        {it.assigneeIcon}
+                      <div
+                        className='flex h-7 w-7 items-center justify-center rounded-full shadow-sm text-[11.5px] font-bold'
+                        style={{
+                          backgroundColor: stringToColor(it.assigneeIcon),
+                          color: '#334155',
+                        }}
+                      >
+                        {getInitials(it.assigneeIcon)}
                       </div>
                     ) : (
-                      <div className='h-7 w-7' />
+                      <div className='flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[11.5px] font-bold text-slate-400'>
+                        ?
+                      </div>
                     )}
                   </div>
 
@@ -298,6 +326,7 @@ export default function SprintBacklog() {
         <div className='px-5 py-4 border-t border-border/60'>
           <button
             type='button'
+            onClick={() => setIsCreateModalOpen(true)}
             className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 hover:bg-primary/10 transition-colors'
           >
             <span className='font-bold text-primary'>+</span>
@@ -305,6 +334,27 @@ export default function SprintBacklog() {
           </button>
         </div>
       </div>
+
+      <CreateTaskModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={(data) => {
+          console.log('New Task:', data);
+          // Optionally add functionality here to prepend task to the `items` list
+          const newTask = {
+            id: Date.now(),
+            key: 'ISSUE-' + Math.floor(Math.random() * 100 + 50),
+            title: data.summary,
+            status: data.status,
+            tag: data.type,
+            date: data.dueDate || '-',
+            priority: data.priority,
+            points: data.points || '-',
+            assigneeIcon: data.assignee ? data.assignee.charAt(0).toUpperCase() : 'U',
+          };
+          setItems([newTask, ...items]);
+        }}
+      />
     </div>
   );
 }
