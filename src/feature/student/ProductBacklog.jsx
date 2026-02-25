@@ -8,15 +8,41 @@ import CreateEpicModal from '@/shared/components/CreateEpicModal';
 import MoreMenuButton from '@/shared/components/MoreMenuButton';
 
 function Avatar({ name = '', avatar }) {
-  const initial = (name || '?').trim().charAt(0).toUpperCase();
+  const getInitials = (n) => {
+    if (!n) return '?';
+    const words = n.trim().split(' ').filter(Boolean);
+    if (words.length === 0) return '?';
+    if (words.length === 1) return words[0].charAt(0).toUpperCase();
+    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+  };
+
+  const initials = getInitials(name);
+
+  // Generate a consistent pastel background color based on the name
+  const stringToColor = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return `hsl(${hue}, 70%, 80%)`;
+  };
+
+  const bgColor = avatar ? 'var(--color-bg)' : stringToColor(name || '?');
+  const textColor = avatar ? 'inherit' : '#334155'; // dark slate for contrast
 
   return (
-    <div className='flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border/60 bg-bg'>
+    <div
+      className='flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border/60 shadow-sm'
+      style={{ backgroundColor: bgColor }}
+    >
       {avatar ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={avatar} alt={name} className='h-full w-full object-cover' />
       ) : (
-        <span className='text-sm font-semibold text-muted'>{initial}</span>
+        <span className='text-[13px] font-bold' style={{ color: textColor }}>
+          {initials}
+        </span>
       )}
     </div>
   );
@@ -152,7 +178,7 @@ export default function ProductBacklog() {
                 'shadow-sm transition-colors',
 
                 // ✅ dùng đúng token global, khỏi phụ thuộc tailwind theme
-                'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]',
+                'bg-primary hover:bg-primary-hover',
               ].join(' ')}
             >
               <span>Create Epic</span>
@@ -171,7 +197,7 @@ export default function ProductBacklog() {
                 'text-white',
                 'text-base font-semibold',
                 'shadow-sm transition-colors',
-                'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]',
+                'bg-primary hover:bg-primary-hover',
               ].join(' ')}
             >
               <span>Create User Story</span>

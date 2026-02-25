@@ -53,7 +53,6 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
           style={{ width: size, height: size }}
         >
           {value ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <>
               <img
                 src={value}

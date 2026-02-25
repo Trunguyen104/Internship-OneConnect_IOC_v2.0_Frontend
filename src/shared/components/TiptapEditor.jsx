@@ -249,13 +249,16 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
   };
 
   return (
-    <div style={{ display: 'grid', gap: 10 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div
         style={{
           border: '1px solid #d7dde7',
           borderRadius: 16,
           background: '#fff',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
         }}
       >
         {/* Toolbar */}
@@ -427,8 +430,22 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
         </div>
 
         {/* Editor */}
-        <div style={{ borderTop: '1px solid #d7dde7', position: 'relative' }}>
+        <div
+          style={{
+            borderTop: '1px solid #d7dde7',
+            position: 'relative',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <style jsx global>{`
+            .ProseMirror {
+              flex: 1;
+              min-height: 100%;
+              outline: none;
+            }
+
             .ProseMirror.is-editor-empty:first-child::before {
               content: attr(data-placeholder);
               float: left;
@@ -460,7 +477,12 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             onChange={onPickImage}
           />
 
-          <EditorContent editor={editor} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+            <EditorContent
+              editor={editor}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+            />
+          </div>
         </div>
       </div>
     </div>
