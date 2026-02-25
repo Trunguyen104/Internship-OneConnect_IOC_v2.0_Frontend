@@ -54,7 +54,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
   if (!open) return null;
 
   return (
-    <div className='fixed inset-0 z-[999] flex items-center justify-center p-4 backdrop-blur-sm'>
+    <div className='fixed inset-0 z-999 flex items-center justify-center p-4 backdrop-blur-sm'>
       {/* overlay */}
       <button
         type='button'

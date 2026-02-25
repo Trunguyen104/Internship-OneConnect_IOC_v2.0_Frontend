@@ -70,7 +70,7 @@ export default function PersonalInfo() {
 
       <Card>
         <div className='flex items-center gap-6 border-b border-slate-200 pb-6'>
-          <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} />
+          <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} fullName='Lê Duy Khánh' />
 
           <div>
             <h2 className='text-lg font-bold text-slate-900'>Ảnh đại diện</h2>
@@ -192,11 +192,10 @@ export default function PersonalInfo() {
                 <label
                   key={skill.name}
                   className={`group flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition
-        ${
-          checked
-            ? 'border-red-400 bg-red-50 text-red-600'
-            : 'border-slate-200 bg-white text-slate-700 hover:border-red-400 hover:bg-red-50'
-        }`}
+        ${checked
+                      ? 'border-red-400 bg-red-50 text-red-600'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-red-400 hover:bg-red-50'
+                    }`}
                 >
                   {selectMode && (
                     <input

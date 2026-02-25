@@ -4,9 +4,9 @@ import { useMemo, useState } from 'react';
 import TiptapEditor from '@/shared/components/TiptapEditor';
 function FieldLabel({ required, children }) {
   return (
-    <div className='mb-2 text-sm font-semibold text-[var(--color-text)]'>
+    <div className='mb-2 text-sm font-semibold text-text'>
       {children}
-      {required ? <span className='text-[var(--color-primary)]'> *</span> : null}
+      {required ? <span className='text-primary'> *</span> : null}
     </div>
   );
 }
@@ -17,8 +17,8 @@ function Select({ value, onChange, options = [], placeholder = 'Chọn' }) {
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       className={[
-        'h-11 w-full rounded-full border border-[var(--color-border)] bg-white px-4 text-sm',
-        'outline-none focus:border-[var(--color-primary)]',
+        'h-11 w-full rounded-full border border-border bg-white px-4 text-sm',
+        'outline-none focus:border-primary',
       ].join(' ')}
     >
       <option value=''>{placeholder}</option>
@@ -38,8 +38,8 @@ function TextInput({ value, onChange, placeholder = '' }) {
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
       className={[
-        'h-11 w-full rounded-full border border-[var(--color-border)] bg-white px-4 text-sm',
-        'outline-none focus:border-[var(--color-primary)]',
+        'h-11 w-full rounded-full border border-border bg-white px-4 text-sm',
+        'outline-none focus:border-primary',
       ].join(' ')}
     />
   );
@@ -52,8 +52,8 @@ function DateInput({ value, onChange }) {
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       className={[
-        'h-11 w-full rounded-full border border-[var(--color-border)] bg-white px-4 text-sm',
-        'outline-none focus:border-[var(--color-primary)]',
+        'h-11 w-full rounded-full border border-border bg-white px-4 text-sm',
+        'outline-none focus:border-primary',
       ].join(' ')}
     />
   );
@@ -116,7 +116,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
   if (!open) return null;
 
   return (
-    <div className='fixed inset-0 z-[999] flex items-center justify-center p-4'>
+    <div className='fixed inset-0 z-999 flex items-center justify-center p-4'>
       {/* overlay */}
       <button
         type='button'
@@ -129,9 +129,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
       <div className='relative w-full max-w-[820px] rounded-2xl bg-white shadow-2xl'>
         {/* Header */}
         <div className='px-8 pt-7'>
-          <div className='text-center text-3xl font-bold text-[var(--color-text)]'>
-            Tạo Nhiệm vụ
-          </div>
+          <div className='text-center text-3xl font-bold text-text'>Tạo Nhiệm vụ</div>
         </div>
 
         {/* Body (scroll like ảnh) */}
@@ -264,7 +262,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
             onClick={handleSubmit}
             className='
     h-10 flex-1 rounded-full px-6 text-sm font-semibold text-white
-    bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]
+    bg-primary hover:bg-primary-hover
   '
           >
             Tạo Nhiệm vụ
