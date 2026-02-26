@@ -42,13 +42,21 @@ export default function Sidebar() {
         <Image src='/assets/images/logo.svg' alt='IOC Logo' width={120} height={40} />
       </div>
 
-      {isProfile && (
+      {isProfile ? (
         <Link
           href='/student/space'
-          className='mx-4 mb-4 flex items-center gap-2 text-xs font-black text-red-800 cursor-pointer'
+          className='mx-4 mb-4 flex items-center gap-2 text-xs font-black text-red-800 cursor-pointer hover:underline'
         >
           <ArrowLeftOutlined />
           Quay lại
+        </Link>
+      ) : (
+        <Link
+          href='/internship-groups'
+          className='mx-5 mb-6 flex items-center gap-2 text-[14px] font-bold text-[var(--primary-700)] hover:text-[var(--primary-800)] cursor-pointer'
+        >
+          <ArrowLeftOutlined />
+          Trở lại trang trước
         </Link>
       )}
 

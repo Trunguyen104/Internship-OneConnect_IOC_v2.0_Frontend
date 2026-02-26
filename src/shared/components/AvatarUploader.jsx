@@ -55,6 +55,7 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
           {value ? (
             <>
               <img
+          // eslint-disable-next-line @next/next/no-img-element
                 src={value}
                 alt='avatar'
                 className='h-full w-full object-cover'
