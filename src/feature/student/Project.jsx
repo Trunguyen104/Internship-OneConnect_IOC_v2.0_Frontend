@@ -1,11 +1,11 @@
-import Card from '@/shared/components/Card';
+// import Card from '@/shared/components/Card';
 
 export default function Project() {
   return (
     <section className='space-y-6 mt-10'>
       <h1 className='text-2xl font-bold ml-1 text-slate-900'>Dự án</h1>
 
-      <Card>
+      <>
         <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
           <InfoItem label='Tên dự án' value='IOC Version 2' />
           <InfoItem label='Lĩnh vực' value='Công nghệ thông tin' />
@@ -81,7 +81,7 @@ export default function Project() {
           <p className='text-xs text-slate-400'>Đã tạo 19/01/2026</p>
           <p className='text-xs font-medium text-slate-400'>Cập nhật 11 ngày trước</p>
         </div>
-      </Card>
+      </>
     </section>
   );
 }
