@@ -28,7 +28,7 @@ const COLUMNS = [
 
 export default function BoardPage() {
   const [items, setItems] = useState([]);
-  const [query, setQuery] = useState('');
+  const [query] = useState('');
   const [activeId, setActiveId] = useState(null);
 
   // ✅ Load data (đang dùng mock)
@@ -117,6 +117,7 @@ export default function BoardPage() {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function Search({ value, onChange }) {
   return (
     <div className='flex items-center gap-2 rounded-full border border-border/60 bg-surface shadow-sm px-4 py-2'>
