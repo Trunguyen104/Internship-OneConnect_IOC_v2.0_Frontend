@@ -48,11 +48,9 @@ export const httpPut = (path, body, options = {}) =>
 
 export const httpDelete = (path, options) => request(path, { method: 'DELETE', ...options });
 
-const httpClient = {
+export default {
   httpGet,
   httpPost,
   httpPut,
   httpDelete,
 };
-
-export default httpClient;

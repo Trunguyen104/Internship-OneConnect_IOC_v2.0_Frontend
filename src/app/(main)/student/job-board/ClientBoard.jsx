@@ -5,10 +5,7 @@ import Board from '@/feature/student/Board';
 
 export default function ClientBoard() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
   return <Board />;

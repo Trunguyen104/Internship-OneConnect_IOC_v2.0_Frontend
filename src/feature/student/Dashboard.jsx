@@ -236,7 +236,6 @@ export default function DashboardPage() {
 
 /* ---------------- UI atoms ---------------- */
 
-// eslint-disable-next-line no-unused-vars
 function Tabs({ items, activeKey }) {
   return (
     <div className='flex flex-wrap gap-2'>
@@ -309,7 +308,7 @@ function ErrorBox({ message }) {
 
 /* ---------------- helpers ---------------- */
 function formatShortDate(iso) {
-  const [, m, d] = iso.split('-');
+  const [y, m, d] = iso.split('-');
   return `${d}/${m}`;
 }
 
