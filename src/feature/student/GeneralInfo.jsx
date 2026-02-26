@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Card from '@/shared/components/Card';
+// import Card from '@/shared/components/Card';
 import { getGeneralInfo } from '@/mocks/mockInfo';
 
 export default function GeneralInfo() {
@@ -30,7 +30,7 @@ export default function GeneralInfo() {
     <section className='space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Thông tin chung</h1>
 
-      <Card>
+      <>
         <div className='grid grid-cols-1 gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-4'>
           {GENERAL_INFO.map((item) => (
             <InfoItem key={item.label} {...item} />
@@ -43,7 +43,7 @@ export default function GeneralInfo() {
           <p className='text-xs text-slate-400'>Đã tạo {info.createdAt}</p>
           <p className='text-xs font-medium text-slate-400'>{info.updatedText}</p>
         </div>
-      </Card>
+      </>
     </section>
   );
 }

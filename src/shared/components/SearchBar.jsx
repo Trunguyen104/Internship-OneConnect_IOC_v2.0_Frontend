@@ -1,6 +1,6 @@
 'use client';
 
-import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { SearchOutlined, FilterOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 export default function SearchBar({
   placeholder = 'Tìm kiếm',
@@ -13,7 +13,6 @@ export default function SearchBar({
 
   showAction = false,
   actionLabel,
-  actionIcon,
   onActionClick,
 }) {
   return (
@@ -33,7 +32,7 @@ export default function SearchBar({
         <button
           onClick={onFilterClick}
           className='flex items-center gap-2 rounded-full border border-slate-300
-            px-4 py-2 text-sm text-slate-600 hover:bg-slate-100'
+            px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 cursor-pointer'
         >
           <FilterOutlined />
           Bộ lọc
@@ -47,8 +46,7 @@ export default function SearchBar({
             bg-primary px-5 py-2 text-sm font-medium text-white
             hover:bg-primary-hover cursor-pointer'
         >
-          {actionIcon}
-          {actionLabel}
+          {actionLabel} <PlusCircleOutlined />
         </button>
       )}
     </div>
