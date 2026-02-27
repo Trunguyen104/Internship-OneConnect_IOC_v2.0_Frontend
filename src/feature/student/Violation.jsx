@@ -4,35 +4,21 @@ import { useEffect, useState, useRef } from 'react';
 import Card from '@/shared/components/Card';
 import { getViolationList } from '@/mocks/mockViolationList';
 import SearchBar from '@/shared/components/SearchBar';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import Footer from '@/shared/components/Footer';
 
 export default function ViolationList() {
   const [violations, setViolations] = useState([]);
   const [search, setSearch] = useState('');
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sortOrder, setSortOrder] = useState('desc');
 
   const tableRef = useRef(null);
 
   useEffect(() => {
-    tableRef.current?.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    tableRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page, pageSize]);
-
-  const filteredViolations = violations.filter(
-    (v) =>
-      v.type.toLowerCase().includes(search.toLowerCase()) ||
-      v.description.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  const total = filteredViolations.length;
-  const totalPages = Math.ceil(total / pageSize);
-
-  const paginatedViolations = filteredViolations.slice((page - 1) * pageSize, page * pageSize);
 
   useEffect(() => {
     async function fetchViolations() {
@@ -42,47 +28,96 @@ export default function ViolationList() {
     fetchViolations();
   }, []);
 
+  const filteredViolations = violations.filter(
+    (v) =>
+      v.type.toLowerCase().includes(search.toLowerCase()) ||
+      v.description.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const sortedViolations = [...filteredViolations].sort((a, b) => {
+    const timeA = new Date(a.createdAt).getTime() || 0;
+    const timeB = new Date(b.createdAt).getTime() || 0;
+    return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+  });
+
+  const total = sortedViolations.length;
+  const totalPages = Math.ceil(total / pageSize);
+  const paginatedViolations = sortedViolations.slice((page - 1) * pageSize, page * pageSize);
+
+  const handleSortDate = () => {
+    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(1);
+  }, [search]);
+
   return (
     <section className='flex flex-col h-full space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Vi phạm</h1>
       <Card>
-        <SearchBar
-          placeholder='Tìm kiếm'
-          value={search}
-          onChange={setSearch}
-          showFilter
-          actionIcon={<PlusOutlined />}
-        />
+        <div className='mb-5'>
+          <SearchBar
+            placeholder='Tìm kiếm'
+            value={search}
+            onChange={setSearch}
+            showFilter
+            actionIcon={<PlusOutlined />}
+          />
+        </div>
 
-        <div className='overflow-x-auto' ref={tableRef}>
-          <table className='w-full text-left mt-5'>
-            <thead className='border-b border-slate-300 text-xs text-slate-400'>
+        <div className='overflow-auto max-h-96 border-t border-slate-200' ref={tableRef}>
+          <table className='w-full text-left table-fixed'>
+            <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
               <tr>
-                <th className='px-6 py-4'>STT</th>
-                <th className='px-6 py-4'>Loại vi phạm</th>
-                <th className='px-6 py-4'>Mô tả chi tiết</th>
-                <th className='px-6 py-4'>Thời gian vi phạm</th>
-                <th className='px-6 py-4'>Người ghi nhận</th>
-                <th className='px-6 py-4'>Ngày tạo</th>
+                <th className='px-6 py-4 w-[60px]'>STT</th>
+                <th className='px-6 py-4 w-[180px]'>Loại vi phạm</th>
+                <th className='px-6 py-4 w-[250px]'>Mô tả chi tiết</th>
+                <th className='px-6 py-4 w-[180px]'>Thời gian vi phạm</th>
+                <th className='px-6 py-4 w-[150px]'>Người ghi nhận</th>
+                <th
+                  className='px-6 py-4 w-[150px] cursor-pointer hover:bg-slate-100 transition-colors'
+                  onClick={handleSortDate}
+                >
+                  <div className='flex items-center gap-1'>
+                    <span>Ngày tạo</span>
+                    <div className='flex flex-col text-[8px] leading-none shrink-0'>
+                      <CaretUpOutlined
+                        className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
+                      />
+                      <CaretDownOutlined
+                        className={sortOrder === 'desc' ? 'text-blue-600' : 'text-slate-300'}
+                      />
+                    </div>
+                  </div>
+                </th>
               </tr>
             </thead>
-
-            <tbody className='divide-y divide-slate-300 text-gray-800'>
+            <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
               {paginatedViolations.map((v, i) => (
-                <tr key={v.id}>
-                  <td className='px-6 py-4 text-sm font-medium'>{i + 1}</td>
-                  <td className='px-6 py-4 text-sm font-medium'>{v.type}</td>
-                  <td className='px-6 py-4 text-sm text-slate-600'>{v.description}</td>
-                  <td className='px-6 py-4 text-sm'>{formatDateTime(v.violationTime)}</td>
-                  <td className='px-6 py-4 text-sm'>{v.reporter}</td>
-                  <td className='px-6 py-4 text-sm'>{formatDate(v.createdAt)}</td>
+                <tr key={v.id} className='hover:bg-slate-50 transition-colors'>
+                  <td className='px-6 py-4 text-sm'>{(page - 1) * pageSize + i + 1}</td>
+                  <td className='px-6 py-4 text-sm font-medium truncate' title={v.type}>
+                    {v.type}
+                  </td>
+                  <td className='px-6 py-4 text-sm text-slate-600 truncate' title={v.description}>
+                    {v.description}
+                  </td>
+                  <td className='px-6 py-4 text-sm whitespace-nowrap'>
+                    {formatDateTime(v.violationTime)}
+                  </td>
+                  <td className='px-6 py-4 text-sm truncate' title={v.reporter}>
+                    {v.reporter}
+                  </td>
+                  <td className='px-6 py-4 text-sm whitespace-nowrap'>{formatDate(v.createdAt)}</td>
                 </tr>
               ))}
 
-              {filteredViolations.length === 0 && (
+              {sortedViolations.length === 0 && (
                 <tr>
-                  <td colSpan={6} className='px-6 py-6 text-center text-sm text-slate-400'>
-                    Không có vi phạm
+                  <td colSpan={6} className='px-6 py-10 text-center text-sm text-slate-400'>
+                    Không có vi phạm nào.
                   </td>
                 </tr>
               )}
