@@ -28,7 +28,7 @@ export default function GeneralInfo() {
 
   return (
     <section className='space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Thông tin chung</h1>
+      <h1 className='text-2xl font-bold text-slate-900'>General Information</h1>
 
       <Card>
         <div className='grid grid-cols-1 gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-4'>
@@ -40,7 +40,7 @@ export default function GeneralInfo() {
         <p className='mt-4 italic text-slate-700'>{info.description}</p>
 
         <div className='mt-8 space-y-1 border-t border-slate-200 pt-6'>
-          <p className='text-xs text-slate-400'>Đã tạo {info.createdAt}</p>
+          <p className='text-xs text-slate-400'>Created {info.createdAt}</p>
           <p className='text-xs font-medium text-slate-400'>{info.updatedText}</p>
         </div>
       </Card>

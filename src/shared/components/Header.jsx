@@ -16,7 +16,7 @@ export default function Header() {
     try {
       await logout();
       clearAuth();
-      toast.success('Đăng xuất thành công');
+      toast.success('Logout successfully');
     } finally {
       router.refresh();
       router.push('/login');
@@ -24,10 +24,10 @@ export default function Header() {
   };
   const avatarMenu = {
     items: [
-      { key: 'profile', icon: <UserOutlined />, label: 'Thông tin cá nhân' },
-      { key: 'settings', icon: <SettingOutlined />, label: 'Cài đặt' },
+      { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
-      { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', danger: true },
+      { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: async ({ key }) => {
       if (key === 'profile') router.push('/student/profile');

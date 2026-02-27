@@ -3,7 +3,7 @@
 export default function Project() {
   return (
     <section className='space-y-6 mt-10 pb-10'>
-      <h1 className='text-2xl font-bold ml-1 text-slate-900'>Dự án</h1>
+      <h1 className='text-2xl font-bold ml-1 text-slate-900'>Project</h1>
 
       <div className='rounded-2xl bg-white shadow-sm p-6 sm:p-8 h-auto border border-slate-100 flex flex-col'>
         <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
@@ -12,7 +12,7 @@ export default function Project() {
         </div>
 
         <div className='mt-8 space-y-6 text-slate-700 leading-relaxed'>
-          <SectionTitle>Mô tả</SectionTitle>
+          <SectionTitle>Description</SectionTitle>
 
           <div>
             <p className='font-bold text-xl mb-2 text-slate-900'>1. Tổng quan dự án</p>
@@ -70,7 +70,7 @@ export default function Project() {
         </div>
 
         <div className='mt-10 pt-6 border-t border-slate-100'>
-          <SectionTitle>Tài nguyên đính kèm</SectionTitle>
+          <SectionTitle>Attached resources</SectionTitle>
           <ul className='mt-4 list-none grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             {['Tài liệu báo cáo bảo mật', 'Test case mẫu', 'Bug Report mẫu', 'User Story mẫu'].map(
               (file, index) => (
@@ -86,13 +86,13 @@ export default function Project() {
         </div>
 
         <div className='mt-10 border-t border-slate-100 pt-4'>
-          <p className='text-xs text-slate-400 uppercase tracking-wide'>Dữ liệu hệ thống</p>
+          <p className='text-xs text-slate-400 uppercase tracking-wide'>System data</p>
           <div className='flex gap-6 mt-1'>
             <p className='text-xs text-slate-400'>
-              Đã tạo: <span className='font-medium'>19/01/2026</span>
+              Created: <span className='font-medium'>19/01/2026</span>
             </p>
             <p className='text-xs text-slate-400'>
-              Cập nhật: <span className='font-medium text-slate-500'>11 ngày trước</span>
+              Updated: <span className='font-medium text-slate-500'>11 days ago</span>
             </p>
           </div>
         </div>

@@ -13,7 +13,7 @@ export default function Footer({
   return (
     <div className='flex items-center justify-between text-sm text-slate-600'>
       <span>
-        Tổng số bản ghi: <b className='text-slate-800'>{total}</b>
+        Total records: <b className='text-slate-800'>{total}</b>
       </span>
 
       <div className='flex items-center gap-3'>
@@ -57,9 +57,9 @@ export default function Footer({
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
           className='ml-4 border rounded-full px-3 py-1'
         >
-          <option value={10}>10/trang</option>
-          <option value={20}>20/trang</option>
-          <option value={50}>50/trang</option>
+          <option value={10}>10/page</option>
+          <option value={20}>20/page</option>
+          <option value={50}>50/page</option>
         </select>
       </div>
     </div>

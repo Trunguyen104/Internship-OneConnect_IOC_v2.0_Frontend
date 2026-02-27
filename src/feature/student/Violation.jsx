@@ -55,11 +55,11 @@ export default function ViolationList() {
 
   return (
     <section className='flex flex-col h-full space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Vi phạm</h1>
+      <h1 className='text-2xl font-bold text-slate-900'>Violation</h1>
       <Card>
         <div className='mb-5'>
           <SearchBar
-            placeholder='Tìm kiếm'
+            placeholder='Search'
             value={search}
             onChange={setSearch}
             showFilter
@@ -72,16 +72,16 @@ export default function ViolationList() {
             <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
               <tr>
                 <th className='px-6 py-4 w-[60px]'>STT</th>
-                <th className='px-6 py-4 w-[180px]'>Loại vi phạm</th>
-                <th className='px-6 py-4 w-[250px]'>Mô tả chi tiết</th>
-                <th className='px-6 py-4 w-[180px]'>Thời gian vi phạm</th>
-                <th className='px-6 py-4 w-[150px]'>Người ghi nhận</th>
+                <th className='px-6 py-4 w-[180px]'>Violation Type</th>
+                <th className='px-6 py-4 w-[250px]'>Description</th>
+                <th className='px-6 py-4 w-[180px]'>Violation Time</th>
+                <th className='px-6 py-4 w-[150px]'>Reporter</th>
                 <th
                   className='px-6 py-4 w-[150px] cursor-pointer hover:bg-slate-100 transition-colors'
                   onClick={handleSortDate}
                 >
                   <div className='flex items-center gap-1'>
-                    <span>Ngày tạo</span>
+                    <span>Created Date</span>
                     <div className='flex flex-col text-[8px] leading-none shrink-0'>
                       <CaretUpOutlined
                         className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
@@ -117,7 +117,7 @@ export default function ViolationList() {
               {sortedViolations.length === 0 && (
                 <tr>
                   <td colSpan={6} className='px-6 py-10 text-center text-sm text-slate-400'>
-                    Không có vi phạm nào.
+                    No violations found.
                   </td>
                 </tr>
               )}

@@ -48,7 +48,7 @@ export default function Sidebar() {
           className='mx-4 mb-4 flex items-center gap-2 text-xs font-black text-red-800 cursor-pointer'
         >
           <ArrowLeftOutlined />
-          Quay lại
+          Back
         </Link>
       )}
 

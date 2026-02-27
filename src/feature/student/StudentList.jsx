@@ -35,12 +35,12 @@ export default function StudentList() {
 
   return (
     <section className='space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Sinh viên</h1>
+      <h1 className='text-2xl font-bold text-slate-900'>Student List</h1>
 
       <Card>
         <div className='p-2'>
           <SearchBar
-            placeholder='Tìm kiếm theo tên'
+            placeholder='Search by name'
             value={search}
             onChange={(val) => {
               setSearch(val);
@@ -55,10 +55,10 @@ export default function StudentList() {
               <tr>
                 <th className='px-6 py-4 text-center w-16'>STT</th>
                 <th className='px-6 py-4'>Avatar</th>
-                <th className='px-6 py-4'>Họ và tên</th>
+                <th className='px-6 py-4'>Full Name</th>
                 <th className='px-6 py-4'>Email</th>
-                <th className='px-6 py-4 text-center'>Ngày sinh</th>
-                <th className='px-6 py-4 text-center'>Giới tính</th>
+                <th className='px-6 py-4 text-center'>Date of Birth</th>
+                <th className='px-6 py-4 text-center'>Gender</th>
               </tr>
             </thead>
 
@@ -83,7 +83,7 @@ export default function StudentList() {
               {filteredStudents.length === 0 && (
                 <tr>
                   <td colSpan={6} className='px-6 py-10 text-center text-sm text-slate-400 italic'>
-                    Không tìm thấy sinh viên nào phù hợp
+                    No students found.
                   </td>
                 </tr>
               )}

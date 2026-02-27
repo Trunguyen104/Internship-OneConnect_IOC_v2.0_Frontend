@@ -162,7 +162,7 @@ export default function StakeholderPage() {
               : 'border-slate-300 text-slate-600 hover:bg-slate-100'
           }`}
         >
-          Các bên liên quan
+          Stakeholder
         </button>
 
         <button
@@ -173,7 +173,7 @@ export default function StakeholderPage() {
               : 'border-slate-300 text-slate-600 hover:bg-slate-100'
           }`}
         >
-          Vấn đề
+          Issue
         </button>
       </div>
 
@@ -182,18 +182,18 @@ export default function StakeholderPage() {
           <>
             <div className='flex flex-col p-3 sm:flex-row sm:items-center sm:justify-between'>
               <SearchBar
-                placeholder='Tìm kiếm bên liên quan...'
+                placeholder='Search stakeholder...'
                 value={search}
                 onChange={setSearch}
                 showFilter
                 showAction
-                actionLabel='Thêm bên liên quan'
+                actionLabel='Add stakeholder'
                 onActionClick={() => setOpenStakeholderForm(true)}
               />
             </div>
 
             <div className='px-6 pb-10 pt-4'>
-              <p className='text-sm text-slate-500'>Chưa có bên liên quan nào.</p>
+              <p className='text-sm text-slate-500'>No stakeholder found.</p>
             </div>
           </>
         )}
@@ -203,12 +203,12 @@ export default function StakeholderPage() {
             <Card>
               <div className='flex flex-col p-2 mb-5 sm:flex-row sm:items-center sm:justify-between'>
                 <SearchBar
-                  placeholder='Tìm kiếm theo tên'
+                  placeholder='Search issue...'
                   value={search}
                   onChange={setSearch}
                   showFilter
                   showAction
-                  actionLabel='Thêm vấn đề'
+                  actionLabel='Add issue'
                   onActionClick={() => setOpenIssueForm(true)}
                 />
               </div>
@@ -217,15 +217,15 @@ export default function StakeholderPage() {
                 <table className='w-full text-left table-fixed'>
                   <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
                     <tr>
-                      <th className='px-6 py-3 w-[300px]'>Tiêu đề</th>
-                      <th className='px-6 py-3 w-[180px]'>Bên liên quan</th>
-                      <th className='px-6 py-3 w-[150px]'>Trạng thái</th>
+                      <th className='px-6 py-3 w-[300px]'>Title</th>
+                      <th className='px-6 py-3 w-[180px]'>Stakeholder</th>
+                      <th className='px-6 py-3 w-[150px]'>Status</th>
                       <th
                         className='px-6 py-3 w-[150px] cursor-pointer hover:bg-slate-100 transition-colors'
                         onClick={handleSortDate}
                       >
                         <div className='flex items-center gap-1'>
-                          <span>Ngày tạo</span>
+                          <span>Created Date</span>
                           <div className='flex flex-col text-[8px] leading-none shrink-0'>
                             <CaretUpOutlined
                               className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
@@ -276,7 +276,7 @@ export default function StakeholderPage() {
                     {filteredIssueData.length === 0 && (
                       <tr>
                         <td colSpan={4} className='px-6 py-10 text-center text-sm text-slate-400'>
-                          Không tìm thấy vấn đề nào.
+                          No issue found.
                         </td>
                       </tr>
                     )}
@@ -306,22 +306,22 @@ export default function StakeholderPage() {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
           <div className='bg-white w-full max-w-[500px] rounded-3xl shadow-xl overflow-hidden'>
             <div className='px-6 py-4 border-b'>
-              <h2 className='text-xl font-semibold text-center'>Thêm bên liên quan mới</h2>
+              <h2 className='text-xl font-semibold text-center'>Add new stakeholder</h2>
             </div>
 
             <div className='max-h-[65vh] overflow-y-auto px-6 py-4 space-y-4'>
               <div>
-                <label className='block text-sm font-medium text-slate-700 mb-1'>Loại</label>
+                <label className='block text-sm font-medium text-slate-700 mb-1'>Type</label>
                 <select className='w-full rounded-full border border-slate-300 px-4 py-2.5 text-sm focus:outline-none'>
-                  <option>Chọn loại</option>
-                  <option>Cá nhân</option>
-                  <option>Tổ chức</option>
+                  <option>Select type</option>
+                  <option>Personal</option>
+                  <option>Organization</option>
                 </select>
               </div>
 
               <div>
                 <label className='block text-sm font-medium text-slate-700 mb-1'>
-                  Tên <span className='text-red-500'>*</span>
+                  Name <span className='text-red-500'>*</span>
                 </label>
                 <input
                   placeholder='VD: Lê Duy Khánh'
@@ -330,7 +330,7 @@ export default function StakeholderPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-slate-700 mb-1'>Vai trò</label>
+                <label className='block text-sm font-medium text-slate-700 mb-1'>Role</label>
                 <input
                   placeholder='VD: Mentor, HR, ...'
                   className='w-full rounded-full border border-slate-300 px-4 py-2.5 text-sm'
@@ -338,7 +338,7 @@ export default function StakeholderPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-slate-700 mb-1'>Mô tả</label>
+                <label className='block text-sm font-medium text-slate-700 mb-1'>Description</label>
                 <textarea className='w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm min-h-[90px]' />
               </div>
             </div>
@@ -348,10 +348,10 @@ export default function StakeholderPage() {
                 onClick={() => setOpenStakeholderForm(false)}
                 className='px-5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-sm'
               >
-                Hủy
+                Cancel
               </button>
               <button className='px-6 py-2 rounded-full bg-(--primary-600) text-white text-sm font-medium'>
-                Tạo bên liên quan
+                Create stakeholder
               </button>
             </div>
           </div>
@@ -362,23 +362,21 @@ export default function StakeholderPage() {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
           <div className='bg-white w-full max-w-[720px] rounded-3xl shadow-xl overflow-hidden'>
             <div className='px-6 py-4 border-b'>
-              <h2 className='text-xl font-semibold text-center'>Thêm vấn đề mới</h2>
+              <h2 className='text-xl font-semibold text-center'>Add new issue</h2>
             </div>
 
             <div className='max-h-[70vh] overflow-y-auto px-6 py-4 space-y-5'>
               <div>
-                <label className='block text-sm font-medium text-slate-700 mb-1'>
-                  Bên liên quan
-                </label>
+                <label className='block text-sm font-medium text-slate-700 mb-1'>Stakeholder</label>
                 <select className='w-full rounded-full border border-slate-300 px-4 py-2.5 text-sm'>
-                  <option>Chọn bên liên quan</option>
+                  <option>Select stakeholder</option>
                   <option>Mentor</option>
-                  <option>Doanh nghiệp A</option>
+                  <option>Enterprise A</option>
                 </select>
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-slate-700 mb-1'>Tiêu đề</label>
+                <label className='block text-sm font-medium text-slate-700 mb-1'>Title</label>
                 <input
                   value={issueForm.title}
                   onChange={(e) => setIssueForm({ ...issueForm, title: e.target.value })}
@@ -387,9 +385,7 @@ export default function StakeholderPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-slate-700 mb-2'>
-                  Mô tả chi tiết
-                </label>
+                <label className='block text-sm font-medium text-slate-700 mb-2'>Description</label>
                 <div className='border border-slate-300 rounded-2xl overflow-hidden'>
                   <TiptapEditor
                     value={issueForm.description}
@@ -404,10 +400,10 @@ export default function StakeholderPage() {
                 onClick={() => setOpenIssueForm(false)}
                 className='px-5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-sm'
               >
-                Hủy
+                Cancel
               </button>
               <button className='px-6 py-2 rounded-full bg-(--primary-600) text-white text-sm font-medium'>
-                Lưu
+                Save
               </button>
             </div>
           </div>

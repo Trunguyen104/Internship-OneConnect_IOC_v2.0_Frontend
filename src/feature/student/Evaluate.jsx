@@ -15,22 +15,22 @@ export default function Evaluation() {
 
   return (
     <section className='space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Đánh giá</h1>
+      <h1 className='text-2xl font-bold text-slate-900'>Evaluation</h1>
 
       <Card>
         <div className='p-5 border-b border-slate-200 bg-slate-50/50'>
-          <h2 className='font-semibold text-slate-800'>Thông tin chung</h2>
+          <h2 className='font-semibold text-slate-800'>General Information</h2>
         </div>
 
         <div className='max-h-96 overflow-auto' style={{ scrollbarWidth: 'thin' }}>
           <table className='w-full text-left table-fixed'>
             <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
               <tr>
-                <th className='px-6 py-3 w-[250px]'>Tên chu kỳ</th>
-                <th className='px-6 py-3 w-[150px]'>Thời gian bắt đầu</th>
-                <th className='px-6 py-3 w-[150px]'>Thời gian kết thúc</th>
-                <th className='px-6 py-3 w-[150px]'>Trạng thái</th>
-                <th className='px-6 py-3 w-[220px]'>Số sinh viên đã được chấm điểm</th>
+                <th className='px-6 py-3 w-[250px]'>Evaluation Cycle</th>
+                <th className='px-6 py-3 w-[150px]'>Start Time</th>
+                <th className='px-6 py-3 w-[150px]'>End Time</th>
+                <th className='px-6 py-3 w-[150px]'>Status</th>
+                <th className='px-6 py-3 w-[220px]'>Scored</th>
                 <th className='px-6 py-3 w-[80px]'></th>
               </tr>
             </thead>
@@ -66,7 +66,7 @@ export default function Evaluation() {
               {evaluations.length === 0 && (
                 <tr>
                   <td colSpan={6} className='px-6 py-10 text-center text-slate-400 text-sm'>
-                    Không có dữ liệu đánh giá
+                    No evaluation data
                   </td>
                 </tr>
               )}
@@ -87,7 +87,7 @@ function StatusBadge({ status }) {
   if (status === 'ONGOING') {
     return (
       <span className='inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 whitespace-nowrap'>
-        Đang diễn ra
+        Ongoing
       </span>
     );
   }
@@ -95,14 +95,14 @@ function StatusBadge({ status }) {
   if (status === 'UPCOMING') {
     return (
       <span className='inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 whitespace-nowrap'>
-        Sắp diễn ra
+        Upcoming
       </span>
     );
   }
 
   return (
     <span className='inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap'>
-      Đã kết thúc
+      Completed
     </span>
   );
 }
