@@ -3,7 +3,7 @@
 import { SearchOutlined, FilterOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 export default function SearchBar({
-  placeholder = 'Tìm kiếm',
+  placeholder = 'Search',
   value,
   onChange,
   width = 'w-72',
@@ -35,7 +35,7 @@ export default function SearchBar({
             px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 cursor-pointer'
         >
           <FilterOutlined />
-          Bộ lọc
+          Filter
         </button>
       )}
 

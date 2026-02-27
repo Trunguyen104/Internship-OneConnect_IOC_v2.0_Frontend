@@ -33,19 +33,19 @@ export default function PersonalInfo() {
     setSelectedSkills([]);
     setSelectMode(false);
 
-    toast.success('Xóa kỹ năng thành công', `Đã xóa ${count} kỹ năng`);
+    toast.success('Skills deleted successfully', `Removed ${count} skills`);
   };
 
   const handleAddSkill = () => {
     if (!newSkill.name.trim()) {
-      setSkillError('Vui lòng nhập tên kỹ năng');
+      setSkillError('Please enter a skill name');
       return;
     }
 
     const exists = skills.some((s) => s.name.toLowerCase() === newSkill.name.trim().toLowerCase());
 
     if (exists) {
-      setSkillError('Kỹ năng này đã tồn tại');
+      setSkillError('Skill already exists');
       return;
     }
 
@@ -54,7 +54,7 @@ export default function PersonalInfo() {
     setSkillError('');
     setShowAddForm(false);
     toast.success(
-      'Thêm kỹ năng thành công',
+      'Skills added successfully',
       `${newSkill.name}${newSkill.level ? ` (${newSkill.level})` : ''}`,
     );
   };
@@ -62,49 +62,49 @@ export default function PersonalInfo() {
 
   return (
     <section className='space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Thông tin cá nhân</h1>
+      <h1 className='text-2xl font-bold text-slate-900'>Personal Information</h1>
 
       <Card>
         <div className='flex items-center gap-6 border-b border-slate-200 pb-6'>
           <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} fullName='Lê Duy Khánh' />
 
           <div>
-            <h2 className='text-lg font-bold text-slate-900'>Ảnh đại diện</h2>
+            <h2 className='text-lg font-bold text-slate-900'>Avatar</h2>
             <p className='mt-1 text-sm text-slate-500'>
-              Định dạng JPG, PNG, kích thước dưới 2MB, kích thước tiêu chuẩn: 1200x1200px
+              JPG, PNG format, under 2MB, recommended size: 1200x1200px
             </p>
           </div>
 
           <div className='flex gap-2 ml-50 mt-15'>
             <button className='rounded-full cursor-pointer bg-red-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-700'>
-              Chỉnh sửa
+              Edit
             </button>
             <button className='rounded-full cursor-pointer bg-red-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-700'>
-              Tải lên CV
+              Upload CV
             </button>
           </div>
         </div>
 
         <div className='pt-6'>
           <div className='grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-4'>
-            <InfoItem label='Họ và tên' value='Lê Duy Khánh' />
+            <InfoItem label='Full Name' value='Lê Duy Khánh' />
             <InfoItem label='Email' value='KhanhLD.CE190235@gmail.com' />
-            <InfoItem label='Số điện thoại' value='0765 602 789' />
-            <InfoItem label='Vai trò'>
+            <InfoItem label='Phone' value='0765 602 789' />
+            <InfoItem label='Role'>
               <span className='inline-flex rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-600'>
-                Sinh viên
+                Student
               </span>
             </InfoItem>
 
-            <InfoItem label='Mã sinh viên' value='STU-1740' />
-            <InfoItem label='Trường học' value='FU Cần Thơ' />
-            <InfoItem label='Ngày sinh' value='29/01/2005' />
-            <InfoItem label='Giới tính' value='Nam' />
+            <InfoItem label='Student ID' value='STU-1740' />
+            <InfoItem label='University' value='FU Cần Thơ' />
+            <InfoItem label='Date of Birth' value='29/01/2005' />
+            <InfoItem label='Gender' value='Male' />
           </div>
         </div>
       </Card>
 
-      <h1 className='text-2xl font-bold text-slate-900 mt-7'>Kỹ năng</h1>
+      <h1 className='text-2xl font-bold text-slate-900 mt-7'>Skills</h1>
 
       <Card>
         <div className='flex min-h-[400px] flex-col'>
@@ -113,7 +113,7 @@ export default function PersonalInfo() {
               <div className='flex flex-col gap-4 rounded-lg border border-slate-200 bg-slate-50 p-6 md:flex-row md:items-end'>
                 <div className='flex-1'>
                   <label className='mb-1 block text-sm font-medium text-slate-600'>
-                    Kỹ năng
+                    Skill
                     <span className='ml-2 text-xs text-slate-400'>({newSkill.name.length}/30)</span>
                   </label>
                   <input
@@ -132,7 +132,7 @@ export default function PersonalInfo() {
                 </div>
 
                 <div className='w-full md:w-48'>
-                  <label className='mb-1 block text-sm font-medium text-slate-600'>Trình độ</label>
+                  <label className='mb-1 block text-sm font-medium text-slate-600'>Level</label>
                   <select
                     value={newSkill.level}
                     onChange={(e) => setNewSkill({ ...newSkill, level: e.target.value })}
@@ -149,7 +149,7 @@ export default function PersonalInfo() {
                   onClick={handleAddSkill}
                   className='h-10 rounded-full bg-red-600 px-6 text-sm font-semibold text-white hover:bg-red-700 cursor-pointer'
                 >
-                  Thêm
+                  Add
                 </button>
               </div>
 
@@ -160,7 +160,7 @@ export default function PersonalInfo() {
           )}
 
           <div className='flex items-center justify-between'>
-            <label className='text-xl font-medium italic'>Kỹ năng của bạn</label>
+            <label className='text-xl font-medium italic'>Your Skills</label>
 
             {skills.length > 0 && (
               <div className='flex items-center gap-4'>
@@ -169,7 +169,7 @@ export default function PersonalInfo() {
                     onClick={handleDeleteSelected}
                     className='rounded-full bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700'
                   >
-                    Xóa ({selectedSkills.length})
+                    Delete ({selectedSkills.length})
                   </button>
                 )}
               </div>
@@ -209,13 +209,13 @@ export default function PersonalInfo() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className='mb-6'>
-                    <h2 className='text-lg font-semibold text-slate-900'>Chỉnh sửa</h2>
+                    <h2 className='text-lg font-semibold text-slate-900'>Edit</h2>
                   </div>
 
                   <div className='space-y-4'>
                     <div>
                       <label className='block text-sm font-medium text-slate-600 mb-1'>
-                        Tên kỹ năng
+                        Skill Name
                       </label>
                       <input
                         value={editForm.name}
@@ -226,9 +226,7 @@ export default function PersonalInfo() {
                     </div>
 
                     <div>
-                      <label className='block text-sm font-medium text-slate-600 mb-1'>
-                        Trình độ
-                      </label>
+                      <label className='block text-sm font-medium text-slate-600 mb-1'>Level</label>
                       <select
                         value={editForm.level || ''}
                         onChange={(e) => setEditForm({ ...editForm, level: e.target.value })}
@@ -251,7 +249,7 @@ export default function PersonalInfo() {
                       }}
                       className='text-sm font-medium text-red-600 hover:underline'
                     >
-                      Xóa
+                      Delete
                     </button>
 
                     <div className='flex gap-3'>
@@ -259,7 +257,7 @@ export default function PersonalInfo() {
                         onClick={() => setEditingSkill(null)}
                         className='rounded-full bg-slate-200 px-5 py-2 text-sm font-semibold hover:bg-slate-300'
                       >
-                        Hủy
+                        Cancel
                       </button>
 
                       <button
@@ -274,7 +272,7 @@ export default function PersonalInfo() {
                         }}
                         className='rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-700'
                       >
-                        Lưu thay đổi
+                        Save Changes
                       </button>
                     </div>
                   </div>
@@ -286,7 +284,7 @@ export default function PersonalInfo() {
                 onClick={() => setShowAddForm(true)}
                 className='rounded-full border border-dashed border-red-400 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 transition'
               >
-                + Thêm
+                + Add
               </button>
             )}
           </div>
@@ -298,7 +296,7 @@ export default function PersonalInfo() {
               }}
               className='min-w-[120px] rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition'
             >
-              {editMode ? 'Hoàn tất' : 'Chỉnh sửa'}
+              {editMode ? 'Done' : 'Edit'}
             </button>
           </div>
         </div>

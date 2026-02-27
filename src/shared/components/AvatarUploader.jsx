@@ -6,7 +6,6 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 
-// bắt lỗi trước khi cho edit
 export default function AvatarUploader({ value, onChange, size = 116, fullName }) {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
@@ -21,13 +20,13 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
   const beforeUpload = (file) => {
     const isImage = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isImage) {
-      toast.error('Chỉ hỗ trợ JPG / PNG');
+      toast.error('Only JPG / PNG is supported');
       return false;
     }
 
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      toast.error('Ảnh phải nhỏ hơn 2MB');
+      toast.error('Image must be less than 2MB');
       return false;
     }
 
@@ -38,7 +37,7 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
       onChange?.(reader.result);
       setLoading(false);
 
-      toast.success('Cập nhật avatar thành công');
+      toast.success('Update avatar successfully');
     };
 
     reader.readAsDataURL(file);
@@ -62,7 +61,7 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
               />
               <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
                 <PlusOutlined className='text-xl' />
-                <span className='mt-1 text-xs font-semibold'>Sửa ảnh</span>
+                <span className='mt-1 text-xs font-semibold'>Edit avatar</span>
               </div>
             </>
           ) : (
@@ -74,13 +73,13 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
                   <span className='text-4xl font-bold text-slate-700'>{getInitials(fullName)}</span>
                   <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
                     <PlusOutlined className='text-xl' />
-                    <span className='mt-1 text-xs font-semibold'>Tải lên</span>
+                    <span className='mt-1 text-xs font-semibold'>Upload</span>
                   </div>
                 </>
               ) : (
                 <>
                   <PlusOutlined className='mb-1 text-2xl' />
-                  <span className='text-xs font-medium'>Tải lên</span>
+                  <span className='text-xs font-medium'>Upload</span>
                 </>
               )}
             </div>

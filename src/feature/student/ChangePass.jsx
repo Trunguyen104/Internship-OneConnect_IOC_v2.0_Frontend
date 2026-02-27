@@ -46,31 +46,31 @@ export default function ChangePass() {
       const text = await res.text();
 
       if (res.ok) {
-        toast.success('Đổi mật khẩu thành công');
+        toast.success('Password changed successfully');
         setForm({
           currentPassword: '',
           newPassword: '',
           confirmPassword: '',
         });
       } else {
-        toast.error(text || 'Đổi mật khẩu thất bại');
+        toast.error(text || 'Failed to change password');
       }
     } catch {
-      toast.error('Có lỗi xảy ra');
+      toast.error('An error occurred');
     }
   };
 
   return (
     <>
       <div className='mb-5'>
-        <h1 className='text-2xl font-bold text-slate-900'>Thay đổi mật khẩu</h1>
-        <label className='text-sm'>Đặt lại mật khẩu để bảo vệ tài khoản của bạn.</label>
+        <h1 className='text-2xl font-bold text-slate-900'>Change Password</h1>
+        <label className='text-sm'>Reset your password to protect your account.</label>
       </div>
       <Card>
         <div className='space-y-8'>
           <div className='space-y-6 w-full'>
             <PasswordField
-              label='Mật khẩu hiện tại'
+              label='Current Password'
               name='currentPassword'
               value={form.currentPassword}
               onChange={handleChange}
@@ -79,7 +79,7 @@ export default function ChangePass() {
             />
 
             <PasswordField
-              label='Mật khẩu mới'
+              label='New Password'
               name='newPassword'
               value={form.newPassword}
               onChange={handleChange}
@@ -88,7 +88,7 @@ export default function ChangePass() {
             />
 
             <PasswordField
-              label='Nhập lại mật khẩu'
+              label='Confirm Password'
               name='confirmPassword'
               value={form.confirmPassword}
               onChange={handleChange}
@@ -96,7 +96,7 @@ export default function ChangePass() {
               onToggle={() => setShow({ ...show, confirm: !show.confirm })}
               error={
                 form.confirmPassword && form.newPassword !== form.confirmPassword
-                  ? 'Mật khẩu không khớp'
+                  ? 'Passwords do not match'
                   : ''
               }
             />
@@ -111,7 +111,7 @@ export default function ChangePass() {
     isValid ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-red-200 text-white cursor-not-allowed'
   }`}
             >
-              Đổi mật khẩu
+              Change Password
             </button>
           </div>
         </div>

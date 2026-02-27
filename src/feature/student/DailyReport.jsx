@@ -198,17 +198,17 @@ export default function DailyReport() {
 
   return (
     <section className='space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Báo cáo hằng ngày</h1>
+      <h1 className='text-2xl font-bold text-slate-900'>Daily Report</h1>
 
       <Card>
         <div className='mb-5 flex items-center'>
           <SearchBar
-            placeholder='Tìm kiếm'
+            placeholder='Search'
             value={search}
             onChange={setSearch}
             showFilter
             showAction
-            actionLabel='Tạo báo cáo'
+            actionLabel='Create Report'
             actionIcon={<PlusOutlined />}
             onActionClick={() => setOpen(true)}
           />
@@ -226,7 +226,7 @@ export default function DailyReport() {
                   onClick={handleSortDate}
                 >
                   <div className='flex items-center gap-1 w-full'>
-                    <span className='whitespace-nowrap'>Ngày báo cáo</span>
+                    <span className='whitespace-nowrap'>Date</span>
                     <div className='flex flex-col text-[8px] leading-none shrink-0'>
                       <CaretUpOutlined
                         className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
@@ -238,11 +238,11 @@ export default function DailyReport() {
                   </div>
                 </th>
 
-                <th className='px-6 py-3 w-[150px]'>Tên sinh viên</th>
-                <th className='px-6 py-3 w-[200px]'>Tóm tắt công việc</th>
-                <th className='px-6 py-3 w-[150px]'>Issue đã làm</th>
-                <th className='px-6 py-3 w-[120px]'>Trạng thái nộp</th>
-                <th className='px-6 py-3 w-[120px]'>Trạng thái</th>
+                <th className='px-6 py-3 w-[150px]'>Student Name</th>
+                <th className='px-6 py-3 w-[200px]'>Summary</th>
+                <th className='px-6 py-3 w-[150px]'>Issue</th>
+                <th className='px-6 py-3 w-[120px]'>Submit Status</th>
+                <th className='px-6 py-3 w-[120px]'>Status</th>
               </tr>
             </thead>
             <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
@@ -303,42 +303,42 @@ export default function DailyReport() {
       {open && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
           <div className='bg-white w-full max-w-xl rounded-2xl p-4'>
-            <h2 className='text-xl font-semibold mb-6'>Tạo báo cáo hằng ngày</h2>
+            <h2 className='text-xl font-semibold mb-6'>Create Daily Report</h2>
 
             <div className='max-h-[60vh] overflow-y-auto px-6 py-5'>
               <div className='space-y-2'>
                 <label className='block text-sm font-medium text-slate-700'>
-                  Ngày báo cáo <span className='text-red-500'>*</span>
+                  Date <span className='text-red-500'>*</span>
                 </label>
                 <input type='date' className='w-full border rounded-xl px-4 py-2' />
               </div>
 
               <div className='space-y-2'>
                 <label className='block mt-4 text-sm font-medium text-slate-700'>
-                  Công việc đã làm hôm qua <span className='text-red-500'>*</span>
+                  Work done yesterday <span className='text-red-500'>*</span>
                 </label>
                 <textarea
-                  placeholder='Nhập công việc đã thực hiện...'
+                  placeholder='Enter the work done...'
                   className='w-full border rounded-xl px-4 py-2 min-h-25'
                 />
               </div>
 
               <div className='space-y-2'>
                 <label className='block mt-4 text-sm font-medium text-slate-700'>
-                  Vấn đề gặp phải <span className='text-red-500'>*</span>
+                  Issues <span className='text-red-500'>*</span>
                 </label>
                 <textarea
-                  placeholder='Mô tả vấn đề nếu có...'
+                  placeholder='Describe issues if any...'
                   className='w-full border rounded-xl px-4 py-2 min-h-25'
                 />
               </div>
 
               <div className='space-y-2'>
                 <label className='block mt-4 text-sm font-medium text-slate-700'>
-                  Kế hoạch hôm nay <span className='text-red-500'>*</span>
+                  Plan for today <span className='text-red-500'>*</span>
                 </label>
                 <textarea
-                  placeholder='Nhập kế hoạch sẽ thực hiện...'
+                  placeholder='Enter the plan for today...'
                   className='w-full border rounded-xl px-4 py-2 min-h-25'
                 />
               </div>
@@ -349,10 +349,10 @@ export default function DailyReport() {
                 onClick={() => setOpen(false)}
                 className='px-5 py-2 rounded-full bg-gray-200 cursor-pointer'
               >
-                Hủy
+                Cancel
               </button>
               <button className='px-6 py-2 rounded-full bg-(--primary-600) text-white cursor-pointer'>
-                Tạo báo cáo
+                Create Report
               </button>
             </div>
           </div>
