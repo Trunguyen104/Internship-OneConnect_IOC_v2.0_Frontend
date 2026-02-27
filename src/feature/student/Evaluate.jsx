@@ -18,38 +18,58 @@ export default function Evaluation() {
       <h1 className='text-2xl font-bold text-slate-900'>Đánh giá</h1>
 
       <Card>
-        <div className='p-3 border-b border-slate-200'>
+        <div className='p-5 border-b border-slate-200 bg-slate-50/50'>
           <h2 className='font-semibold text-slate-800'>Thông tin chung</h2>
         </div>
 
-        <div className='overflow-x-auto'>
-          <table className='w-full'>
-            <thead className='border-b border-slate-200 text-xs text-slate-400'>
+        <div className='max-h-96 overflow-auto' style={{ scrollbarWidth: 'thin' }}>
+          <table className='w-full text-left table-fixed'>
+            <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
               <tr>
-                <th className='px-6 py-4 text-left'>Tên chu kỳ</th>
-                <th className='px-6 py-4 text-left'>Thời gian bắt đầu</th>
-                <th className='px-6 py-4 text-left'>Thời gian kết thúc</th>
-                <th className='px-6 py-4 text-left'>Trạng thái</th>
-                <th className='px-6 py-4 text-left'>Số sinh viên đã được chấm điểm</th>
-                <th className='px-6 py-4'></th>
+                <th className='px-6 py-3 w-[250px]'>Tên chu kỳ</th>
+                <th className='px-6 py-3 w-[150px]'>Thời gian bắt đầu</th>
+                <th className='px-6 py-3 w-[150px]'>Thời gian kết thúc</th>
+                <th className='px-6 py-3 w-[150px]'>Trạng thái</th>
+                <th className='px-6 py-3 w-[220px]'>Số sinh viên đã được chấm điểm</th>
+                <th className='px-6 py-3 w-[80px]'></th>
               </tr>
             </thead>
 
-            <tbody className='divide-y text-sm divide-slate-200'>
+            <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
               {evaluations.map((e) => (
-                <tr key={e.id} className='hover:bg-slate-50 transition'>
-                  <td className='px-6 py-4 font-medium text-slate-800'>{e.name}</td>
-                  <td className='px-6 py-4 text-slate-600'>{formatDate(e.startDate)}</td>
-                  <td className='px-6 py-4 text-slate-600'>{formatDate(e.endDate)}</td>
-                  <td className='px-6 py-4'>
+                <tr key={e.id} className='hover:bg-slate-50 transition-colors'>
+                  <td
+                    className='px-6 py-4 text-sm font-medium truncate overflow-hidden'
+                    title={e.name}
+                  >
+                    {e.name}
+                  </td>
+                  <td className='px-6 py-4 text-sm text-slate-600 whitespace-nowrap'>
+                    {formatDate(e.startDate)}
+                  </td>
+                  <td className='px-6 py-4 text-sm text-slate-600 whitespace-nowrap'>
+                    {formatDate(e.endDate)}
+                  </td>
+                  <td className='px-6 py-4 text-sm'>
                     <StatusBadge status={e.status} />
                   </td>
-                  <td className='px-6 py-4 text-slate-600'>{e.totalStudents}</td>
+                  <td className='px-6 py-4 text-sm text-slate-600 text-center lg:text-left'>
+                    {e.totalStudents}
+                  </td>
                   <td className='px-6 py-4 text-right'>
-                    <button className='p-2 hover:bg-slate-100 rounded'>⋮</button>
+                    <button className='p-2 hover:bg-slate-200 rounded-full transition-colors cursor-pointer text-slate-400'>
+                      ⋮
+                    </button>
                   </td>
                 </tr>
               ))}
+              {evaluations.length === 0 && (
+                <tr>
+                  <td colSpan={6} className='px-6 py-10 text-center text-slate-400 text-sm'>
+                    Không có dữ liệu đánh giá
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -59,13 +79,14 @@ export default function Evaluation() {
 }
 
 function formatDate(date) {
+  if (!date) return '';
   return new Date(`${date}T00:00:00`).toLocaleDateString('vi-VN');
 }
 
 function StatusBadge({ status }) {
   if (status === 'ONGOING') {
     return (
-      <span className='px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700'>
+      <span className='inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 whitespace-nowrap'>
         Đang diễn ra
       </span>
     );
@@ -73,11 +94,15 @@ function StatusBadge({ status }) {
 
   if (status === 'UPCOMING') {
     return (
-      <span className='px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700'>
+      <span className='inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700 whitespace-nowrap'>
         Sắp diễn ra
       </span>
     );
   }
 
-  return null;
+  return (
+    <span className='inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 whitespace-nowrap'>
+      Đã kết thúc
+    </span>
+  );
 }

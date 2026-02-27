@@ -3,168 +3,152 @@
 import Card from '@/shared/components/Card';
 import SearchBar from '@/shared/components/SearchBar';
 import { useState, useEffect, useRef } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import Footer from '@/shared/components/Footer';
 
 const DATA = [
   {
     id: 1,
-    date: '29/01/2026',
-    student: 'Lê Duy Khánh',
+    date: '27/02/2026 - 01:48:28',
+    student: 'Lê Duy Khánhhhhhhhhhhhhhhhhhh',
     status: 'Đang làm',
     summary: 'Hoàn thiện giao diện báo cáo',
     issue: 'Fix layout table',
-    time: '2h',
     submitStatus: 'Đã nộp',
   },
   {
     id: 2,
-    date: '30/01/2026',
+    date: '27/02/2026 - 01:32:17',
     student: 'Trần Gia Đạt',
     status: 'Hoàn thành',
     summary: 'Sửa UI dashboard',
     issue: 'Chỉnh responsive',
-    time: '3h',
     submitStatus: 'Chưa nộp',
   },
   {
     id: 3,
-    date: '29/01/2026',
-    student: 'Lê Duy Khánh',
+    date: '26/02/2026 - 03:28:17',
+    student: 'Nguyễn Văn A',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Viết API login',
+    issue: 'Backend task',
     submitStatus: 'Đã nộp',
   },
   {
     id: 4,
-    date: '29/01/2026',
+    date: '26/02/2026 - 02:58:45',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
     summary: 'Hoàn thiện giao diện báo cáo',
     issue: 'Fix layout table',
-    time: '2h',
     submitStatus: 'Đã nộp',
   },
   {
     id: 5,
-    date: '29/01/2026',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    date: '26/02/2026 - 02:05:54',
+    student: 'Phạm Thị B',
+    status: 'Hoàn thành',
+    summary: 'Thiết kế database',
+    issue: 'DB design',
     submitStatus: 'Đã nộp',
   },
   {
     id: 6,
-    date: '29/01/2026',
+    date: '26/02/2026 - 02:03:04',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
-    submitStatus: 'Đã nộp',
+    summary: 'Cài đặt môi trường',
+    issue: 'Setup project',
+    submitStatus: 'Chưa nộp',
   },
   {
     id: 7,
-    date: '29/01/2026',
-    student: 'Lê Duy Khánh',
+    date: '24/01/2026 - 09:15:22',
+    student: 'Trần C',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Test component',
+    issue: 'Unit test',
     submitStatus: 'Đã nộp',
   },
   {
     id: 8,
-    date: '29/01/2026',
+    date: '23/01/2026 - 10:45:10',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Hoàn thiện UI',
+    issue: 'UI fix',
     submitStatus: 'Đã nộp',
   },
   {
     id: 9,
-    date: '29/01/2026',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    date: '22/01/2026 - 08:20:05',
+    student: 'Nguyễn D',
+    status: 'Hoàn thành',
+    summary: 'Deploy staging',
+    issue: 'Devops',
     submitStatus: 'Đã nộp',
   },
   {
     id: 10,
-    date: '29/01/2026',
+    date: '21/01/2026 - 14:30:55',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Fix bug login',
+    issue: 'Bug fix',
     submitStatus: 'Đã nộp',
   },
   {
     id: 11,
-    date: '29/01/2026',
+    date: '20/01/2026 - 16:12:40',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Họp team',
+    issue: 'Meeting',
     submitStatus: 'Đã nộp',
   },
   {
     id: 12,
-    date: '29/01/2026',
+    date: '19/01/2026 - 11:05:18',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Research tech stack',
+    issue: 'Research',
     submitStatus: 'Đã nộp',
   },
   {
     id: 13,
-    date: '29/01/2026',
+    date: '18/01/2026 - 09:40:33',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    time: '2h',
+    summary: 'Code review',
+    issue: 'Review',
     submitStatus: 'Đã nộp',
   },
   {
     id: 14,
-    date: '29/01/2026',
+    date: '17/01/2026 - 15:22:11',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
     summary: 'Hoàn thiện giao diện báo cáo',
     issue: 'Fix layout table',
-    time: '2h',
     submitStatus: 'Đã nộp',
   },
   {
     id: 15,
-    date: '29/01/2026',
+    date: '16/01/2026 - 10:10:01',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
     summary: 'Hoàn thiện giao diện báo cáo',
     issue: 'Fix layout table',
-    time: '2h',
     submitStatus: 'Đã nộp',
   },
   {
     id: 16,
-    date: '29/01/2026',
+    date: '15/01/2026 - 08:55:45',
     student: 'Lê Duy Khánh',
     status: 'Đang làm',
     summary: 'Hoàn thiện giao diện báo cáo',
     issue: 'Fix layout table',
-    time: '2h',
     submitStatus: 'Đã nộp',
   },
 ];
@@ -173,12 +157,34 @@ export default function DailyReport() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const filteredData = DATA.filter((r) => r.student.toLowerCase().includes(search.toLowerCase()));
+  const [sortOrder, setSortOrder] = useState('desc');
   const [open, setOpen] = useState(false);
-  const total = filteredData.length;
+
+  const filteredData = DATA.filter((r) => r.student.toLowerCase().includes(search.toLowerCase()));
+
+  const parseDate = (dateStr) => {
+    if (!dateStr) return 0;
+    const dateOnly = dateStr.split(' - ')[0];
+    const [day, month, year] = dateOnly.split('/');
+    return new Date(Number(year), Number(month) - 1, Number(day)).getTime() || 0;
+  };
+  const sortedData = [...filteredData].sort((a, b) => {
+    const timeA = parseDate(a.date);
+    const timeB = parseDate(b.date);
+    if (timeA === timeB) {
+      return a.id - b.id;
+    }
+    return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+  });
+
+  const total = sortedData.length;
   const totalPages = Math.ceil(total / pageSize);
 
-  const paginatedData = filteredData.slice((page - 1) * pageSize, page * pageSize);
+  const paginatedData = sortedData.slice((page - 1) * pageSize, page * pageSize);
+
+  const handleSortDate = () => {
+    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+  };
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
@@ -197,7 +203,7 @@ export default function DailyReport() {
       <Card>
         <div className='mb-5 flex items-center'>
           <SearchBar
-            placeholder='Tìm kiếm theo tên'
+            placeholder='Tìm kiếm'
             value={search}
             onChange={setSearch}
             showFilter
@@ -208,36 +214,62 @@ export default function DailyReport() {
           />
         </div>
 
-        <div className='max-h-96 overflow-auto' ref={tableBodyRef}>
-          <table className='w-full text-left'>
-            <thead className='border-b border-slate-300 text-xs text-slate-400'>
+        <div
+          className='max-h-96 overflow-auto border border-slate-200 rounded-lg'
+          ref={tableBodyRef}
+        >
+          <table className='w-full text-left table-fixed'>
+            <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
               <tr>
-                <th className='px-6 py-3'>Ngày báo cáo</th>
-                <th className='px-6 py-3'>Tên sinh viên</th>
-                <th className='px-6 py-3'>Trạng thái</th>
-                <th className='px-6 py-3'>Tóm tắt công việc</th>
-                <th className='px-6 py-3'>Issue đã làm</th>
-                <th className='px-6 py-3'>Time báo cáo</th>
-                <th className='px-6 py-3'>Trạng thái nộp</th>
+                <th
+                  className='px-6 py-3 cursor-pointer hover:bg-slate-100 transition-colors w-[180px]'
+                  onClick={handleSortDate}
+                >
+                  <div className='flex items-center gap-1 w-full'>
+                    <span className='whitespace-nowrap'>Ngày báo cáo</span>
+                    <div className='flex flex-col text-[8px] leading-none shrink-0'>
+                      <CaretUpOutlined
+                        className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
+                      />
+                      <CaretDownOutlined
+                        className={sortOrder === 'desc' ? 'text-blue-600' : 'text-slate-300'}
+                      />
+                    </div>
+                  </div>
+                </th>
+
+                <th className='px-6 py-3 w-[150px]'>Tên sinh viên</th>
+                <th className='px-6 py-3 w-[200px]'>Tóm tắt công việc</th>
+                <th className='px-6 py-3 w-[150px]'>Issue đã làm</th>
+                <th className='px-6 py-3 w-[120px]'>Trạng thái nộp</th>
+                <th className='px-6 py-3 w-[120px]'>Trạng thái</th>
               </tr>
             </thead>
-
-            <tbody className='divide-y divide-slate-300 text-slate-800'>
+            <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
               {paginatedData.map((r) => (
-                <tr key={r.id}>
-                  <td className='px-6 py-4 text-sm'>{r.date}</td>
-                  <td className='px-6 py-4 text-sm font-medium'>{r.student}</td>
-                  <td className='px-6 py-4 text-sm'>
-                    <span className='rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700'>
-                      {r.status}
-                    </span>
+                <tr key={r.id} className='hover:bg-slate-50 transition-colors'>
+                  <td className='px-6 py-4 text-sm whitespace-nowrap'>{r.date}</td>
+
+                  <td
+                    className='px-6 py-4 text-sm font-medium truncate overflow-hidden'
+                    title={r.student}
+                  >
+                    {r.student}
                   </td>
-                  <td className='px-6 py-4 text-sm'>{r.summary}</td>
-                  <td className='px-6 py-4 text-sm text-slate-500'>{r.issue}</td>
-                  <td className='px-6 py-4 text-sm'>{r.time}</td>
+
+                  <td className='px-6 py-4 text-sm truncate overflow-hidden' title={r.summary}>
+                    {r.summary}
+                  </td>
+                  <td
+                    className='px-6 py-4 text-sm text-slate-500 truncate overflow-hidden'
+                    title={r.issue}
+                  >
+                    {r.issue}
+                  </td>
+
                   <td className='px-6 py-4 text-sm'>
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${
                         r.submitStatus === 'Đã nộp'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
@@ -246,15 +278,13 @@ export default function DailyReport() {
                       {r.submitStatus}
                     </span>
                   </td>
-                </tr>
-              ))}
-              {filteredData.length === 0 && (
-                <tr>
-                  <td colSpan={7} className='px-6 py-6 text-center text-sm text-slate-400'>
-                    Không tìm thấy báo cáo
+                  <td className='px-6 py-4 text-sm'>
+                    <span className='rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 whitespace-nowrap'>
+                      {r.status}
+                    </span>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>

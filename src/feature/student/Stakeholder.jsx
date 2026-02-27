@@ -5,6 +5,7 @@ import SearchBar from '@/shared/components/SearchBar';
 import Card from '@/shared/components/Card';
 import TiptapEditor from '@/shared/components/TiptapEditor';
 import Footer from '@/shared/components/Footer';
+import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 
 const ISSUE_DATA = [
   {
@@ -105,7 +106,7 @@ export default function StakeholderPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
+  const [sortOrder, setSortOrder] = useState('desc');
   const [openStakeholderForm, setOpenStakeholderForm] = useState(false);
   const [openIssueForm, setOpenIssueForm] = useState(false);
 
@@ -121,12 +122,24 @@ export default function StakeholderPage() {
       i.title.toLowerCase().includes(search.toLowerCase()) ||
       i.stakeholder.toLowerCase().includes(search.toLowerCase()),
   );
-
-  const total = filteredIssueData.length;
+  const parseDate = (dateStr) => {
+    if (!dateStr) return 0;
+    const [day, month, year] = dateStr.split('/');
+    return new Date(Number(year), Number(month) - 1, Number(day)).getTime() || 0;
+  };
+  const sortedData = [...filteredIssueData].sort((a, b) => {
+    const timeA = parseDate(a.createdAt);
+    const timeB = parseDate(b.createdAt);
+    if (timeA === timeB) return b.id - a.id;
+    return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+  });
+  const total = sortedData.length;
   const totalPages = Math.ceil(total / pageSize);
 
-  const paginatedData = filteredIssueData.slice((page - 1) * pageSize, page * pageSize);
-
+  const paginatedData = sortedData.slice((page - 1) * pageSize, page * pageSize);
+  const handleSortDate = () => {
+    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+  };
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
@@ -169,7 +182,7 @@ export default function StakeholderPage() {
           <>
             <div className='flex flex-col p-3 sm:flex-row sm:items-center sm:justify-between'>
               <SearchBar
-                placeholder='Tìm kiếm theo tên'
+                placeholder='Tìm kiếm bên liên quan...'
                 value={search}
                 onChange={setSearch}
                 showFilter
@@ -188,7 +201,7 @@ export default function StakeholderPage() {
         {tab === 'issue' && (
           <>
             <Card>
-              <div className='flex flex-col p-2 sm:flex-row sm:items-center sm:justify-between'>
+              <div className='flex flex-col p-2 mb-5 sm:flex-row sm:items-center sm:justify-between'>
                 <SearchBar
                   placeholder='Tìm kiếm theo tên'
                   value={search}
@@ -200,25 +213,51 @@ export default function StakeholderPage() {
                 />
               </div>
 
-              <div className='overflow-x-auto max-h-96' ref={tableBodyRef}>
-                <table className='w-full text-left'>
-                  <thead className='border-b border-slate-200 text-xs text-slate-400'>
+              <div className='overflow-auto max-h-96 border-t border-slate-200' ref={tableBodyRef}>
+                <table className='w-full text-left table-fixed'>
+                  <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
                     <tr>
-                      <th className='px-6 py-3'>Tiêu đề</th>
-                      <th className='px-6 py-3'>Bên liên quan</th>
-                      <th className='px-6 py-3'>Trạng thái</th>
-                      <th className='px-6 py-3'>Ngày tạo</th>
+                      <th className='px-6 py-3 w-[300px]'>Tiêu đề</th>
+                      <th className='px-6 py-3 w-[180px]'>Bên liên quan</th>
+                      <th className='px-6 py-3 w-[150px]'>Trạng thái</th>
+                      <th
+                        className='px-6 py-3 w-[150px] cursor-pointer hover:bg-slate-100 transition-colors'
+                        onClick={handleSortDate}
+                      >
+                        <div className='flex items-center gap-1'>
+                          <span>Ngày tạo</span>
+                          <div className='flex flex-col text-[8px] leading-none shrink-0'>
+                            <CaretUpOutlined
+                              className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
+                            />
+                            <CaretDownOutlined
+                              className={sortOrder === 'desc' ? 'text-blue-600' : 'text-slate-300'}
+                            />
+                          </div>
+                        </div>
+                      </th>
                     </tr>
                   </thead>
-
-                  <tbody className='divide-y divide-slate-200 text-sm text-slate-800'>
+                  <tbody className='divide-y divide-slate-200 text-sm text-slate-800 bg-white'>
                     {paginatedData.map((i) => (
-                      <tr key={i.id}>
-                        <td className='px-6 py-4 font-medium'>{i.title}</td>
-                        <td className='px-6 py-4'>{i.stakeholder}</td>
+                      <tr key={i.id} className='hover:bg-slate-50 transition-colors'>
+                        <td
+                          className='px-6 py-4 font-medium truncate overflow-hidden'
+                          title={i.title}
+                        >
+                          {i.title}
+                        </td>
+
+                        <td
+                          className='px-6 py-4 truncate overflow-hidden text-slate-600'
+                          title={i.stakeholder}
+                        >
+                          {i.stakeholder}
+                        </td>
+
                         <td className='px-6 py-4'>
                           <span
-                            className={`rounded-full px-3 py-1 text-xs font-medium ${
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${
                               i.status === 'Đã giải quyết'
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-blue-100 text-blue-700'
@@ -227,14 +266,17 @@ export default function StakeholderPage() {
                             {i.status}
                           </span>
                         </td>
-                        <td className='px-6 py-4'>{i.createdAt}</td>
+
+                        <td className='px-6 py-4 text-slate-500 whitespace-nowrap'>
+                          {i.createdAt}
+                        </td>
                       </tr>
                     ))}
 
                     {filteredIssueData.length === 0 && (
                       <tr>
-                        <td colSpan={4} className='px-6 py-6 text-center text-sm text-slate-400'>
-                          Không tìm thấy vấn đề
+                        <td colSpan={4} className='px-6 py-10 text-center text-sm text-slate-400'>
+                          Không tìm thấy vấn đề nào.
                         </td>
                       </tr>
                     )}
@@ -242,6 +284,7 @@ export default function StakeholderPage() {
                 </table>
               </div>
             </Card>
+
             <div className='mt-5'>
               <Footer
                 total={total}
