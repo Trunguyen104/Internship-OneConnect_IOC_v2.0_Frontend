@@ -69,46 +69,45 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
         <div className='flex flex-col h-full max-h-[85vh]'>
           {/* Header */}
           <div className='px-8 pt-8 pb-4 shrink-0'>
-            <div className='text-2xl font-bold text-text'>Tạo Epic</div>
+            <div className='text-2xl font-bold text-text'>Create Epic</div>
           </div>
 
           {/* Body */}
           <div className='flex-1 flex flex-col overflow-y-auto px-8 py-2 space-y-6'>
             {/* Tên Epic */}
             <div>
-              <FieldLabel required>Tên Epic</FieldLabel>
+              <FieldLabel required>Epic Name</FieldLabel>
               <TextInput
                 value={epicName}
                 onChange={setEpicName}
-                placeholder='Nhập tóm tắt Epic...'
+                placeholder='Enter epic summary...'
               />
             </div>
 
             {/* Mô tả */}
             <div className='flex flex-1 flex-col overflow-hidden min-h-[250px]'>
-              <FieldLabel>Mô tả</FieldLabel>
+              <FieldLabel>Description</FieldLabel>
               <div className='flex-1 overflow-y-auto rounded-2xl'>
-                <TiptapEditor value={desc} onChange={setDesc} placeholder='Nhập mô tả...' />
+                <TiptapEditor value={desc} onChange={setDesc} placeholder='Enter description...' />
               </div>
             </div>
 
             {/* Ngày kết thúc */}
             <div>
-              <FieldLabel>Ngày kết thúc</FieldLabel>
+              <FieldLabel>End Date</FieldLabel>
               <div className='w-[200px]'>
                 <DateInput value={endDate} onChange={setEndDate} />
               </div>
             </div>
           </div>
 
-          {/* Footer */}
           <div className='flex items-center justify-end gap-3 px-8 py-6 shrink-0'>
             <button
               type='button'
               onClick={handleClose}
               className='h-11 rounded-full bg-red-50/50 px-6 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors'
             >
-              Hủy
+              Cancel
             </button>
 
             <button
@@ -117,7 +116,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
               onClick={handleSubmit}
               className='h-11 rounded-full px-8 text-sm font-semibold text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'
             >
-              Tạo
+              Create
             </button>
           </div>
         </div>

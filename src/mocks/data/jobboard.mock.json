@@ -1,7 +1,7 @@
 [
   {
     "id": "ISSUE-39",
-    "title": "Báo cáo định kỳ (tạo, sửa, xem lịch sử)…",
+    "title": "Periodic reports (create, edit, view history)…",
     "type": "User Story",
     "tag": "Internship Execution & Workspace",
     "priority": "Medium",
@@ -11,7 +11,7 @@
   },
   {
     "id": "ISSUE-30",
-    "title": "Xem thông tin chi tiết dự án (tên, lĩnh vực, mô tả)…",
+    "title": "View detailed project information (name, field, description)…",
     "type": "User Story",
     "tag": "Internship Execution & Workspace",
     "priority": "High",
@@ -21,7 +21,7 @@
   },
   {
     "id": "ISSUE-13",
-    "title": "Đăng nhập để truy cập hệ thống.",
+    "title": "Log in to access the system.",
     "type": "User Story",
     "tag": "Login/Logout",
     "priority": "Medium",

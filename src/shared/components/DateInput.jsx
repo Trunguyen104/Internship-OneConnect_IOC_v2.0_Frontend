@@ -90,7 +90,7 @@ export default function DateInput({ value, onChange }) {
         className='h-10 w-full rounded-full border border-red-100 bg-red-50/50 text-red-500 font-semibold text-[13.5px] flex items-center justify-between px-4 hover:bg-red-50 transition-colors'
       >
         <span className={value ? 'text-slate-700' : 'text-slate-400 font-medium'}>
-          {value ? dayjs(value).format('MM/DD/YYYY') : 'Chọn ngày'}
+          {value ? dayjs(value).format('MM/DD/YYYY') : 'Select Date'}
         </span>
         <CalendarIcon className='w-4 h-4 text-red-500' />
       </button>
@@ -146,7 +146,7 @@ export default function DateInput({ value, onChange }) {
                   onClick={setToday}
                   className='h-10 px-[14px] rounded-full text-[#A32A2A] font-bold text-[13px] bg-red-50 hover:bg-red-100 shrink-0 transition-colors'
                 >
-                  Hôm nay
+                  Today
                 </button>
               </div>
 
@@ -202,14 +202,14 @@ export default function DateInput({ value, onChange }) {
                   onClick={() => setOpen(false)}
                   className='flex-1 h-11 rounded-full bg-red-50 text-[#A32A2A] font-bold text-[14px] hover:bg-red-100 transition-colors'
                 >
-                  Hủy
+                  Cancel
                 </button>
                 <button
                   type='button'
                   onClick={handleApply}
                   className='flex-1 h-11 rounded-full bg-[#A32A2A] text-white font-bold text-[14px] hover:bg-red-800 transition-colors'
                 >
-                  Áp dụng
+                  Apply
                 </button>
               </div>
             </div>

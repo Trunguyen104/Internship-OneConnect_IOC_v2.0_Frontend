@@ -56,7 +56,7 @@ export default function LoginPage() {
       setAccessToken(token, form.rememberMe);
 
       toast.success('Đăng nhập thành công');
-      router.push('/student/space');
+      router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
       toast.error('Đăng nhập thất bại');

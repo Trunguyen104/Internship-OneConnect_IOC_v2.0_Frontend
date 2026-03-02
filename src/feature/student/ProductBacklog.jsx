@@ -48,7 +48,7 @@ function Avatar({ name = '', avatar }) {
   );
 }
 
-function Badge({ children, tone = 'default', className = '' }) {
+function Badge({ children, tone = 'default', className = '', ...props }) {
   const map = {
     default: 'bg-bg text-foreground border-border/60',
     info: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -60,10 +60,11 @@ function Badge({ children, tone = 'default', className = '' }) {
   return (
     <span
       className={[
-        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
+        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium max-w-full',
         map[tone] || map.default,
         className,
       ].join(' ')}
+      {...props}
     >
       {children}
     </span>
@@ -150,62 +151,62 @@ export default function ProductBacklog() {
   return (
     <div className='w-full space-y-4'>
       {/* Toolbar */}
-      <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-        <div className='text-xl font-semibold'>Product Backlog</div>
+      <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+        <div className='flex flex-col gap-3 md:flex-row md:items-center md:gap-8'>
+          <div className='text-xl font-semibold whitespace-nowrap'>Product Backlog</div>
 
-        <div className='flex flex-1 flex-col gap-2 md:flex-row md:items-center md:justify-end'>
-          <div className='relative md:w-[420px]'>
+          <div className='relative w-full md:w-[320px]'>
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className='h-10 w-full rounded-full border border-border/60 bg-surface px-4 pr-10 text-sm outline-none focus:border-primary/40'
-              placeholder='Tìm kiếm backlog…'
+              placeholder='Search backlog…'
             />
             <span className='pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted'>
               ⌕
             </span>
           </div>
+        </div>
 
-          <div className='flex items-center gap-2'>
-            <button
-              type='button'
-              onClick={() => setOpenCreateEpic(true)}
-              className={[
-                'inline-flex items-center gap-3',
-                'h-10 px-6 rounded-full',
-                'text-white',
-                'text-base font-semibold',
-                'shadow-sm transition-colors',
+        <div className='flex items-center gap-2 mt-2 md:mt-0'>
+          <button
+            type='button'
+            onClick={() => setOpenCreateEpic(true)}
+            className={[
+              'inline-flex items-center gap-3',
+              'h-10 px-6 rounded-full',
+              'text-white',
+              'text-base font-semibold',
+              'shadow-sm transition-colors',
 
-                // ✅ dùng đúng token global, khỏi phụ thuộc tailwind theme
-                'bg-primary hover:bg-primary-hover',
-              ].join(' ')}
-            >
-              <span>Create Epic</span>
+              // ✅ dùng đúng token global, khỏi phụ thuộc tailwind theme
+              'bg-primary hover:bg-primary-hover',
+            ].join(' ')}
+          >
+            <span>Create Epic</span>
 
-              <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-white text-xl leading-none'>
-                +
-              </span>
-            </button>
+            <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-white text-xl leading-none'>
+              +
+            </span>
+          </button>
 
-            <button
-              type='button'
-              onClick={() => setOpenCreateTask(true)}
-              className={[
-                'inline-flex items-center gap-3',
-                'h-10 px-6 rounded-full',
-                'text-white',
-                'text-base font-semibold',
-                'shadow-sm transition-colors',
-                'bg-primary hover:bg-primary-hover',
-              ].join(' ')}
-            >
-              <span>Create User Story</span>
-              <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-white text-xl leading-none'>
-                +
-              </span>
-            </button>
-          </div>
+          <button
+            type='button'
+            onClick={() => setOpenCreateTask(true)}
+            className={[
+              'inline-flex items-center gap-3',
+              'h-10 px-6 rounded-full',
+              'text-white',
+              'text-base font-semibold',
+              'shadow-sm transition-colors',
+              'bg-primary hover:bg-primary-hover',
+            ].join(' ')}
+          >
+            <span>Create Issue</span>
+            <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-white text-xl leading-none'>
+              +
+            </span>
+          </button>
         </div>
       </div>
       {/* Body */}
@@ -215,7 +216,7 @@ export default function ProductBacklog() {
           <div className='rounded-2xl border border-border/60 bg-surface shadow-sm'>
             <div className='border-b border-border/60 px-4 py-3'>
               <div className='text-sm font-semibold'>Epic</div>
-              <div className='mt-1 text-xs text-muted'>Chọn Epic để lọc danh sách backlog</div>
+              <div className='mt-1 text-xs text-muted'>Select Epic to filter backlog items</div>
             </div>
 
             <div className='p-2'>
@@ -247,7 +248,7 @@ export default function ProductBacklog() {
                 );
               })}
 
-              {!epics.length && <div className='p-4 text-sm text-muted'>Chưa có Epic.</div>}
+              {!epics.length && <div className='p-4 text-sm text-muted'>No Epics found.</div>}
             </div>
           </div>
         </div>
@@ -279,16 +280,15 @@ export default function ProductBacklog() {
             <div
               className='grid items-center gap-3 px-4 py-3 text-xs font-semibold text-muted'
               style={{
-                gridTemplateColumns: '110px 1fr 140px 120px 220px 90px 120px 48px',
+                gridTemplateColumns: '110px 1fr 140px 120px 90px 120px 48px',
               }}
             >
               <div>Issue</div>
-              <div>Tiêu đề</div>
-              <div>Trạng thái</div>
-              <div>Priority</div>
-              <div>Epic</div>
+              <div>Title</div>
+              <div className='text-center'>Status</div>
+              <div className='text-center'>Priority</div>
               <div className='text-center'>Points</div>
-              <div className='text-right'>Assignee</div>
+              <div className='text-center'>Assignee</div>
               <div />
             </div>
 
@@ -296,20 +296,18 @@ export default function ProductBacklog() {
 
             {/* Rows */}
             {loading ? (
-              <div className='p-4 text-sm text-muted'>Đang tải…</div>
+              <div className='p-4 text-sm text-muted'>Loading…</div>
             ) : filteredItems.length === 0 ? (
-              <div className='p-4 text-sm text-muted'>Không có item phù hợp.</div>
+              <div className='p-4 text-sm text-muted'>No items found.</div>
             ) : (
               <div className='divide-y divide-border/60'>
                 {filteredItems.map((it, idx) => {
-                  const epic = epics.find((e) => e.id === it.epicId);
-
                   return (
                     <div
                       key={it.id}
                       className='grid items-center gap-3 px-4 py-4 hover:bg-bg'
                       style={{
-                        gridTemplateColumns: '110px 1fr 140px 120px 220px 90px 120px 48px',
+                        gridTemplateColumns: '110px 1fr 140px 120px 90px 120px 48px',
                       }}
                     >
                       {/* 1) checkbox */}
@@ -330,7 +328,7 @@ export default function ProductBacklog() {
                       </div>
 
                       {/* 4) status */}
-                      <div className='flex items-center'>
+                      <div className='flex items-center justify-center'>
                         <Badge tone={statusTone[it.status] || 'default'}>
                           {it.status === 'IN_PROGRESS'
                             ? 'In Progress'
@@ -338,12 +336,14 @@ export default function ProductBacklog() {
                               ? 'To Do'
                               : it.status === 'IN_REVIEW'
                                 ? 'In Review'
-                                : it.status}
+                                : it.status === 'DONE'
+                                  ? 'Done'
+                                  : it.status}
                         </Badge>
                       </div>
 
                       {/* 5) priority */}
-                      <div className='flex items-center'>
+                      <div className='flex items-center justify-center'>
                         <Badge tone={priorityTone[it.priority] || 'default'}>
                           {it.priority === 'HIGH'
                             ? 'High'
@@ -353,16 +353,11 @@ export default function ProductBacklog() {
                         </Badge>
                       </div>
 
-                      {/* 6) epic */}
-                      <div className='flex items-center'>
-                        <Badge tone='purple'>{epic?.name || '—'}</Badge>
-                      </div>
-
                       {/* ✅ 7) points */}
                       <div className='text-center text-sm font-semibold'>{it.points ?? '-'}</div>
 
                       {/* ✅ 8) assignee (chỉ avatar) */}
-                      <div className='flex items-center justify-end'>
+                      <div className='flex items-center justify-center'>
                         {(it.assignees || []).slice(0, 1).map((a) => (
                           <Avatar key={a.name} name={a.name} avatar={a.avatar} />
                         ))}
@@ -371,7 +366,7 @@ export default function ProductBacklog() {
                       {/* ✅ 9) action column (cột mới, trống header) */}
                       <div className='flex items-center justify-end'>
                         <MoreMenuButton
-                          items={[{ label: 'Xóa', value: 'delete', tone: 'danger' }]}
+                          items={[{ label: 'Delete', value: 'delete', tone: 'danger' }]}
                           onSelect={(action) => {
                             if (action.value === 'delete') console.log('delete', it.id);
                           }}
@@ -382,10 +377,6 @@ export default function ProductBacklog() {
                 })}
               </div>
             )}
-          </div>
-
-          <div className='mt-3 text-xs text-muted'>
-            * Bước tiếp theo: làm modal Create Epic / Create Feature + nối API thật.
           </div>
         </div>
       </div>
