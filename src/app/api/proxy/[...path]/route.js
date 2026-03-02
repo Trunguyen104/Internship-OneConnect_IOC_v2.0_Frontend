@@ -1,41 +1,50 @@
-// import { NextResponse } from 'next/server';
+// src/app/api/proxy/[...path]/route.js
+import { NextResponse } from 'next/server';
 
-// const BASE = process.env.API_BASE_URL;
+const BE_URL = process.env.BE_URL || 'http://localhost:5050';
 
-// async function forward(req, pathParts) {
-//   if (!BASE) {
-//     return NextResponse.json({ message: 'Missing API_BASE_URL in .env.local' }, { status: 500 });
-//   }
+async function handler(req, { params }) {
+  try {
+    const resolvedParams = await Promise.resolve(params);
+    const { path } = resolvedParams;
+    const reqUrl = new URL(req.url);
+    const searchString = reqUrl.search;
 
-//   const url = new URL(req.url);
-//   const targetUrl = `${BASE}/${pathParts.join('/')}${url.search}`;
+    if (!path || !Array.isArray(path)) {
+      throw new Error(`Path is missing or invalid. Details: ${JSON.stringify(resolvedParams)}`);
+    }
 
-//   const headers = new Headers(req.headers);
-//   headers.delete('host');
+    const url = `${BE_URL}/api/${path.join('/')}${searchString}`;
 
-//   const res = await fetch(targetUrl, {
-//     method: req.method,
-//     headers,
-//     body: req.method === 'GET' || req.method === 'HEAD' ? undefined : await req.arrayBuffer(),
-//     redirect: 'manual',
-//   });
+    const res = await fetch(url, {
+      method: req.method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(req.headers.get('authorization')
+          ? { Authorization: req.headers.get('authorization') }
+          : {}),
+      },
+      body: ['GET', 'HEAD'].includes(req.method) ? undefined : await req.text(),
+    });
 
-//   const body = await res.arrayBuffer();
-//   return new NextResponse(body, { status: res.status, headers: res.headers });
-// }
+    const data = await res.text();
 
-// export async function GET(req, ctx) {
-//   return forward(req, ctx.params.path);
-// }
-// export async function POST(req, ctx) {
-//   return forward(req, ctx.params.path);
-// }
-// export async function PUT(req, ctx) {
-//   return forward(req, ctx.params.path);
-// }
-// export async function PATCH(req, ctx) {
-//   return forward(req, ctx.params.path);
-// }
-// export async function DELETE(req, ctx) {
-//   return forward(req, ctx.params.path);
-// }
+    return new NextResponse(data, {
+      status: res.status,
+      headers: {
+        'Content-Type': res.headers.get('content-type') || 'application/json',
+      },
+    });
+  } catch (error) {
+    return new NextResponse(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const PATCH = handler;
+export const DELETE = handler;
