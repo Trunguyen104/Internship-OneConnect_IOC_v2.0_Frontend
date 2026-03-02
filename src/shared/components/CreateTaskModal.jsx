@@ -13,7 +13,7 @@ function FieldLabel({ required, children }) {
   );
 }
 
-function Select({ value, onChange, options = [], placeholder = 'Chọn' }) {
+function Select({ value, onChange, options = [], placeholder = 'Select' }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -156,7 +156,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
       <div className='relative flex max-h-[90vh] w-full max-w-[1200px] flex-col rounded-4xl bg-white shadow-2xl'>
         {/* Header */}
         <div className='flex items-center justify-between px-8 pt-8 pb-5'>
-          <h2 className='text-[28px] font-bold text-slate-900'>Tạo Nhiệm vụ</h2>
+          <h2 className='text-[28px] font-bold text-slate-900'>Create Task</h2>
         </div>
 
         {/* Content Body - 2 Columns */}
@@ -169,18 +169,18 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
             <div className='flex flex-1 flex-col space-y-6'>
               {/* Tóm tắt */}
               <div>
-                <FieldLabel required>Tóm tắt</FieldLabel>
-                <TextInput value={summary} onChange={setSummary} placeholder='Nhập tóm tắt...' />
+                <FieldLabel required>Summary</FieldLabel>
+                <TextInput value={summary} onChange={setSummary} placeholder='Enter summary...' />
               </div>
 
               {/* Mô tả */}
               <div className='flex flex-1 flex-col overflow-hidden min-h-[200px]'>
-                <FieldLabel required>Mô tả</FieldLabel>
+                <FieldLabel required>Description</FieldLabel>
                 <div className='flex-1 overflow-y-auto rounded-2xl'>
                   <TiptapEditor
                     value={desc}
                     onChange={setDesc}
-                    placeholder='Nhập mô tả chi tiết...'
+                    placeholder='Enter detailed description...'
                   />
                 </div>
               </div>
@@ -192,13 +192,13 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                 className='rounded-3xl bg-white p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] h-full overflow-y-auto'
                 style={{ scrollbarWidth: 'none' }}
               >
-                <h3 className='mb-5 text-[17px] font-bold text-slate-800'>Chi tiết</h3>
+                <h3 className='mb-5 text-[17px] font-bold text-slate-800'>Details</h3>
 
                 <div className='space-y-5'>
                   {/* Trạng thái */}
                   <div className='flex items-center justify-between gap-4'>
                     <span className='min-w-[130px] text-[13.5px] font-semibold text-slate-600'>
-                      Trạng thái <span className='text-red-500'>*</span>
+                      Status <span className='text-red-500'>*</span>
                     </span>
                     <div className='flex-1'>
                       <Select
@@ -216,7 +216,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                   {/* Loại */}
                   <div className='flex items-center justify-between gap-4'>
                     <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-                      Loại <span className='text-red-500'>*</span>
+                      Type <span className='text-red-500'>*</span>
                     </span>
                     <div className='flex-1'>
                       <Select
@@ -238,7 +238,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                       <Select
                         value={epic}
                         onChange={setEpic}
-                        placeholder='Chọn'
+                        placeholder='Select'
                         options={[
                           { value: 'epic1', label: 'Epic 1' },
                           { value: 'epic2', label: 'Epic 2' },
@@ -250,16 +250,16 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                   {/* Người thực hiện */}
                   <div className='flex items-center justify-between gap-4'>
                     <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-                      Người thực hiện
+                      Assignee
                     </span>
                     <div className='flex-1'>
                       <Select
                         value={assignee}
                         onChange={setAssignee}
-                        placeholder='Chọn'
+                        placeholder='Select'
                         options={[
-                          { value: 'dev1', label: 'Nguyễn Văn A' },
-                          { value: 'dev2', label: 'Trần Thị B' },
+                          { value: 'dev1', label: 'Nguyen Van A' },
+                          { value: 'dev2', label: 'Tran Thi B' },
                         ]}
                       />
                     </div>
@@ -268,7 +268,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                   {/* Độ ưu tiên */}
                   <div className='flex items-center justify-between gap-4'>
                     <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-                      Độ ưu tiên <span className='text-red-500'>*</span>
+                      Priority <span className='text-red-500'>*</span>
                     </span>
                     <div className='flex-1'>
                       <Select
@@ -286,7 +286,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                   {/* Ngày hết hạn */}
                   <div className='flex items-center justify-between gap-4'>
                     <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-                      Ngày hết hạn
+                      Due Date
                     </span>
                     <div className='flex-1'>
                       <DateInput value={dueDate} onChange={setDueDate} />
@@ -315,7 +315,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
             onClick={handleClose}
             className='h-[50px] px-10 w-[140px] rounded-full text-[15px] font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors'
           >
-            Hủy
+            Cancel
           </button>
 
           <button
@@ -324,7 +324,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
             disabled={!canSubmit}
             className='h-[50px] flex-1 flex items-center justify-center rounded-full bg-[#A32A2A] text-[15px] font-bold text-white transition-colors hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60'
           >
-            Tạo Nhiệm vụ
+            Create Task
           </button>
         </div>
       </div>

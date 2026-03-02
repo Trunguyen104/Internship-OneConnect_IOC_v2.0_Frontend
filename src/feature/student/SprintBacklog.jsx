@@ -110,16 +110,16 @@ export default function SprintBacklog() {
   ]);
 
   const mapStatusObj = {
-    TODO: { label: 'To Do', className: 'bg-bg text-text border border-border/60' },
+    TODO: { label: 'To Do', className: 'bg-white text-gray-600 border border-gray-200' },
     IN_PROGRESS: {
       label: 'In Progress',
-      className: 'bg-blue-50 text-blue-700 border border-blue-200',
+      className: 'bg-blue-50 text-blue-600 border border-blue-100',
     },
     IN_REVIEW: {
       label: 'In Review',
-      className: 'bg-primary/10 text-primary border border-primary/20',
+      className: 'bg-red-50 text-red-600 border border-red-100',
     },
-    DONE: { label: 'Done', className: 'bg-green-50 text-green-700 border border-green-200' },
+    DONE: { label: 'Done', className: 'bg-[#F0FDF4] text-[#16A34A] border border-[#DCFCE7]' },
   };
 
   const getInitials = (n) => {
@@ -130,13 +130,13 @@ export default function SprintBacklog() {
     return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
   };
 
-  const stringToColor = (str) => {
+  const stringToColorTuple = (str) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = Math.abs(hash) % 360;
-    return `hsl(${hue}, 70%, 80%)`;
+    return { bg: `hsl(${hue}, 70%, 90%)`, text: `hsl(${hue}, 70%, 30%)` };
   };
 
   return (
@@ -169,7 +169,7 @@ export default function SprintBacklog() {
               </div>
               <input
                 type='text'
-                className='block w-full p-2 pl-10 text-sm text-text border border-border/60 rounded-full bg-bg focus:ring-primary focus:border-primary transition-colors'
+                className='block w-[240px] p-2 pl-9 text-[13px] text-text border border-gray-200 rounded-full bg-gray-50 focus:ring-primary focus:border-primary transition-colors outline-none placeholder:text-gray-400'
                 placeholder='Tìm kiếm...'
               />
             </div>
@@ -206,15 +206,57 @@ export default function SprintBacklog() {
           </div>
         </div>
 
-        {/* Danh sách các dòng công việc */}
         <div className='divide-y divide-border/60'>
+          {/* Hàng Tiêu Đề Cột */}
+          <div className='flex items-center justify-between px-5 py-3 bg-gray-50/50 border-b border-border/60'>
+            <div className='flex items-center gap-4 w-[120px] shrink-0'>
+              <div className='text-[11px] font-bold text-muted uppercase tracking-wider pl-1'>
+                Issue
+              </div>
+            </div>
+            <div className='flex-1 min-w-0 pr-4 pl-4'>
+              <div className='text-[11px] font-bold text-muted uppercase tracking-wider'>
+                Summary
+              </div>
+            </div>
+            <div className='flex items-center justify-end shrink-0'>
+              <div className='w-[100px] flex justify-center'>
+                <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
+                  Status
+                </span>
+              </div>
+              <div className='w-[220px] flex justify-center px-4'>
+                <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
+                  Epic / Tag
+                </span>
+              </div>
+              <div className='w-[90px] text-center text-[11px] font-bold text-muted uppercase tracking-wider'>
+                Due Date
+              </div>
+              <div className='w-[40px] text-center text-[11px] font-bold text-muted uppercase tracking-wider'>
+                Pts
+              </div>
+              <div className='w-[90px] flex justify-center'>
+                <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
+                  Priority
+                </span>
+              </div>
+              <div className='w-[50px] flex justify-center'>
+                <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
+                  Assignee
+                </span>
+              </div>
+              <div className='w-[32px]'></div>
+            </div>
+          </div>
+
           {items.map((it) => {
             const statusConfig = mapStatusObj[it.status] || mapStatusObj.TODO;
 
             const priorityBadgeClass =
               it.priority === 'HIGH'
-                ? 'bg-primary/10 text-primary border border-primary/20'
-                : 'bg-blue-50 text-blue-700 border border-blue-200';
+                ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#FEE2E2]'
+                : 'bg-[#EFF6FF] text-[#2563EB] border border-[#DBEAFE]';
             const priorityLabel = it.priority === 'HIGH' ? 'High' : 'Medium';
 
             return (
@@ -260,8 +302,8 @@ export default function SprintBacklog() {
                     {it.date}
                   </div>
 
-                  {/* Points (Có trong hình) */}
-                  <div className='w-[40px] text-center text-[13px] font-semibold text-primary'>
+                  {/* Points (Màu đỏ theo thiết kế) */}
+                  <div className='w-[40px] text-center text-[13px] font-bold text-[#DC2626]'>
                     {it.points === '-' ? '-' : it.points}
                   </div>
 
@@ -281,16 +323,16 @@ export default function SprintBacklog() {
                   <div className='w-[50px] flex justify-center'>
                     {it.assigneeIcon ? (
                       <div
-                        className='flex h-7 w-7 items-center justify-center rounded-full shadow-sm text-[11.5px] font-bold'
+                        className='flex h-[26px] w-[26px] items-center justify-center rounded-full text-[11px] font-bold'
                         style={{
-                          backgroundColor: stringToColor(it.assigneeIcon),
-                          color: '#334155',
+                          backgroundColor: stringToColorTuple(it.assigneeIcon).bg,
+                          color: stringToColorTuple(it.assigneeIcon).text,
                         }}
                       >
                         {getInitials(it.assigneeIcon)}
                       </div>
                     ) : (
-                      <div className='flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-[11.5px] font-bold text-slate-400'>
+                      <div className='flex h-[26px] w-[26px] items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold text-slate-400'>
                         ?
                       </div>
                     )}

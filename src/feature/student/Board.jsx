@@ -86,17 +86,14 @@ export default function BoardPage() {
 
   return (
     <PageShell>
-      <div className='flex items-center gap-4 mb-4'>
-        <div className='flex-1 min-w-0'>
+      <div className='flex flex-col gap-4 mb-4'>
+        <div className='w-full'>
           <StudentTabs />
         </div>
 
-        {/* <div className='shrink-0 flex items-center gap-2'>
+        <div className='flex items-center gap-2'>
           <Search value={query} onChange={setQuery} />
-          <button className='text-sm px-4 py-2 rounded-full border border-border/60 bg-surface shadow-sm hover:bg-bg'>
-            Bộ lọc
-          </button>
-        </div> */}
+        </div>
       </div>
 
       <DndContext
@@ -119,14 +116,28 @@ export default function BoardPage() {
 
 function Search({ value, onChange }) {
   return (
-    <div className='flex items-center gap-2 rounded-full border border-border/60 bg-surface shadow-sm px-4 py-2'>
-      <span className='text-muted text-sm'>🔎</span>
+    <div className='flex items-center justify-between gap-2 rounded-4xl border border-border/80 bg-surface px-5 py-2.5 w-full max-w-sm'>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder='Tìm kiếm'
-        className='outline-none bg-transparent text-sm w-56 placeholder:text-muted'
+        placeholder='Search'
+        className='outline-none bg-transparent text-base w-full placeholder:text-muted/70 text-text'
       />
+      <svg
+        xmlns='http://www.w3.org/2000/svg'
+        width='20'
+        height='20'
+        viewBox='0 0 24 24'
+        fill='none'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        className='text-muted/70 shrink-0'
+      >
+        <circle cx='11' cy='11' r='8'></circle>
+        <line x1='21' y1='21' x2='16.65' y2='16.65'></line>
+      </svg>
     </div>
   );
 }

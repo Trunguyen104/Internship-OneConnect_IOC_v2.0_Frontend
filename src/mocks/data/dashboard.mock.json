@@ -40,13 +40,13 @@
     { "name": "Unassigned", "count": 10 }
   ],
   "studentStatus": [
-    { "status": "Đang thực tập", "count": 120 },
-    { "status": "Đã hoàn thành", "count": 18 },
-    { "status": "Tạm dừng", "count": 4 }
+    { "status": "Interning", "count": 120 },
+    { "status": "Completed", "count": 18 },
+    { "status": "Paused", "count": 4 }
   ],
   "studentViolations": [
-    { "type": "Không nộp báo cáo hằng ngày", "count": 2 },
-    { "type": "Nộp muộn logbook", "count": 3 },
-    { "type": "Không tham gia đánh giá", "count": 1 }
+    { "type": "No daily report submitted", "count": 2 },
+    { "type": "Late logbook submission", "count": 3 },
+    { "type": "Missed evaluation meeting", "count": 1 }
   ]
 }
