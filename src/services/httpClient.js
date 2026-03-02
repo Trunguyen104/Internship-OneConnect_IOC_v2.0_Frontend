@@ -4,32 +4,31 @@
 const API_BASE = '/api/proxy';
 
 async function request(path, options = {}) {
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') : null;
   const res = await fetch(`${API_BASE}${path}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
     ...options,
   });
 
-  if (!res.ok) {
-    let message = '';
-    try {
-      message = await res.text();
-    } catch {}
-    throw new Error(`API error ${res.status}: ${message}`);
-  }
-
-  // nếu response không phải JSON (file download...) thì vẫn an toàn
   const contentType = res.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return res.json();
+  const data =
+    contentType && contentType.includes('application/json') ? await res.json() : await res.text();
+
+  if (!res.ok) {
+    return {
+      isSuccess: false,
+      status: res.status,
+      data,
+    };
   }
 
-  return res;
+  return data;
 }
 
-// ===== helper methods =====
 export const httpGet = (path, options) => request(path, { method: 'GET', ...options });
 
 export const httpPost = (path, body, options = {}) =>
@@ -48,11 +47,19 @@ export const httpPut = (path, body, options = {}) =>
 
 export const httpDelete = (path, options) => request(path, { method: 'DELETE', ...options });
 
-const httpClient = {
+export const httpPatch = (path, body, options = {}) =>
+  request(path, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+    ...options,
+  });
+
+export default {
   httpGet,
   httpPost,
   httpPut,
   httpDelete,
+  httpPatch,
 };
 
 export default httpClient;
