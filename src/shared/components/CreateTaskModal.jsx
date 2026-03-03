@@ -62,11 +62,10 @@ function Select({ value, onChange, options = [], placeholder = 'Select' }) {
                   onChange?.(op.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${
-                  isSelected
-                    ? 'bg-red-50 text-[#A32A2A] font-bold'
-                    : 'text-slate-600 hover:bg-slate-50 font-medium'
-                }`}
+                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${isSelected
+                  ? 'bg-red-50 text-[#A32A2A] font-bold'
+                  : 'text-slate-600 hover:bg-slate-50 font-medium'
+                  }`}
               >
                 {op.label}
               </button>
@@ -89,11 +88,11 @@ function TextInput({ value, onChange, placeholder = '' }) {
   );
 }
 
-export default function CreateTaskModal({ open, onClose, onSubmit }) {
+export default function CreateTaskModal({ open, onClose, onSubmit, epics = [] }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
 
-  const [type, setType] = useState('USER_STORY');
+  const [type, setType] = useState('UserStory');
   const [status, setStatus] = useState('TODO');
   const [assignee, setAssignee] = useState('');
   const [priority, setPriority] = useState('MEDIUM');
@@ -110,7 +109,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
   function reset() {
     setSummary('');
     setDesc('');
-    setType('USER_STORY');
+    setType('UserStory');
     setStatus('TODO');
     setAssignee('');
     setPriority('MEDIUM');
@@ -223,9 +222,9 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                         value={type}
                         onChange={setType}
                         options={[
-                          { value: 'USER_STORY', label: 'User Story' },
-                          { value: 'TASK', label: 'Task' },
-                          { value: 'BUG', label: 'Bug' },
+                          { value: 'UserStory', label: 'User Story' },
+                          { value: 'Task', label: 'Task' },
+                          { value: 'Subtask', label: 'Subtask' },
                         ]}
                       />
                     </div>
@@ -239,10 +238,10 @@ export default function CreateTaskModal({ open, onClose, onSubmit }) {
                         value={epic}
                         onChange={setEpic}
                         placeholder='Select'
-                        options={[
-                          { value: 'epic1', label: 'Epic 1' },
-                          { value: 'epic2', label: 'Epic 2' },
-                        ]}
+                        options={epics.map((e) => ({
+                          value: e.id,
+                          label: e.title || e.name || 'Untitled',
+                        }))}
                       />
                     </div>
                   </div>
