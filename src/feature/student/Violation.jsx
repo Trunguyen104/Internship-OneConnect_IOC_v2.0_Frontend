@@ -2,13 +2,13 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Card from '@/shared/components/Card';
-import { getViolationList } from '@/mocks/mockViolationList';
+// import { getViolationList } from '@/mocks/mockViolationList';
 import SearchBar from '@/shared/components/SearchBar';
 import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import Footer from '@/shared/components/Footer';
 
 export default function ViolationList() {
-  const [violations, setViolations] = useState([]);
+  // const [violations, setViolations] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -20,13 +20,13 @@ export default function ViolationList() {
     tableRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page, pageSize]);
 
-  useEffect(() => {
-    async function fetchViolations() {
-      const res = await getViolationList();
-      setViolations(res.data || []);
-    }
-    fetchViolations();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchViolations() {
+  //     const res = await getViolationList();
+  //     setViolations(res.data || []);
+  //   }
+  //   fetchViolations();
+  // }, []);
 
   const filteredViolations = violations.filter(
     (v) =>
