@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Card from '@/shared/components/Card';
-import { getStudentList } from '@/mocks/mockStudentList';
 import SearchBar from '@/shared/components/SearchBar';
 import Footer from '@/shared/components/Footer';
 

@@ -1,17 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+// import { useState } from 'react';
 import Card from '@/shared/components/Card';
-import { getEvaluationList } from '@/mocks/mockEvaluationList';
 
 export default function Evaluation() {
-  const [evaluations, setEvaluations] = useState([]);
+  // const [evaluations, setEvaluations] = useState([]);
 
-  useEffect(() => {
-    getEvaluationList().then((res) => {
-      setEvaluations(res.data || []);
-    });
-  }, []);
+  // useEffect(() => {
+  //   getEvaluationList().then((res) => {
+  //     setEvaluations(res.data || []);
+  //   });
+  // }, []);
 
   return (
     <section className='space-y-6'>
