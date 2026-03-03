@@ -14,9 +14,11 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Popconfirm } from 'antd';
+import { ProjectService } from '@/services/projectService';
 
 export default function StakeholderTab() {
   const toast = useToast();
+  const [projectId, setProjectId] = useState(null);
   const [stakeholders, setStakeholders] = useState([]);
   const [stakeholderLoading, setStakeholderLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -38,8 +40,17 @@ export default function StakeholderTab() {
       return;
     }
 
+    // const payload = {
+    //   projectId: '670c5dc7-a816-40dd-a5b8-fe5bbcf5eb77',
+    //   ...stakeholderForm,
+    // };
+    if (!projectId) {
+      toast.error('Chưa xác định project');
+      return;
+    }
+
     const payload = {
-      projectId: '670c5dc7-a816-40dd-a5b8-fe5bbcf5eb77',
+      projectId,
       ...stakeholderForm,
     };
 
@@ -80,32 +91,55 @@ export default function StakeholderTab() {
       toast.error('Không thể xoá stakeholder');
     }
   };
+
   const fetchStakeholders = useCallback(async () => {
+    if (!projectId) return;
+
     try {
       setStakeholderLoading(true);
-      const projectId = '670c5dc7-a816-40dd-a5b8-fe5bbcf5eb77';
-      const params = {};
 
-      if (debouncedSearch?.trim()) params.SearchTerm = debouncedSearch.trim();
+      const params = {};
+      if (debouncedSearch?.trim()) {
+        params.SearchTerm = debouncedSearch.trim();
+      }
 
       const res = await StakeholderService.getByProject(projectId, params);
-      if (res?.data?.items) setStakeholders(res.data.items);
+      if (res?.data?.items) {
+        setStakeholders(res.data.items);
+      }
     } catch {
       toast.error('Failed to load stakeholders');
     } finally {
       setStakeholderLoading(false);
     }
-  }, [debouncedSearch]);
-
-  useEffect(() => {
-    fetchStakeholders();
-  }, [fetchStakeholders]);
+  }, [projectId, debouncedSearch]);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 500);
     return () => clearTimeout(t);
   }, [search]);
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        const res = await ProjectService.getAll({
+          PageNumber: 1,
+          PageSize: 1,
+        });
 
+        if (res?.data?.items?.length > 0) {
+          setProjectId(res.data.items[0].projectId);
+        }
+      } catch {
+        toast.error('Không lấy được project');
+      }
+    };
+
+    fetchProjectId();
+  }, []);
+
+  useEffect(() => {
+    fetchStakeholders();
+  }, [fetchStakeholders]);
   return (
     <>
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
@@ -159,6 +193,9 @@ export default function StakeholderTab() {
                   </div>
 
                   <div className='mt-6 space-y-3'>
+                    {s.description && (
+                      <p className='mt-3 text-sm text-slate-500 line-clamp-2'>{s.description}</p>
+                    )}
                     <div className='flex items-center gap-3 text-sm text-slate-500'>
                       <div className='flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-slate-400'>
                         <MailOutlined />

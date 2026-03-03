@@ -3,7 +3,7 @@ import httpClient from './httpClient';
 export const StakeholderService = {
   getByProject(projectId, params) {
     const query = params ? new URLSearchParams(params).toString() : '';
-    return httpClient.httpGet(`/Stakeholders/project/${projectId}${query ? `?${query}` : ''}`);
+    return httpClient.httpGet(`/projects/${projectId}/stakeholders${query ? `?${query}` : ''}`);
   },
 
   getById(id) {

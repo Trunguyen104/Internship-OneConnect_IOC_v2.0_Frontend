@@ -15,10 +15,10 @@ import {
   CloseOutlined,
 } from '@ant-design/icons';
 import { useToast } from '@/providers/ToastProvider';
-
+import { ProjectService } from '@/services/projectService';
 export default function IssueTab() {
-  const projectId = '670c5dc7-a816-40dd-a5b8-fe5bbcf5eb77';
   const toast = useToast();
+  const [projectId, setProjectId] = useState(null);
   const [issues, setIssues] = useState([]);
   const [stakeholders, setStakeholders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -37,51 +37,12 @@ export default function IssueTab() {
     stakeholderId: '',
   });
 
-  const fetchStakeholders = async () => {
-    const res = await StakeholderService.getByProject(projectId);
-    if (res?.data?.items) {
-      setStakeholders(res.data.items);
-    }
-  };
   const [issueDetail, setIssueDetail] = useState(null);
 
   const handleViewDetail = async (id) => {
     const res = await StakeholderIssueService.getById(id);
     setIssueDetail(res.data);
   };
-  useEffect(() => {
-    fetchStakeholders();
-  }, []);
-
-  const fetchIssues = useCallback(async () => {
-    try {
-      setLoading(true);
-
-      const params = {
-        projectId,
-        PageIndex: page,
-        PageSize: pageSize,
-        OrderBy: 'createdAt desc',
-      };
-
-      if (debouncedSearch) {
-        params.Search = debouncedSearch;
-      }
-
-      const res = await StakeholderIssueService.getAll(params);
-
-      if (res?.data?.items) {
-        setIssues(res.data.items);
-        setTotal(res.data.totalCount || 0);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [page, pageSize, debouncedSearch]);
-
-  useEffect(() => {
-    fetchIssues();
-  }, [fetchIssues]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -144,6 +105,69 @@ export default function IssueTab() {
     }
   };
 
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        const res = await ProjectService.getAll({
+          PageNumber: 1,
+          PageSize: 1,
+        });
+
+        if (res?.data?.items?.length > 0) {
+          setProjectId(res.data.items[0].projectId);
+        }
+      } catch {
+        toast.error('Cannot load project');
+      }
+    };
+
+    fetchProjectId();
+  }, []);
+
+  const fetchStakeholders = useCallback(async () => {
+    if (!projectId) return;
+
+    const res = await StakeholderService.getByProject(projectId);
+    if (res?.data?.items) {
+      setStakeholders(res.data.items);
+    }
+  }, [projectId]);
+
+  const fetchIssues = useCallback(async () => {
+    if (!projectId) return;
+
+    try {
+      setLoading(true);
+
+      const params = {
+        projectId,
+        PageIndex: page,
+        PageSize: pageSize,
+        OrderBy: 'createdAt desc',
+      };
+
+      if (debouncedSearch) {
+        params.Search = debouncedSearch;
+      }
+
+      const res = await StakeholderIssueService.getAll(params);
+
+      if (res?.data?.items) {
+        setIssues(res.data.items);
+        setTotal(res.data.totalCount || 0);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, page, pageSize, debouncedSearch]);
+
+  useEffect(() => {
+    fetchStakeholders();
+  }, [fetchStakeholders]);
+
+  useEffect(() => {
+    fetchIssues();
+  }, [fetchIssues]);
   return (
     <>
       <Card>
