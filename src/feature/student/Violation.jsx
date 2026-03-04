@@ -8,7 +8,7 @@ import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/ic
 import Footer from '@/shared/components/Footer';
 
 export default function ViolationList() {
-  // const [violations, setViolations] = useState([]);
+  const [violations] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -95,7 +95,7 @@ export default function ViolationList() {
               </tr>
             </thead>
             <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
-              {paginatedViolations.map((v, i) => (
+              {(paginatedViolations || []).map((v, i) => (
                 <tr key={v.id} className='hover:bg-slate-50 transition-colors'>
                   <td className='px-6 py-4 text-sm'>{(page - 1) * pageSize + i + 1}</td>
                   <td className='px-6 py-4 text-sm font-medium truncate' title={v.type}>

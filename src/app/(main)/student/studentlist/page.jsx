@@ -1,10 +1,7 @@
 import StudentList from '@/feature/student/StudentList';
-import React from 'react';
 
-export default function page() {
-  return (
-    <>
-      <StudentList />
-    </>
-  );
+export const dynamic = 'force-dynamic';
+
+export default function Page() {
+  return <StudentList />;
 }
