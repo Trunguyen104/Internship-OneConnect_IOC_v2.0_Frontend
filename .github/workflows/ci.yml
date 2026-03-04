@@ -5,6 +5,9 @@ on:
     branches:
       - develop
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -35,4 +38,5 @@ jobs:
       - name: Build & Push Image
         run: |
           docker build -t trunguyen104/iocv2-frontend:latest .
+
           docker push trunguyen104/iocv2-frontend:latest
