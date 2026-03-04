@@ -20,12 +20,22 @@ export default function DateInput({ value, onChange }) {
 
   // Calculate popup position when open
   useEffect(() => {
-    if (open && buttonRef.current && typeof window !== 'undefined') {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPopupStyle({
-        bottom: window.innerHeight - rect.top + 8,
-        left: Math.max(8, rect.right - 330),
-      });
+    if (open) {
+      const initDate = value ? dayjs(value) : dayjs();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setViewDate(initDate);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedDate(value ? dayjs(value) : null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInputValue(value ? dayjs(value).format('MM/DD/YYYY') : '');
+
+      if (buttonRef.current && typeof window !== 'undefined') {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPopupStyle({
+          bottom: window.innerHeight - rect.top + 8,
+          left: Math.max(8, rect.right - 330),
+        });
+      }
     }
   }, [open]);
 

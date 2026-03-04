@@ -15,15 +15,15 @@ import {
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// ✅ Chọn 1 trong 2 (mock hoặc API)
-import { getJobBoardMock } from '@/mocks/jobboardMock';
-// import { getJobBoardData } from '@/services/jobboard.service';
+import { productBacklogService } from '@/services/productbacklog.service';
+import { ProjectService } from '@/services/projectService';
+import { useToast } from '@/providers/ToastProvider';
 
 const COLUMNS = [
-  { id: 'todo', title: 'To Do', underline: 'bg-gray-700' },
-  { id: 'in_progress', title: 'In Progress', underline: 'bg-blue-600' },
-  { id: 'in_review', title: 'In Review', underline: 'bg-yellow-500' },
-  { id: 'done', title: 'Done', underline: 'bg-green-500' },
+  { id: 'TODO', title: 'To Do', underline: 'bg-gray-700' },
+  { id: 'IN_PROGRESS', title: 'In Progress', underline: 'bg-blue-600' },
+  { id: 'IN_REVIEW', title: 'In Review', underline: 'bg-yellow-500' },
+  { id: 'DONE', title: 'Done', underline: 'bg-green-500' },
 ];
 
 export default function BoardPage() {
@@ -31,13 +31,67 @@ export default function BoardPage() {
   const [query, setQuery] = useState('');
   const [activeId, setActiveId] = useState(null);
 
-  // ✅ Load data (đang dùng mock)
-  useEffect(() => {
-    getJobBoardMock().then(setItems).catch(console.error);
+  const toast = useToast();
+  const [projectId, setProjectId] = useState(null);
 
-    // Backend xong thì đổi sang dòng này:
-    // getJobBoardData().then(setItems).catch(console.error);
-  }, []);
+  // Fetch Project ID
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
+        if (res?.data?.items?.length > 0) {
+          setProjectId(res.data.items[0].projectId);
+        }
+      } catch {
+        toast.error('Không lấy được project');
+      }
+    };
+    fetchProjectId();
+  }, [toast]);
+
+  // Fetch Active Sprint Tasks
+  useEffect(() => {
+    if (!projectId) return;
+
+    const fetchSprints = async () => {
+      try {
+        const sprintsRes = await productBacklogService.getSprints(projectId);
+        let sprintsData = [];
+        if (sprintsRes?.data?.items) {
+          sprintsData = sprintsRes.data.items;
+        } else if (sprintsRes?.data) {
+          sprintsData = sprintsRes.data;
+        } else if (Array.isArray(sprintsRes)) {
+          sprintsData = sprintsRes;
+        }
+
+        // Ưu tiên Sprint đang ACTIVE, nếu không lấy Sprint đầu tiên
+        const activeSprint = sprintsData.find((s) => s.status === 'ACTIVE') || sprintsData[0];
+
+        if (activeSprint && activeSprint.featureWorkItems) {
+          const mappedItems = activeSprint.featureWorkItems.map((it, idx) => ({
+            id: it.id,
+            displayId: it.key || `ISSUE-${idx + 1}`,
+            title: it.title || it.name,
+            type: 'User Story', // default
+            tag: 'Task', // default
+            priority: it.priority || 'Medium',
+            points: it.point || it.points || 0,
+            assignee: it.assignee || '—',
+            status: it.status || 'TODO',
+          }));
+          setItems(mappedItems);
+        } else {
+          setItems([]);
+        }
+      } catch (err) {
+        console.error('Fetch sprints failed:', err);
+        toast.error('Lỗi khi tải dữ liệu Bảng công việc');
+      }
+    };
+
+    fetchSprints();
+  }, [projectId, toast]);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
 
@@ -64,7 +118,7 @@ export default function BoardPage() {
     setActiveId(e.active.id);
   }
 
-  function onDragEnd(e) {
+  async function onDragEnd(e) {
     const { active, over } = e;
     setActiveId(null);
     if (!over) return;
@@ -78,7 +132,22 @@ export default function BoardPage() {
     if (!fromCol || !toCol) return;
 
     if (fromCol !== toCol) {
+      // Optimistic update
       setItems((prev) => prev.map((x) => (x.id === activeTaskId ? { ...x, status: toCol } : x)));
+
+      // API call
+      try {
+        if (!projectId) throw new Error('Missing Project ID');
+        // Gọi API cập nhật trạng thái
+        await productBacklogService.updateWorkItem(projectId, activeTaskId, { status: toCol });
+      } catch (err) {
+        console.error('Lỗi khi cập nhật trạng thái:', err);
+        toast.error('Cập nhật trạng thái thất bại');
+        // Revert UI nếu lỗi
+        setItems((prev) =>
+          prev.map((x) => (x.id === activeTaskId ? { ...x, status: fromCol } : x)),
+        );
+      }
     }
   }
 
@@ -210,10 +279,13 @@ function IssueCard({ task, isOverlay }) {
       </div>
 
       {/* content */}
-      <div className='mt-3 text-lg font-extrabold tracking-wide'>{task.id}</div>
+      <div className='mt-3 text-lg font-extrabold tracking-wide'>{task.displayId || task.id}</div>
 
       {/* ✅ cố định vùng title để card đều nhau */}
-      <div className='mt-1 text-sm leading-5 line-clamp-2 min-h-[40px]'>{task.title}</div>
+      <div
+        className='mt-1 text-sm leading-5 line-clamp-2 min-h-[40px]'
+        dangerouslySetInnerHTML={{ __html: task.title }}
+      />
 
       <div className='mt-3 flex flex-wrap gap-2'>
         <span className='text-xs px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20'>
