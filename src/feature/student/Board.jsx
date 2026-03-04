@@ -66,7 +66,7 @@ export default function BoardPage() {
         }
 
         // Ưu tiên Sprint đang ACTIVE, nếu không lấy Sprint đầu tiên
-        const activeSprint = sprintsData.find(s => s.status === 'ACTIVE') || sprintsData[0];
+        const activeSprint = sprintsData.find((s) => s.status === 'ACTIVE') || sprintsData[0];
 
         if (activeSprint && activeSprint.featureWorkItems) {
           const mappedItems = activeSprint.featureWorkItems.map((it, idx) => ({
@@ -78,7 +78,7 @@ export default function BoardPage() {
             priority: it.priority || 'Medium',
             points: it.point || it.points || 0,
             assignee: it.assignee || '—',
-            status: it.status || 'TODO'
+            status: it.status || 'TODO',
           }));
           setItems(mappedItems);
         } else {
@@ -137,14 +137,16 @@ export default function BoardPage() {
 
       // API call
       try {
-        if (!projectId) throw new Error("Missing Project ID");
+        if (!projectId) throw new Error('Missing Project ID');
         // Gọi API cập nhật trạng thái
         await productBacklogService.updateWorkItem(projectId, activeTaskId, { status: toCol });
       } catch (err) {
         console.error('Lỗi khi cập nhật trạng thái:', err);
         toast.error('Cập nhật trạng thái thất bại');
         // Revert UI nếu lỗi
-        setItems((prev) => prev.map((x) => (x.id === activeTaskId ? { ...x, status: fromCol } : x)));
+        setItems((prev) =>
+          prev.map((x) => (x.id === activeTaskId ? { ...x, status: fromCol } : x)),
+        );
       }
     }
   }

@@ -8,7 +8,7 @@ import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/ic
 import Footer from '@/shared/components/Footer';
 
 export default function ViolationList() {
-  // const [violations, setViolations] = useState([]);
+  const [violations] = useState([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -20,13 +20,13 @@ export default function ViolationList() {
     tableRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page, pageSize]);
 
-  // useEffect(() => {
-  //   async function fetchViolations() {
-  //     const res = await getViolationList();
-  //     setViolations(res.data || []);
-  //   }
-  //   fetchViolations();
-  // }, []);
+  useEffect(() => {
+    // async function fetchViolations() {
+    //   const res = await getViolationList();
+    //   setViolations(res.data || []);
+    // }
+    // fetchViolations();
+  }, []);
 
   const filteredViolations = violations.filter(
     (v) =>
