@@ -3,6 +3,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { productBacklogService } from '@/services/productbacklog.service';
+import { ProjectService } from '@/services/projectService';
+import { useToast } from '@/providers/ToastProvider';
 import CreateTaskModal from '@/shared/components/CreateTaskModal';
 import CreateEpicModal from '@/shared/components/CreateEpicModal';
 import MoreMenuButton from '@/shared/components/MoreMenuButton';
@@ -85,41 +87,85 @@ const priorityTone = {
 };
 
 export default function ProductBacklog() {
-  const [data, setData] = useState({ epics: [], items: [] });
+  const toast = useToast();
+  const [projectId, setProjectId] = useState(null);
+  const [epics, setEpics] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openCreateTask, setOpenCreateTask] = useState(false);
   const [selectedEpicId, setSelectedEpicId] = useState('');
   const [search, setSearch] = useState('');
   const [openCreateEpic, setOpenCreateEpic] = useState(false);
+
+  useEffect(() => {
+    const fetchProjectId = async () => {
+      try {
+        const res = await ProjectService.getAll({
+          PageNumber: 1,
+          PageSize: 1,
+        });
+
+        if (res?.data?.items?.length > 0) {
+          setProjectId(res.data.items[0].projectId);
+        }
+      } catch {
+        toast.error('Không lấy được project');
+      }
+    };
+
+    fetchProjectId();
+  }, [toast]);
+
   useEffect(() => {
     let mounted = true;
 
     async function fetchData() {
+      if (!projectId) return;
+
       try {
         setLoading(true);
 
-        let res;
-        const hasApi = !!process.env.NEXT_PUBLIC_API_URL;
+        const epicsRes = await productBacklogService.getEpics(projectId);
 
-        if (hasApi) {
-          res = await productBacklogService.getAll();
-        } else {
-          res = (await import('@/mocks/data/productbacklog.mock.json')).default;
+        let epicsData = [];
+        if (epicsRes?.data?.items) {
+          epicsData = epicsRes.data.items;
+        } else if (epicsRes?.data) {
+          epicsData = epicsRes.data;
+        } else if (Array.isArray(epicsRes)) {
+          epicsData = epicsRes;
+        }
+
+        let itemsData = [];
+        try {
+          const itemsRes = await productBacklogService.getWorkItemsBacklog(projectId);
+          console.log('itemsRes from backend:', itemsRes);
+
+          if (itemsRes?.data?.productBacklog?.items) {
+            itemsData = itemsRes.data.productBacklog.items;
+          } else if (itemsRes?.data?.items) {
+            itemsData = itemsRes.data.items;
+          } else if (itemsRes?.data) {
+            itemsData = itemsRes.data;
+          } else if (Array.isArray(itemsRes)) {
+            itemsData = itemsRes;
+          }
+        } catch (e) {
+          console.error('Failed to load backlog items', e);
         }
 
         if (!mounted) return;
-        setData(res);
-        setSelectedEpicId(res.epics?.[0]?.id || '');
-      } catch {
-        // fallback mock nếu API fail
-        try {
-          const mock = (await import('@/mocks/data/productbacklog.mock.json')).default;
-          if (!mounted) return;
-          setData(mock);
-          setSelectedEpicId(mock.epics?.[0]?.id || '');
-        } catch {
-          // ignore
-        }
+
+        console.log('Setting Epics:', epicsData);
+        console.log('Setting Items:', itemsData);
+
+        setEpics(Array.isArray(epicsData) ? epicsData : []);
+        setItems(Array.isArray(itemsData) ? itemsData : []);
+        setSelectedEpicId(Array.isArray(epicsData) && epicsData.length > 0 ? epicsData[0].id : '');
+      } catch (err) {
+        console.error(err);
+        if (!mounted) return;
+        toast.error('Failed to load Product Backlog');
       } finally {
         if (mounted) setLoading(false);
       }
@@ -129,13 +175,22 @@ export default function ProductBacklog() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [projectId, toast]);
 
   const filteredItems = useMemo(() => {
-    const items = data.items || [];
     const s = search.trim().toLowerCase();
-    return items
-      .filter((it) => (selectedEpicId ? it.epicId === selectedEpicId : true))
+    const safeItems = Array.isArray(items) ? items : [];
+
+    // Debug log to check what is going on with the filtering:
+    console.log('--- Filtering Items ---');
+    console.log('Total items in state:', safeItems.length);
+    console.log('Selected Epic ID:', selectedEpicId);
+    if (safeItems.length > 0) {
+      console.log('Sample item parentId:', safeItems[0].parentId, safeItems[0]);
+    }
+
+    const result = safeItems
+      .filter((it) => (selectedEpicId ? it.parentId === selectedEpicId : true))
       .filter((it) => {
         if (!s) return true;
         return (
@@ -144,9 +199,10 @@ export default function ProductBacklog() {
           it.type?.toLowerCase().includes(s)
         );
       });
-  }, [data.items, selectedEpicId, search]);
 
-  const epics = data.epics || [];
+    console.log('Filtered result count:', result.length);
+    return result;
+  }, [items, selectedEpicId, search]);
 
   return (
     <div className='w-full space-y-4'>
@@ -237,11 +293,12 @@ export default function ProductBacklog() {
                     <div className='flex items-start justify-between gap-2'>
                       <div className='min-w-0'>
                         <div className='truncate text-sm font-semibold text-foreground'>
-                          {epic.name}
+                          {epic.title || epic.name || 'Untitled Epic'}
                         </div>
-                        <div className='mt-0.5 line-clamp-2 text-xs text-muted'>
-                          {epic.description}
-                        </div>
+                        <div
+                          className='mt-0.5 line-clamp-2 text-xs text-muted'
+                          dangerouslySetInnerHTML={{ __html: epic.description || '' }}
+                        />
                       </div>
                     </div>
                   </button>
@@ -304,7 +361,7 @@ export default function ProductBacklog() {
                 {filteredItems.map((it, idx) => {
                   return (
                     <div
-                      key={it.id}
+                      key={it.workItemId || it.id || idx}
                       className='grid items-center gap-3 px-4 py-4 hover:bg-bg'
                       style={{
                         gridTemplateColumns: '110px 1fr 140px 120px 90px 120px 48px',
@@ -322,9 +379,10 @@ export default function ProductBacklog() {
                         <div className='truncate text-sm font-semibold text-foreground'>
                           {it.title}
                         </div>
-                        <div className='mt-0.5 line-clamp-1 text-xs text-muted'>
-                          {it.description}
-                        </div>
+                        <div
+                          className='mt-0.5 line-clamp-1 text-xs text-muted'
+                          dangerouslySetInnerHTML={{ __html: it.description || '' }}
+                        />
                       </div>
 
                       {/* 4) status */}
@@ -382,18 +440,101 @@ export default function ProductBacklog() {
       </div>
       <CreateTaskModal
         open={openCreateTask}
+        epics={epics}
         onClose={() => setOpenCreateTask(false)}
-        onSubmit={(payload) => {
-          console.log('create task payload:', payload);
-          // TODO: gọi API create backlog item ở đây
+        onSubmit={async (payload) => {
+          console.log('--- SUBMIT CREATE TASK ---');
+          console.log('Form Payload:', payload);
+          try {
+            const apiPayload = {
+              title: payload.summary,
+              description: payload.description,
+              type: payload.type,
+              status: payload.status,
+              priority: payload.priority,
+              parentId: payload.epic || null,
+              assigneeId: payload.assignee || null,
+              dueDate: payload.dueDate || undefined,
+              storyPoint: payload.points ? Number(payload.points) : 0,
+            };
+            console.log('API Payload Sent:', apiPayload);
+
+            const res = await productBacklogService.createWorkItem(projectId, apiPayload);
+            console.log('API Response Task:', res);
+
+            if (res && res.isSuccess === false) {
+              let errorMsg = 'Failed to create task';
+              try {
+                const parsed = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                if (parsed.errors) {
+                  errorMsg = Object.entries(parsed.errors)
+                    .map(([k, v]) => `${k}: ${v}`)
+                    .join('\n');
+                } else if (parsed.title) {
+                  errorMsg = parsed.title;
+                }
+              } catch (_e) { }
+              toast.error(errorMsg);
+              return;
+            }
+
+            toast.success('Task created successfully');
+            setOpenCreateTask(false);
+
+            if (res?.data) {
+              setItems((prev) => [...prev, res.data]);
+            } else {
+              window.location.reload();
+            }
+          } catch (e) {
+            console.error('Failed to create task:', e);
+            toast.error('Failed to create task');
+          }
         }}
       />
       <CreateEpicModal
         open={openCreateEpic}
         onClose={() => setOpenCreateEpic(false)}
-        onSubmit={(payload) => {
-          console.log('create epic payload:', payload);
-          // TODO: gọi API create epic ở đây
+        onSubmit={async (payload) => {
+          try {
+            const apiPayload = {
+              title: payload.name,
+              name: payload.name, // Send both just in case backend diverges
+              description: payload.description,
+              endDate: payload.endDate || undefined,
+            };
+
+            const res = await productBacklogService.createEpic(projectId, apiPayload);
+
+            if (res && res.isSuccess === false) {
+              let errorMsg = 'Failed to create epic';
+              try {
+                const parsed = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                if (parsed.errors) {
+                  errorMsg = Object.entries(parsed.errors)
+                    .map(([k, v]) => `${k}: ${v}`)
+                    .join('\n');
+                } else if (parsed.title) {
+                  errorMsg = parsed.title;
+                }
+              } catch (_e) { }
+              toast.error(errorMsg);
+              return;
+            }
+
+            toast.success('Epic created successfully');
+            setOpenCreateEpic(false);
+
+            // Append the new Epic to the state locally
+            if (res?.data) {
+              setEpics((prev) => [...prev, res.data]);
+            } else {
+              window.location.reload(); // Fallback if no data is returned
+            }
+          } catch (e) {
+            console.error('Failed to create epic:', e);
+            toast.error('Failed to create epic');
+          }
         }}
       />
     </div>
