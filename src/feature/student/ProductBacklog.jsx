@@ -473,7 +473,7 @@ export default function ProductBacklog() {
                 } else if (parsed.title) {
                   errorMsg = parsed.title;
                 }
-              } catch (_e) { }
+              } catch {}
               toast.error(errorMsg);
               return;
             }
@@ -517,7 +517,7 @@ export default function ProductBacklog() {
                 } else if (parsed.title) {
                   errorMsg = parsed.title;
                 }
-              } catch (_e) { }
+              } catch {}
               toast.error(errorMsg);
               return;
             }

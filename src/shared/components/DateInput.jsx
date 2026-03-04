@@ -22,8 +22,11 @@ export default function DateInput({ value, onChange }) {
   useEffect(() => {
     if (open) {
       const initDate = value ? dayjs(value) : dayjs();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setViewDate(initDate);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedDate(value ? dayjs(value) : null);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInputValue(value ? dayjs(value).format('MM/DD/YYYY') : '');
 
       if (buttonRef.current && typeof window !== 'undefined') {

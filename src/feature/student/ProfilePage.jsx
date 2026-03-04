@@ -88,7 +88,9 @@ export default function PersonalInfo() {
     }
 
     fetchMe();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [toast]);
 
   return (
@@ -135,7 +137,14 @@ export default function PersonalInfo() {
               </InfoItem>
 
               <InfoItem label='User Code' value={userInfo?.userCode || '—'} />
-              <InfoItem label='Date of Birth' value={userInfo?.dateOfBirth ? new Date(userInfo.dateOfBirth).toLocaleDateString('vi-VN') : '—'} />
+              <InfoItem
+                label='Date of Birth'
+                value={
+                  userInfo?.dateOfBirth
+                    ? new Date(userInfo.dateOfBirth).toLocaleDateString('vi-VN')
+                    : '—'
+                }
+              />
               <InfoItem label='University' value='—' />
               <InfoItem label='Gender' value='—' />
             </div>
