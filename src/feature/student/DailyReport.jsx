@@ -1,363 +1,586 @@
 'use client';
 
-import Card from '@/shared/components/Card';
-import SearchBar from '@/shared/components/SearchBar';
-import { useState, useEffect, useRef } from 'react';
-import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import Footer from '@/shared/components/Footer';
+import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  message,
+  Typography,
+  Skeleton,
+  Empty,
+  Tooltip,
+} from 'antd';
+import {
+  PlusOutlined,
+  FileTextOutlined,
+  FilterOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
+import { LogBookService } from '@/services/logBook.service';
+import { InternshipGroupService } from '@/services/internshipGroup.service';
+import dayjs from 'dayjs';
 
-const DATA = [
-  {
-    id: 1,
-    date: '27/02/2026 - 01:48:28',
-    student: 'Lê Duy Khánhhhhhhhhhhhhhhhhhh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 2,
-    date: '27/02/2026 - 01:32:17',
-    student: 'Trần Gia Đạt',
-    status: 'Hoàn thành',
-    summary: 'Sửa UI dashboard',
-    issue: 'Chỉnh responsive',
-    submitStatus: 'Chưa nộp',
-  },
-  {
-    id: 3,
-    date: '26/02/2026 - 03:28:17',
-    student: 'Nguyễn Văn A',
-    status: 'Đang làm',
-    summary: 'Viết API login',
-    issue: 'Backend task',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 4,
-    date: '26/02/2026 - 02:58:45',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 5,
-    date: '26/02/2026 - 02:05:54',
-    student: 'Phạm Thị B',
-    status: 'Hoàn thành',
-    summary: 'Thiết kế database',
-    issue: 'DB design',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 6,
-    date: '26/02/2026 - 02:03:04',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Cài đặt môi trường',
-    issue: 'Setup project',
-    submitStatus: 'Chưa nộp',
-  },
-  {
-    id: 7,
-    date: '24/01/2026 - 09:15:22',
-    student: 'Trần C',
-    status: 'Đang làm',
-    summary: 'Test component',
-    issue: 'Unit test',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 8,
-    date: '23/01/2026 - 10:45:10',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện UI',
-    issue: 'UI fix',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 9,
-    date: '22/01/2026 - 08:20:05',
-    student: 'Nguyễn D',
-    status: 'Hoàn thành',
-    summary: 'Deploy staging',
-    issue: 'Devops',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 10,
-    date: '21/01/2026 - 14:30:55',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Fix bug login',
-    issue: 'Bug fix',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 11,
-    date: '20/01/2026 - 16:12:40',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Họp team',
-    issue: 'Meeting',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 12,
-    date: '19/01/2026 - 11:05:18',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Research tech stack',
-    issue: 'Research',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 13,
-    date: '18/01/2026 - 09:40:33',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Code review',
-    issue: 'Review',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 14,
-    date: '17/01/2026 - 15:22:11',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 15,
-    date: '16/01/2026 - 10:10:01',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    submitStatus: 'Đã nộp',
-  },
-  {
-    id: 16,
-    date: '15/01/2026 - 08:55:45',
-    student: 'Lê Duy Khánh',
-    status: 'Đang làm',
-    summary: 'Hoàn thiện giao diện báo cáo',
-    issue: 'Fix layout table',
-    submitStatus: 'Đã nộp',
-  },
-];
+const { Title, Text } = Typography;
+const { TextArea } = Input;
 
 export default function DailyReport() {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [messageApi, contextHolder] = message.useMessage();
+  const searchParams = useSearchParams();
+  const internshipId = searchParams.get('id');
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+
+  // Pagination & Filters
+  const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [open, setOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState(undefined);
+  const [sortOrder, setSortOrder] = useState('desc'); // api default usually implies descending for date, we can pass it if supported
+  const [currentId, setCurrentId] = useState(internshipId);
 
-  const filteredData = DATA.filter((r) => r.student.toLowerCase().includes(search.toLowerCase()));
+  // Modal & Edit State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [form] = Form.useForm();
 
-  const parseDate = (dateStr) => {
-    if (!dateStr) return 0;
-    const dateOnly = dateStr.split(' - ')[0];
-    const [day, month, year] = dateOnly.split('/');
-    return new Date(Number(year), Number(month) - 1, Number(day)).getTime() || 0;
-  };
-  const sortedData = [...filteredData].sort((a, b) => {
-    const timeA = parseDate(a.date);
-    const timeB = parseDate(b.date);
-    if (timeA === timeB) {
-      return a.id - b.id;
+  const [studentId, setStudentId] = useState(null);
+
+  useEffect(() => {
+    // Extract studentId from the JWT token
+    const tokenRaw = sessionStorage.getItem('accessToken');
+    if (tokenRaw) {
+      try {
+        let token = tokenRaw;
+        if (!token.startsWith('ey')) {
+          const parsed = JSON.parse(tokenRaw);
+          token = parsed?.accessToken || parsed?.data?.accessToken;
+        }
+        if (token) {
+          const payloadBase64 = token.split('.')[1];
+          const payloadStr = atob(payloadBase64);
+          const payload = JSON.parse(payloadStr);
+          const id =
+            payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+            payload.sub;
+          setStudentId(id);
+        }
+      } catch (e) {
+        console.error('Failed to decode JWT to get StudentId', e);
+      }
     }
-    return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
-  });
+  }, []);
 
-  const total = sortedData.length;
-  const totalPages = Math.ceil(total / pageSize);
+  const fetchLogbooks = useCallback(async () => {
+    let idToFetch = currentId || internshipId;
+    setLoading(true);
 
-  const paginatedData = sortedData.slice((page - 1) * pageSize, page * pageSize);
+    try {
+      // If no ID is present in URL, try to fetch the first group for this student
+      if (!idToFetch) {
+        const groupsRes = await InternshipGroupService.getAll();
+        if (groupsRes && groupsRes.isSuccess !== false && groupsRes.data) {
+          const items = groupsRes.data.items || groupsRes.items || [];
+          if (items.length > 0) {
+            idToFetch = items[0].internshipId;
+            setCurrentId(idToFetch);
+          }
+        }
+      }
 
-  const handleSortDate = () => {
-    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+      if (!idToFetch) {
+        setLoading(false);
+        return;
+      }
+
+      const res = await LogBookService.getAll({
+        InternshipId: idToFetch,
+        Status: statusFilter,
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        SortColumn: 'dateReport',
+        SortOrder: sortOrder,
+      });
+
+      if (res && res.isSuccess !== false) {
+        // Assume API returns { data: { items: [], totalCount: ... } } or similar
+        // Adjust according to standard list response
+        let items = [];
+        if (Array.isArray(res.data)) {
+          items = res.data;
+        } else if (res.data?.items && Array.isArray(res.data.items)) {
+          items = res.data.items;
+        } else if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
+          // Maybe it's a single item returned as just an object inside data
+          items = [res.data];
+        } else if (Array.isArray(res.items)) {
+          items = res.items;
+        }
+
+        const totalItems = res.data?.totalCount || res.totalCount || items.length;
+
+        setData(items);
+        setTotal(totalItems);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [internshipId, currentId, statusFilter, pageNumber, pageSize, sortOrder, messageApi]);
+
+  useEffect(() => {
+    fetchLogbooks();
+  }, [fetchLogbooks]);
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    setPageNumber(pagination.current);
+    setPageSize(pagination.pageSize);
+
+    if (sorter.field === 'dateReport' && sorter.order) {
+      setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
+    } else if (!sorter.order) {
+      setSortOrder(undefined);
+    }
   };
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPage(1);
-  }, [search]);
 
-  const tableBodyRef = useRef(null);
+  const handleCreateOrUpdate = async (values) => {
+    const targetId = currentId || internshipId;
+    if (!targetId) {
+      messageApi.error('Missing Internship ID');
+      return;
+    }
+    if (!studentId) {
+      messageApi.error('User context missing (Student ID not found)');
+      return;
+    }
 
-  useEffect(() => {
-    tableBodyRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [page, pageSize]);
+    setSubmitting(true);
+    try {
+      const payload = {
+        internshipId: targetId,
+        studentId,
+        summary: values.summary,
+        issue: values.issue || '',
+        plan: values.plan,
+        dateReport: dayjs(values.dateReport).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+        status: values.status !== undefined ? values.status : 1, // Default to Submitted
+      };
+
+      let res;
+      if (editingId) {
+        payload.logbookId = editingId;
+        res = await LogBookService.update(editingId, payload);
+      } else {
+        res = await LogBookService.create(payload);
+      }
+
+      if (res && res.isSuccess !== false) {
+        messageApi.success(
+          editingId ? 'Logbook updated successfully!' : 'Logbook created successfully!',
+        );
+        closeModal();
+        fetchLogbooks(); // Refresh table
+      } else {
+        messageApi.error(
+          res?.message ||
+            res?.data?.message ||
+            (editingId ? 'Failed to update logbook' : 'Failed to create logbook'),
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      messageApi.error('An unexpected error occurred');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEdit = (record) => {
+    setEditingId(record.logbookId);
+    form.setFieldsValue({
+      dateReport: record.dateReport ? dayjs(record.dateReport) : null,
+      status: record.status,
+      summary: record.summary,
+      issue: record.issue,
+      plan: record.plan,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const res = await LogBookService.delete(id);
+      if (res && res.isSuccess !== false) {
+        messageApi.success('Logbook deleted successfully!');
+        if (data.length === 1 && pageNumber > 1) {
+          setPageNumber(pageNumber - 1);
+        } else {
+          fetchLogbooks();
+        }
+      } else {
+        messageApi.error(res?.message || 'Failed to delete logbook');
+      }
+    } catch {
+      messageApi.error('An error occurred during deletion');
+    }
+  };
+
+  const renderStatus = (status) => {
+    const config = {
+      0: { label: 'Draft', style: 'bg-orange-50 text-orange-600 border-orange-200 border' },
+      1: { label: 'Submit for Approval', style: 'bg-blue-50 text-blue-600 border-blue-200 border' },
+      2: { label: 'Approved', style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border' },
+      3: { label: 'Rejected', style: 'bg-red-50 text-red-600 border-red-200 border' },
+    };
+    const c = config[status] || {
+      label: 'Unknown',
+      style: 'bg-gray-50 text-gray-600 border-gray-200 border',
+    };
+
+    return (
+      <div className={`inline-flex px-3 py-1 rounded-full text-[13px] font-semibold ${c.style}`}>
+        {c.label}
+      </div>
+    );
+  };
+
+  const columns = [
+    {
+      title: 'Report Date',
+      dataIndex: 'dateReport',
+      key: 'dateReport',
+      sorter: true,
+      render: (text) => (
+        <span className='font-medium text-gray-700'>
+          {text ? new Date(text).toLocaleDateString('en-GB') : 'N/A'}
+        </span>
+      ),
+    },
+    {
+      title: 'Student',
+      dataIndex: 'studentName',
+      key: 'studentName',
+      render: (text) => <Text className='font-semibold'>{text || 'N/A'}</Text>,
+    },
+    {
+      title: 'Summary',
+      dataIndex: 'summary',
+      key: 'summary',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (text) => (
+        <Tooltip placement='topLeft' title={text}>
+          <span className='text-gray-600'>{text}</span>
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Issue',
+      dataIndex: 'issue',
+      key: 'issue',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (text) => (
+        <Tooltip placement='topLeft' title={text}>
+          <span className='text-gray-600'>{text || '-'}</span>
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => renderStatus(status),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      width: 120,
+      align: 'center',
+      render: (_, record) => (
+        <div className='flex items-center justify-center gap-2'>
+          <Tooltip title='Edit Report'>
+            <Button
+              type='text'
+              icon={
+                <EditOutlined className='text-gray-500 hover:text-blue-600 transition-colors' />
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(record);
+              }}
+              className='hover:bg-blue-50 w-8 h-8 rounded-lg flex items-center justify-center'
+            />
+          </Tooltip>
+
+          <Tooltip title='Delete Report'>
+            <Button
+              type='text'
+              danger
+              icon={
+                <DeleteOutlined className='text-gray-400 hover:text-red-500 transition-colors' />
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                Modal.confirm({
+                  title: 'Delete Logbook',
+                  content: 'Are you sure you want to delete this logbook entry?',
+                  okText: 'Yes, Delete',
+                  okType: 'danger',
+                  cancelText: 'Cancel',
+                  onOk: () => handleDelete(record.logbookId),
+                  className: 'modern-modal',
+                  okButtonProps: { className: 'rounded-lg font-semibold' },
+                  cancelButtonProps: { className: 'rounded-lg font-medium' },
+                });
+              }}
+              className='hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center'
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
+  if (!internshipId && !currentId && !loading && total === 0) {
+    return (
+      <div className='flex h-[400px] items-center justify-center bg-gray-50/50 rounded-[24px] border border-gray-200/50 m-6'>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          className='my-auto'
+          description={
+            <span className='text-gray-500 font-medium'>
+              Please select an internship group to view logbooks.
+            </span>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
-    <section className='space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Daily Report</h1>
+    <div className='space-y-6 max-w-[1400px] mx-auto pb-8'>
+      {contextHolder}
 
-      <Card>
-        <div className='mb-5 flex items-center'>
-          <SearchBar
-            placeholder='Search'
-            value={search}
-            onChange={setSearch}
-            showFilter
-            showAction
-            actionLabel='Create Report'
-            actionIcon={<PlusOutlined />}
-            onActionClick={() => setOpen(true)}
-          />
+      <div className='flex items-center justify-between mb-8 mt-4 px-2'>
+        <div>
+          <Title level={2} className='!mb-1 tracking-tight text-gray-900'>
+            Daily Report
+          </Title>
+          <Text className='text-gray-500 text-[15px]'>
+            Manage and submit your daily internship logbooks
+          </Text>
         </div>
+      </div>
 
-        <div
-          className='max-h-96 overflow-auto border border-slate-200 rounded-lg'
-          ref={tableBodyRef}
-        >
-          <table className='w-full text-left table-fixed'>
-            <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
-              <tr>
-                <th
-                  className='px-6 py-3 cursor-pointer hover:bg-slate-100 transition-colors w-[180px]'
-                  onClick={handleSortDate}
-                >
-                  <div className='flex items-center gap-1 w-full'>
-                    <span className='whitespace-nowrap'>Date</span>
-                    <div className='flex flex-col text-[8px] leading-none shrink-0'>
-                      <CaretUpOutlined
-                        className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
-                      />
-                      <CaretDownOutlined
-                        className={sortOrder === 'desc' ? 'text-blue-600' : 'text-slate-300'}
-                      />
-                    </div>
-                  </div>
-                </th>
-
-                <th className='px-6 py-3 w-[150px]'>Student Name</th>
-                <th className='px-6 py-3 w-[200px]'>Summary</th>
-                <th className='px-6 py-3 w-[150px]'>Issue</th>
-                <th className='px-6 py-3 w-[120px]'>Submit Status</th>
-                <th className='px-6 py-3 w-[120px]'>Status</th>
-              </tr>
-            </thead>
-            <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
-              {paginatedData.map((r) => (
-                <tr key={r.id} className='hover:bg-slate-50 transition-colors'>
-                  <td className='px-6 py-4 text-sm whitespace-nowrap'>{r.date}</td>
-
-                  <td
-                    className='px-6 py-4 text-sm font-medium truncate overflow-hidden'
-                    title={r.student}
-                  >
-                    {r.student}
-                  </td>
-
-                  <td className='px-6 py-4 text-sm truncate overflow-hidden' title={r.summary}>
-                    {r.summary}
-                  </td>
-                  <td
-                    className='px-6 py-4 text-sm text-slate-500 truncate overflow-hidden'
-                    title={r.issue}
-                  >
-                    {r.issue}
-                  </td>
-
-                  <td className='px-6 py-4 text-sm'>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${
-                        r.submitStatus === 'Đã nộp'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}
-                    >
-                      {r.submitStatus}
-                    </span>
-                  </td>
-                  <td className='px-6 py-4 text-sm'>
-                    <span className='rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 whitespace-nowrap'>
-                      {r.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-      <Footer
-        total={total}
-        page={page}
-        pageSize={pageSize}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
-      {open && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-          <div className='bg-white w-full max-w-xl rounded-2xl p-4'>
-            <h2 className='text-xl font-semibold mb-6'>Create Daily Report</h2>
-
-            <div className='max-h-[60vh] overflow-y-auto px-6 py-5'>
-              <div className='space-y-2'>
-                <label className='block text-sm font-medium text-slate-700'>
-                  Date <span className='text-red-500'>*</span>
-                </label>
-                <input type='date' className='w-full border rounded-xl px-4 py-2' />
-              </div>
-
-              <div className='space-y-2'>
-                <label className='block mt-4 text-sm font-medium text-slate-700'>
-                  Work done yesterday <span className='text-red-500'>*</span>
-                </label>
-                <textarea
-                  placeholder='Enter the work done...'
-                  className='w-full border rounded-xl px-4 py-2 min-h-25'
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <label className='block mt-4 text-sm font-medium text-slate-700'>
-                  Issues <span className='text-red-500'>*</span>
-                </label>
-                <textarea
-                  placeholder='Describe issues if any...'
-                  className='w-full border rounded-xl px-4 py-2 min-h-25'
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <label className='block mt-4 text-sm font-medium text-slate-700'>
-                  Plan for today <span className='text-red-500'>*</span>
-                </label>
-                <textarea
-                  placeholder='Enter the plan for today...'
-                  className='w-full border rounded-xl px-4 py-2 min-h-25'
-                />
-              </div>
+      <div className='bg-white rounded-[24px] border border-gray-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden'>
+        <div className='px-8 py-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4'>
+          <div className='flex items-center gap-4'>
+            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shrink-0'>
+              <FileTextOutlined className='text-blue-600 text-lg' />
             </div>
 
-            <div className='mt-6 flex justify-end gap-3'>
-              <button
-                onClick={() => setOpen(false)}
-                className='px-5 py-2 rounded-full bg-gray-200 cursor-pointer'
-              >
-                Cancel
-              </button>
-              <button className='px-6 py-2 rounded-full bg-(--primary-600) text-white cursor-pointer'>
-                Create Report
-              </button>
+            <Select
+              allowClear
+              placeholder='Filter by Status'
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPageNumber(1);
+              }}
+              className='w-48 shadow-sm'
+              rootClassName='custom-select-rounded'
+              popupClassName='!rounded-xl shadow-lg border border-gray-100'
+              suffixIcon={<FilterOutlined />}
+              options={[
+                { value: 0, label: 'Draft' },
+                { value: 1, label: 'Submitted' },
+                { value: 2, label: 'Approved' },
+                { value: 3, label: 'Rejected' },
+              ]}
+            />
+          </div>
+
+          <Button
+            type='primary'
+            icon={<PlusOutlined />}
+            onClick={() => setIsModalOpen(true)}
+            className='bg-black hover:bg-gray-800 text-white rounded-xl h-10 px-6 font-semibold shadow-sm border-0 transition-all hover:scale-105'
+          >
+            Create Report
+          </Button>
+        </div>
+
+        <div className='px-4 pb-4 mt-2'>
+          {loading ? (
+            <div className='p-6 space-y-4'>
+              <Skeleton active paragraph={{ rows: 6 }} />
+            </div>
+          ) : (
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey='logbookId'
+              onChange={handleTableChange}
+              pagination={{
+                current: pageNumber,
+                pageSize: pageSize,
+                total: total,
+                showSizeChanger: true,
+                className: 'px-6 mb-2',
+              }}
+              rowClassName='hover:bg-gray-50/50 transition-colors cursor-default'
+              locale={{
+                emptyText: (
+                  <div className='py-12'>
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={
+                        <span className='text-gray-400 font-medium'>
+                          No logbooks found for this group
+                        </span>
+                      }
+                    />
+                  </div>
+                ),
+              }}
+            />
+          )}
+        </div>
+      </div>
+
+      <Modal
+        title={
+          <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
+            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shrink-0'>
+              {editingId ? (
+                <EditOutlined className='text-lg' />
+              ) : (
+                <PlusOutlined className='text-lg' />
+              )}
+            </div>
+            <div>
+              <h3 className='text-lg font-bold text-gray-900 m-0'>
+                {editingId ? 'Edit Daily Report' : 'Create Daily Report'}
+              </h3>
+              <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
+                {editingId
+                  ? 'Update your submitted logbook details'
+                  : 'Submit your internship progress'}
+              </p>
             </div>
           </div>
-        </div>
-      )}
-    </section>
+        }
+        open={isModalOpen}
+        // onCancel={closeModal}
+        confirmLoading={submitting}
+        onOk={() => form.submit()}
+        okText={editingId ? 'Save Changes' : 'Submit Report'}
+        cancelText='Cancel'
+        className='modern-modal'
+        width={700}
+        okButtonProps={{
+          className:
+            'bg-black hover:bg-gray-800 text-white rounded-lg h-10 px-6 font-semibold shadow-sm border-0',
+        }}
+        cancelButtonProps={{
+          className:
+            'rounded-lg h-10 px-5 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600',
+        }}
+      >
+        <Form
+          form={form}
+          layout='vertical'
+          onFinish={handleCreateOrUpdate}
+          className='mt-4 px-2'
+          initialValues={{
+            status: 1, // default Submitted
+          }}
+        >
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
+            <Form.Item
+              label={<span className='text-sm font-semibold text-gray-700'>Report Date</span>}
+              name='dateReport'
+              rules={[{ required: true, message: 'Please select a date!' }]}
+            >
+              <DatePicker
+                className='w-full h-[44px] rounded-xl'
+                format='DD/MM/YYYY'
+                disabledDate={(current) => current && current > dayjs().endOf('day')}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={<span className='text-sm font-semibold text-gray-700'>Status</span>}
+              name='status'
+              rules={[{ required: true, message: 'Please select a status!' }]}
+            >
+              <Select
+                className='h-[44px]'
+                rootClassName='custom-select-rounded'
+                popupClassName='!rounded-xl shadow-lg border border-gray-100'
+                options={[
+                  { value: 0, label: 'Draft' },
+                  { value: 1, label: 'Submit for Approval' },
+                ]}
+              />
+            </Form.Item>
+          </div>
+
+          <Form.Item
+            label={<span className='text-sm font-semibold text-gray-700'>Work Summary</span>}
+            name='summary'
+            rules={[
+              { required: true, message: 'Please enter a summary of your work!' },
+              { min: 10, message: 'Summary must be at least 10 characters long.' },
+            ]}
+          >
+            <TextArea
+              placeholder='Describe the tasks you worked on today...'
+              autoSize={{ minRows: 4, maxRows: 8 }}
+              className='rounded-xl p-3'
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <span className='text-sm font-semibold text-gray-700'>
+                Issues Encountered (Optional)
+              </span>
+            }
+            name='issue'
+          >
+            <TextArea
+              placeholder='Any blockers or challenges you faced?'
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              className='rounded-xl p-3'
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={<span className='text-sm font-semibold text-gray-700'>Plan for Next Day</span>}
+            name='plan'
+            rules={[
+              { required: true, message: 'Please outline your plan for the next working day!' },
+            ]}
+          >
+            <TextArea
+              placeholder='What are your tasks for tomorrow?'
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              className='rounded-xl p-3'
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
 }
