@@ -26,6 +26,7 @@ import {
   deleteProjectResource,
   updateProjectResource,
 } from '@/services/projectResources';
+import { ProjectService } from '@/services/projectService';
 import {
   UploadOutlined,
   FileTextOutlined,
@@ -47,7 +48,7 @@ const RESOURCE_TYPES = [
 ];
 
 export default function Project() {
-  const PROJECT_ID = '670c5dc7-a816-40dd-a5b8-fe5bbcf5eb77';
+  const [projectId, setProjectId] = useState(null);
 
   const [resources, setResources] = useState([]);
   const [fileList, setFileList] = useState([]);
@@ -59,10 +60,11 @@ export default function Project() {
   const [editingResource, setEditingResource] = useState(null);
   const [editForm] = Form.useForm();
 
-  const loadResources = async () => {
+  const loadResources = async (id) => {
+    if (!id) return;
     setLoading(true);
     try {
-      const data = await getProjectResources(PROJECT_ID);
+      const data = await getProjectResources(id);
       setResources(data?.data?.items || []);
     } catch (err) {
       console.error('Load resources error:', err);
@@ -72,8 +74,24 @@ export default function Project() {
     }
   };
 
+  const initProject = async () => {
+    try {
+      setLoading(true);
+      const res = await ProjectService.getAll();
+      if (res && res.data && res.data.items && res.data.items.length > 0) {
+        const id = res.data.items[0].projectId;
+        setProjectId(id);
+        await loadResources(id);
+      }
+    } catch (error) {
+      console.error('Failed to init project', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    loadResources();
+    initProject();
   }, []);
 
   const handleUpload = async (values) => {
@@ -86,14 +104,14 @@ export default function Project() {
     const file = fileList[0];
 
     const formData = new FormData();
-    formData.append('ProjectId', PROJECT_ID);
+    formData.append('ProjectId', projectId);
     formData.append('ResourceName', values.resourceName || file.name);
     formData.append('ResourceType', values.resourceType || 1);
     formData.append('File', file.originFileObj || file);
 
     try {
       await createProjectResource(formData);
-      await loadResources();
+      await loadResources(projectId);
       setFileList([]);
       form.resetFields();
       message.success('Tải lên tài liệu thành công!');
@@ -109,7 +127,7 @@ export default function Project() {
     try {
       await deleteProjectResource(id);
       message.success('Xóa tài liệu thành công!');
-      loadResources();
+      await loadResources(projectId);
     } catch (err) {
       console.error('Delete error:', err);
       message.error('Lỗi khi xóa tài liệu!');
@@ -128,13 +146,13 @@ export default function Project() {
   const handleUpdate = async (values) => {
     try {
       await updateProjectResource(editingResource.projectResourceId, {
-        projectId: PROJECT_ID,
+        projectId: projectId,
         resourceName: values.resourceName,
         resourceType: values.resourceType || editingResource.resourceType || 1,
       });
       message.success('Cập nhật tài liệu thành công!');
       setIsEditModalVisible(false);
-      loadResources();
+      await loadResources(projectId);
     } catch (err) {
       console.error('Update error:', err);
       message.error('Lỗi khi cập nhật tài liệu!');
