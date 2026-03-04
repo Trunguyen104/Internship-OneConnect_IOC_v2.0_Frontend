@@ -39,14 +39,12 @@ export default function DailyReport() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  // Pagination & Filters
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState(undefined);
-  const [sortOrder, setSortOrder] = useState('desc'); // api default usually implies descending for date, we can pass it if supported
+  const [sortOrder, setSortOrder] = useState('desc');
   const [projectId, setProjectId] = useState(null);
 
-  // Modal & Edit State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewRecord, setViewRecord] = useState(null);
@@ -57,7 +55,6 @@ export default function DailyReport() {
   const [studentId, setStudentId] = useState(null);
 
   useEffect(() => {
-    // Extract studentId from the JWT token
     const tokenRaw = sessionStorage.getItem('accessToken');
     if (tokenRaw) {
       try {
@@ -89,7 +86,6 @@ export default function DailyReport() {
       if (!idToFetch) {
         let projectRes;
 
-        // Fetch via group if id exists in URL, otherwise fetch all projects to find one
         if (internshipId) {
           projectRes = await ProjectService.getByInternshipGroup(internshipId);
         } else {
@@ -99,7 +95,6 @@ export default function DailyReport() {
         if (projectRes && projectRes.isSuccess !== false && projectRes.data) {
           const items = projectRes.data.items || projectRes.items || [];
           if (items.length > 0) {
-            // Find a project that has this internshipId (if provided), or just take the first one
             const matchedProject = internshipId
               ? items.find((p) => p.internshipId === internshipId) || items[0]
               : items[0];
@@ -116,7 +111,6 @@ export default function DailyReport() {
       }
 
       const res = await LogBookService.getAll(idToFetch, {
-        // Truyền ID trước, params sau
         Status: statusFilter,
         PageNumber: pageNumber,
         PageSize: pageSize,
@@ -182,18 +176,18 @@ export default function DailyReport() {
           issue: values.issue || '',
           plan: values.plan,
           dateReport: dayjs(values.dateReport).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-          // status: values.status !== undefined ? String(values.status) : '0',
-          status: values.status !== undefined ? values.status : 0,
+          // status: values.status !== undefined ? values.status : 0,
+          status: String(values.status),
         };
         res = await LogBookService.update(targetId, editingId, updatePayload);
       } else {
         const createPayload = {
-          projectId: targetId,
+          logbookId: editingId,
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
           dateReport: dayjs(values.dateReport).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-          status: values.status !== undefined ? String(values.status) : '0',
+          status: String(values.status),
         };
         res = await LogBookService.create(targetId, createPayload);
       }
@@ -585,7 +579,7 @@ export default function DailyReport() {
           onFinish={handleCreateOrUpdate}
           className='mt-4 px-2'
           initialValues={{
-            status: 1, // default Submitted
+            status: 0,
           }}
         >
           <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
