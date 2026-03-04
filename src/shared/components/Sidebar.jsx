@@ -13,11 +13,13 @@ import {
   ShopOutlined,
   ArrowLeftOutlined,
   LockOutlined,
+  ProjectOutlined,
 } from '@ant-design/icons';
 
 const studentMenu = [
   { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
   { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/general-info' },
+  { icon: <ProjectOutlined />, label: 'Dự án', href: '/student/project' },
   { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
   { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
   { icon: <UploadOutlined />, label: 'Đánh giá', href: '/student/evaluate' },
