@@ -2,11 +2,14 @@
 
 import AvatarUploader from '@/shared/components/AvatarUploader';
 import Card from '@/shared/components/Card';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/providers/ToastProvider';
+import { userService } from '@/services/userService';
 
 export default function PersonalInfo() {
   const toast = useToast();
+  const [userInfo, setUserInfo] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState(null);
 
   const [skills, setSkills] = useState([
@@ -60,13 +63,45 @@ export default function PersonalInfo() {
   };
   const [skillError, setSkillError] = useState('');
 
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchMe() {
+      try {
+        setLoadingUser(true);
+        const res = await userService.getMe();
+        if (mounted) {
+          if (res?.data) {
+            setUserInfo(res.data);
+            if (res.data.avatarUrl) setAvatarUrl(res.data.avatarUrl);
+          } else if (res) {
+            setUserInfo(res);
+            if (res.avatarUrl) setAvatarUrl(res.avatarUrl);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch user info', err);
+        if (mounted) toast.error('Lỗi khi tải thông tin cá nhân');
+      } finally {
+        if (mounted) setLoadingUser(false);
+      }
+    }
+
+    fetchMe();
+    return () => { mounted = false; };
+  }, [toast]);
+
   return (
     <section className='space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Personal Information</h1>
 
       <Card>
         <div className='flex items-center gap-6 border-b border-slate-200 pb-6'>
-          <AvatarUploader value={avatarUrl} onChange={setAvatarUrl} fullName='Lê Duy Khánh' />
+          <AvatarUploader
+            value={avatarUrl}
+            onChange={setAvatarUrl}
+            fullName={userInfo?.fullName || 'Người dùng'}
+          />
 
           <div>
             <h2 className='text-lg font-bold text-slate-900'>Avatar</h2>
@@ -86,21 +121,25 @@ export default function PersonalInfo() {
         </div>
 
         <div className='pt-6'>
-          <div className='grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-4'>
-            <InfoItem label='Full Name' value='Lê Duy Khánh' />
-            <InfoItem label='Email' value='KhanhLD.CE190235@gmail.com' />
-            <InfoItem label='Phone' value='0765 602 789' />
-            <InfoItem label='Role'>
-              <span className='inline-flex rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-600'>
-                Student
-              </span>
-            </InfoItem>
+          {loadingUser ? (
+            <div className='text-sm text-slate-500'>Đang tải thông tin cá nhân...</div>
+          ) : (
+            <div className='grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-4'>
+              <InfoItem label='Full Name' value={userInfo?.fullName || '—'} />
+              <InfoItem label='Email' value={userInfo?.email || '—'} />
+              <InfoItem label='Phone' value={userInfo?.phoneNumber || '—'} />
+              <InfoItem label='Role'>
+                <span className='inline-flex rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-600 uppercase'>
+                  {userInfo?.role || 'Unknown'}
+                </span>
+              </InfoItem>
 
-            <InfoItem label='Student ID' value='STU-1740' />
-            <InfoItem label='University' value='FU Cần Thơ' />
-            <InfoItem label='Date of Birth' value='29/01/2005' />
-            <InfoItem label='Gender' value='Male' />
-          </div>
+              <InfoItem label='User Code' value={userInfo?.userCode || '—'} />
+              <InfoItem label='Date of Birth' value={userInfo?.dateOfBirth ? new Date(userInfo.dateOfBirth).toLocaleDateString('vi-VN') : '—'} />
+              <InfoItem label='University' value='—' />
+              <InfoItem label='Gender' value='—' />
+            </div>
+          )}
         </div>
       </Card>
 
