@@ -20,13 +20,13 @@ export default function ViolationList() {
     tableRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page, pageSize]);
 
-  // useEffect(() => {
-  //   async function fetchViolations() {
-  //     const res = await getViolationList();
-  //     setViolations(res.data || []);
-  //   }
-  //   fetchViolations();
-  // }, []);
+  useEffect(() => {
+    // async function fetchViolations() {
+    //   const res = await getViolationList();
+    //   setViolations(res.data || []);
+    // }
+    // fetchViolations();
+  }, []);
 
   const filteredViolations = violations.filter(
     (v) =>

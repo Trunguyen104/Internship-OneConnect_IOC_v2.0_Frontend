@@ -18,12 +18,15 @@ export default function DateInput({ value, onChange }) {
   const [inputValue, setInputValue] = useState('');
   const [popupStyle, setPopupStyle] = useState({ bottom: 0, left: 0 });
 
-  // Sync state when opening
+  // Calculate popup position when open
   useEffect(() => {
     if (open) {
       const initDate = value ? dayjs(value) : dayjs();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setViewDate(initDate);
+
       setSelectedDate(value ? dayjs(value) : null);
+
       setInputValue(value ? dayjs(value).format('MM/DD/YYYY') : '');
 
       if (buttonRef.current && typeof window !== 'undefined') {
@@ -34,7 +37,7 @@ export default function DateInput({ value, onChange }) {
         });
       }
     }
-  }, [open, value]);
+  }, [open]);
 
   // Click outside to close
   useEffect(() => {
@@ -52,6 +55,14 @@ export default function DateInput({ value, onChange }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [open]);
+
+  const handleOpen = () => {
+    const initDate = value ? dayjs(value) : dayjs();
+    setViewDate(initDate);
+    setSelectedDate(value ? dayjs(value) : null);
+    setInputValue(value ? dayjs(value).format('MM/DD/YYYY') : '');
+    setOpen(true);
+  };
 
   const handleApply = () => {
     if (selectedDate) {
@@ -86,7 +97,7 @@ export default function DateInput({ value, onChange }) {
       <button
         ref={buttonRef}
         type='button'
-        onClick={() => setOpen(!open)}
+        onClick={handleOpen}
         className='h-10 w-full rounded-full border border-red-100 bg-red-50/50 text-red-500 font-semibold text-[13.5px] flex items-center justify-between px-4 hover:bg-red-50 transition-colors'
       >
         <span className={value ? 'text-slate-700' : 'text-slate-400 font-medium'}>

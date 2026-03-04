@@ -56,7 +56,6 @@ export default function SprintBacklog() {
         if (mounted) {
           setSprints(sprintsData);
         }
-
       } catch (err) {
         console.error('Fetch Sprint Backlog failed:', err);
         if (mounted) toast.error('Lỗi khi tải dữ liệu Sprint');
