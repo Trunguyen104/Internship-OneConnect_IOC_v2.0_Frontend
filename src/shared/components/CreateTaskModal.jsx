@@ -62,10 +62,11 @@ function Select({ value, onChange, options = [], placeholder = 'Select' }) {
                   onChange?.(op.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${isSelected
-                  ? 'bg-red-50 text-[#A32A2A] font-bold'
-                  : 'text-slate-600 hover:bg-slate-50 font-medium'
-                  }`}
+                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${
+                  isSelected
+                    ? 'bg-red-50 text-[#A32A2A] font-bold'
+                    : 'text-slate-600 hover:bg-slate-50 font-medium'
+                }`}
               >
                 {op.label}
               </button>
