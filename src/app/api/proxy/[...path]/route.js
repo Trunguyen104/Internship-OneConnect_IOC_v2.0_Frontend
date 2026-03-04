@@ -16,16 +16,27 @@ async function handler(req, { params }) {
 
     const url = `${BE_URL}/api/${path.join('/')}${searchString}`;
 
-    const res = await fetch(url, {
+    const headers = new Headers();
+    const contentType = req.headers.get('content-type');
+    if (contentType) {
+      headers.set('Content-Type', contentType);
+    }
+    const authorization = req.headers.get('authorization');
+    if (authorization) {
+      headers.set('Authorization', authorization);
+    }
+
+    const requestOptions = {
       method: req.method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(req.headers.get('authorization')
-          ? { Authorization: req.headers.get('authorization') }
-          : {}),
-      },
-      body: ['GET', 'HEAD'].includes(req.method) ? undefined : await req.text(),
-    });
+      headers,
+    };
+
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      requestOptions.body = req.body;
+      requestOptions.duplex = 'half';
+    }
+
+    const res = await fetch(url, requestOptions);
 
     const data = await res.text();
 
