@@ -46,6 +46,49 @@ async function request(path, options = {}) {
   }
 
   if (!res.ok) {
+    // if (res.status === 401 && typeof window !== 'undefined') {
+    //   const authHeader = res.headers.get('www-authenticate') || '';
+    //   if (authHeader.includes('invalid_token') || authHeader.includes('expired') || !authHeader) {
+    //     sessionStorage.removeItem('accessToken');
+    //     window.location.href = '/login';
+    //   }
+    // }
+    if (!res.ok) {
+      if (res.status === 401 && typeof window !== 'undefined') {
+        try {
+          // thử refresh token
+          const refreshRes = await fetch('/api/auth', {
+            method: 'PUT',
+            credentials: 'include',
+          });
+
+          if (refreshRes.ok) {
+            const { accessToken } = await refreshRes.json();
+            sessionStorage.setItem('accessToken', accessToken);
+
+            // retry request ban đầu
+            const retryRes = await fetch(`${API_BASE}${path}`, {
+              ...options,
+              headers: {
+                ...headers,
+                Authorization: `Bearer ${accessToken}`,
+              },
+            });
+
+            return retryRes.json();
+          }
+        } catch (e) {
+          console.error('Refresh token failed', e);
+        }
+      }
+
+      return {
+        isSuccess: false,
+        status: res.status,
+        data,
+      };
+    }
+
     return {
       isSuccess: false,
       status: res.status,
