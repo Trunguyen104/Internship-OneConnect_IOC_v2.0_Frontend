@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '@/shared/components/Card';
 
 export default function Evaluation() {
   const [evaluations] = useState([]);
 
-  // useEffect(() => {
-  //   getEvaluationList().then((res) => {
-  //     setEvaluations(res.data || []);
-  //   });
-  // }, []);
+  useEffect(() => {
+    // getEvaluationList().then((res) => {
+    //   setEvaluations(res.data || []);
+    // });
+  }, []);
 
   return (
     <section className='space-y-6'>

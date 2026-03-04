@@ -473,7 +473,9 @@ export default function ProductBacklog() {
                 } else if (parsed.title) {
                   errorMsg = parsed.title;
                 }
-              } catch {}
+              } catch (e) {
+                console.error('Error parsing creation task response:', e);
+              }
               toast.error(errorMsg);
               return;
             }
@@ -517,7 +519,9 @@ export default function ProductBacklog() {
                 } else if (parsed.title) {
                   errorMsg = parsed.title;
                 }
-              } catch {}
+              } catch (e) {
+                console.error('Error parsing creation epic response:', e);
+              }
               toast.error(errorMsg);
               return;
             }
