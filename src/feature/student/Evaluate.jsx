@@ -1,10 +1,10 @@
 'use client';
 
-// import { useState } from 'react';
+import { useState } from 'react';
 import Card from '@/shared/components/Card';
 
 export default function Evaluation() {
-  // const [evaluations, setEvaluations] = useState([]);
+  const [evaluations] = useState([]);
 
   // useEffect(() => {
   //   getEvaluationList().then((res) => {
