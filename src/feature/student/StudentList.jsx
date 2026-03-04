@@ -13,6 +13,7 @@ import {
   Avatar,
   Tooltip,
   Tag,
+  Input,
 } from 'antd';
 import {
   DeleteOutlined,
@@ -37,6 +38,15 @@ export default function StudentList() {
   // const [form] = Form.useForm();
 
   const [currentId, setCurrentId] = useState(internshipId);
+  // Thêm state vào component
+  const [searchText, setSearchText] = useState('');
+
+  // Filter dữ liệu trước khi đưa vào Table
+  const filteredMembers = (groupDetail?.members || []).filter(
+    (m) =>
+      m.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
+      m.email?.toLowerCase().includes(searchText.toLowerCase()),
+  );
 
   const fetchGroupDetail = useCallback(async () => {
     let idToFetch = currentId || internshipId;
@@ -324,8 +334,13 @@ export default function StudentList() {
           </div>
 
           <div className='px-4 pb-4'>
+            <Input.Search
+              placeholder='Search by name or email'
+              onChange={(e) => setSearchText(e.target.value)}
+              className='w-full md:w-64 mb-4'
+            />
             <Table
-              dataSource={groupDetail?.members || []}
+              dataSource={filteredMembers}
               columns={columns}
               rowKey='studentId'
               pagination={{
