@@ -24,8 +24,9 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { LogBookService } from '@/services/logBook.service';
-import { InternshipGroupService } from '@/services/internshipGroup.service';
+import { ProjectService } from '@/services/projectService';
 import dayjs from 'dayjs';
+import Card from '@/shared/components/Card';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -39,15 +40,15 @@ export default function DailyReport() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  // Pagination & Filters
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState(undefined);
-  const [sortOrder, setSortOrder] = useState('desc'); // api default usually implies descending for date, we can pass it if supported
-  const [currentId, setCurrentId] = useState(internshipId);
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [projectId, setProjectId] = useState(null);
 
-  // Modal & Edit State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewRecord, setViewRecord] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
@@ -55,7 +56,6 @@ export default function DailyReport() {
   const [studentId, setStudentId] = useState(null);
 
   useEffect(() => {
-    // Extract studentId from the JWT token
     const tokenRaw = sessionStorage.getItem('accessToken');
     if (tokenRaw) {
       try {
@@ -80,18 +80,28 @@ export default function DailyReport() {
   }, []);
 
   const fetchLogbooks = useCallback(async () => {
-    let idToFetch = currentId || internshipId;
+    let idToFetch = projectId;
     setLoading(true);
 
     try {
-      // If no ID is present in URL, try to fetch the first group for this student
       if (!idToFetch) {
-        const groupsRes = await InternshipGroupService.getAll();
-        if (groupsRes && groupsRes.isSuccess !== false && groupsRes.data) {
-          const items = groupsRes.data.items || groupsRes.items || [];
+        let projectRes;
+
+        if (internshipId) {
+          projectRes = await ProjectService.getByInternshipGroup(internshipId);
+        } else {
+          projectRes = await ProjectService.getAll();
+        }
+
+        if (projectRes && projectRes.isSuccess !== false && projectRes.data) {
+          const items = projectRes.data.items || projectRes.items || [];
           if (items.length > 0) {
-            idToFetch = items[0].internshipId;
-            setCurrentId(idToFetch);
+            const matchedProject = internshipId
+              ? items.find((p) => p.internshipId === internshipId) || items[0]
+              : items[0];
+
+            idToFetch = matchedProject.projectId;
+            setProjectId(idToFetch);
           }
         }
       }
@@ -101,8 +111,7 @@ export default function DailyReport() {
         return;
       }
 
-      const res = await LogBookService.getAll({
-        InternshipId: idToFetch,
+      const res = await LogBookService.getAll(idToFetch, {
         Status: statusFilter,
         PageNumber: pageNumber,
         PageSize: pageSize,
@@ -111,29 +120,34 @@ export default function DailyReport() {
       });
 
       if (res && res.isSuccess !== false) {
-        // Assume API returns { data: { items: [], totalCount: ... } } or similar
-        // Adjust according to standard list response
         let items = [];
         if (Array.isArray(res.data)) {
           items = res.data;
         } else if (res.data?.items && Array.isArray(res.data.items)) {
           items = res.data.items;
         } else if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
-          // Maybe it's a single item returned as just an object inside data
           items = [res.data];
         } else if (Array.isArray(res.items)) {
           items = res.items;
         }
 
-        const totalItems = res.data?.totalCount || res.totalCount || items.length;
+        if (statusFilter) {
+          items = items.filter((item) => {
+            const itemStatus = item.status ? String(item.status).toUpperCase() : '';
+            return itemStatus === String(statusFilter).toUpperCase();
+          });
+        }
 
-        setData(items);
-        setTotal(totalItems);
+        const startIndex = (pageNumber - 1) * pageSize;
+        const pagedItems = items.slice(startIndex, startIndex + pageSize);
+
+        setData(pagedItems);
+        setTotal(items.length);
       }
     } finally {
       setLoading(false);
     }
-  }, [internshipId, currentId, statusFilter, pageNumber, pageSize, sortOrder, messageApi]);
+  }, [internshipId, projectId, statusFilter, pageNumber, pageSize, sortOrder, messageApi]);
 
   useEffect(() => {
     fetchLogbooks();
@@ -151,9 +165,9 @@ export default function DailyReport() {
   };
 
   const handleCreateOrUpdate = async (values) => {
-    const targetId = currentId || internshipId;
+    const targetId = projectId;
     if (!targetId) {
-      messageApi.error('Missing Internship ID');
+      messageApi.error('Missing Project ID');
       return;
     }
     if (!studentId) {
@@ -163,22 +177,26 @@ export default function DailyReport() {
 
     setSubmitting(true);
     try {
-      const payload = {
-        internshipId: targetId,
-        studentId,
-        summary: values.summary,
-        issue: values.issue || '',
-        plan: values.plan,
-        dateReport: dayjs(values.dateReport).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-        status: values.status !== undefined ? values.status : 1, // Default to Submitted
-      };
-
       let res;
       if (editingId) {
-        payload.logbookId = editingId;
-        res = await LogBookService.update(editingId, payload);
+        const updatePayload = {
+          logbookId: editingId,
+          summary: values.summary,
+          issue: values.issue || '',
+          plan: values.plan,
+          dateReport: values.dateReport.toISOString(),
+          status: values.status,
+        };
+        res = await LogBookService.update(targetId, editingId, updatePayload);
       } else {
-        res = await LogBookService.create(payload);
+        const createPayload = {
+          projectId: targetId,
+          summary: values.summary,
+          issue: values.issue || '',
+          plan: values.plan,
+          dateReport: values.dateReport.toISOString(),
+        };
+        res = await LogBookService.create(targetId, createPayload);
       }
 
       if (res && res.isSuccess !== false) {
@@ -186,7 +204,7 @@ export default function DailyReport() {
           editingId ? 'Logbook updated successfully!' : 'Logbook created successfully!',
         );
         closeModal();
-        fetchLogbooks(); // Refresh table
+        fetchLogbooks();
       } else {
         messageApi.error(
           res?.message ||
@@ -204,6 +222,7 @@ export default function DailyReport() {
 
   const handleEdit = (record) => {
     setEditingId(record.logbookId);
+
     form.setFieldsValue({
       dateReport: record.dateReport ? dayjs(record.dateReport) : null,
       status: record.status,
@@ -211,12 +230,24 @@ export default function DailyReport() {
       issue: record.issue,
       plan: record.plan,
     });
+
     setIsModalOpen(true);
+  };
+  const handleView = (record) => {
+    setViewRecord(record);
+    setIsViewModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    form.resetFields();
   };
 
   const handleDelete = async (id) => {
     try {
-      const res = await LogBookService.delete(id);
+      if (!projectId) return;
+      const res = await LogBookService.delete(projectId, id);
       if (res && res.isSuccess !== false) {
         messageApi.success('Logbook deleted successfully!');
         if (data.length === 1 && pageNumber > 1) {
@@ -234,11 +265,28 @@ export default function DailyReport() {
 
   const renderStatus = (status) => {
     const config = {
-      0: { label: 'Draft', style: 'bg-orange-50 text-orange-600 border-orange-200 border' },
-      1: { label: 'Submit for Approval', style: 'bg-blue-50 text-blue-600 border-blue-200 border' },
-      2: { label: 'Approved', style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border' },
-      3: { label: 'Rejected', style: 'bg-red-50 text-red-600 border-red-200 border' },
+      SUBMITTED: {
+        label: 'Submitted',
+        style: 'bg-blue-50 text-blue-600 border-blue-200 border',
+      },
+      APPROVED: {
+        label: 'Approved',
+        style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      },
+      NEEDS_REVISION: {
+        label: 'Needs Revision',
+        style: 'bg-orange-50 text-orange-600 border-orange-200 border',
+      },
+      PUNCTUAL: {
+        label: 'Punctual',
+        style: 'bg-purple-50 text-purple-600 border-purple-200 border',
+      },
+      LATE: {
+        label: 'Late',
+        style: 'bg-red-50 text-red-600 border-red-200 border',
+      },
     };
+
     const c = config[status] || {
       label: 'Unknown',
       style: 'bg-gray-50 text-gray-600 border-gray-200 border',
@@ -250,7 +298,6 @@ export default function DailyReport() {
       </div>
     );
   };
-
   const columns = [
     {
       title: 'Report Date',
@@ -308,6 +355,20 @@ export default function DailyReport() {
       align: 'center',
       render: (_, record) => (
         <div className='flex items-center justify-center gap-2'>
+          <Tooltip title='View Details'>
+            <Button
+              type='text'
+              icon={
+                <FileTextOutlined className='text-gray-500 hover:text-blue-600 transition-colors' />
+              }
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(record);
+              }}
+              className='hover:bg-blue-50 w-8 h-8 rounded-lg flex items-center justify-center'
+            />
+          </Tooltip>
+
           <Tooltip title='Edit Report'>
             <Button
               type='text'
@@ -351,7 +412,7 @@ export default function DailyReport() {
     },
   ];
 
-  if (!internshipId && !currentId && !loading && total === 0) {
+  if (!projectId && !loading && total === 0) {
     return (
       <div className='flex h-[400px] items-center justify-center bg-gray-50/50 rounded-[24px] border border-gray-200/50 m-6'>
         <Empty
@@ -359,7 +420,7 @@ export default function DailyReport() {
           className='my-auto'
           description={
             <span className='text-gray-500 font-medium'>
-              Please select an internship group to view logbooks.
+              You are not assigned to any projects yet.
             </span>
           }
         />
@@ -368,10 +429,10 @@ export default function DailyReport() {
   }
 
   return (
-    <div className='space-y-6 max-w-[1400px] mx-auto pb-8'>
+    <div className='max-w-[1400px] mx-auto pb-4 gap-4'>
       {contextHolder}
 
-      <div className='flex items-center justify-between mb-8 mt-4 px-2'>
+      <div className='flex items-center justify-between mt-4 px-2 shrink-0 mb-4'>
         <div>
           <Title level={2} className='!mb-1 tracking-tight text-gray-900'>
             Daily Report
@@ -382,13 +443,9 @@ export default function DailyReport() {
         </div>
       </div>
 
-      <div className='bg-white rounded-[24px] border border-gray-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden'>
-        <div className='px-8 py-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4'>
+      <Card>
+        <div className='px-2 py-2 border-none flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0'>
           <div className='flex items-center gap-4'>
-            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shrink-0'>
-              <FileTextOutlined className='text-blue-600 text-lg' />
-            </div>
-
             <Select
               allowClear
               placeholder='Filter by Status'
@@ -399,13 +456,14 @@ export default function DailyReport() {
               }}
               className='w-48 shadow-sm'
               rootClassName='custom-select-rounded'
-              popupClassName='!rounded-xl shadow-lg border border-gray-100'
+              classNames={{ popup: '!rounded-xl shadow-lg border border-gray-100' }}
               suffixIcon={<FilterOutlined />}
               options={[
-                { value: 0, label: 'Draft' },
-                { value: 1, label: 'Submitted' },
-                { value: 2, label: 'Approved' },
-                { value: 3, label: 'Rejected' },
+                { value: 'SUBMITTED', label: 'Submitted' },
+                { value: 'APPROVED', label: 'Approved' },
+                { value: 'NEEDS_REVISION', label: 'Needs Revision' },
+                { value: 'PUNCTUAL', label: 'Punctual' },
+                { value: 'LATE', label: 'Late' },
               ]}
             />
           </div>
@@ -419,11 +477,233 @@ export default function DailyReport() {
             Create Report
           </Button>
         </div>
+      </div>
 
-        <div className='px-4 pb-4 mt-2'>
+        <div className='px-2 pb-2 mt-2 flex-grow'>
           {loading ? (
             <div className='p-6 space-y-4'>
               <Skeleton active paragraph={{ rows: 6 }} />
+            </div>
+          ) : (
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey='logbookId'
+              onChange={handleTableChange}
+              scroll={{ x: 800, y: 220 }}
+              pagination={{
+                current: pageNumber,
+                pageSize: pageSize,
+                total: total,
+                showSizeChanger: true,
+                className: 'px-2 mt-4',
+              }}
+              rowClassName='hover:bg-gray-50/50 transition-colors cursor-default'
+              locale={{
+                emptyText: (
+                  <div className='py-12'>
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={
+                        <span className='text-gray-400 font-medium'>
+                          No logbooks found for this group
+                        </span>
+                      }
+                    />
+                  </div>
+                ),
+              }}
+            />
+          )}
+        </div>
+      </Card>
+
+      <Modal
+        title={
+          <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
+            <div>
+              <h3 className='text-lg font-bold text-gray-900 m-0'>
+                {editingId ? 'Edit Daily Report' : 'Create Daily Report'}
+              </h3>
+              <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
+                {editingId
+                  ? 'Update your submitted logbook details'
+                  : 'Submit your internship progress'}
+              </p>
+            </div>
+          </div>
+        }
+        open={isModalOpen}
+        onCancel={closeModal}
+        confirmLoading={submitting}
+        onOk={() => form.submit()}
+        okText={editingId ? 'Save Changes' : 'Submit Report'}
+        cancelText='Cancel'
+        className='modern-modal'
+        width={700}
+        centered
+        okButtonProps={{
+          className:
+            'bg-black hover:bg-gray-800 text-white rounded-lg h-10 px-6 font-semibold shadow-sm border-0',
+        }}
+        cancelButtonProps={{
+          className:
+            'rounded-lg h-10 px-5 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600',
+        }}
+      >
+        <div className='max-h-[60vh] overflow-y-auto px-1 custom-scrollbar'>
+          <Form
+            form={form}
+            layout='vertical'
+            onFinish={handleCreateOrUpdate}
+            className='mt-2'
+            initialValues={{
+              // status: 0,
+              status: 'SUBMITTED',
+            }}
+          >
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
+              <Form.Item
+                label={<span className='text-sm font-semibold text-gray-700'>Report Date</span>}
+                name='dateReport'
+                rules={[{ required: true, message: 'Please select a date!' }]}
+              >
+                <DatePicker
+                  className='w-full h-[44px] rounded-xl'
+                  format='DD/MM/YYYY'
+                  disabledDate={(current) => current && current > dayjs().endOf('day')}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={<span className='text-sm font-semibold text-gray-700'>Status</span>}
+                name='status'
+                rules={[{ required: true, message: 'Please select a status!' }]}
+              >
+                <Select
+                  className='h-[44px]'
+                  rootClassName='custom-select-rounded'
+                  classNames={{
+                    popup: {
+                      root: '!rounded-xl shadow-lg border border-gray-100',
+                    },
+                  }}
+                  options={[
+                    { value: 'SUBMITTED', label: 'Submitted' },
+                    { value: 'APPROVED', label: 'Approved' },
+                    { value: 'NEEDS_REVISION', label: 'Needs Revision' },
+                    { value: 'PUNCTUAL', label: 'Punctual' },
+                    { value: 'LATE', label: 'Late' },
+                  ]}
+                />
+              </Form.Item>
+            </div>
+
+            <Form.Item
+              label={<span className='text-sm font-semibold text-gray-700'>Work Summary</span>}
+              name='summary'
+              rules={[
+                { required: true, message: 'Please enter a summary of your work!' },
+                { min: 10, message: 'Summary must be at least 10 characters long.' },
+              ]}
+            >
+              <TextArea
+                placeholder='Describe the tasks you worked on today...'
+                autoSize={{ minRows: 2, maxRows: 6 }}
+                className='rounded-xl p-3'
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={
+                <span className='text-sm font-semibold text-gray-700'>
+                  Issues Encountered (Optional)
+                </span>
+              }
+              name='issue'
+            >
+              <TextArea
+                placeholder='Any blockers or challenges you faced?'
+                autoSize={{ minRows: 2, maxRows: 5 }}
+                className='rounded-xl p-3'
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={<span className='text-sm font-semibold text-gray-700'>Plan for Next Day</span>}
+              name='plan'
+              rules={[
+                { required: true, message: 'Please outline your plan for the next working day!' },
+              ]}
+            >
+              <TextArea
+                placeholder='What are your tasks for tomorrow?'
+                autoSize={{ minRows: 3, maxRows: 6 }}
+                className='rounded-xl p-3'
+              />
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+
+      <Modal
+        title={
+          <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
+            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shrink-0'>
+              <FileTextOutlined className='text-lg' />
+            </div>
+            <div>
+              <h3 className='text-lg font-bold text-gray-900 m-0'>Logbook Details</h3>
+              <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
+                {viewRecord ? dayjs(viewRecord.dateReport).format('DD/MM/YYYY') : ''}
+              </p>
+            </div>
+          </div>
+        }
+        open={isViewModalOpen}
+        onCancel={() => setIsViewModalOpen(false)}
+        footer={[
+          <Button
+            key='close'
+            onClick={() => setIsViewModalOpen(false)}
+            className='rounded-lg h-10 px-6 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600'
+          >
+            Close
+          </Button>,
+        ]}
+        width={700}
+        className='modern-modal'
+        centered
+      >
+        {viewRecord && (
+          <div className='space-y-6 mt-2 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar'>
+            <div className='grid grid-cols-2 gap-4 pb-4 border-b border-gray-100'>
+              <div>
+                <span className='block text-sm font-semibold text-gray-500 mb-1'>Student</span>
+                <span className='text-base font-medium text-gray-900'>
+                  {viewRecord.studentName || 'N/A'}
+                </span>
+              </div>
+              <div>
+                <span className='block text-sm font-semibold text-gray-500 mb-1'>Status</span>
+                {renderStatus(viewRecord.status)}
+              </div>
+            </div>
+
+            <div>
+              <span className='block text-md font-semibold text-gray-800 mb-2'>Work Summary</span>
+              <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
+                {viewRecord.summary || 'No summary provided.'}
+              </div>
+            </div>
+
+            <div>
+              <span className='block text-md font-semibold text-gray-800 mb-2'>
+                Issues Encountered
+              </span>
+              <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
+                {viewRecord.issue || 'No issues reported.'}
+              </div>
             </div>
           ) : (
             <Table
@@ -458,128 +738,16 @@ export default function DailyReport() {
         </div>
       </div>
 
-      <Modal
-        title={
-          <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
-            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shrink-0'>
-              {editingId ? (
-                <EditOutlined className='text-lg' />
-              ) : (
-                <PlusOutlined className='text-lg' />
-              )}
-            </div>
             <div>
-              <h3 className='text-lg font-bold text-gray-900 m-0'>
-                {editingId ? 'Edit Daily Report' : 'Create Daily Report'}
-              </h3>
-              <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
-                {editingId
-                  ? 'Update your submitted logbook details'
-                  : 'Submit your internship progress'}
-              </p>
+              <span className='block text-md font-semibold text-gray-800 mb-2'>
+                Plan for Next Day
+              </span>
+              <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
+                {viewRecord.plan || 'No plan outlined.'}
+              </div>
             </div>
           </div>
-        }
-        open={isModalOpen}
-        // onCancel={closeModal}
-        confirmLoading={submitting}
-        onOk={() => form.submit()}
-        okText={editingId ? 'Save Changes' : 'Submit Report'}
-        cancelText='Cancel'
-        className='modern-modal'
-        width={700}
-        okButtonProps={{
-          className:
-            'bg-black hover:bg-gray-800 text-white rounded-lg h-10 px-6 font-semibold shadow-sm border-0',
-        }}
-        cancelButtonProps={{
-          className:
-            'rounded-lg h-10 px-5 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600',
-        }}
-      >
-        <Form
-          form={form}
-          layout='vertical'
-          onFinish={handleCreateOrUpdate}
-          className='mt-4 px-2'
-          initialValues={{
-            status: 1, // default Submitted
-          }}
-        >
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
-            <Form.Item
-              label={<span className='text-sm font-semibold text-gray-700'>Report Date</span>}
-              name='dateReport'
-              rules={[{ required: true, message: 'Please select a date!' }]}
-            >
-              <DatePicker
-                className='w-full h-[44px] rounded-xl'
-                format='DD/MM/YYYY'
-                disabledDate={(current) => current && current > dayjs().endOf('day')}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label={<span className='text-sm font-semibold text-gray-700'>Status</span>}
-              name='status'
-              rules={[{ required: true, message: 'Please select a status!' }]}
-            >
-              <Select
-                className='h-[44px]'
-                rootClassName='custom-select-rounded'
-                popupClassName='!rounded-xl shadow-lg border border-gray-100'
-                options={[
-                  { value: 0, label: 'Draft' },
-                  { value: 1, label: 'Submit for Approval' },
-                ]}
-              />
-            </Form.Item>
-          </div>
-
-          <Form.Item
-            label={<span className='text-sm font-semibold text-gray-700'>Work Summary</span>}
-            name='summary'
-            rules={[
-              { required: true, message: 'Please enter a summary of your work!' },
-              { min: 10, message: 'Summary must be at least 10 characters long.' },
-            ]}
-          >
-            <TextArea
-              placeholder='Describe the tasks you worked on today...'
-              autoSize={{ minRows: 4, maxRows: 8 }}
-              className='rounded-xl p-3'
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <span className='text-sm font-semibold text-gray-700'>
-                Issues Encountered (Optional)
-              </span>
-            }
-            name='issue'
-          >
-            <TextArea
-              placeholder='Any blockers or challenges you faced?'
-              autoSize={{ minRows: 3, maxRows: 6 }}
-              className='rounded-xl p-3'
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<span className='text-sm font-semibold text-gray-700'>Plan for Next Day</span>}
-            name='plan'
-            rules={[
-              { required: true, message: 'Please outline your plan for the next working day!' },
-            ]}
-          >
-            <TextArea
-              placeholder='What are your tasks for tomorrow?'
-              autoSize={{ minRows: 3, maxRows: 6 }}
-              className='rounded-xl p-3'
-            />
-          </Form.Item>
-        </Form>
+        )}
       </Modal>
     </div>
   );

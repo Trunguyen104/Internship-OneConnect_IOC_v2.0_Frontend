@@ -35,7 +35,7 @@ export default function Evaluation() {
             </thead>
 
             <tbody className='divide-y divide-slate-300 text-slate-800 bg-white'>
-              {evaluations.map((e) => (
+              {(evaluations || []).map((e) => (
                 <tr key={e.id} className='hover:bg-slate-50 transition-colors'>
                   <td
                     className='px-6 py-4 text-sm font-medium truncate overflow-hidden'
