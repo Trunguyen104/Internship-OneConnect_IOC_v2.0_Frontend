@@ -48,11 +48,6 @@ export default function ViolationList() {
     setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPage(1);
-  }, [search]);
-
   return (
     <section className='flex flex-col h-full space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Violation</h1>
@@ -61,7 +56,10 @@ export default function ViolationList() {
           <SearchBar
             placeholder='Search'
             value={search}
-            onChange={setSearch}
+            onChange={(val) => {
+              setSearch(val);
+              setPage(1);
+            }}
             showFilter
             actionIcon={<PlusOutlined />}
           />

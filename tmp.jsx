@@ -17,26 +17,29 @@ export default function SprintBacklog() {
   const [loading, setLoading] = useState(true);
 
   // Fix 1: H├ám fetch lß║Ñy dß╗» liß╗çu tß╗½ cß╗òng Backlog (Chß╗⌐a cß║ú Sprint v├á Items)
-  const fetchData = useCallback(async (id) => {
-    if (!id) return;
-    try {
-      setLoading(true);
-      // Gß╗ìi ─æ├║ng h├ám lß║Ñy dß╗» liß╗çu tß╗òng hß╗úp
-      const res = await productBacklogService.getWorkItemsBacklog(id);
+  const fetchData = useCallback(
+    async (id) => {
+      if (!id) return;
+      try {
+        setLoading(true);
+        // Gß╗ìi ─æ├║ng h├ám lß║Ñy dß╗» liß╗çu tß╗òng hß╗úp
+        const res = await productBacklogService.getWorkItemsBacklog(id);
 
-      // Theo cß║Ñu tr├║c JSON bß║ín gß╗¡i: data.sprints l├á mß║úng chß╗⌐a danh s├ích sprint
-      if (res?.data?.sprints) {
-        setSprints(res.data.sprints);
-      } else {
-        setSprints([]);
+        // Theo cß║Ñu tr├║c JSON bß║ín gß╗¡i: data.sprints l├á mß║úng chß╗⌐a danh s├ích sprint
+        if (res?.data?.sprints) {
+          setSprints(res.data.sprints);
+        } else {
+          setSprints([]);
+        }
+      } catch (err) {
+        console.error('Fetch Sprint Backlog failed:', err);
+        toast.error('Lß╗ùi khi tß║úi dß╗» liß╗çu Sprint');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Fetch Sprint Backlog failed:', err);
-      toast.error('Lß╗ùi khi tß║úi dß╗» liß╗çu Sprint');
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast],
+  );
 
   useEffect(() => {
     const initProject = async () => {
@@ -56,7 +59,10 @@ export default function SprintBacklog() {
 
   const mapStatusObj = {
     TODO: { label: 'To Do', className: 'bg-white text-gray-600 border border-gray-200' },
-    IN_PROGRESS: { label: 'In Progress', className: 'bg-blue-50 text-blue-600 border border-blue-100' },
+    IN_PROGRESS: {
+      label: 'In Progress',
+      className: 'bg-blue-50 text-blue-600 border border-blue-100',
+    },
     DONE: { label: 'Done', className: 'bg-[#F0FDF4] text-[#16A34A] border border-[#DCFCE7]' },
   };
 
@@ -78,17 +84,24 @@ export default function SprintBacklog() {
           className='inline-flex items-center gap-3 h-10 px-6 rounded-full text-white text-base font-semibold shadow-sm transition-colors bg-primary hover:bg-primary-hover'
         >
           <span>Create Sprint</span>
-          <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-xl'>+</span>
+          <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-xl'>
+            +
+          </span>
         </button>
       </div>
 
       {loading ? (
         <div className='text-center py-10'>─Éang tß║úi dß╗» liß╗çu...</div>
       ) : sprints.length === 0 ? (
-        <div className='rounded-2xl bg-white shadow-sm p-8 text-center text-slate-500'>Kh├┤ng c├│ dß╗» liß╗çu Sprint</div>
+        <div className='rounded-2xl bg-white shadow-sm p-8 text-center text-slate-500'>
+          Kh├┤ng c├│ dß╗» liß╗çu Sprint
+        </div>
       ) : (
         sprints.map((sprint) => (
-          <div key={sprint.sprintId} className='rounded-2xl bg-white shadow-sm overflow-hidden mb-6 border border-border/40'>
+          <div
+            key={sprint.sprintId}
+            className='rounded-2xl bg-white shadow-sm overflow-hidden mb-6 border border-border/40'
+          >
             {/* Header Sprint */}
             <div className='flex items-center justify-between border-b border-border/60 px-5 py-4 bg-gray-50/30'>
               <div className='flex items-center gap-4'>
@@ -117,13 +130,18 @@ export default function SprintBacklog() {
               </div>
 
               {/* Fix 2: Render danh s├ích Items tß╗½ mß║úng sprint.items */}
-              {(!sprint.items || sprint.items.length === 0) ? (
-                <div className='px-5 py-8 text-center text-sm text-slate-400 italic'>Sprint n├áy ch╞░a c├│ c├┤ng viß╗çc n├áo.</div>
+              {!sprint.items || sprint.items.length === 0 ? (
+                <div className='px-5 py-8 text-center text-sm text-slate-400 italic'>
+                  Sprint n├áy ch╞░a c├│ c├┤ng viß╗çc n├áo.
+                </div>
               ) : (
                 sprint.items.map((it) => {
                   const statusConfig = mapStatusObj[it.status?.toUpperCase()] || mapStatusObj.TODO;
                   return (
-                    <div key={it.workItemId} className='flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-colors'>
+                    <div
+                      key={it.workItemId}
+                      className='flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-colors'
+                    >
                       <div className='w-[120px] text-sm font-mono text-muted'>
                         {it.workItemId.substring(0, 8)}
                       </div>
@@ -132,7 +150,9 @@ export default function SprintBacklog() {
                       </div>
                       <div className='flex items-center justify-end'>
                         <div className='w-[100px] flex justify-center'>
-                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusConfig.className}`}>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusConfig.className}`}
+                          >
                             {it.status}
                           </span>
                         </div>
@@ -149,7 +169,10 @@ export default function SprintBacklog() {
                         <div className='w-[50px] flex justify-center'>
                           <div
                             className='h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold'
-                            style={{ backgroundColor: stringToColorTuple(it.assigneeName || 'U').bg, color: stringToColorTuple(it.assigneeName || 'U').text }}
+                            style={{
+                              backgroundColor: stringToColorTuple(it.assigneeName || 'U').bg,
+                              color: stringToColorTuple(it.assigneeName || 'U').text,
+                            }}
                           >
                             {(it.assigneeName || '?').charAt(0)}
                           </div>
@@ -162,7 +185,10 @@ export default function SprintBacklog() {
             </div>
 
             <div className='px-5 py-3 border-t border-border/40'>
-              <button onClick={() => setIsCreateModalOpen(true)} className='text-primary text-sm font-bold flex items-center gap-2 hover:underline'>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className='text-primary text-sm font-bold flex items-center gap-2 hover:underline'
+              >
                 <span>+</span> Tß║ío nhiß╗çm vß╗Ñ
               </button>
             </div>

@@ -116,14 +116,30 @@ function ColumnHeaders() {
     return (
         <div className='flex items-center justify-between py-2 mb-2 bg-gray-50/80 rounded-lg px-2 border-b border-gray-100/50'>
             <div className='w-4 mr-4 shrink-0' />
-            <div className='w-32 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1'>Issue</div>
-            <div className='flex-1 min-w-0 text-xs font-semibold text-gray-400 uppercase tracking-wider'>Summary</div>
-            <div className='w-28 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider'>Status</div>
-            <div className='w-44 shrink-0 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>Epic</div>
-            <div className='w-24 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>Due Date</div>
-            <div className='w-10 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>Pts</div>
-            <div className='w-24 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>Priority</div>
-            <div className='w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>User</div>
+            <div className='w-32 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1'>
+                Issue
+            </div>
+            <div className='flex-1 min-w-0 text-xs font-semibold text-gray-400 uppercase tracking-wider'>
+                Summary
+            </div>
+            <div className='w-28 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider'>
+                Status
+            </div>
+            <div className='w-44 shrink-0 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
+                Epic
+            </div>
+            <div className='w-24 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
+                Due Date
+            </div>
+            <div className='w-10 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
+                Pts
+            </div>
+            <div className='w-24 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
+                Priority
+            </div>
+            <div className='w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
+                User
+            </div>
             <div className='w-8 shrink-0' />
         </div>
     );
@@ -153,7 +169,6 @@ export default function BacklogBoard() {
     const [openStartSprint, setOpenStartSprint] = useState(false);
     const [openCompleteSprint, setOpenCompleteSprint] = useState(false);
     const [selectedSprintAction, setSelectedSprintAction] = useState(null);
-
 
     const formatToDateOnly = (dateString) => {
         if (!dateString) return null;
@@ -235,19 +250,15 @@ export default function BacklogBoard() {
     const isSelectedEpic = (parentId) => selectedEpicId === 'ALL' || parentId === selectedEpicId;
 
     const filteredBacklogItems = useMemo(() => {
-        return backlogItems
-            .filter((it) => it && isSelectedEpic(it.parentId))
-            .map(appendEpicName);
-    }, [backlogItems, selectedEpicId, epics]);
+        return backlogItems.filter((it) => it && isSelectedEpic(it.parentId)).map(appendEpicName);
+    }, [backlogItems, selectedEpicId, epics, appendEpicName, isSelectedEpic]);
 
     const filteredSprints = useMemo(() => {
         return sprints.map((sp) => ({
             ...sp,
-            items: (sp.items || [])
-                .filter((it) => it && isSelectedEpic(it.parentId))
-                .map(appendEpicName),
+            items: (sp.items || []).filter((it) => it && isSelectedEpic(it.parentId)).map(appendEpicName),
         }));
-    }, [sprints, selectedEpicId, epics]);
+    }, [sprints, selectedEpicId, epics, appendEpicName, isSelectedEpic]);
 
     // Compute absolute creation order of all issues based on ID/CreatedAt
     const itemOrders = useMemo(() => {
@@ -258,7 +269,7 @@ export default function BacklogBoard() {
 
         // Deduplicate
         const uniqueItemsMap = {};
-        allItems.forEach(i => {
+        allItems.forEach((i) => {
             uniqueItemsMap[i.workItemId || i.id] = i;
         });
         const uniqueItems = Object.values(uniqueItemsMap);
@@ -295,7 +306,7 @@ export default function BacklogBoard() {
             const sprintNum = sprints.length + 1;
             const payload = {
                 name: `Sprint ${sprintNum}`,
-                title: `Sprint ${sprintNum}`
+                title: `Sprint ${sprintNum}`,
             };
             const res = await productBacklogService.createSprint(projectId, payload);
             if (res && res.isSuccess === false) {
@@ -304,7 +315,7 @@ export default function BacklogBoard() {
                 toast.success('Đã tạo một Sprint mới');
                 fetchData(projectId);
             }
-        } catch (e) {
+        } catch {
             toast.error('Lỗi khi tạo Sprint');
         }
     };
@@ -337,8 +348,8 @@ export default function BacklogBoard() {
                         <button
                             onClick={() => setSelectedEpicId('ALL')}
                             className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === 'ALL'
-                                ? 'bg-[#F4F0FF] text-[#6333FF]'
-                                : 'text-gray-700 hover:bg-gray-50'
+                                    ? 'bg-[#F4F0FF] text-[#6333FF]'
+                                    : 'text-gray-700 hover:bg-gray-50'
                                 }`}
                         >
                             Tất cả
@@ -349,8 +360,8 @@ export default function BacklogBoard() {
                                 key={epic.id}
                                 onClick={() => setSelectedEpicId(epic.id)}
                                 className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === epic.id
-                                    ? 'bg-[#F4F0FF] text-[#6333FF]'
-                                    : 'text-gray-700 hover:bg-gray-50'
+                                        ? 'bg-[#F4F0FF] text-[#6333FF]'
+                                        : 'text-gray-700 hover:bg-gray-50'
                                     }`}
                             >
                                 <div className='truncate'>{epic.title || epic.name || 'Untitled Epic'}</div>
@@ -399,7 +410,6 @@ export default function BacklogBoard() {
                         <div className='min-w-[1000px] pr-2'>
                             {/* SPRINTS */}
                             {filteredSprints.map((sprint) => {
-                                const sprintItemIds = (sprint.items || []).map((i) => i.workItemId || i.id);
                                 return (
                                     <div
                                         key={sprint.sprintId}
@@ -414,7 +424,8 @@ export default function BacklogBoard() {
                                             <div className='flex-1' />
 
                                             {/* Dynamic Start/Complete Sprint button based on status */}
-                                            {sprint.status?.toUpperCase() === 'ACTIVE' || sprint.status?.toUpperCase() === 'IN_PROGRESS' ? (
+                                            {sprint.status?.toUpperCase() === 'ACTIVE' ||
+                                                sprint.status?.toUpperCase() === 'IN_PROGRESS' ? (
                                                 <button
                                                     onClick={() => handleSprintActionClick(sprint, false)}
                                                     className='h-[34px] px-5 border border-green-200 bg-green-50 rounded-full text-[13px] font-medium text-green-700 hover:bg-green-100 transition-colors flex items-center shadow-sm'
@@ -445,7 +456,10 @@ export default function BacklogBoard() {
                                                     itemOrder={itemOrders[it.workItemId || it.id]}
                                                     onClick={async (task) => {
                                                         try {
-                                                            const res = await productBacklogService.getWorkItemById(projectId, task.workItemId || task.id);
+                                                            const res = await productBacklogService.getWorkItemById(
+                                                                projectId,
+                                                                task.workItemId || task.id,
+                                                            );
                                                             setSelectedTask(res?.data ? { ...task, ...res.data } : task);
                                                         } catch (e) {
                                                             console.error(e);
@@ -500,7 +514,10 @@ export default function BacklogBoard() {
                                             itemOrder={itemOrders[it.workItemId || it.id]}
                                             onClick={async (task) => {
                                                 try {
-                                                    const res = await productBacklogService.getWorkItemById(projectId, task.workItemId || task.id);
+                                                    const res = await productBacklogService.getWorkItemById(
+                                                        projectId,
+                                                        task.workItemId || task.id,
+                                                    );
                                                     setSelectedTask(res?.data ? { ...task, ...res.data } : task);
                                                 } catch (e) {
                                                     console.error(e);
@@ -572,27 +589,31 @@ export default function BacklogBoard() {
                         // Chuẩn bị payload khớp với DateOnly của Backend
                         const startPayload = {
                             startDate: formatToDateOnly(payload.startDate),
-                            endDate: formatToDateOnly(payload.endDate)
+                            endDate: formatToDateOnly(payload.endDate),
                         };
 
-                        const resStart = await productBacklogService.startSprint(projectId, selectedSprintAction.sprintId, startPayload);
+                        const resStart = await productBacklogService.startSprint(
+                            projectId,
+                            selectedSprintAction.sprintId,
+                            startPayload,
+                        );
 
                         if (resStart && resStart.isSuccess !== false) {
                             toast.success('Bắt đầu Sprint thành công');
 
                             // Cập nhật State tại chỗ để nút đổi trạng thái ngay lập tức
-                            setSprints(prevSprints =>
-                                prevSprints.map(s =>
+                            setSprints((prevSprints) =>
+                                prevSprints.map((s) =>
                                     s.sprintId === selectedSprintAction.sprintId
                                         ? { ...s, status: 'ACTIVE' } // Ép trạng thái thành ACTIVE để khớp điều kiện hiển thị
-                                        : s
-                                )
+                                        : s,
+                                ),
                             );
 
                             setOpenStartSprint(false);
                             fetchData(projectId); // Đồng bộ lại với Server
                         }
-                    } catch (err) {
+                    } catch {
                         toast.error('Lỗi khi bắt đầu Sprint');
                     }
                 }}
@@ -607,7 +628,7 @@ export default function BacklogBoard() {
                     try {
                         if (!selectedSprintAction) return;
 
-                        // Payload nhận từ Modal bao gồm: 
+                        // Payload nhận từ Modal bao gồm:
                         // incompleteItemsOption ("ToBacklog", "ToNextPlannedSprint", "CreateNewSprint")
                         // targetSprintId (ID của sprint mới hoặc kế tiếp)
                         // newSprintName (Tên sprint mới nếu chọn CreateNewSprint)
@@ -615,15 +636,15 @@ export default function BacklogBoard() {
                         const completePayload = {
                             incompleteItemsOption: payload.incompleteItemsOption,
                             targetSprintId: payload.targetSprintId,
-                            newSprintName: payload.newSprintName || ""
+                            newSprintName: payload.newSprintName || '',
                         };
 
-                        console.log("Payload gửi đi thực tế:", completePayload);
+                        console.log('Payload gửi đi thực tế:', completePayload);
 
                         const resComp = await productBacklogService.completeSprint(
                             projectId,
                             selectedSprintAction.sprintId,
-                            completePayload
+                            completePayload,
                         );
 
                         if (resComp && resComp.isSuccess === false) {
@@ -635,25 +656,24 @@ export default function BacklogBoard() {
 
                         // 🔄 Cập nhật UI ngay lập tức (Optimistic Update)
                         // 1. Chuyển các task chưa xong của sprint vừa đóng vào Backlog Items
-                        if (payload.incompleteItemsOption === "ToBacklog") {
-                            const undoneItems = selectedSprintAction.items.filter(it => {
+                        if (payload.incompleteItemsOption === 'ToBacklog') {
+                            const undoneItems = selectedSprintAction.items.filter((it) => {
                                 const status = (it.status?.name || it.status || '').toUpperCase();
                                 return !['DONE', 'COMPLETED', 'CLOSED'].includes(status);
                             });
 
-                            setBacklogItems(prev => [...prev, ...undoneItems]);
+                            setBacklogItems((prev) => [...prev, ...undoneItems]);
                         }
 
                         // 2. Loại bỏ Sprint vừa hoàn thành khỏi danh sách hiển thị
-                        setSprints(prev => prev.filter(s => s.sprintId !== selectedSprintAction.sprintId));
+                        setSprints((prev) => prev.filter((s) => s.sprintId !== selectedSprintAction.sprintId));
 
                         // 3. Đồng bộ lại dữ liệu chuẩn từ Server sau 500ms
                         setTimeout(() => {
                             fetchData(projectId, false);
                         }, 500);
-
                     } catch (err) {
-                        console.error("COMPLETE ERROR:", err);
+                        console.error('COMPLETE ERROR:', err);
                         toast.error('Lỗi server khi hoàn thành Sprint');
                     }
                 }}
@@ -689,47 +709,44 @@ export default function BacklogBoard() {
                         const resCreate = await productBacklogService.createWorkItem(projectId, apiPayload);
 
                         if (!resCreate || resCreate.isSuccess === false) {
-                            throw new Error("Create failed");
+                            throw new Error('Create failed');
                         }
 
                         const newWorkItemId =
                             typeof resCreate.data === 'string'
                                 ? resCreate.data
-                                : (resCreate.data.workItemId || resCreate.data.id);
+                                : resCreate.data.workItemId || resCreate.data.id;
 
                         // 🧠 3. BUILD OPTIMISTIC OBJECT
-                        const epicName =
-                            epics.find(e => e.id === payload.epic)?.title || '';
+                        const epicName = epics.find((e) => e.id === payload.epic)?.title || '';
 
                         const optimisticItem = {
                             ...apiPayload,
                             workItemId: newWorkItemId,
                             id: newWorkItemId,
                             epicName,
-                            sprintId: targetSprintId || null
+                            sprintId: targetSprintId || null,
                         };
 
                         // 🛑 4. KHÔNG BAO GIỜ setBacklogItems nếu có sprint
                         if (targetSprintId) {
-                            setSprints(prev =>
-                                prev.map(s =>
+                            setSprints((prev) =>
+                                prev.map((s) =>
                                     s.sprintId === targetSprintId
                                         ? {
                                             ...s,
                                             items: [...(s.items || []), optimisticItem],
-                                            itemCount: (s.itemCount || 0) + 1
+                                            itemCount: (s.itemCount || 0) + 1,
                                         }
-                                        : s
-                                )
+                                        : s,
+                                ),
                             );
                         } else {
-                            setBacklogItems(prev => [...prev, optimisticItem]);
+                            setBacklogItems((prev) => [...prev, optimisticItem]);
                         }
 
                         toast.success(
-                            targetSprintId
-                                ? 'Tạo và găm vào Sprint thành công!'
-                                : 'Tạo nhiệm vụ thành công!'
+                            targetSprintId ? 'Tạo và găm vào Sprint thành công!' : 'Tạo nhiệm vụ thành công!',
                         );
 
                         setOpenCreateTask(false);
@@ -739,9 +756,8 @@ export default function BacklogBoard() {
                         setTimeout(() => {
                             fetchData(projectId, false);
                         }, 800);
-
                     } catch (error) {
-                        console.error("ANTIGRAVITY ERROR:", error);
+                        console.error('ANTIGRAVITY ERROR:', error);
                         toast.error('Lỗi khi tạo nhiệm vụ');
                     }
                 }}
@@ -775,9 +791,13 @@ export default function BacklogBoard() {
                         const workItemId = payload.id;
 
                         // 1. UPDATE CHI TIẾT
-                        const resUpdate = await productBacklogService.updateWorkItem(projectId, workItemId, apiPayload);
+                        const resUpdate = await productBacklogService.updateWorkItem(
+                            projectId,
+                            workItemId,
+                            apiPayload,
+                        );
                         if (!resUpdate || resUpdate.isSuccess === false) {
-                            throw new Error("Update failed");
+                            throw new Error('Update failed');
                         }
 
                         // 2. DI CHUYỂN SPRINT (NẾU CÓ THAY ĐỔI)
@@ -786,7 +806,11 @@ export default function BacklogBoard() {
                                 // Nếu sprintId mới không có, thì về backlog
                                 await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
                             } else {
-                                await productBacklogService.moveWorkItemToSprint(projectId, workItemId, newSprintId);
+                                await productBacklogService.moveWorkItemToSprint(
+                                    projectId,
+                                    workItemId,
+                                    newSprintId,
+                                );
                             }
                         }
 
@@ -796,9 +820,8 @@ export default function BacklogBoard() {
 
                         // Đồng bộ danh sách
                         fetchData(projectId, false);
-
                     } catch (error) {
-                        console.error("UPDATE ERROR:", error);
+                        console.error('UPDATE ERROR:', error);
                         toast.error('Lỗi khi cập nhật nhiệm vụ');
                     }
                 }}

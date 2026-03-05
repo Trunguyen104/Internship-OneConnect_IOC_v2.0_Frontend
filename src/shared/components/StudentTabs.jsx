@@ -32,17 +32,17 @@ export default function StudentTabs() {
 
                 // inactive
                 !active &&
-                ['bg-surface', 'text-text', 'border-border', 'hover:bg-[var(--gray-100)]'].join(
-                  ' ',
-                ),
+                  ['bg-surface', 'text-text', 'border-border', 'hover:bg-[var(--gray-100)]'].join(
+                    ' ',
+                  ),
 
                 // active — giống "Thông tin chung"
                 active &&
-                [
-                  'bg-[var(--primary-50)]',
-                  'text-[var(--primary-700)]',
-                  'border-[var(--primary-100)]',
-                ].join(' '),
+                  [
+                    'bg-[var(--primary-50)]',
+                    'text-[var(--primary-700)]',
+                    'border-[var(--primary-100)]',
+                  ].join(' '),
               ]
                 .filter(Boolean)
                 .join(' ')}

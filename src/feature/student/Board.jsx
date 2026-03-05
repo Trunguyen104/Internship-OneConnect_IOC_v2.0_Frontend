@@ -12,11 +12,7 @@ import {
   useDroppable,
 } from '@dnd-kit/core';
 
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import { productBacklogService } from '@/services/productbacklog.service';
@@ -47,9 +43,7 @@ export default function Board() {
   const [epics, setEpics] = useState([]);
   const [sprints, setSprints] = useState([]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
-  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   useEffect(() => {
     const fetchProjectId = async () => {
@@ -66,19 +60,20 @@ export default function Board() {
   }, [toast]);
 
   // Hàm fetch dữ liệu (Dùng useCallback để đồng bộ như bên Backlog)
-  const fetchSprints = useCallback(async (showLoading = true) => {
+  const fetchSprints = useCallback(async () => {
     if (!projectId) return;
     try {
       const [sprintsRes, epicsRes] = await Promise.all([
         productBacklogService.getWorkItemsBacklog(projectId),
-        productBacklogService.getEpics(projectId)
+        productBacklogService.getEpics(projectId),
       ]);
 
       setEpics(epicsRes?.data?.items || epicsRes?.data || []);
       let sprintsData = sprintsRes?.data?.sprints || [];
       setSprints(sprintsData);
 
-      const activeSprint = sprintsData.find((s) => s.status?.toUpperCase() === 'ACTIVE') || sprintsData[0];
+      const activeSprint =
+        sprintsData.find((s) => s.status?.toUpperCase() === 'ACTIVE') || sprintsData[0];
 
       if (activeSprint) {
         const itemsToMap = activeSprint.featureWorkItems || activeSprint.items || [];
@@ -92,11 +87,11 @@ export default function Board() {
           assignee: it.assigneeName || '—',
           status: it.status || 'Todo', // Chuẩn hóa viết hoa
           sprintId: activeSprint.sprintId,
-          parentId: it.parentId
+          parentId: it.parentId,
         }));
         setItems(mappedItems);
       }
-    } catch (err) {
+    } catch {
       toast.error('Lỗi khi tải dữ liệu');
     }
   }, [projectId, toast]);
@@ -120,7 +115,7 @@ export default function Board() {
       const res = await productBacklogService.getWorkItemById(projectId, task.id);
       setSelectedTask(res?.data ? { ...task, ...res.data } : task);
       setOpenUpdateTask(true);
-    } catch (e) {
+    } catch {
       setSelectedTask(task);
       setOpenUpdateTask(true);
     }
@@ -146,8 +141,12 @@ export default function Board() {
       const newSprintId = payload.sprintId;
 
       // 1. Update chi tiết
-      const resUpdate = await productBacklogService.updateWorkItem(projectId, workItemId, apiPayload);
-      if (!resUpdate || resUpdate.isSuccess === false) throw new Error("Update failed");
+      const resUpdate = await productBacklogService.updateWorkItem(
+        projectId,
+        workItemId,
+        apiPayload,
+      );
+      if (!resUpdate || resUpdate.isSuccess === false) throw new Error('Update failed');
 
       // 2. Di chuyển Sprint nếu cần
       if (currentSprintId !== newSprintId && newSprintId !== undefined) {
@@ -163,7 +162,6 @@ export default function Board() {
 
       // 3. Đồng bộ lại dữ liệu board (Không dùng loading để tránh nháy màn hình)
       fetchSprints(false);
-
     } catch (error) {
       console.error(error);
       toast.error('Lỗi khi cập nhật nhiệm vụ');
@@ -171,7 +169,9 @@ export default function Board() {
   };
 
   // Dnd Handlers
-  function onDragStart(event) { setActiveId(event.active.id); }
+  function onDragStart(event) {
+    setActiveId(event.active.id);
+  }
 
   function onDragOver(event) {
     const { active, over } = event;
@@ -183,7 +183,9 @@ export default function Board() {
     const isOverAColumn = COLUMNS.some((col) => col.id === overId);
     const overColumnId = isOverAColumn ? overId : items.find((i) => i.id === overId)?.status;
     if (!overColumnId || overColumnId === activeTask.status) return;
-    setItems((prev) => prev.map((item) => item.id === activeId ? { ...item, status: overColumnId } : item));
+    setItems((prev) =>
+      prev.map((item) => (item.id === activeId ? { ...item, status: overColumnId } : item)),
+    );
   }
 
   async function onDragEnd(event) {
@@ -210,7 +212,7 @@ export default function Board() {
         await productBacklogService.updateWorkItem(projectId, activeId, payload);
       }
     } catch (err) {
-      console.error("Lỗi cập nhật:", err);
+      console.error('Lỗi cập nhật:', err);
     }
   }
 
@@ -223,7 +225,7 @@ export default function Board() {
         <div className='flex items-center gap-2'>
           <div className='w-full max-w-sm border rounded-full px-4 py-2 bg-white'>
             <input
-              placeholder="Search tasks..."
+              placeholder='Search tasks...'
               className='bg-transparent outline-none w-full text-sm'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -244,13 +246,17 @@ export default function Board() {
             <BoardColumn
               key={col.id}
               column={col}
-              tasks={byColumn[col.id].filter(t => t.title.toLowerCase().includes(query.toLowerCase()))}
+              tasks={byColumn[col.id].filter((t) =>
+                t.title.toLowerCase().includes(query.toLowerCase()),
+              )}
               onCardClick={handleTaskClick}
             />
           ))}
         </div>
 
-        <DragOverlay dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}>
+        <DragOverlay
+          dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}
+        >
           {activeTask ? <IssueCard task={activeTask} isOverlay /> : null}
         </DragOverlay>
       </DndContext>
@@ -277,7 +283,9 @@ function BoardColumn({ column, tasks, onCardClick }) {
     <div className='flex flex-col w-full h-full'>
       <div className='flex items-center gap-2 mb-3'>
         <span className='text-sm font-bold text-gray-700'>{column.title}</span>
-        <span className='text-[11px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full'>{tasks.length}</span>
+        <span className='text-[11px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full'>
+          {tasks.length}
+        </span>
       </div>
       <div className={`h-1 w-full ${column.underline} mb-4 rounded-full opacity-80`} />
       <div
@@ -295,10 +303,16 @@ function BoardColumn({ column, tasks, onCardClick }) {
 }
 
 function SortableIssueCard({ task, onClick }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
-  const style = { transform: CSS.Translate.toString(transform), transition, opacity: isDragging ? 0.3 : 1 };
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: task.id,
+  });
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.3 : 1,
+  };
   return (
-    <div ref={setNodeRef} style={style} className="touch-none" onClick={() => onClick(task)}>
+    <div ref={setNodeRef} style={style} className='touch-none' onClick={() => onClick(task)}>
       <div {...attributes} {...listeners}>
         <IssueCard task={task} />
       </div>
@@ -315,19 +329,34 @@ function IssueCard({ task, isOverlay }) {
   };
 
   return (
-    <div className={`bg-white border p-4 rounded-[24px] shadow-sm flex flex-col gap-3 transition-all relative ${isOverlay ? 'cursor-grabbing border-blue-500 shadow-xl scale-105' : 'cursor-grab border-gray-100 hover:shadow-md hover:border-gray-200'}`}>
+    <div
+      className={`bg-white border p-4 rounded-[24px] shadow-sm flex flex-col gap-3 transition-all relative ${isOverlay ? 'cursor-grabbing border-blue-500 shadow-xl scale-105' : 'cursor-grab border-gray-100 hover:shadow-md hover:border-gray-200'}`}
+    >
       <div className='flex justify-between items-start'>
-        <div className='px-3 py-1 border border-gray-100 rounded-full text-[10px] font-bold text-gray-400 bg-white uppercase'>{task.type || 'User Story'}</div>
+        <div className='px-3 py-1 border border-gray-100 rounded-full text-[10px] font-bold text-gray-400 bg-white uppercase'>
+          {task.type || 'User Story'}
+        </div>
       </div>
       <div className='mt-0.5'>
-        <div className='text-[18px] font-extrabold text-gray-900 leading-none mb-2'>{task.displayId}</div>
-        <div className='text-[14px] font-medium text-gray-600 line-clamp-3 leading-snug' dangerouslySetInnerHTML={{ __html: task.title }} />
+        <div className='text-[18px] font-extrabold text-gray-900 leading-none mb-2'>
+          {task.displayId}
+        </div>
+        <div
+          className='text-[14px] font-medium text-gray-600 line-clamp-3 leading-snug'
+          dangerouslySetInnerHTML={{ __html: task.title }}
+        />
       </div>
       <div className='flex flex-wrap gap-2 items-center mt-1'>
-        <span className={`px-2.5 py-1 text-[11px] font-bold rounded-full ${getPriorityStyle(task.priority)}`}>
+        <span
+          className={`px-2.5 py-1 text-[11px] font-bold rounded-full ${getPriorityStyle(task.priority)}`}
+        >
           {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1).toLowerCase()}
         </span>
-        {task.points > 0 && <span className='w-6 h-6 flex items-center justify-center text-[11px] font-bold bg-blue-50 text-blue-500 rounded-full border border-blue-100'>{task.points}</span>}
+        {task.points > 0 && (
+          <span className='w-6 h-6 flex items-center justify-center text-[11px] font-bold bg-blue-50 text-blue-500 rounded-full border border-blue-100'>
+            {task.points}
+          </span>
+        )}
       </div>
       <div className='flex items-center mt-1'>
         <div className='w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-400 text-[10px] font-bold uppercase'>
