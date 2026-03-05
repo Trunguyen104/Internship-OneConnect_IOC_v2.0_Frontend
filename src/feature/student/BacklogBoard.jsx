@@ -603,18 +603,19 @@ export default function BacklogBoard() {
                 sprint={selectedSprintAction}
                 sprints={sprints}
                 onClose={() => setOpenCompleteSprint(false)}
-                onSubmit={async ({ destination }) => {
+                onSubmit={async (payload) => {
                     try {
                         if (!selectedSprintAction) return;
 
-                        // destination là null (từ Modal) nghĩa là chọn Backlog
-                        const isBacklog = destination === null;
+                        // Payload nhận từ Modal bao gồm: 
+                        // incompleteItemsOption ("ToBacklog", "ToNextPlannedSprint", "CreateNewSprint")
+                        // targetSprintId (ID của sprint mới hoặc kế tiếp)
+                        // newSprintName (Tên sprint mới nếu chọn CreateNewSprint)
 
                         const completePayload = {
-                            // Gửi đúng chuỗi Enum mà Backend yêu cầu
-                            incompleteItemsOption: isBacklog ? 'ToBacklog' : 'ToNextPlannedSprint',
-                            targetSprintId: isBacklog ? null : destination,
-                            newSprintName: ""
+                            incompleteItemsOption: payload.incompleteItemsOption,
+                            targetSprintId: payload.targetSprintId,
+                            newSprintName: payload.newSprintName || ""
                         };
 
                         console.log("Payload gửi đi thực tế:", completePayload);
@@ -631,8 +632,28 @@ export default function BacklogBoard() {
 
                         toast.success('Hoàn thành Sprint thành công');
                         setOpenCompleteSprint(false);
-                        fetchData(projectId);
+
+                        // 🔄 Cập nhật UI ngay lập tức (Optimistic Update)
+                        // 1. Chuyển các task chưa xong của sprint vừa đóng vào Backlog Items
+                        if (payload.incompleteItemsOption === "ToBacklog") {
+                            const undoneItems = selectedSprintAction.items.filter(it => {
+                                const status = (it.status?.name || it.status || '').toUpperCase();
+                                return !['DONE', 'COMPLETED', 'CLOSED'].includes(status);
+                            });
+
+                            setBacklogItems(prev => [...prev, ...undoneItems]);
+                        }
+
+                        // 2. Loại bỏ Sprint vừa hoàn thành khỏi danh sách hiển thị
+                        setSprints(prev => prev.filter(s => s.sprintId !== selectedSprintAction.sprintId));
+
+                        // 3. Đồng bộ lại dữ liệu chuẩn từ Server sau 500ms
+                        setTimeout(() => {
+                            fetchData(projectId, false);
+                        }, 500);
+
                     } catch (err) {
+                        console.error("COMPLETE ERROR:", err);
                         toast.error('Lỗi server khi hoàn thành Sprint');
                     }
                 }}
