@@ -122,7 +122,7 @@ export default function IssueTab() {
     };
 
     fetchProjectId();
-  }, []);
+  }, [toast]);
 
   const fetchStakeholders = useCallback(async () => {
     if (!projectId) return;
@@ -174,7 +174,10 @@ export default function IssueTab() {
         <SearchBar
           placeholder='Search issue...'
           value={search}
-          onChange={setSearch}
+          onChange={(val) => {
+            setSearch(val);
+            setPage(1);
+          }}
           showFilter
           showAction
           actionLabel='Add issue'

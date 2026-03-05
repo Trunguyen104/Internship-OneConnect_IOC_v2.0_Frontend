@@ -62,11 +62,10 @@ function Select({ value, onChange, options = [], placeholder = 'Select' }) {
                   onChange?.(op.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${
-                  isSelected
+                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${isSelected
                     ? 'bg-red-50 text-[#A32A2A] font-bold'
                     : 'text-slate-600 hover:bg-slate-50 font-medium'
-                }`}
+                  }`}
               >
                 {op.label}
               </button>
@@ -89,13 +88,13 @@ function TextInput({ value, onChange, placeholder = '' }) {
   );
 }
 
-export default function CreateTaskModal({
+export default function UpdateTaskModal({
   open,
   onClose,
   onSubmit,
   epics = [],
   sprints = [],
-  initialSprintId = '',
+  initialData = null,
 }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
@@ -106,33 +105,66 @@ export default function CreateTaskModal({
   const [priority, setPriority] = useState('MEDIUM');
 
   const [epic, setEpic] = useState('');
-  const [sprintId, setSprintId] = useState(initialSprintId || '');
+  const [sprintId, setSprintId] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
 
   useEffect(() => {
-    if (open) {
-      setSprintId(initialSprintId || '');
+    if (open && initialData) {
+      /* eslint-disable react-hooks/set-state-in-effect */
+      setSummary(initialData.title || initialData.name || '');
+      setDesc(initialData.description || '');
+      setType(initialData.type || 'UserStory');
+      const st = initialData.status?.toUpperCase() || 'TODO';
+      setStatus(st);
+      setAssignee(initialData.assigneeId || '');
+
+      const pr = initialData.priority?.toUpperCase() || 'MEDIUM';
+      setPriority(pr);
+
+      setEpic(initialData.parentId || '');
+
+      // Determine sprintId
+      let sid = initialData.sprintId;
+      if (!sid) {
+        for (const sp of sprints) {
+          if (
+            sp.items?.find(
+              (i) => (i.workItemId || i.id) === (initialData.workItemId || initialData.id),
+            )
+          ) {
+            sid = sp.sprintId;
+            break;
+          }
+        }
+      }
+      setSprintId(sid || '');
+
+      if (initialData.dueDate) {
+        const date = new Date(initialData.dueDate);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        setDueDate(`${year}-${month}-${day}`);
+      } else {
+        setDueDate('');
+      }
+
+      setPoints(
+        initialData.storyPoint !== undefined && initialData.storyPoint !== null
+          ? String(initialData.storyPoint)
+          : initialData.points !== undefined && initialData.points !== null
+            ? String(initialData.points)
+            : '',
+      );
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
-  }, [open, initialSprintId]);
+  }, [open, initialData, sprints]);
 
   const canSubmit = useMemo(
     () => summary.trim() && type && status && priority,
     [summary, type, status, priority],
   );
-
-  function reset() {
-    setSummary('');
-    setDesc('');
-    setType('UserStory');
-    setStatus('TODO');
-    setAssignee('');
-    setPriority('MEDIUM');
-    setEpic('');
-    setSprintId('');
-    setDueDate('');
-    setPoints('');
-  }
 
   function handleClose() {
     onClose?.();
@@ -150,9 +182,9 @@ export default function CreateTaskModal({
       epic,
       sprintId,
       dueDate,
-      points: points ? Number(points) : null,
+      points: points !== '' ? Number(points) : null,
+      id: initialData?.workItemId || initialData?.id,
     });
-    reset();
     onClose?.();
   }
 
@@ -172,7 +204,7 @@ export default function CreateTaskModal({
       <div className='relative flex max-h-[90vh] w-full max-w-[1200px] flex-col rounded-4xl bg-white shadow-2xl'>
         {/* Header */}
         <div className='flex items-center justify-between px-8 pt-8 pb-5'>
-          <h2 className='text-[28px] font-bold text-slate-900'>Create Task</h2>
+          <h2 className='text-[28px] font-bold text-slate-900'>Update Task</h2>
         </div>
 
         {/* Content Body - 2 Columns */}
@@ -223,7 +255,9 @@ export default function CreateTaskModal({
                         options={[
                           { value: 'TODO', label: 'To Do' },
                           { value: 'IN_PROGRESS', label: 'In Progress' },
+                          { value: 'IN_REVIEW', label: 'In Review' },
                           { value: 'DONE', label: 'Done' },
+                          { value: 'CLOSED', label: 'Closed' },
                         ]}
                       />
                     </div>
@@ -242,6 +276,7 @@ export default function CreateTaskModal({
                           { value: 'UserStory', label: 'User Story' },
                           { value: 'Task', label: 'Task' },
                           { value: 'Subtask', label: 'Subtask' },
+                          { value: 'Bug', label: 'Bug' },
                         ]}
                       />
                     </div>
@@ -356,7 +391,7 @@ export default function CreateTaskModal({
             disabled={!canSubmit}
             className='h-[50px] flex-1 flex items-center justify-center rounded-full bg-[#A32A2A] text-[15px] font-bold text-white transition-colors hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60'
           >
-            Create Task
+            Update
           </button>
         </div>
       </div>

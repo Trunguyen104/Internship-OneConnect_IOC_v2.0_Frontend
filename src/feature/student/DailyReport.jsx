@@ -477,6 +477,7 @@ export default function DailyReport() {
             Create Report
           </Button>
         </div>
+      </div>
 
         <div className='px-2 pb-2 mt-2 flex-grow'>
           {loading ? (
@@ -704,6 +705,38 @@ export default function DailyReport() {
                 {viewRecord.issue || 'No issues reported.'}
               </div>
             </div>
+          ) : (
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey='logbookId'
+              onChange={handleTableChange}
+              pagination={{
+                current: pageNumber,
+                pageSize: pageSize,
+                total: total,
+                showSizeChanger: true,
+                className: 'px-6 mb-2',
+              }}
+              rowClassName='hover:bg-gray-50/50 transition-colors cursor-default'
+              locale={{
+                emptyText: (
+                  <div className='py-12'>
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={
+                        <span className='text-gray-400 font-medium'>
+                          No logbooks found for this group
+                        </span>
+                      }
+                    />
+                  </div>
+                ),
+              }}
+            />
+          )}
+        </div>
+      </div>
 
             <div>
               <span className='block text-md font-semibold text-gray-800 mb-2'>

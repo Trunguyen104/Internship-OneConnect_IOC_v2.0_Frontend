@@ -122,7 +122,12 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
 
   const filteredItems = useMemo(() => {
     if (!selectedEpicId) return [];
-    return backlogItems.filter((it) => it.parentId === selectedEpicId);
+    return backlogItems
+      .filter((it) => it.parentId === selectedEpicId)
+      .map((it) => ({
+        ...it,
+        _id: it.workItemId || it.id,
+      }));
   }, [backlogItems, selectedEpicId]);
 
   const toggleSelection = (id) => {
@@ -135,23 +140,23 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
     if (filteredItems.length === 0) return;
 
     // Check if all filtered items are already selected
-    const allSelected = filteredItems.every((it) => selectedItemIds.includes(it.id));
+    const allSelected = filteredItems.every((it) => selectedItemIds.includes(it._id));
 
     if (allSelected) {
       // Remove all filtered items from selection
-      const filteredIds = filteredItems.map((it) => it.id);
+      const filteredIds = filteredItems.map((it) => it._id);
       setSelectedItemIds((prev) => prev.filter((id) => !filteredIds.includes(id)));
     } else {
       // Add all filtered items to selection
       const newSelections = filteredItems
-        .map((it) => it.id)
+        .map((it) => it._id)
         .filter((id) => !selectedItemIds.includes(id));
       setSelectedItemIds((prev) => [...prev, ...newSelections]);
     }
   };
 
   const isAllFilteredSelected =
-    filteredItems.length > 0 && filteredItems.every((it) => selectedItemIds.includes(it.id));
+    filteredItems.length > 0 && filteredItems.every((it) => selectedItemIds.includes(it._id));
 
   if (!open) return null;
 
@@ -246,14 +251,14 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
                       {/* Item List */}
                       {filteredItems.map((it, idx) => (
                         <label
-                          key={it.id}
+                          key={it._id}
                           className='flex items-start px-4 py-4 hover:bg-gray-50/50 cursor-pointer transition-colors group'
                         >
                           <input
                             type='checkbox'
                             className='mt-1 mr-4 rounded border-gray-300 w-4 h-4 cursor-pointer text-primary focus:ring-primary'
-                            checked={selectedItemIds.includes(it.id)}
-                            onChange={() => toggleSelection(it.id)}
+                            checked={selectedItemIds.includes(it._id)}
+                            onChange={() => toggleSelection(it._id)}
                           />
                           <div className='min-w-0 flex-1 flex flex-col gap-2'>
                             <div className='flex items-center gap-3'>

@@ -2,9 +2,9 @@
 
 import PageShell from '@/shared/components/PageShell';
 import StudentTabs from '@/shared/components/StudentTabs';
-import ProductBacklog from '@/feature/student/ProductBacklog';
+import BacklogBoard from '@/feature/student/BacklogBoard';
 
-export default function ProductBacklogPage() {
+export default function BacklogBoardPage() {
   return (
     <PageShell>
       <div className='flex items-center gap-4 mb-4'>
@@ -12,8 +12,7 @@ export default function ProductBacklogPage() {
           <StudentTabs />
         </div>
       </div>
-
-      <ProductBacklog />
+      <BacklogBoard />
     </PageShell>
   );
 }

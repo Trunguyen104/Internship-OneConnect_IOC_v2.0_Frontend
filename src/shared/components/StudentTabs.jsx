@@ -9,8 +9,7 @@ export default function StudentTabs() {
   const items = [
     { label: 'Tóm tắt', href: '/student/space' },
     { label: 'Bảng công việc', href: '/student/job-board' },
-    { label: 'Product Backlog', href: '/student/backlog/product' },
-    { label: 'Sprint Backlog', href: '/student/backlog/sprint' },
+    { label: 'Backlog Board', href: '/student/backlog' },
   ];
 
   return (
