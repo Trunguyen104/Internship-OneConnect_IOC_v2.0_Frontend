@@ -96,7 +96,7 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
                             </div>
                         )}
                     </div>
-
+                    {/* 3. Quăng vô Sprint mới tạo */}
                     {/* 3. Quăng vô Sprint mới tạo */}
                     <div className='space-y-2'>
                         <label className='flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-transparent hover:bg-gray-50 transition-colors'>
