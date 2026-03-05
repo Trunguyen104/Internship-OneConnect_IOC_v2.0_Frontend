@@ -174,7 +174,10 @@ export default function IssueTab() {
         <SearchBar
           placeholder='Search issue...'
           value={search}
-          onChange={setSearch}
+          onChange={(val) => {
+            setSearch(val);
+            setPage(1);
+          }}
           showFilter
           showAction
           actionLabel='Add issue'
@@ -236,10 +239,11 @@ export default function IssueTab() {
                         </td>
                         <td className='px-6 py-4'>
                           <span
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${i.status === 'Resolved' || i.status === 'Đã giải quyết'
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${
+                              i.status === 'Resolved' || i.status === 'Đã giải quyết'
                                 ? 'bg-green-50 text-green-700 border-green-200'
                                 : 'bg-orange-50 text-orange-700 border-orange-200'
-                              }`}
+                            }`}
                           >
                             {i.status === 'Resolved' || i.status === 'Đã giải quyết' ? (
                               <CheckCircleOutlined />

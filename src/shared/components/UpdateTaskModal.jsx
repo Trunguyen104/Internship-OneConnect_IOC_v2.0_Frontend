@@ -111,7 +111,7 @@ export default function UpdateTaskModal({
 
   useEffect(() => {
     if (open && initialData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      /* eslint-disable react-hooks/set-state-in-effect */
       setSummary(initialData.title || initialData.name || '');
       setDesc(initialData.description || '');
       setType(initialData.type || 'UserStory');
@@ -157,6 +157,7 @@ export default function UpdateTaskModal({
             ? String(initialData.points)
             : '',
       );
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [open, initialData, sprints]);
 

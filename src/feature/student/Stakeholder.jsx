@@ -78,7 +78,6 @@ export default function StakeholderPage() {
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
-      setPage(1);
     }, 500);
     return () => clearTimeout(handler);
   }, [search]);
@@ -215,7 +214,10 @@ export default function StakeholderPage() {
               <SearchBar
                 placeholder='Search stakeholder...'
                 value={search}
-                onChange={setSearch}
+                onChange={(val) => {
+                  setSearch(val);
+                  setPage(1);
+                }}
                 showFilter
                 showAction
                 actionLabel='Add stakeholder'
@@ -261,7 +263,10 @@ export default function StakeholderPage() {
                 <SearchBar
                   placeholder='Search issue...'
                   value={search}
-                  onChange={setSearch}
+                  onChange={(val) => {
+                    setSearch(val);
+                    setPage(1);
+                  }}
                   showFilter
                   showAction
                   actionLabel='Add issue'
