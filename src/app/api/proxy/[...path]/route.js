@@ -29,6 +29,7 @@ async function handler(req, { params }) {
     const requestOptions = {
       method: req.method,
       headers,
+      cache: 'no-store', // Disable Next.js app router server cache
     };
 
     if (!['GET', 'HEAD'].includes(req.method)) {

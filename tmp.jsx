@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import CreateTaskModal from '@/shared/components/CreateTaskModal';
@@ -16,15 +16,15 @@ export default function SprintBacklog() {
   const [sprints, setSprints] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fix 1: Hàm fetch lấy dữ liệu từ cổng Backlog (Chứa cả Sprint và Items)
+  // Fix 1: H├ám fetch lß║Ñy dß╗» liß╗çu tß╗½ cß╗òng Backlog (Chß╗⌐a cß║ú Sprint v├á Items)
   const fetchData = useCallback(async (id) => {
     if (!id) return;
     try {
       setLoading(true);
-      // Gọi đúng hàm lấy dữ liệu tổng hợp
+      // Gß╗ìi ─æ├║ng h├ám lß║Ñy dß╗» liß╗çu tß╗òng hß╗úp
       const res = await productBacklogService.getWorkItemsBacklog(id);
 
-      // Theo cấu trúc JSON bạn gửi: data.sprints là mảng chứa danh sách sprint
+      // Theo cß║Ñu tr├║c JSON bß║ín gß╗¡i: data.sprints l├á mß║úng chß╗⌐a danh s├ích sprint
       if (res?.data?.sprints) {
         setSprints(res.data.sprints);
       } else {
@@ -32,7 +32,7 @@ export default function SprintBacklog() {
       }
     } catch (err) {
       console.error('Fetch Sprint Backlog failed:', err);
-      toast.error('Lỗi khi tải dữ liệu Sprint');
+      toast.error('Lß╗ùi khi tß║úi dß╗» liß╗çu Sprint');
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ export default function SprintBacklog() {
           fetchData(id);
         }
       } catch {
-        toast.error('Không lấy được project');
+        toast.error('Kh├┤ng lß║Ñy ─æ╞░ß╗úc project');
       }
     };
     initProject();
@@ -83,9 +83,9 @@ export default function SprintBacklog() {
       </div>
 
       {loading ? (
-        <div className='text-center py-10'>Đang tải dữ liệu...</div>
+        <div className='text-center py-10'>─Éang tß║úi dß╗» liß╗çu...</div>
       ) : sprints.length === 0 ? (
-        <div className='rounded-2xl bg-white shadow-sm p-8 text-center text-slate-500'>Không có dữ liệu Sprint</div>
+        <div className='rounded-2xl bg-white shadow-sm p-8 text-center text-slate-500'>Kh├┤ng c├│ dß╗» liß╗çu Sprint</div>
       ) : (
         sprints.map((sprint) => (
           <div key={sprint.sprintId} className='rounded-2xl bg-white shadow-sm overflow-hidden mb-6 border border-border/40'>
@@ -99,12 +99,12 @@ export default function SprintBacklog() {
                 <span className='text-sm text-muted'>({sprint.itemCount || 0} issues)</span>
               </div>
               <button className='h-9 rounded-full border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50'>
-                Hoàn thành Sprint
+                Ho├án th├ánh Sprint
               </button>
             </div>
 
             <div className='divide-y divide-border/60'>
-              {/* Header Cột */}
+              {/* Header Cß╗Öt */}
               <div className='flex items-center justify-between px-5 py-3 bg-gray-50/50 border-b text-[11px] font-bold text-muted uppercase'>
                 <div className='w-[120px]'>Issue</div>
                 <div className='flex-1 pr-4 pl-4'>Summary</div>
@@ -116,9 +116,9 @@ export default function SprintBacklog() {
                 </div>
               </div>
 
-              {/* Fix 2: Render danh sách Items từ mảng sprint.items */}
+              {/* Fix 2: Render danh s├ích Items tß╗½ mß║úng sprint.items */}
               {(!sprint.items || sprint.items.length === 0) ? (
-                <div className='px-5 py-8 text-center text-sm text-slate-400 italic'>Sprint này chưa có công việc nào.</div>
+                <div className='px-5 py-8 text-center text-sm text-slate-400 italic'>Sprint n├áy ch╞░a c├│ c├┤ng viß╗çc n├áo.</div>
               ) : (
                 sprint.items.map((it) => {
                   const statusConfig = mapStatusObj[it.status?.toUpperCase()] || mapStatusObj.TODO;
@@ -163,7 +163,7 @@ export default function SprintBacklog() {
 
             <div className='px-5 py-3 border-t border-border/40'>
               <button onClick={() => setIsCreateModalOpen(true)} className='text-primary text-sm font-bold flex items-center gap-2 hover:underline'>
-                <span>+</span> Tạo nhiệm vụ
+                <span>+</span> Tß║ío nhiß╗çm vß╗Ñ
               </button>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function SprintBacklog() {
             console.log('Create Sprint response:', res);
 
             if (res && res.isSuccess === false) {
-              let errorMsg = 'Lỗi khi tạo Sprint';
+              let errorMsg = 'Lß╗ùi khi tß║ío Sprint';
               try {
                 const parsed = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
                 if (parsed?.errors) {
@@ -209,12 +209,12 @@ export default function SprintBacklog() {
               return;
             }
 
-            toast.success('Tạo Sprint thành công');
+            toast.success('Tß║ío Sprint th├ánh c├┤ng');
             setIsCreateSprintModalOpen(false);
             fetchData(projectId);
           } catch (error) {
             console.error('Failed to create sprint:', error);
-            toast.error('Lỗi khi tạo Sprint');
+            toast.error('Lß╗ùi khi tß║ío Sprint');
           }
         }}
       />

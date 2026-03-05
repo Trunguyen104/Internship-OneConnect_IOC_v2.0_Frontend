@@ -9,8 +9,7 @@ export default function StudentTabs() {
   const items = [
     { label: 'Tóm tắt', href: '/student/space' },
     { label: 'Bảng công việc', href: '/student/job-board' },
-    { label: 'Product Backlog', href: '/student/backlog/product' },
-    { label: 'Sprint Backlog', href: '/student/backlog/sprint' },
+    { label: 'Backlog Board', href: '/student/backlog' },
   ];
 
   return (
@@ -33,17 +32,17 @@ export default function StudentTabs() {
 
                 // inactive
                 !active &&
-                  ['bg-surface', 'text-text', 'border-border', 'hover:bg-[var(--gray-100)]'].join(
-                    ' ',
-                  ),
+                ['bg-surface', 'text-text', 'border-border', 'hover:bg-[var(--gray-100)]'].join(
+                  ' ',
+                ),
 
                 // active — giống "Thông tin chung"
                 active &&
-                  [
-                    'bg-[var(--primary-50)]',
-                    'text-[var(--primary-700)]',
-                    'border-[var(--primary-100)]',
-                  ].join(' '),
+                [
+                  'bg-[var(--primary-50)]',
+                  'text-[var(--primary-700)]',
+                  'border-[var(--primary-100)]',
+                ].join(' '),
               ]
                 .filter(Boolean)
                 .join(' ')}

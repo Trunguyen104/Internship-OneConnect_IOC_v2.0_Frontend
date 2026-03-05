@@ -62,11 +62,10 @@ function Select({ value, onChange, options = [], placeholder = 'Select' }) {
                   onChange?.(op.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${
-                  isSelected
-                    ? 'bg-red-50 text-[#A32A2A] font-bold'
-                    : 'text-slate-600 hover:bg-slate-50 font-medium'
-                }`}
+                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${isSelected
+                  ? 'bg-red-50 text-[#A32A2A] font-bold'
+                  : 'text-slate-600 hover:bg-slate-50 font-medium'
+                  }`}
               >
                 {op.label}
               </button>
@@ -89,7 +88,7 @@ function TextInput({ value, onChange, placeholder = '' }) {
   );
 }
 
-export default function CreateTaskModal({ open, onClose, onSubmit, epics = [] }) {
+export default function CreateTaskModal({ open, onClose, onSubmit, epics = [], sprints = [], initialSprintId = '' }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
 
@@ -99,8 +98,15 @@ export default function CreateTaskModal({ open, onClose, onSubmit, epics = [] })
   const [priority, setPriority] = useState('MEDIUM');
 
   const [epic, setEpic] = useState('');
+  const [sprintId, setSprintId] = useState(initialSprintId || '');
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      setSprintId(initialSprintId || '');
+    }
+  }, [open, initialSprintId]);
 
   const canSubmit = useMemo(
     () => summary.trim() && type && status && priority,
@@ -115,6 +121,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit, epics = [] })
     setAssignee('');
     setPriority('MEDIUM');
     setEpic('');
+    setSprintId('');
     setDueDate('');
     setPoints('');
   }
@@ -133,6 +140,7 @@ export default function CreateTaskModal({ open, onClose, onSubmit, epics = [] })
       assignee,
       priority,
       epic,
+      sprintId,
       dueDate,
       points: points ? Number(points) : null,
     });
@@ -242,6 +250,22 @@ export default function CreateTaskModal({ open, onClose, onSubmit, epics = [] })
                         options={epics.map((e) => ({
                           value: e.id,
                           label: e.title || e.name || 'Untitled',
+                        }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Sprint */}
+                  <div className='flex items-center justify-between gap-4'>
+                    <span className='min-w-[120px] text-sm font-medium text-slate-600'>Sprint</span>
+                    <div className='flex-1'>
+                      <Select
+                        value={sprintId}
+                        onChange={setSprintId}
+                        placeholder='Select Sprint (Optional)'
+                        options={sprints.map((s) => ({
+                          value: s.sprintId || s.id,
+                          label: s.name || s.title || 'Untitled Sprint',
                         }))}
                       />
                     </div>
