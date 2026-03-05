@@ -55,30 +55,28 @@ export default function BoardPage() {
 
     const fetchSprints = async () => {
       try {
-        const sprintsRes = await productBacklogService.getSprints(projectId);
+        const sprintsRes = await productBacklogService.getWorkItemsBacklog(projectId);
         let sprintsData = [];
-        if (sprintsRes?.data?.items) {
-          sprintsData = sprintsRes.data.items;
-        } else if (sprintsRes?.data) {
-          sprintsData = sprintsRes.data;
-        } else if (Array.isArray(sprintsRes)) {
-          sprintsData = sprintsRes;
+        if (sprintsRes?.data?.sprints) {
+          sprintsData = sprintsRes.data.sprints;
         }
 
         // Ưu tiên Sprint đang ACTIVE, nếu không lấy Sprint đầu tiên
-        const activeSprint = sprintsData.find((s) => s.status === 'ACTIVE') || sprintsData[0];
+        const activeSprint =
+          sprintsData.find((s) => s.status?.toUpperCase() === 'ACTIVE') || sprintsData[0];
 
-        if (activeSprint && activeSprint.featureWorkItems) {
-          const mappedItems = activeSprint.featureWorkItems.map((it, idx) => ({
-            id: it.id,
+        if (activeSprint) {
+          const itemsToMap = activeSprint.featureWorkItems || activeSprint.items || [];
+          const mappedItems = itemsToMap.map((it, idx) => ({
+            id: it.workItemId || it.id,
             displayId: it.key || `ISSUE-${idx + 1}`,
             title: it.title || it.name,
-            type: 'User Story', // default
-            tag: 'Task', // default
-            priority: it.priority || 'Medium',
-            points: it.point || it.points || 0,
-            assignee: it.assignee || '—',
-            status: it.status || 'TODO',
+            type: it.type || 'UserStory',
+            tag: it.type || 'Task',
+            priority: it.priority || 'MEDIUM',
+            points: it.storyPoint || it.point || it.points || 0,
+            assignee: it.assigneeName || it.assignee || '—',
+            status: it.status ? it.status.toUpperCase() : 'TODO',
           }));
           setItems(mappedItems);
         } else {
@@ -138,8 +136,32 @@ export default function BoardPage() {
       // API call
       try {
         if (!projectId) throw new Error('Missing Project ID');
-        // Gọi API cập nhật trạng thái
-        await productBacklogService.updateWorkItem(projectId, activeTaskId, { status: toCol });
+
+        const taskRes = await productBacklogService.getWorkItemById(projectId, activeTaskId);
+        if (taskRes && taskRes.data) {
+          const currentData = taskRes.data;
+          const apiPayload = {
+            title: currentData.title,
+            description: currentData.description || '',
+            type: currentData.type || 'UserStory',
+            status: toCol,
+            priority: currentData.priority || 'MEDIUM',
+            parentId: currentData.parentId || null,
+            assigneeId: currentData.assigneeId || null,
+            dueDate: currentData.dueDate || null,
+            storyPoint: currentData.storyPoint || 0,
+          };
+          const updateRes = await productBacklogService.updateWorkItem(
+            projectId,
+            activeTaskId,
+            apiPayload,
+          );
+          if (updateRes && updateRes.isSuccess === false) {
+            throw new Error(updateRes.message || 'Cập nhật thất bại');
+          }
+        } else {
+          throw new Error('Không lấy được dữ liệu của task');
+        }
       } catch (err) {
         console.error('Lỗi khi cập nhật trạng thái:', err);
         toast.error('Cập nhật trạng thái thất bại');
@@ -315,7 +337,7 @@ function IssueCard({ task, isOverlay }) {
         )}
 
         <div className='ml-auto w-9 h-9 rounded-full bg-bg border border-border/60 flex items-center justify-center text-sm font-semibold'>
-          {task.assignee}
+          {task.assignee ? task.assignee.charAt(0).toUpperCase() : '?'}
         </div>
       </div>
     </div>
