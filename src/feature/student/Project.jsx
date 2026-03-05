@@ -27,24 +27,18 @@ import {
   updateProjectResource,
 } from '@/services/projectResources';
 import { ProjectService } from '@/services/projectService';
-import {
-  UploadOutlined,
-  FileTextOutlined,
-  DownloadOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
+import { UploadOutlined, FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Title, Text, Paragraph } = Typography;
 
 const RESOURCE_TYPES = [
-  { value: 1, label: 'Tài liệu hướng dẫn (PDF/DOC)' },
-  { value: 2, label: 'Biểu mẫu (DOC/XLS)' },
-  { value: 3, label: 'Hình ảnh (PNG/JPG)' },
-  { value: 4, label: 'Slide trình bày (PPT)' },
-  { value: 5, label: 'Mã nguồn/File nén (ZIP/RAR)' },
-  { value: 6, label: 'Video (MP4)' },
-  { value: 7, label: 'Khác' },
+  { value: 'PDF', label: 'Tài liệu hướng dẫn (PDF)' },
+  { value: 'DOCX', label: 'Biểu mẫu (DOCX)' },
+  { value: 'PNG', label: 'Hình ảnh (PNG)' },
+  { value: 'JPG', label: 'Hình ảnh (JPG)' },
+  { value: 'PPTX', label: 'Slide trình bày (PPTX)' },
+  { value: 'ZIP', label: 'Mã nguồn/File nén (ZIP)' },
+  { value: 'RAR', label: 'Mã nguồn/File nén (RAR)' },
 ];
 
 export default function Project() {
@@ -104,10 +98,10 @@ export default function Project() {
     const file = fileList[0];
 
     const formData = new FormData();
-    formData.append('ProjectId', projectId);
-    formData.append('ResourceName', values.resourceName || file.name);
-    formData.append('ResourceType', values.resourceType || 1);
-    formData.append('File', file.originFileObj || file);
+    formData.append('projectId', projectId);
+    formData.append('resourceName', values.resourceName || file.name);
+    formData.append('resourceType', values.resourceType || 'PDF');
+    formData.append('file', file.originFileObj || file);
 
     try {
       await createProjectResource(formData);
@@ -145,11 +139,14 @@ export default function Project() {
 
   const handleUpdate = async (values) => {
     try {
-      await updateProjectResource(editingResource.projectResourceId, {
+      const updateData = {
+        projectResourceId: editingResource.projectResourceId,
         projectId: projectId,
         resourceName: values.resourceName,
-        resourceType: values.resourceType || editingResource.resourceType || 1,
-      });
+        resourceType: values.resourceType || editingResource.resourceType || 'PDF',
+      };
+
+      await updateProjectResource(editingResource.projectResourceId, updateData);
       message.success('Cập nhật tài liệu thành công!');
       setIsEditModalVisible(false);
       await loadResources(projectId);
@@ -204,10 +201,10 @@ export default function Project() {
       <Space orientation='vertical' size='large' style={{ width: '100%' }}>
         <div style={{ padding: '0 8px' }}>
           <Title level={2} style={{ margin: 0 }}>
-            Thông tin dự án
+            Project Information
           </Title>
           <Text type='secondary'>
-            Xem thông tin chi tiết, các phân hệ và quản lý tài liệu đính kèm dự án.
+            View detailed information, modules, and manage attached project documents.
           </Text>
         </div>
 
@@ -215,7 +212,7 @@ export default function Project() {
           <Descriptions
             title={
               <Title level={4} style={{ margin: 0 }}>
-                Tổng quan
+                Overview
               </Title>
             }
             bordered
@@ -225,7 +222,7 @@ export default function Project() {
               <Text strong>IOC Version 2</Text>
             </Descriptions.Item>
             <Descriptions.Item label='Lĩnh vực'>
-              <Tag color='blue'>Công nghệ thông tin</Tag>
+              <Tag color='blue'>Information Technology</Tag>
             </Descriptions.Item>
           </Descriptions>
 
@@ -234,7 +231,7 @@ export default function Project() {
           <Space orientation='vertical' size='large' style={{ width: '100%' }}>
             <div>
               <Title level={5} style={{ color: '#1890ff' }}>
-                1. Tổng quan dự án
+                1. Project Overview
               </Title>
               <Paragraph style={{ fontSize: 15, lineHeight: 1.8, marginBottom: 0 }}>
                 Internship OneConnect (IOC) là nền tảng chuyển đổi số toàn diện quy trình thực tập,
@@ -246,16 +243,11 @@ export default function Project() {
 
             <div>
               <Title level={5} style={{ color: '#1890ff' }}>
-                2. Chi tiết các Phân hệ (Modules)
+                2. Detailed Modules
               </Title>
               <Row gutter={[24, 24]}>
                 <Col xs={24} md={8}>
-                  <Card
-                    title='Phân hệ Nhà trường'
-                    size='small'
-                    type='inner'
-                    style={{ height: '100%' }}
-                  >
+                  <Card title='School Module' size='small' type='inner' style={{ height: '100%' }}>
                     <ul style={{ paddingLeft: 20, margin: 0, lineHeight: 1.8 }}>
                       <li>
                         Quản lý Kỳ thực tập: Tạo và cấu hình các đợt thực tập, thiết lập timeline,
@@ -306,17 +298,17 @@ export default function Project() {
 
             <div>
               <Title level={5} style={{ color: '#1890ff' }}>
-                3. Các tính năng nâng cao
+                3. Advanced Features
               </Title>
               <ul style={{ paddingLeft: 20, marginBottom: 0, lineHeight: 1.8 }}>
                 <li>
-                  <Text>Hợp đồng điện tử (E-Sign)</Text>
+                  <Text>E-Sign Contracts</Text>
                 </li>
                 <li>
                   <Text>AI Matching giữa CV & JD</Text>
                 </li>
                 <li>
-                  <Text>Tích hợp Google Calendar</Text>
+                  <Text>Google Calendar Integration</Text>
                 </li>
               </ul>
             </div>
@@ -327,7 +319,7 @@ export default function Project() {
           variant='borderless'
           title={
             <Title level={4} style={{ margin: 0 }}>
-              Tài liệu dự án
+              Project Documents
             </Title>
           }
           className='shadow-sm'
@@ -343,18 +335,18 @@ export default function Project() {
               >
                 <Form form={form} layout='vertical' onFinish={handleUpload}>
                   <Form.Item
-                    label='Tên tài liệu'
+                    label='Document Name'
                     name='resourceName'
-                    tooltip='Nếu để trống sẽ sử dụng tên file đính kèm'
+                    tooltip='If left blank, the attached file name will be used'
                   >
-                    <Input placeholder='Nhập tên tài liệu (tùy chọn)...' />
+                    <Input placeholder='Enter document name (optional)...' />
                   </Form.Item>
 
-                  <Form.Item label='Loại tài liệu' name='resourceType' initialValue={1} required>
+                  <Form.Item label='Document Type' name='resourceType' initialValue='PDF' required>
                     <Select options={RESOURCE_TYPES} />
                   </Form.Item>
 
-                  <Form.Item label='File đính kèm' required>
+                  <Form.Item label='Attached File' required>
                     <Upload {...uploadProps}>
                       <Button icon={<UploadOutlined />}>Chọn file</Button>
                     </Upload>
@@ -368,7 +360,7 @@ export default function Project() {
                       disabled={fileList.length === 0}
                       block
                     >
-                      Tải lên
+                      Upload
                     </Button>
                   </Form.Item>
                 </Form>
@@ -378,7 +370,7 @@ export default function Project() {
             <Col xs={24} lg={15} xl={16}>
               <Space style={{ marginBottom: 16 }} size='small' align='center'>
                 <Title level={5} style={{ margin: 0 }}>
-                  Danh sách tài liệu
+                  List of documents
                 </Title>
                 <Tag color='geekblue'>{resources.length} files</Tag>
               </Space>
@@ -392,32 +384,22 @@ export default function Project() {
                   <List.Item
                     actions={[
                       <Button
-                        key='download'
-                        type='link'
-                        icon={<DownloadOutlined />}
-                        href={item.resourceUrl}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                      >
-                        Tải xuống
-                      </Button>,
-                      <Button
                         key='edit'
                         type='link'
                         icon={<EditOutlined />}
                         onClick={() => openEditModal(item)}
                       >
-                        Sửa
+                        Edit
                       </Button>,
                       <Popconfirm
                         key='delete'
-                        title='Bạn có chắc chắn muốn xóa tài liệu này?'
+                        title='Are you sure you want to delete this document?'
                         onConfirm={() => handleDelete(item.projectResourceId)}
-                        okText='Có'
-                        cancelText='Không'
+                        okText='Yes'
+                        cancelText='No'
                       >
                         <Button type='link' danger icon={<DeleteOutlined />}>
-                          Xóa
+                          Delete
                         </Button>
                       </Popconfirm>,
                     ]}
@@ -433,7 +415,7 @@ export default function Project() {
                         />
                       }
                       title={<Text strong>{item.resourceName || 'Untitled Resource'}</Text>}
-                      description={`Loại tài liệu: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType)?.label || 'Khác'}`}
+                      description={`Document Type: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType)?.label || 'Other'}`}
                     />
                   </List.Item>
                 )}
