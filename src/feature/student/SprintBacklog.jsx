@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import CreateTaskModal from '@/shared/components/CreateTaskModal';
 import CreateSprintModal from '@/shared/components/CreateSprintModal';
 import { productBacklogService } from '@/services/productbacklog.service';
@@ -16,87 +16,53 @@ export default function SprintBacklog() {
   const [sprints, setSprints] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Fix 1: Hàm fetch lấy dữ liệu từ cổng Backlog (Chứa cả Sprint và Items)
+  const fetchData = useCallback(async (id) => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      // Gọi đúng hàm lấy dữ liệu tổng hợp
+      const res = await productBacklogService.getWorkItemsBacklog(id);
+
+      // Theo cấu trúc JSON bạn gửi: data.sprints là mảng chứa danh sách sprint
+      if (res?.data?.sprints) {
+        setSprints(res.data.sprints);
+      } else {
+        setSprints([]);
+      }
+    } catch (err) {
+      console.error('Fetch Sprint Backlog failed:', err);
+      toast.error('Lỗi khi tải dữ liệu Sprint');
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
   useEffect(() => {
-    const fetchProjectId = async () => {
+    const initProject = async () => {
       try {
         const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
         if (res?.data?.items?.length > 0) {
-          setProjectId(res.data.items[0].projectId);
+          const id = res.data.items[0].projectId;
+          setProjectId(id);
+          fetchData(id);
         }
       } catch {
         toast.error('Không lấy được project');
       }
     };
-
-    fetchProjectId();
-  }, [toast]);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function fetchData() {
-      if (!projectId) return;
-
-      try {
-        setLoading(true);
-
-        const sprintsRes = await productBacklogService.getSprints(projectId);
-        console.log('--- SPRINT FETCH RESULT ---', sprintsRes);
-
-        // Temporarily log and try to set
-        let sprintsData = [];
-        if (sprintsRes?.data?.items) {
-          sprintsData = sprintsRes.data.items;
-        } else if (sprintsRes?.data) {
-          sprintsData = sprintsRes.data;
-        } else if (Array.isArray(sprintsRes)) {
-          sprintsData = sprintsRes;
-        }
-
-        if (mounted) {
-          setSprints(sprintsData);
-        }
-      } catch (err) {
-        console.error('Fetch Sprint Backlog failed:', err);
-        if (mounted) toast.error('Lỗi khi tải dữ liệu Sprint');
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    fetchData();
-
-    return () => {
-      mounted = false;
-    };
-  }, [projectId, toast]);
-
-  // items state can be removed; we will use sprints data directly.
+    initProject();
+  }, [fetchData, toast]);
 
   const mapStatusObj = {
     TODO: { label: 'To Do', className: 'bg-white text-gray-600 border border-gray-200' },
-    IN_PROGRESS: {
-      label: 'In Progress',
-      className: 'bg-blue-50 text-blue-600 border border-blue-100',
-    },
-    IN_REVIEW: {
-      label: 'In Review',
-      className: 'bg-red-50 text-red-600 border border-red-100',
-    },
+    IN_PROGRESS: { label: 'In Progress', className: 'bg-blue-50 text-blue-600 border border-blue-100' },
     DONE: { label: 'Done', className: 'bg-[#F0FDF4] text-[#16A34A] border border-[#DCFCE7]' },
-  };
-
-  const getInitials = (n) => {
-    if (!n) return '?';
-    const words = n.trim().split(' ').filter(Boolean);
-    if (words.length === 0) return '?';
-    if (words.length === 1) return words[0].charAt(0).toUpperCase();
-    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
   };
 
   const stringToColorTuple = (str) => {
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
+    for (let i = 0; i < (str?.length || 0); i++) {
       hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     const hue = Math.abs(hash) % 360;
@@ -109,268 +75,146 @@ export default function SprintBacklog() {
         <button
           type='button'
           onClick={() => setIsCreateSprintModalOpen(true)}
-          className={[
-            'inline-flex items-center gap-3',
-            'h-10 px-6 rounded-full',
-            'text-white',
-            'text-base font-semibold',
-            'shadow-sm transition-colors',
-            'bg-primary hover:bg-primary-hover',
-          ].join(' ')}
+          className='inline-flex items-center gap-3 h-10 px-6 rounded-full text-white text-base font-semibold shadow-sm transition-colors bg-primary hover:bg-primary-hover'
         >
           <span>Create Sprint</span>
-          <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-white text-xl leading-none'>
-            +
-          </span>
+          <span className='flex items-center justify-center h-5 w-5 rounded-full border-2 border-white text-xl'>+</span>
         </button>
       </div>
 
-      {!loading && sprints.length === 0 && (
-        <div className='rounded-2xl bg-white shadow-sm p-8 text-center text-slate-500'>
-          Không có dữ liệu Sprint
-        </div>
-      )}
-
-      {sprints.map((sprint, sprintIdx) => (
-        <div
-          key={sprint.sprintId || sprintIdx}
-          className='rounded-2xl bg-white shadow-sm overflow-hidden'
-        >
-          {/* Header bảng */}
-          <div className='flex items-center justify-between border-b border-border/60 px-5 py-4 bg-gray-50/30'>
-            <div className='flex items-center gap-4 pl-1'>
-              <div className='text-lg font-bold text-text'>
-                {sprint.name || `Sprint ${sprintIdx + 1}`}
+      {loading ? (
+        <div className='text-center py-10'>Đang tải dữ liệu...</div>
+      ) : sprints.length === 0 ? (
+        <div className='rounded-2xl bg-white shadow-sm p-8 text-center text-slate-500'>Không có dữ liệu Sprint</div>
+      ) : (
+        sprints.map((sprint) => (
+          <div key={sprint.sprintId} className='rounded-2xl bg-white shadow-sm overflow-hidden mb-6 border border-border/40'>
+            {/* Header Sprint */}
+            <div className='flex items-center justify-between border-b border-border/60 px-5 py-4 bg-gray-50/30'>
+              <div className='flex items-center gap-4'>
+                <div className='text-lg font-bold text-text'>{sprint.name}</div>
+                <div className='px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700 uppercase'>
+                  {sprint.status}
+                </div>
+                <span className='text-sm text-muted'>({sprint.itemCount || 0} issues)</span>
               </div>
-              <div className='ml-3 px-2 py-0.5 rounded textxs font-semibold bg-gray-200 text-gray-700'>
-                {sprint.status || 'Planned'}
-              </div>
-            </div>
-
-            <div className='flex items-center gap-3'>
-              <button
-                type='button'
-                className='h-9 rounded-full border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50'
-              >
+              <button className='h-9 rounded-full border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50'>
                 Hoàn thành Sprint
               </button>
             </div>
-          </div>
 
-          <div className='divide-y divide-border/60'>
-            {/* Hàng Tiêu Đề Cột */}
-            <div className='flex items-center justify-between px-5 py-3 bg-gray-50/50 border-b border-border/60'>
-              <div className='flex items-center gap-4 w-[120px] shrink-0'>
-                <div className='text-[11px] font-bold text-muted uppercase tracking-wider pl-1'>
-                  Issue
+            <div className='divide-y divide-border/60'>
+              {/* Header Cột */}
+              <div className='flex items-center justify-between px-5 py-3 bg-gray-50/50 border-b text-[11px] font-bold text-muted uppercase'>
+                <div className='w-[120px]'>Issue</div>
+                <div className='flex-1 pr-4 pl-4'>Summary</div>
+                <div className='flex items-center justify-end'>
+                  <div className='w-[100px] text-center'>Status</div>
+                  <div className='w-[120px] text-center'>Type</div>
+                  <div className='w-[90px] text-center'>Priority</div>
+                  <div className='w-[50px] text-center'>Assignee</div>
                 </div>
               </div>
-              <div className='flex-1 min-w-0 pr-4 pl-4'>
-                <div className='text-[11px] font-bold text-muted uppercase tracking-wider'>
-                  Summary
-                </div>
-              </div>
-              <div className='flex items-center justify-end shrink-0'>
-                <div className='w-[100px] flex justify-center'>
-                  <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
-                    Status
-                  </span>
-                </div>
-                <div className='w-[220px] flex justify-center px-4'>
-                  <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
-                    Epic / Tag
-                  </span>
-                </div>
-                <div className='w-[90px] text-center text-[11px] font-bold text-muted uppercase tracking-wider'>
-                  Due Date
-                </div>
-                <div className='w-[40px] text-center text-[11px] font-bold text-muted uppercase tracking-wider'>
-                  Pts
-                </div>
-                <div className='w-[90px] flex justify-center'>
-                  <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
-                    Priority
-                  </span>
-                </div>
-                <div className='w-[50px] flex justify-center'>
-                  <span className='text-[11px] font-bold text-muted uppercase tracking-wider'>
-                    Assignee
-                  </span>
-                </div>
-                <div className='w-[32px]'></div>
-              </div>
+
+              {/* Fix 2: Render danh sách Items từ mảng sprint.items */}
+              {(!sprint.items || sprint.items.length === 0) ? (
+                <div className='px-5 py-8 text-center text-sm text-slate-400 italic'>Sprint này chưa có công việc nào.</div>
+              ) : (
+                sprint.items.map((it) => {
+                  const statusConfig = mapStatusObj[it.status?.toUpperCase()] || mapStatusObj.TODO;
+                  return (
+                    <div key={it.workItemId} className='flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-colors'>
+                      <div className='w-[120px] text-sm font-mono text-muted'>
+                        {it.workItemId.substring(0, 8)}
+                      </div>
+                      <div className='flex-1 text-[13px] font-medium text-text truncate px-4'>
+                        {it.title}
+                      </div>
+                      <div className='flex items-center justify-end'>
+                        <div className='w-[100px] flex justify-center'>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusConfig.className}`}>
+                            {it.status}
+                          </span>
+                        </div>
+                        <div className='w-[120px] flex justify-center'>
+                          <span className='bg-purple-50 text-purple-600 px-2.5 py-0.5 rounded-full text-[11px] font-bold'>
+                            {it.type}
+                          </span>
+                        </div>
+                        <div className='w-[90px] flex justify-center'>
+                          <span className='px-3 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-600'>
+                            {it.priority || 'Medium'}
+                          </span>
+                        </div>
+                        <div className='w-[50px] flex justify-center'>
+                          <div
+                            className='h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-bold'
+                            style={{ backgroundColor: stringToColorTuple(it.assigneeName || 'U').bg, color: stringToColorTuple(it.assigneeName || 'U').text }}
+                          >
+                            {(it.assigneeName || '?').charAt(0)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
 
-            {/* Empty state for WorkItems on this Sprint */}
-            {(!sprint.featureWorkItems || sprint.featureWorkItems.length === 0) && (
-              <div className='px-5 py-8 text-center text-sm text-slate-500'>
-                Sprint này chưa có công việc nào.
-              </div>
-            )}
-
-            {/* Render WorkItems inside the Sprint using featureWorkItems (Placeholder array name for mapping) */}
-            {(sprint.featureWorkItems || []).map((it) => {
-              const statusConfig = mapStatusObj[it.status] || mapStatusObj.TODO;
-
-              const priorityBadgeClass =
-                it.priority === 'HIGH'
-                  ? 'bg-[#FEF2F2] text-[#DC2626] border border-[#FEE2E2]'
-                  : 'bg-[#EFF6FF] text-[#2563EB] border border-[#DBEAFE]';
-              const priorityLabel = it.priority === 'HIGH' ? 'High' : 'Medium';
-
-              return (
-                <div
-                  key={it.id}
-                  className='flex items-center justify-between px-5 py-3 hover:bg-bg transition-colors'
-                >
-                  {/* 1. Checkbox (REMOVED) & ID */}
-                  <div className='flex items-center gap-4 w-[120px] shrink-0'>
-                    <div className='text-sm font-semibold text-muted pl-1'>{it.key}</div>
-                  </div>
-
-                  {/* 2. Nội dung công việc (flexible) */}
-                  <div className='flex-1 min-w-0 pr-4 pl-4'>
-                    <div
-                      className='truncate text-[13px] font-medium text-text tracking-tight'
-                      dangerouslySetInnerHTML={{ __html: it.title || it.name || 'Untitled Issue' }}
-                    />
-                  </div>
-
-                  {/* Phần bên phải - Các cột fixed width để thẳng hàng */}
-                  <div className='flex items-center justify-end shrink-0'>
-                    {/* 3. Trạng thái */}
-                    <div className='w-[100px] flex justify-center'>
-                      <span
-                        className={[
-                          'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide',
-                          statusConfig.className,
-                        ].join(' ')}
-                      >
-                        {statusConfig.label}
-                      </span>
-                    </div>
-
-                    {/* 4. Tags/Epic */}
-                    <div className='w-[220px] flex justify-center px-4'>
-                      <span className='inline-flex items-center justify-center rounded-full bg-[#F3F0FF] text-[#6D28D9] border border-[#E9D5FF] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide w-full truncate'>
-                        {it.type || 'N/A'}
-                      </span>
-                    </div>
-
-                    {/* 5. Ngày tháng (Mờ) */}
-                    <div className='w-[90px] text-center text-[13px] text-muted font-medium'>
-                      {it.date}
-                    </div>
-
-                    {/* Points (Màu đỏ theo thiết kế) */}
-                    <div className='w-[40px] text-center text-[13px] font-bold text-[#DC2626]'>
-                      {it.points === '-' ? '-' : it.points}
-                    </div>
-
-                    {/* 6. Độ ưu tiên */}
-                    <div className='w-[90px] flex justify-center'>
-                      <span
-                        className={[
-                          'inline-flex items-center rounded-full px-3 py-0.5 text-[12px] font-semibold',
-                          priorityBadgeClass,
-                        ].join(' ')}
-                      >
-                        {priorityLabel}
-                      </span>
-                    </div>
-
-                    {/* 7. Ký hiệu bổ sung (Assignee Icon) */}
-                    <div className='w-[50px] flex justify-center'>
-                      {it.assigneeIcon ? (
-                        <div
-                          className='flex h-[26px] w-[26px] items-center justify-center rounded-full text-[11px] font-bold'
-                          style={{
-                            backgroundColor: stringToColorTuple(it.assigneeIcon).bg,
-                            color: stringToColorTuple(it.assigneeIcon).text,
-                          }}
-                        >
-                          {getInitials(it.assigneeIcon)}
-                        </div>
-                      ) : (
-                        <div className='flex h-[26px] w-[26px] items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold text-slate-400'>
-                          ?
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 8. Menu Icon */}
-                    <div className='w-[32px] flex justify-end'>
-                      <button
-                        type='button'
-                        className='text-muted hover:text-text transition-colors'
-                      >
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          width='20'
-                          height='20'
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          strokeWidth='2'
-                          strokeLinecap='round'
-                          strokeLinejoin='round'
-                        >
-                          <circle cx='12' cy='12' r='1' />
-                          <circle cx='12' cy='5' r='1' />
-                          <circle cx='12' cy='19' r='1' />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            <div className='px-5 py-3 border-t border-border/40'>
+              <button onClick={() => setIsCreateModalOpen(true)} className='text-primary text-sm font-bold flex items-center gap-2 hover:underline'>
+                <span>+</span> Tạo nhiệm vụ
+              </button>
+            </div>
           </div>
+        ))
+      )}
 
-          {/* Nút Tạo nhiệm vụ ở cuối */}
-          <div className='px-5 py-4 border-t border-border/60'>
-            <button
-              type='button'
-              onClick={() => setIsCreateModalOpen(true)}
-              className='inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 hover:bg-primary/10 transition-colors'
-            >
-              <span className='font-bold text-primary'>+</span>
-              <span className='text-sm font-semibold text-primary'>Tạo nhiệm vụ</span>
-            </button>
-          </div>
-        </div>
-      ))}
-
-      <CreateTaskModal
-        open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={(data) => {
-          console.log('New Task:', data);
-          // TODO: Optionally add functionality here to prepend task to the backend via service
-        }}
-      />
-
+      {/* Modals */}
+      <CreateTaskModal open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
       <CreateSprintModal
         open={isCreateSprintModalOpen}
         projectId={projectId}
         onClose={() => setIsCreateSprintModalOpen(false)}
         onSubmit={async (payload) => {
           try {
-            await productBacklogService.createSprint(projectId, payload);
+            const apiPayload = {
+              name: payload.name,
+              title: payload.name,
+              goal: payload.goal,
+              description: payload.goal,
+              workItemIds: payload.workItemIds || [],
+            };
+            console.log('Create Sprint payload:', apiPayload);
+            const res = await productBacklogService.createSprint(projectId, apiPayload);
+            console.log('Create Sprint response:', res);
+
+            if (res && res.isSuccess === false) {
+              let errorMsg = 'Lỗi khi tạo Sprint';
+              try {
+                const parsed = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                if (parsed?.errors) {
+                  errorMsg = Object.entries(parsed.errors)
+                    .map(([k, v]) => `${k}: ${v}`)
+                    .join('\n');
+                } else if (parsed?.title) {
+                  errorMsg = parsed.title;
+                } else if (res.message) {
+                  errorMsg = res.message;
+                }
+              } catch (e) {
+                console.error('Error parsing creation sprint response:', e);
+              }
+              toast.error(errorMsg);
+              return;
+            }
+
             toast.success('Tạo Sprint thành công');
             setIsCreateSprintModalOpen(false);
-
-            // Temporary trigger reload to fetch new list since we lack a refetch hook right now
-            window.location.reload();
+            fetchData(projectId);
           } catch (error) {
             console.error('Failed to create sprint:', error);
-            const errs = error?.response?.data?.errors;
-            if (errs && errs !== null) {
-              const errorMessage = Object.values(errs).flat().join('\n');
-              toast.error(errorMessage);
-            } else {
-              toast.error('Lỗi khi tạo Sprint');
-            }
+            toast.error('Lỗi khi tạo Sprint');
           }
         }}
       />
