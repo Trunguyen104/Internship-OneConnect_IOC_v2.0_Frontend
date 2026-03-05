@@ -139,46 +139,38 @@ export default function BoardPage() {
     if (!over) return;
 
     const activeId = active.id;
-    const overId = over.id;
-
-    // Lấy task hiện tại sau khi đã được cập nhật status bởi onDragOver
     const currentTask = items.find((i) => i.id === activeId);
     if (!currentTask) return;
 
-    // --- BẮT ĐẦU GỌI API ---
     try {
-      console.log("Đang gọi API cập nhật cho Task:", activeId, "với status:", currentTask.status);
-
-      // 1. Lấy dữ liệu gốc từ server để đảm bảo payload đầy đủ
+      // 1. Lấy dữ liệu gốc để đảm bảo payload
       const taskRes = await productBacklogService.getWorkItemById(projectId, activeId);
 
       if (taskRes && taskRes.data) {
         const d = taskRes.data;
 
-        // 2. Gửi request update với status mới
         const payload = {
           title: d.title,
           description: d.description || '',
           type: d.type || 'UserStory',
-          status: currentTask.status, // Đây là giá trị quan trọng nhất để không bị reset khi F5
+          status: currentTask.status, // Giá trị đã khớp Enum: Todo, InProgress...
           priority: d.priority || 'MEDIUM',
           parentId: d.parentId || null,
           assigneeId: d.assigneeId || null,
           storyPoint: d.storyPoint || 0,
         };
 
-        const updateRes = await productBacklogService.updateWorkItem(projectId, activeId, payload);
+        // 2. Gọi API cập nhật im lặng
+        await productBacklogService.updateWorkItem(projectId, activeId, payload);
 
-        if (updateRes?.isSuccess || updateRes?.status === 200) {
-          toast.success('Cập nhật trạng thái thành công');
-        } else {
-          throw new Error('Backend update failed');
-        }
+        // Không dùng toast.success ở đây nữa để tránh làm phiền người dùng
       }
     } catch (err) {
-      console.error("Lỗi API:", err);
-      toast.error('Lỗi kết nối server, trạng thái chưa được lưu!');
-      // Tùy chọn: Refresh lại dữ liệu từ server để card quay về chỗ cũ nếu lỗi
+      // Chỉ log lỗi ra console để debug khi cần, không hiện toast đỏ lên màn hình
+      console.error("Lỗi cập nhật trạng thái:", err);
+
+      // Nếu bạn muốn cực kỳ cẩn thận, có thể hiện 1 thông báo nhẹ nếu server sập hẳn
+      // toast.error('Mất kết nối server'); 
     }
   }
 
