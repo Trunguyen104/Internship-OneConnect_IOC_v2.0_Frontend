@@ -347,11 +347,10 @@ export default function BacklogBoard() {
           <div className='flex flex-col gap-1'>
             <button
               onClick={() => setSelectedEpicId('ALL')}
-              className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${
-                selectedEpicId === 'ALL'
+              className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === 'ALL'
                   ? 'bg-[#F4F0FF] text-[#6333FF]'
                   : 'text-gray-700 hover:bg-gray-50'
-              }`}
+                }`}
             >
               Tất cả
             </button>
@@ -360,11 +359,10 @@ export default function BacklogBoard() {
               <button
                 key={epic.id}
                 onClick={() => setSelectedEpicId(epic.id)}
-                className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${
-                  selectedEpicId === epic.id
+                className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === epic.id
                     ? 'bg-[#F4F0FF] text-[#6333FF]'
                     : 'text-gray-700 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <div className='truncate'>{epic.title || epic.name || 'Untitled Epic'}</div>
               </button>
@@ -427,7 +425,7 @@ export default function BacklogBoard() {
 
                       {/* Dynamic Start/Complete Sprint button based on status */}
                       {sprint.status?.toUpperCase() === 'ACTIVE' ||
-                      sprint.status?.toUpperCase() === 'IN_PROGRESS' ? (
+                        sprint.status?.toUpperCase() === 'IN_PROGRESS' ? (
                         <button
                           onClick={() => handleSprintActionClick(sprint, false)}
                           className='h-[34px] px-5 border border-green-200 bg-green-50 rounded-full text-[13px] font-medium text-green-700 hover:bg-green-100 transition-colors flex items-center shadow-sm'
@@ -736,10 +734,10 @@ export default function BacklogBoard() {
                 prev.map((s) =>
                   s.sprintId === targetSprintId
                     ? {
-                        ...s,
-                        items: [...(s.items || []), optimisticItem],
-                        itemCount: (s.itemCount || 0) + 1,
-                      }
+                      ...s,
+                      items: [...(s.items || []), optimisticItem],
+                      itemCount: (s.itemCount || 0) + 1,
+                    }
                     : s,
                 ),
               );
