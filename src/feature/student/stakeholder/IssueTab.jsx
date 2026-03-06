@@ -8,6 +8,8 @@ import dayjs from 'dayjs';
 import Card from '@/shared/components/Card';
 import StakeholderIssueService from '@/services/stakeholderIssue';
 import { StakeholderService } from '@/services/stakeholder';
+import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+import { ISSUE_MESSAGES } from '@/constants/stakeholderIssue/messages';
 import {
   CheckCircleOutlined,
   DeleteOutlined,
@@ -60,8 +62,8 @@ export default function IssueTab() {
 
   const totalPages = Math.ceil(total / pageSize);
   const handleSaveIssue = async () => {
-    if (!issueForm.title || !issueForm.stakeholderId) {
-      toast.warning('Please fill required fields');
+    if (!issueForm.title?.trim() || !issueForm.stakeholderId || !issueForm.description?.trim()) {
+      toast.warning(ISSUE_MESSAGES.REQUIRED_FIELDS.GENERAL);
       return;
     }
 
@@ -73,35 +75,38 @@ export default function IssueTab() {
         projectId,
       });
 
-      toast.success('Issue created successfully');
+      toast.success(ISSUE_MESSAGES.CREATE_SUCCESS);
 
       setOpenIssueForm(false);
       setIssueForm({ title: '', description: '', stakeholderId: '' });
       fetchIssues();
     } catch {
-      toast.error('Failed to create issue');
+      toast.error(ISSUE_MESSAGES.CREATE_FAILED);
     }
   };
   const handleDelete = async (id) => {
     try {
       await StakeholderIssueService.delete(id);
-      toast.success('Issue deleted successfully');
+      toast.success(ISSUE_MESSAGES.DELETE_SUCCESS);
       fetchIssues();
     } catch {
-      toast.error('Failed to delete issue');
+      toast.error(ISSUE_MESSAGES.DELETE_FAILED);
     }
   };
 
   const handleToggleStatus = async (issue) => {
     try {
-      const newStatus = issue.status === 'Resolved' ? 'Open' : 'Resolved';
+      const newStatus =
+        issue.status === ISSUE_UI.STATUS.RESOLVED ? 'Open' : ISSUE_UI.STATUS.RESOLVED;
       await StakeholderIssueService.updateStatus(issue.id, newStatus);
 
-      toast.success(newStatus === 'Resolved' ? 'Issue marked as resolved' : 'Issue reopened');
+      toast.success(
+        newStatus === ISSUE_UI.STATUS.RESOLVED ? ISSUE_MESSAGES.RESOLVED : ISSUE_MESSAGES.REOPENED,
+      );
 
       fetchIssues();
     } catch {
-      toast.error('Failed to update issue status');
+      toast.error(ISSUE_MESSAGES.UPDATE_STATUS_FAILED);
     }
   };
 
@@ -117,7 +122,7 @@ export default function IssueTab() {
           setProjectId(res.data.items[0].projectId);
         }
       } catch {
-        toast.error('Cannot load project');
+        toast.error(ISSUE_MESSAGES.LOAD_PROJECT_FAILED);
       }
     };
 
@@ -172,7 +177,7 @@ export default function IssueTab() {
     <>
       <Card>
         <SearchBar
-          placeholder='Search issue...'
+          placeholder={ISSUE_UI.SEARCH_PLACEHOLDER}
           value={search}
           onChange={(val) => {
             setSearch(val);
@@ -180,7 +185,7 @@ export default function IssueTab() {
           }}
           showFilter
           showAction
-          actionLabel='Add issue'
+          actionLabel={ISSUE_UI.ADD_BUTTON}
           onActionClick={() => setOpenIssueForm(true)}
         />
 
@@ -191,7 +196,7 @@ export default function IssueTab() {
             </div>
           ) : issues.length === 0 ? (
             <div className='flex-1 flex items-center justify-center'>
-              <p className='text-slate-400'>No issues found.</p>
+              <p className='text-slate-400'>{ISSUE_UI.EMPTY.NO_DATA}</p>
             </div>
           ) : (
             <div className='flex-1 flex flex-col min-h-0 mt-5'>
@@ -200,21 +205,25 @@ export default function IssueTab() {
                   <thead className='bg-slate-50 sticky top-0 z-10 border-b border-slate-200'>
                     <tr>
                       <th className='px-6 py-4 text-xs font-semibold text-slate-500 w-[60px]'>
-                        STT
-                      </th>
-                      <th className='px-6 py-4 text-xs font-semibold text-slate-500'>Title</th>
-                      <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                        Stakeholder
+                        {ISSUE_UI.TABLE.NO}
                       </th>
                       <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                        Description
+                        {ISSUE_UI.TABLE.TITLE}
                       </th>
-                      <th className='px-6 py-4 text-xs font-semibold text-slate-500'>Status</th>
                       <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                        Created Date
+                        {ISSUE_UI.TABLE.STAKEHOLDER}
+                      </th>
+                      <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+                        {ISSUE_UI.TABLE.DESCRIPTION}
+                      </th>
+                      <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+                        {ISSUE_UI.TABLE.STATUS}
+                      </th>
+                      <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+                        {ISSUE_UI.TABLE.CREATED_DATE}
                       </th>
                       <th className='px-6 py-4 text-xs font-semibold text-slate-500 text-right'>
-                        Actions
+                        {ISSUE_UI.TABLE.ACTIONS}
                       </th>
                     </tr>
                   </thead>
@@ -230,7 +239,8 @@ export default function IssueTab() {
                         </td>
                         <td className='px-6 py-4 text-sm text-slate-600'>{i.title}</td>
                         <td className='px-6 py-4 text-sm text-slate-600 truncate'>
-                          {stakeholders.find((s) => s.id === i.stakeholderId)?.name || 'Unknown'}
+                          {stakeholders.find((s) => s.id === i.stakeholderId)?.name ||
+                            ISSUE_UI.EMPTY.UNKNOWN}
                         </td>
                         <td className='px-6 py-4 text-sm text-slate-600'>
                           <div className='truncate max-w-[300px]' title={i.description}>
@@ -240,17 +250,18 @@ export default function IssueTab() {
                         <td className='px-6 py-4'>
                           <span
                             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${
-                              i.status === 'Resolved' || i.status === 'Đã giải quyết'
+                              i.status === ISSUE_UI.STATUS.RESOLVED || i.status === 'Đã giải quyết'
                                 ? 'bg-green-50 text-green-700 border-green-200'
                                 : 'bg-orange-50 text-orange-700 border-orange-200'
                             }`}
                           >
-                            {i.status === 'Resolved' || i.status === 'Đã giải quyết' ? (
+                            {i.status === ISSUE_UI.STATUS.RESOLVED ||
+                            i.status === 'Đã giải quyết' ? (
                               <CheckCircleOutlined />
                             ) : (
                               <SyncOutlined spin />
                             )}
-                            {i.status || 'Đang xử lý'}
+                            {i.status || ISSUE_UI.STATUS.PROCESSING}
                           </span>
                         </td>
                         <td className='px-6 py-4 text-sm text-slate-600'>
@@ -265,10 +276,12 @@ export default function IssueTab() {
                               }}
                               className='text-slate-400 hover:text-blue-600 px-2'
                             >
-                              {i.status === 'Resolved' ? 'Reopen' : 'Resolve'}
+                              {i.status === ISSUE_UI.STATUS.RESOLVED
+                                ? ISSUE_UI.BUTTON.REOPEN
+                                : ISSUE_UI.BUTTON.RESOLVE}
                             </button>
                             <Popconfirm
-                              title='Delete'
+                              title={ISSUE_UI.BUTTON.DELETE}
                               onConfirm={(e) => {
                                 e?.stopPropagation();
                                 handleDelete(i.id);
@@ -317,7 +330,7 @@ export default function IssueTab() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className='flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-5'>
-              <h2 className='text-lg font-semibold text-slate-800'>Add New Issue</h2>
+              <h2 className='text-lg font-semibold text-slate-800'>{ISSUE_UI.FORM.ADD_TITLE}</h2>
               <button
                 onClick={() => setOpenIssueForm(false)}
                 className='flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600'
@@ -329,26 +342,26 @@ export default function IssueTab() {
             <div className='space-y-4 overflow-y-auto px-6 py-5'>
               <div>
                 <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-                  Title <span className='text-red-500'>*</span>
+                  {ISSUE_UI.TABLE.TITLE} <span className='text-red-500'>*</span>
                 </label>
                 <input
                   value={issueForm.title}
                   onChange={(e) => setIssueForm({ ...issueForm, title: e.target.value })}
                   className='w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                  placeholder='Enter issue title'
+                  placeholder={ISSUE_UI.FORM.TITLE_PLACEHOLDER}
                 />
               </div>
 
               <div>
                 <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-                  Stakeholder <span className='text-red-500'>*</span>
+                  {ISSUE_UI.TABLE.STAKEHOLDER} <span className='text-red-500'>*</span>
                 </label>
                 <select
                   value={issueForm.stakeholderId}
                   onChange={(e) => setIssueForm({ ...issueForm, stakeholderId: e.target.value })}
                   className='w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
                 >
-                  <option value=''>Select stakeholder</option>
+                  <option value=''>{ISSUE_UI.FORM.STAKEHOLDER_PLACEHOLDER}</option>
                   {stakeholders.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
@@ -359,14 +372,14 @@ export default function IssueTab() {
 
               <div>
                 <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-                  Description
+                  {ISSUE_UI.TABLE.DESCRIPTION}
                 </label>
                 <textarea
                   rows={3}
                   value={issueForm.description}
                   onChange={(e) => setIssueForm({ ...issueForm, description: e.target.value })}
                   className='w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                  placeholder='Optional description...'
+                  placeholder={ISSUE_UI.FORM.DESCRIPTION_PLACEHOLDER}
                 />
               </div>
             </div>
@@ -376,13 +389,13 @@ export default function IssueTab() {
                 onClick={() => setOpenIssueForm(false)}
                 className='rounded-xl bg-white px-5 py-2.5 text-sm font-medium text-slate-600'
               >
-                Cancel
+                {ISSUE_UI.BUTTON.CANCEL}
               </button>
               <button
                 onClick={handleSaveIssue}
                 className='rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 shadow-sm'
               >
-                Save Issue
+                {ISSUE_UI.BUTTON.SAVE}
               </button>
             </div>
           </div>
@@ -392,7 +405,7 @@ export default function IssueTab() {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm'>
           <div className='w-full max-w-[520px] rounded-3xl bg-white shadow-2xl overflow-hidden'>
             <div className='flex items-center justify-between border-b px-6 py-4'>
-              <h2 className='text-lg font-semibold'>Issue Detail</h2>
+              <h2 className='text-lg font-semibold'>{ISSUE_UI.DETAIL.TITLE}</h2>
               <button
                 onClick={() => setIssueDetail(null)}
                 className='rounded-full p-2 hover:bg-slate-100'
@@ -403,33 +416,33 @@ export default function IssueTab() {
 
             <div className='space-y-4 px-6 py-5 text-sm'>
               <div>
-                <p className='text-slate-500'>Title</p>
+                <p className='text-slate-500'>{ISSUE_UI.TABLE.TITLE}</p>
                 <p className='font-medium'>{issueDetail.title}</p>
               </div>
 
               <div>
-                <p className='text-slate-500'>Description</p>
+                <p className='text-slate-500'>{ISSUE_UI.TABLE.DESCRIPTION}</p>
                 <p>{issueDetail.description || '-'}</p>
               </div>
 
               <div>
-                <p className='text-slate-500'>Stakeholder</p>
+                <p className='text-slate-500'>{ISSUE_UI.TABLE.STAKEHOLDER}</p>
                 <p>{issueDetail.stakeholderName || '-'}</p>
               </div>
 
               <div>
-                <p className='text-slate-500'>Status</p>
+                <p className='text-slate-500'>{ISSUE_UI.TABLE.STATUS}</p>
                 <p>{issueDetail.status}</p>
               </div>
 
               <div className='grid grid-cols-2 gap-4'>
                 <div>
-                  <p className='text-slate-500'>Created At</p>
+                  <p className='text-slate-500'>{ISSUE_UI.DETAIL.CREATED_AT}</p>
                   <p>{dayjs(issueDetail.createdAt).format('DD/MM/YYYY')}</p>
                 </div>
 
                 <div>
-                  <p className='text-slate-500'>Resolved At</p>
+                  <p className='text-slate-500'>{ISSUE_UI.DETAIL.RESOLVED_AT}</p>
                   <p>
                     {issueDetail.resolvedAt
                       ? dayjs(issueDetail.resolvedAt).format('DD/MM/YYYY')
