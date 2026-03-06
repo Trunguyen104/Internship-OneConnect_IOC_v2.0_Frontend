@@ -34,18 +34,11 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
+import { PROJECT_MESSAGES } from '@/constants/project/messages';
+import { PROJECT_UI } from '@/constants/project/uiText';
+import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 
 const { Title, Text, Paragraph } = Typography;
-
-const RESOURCE_TYPES = [
-  { value: 1, label: 'Tài liệu hướng dẫn (PDF/DOC)' },
-  { value: 2, label: 'Biểu mẫu (DOC/XLS)' },
-  { value: 3, label: 'Hình ảnh (PNG/JPG)' },
-  { value: 4, label: 'Slide trình bày (PPT)' },
-  { value: 5, label: 'Mã nguồn/File nén (ZIP/RAR)' },
-  { value: 6, label: 'Video (MP4)' },
-  { value: 7, label: 'Khác' },
-];
 
 export default function Project() {
   const [projectId, setProjectId] = useState(null);
@@ -68,7 +61,7 @@ export default function Project() {
       setResources(data?.data?.items || []);
     } catch (err) {
       console.error('Load resources error:', err);
-      message.error('Lỗi khi tải danh sách tài liệu.');
+      message.error(PROJECT_MESSAGES.ERROR.LOAD_RESOURCES);
     } finally {
       setLoading(false);
     }
@@ -96,7 +89,7 @@ export default function Project() {
 
   const handleUpload = async (values) => {
     if (fileList.length === 0) {
-      message.warning('Vui lòng chọn file đính kèm!');
+      message.warning(PROJECT_MESSAGES.WARNING.FILE_REQUIRED);
       return;
     }
 
@@ -114,10 +107,10 @@ export default function Project() {
       await loadResources(projectId);
       setFileList([]);
       form.resetFields();
-      message.success('Tải lên tài liệu thành công!');
+      message.success(PROJECT_MESSAGES.SUCCESS.UPLOAD);
     } catch (err) {
       console.error('Upload error:', err);
-      message.error('Tải lên tài liệu thất bại!');
+      message.error(PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
     } finally {
       setUploading(false);
     }
@@ -126,11 +119,11 @@ export default function Project() {
   const handleDelete = async (id) => {
     try {
       await deleteProjectResource(id);
-      message.success('Xóa tài liệu thành công!');
+      message.success(PROJECT_MESSAGES.SUCCESS.DELETE);
       await loadResources(projectId);
     } catch (err) {
       console.error('Delete error:', err);
-      message.error('Lỗi khi xóa tài liệu!');
+      message.error(PROJECT_MESSAGES.ERROR.DELETE_FAILED);
     }
   };
 
@@ -150,12 +143,12 @@ export default function Project() {
         resourceName: values.resourceName,
         resourceType: values.resourceType || editingResource.resourceType || 1,
       });
-      message.success('Cập nhật tài liệu thành công!');
+      message.success(PROJECT_MESSAGES.SUCCESS.UPDATE);
       setIsEditModalVisible(false);
       await loadResources(projectId);
     } catch (err) {
       console.error('Update error:', err);
-      message.error('Lỗi khi cập nhật tài liệu!');
+      message.error(PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
     }
   };
 
@@ -182,13 +175,13 @@ export default function Project() {
       const currentExt = file.name.split('.').pop().toLowerCase();
       const isAllowed = allowedExtensions.includes(currentExt);
       if (!isAllowed) {
-        message.error(`Không hỗ trợ định dạng file .${currentExt}! Chỉ cho phép loại file cơ bản.`);
+        message.error(PROJECT_MESSAGES.ERROR.INVALID_FILE_TYPE);
         return Upload.LIST_IGNORE;
       }
 
       const isLt10M = file.size / 1024 / 1024 <= 10;
       if (!isLt10M) {
-        message.error('Dung lượng file vượt quá giới hạn 10MB!');
+        message.error(PROJECT_MESSAGES.ERROR.FILE_TOO_LARGE);
         return Upload.LIST_IGNORE;
       }
 
@@ -337,26 +330,31 @@ export default function Project() {
             <Col xs={24} lg={9} xl={8}>
               <Card
                 type='inner'
-                title='Thêm tài liệu mới'
+                title={PROJECT_UI.TITLE.ADD_RESOURCE}
                 variant='borderless'
                 style={{ background: '#fafafa' }}
               >
                 <Form form={form} layout='vertical' onFinish={handleUpload}>
                   <Form.Item
-                    label='Tên tài liệu'
+                    label={PROJECT_UI.FORM.RESOURCE_NAME}
                     name='resourceName'
                     tooltip='Nếu để trống sẽ sử dụng tên file đính kèm'
                   >
-                    <Input placeholder='Nhập tên tài liệu (tùy chọn)...' />
+                    <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
                   </Form.Item>
 
-                  <Form.Item label='Loại tài liệu' name='resourceType' initialValue={1} required>
+                  <Form.Item
+                    label={PROJECT_UI.FORM.RESOURCE_TYPE}
+                    name='resourceType'
+                    initialValue={1}
+                    required
+                  >
                     <Select options={RESOURCE_TYPES} />
                   </Form.Item>
 
-                  <Form.Item label='File đính kèm' required>
+                  <Form.Item label={PROJECT_UI.FORM.ATTACH_FILE} required>
                     <Upload {...uploadProps}>
-                      <Button icon={<UploadOutlined />}>Chọn file</Button>
+                      <Button icon={<UploadOutlined />}>{PROJECT_UI.BUTTON.SELECT_FILE}</Button>
                     </Upload>
                   </Form.Item>
 
@@ -368,7 +366,7 @@ export default function Project() {
                       disabled={fileList.length === 0}
                       block
                     >
-                      Tải lên
+                      {PROJECT_UI.BUTTON.UPLOAD}
                     </Button>
                   </Form.Item>
                 </Form>
@@ -378,7 +376,7 @@ export default function Project() {
             <Col xs={24} lg={15} xl={16}>
               <Space style={{ marginBottom: 16 }} size='small' align='center'>
                 <Title level={5} style={{ margin: 0 }}>
-                  Danh sách tài liệu
+                  {PROJECT_UI.TITLE.RESOURCE_LIST}
                 </Title>
                 <Tag color='geekblue'>{resources.length} files</Tag>
               </Space>
@@ -387,7 +385,7 @@ export default function Project() {
                 itemLayout='horizontal'
                 dataSource={resources}
                 loading={loading}
-                locale={{ emptyText: 'Chưa có tài liệu nào đính kèm.' }}
+                locale={{ emptyText: PROJECT_UI.EMPTY.NO_RESOURCE }}
                 renderItem={(item) => (
                   <List.Item
                     actions={[
@@ -399,7 +397,7 @@ export default function Project() {
                         target='_blank'
                         rel='noopener noreferrer'
                       >
-                        Tải xuống
+                        {PROJECT_UI.BUTTON.DOWNLOAD}
                       </Button>,
                       <Button
                         key='edit'
@@ -407,17 +405,17 @@ export default function Project() {
                         icon={<EditOutlined />}
                         onClick={() => openEditModal(item)}
                       >
-                        Sửa
+                        {PROJECT_UI.BUTTON.EDIT}
                       </Button>,
                       <Popconfirm
                         key='delete'
-                        title='Bạn có chắc chắn muốn xóa tài liệu này?'
+                        title={PROJECT_UI.CONFIRM.DELETE_RESOURCE}
                         onConfirm={() => handleDelete(item.projectResourceId)}
-                        okText='Có'
-                        cancelText='Không'
+                        okText='Yes'
+                        cancelText='No'
                       >
                         <Button type='link' danger icon={<DeleteOutlined />}>
-                          Xóa
+                          {PROJECT_UI.BUTTON.DELETE}
                         </Button>
                       </Popconfirm>,
                     ]}
@@ -433,7 +431,7 @@ export default function Project() {
                         />
                       }
                       title={<Text strong>{item.resourceName || 'Untitled Resource'}</Text>}
-                      description={`Loại tài liệu: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType)?.label || 'Khác'}`}
+                      description={`Type: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType)?.label || 'Other'}`}
                     />
                   </List.Item>
                 )}
@@ -444,25 +442,25 @@ export default function Project() {
       </Space>
 
       <Modal
-        title='Chỉnh sửa tài liệu'
+        title={PROJECT_UI.TITLE.EDIT_RESOURCE}
         open={isEditModalVisible}
         onCancel={() => setIsEditModalVisible(false)}
         onOk={() => editForm.submit()}
-        okText='Cập nhật'
-        cancelText='Hủy'
+        okText={PROJECT_UI.BUTTON.UPDATE}
+        cancelText={PROJECT_UI.BUTTON.CANCEL}
       >
         <Form form={editForm} layout='vertical' onFinish={handleUpdate}>
           <Form.Item
             name='resourceName'
-            label='Tên tài liệu'
+            label={PROJECT_UI.FORM.RESOURCE_NAME}
             rules={[{ required: true, message: 'Vui lòng nhập tên tài liệu!' }]}
           >
-            <Input placeholder='Nhập tên tài liệu...' />
+            <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
           </Form.Item>
 
           <Form.Item
             name='resourceType'
-            label='Loại tài liệu'
+            label={PROJECT_UI.FORM.RESOURCE_TYPE}
             rules={[{ required: true, message: 'Vui lòng chọn loại tài liệu!' }]}
           >
             <Select options={RESOURCE_TYPES} />

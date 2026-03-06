@@ -23,6 +23,8 @@ import {
   BankOutlined,
 } from '@ant-design/icons';
 import { InternshipGroupService } from '@/services/internshipGroup.service';
+import { STUDENT_LIST_MESSAGES } from '@/constants/studentList/messages';
+import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 
 const { Title, Text } = Typography;
 
@@ -38,10 +40,8 @@ export default function StudentList() {
   // const [form] = Form.useForm();
 
   const [currentId, setCurrentId] = useState(internshipId);
-  // Thêm state vào component
   const [searchText, setSearchText] = useState('');
 
-  // Filter dữ liệu trước khi đưa vào Table
   const filteredMembers = (groupDetail?.members || []).filter(
     (m) =>
       m.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -74,12 +74,12 @@ export default function StudentList() {
         setGroupDetail(res.data);
       } else {
         messageApi.error(
-          res?.message || res?.data?.message || 'Failed to fetch internship group details',
+          res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED,
         );
       }
     } catch (error) {
       console.error('Error fetching group detail:', error);
-      messageApi.error('An error occurred while fetching group details');
+      messageApi.error(STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_EXCEPTION);
     } finally {
       setLoading(false);
     }
@@ -129,20 +129,22 @@ export default function StudentList() {
       };
       const res = await InternshipGroupService.removeStudents(targetId, payload);
       if (res && res.isSuccess !== false) {
-        messageApi.success('Student removed successfully!');
+        messageApi.success(STUDENT_LIST_MESSAGES.SUCCESS.REMOVE_STUDENT);
         fetchGroupDetail();
       } else {
-        messageApi.error(res?.message || res?.data?.message || 'Failed to remove student');
+        messageApi.error(
+          res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.REMOVE_FAILED,
+        );
       }
     } catch (error) {
       console.error('Error removing student:', error);
-      messageApi.error('An error occurred while removing student');
+      messageApi.error(STUDENT_LIST_MESSAGES.ERROR.REMOVE_EXCEPTION);
     }
   };
 
   const columns = [
     {
-      title: 'Student',
+      title: STUDENT_LIST_UI.TABLE.STUDENT,
       dataIndex: 'fullName',
       key: 'fullName',
       render: (text, record) => (
@@ -154,50 +156,63 @@ export default function StudentList() {
             {text ? text.charAt(0).toUpperCase() : <UserOutlined />}
           </Avatar>
           <div className='flex flex-col'>
-            <Text className='font-semibold text-gray-900 text-[15px]'>{text || 'N/A'}</Text>
+            <Text className='font-semibold text-gray-900 text-[15px]'>
+              {text || STUDENT_LIST_UI.DEFAULT.NA}
+            </Text>
             <Text className='text-gray-500 text-[13px]'>{record.email}</Text>
           </div>
         </div>
       ),
     },
     {
-      title: 'Code',
+      title: STUDENT_LIST_UI.TABLE.CODE,
       dataIndex: 'studentCode',
       key: 'studentCode',
       render: (text) => <Text className='text-gray-600 font-medium'>{text}</Text>,
     },
     {
-      title: 'Role',
+      title: STUDENT_LIST_UI.TABLE.ROLE,
       dataIndex: 'role',
       key: 'role',
       render: (role) => (
         <Tag
           className={`px-3 py-1 rounded-full font-medium border-0 ${
-            role === 1 ? 'bg-amber-100 text-amber-700' : 'bg-indigo-50 text-indigo-600'
+            role === 'Leader' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-50 text-indigo-600'
           }`}
         >
-          {role === 1 ? 'Leader' : 'Member'}
+          {role === 'Leader' ? STUDENT_LIST_UI.ROLE.LEADER : STUDENT_LIST_UI.ROLE.MEMBER}
         </Tag>
       ),
     },
     {
-      title: 'Status',
+      title: STUDENT_LIST_UI.TABLE.STATUS,
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
         const style =
-          status === 1
+          status === 'InProgress' || status === 'Active'
             ? 'bg-emerald-50 text-emerald-600'
-            : status === 0
+            : status === 'Pending'
               ? 'bg-orange-50 text-orange-600'
               : 'bg-gray-100 text-gray-600';
 
-        const label = status === 1 ? 'Active' : status === 0 ? 'Pending' : 'Unknown';
+        const label =
+          status === 'InProgress' || status === 'Active'
+            ? STUDENT_LIST_UI.STATUS.ACTIVE
+            : status === 'Pending'
+              ? STUDENT_LIST_UI.STATUS.PENDING
+              : STUDENT_LIST_UI.STATUS.UNKNOWN;
 
         return (
           <div className='flex items-center gap-2'>
             <span
-              className={`w-2 h-2 rounded-full ${status === 1 ? 'bg-emerald-500' : status === 0 ? 'bg-orange-500' : 'bg-gray-400'}`}
+              className={`w-2 h-2 rounded-full ${
+                status === 'InProgress' || status === 'Active'
+                  ? 'bg-emerald-500'
+                  : status === 'Pending'
+                    ? 'bg-orange-500'
+                    : 'bg-gray-400'
+              }`}
             ></span>
             <span className={`px-2.5 py-0.5 rounded-md text-xs font-semibold ${style}`}>
               {label}
@@ -207,12 +222,12 @@ export default function StudentList() {
       },
     },
     {
-      title: 'Joined At',
+      title: STUDENT_LIST_UI.TABLE.JOINED_AT,
       dataIndex: 'joinedAt',
       key: 'joinedAt',
       render: (date) => (
         <span className='text-gray-500 text-sm'>
-          {date ? new Date(date).toLocaleDateString('en-GB') : 'N/A'}
+          {date ? new Date(date).toLocaleDateString('en-GB') : STUDENT_LIST_UI.DEFAULT.NA}
         </span>
       ),
     },
@@ -221,13 +236,13 @@ export default function StudentList() {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <Tooltip title='Remove student'>
+        <Tooltip title={STUDENT_LIST_UI.ACTION.REMOVE_STUDENT}>
           <Popconfirm
-            title='Remove student'
-            description='Are you sure you want to remove this student from the group?'
+            title={STUDENT_LIST_UI.CONFIRM.REMOVE_TITLE}
+            description={STUDENT_LIST_UI.CONFIRM.REMOVE_DESC}
             onConfirm={() => handleDeleteStudent(record.studentId)}
-            okText='Yes'
-            cancelText='No'
+            okText={STUDENT_LIST_UI.CONFIRM.YES}
+            cancelText={STUDENT_LIST_UI.CONFIRM.NO}
             okButtonProps={{ danger: true, shape: 'round' }}
             cancelButtonProps={{ shape: 'round' }}
             placement='topLeft'
@@ -252,9 +267,9 @@ export default function StudentList() {
           className='my-auto'
           description={
             <span className='text-gray-500 font-medium'>
-              No internship group found.
+              {STUDENT_LIST_UI.EMPTY.NO_GROUP}
               <br />
-              You might not be assigned to any group yet.
+              {STUDENT_LIST_UI.EMPTY.NOT_ASSIGNED}
             </span>
           }
         />
@@ -272,47 +287,49 @@ export default function StudentList() {
               <div className='flex items-start gap-5'>
                 <div>
                   <Title level={3} className='!mb-1.5 !font-bold text-gray-900 tracking-tight'>
-                    {groupDetail.groupName || 'Unnamed Group'}
+                    {groupDetail.groupName || STUDENT_LIST_UI.DEFAULT.UNNAMED_GROUP}
                   </Title>
                   <div className='flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] text-gray-500 font-medium'>
                     <span className='flex items-center gap-1.5'>
                       <BankOutlined className='text-gray-400' />
-                      {groupDetail.enterpriseName || 'N/A Enterprise'}
+                      {groupDetail.enterpriseName || STUDENT_LIST_UI.DEFAULT.ENTERPRISE}
                     </span>
                     <span className='w-1 h-1 rounded-full bg-gray-300'></span>
                     <span className='flex items-center gap-1.5'>
                       <UserOutlined className='text-gray-400' />
                       Mentor:{' '}
-                      <span className='text-gray-700'>{groupDetail.mentorName || 'N/A'}</span>
+                      <span className='text-gray-700'>
+                        {groupDetail.mentorName || STUDENT_LIST_UI.DEFAULT.NA}
+                      </span>
                     </span>
                     <span className='w-1 h-1 rounded-full bg-gray-300'></span>
                     <span className='flex items-center gap-1.5'>
                       <CalendarOutlined className='text-gray-400' />
                       {groupDetail.startDate
                         ? new Date(groupDetail.startDate).toLocaleDateString('en-GB')
-                        : 'N/A'}{' '}
+                        : STUDENT_LIST_UI.DEFAULT.NA}{' '}
                       -{' '}
                       {groupDetail.endDate
                         ? new Date(groupDetail.endDate).toLocaleDateString('en-GB')
-                        : 'N/A'}
+                        : STUDENT_LIST_UI.DEFAULT.NA}
                     </span>
                   </div>
                 </div>
               </div>
               <div
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${
-                  groupDetail.status === 2
+                  groupDetail.status === 'Completed'
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : groupDetail.status === 1
+                    : groupDetail.status === 'InProgress' || groupDetail.status === 'Active'
                       ? 'bg-blue-50 text-blue-700 border-blue-200'
                       : 'bg-orange-50 text-orange-700 border-orange-200'
                 }`}
               >
-                {groupDetail.status === 2
-                  ? 'Completed'
-                  : groupDetail.status === 1
-                    ? 'Active'
-                    : 'Initializing'}
+                {groupDetail.status === 'Completed'
+                  ? STUDENT_LIST_UI.GROUP_STATUS.COMPLETED
+                  : groupDetail.status === 'InProgress' || groupDetail.status === 'Active'
+                    ? STUDENT_LIST_UI.GROUP_STATUS.ACTIVE
+                    : STUDENT_LIST_UI.GROUP_STATUS.INITIALIZING}
               </div>
             </div>
           </div>
@@ -325,9 +342,11 @@ export default function StudentList() {
                 <TeamOutlined className='text-gray-500 text-lg' />
               </div>
               <div>
-                <h3 className='text-lg font-bold text-gray-900 m-0'>Group Members</h3>
+                <h3 className='text-lg font-bold text-gray-900 m-0'>
+                  {STUDENT_LIST_UI.GROUP.MEMBERS}
+                </h3>
                 <p className='text-sm text-gray-500 m-0 mt-0.5 font-medium'>
-                  {groupDetail?.members?.length || 0} students total
+                  {groupDetail?.members?.length || 0} {STUDENT_LIST_UI.GROUP.STUDENTS_TOTAL}
                 </p>
               </div>
             </div>
@@ -335,7 +354,7 @@ export default function StudentList() {
 
           <div className='px-4 pb-4'>
             <Input.Search
-              placeholder='Search by name or email'
+              placeholder={STUDENT_LIST_UI.SEARCH.PLACEHOLDER}
               onChange={(e) => setSearchText(e.target.value)}
               className='w-full md:w-64 mb-4'
             />
@@ -354,7 +373,7 @@ export default function StudentList() {
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description={
-                      <span className='text-gray-400'>No members in this group yet</span>
+                      <span className='text-gray-400'>{STUDENT_LIST_UI.EMPTY.NO_MEMBERS}</span>
                     }
                   />
                 ),

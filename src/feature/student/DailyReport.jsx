@@ -25,7 +25,10 @@ import {
 } from '@ant-design/icons';
 import { LogBookService } from '@/services/logBook.service';
 import { ProjectService } from '@/services/projectService';
+import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
+import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import dayjs from 'dayjs';
+import Card from '@/shared/components/Card';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -130,10 +133,18 @@ export default function DailyReport() {
           items = res.items;
         }
 
-        const totalItems = res.data?.totalCount || res.totalCount || items.length;
+        if (statusFilter) {
+          items = items.filter((item) => {
+            const itemStatus = item.status ? String(item.status).toUpperCase() : '';
+            return itemStatus === String(statusFilter).toUpperCase();
+          });
+        }
 
-        setData(items);
-        setTotal(totalItems);
+        const startIndex = (pageNumber - 1) * pageSize;
+        const pagedItems = items.slice(startIndex, startIndex + pageSize);
+
+        setData(pagedItems);
+        setTotal(items.length);
       }
     } finally {
       setLoading(false);
@@ -158,11 +169,11 @@ export default function DailyReport() {
   const handleCreateOrUpdate = async (values) => {
     const targetId = projectId;
     if (!targetId) {
-      messageApi.error('Missing Project ID');
+      messageApi.error(DAILY_REPORT_MESSAGES.ERROR.MISSING_PROJECT_ID);
       return;
     }
     if (!studentId) {
-      messageApi.error('User context missing (Student ID not found)');
+      messageApi.error(DAILY_REPORT_MESSAGES.ERROR.MISSING_STUDENT_CONTEXT);
       return;
     }
 
@@ -171,43 +182,43 @@ export default function DailyReport() {
       let res;
       if (editingId) {
         const updatePayload = {
+          projectId: targetId,
           logbookId: editingId,
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: dayjs(values.dateReport).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-          // status: values.status !== undefined ? values.status : 0,
-          status: String(values.status),
+          dateReport: values.dateReport.toISOString(),
         };
         res = await LogBookService.update(targetId, editingId, updatePayload);
       } else {
         const createPayload = {
-          logbookId: editingId,
+          projectId: targetId,
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: dayjs(values.dateReport).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-          status: String(values.status),
+          dateReport: values.dateReport.toISOString(),
         };
         res = await LogBookService.create(targetId, createPayload);
       }
 
       if (res && res.isSuccess !== false) {
         messageApi.success(
-          editingId ? 'Logbook updated successfully!' : 'Logbook created successfully!',
+          editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
         );
         closeModal();
-        fetchLogbooks(); // Refresh table
+        fetchLogbooks();
       } else {
         messageApi.error(
           res?.message ||
             res?.data?.message ||
-            (editingId ? 'Failed to update logbook' : 'Failed to create logbook'),
+            (editingId
+              ? DAILY_REPORT_MESSAGES.ERROR.UPDATE_FAILED
+              : DAILY_REPORT_MESSAGES.ERROR.CREATE_FAILED),
         );
       }
     } catch (error) {
       console.error(error);
-      messageApi.error('An unexpected error occurred');
+      messageApi.error(DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
     } finally {
       setSubmitting(false);
     }
@@ -216,32 +227,15 @@ export default function DailyReport() {
   const handleEdit = (record) => {
     setEditingId(record.logbookId);
 
-    // Convert string ENUM to Int if backend returns string like "SUBMITTED"
-    const parseStatus = (statusVal) => {
-      if (typeof statusVal === 'number') return statusVal;
-      if (!statusVal) return 0;
-      const strMap = {
-        SUBMITTED: 0,
-        APPROVED: 1,
-        NEEDS_REVISION: 2,
-        PUNCTUAL: 3,
-        LATE: 4,
-      };
-      // fallback if it's "0", "1" string
-      if (!isNaN(statusVal)) return parseInt(statusVal, 10);
-      return strMap[statusVal.toUpperCase()] !== undefined ? strMap[statusVal.toUpperCase()] : 0;
-    };
-
     form.setFieldsValue({
       dateReport: record.dateReport ? dayjs(record.dateReport) : null,
-      status: parseStatus(record.status),
       summary: record.summary,
       issue: record.issue,
       plan: record.plan,
     });
+
     setIsModalOpen(true);
   };
-
   const handleView = (record) => {
     setViewRecord(record);
     setIsViewModalOpen(true);
@@ -258,50 +252,34 @@ export default function DailyReport() {
       if (!projectId) return;
       const res = await LogBookService.delete(projectId, id);
       if (res && res.isSuccess !== false) {
-        messageApi.success('Logbook deleted successfully!');
+        messageApi.success(DAILY_REPORT_MESSAGES.SUCCESS.DELETE);
         if (data.length === 1 && pageNumber > 1) {
           setPageNumber(pageNumber - 1);
         } else {
           fetchLogbooks();
         }
       } else {
-        messageApi.error(res?.message || 'Failed to delete logbook');
+        messageApi.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
       }
     } catch {
-      messageApi.error('An error occurred during deletion');
+      messageApi.error(DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
     }
   };
 
   const renderStatus = (status) => {
-    // Handling Both String and Integer versions
-    const parseStatus = (statusVal) => {
-      if (typeof statusVal === 'number') return statusVal;
-      if (!statusVal) return 0;
-      const strMap = {
-        SUBMITTED: 0,
-        APPROVED: 1,
-        NEEDS_REVISION: 2,
-        PUNCTUAL: 3,
-        LATE: 4,
-      };
-      if (!isNaN(statusVal)) return parseInt(statusVal, 10);
-      return strMap[statusVal.toUpperCase()] !== undefined ? strMap[statusVal.toUpperCase()] : 0;
-    };
-
-    const normalizedStatus = parseStatus(status);
-
     const config = {
-      0: { label: 'Submitted', style: 'bg-blue-50 text-blue-600 border-blue-200 border' },
-      1: { label: 'Approved', style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border' },
-      2: {
-        label: 'Needs Revision',
-        style: 'bg-orange-50 text-orange-600 border-orange-200 border',
+      PUNCTUAL: {
+        label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
+        style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
       },
-      3: { label: 'Punctual', style: 'bg-purple-50 text-purple-600 border-purple-200 border' },
-      4: { label: 'Late', style: 'bg-red-50 text-red-600 border-red-200 border' },
+      LATE: {
+        label: DAILY_REPORT_UI.STATUS.LATE,
+        style: 'bg-red-50 text-red-600 border-red-200 border',
+      },
     };
-    const c = config[normalizedStatus] || {
-      label: 'Unknown',
+
+    const c = config[status] || {
+      label: DAILY_REPORT_UI.STATUS.UNKNOWN,
       style: 'bg-gray-50 text-gray-600 border-gray-200 border',
     };
 
@@ -311,10 +289,9 @@ export default function DailyReport() {
       </div>
     );
   };
-
   const columns = [
     {
-      title: 'Report Date',
+      title: DAILY_REPORT_UI.TABLE.REPORT_DATE,
       dataIndex: 'dateReport',
       key: 'dateReport',
       sorter: true,
@@ -325,13 +302,13 @@ export default function DailyReport() {
       ),
     },
     {
-      title: 'Student',
+      title: DAILY_REPORT_UI.TABLE.STUDENT,
       dataIndex: 'studentName',
       key: 'studentName',
       render: (text) => <Text className='font-semibold'>{text || 'N/A'}</Text>,
     },
     {
-      title: 'Summary',
+      title: DAILY_REPORT_UI.TABLE.SUMMARY,
       dataIndex: 'summary',
       key: 'summary',
       ellipsis: {
@@ -344,7 +321,7 @@ export default function DailyReport() {
       ),
     },
     {
-      title: 'Issue',
+      title: DAILY_REPORT_UI.TABLE.ISSUE,
       dataIndex: 'issue',
       key: 'issue',
       ellipsis: {
@@ -357,14 +334,14 @@ export default function DailyReport() {
       ),
     },
     {
-      title: 'Status',
+      title: DAILY_REPORT_UI.TABLE.STATUS,
       dataIndex: 'status',
       key: 'status',
       render: (status) => renderStatus(status),
     },
     {
-      title: 'Action',
-      key: 'action',
+      title: DAILY_REPORT_UI.TABLE.ACTION,
+      key: DAILY_REPORT_UI.TABLE.ACTION,
       width: 120,
       align: 'center',
       render: (_, record) => (
@@ -407,11 +384,11 @@ export default function DailyReport() {
               onClick={(e) => {
                 e.stopPropagation();
                 Modal.confirm({
-                  title: 'Delete Logbook',
-                  content: 'Are you sure you want to delete this logbook entry?',
-                  okText: 'Yes, Delete',
+                  title: DAILY_REPORT_UI.DELETE_MODAL.TITLE,
+                  content: DAILY_REPORT_UI.DELETE_MODAL.CONTENT,
+                  okText: DAILY_REPORT_UI.DELETE_MODAL.CONFIRM,
                   okType: 'danger',
-                  cancelText: 'Cancel',
+                  cancelText: DAILY_REPORT_UI.DELETE_MODAL.CANCEL,
                   onOk: () => handleDelete(record.logbookId),
                   className: 'modern-modal',
                   okButtonProps: { className: 'rounded-lg font-semibold' },
@@ -433,9 +410,7 @@ export default function DailyReport() {
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           className='my-auto'
           description={
-            <span className='text-gray-500 font-medium'>
-              You are not assigned to any projects yet.
-            </span>
+            <span className='text-gray-500 font-medium'>{DAILY_REPORT_UI.EMPTY.NO_PROJECT}</span>
           }
         />
       </div>
@@ -443,30 +418,24 @@ export default function DailyReport() {
   }
 
   return (
-    <div className='space-y-6 max-w-[1400px] mx-auto pb-8'>
+    <div className='max-w-[1400px] mx-auto pb-4 gap-4'>
       {contextHolder}
 
-      <div className='flex items-center justify-between mb-8 mt-4 px-2'>
+      <div className='flex items-center justify-between mt-4 px-2 shrink-0 mb-4'>
         <div>
           <Title level={2} className='!mb-1 tracking-tight text-gray-900'>
-            Daily Report
+            {DAILY_REPORT_UI.TITLE}
           </Title>
-          <Text className='text-gray-500 text-[15px]'>
-            Manage and submit your daily internship logbooks
-          </Text>
+          <Text className='text-gray-500 text-[15px]'>{DAILY_REPORT_UI.DESCRIPTION}</Text>
         </div>
       </div>
 
-      <div className='bg-white rounded-[24px] border border-gray-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden'>
-        <div className='px-8 py-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4'>
+      <Card>
+        <div className='px-2 py-2 border-none flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0'>
           <div className='flex items-center gap-4'>
-            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shrink-0'>
-              <FileTextOutlined className='text-blue-600 text-lg' />
-            </div>
-
             <Select
               allowClear
-              placeholder='Filter by Status'
+              placeholder={DAILY_REPORT_UI.FILTER_STATUS}
               value={statusFilter}
               onChange={(val) => {
                 setStatusFilter(val);
@@ -477,11 +446,8 @@ export default function DailyReport() {
               classNames={{ popup: '!rounded-xl shadow-lg border border-gray-100' }}
               suffixIcon={<FilterOutlined />}
               options={[
-                { value: 0, label: 'Submitted' },
-                { value: 1, label: 'Approved' },
-                { value: 2, label: 'Needs Revision' },
-                { value: 3, label: 'Punctual' },
-                { value: 4, label: 'Late' },
+                { value: 'PUNCTUAL', label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 'LATE', label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
             />
           </div>
@@ -492,11 +458,11 @@ export default function DailyReport() {
             onClick={() => setIsModalOpen(true)}
             className='bg-black hover:bg-gray-800 text-white rounded-xl h-10 px-6 font-semibold shadow-sm border-0 transition-all hover:scale-105'
           >
-            Create Report
+            {DAILY_REPORT_UI.CREATE_BUTTON}
           </Button>
         </div>
 
-        <div className='px-4 pb-4 mt-2'>
+        <div className='px-2 pb-2 mt-2 flex-grow'>
           {loading ? (
             <div className='p-6 space-y-4'>
               <Skeleton active paragraph={{ rows: 6 }} />
@@ -507,12 +473,13 @@ export default function DailyReport() {
               columns={columns}
               rowKey='logbookId'
               onChange={handleTableChange}
+              scroll={{ x: 800, y: 220 }}
               pagination={{
                 current: pageNumber,
                 pageSize: pageSize,
                 total: total,
                 showSizeChanger: true,
-                className: 'px-6 mb-2',
+                className: 'px-2 mt-4',
               }}
               rowClassName='hover:bg-gray-50/50 transition-colors cursor-default'
               locale={{
@@ -522,7 +489,7 @@ export default function DailyReport() {
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description={
                         <span className='text-gray-400 font-medium'>
-                          No logbooks found for this group
+                          {DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}
                         </span>
                       }
                     />
@@ -532,26 +499,17 @@ export default function DailyReport() {
             />
           )}
         </div>
-      </div>
+      </Card>
 
       <Modal
         title={
           <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
-            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shrink-0'>
-              {editingId ? (
-                <EditOutlined className='text-lg' />
-              ) : (
-                <PlusOutlined className='text-lg' />
-              )}
-            </div>
             <div>
               <h3 className='text-lg font-bold text-gray-900 m-0'>
-                {editingId ? 'Edit Daily Report' : 'Create Daily Report'}
+                {editingId ? DAILY_REPORT_UI.MODAL.EDIT_TITLE : DAILY_REPORT_UI.MODAL.CREATE_TITLE}
               </h3>
               <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
-                {editingId
-                  ? 'Update your submitted logbook details'
-                  : 'Submit your internship progress'}
+                {editingId ? DAILY_REPORT_UI.MODAL.EDIT_DESC : DAILY_REPORT_UI.MODAL.CREATE_DESC}
               </p>
             </div>
           </div>
@@ -560,10 +518,11 @@ export default function DailyReport() {
         onCancel={closeModal}
         confirmLoading={submitting}
         onOk={() => form.submit()}
-        okText={editingId ? 'Save Changes' : 'Submit Report'}
-        cancelText='Cancel'
+        okText={editingId ? DAILY_REPORT_UI.MODAL.SAVE : DAILY_REPORT_UI.MODAL.SUBMIT}
+        cancelText={DAILY_REPORT_UI.MODAL.CANCEL}
         className='modern-modal'
         width={700}
+        centered
         okButtonProps={{
           className:
             'bg-black hover:bg-gray-800 text-white rounded-lg h-10 px-6 font-semibold shadow-sm border-0',
@@ -573,95 +532,81 @@ export default function DailyReport() {
             'rounded-lg h-10 px-5 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600',
         }}
       >
-        <Form
-          form={form}
-          layout='vertical'
-          onFinish={handleCreateOrUpdate}
-          className='mt-4 px-2'
-          initialValues={{
-            status: 0,
-          }}
-        >
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
+        <div className='max-h-[60vh] overflow-y-auto px-1 custom-scrollbar'>
+          <Form form={form} layout='vertical' onFinish={handleCreateOrUpdate} className='mt-2'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
+              <Form.Item
+                label={
+                  <span className='text-sm font-semibold text-gray-700'>
+                    {DAILY_REPORT_UI.FORM.REPORT_DATE}
+                  </span>
+                }
+                name='dateReport'
+                rules={[{ required: true, message: 'Please select a date!' }]}
+              >
+                <DatePicker
+                  className='w-full h-[44px] rounded-xl'
+                  format='DD/MM/YYYY'
+                  disabledDate={(current) => current && current > dayjs().endOf('day')}
+                />
+              </Form.Item>
+            </div>
+
             <Form.Item
-              label={<span className='text-sm font-semibold text-gray-700'>Report Date</span>}
-              name='dateReport'
-              rules={[{ required: true, message: 'Please select a date!' }]}
+              label={
+                <span className='text-sm font-semibold text-gray-700'>
+                  {DAILY_REPORT_UI.FORM.SUMMARY}
+                </span>
+              }
+              name='summary'
+              rules={[
+                { required: true, message: 'Please enter a summary of your work!' },
+                { min: 10, message: 'Summary must be at least 10 characters long.' },
+              ]}
             >
-              <DatePicker
-                className='w-full h-[44px] rounded-xl'
-                format='DD/MM/YYYY'
-                disabledDate={(current) => current && current > dayjs().endOf('day')}
+              <TextArea
+                placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_SUMMARY}
+                autoSize={{ minRows: 2, maxRows: 6 }}
+                className='rounded-xl p-3'
               />
             </Form.Item>
 
             <Form.Item
-              label={<span className='text-sm font-semibold text-gray-700'>Status</span>}
-              name='status'
-              rules={[{ required: true, message: 'Please select a status!' }]}
+              label={
+                <span className='text-sm font-semibold text-gray-700'>
+                  {DAILY_REPORT_UI.FORM.ISSUE}
+                </span>
+              }
+              name='issue'
             >
-              <Select
-                className='h-[44px]'
-                rootClassName='custom-select-rounded'
-                popupClassName='!rounded-xl shadow-lg border border-gray-100'
-                options={[
-                  { value: 0, label: 'Submitted' },
-                  { value: 1, label: 'Approved' },
-                  { value: 2, label: 'Needs Revision' },
-                  { value: 3, label: 'Punctual' },
-                  { value: 4, label: 'Late' },
-                ]}
+              <TextArea
+                placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_ISSUE}
+                autoSize={{ minRows: 2, maxRows: 5 }}
+                className='rounded-xl p-3'
               />
             </Form.Item>
-          </div>
 
-          <Form.Item
-            label={<span className='text-sm font-semibold text-gray-700'>Work Summary</span>}
-            name='summary'
-            rules={[
-              { required: true, message: 'Please enter a summary of your work!' },
-              { min: 10, message: 'Summary must be at least 10 characters long.' },
-            ]}
-          >
-            <TextArea
-              placeholder='Describe the tasks you worked on today...'
-              autoSize={{ minRows: 4, maxRows: 8 }}
-              className='rounded-xl p-3'
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={
-              <span className='text-sm font-semibold text-gray-700'>
-                Issues Encountered (Optional)
-              </span>
-            }
-            name='issue'
-          >
-            <TextArea
-              placeholder='Any blockers or challenges you faced?'
-              autoSize={{ minRows: 3, maxRows: 6 }}
-              className='rounded-xl p-3'
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={<span className='text-sm font-semibold text-gray-700'>Plan for Next Day</span>}
-            name='plan'
-            rules={[
-              { required: true, message: 'Please outline your plan for the next working day!' },
-            ]}
-          >
-            <TextArea
-              placeholder='What are your tasks for tomorrow?'
-              autoSize={{ minRows: 3, maxRows: 6 }}
-              className='rounded-xl p-3'
-            />
-          </Form.Item>
-        </Form>
+            <Form.Item
+              label={
+                <span className='text-sm font-semibold text-gray-700'>
+                  {DAILY_REPORT_UI.FORM.PLAN}
+                </span>
+              }
+              name='plan'
+              rules={[
+                { required: true, message: 'Please outline your plan for the next working day!' },
+              ]}
+            >
+              <TextArea
+                placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_PLAN}
+                autoSize={{ minRows: 3, maxRows: 6 }}
+                className='rounded-xl p-3'
+              />
+            </Form.Item>
+          </Form>
+        </div>
       </Modal>
 
-      {/* View Logbook Modal */}
       <Modal
         title={
           <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
@@ -669,7 +614,9 @@ export default function DailyReport() {
               <FileTextOutlined className='text-lg' />
             </div>
             <div>
-              <h3 className='text-lg font-bold text-gray-900 m-0'>Logbook Details</h3>
+              <h3 className='text-lg font-bold text-gray-900 m-0'>
+                {DAILY_REPORT_UI.VIEW_MODAL.TITLE}
+              </h3>
               <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
                 {viewRecord ? dayjs(viewRecord.dateReport).format('DD/MM/YYYY') : ''}
               </p>
@@ -684,37 +631,44 @@ export default function DailyReport() {
             onClick={() => setIsViewModalOpen(false)}
             className='rounded-lg h-10 px-6 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600'
           >
-            Close
+            {DAILY_REPORT_UI.VIEW_MODAL.CLOSE}
           </Button>,
         ]}
         width={700}
         className='modern-modal'
+        centered
       >
         {viewRecord && (
-          <div className='space-y-6 mt-4'>
+          <div className='space-y-6 mt-2 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar'>
             <div className='grid grid-cols-2 gap-4 pb-4 border-b border-gray-100'>
               <div>
-                <span className='block text-sm font-semibold text-gray-500 mb-1'>Student</span>
+                <span className='block text-sm font-semibold text-gray-500 mb-1'>
+                  {DAILY_REPORT_UI.TABLE.STUDENT}
+                </span>
                 <span className='text-base font-medium text-gray-900'>
                   {viewRecord.studentName || 'N/A'}
                 </span>
               </div>
               <div>
-                <span className='block text-sm font-semibold text-gray-500 mb-1'>Status</span>
+                <span className='block text-sm font-semibold text-gray-500 mb-1'>
+                  {DAILY_REPORT_UI.TABLE.STATUS}
+                </span>
                 {renderStatus(viewRecord.status)}
               </div>
             </div>
 
             <div>
-              <span className='block text-md font-semibold text-gray-800 mb-2'>Work Summary</span>
+              <span className='block text-md font-semibold text-gray-800 mb-2'>
+                {DAILY_REPORT_UI.FORM.SUMMARY}
+              </span>
               <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
-                {viewRecord.summary || 'No summary provided.'}
+                {viewRecord.summary || DAILY_REPORT_UI.VIEW_MODAL.NO_SUMMARY}
               </div>
             </div>
 
             <div>
               <span className='block text-md font-semibold text-gray-800 mb-2'>
-                Issues Encountered
+                {DAILY_REPORT_UI.FORM.ISSUE}
               </span>
               <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
                 {viewRecord.issue || 'No issues reported.'}
@@ -723,7 +677,7 @@ export default function DailyReport() {
 
             <div>
               <span className='block text-md font-semibold text-gray-800 mb-2'>
-                Plan for Next Day
+                {DAILY_REPORT_UI.FORM.PLAN}
               </span>
               <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
                 {viewRecord.plan || 'No plan outlined.'}

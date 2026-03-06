@@ -1,0 +1,41 @@
+export const STAKEHOLDER_UI = {
+  SEARCH_PLACEHOLDER: 'Search stakeholder...',
+  ADD_BUTTON: 'Add Stakeholder',
+
+  EMPTY_TITLE: 'No Stakeholders',
+  EMPTY_DESC: 'There are no stakeholders in this project yet.',
+
+  DELETE_TITLE: 'Delete Stakeholder',
+  DELETE_CONFIRM: 'Are you sure you want to delete this stakeholder?',
+  DELETE: 'Delete',
+  CANCEL: 'Cancel',
+
+  EDIT_BUTTON: 'Edit',
+  DELETE_BUTTON: 'Delete',
+
+  UPDATE: 'Update',
+  SAVE: 'Save',
+
+  NO_ROLE: 'No role',
+
+  PLACEHOLDER_NAME: "Enter stakeholder's name",
+  PLACEHOLDER_EMAIL: 'Enter email address',
+  PLACEHOLDER_PHONE: 'Enter phone number',
+  PLACEHOLDER_DESC: 'Enter description',
+
+  MODAL_ADD: 'Add New Stakeholder',
+  MODAL_EDIT: 'Edit Stakeholder',
+
+  ROLE_SELECT: 'Select a role',
+  ROLE_MENTOR: 'Mentor',
+  ROLE_SUPERVISOR: 'Supervisor',
+  ROLE_LECTURER: 'Lecturer',
+  ROLE_MEMBER: 'Team Member',
+
+  FIELD_NAME: 'Name',
+  FIELD_EMAIL: 'Email',
+  FIELD_ROLE: 'Role',
+  FIELD_PHONE: 'Phone number',
+  FIELD_DESC: 'Description',
+  FIELD_TYPE: 'Type',
+};
