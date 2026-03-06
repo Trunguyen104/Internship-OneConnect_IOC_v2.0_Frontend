@@ -348,8 +348,8 @@ export default function BacklogBoard() {
             <button
               onClick={() => setSelectedEpicId('ALL')}
               className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === 'ALL'
-                  ? 'bg-[#F4F0FF] text-[#6333FF]'
-                  : 'text-gray-700 hover:bg-gray-50'
+                ? 'bg-[#F4F0FF] text-[#6333FF]'
+                : 'text-gray-700 hover:bg-gray-50'
                 }`}
             >
               Tất cả
@@ -360,8 +360,8 @@ export default function BacklogBoard() {
                 key={epic.id}
                 onClick={() => setSelectedEpicId(epic.id)}
                 className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === epic.id
-                    ? 'bg-[#F4F0FF] text-[#6333FF]'
-                    : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-[#F4F0FF] text-[#6333FF]'
+                  : 'text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 <div className='truncate'>{epic.title || epic.name || 'Untitled Epic'}</div>
@@ -476,13 +476,14 @@ export default function BacklogBoard() {
                       {/* TẠO NHIỆM VỤ DƯỚI SPRINT */}
                       <button
                         onClick={() => {
-                          setActiveSprintForTask(sprint.sprintId); // Lưu ID của sprint hiện tại
+                          setActiveSprintForTask(sprint.sprintId);
                           setOpenCreateTask(true);
                         }}
-                        className='flex items-center gap-2 ...'
+                        className='flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium
+             bg-primary text-white hover:bg-primary-hover active:bg-primary-700'
                       >
                         <Plus className='w-4 h-4' />
-                        Tạo nhiệm vụ
+                        <span>Tạo nhiệm vụ</span>
                       </button>
                     </div>
                   </div>
@@ -535,7 +536,8 @@ export default function BacklogBoard() {
                       setActiveSprintForTask(null); // Backlog thì để null
                       setOpenCreateTask(true);
                     }}
-                    className='flex items-center gap-2 ...'
+                    className='flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium
+             bg-primary text-white hover:bg-primary-hover active:bg-primary-700'
                   >
                     <Plus className='w-4 h-4' />
                     Tạo nhiệm vụ
@@ -705,7 +707,7 @@ export default function BacklogBoard() {
               sprintId: targetSprintId || null,
             };
 
-            // 🚀 1. IGNITION - CREATE
+            // 1. IGNITION - CREATE
             const resCreate = await productBacklogService.createWorkItem(projectId, apiPayload);
 
             if (!resCreate || resCreate.isSuccess === false) {
@@ -717,7 +719,7 @@ export default function BacklogBoard() {
                 ? resCreate.data
                 : resCreate.data.workItemId || resCreate.data.id;
 
-            // 🧠 3. BUILD OPTIMISTIC OBJECT
+            // 3. BUILD OPTIMISTIC OBJECT
             const epicName = epics.find((e) => e.id === payload.epic)?.title || '';
 
             const optimisticItem = {
@@ -728,7 +730,7 @@ export default function BacklogBoard() {
               sprintId: targetSprintId || null,
             };
 
-            // 🛑 4. KHÔNG BAO GIỜ setBacklogItems nếu có sprint
+            // 4. KHÔNG BAO GIỜ setBacklogItems nếu có sprint
             if (targetSprintId) {
               setSprints((prev) =>
                 prev.map((s) =>
@@ -752,7 +754,7 @@ export default function BacklogBoard() {
             setOpenCreateTask(false);
             setActiveSprintForTask(null);
 
-            // 🔄 Đồng bộ server sau 800ms (KHÔNG show loading)
+            // Đồng bộ server sau 800ms (KHÔNG show loading)
             setTimeout(() => {
               fetchData(projectId, false);
             }, 800);
