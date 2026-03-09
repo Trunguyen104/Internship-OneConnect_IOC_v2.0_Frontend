@@ -290,7 +290,25 @@ export default function BacklogBoard() {
     });
     return map;
   }, [backlogItems, sprints]);
+  const handleDeleteSprint = async (sprintId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.')) return;
 
+    try {
+      // Giả sử service của bạn có hàm deleteSprint
+      const res = await productBacklogService.deleteSprint(projectId, sprintId);
+
+      if (res && res.isSuccess !== false) {
+        toast.success('Xóa Sprint thành công');
+        // Cập nhật lại state danh sách sprint ngay lập tức
+        setSprints(prev => prev.filter(s => s.sprintId !== sprintId));
+        fetchData(projectId, false); // Fetch lại để đồng bộ Backlog
+      } else {
+        toast.error(res.message || 'Không thể xóa Sprint');
+      }
+    } catch (err) {
+      toast.error('Lỗi server khi xóa Sprint');
+    }
+  };
   const handleSprintActionClick = (sprint, isStart) => {
     setSelectedSprintAction(sprint);
     if (isStart) {
@@ -441,9 +459,40 @@ export default function BacklogBoard() {
                         </button>
                       )}
 
-                      <button className='ml-3 p-1.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors'>
-                        <MoreVertical className='w-4 h-4' />
-                      </button>
+                      {/* Trong đoạn filteredSprints.map((sprint) => { ... }) */}
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className='ml-3 p-1.5 text-gray-500 hover:bg-gray-100 rounded-full transition-all outline-none 
+      data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:bg-gray-50'>
+                            <MoreVertical className='w-4 h-4' />
+                          </button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end" className="w-52 rounded-2xl shadow-xl border-gray-100 p-1">
+                          {/* Nút Chỉnh sửa */}
+                          <DropdownMenuItem
+                            onClick={() => {
+                              // Logic mở modal sửa sprint (ví dụ setOpenUpdateSprint(true))
+                              setSelectedSprintAction(sprint);
+                              console.log("Mở modal sửa cho sprint:", sprint.sprintId);
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl font-semibold text-gray-700 focus:bg-gray-50 transition-colors"
+                          >
+                            <Pencil className="w-4 h-4 text-blue-600" />
+                            Chỉnh sửa Sprint
+                          </DropdownMenuItem>
+
+                          {/* Nút Xóa - Sử dụng màu danger từ file CSS của bạn */}
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteSprint(sprint.sprintId)}
+                            className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl font-semibold text-danger focus:text-danger focus:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4 text-danger" />
+                            Xóa Sprint
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {/* List Container */}
