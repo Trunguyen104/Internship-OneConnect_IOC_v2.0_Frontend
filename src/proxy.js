@@ -8,9 +8,9 @@ export function proxy(request) {
     return NextResponse.redirect(new URL('/student/space', request.url));
   }
 
-  if (pathname.startsWith('/student') && !refreshToken) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  // if (pathname.startsWith('/student') && !refreshToken) {
+  //   return NextResponse.redirect(new URL('/login', request.url));
+  // }
 
   return NextResponse.next();
 }
