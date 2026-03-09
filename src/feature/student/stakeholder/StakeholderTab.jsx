@@ -228,21 +228,21 @@ export default function StakeholderTab() {
               <li
                 key={s.id}
                 className='group relative flex flex-col justify-between rounded-3xl border border-slate-200/70 bg-white p-6
-  transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:bg-white hover:shadow-xl hover:shadow-red-900/5'
+  transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:bg-white hover:shadow-xl hover:shadow-primary/5'
               >
                 <div className='min-w-0 flex-1 mb-6'>
                   <div className='flex items-start justify-between gap-4'>
                     <div className='flex-1'>
-                      <h3 className='truncate text-lg font-bold text-slate-800 group-hover:text-red-700 transition-colors'>
+                      <h3 className='truncate text-lg font-bold text-slate-800 group-hover:text-primary transition-colors'>
                         {s.name}
                       </h3>
                       <div className='mt-2 flex flex-wrap items-center gap-2'>
-                        <span className='inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 border border-red-100'>
+                        <span className='inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-xs font-semibold text-primary border border-primary/10'>
                           {s.role || STAKEHOLDER_UI.NO_ROLE}
                         </span>
                       </div>
                     </div>
-                    <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-xl font-bold text-slate-400 group-hover:bg-red-50 group-hover:text-red-500 transition-colors'>
+                    <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-xl font-bold text-slate-400 group-hover:bg-primary/5 group-hover:text-primary transition-colors'>
                       <UserOutlined />
                     </div>
                   </div>
@@ -301,7 +301,7 @@ export default function StakeholderTab() {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
-                      className='flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600'
+                      className='flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-primary/5 hover:text-primary'
                       title={STAKEHOLDER_UI.DELETE_BUTTON}
                     >
                       <DeleteOutlined className='text-[16px]' />
@@ -336,7 +336,7 @@ export default function StakeholderTab() {
             <div className='space-y-4 overflow-y-auto px-6 py-5'>
               <div>
                 <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-                  {STAKEHOLDER_UI.FIELD_NAME} <span className='text-red-500'>*</span>
+                  {STAKEHOLDER_UI.FIELD_NAME} <span className='text-primary'>*</span>
                 </label>
                 <input
                   value={stakeholderForm.name}
@@ -344,15 +344,15 @@ export default function StakeholderTab() {
                     setStakeholderForm({ ...stakeholderForm, name: e.target.value });
                     if (errors.name) setErrors({ ...errors, name: null });
                   }}
-                  className={`w-full rounded-xl border ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1`}
+                  className={`w-full rounded-xl border ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-primary focus:ring-primary/20'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1`}
                   placeholder={STAKEHOLDER_UI.PLACEHOLDER_NAME}
                 />
-                {errors.name && <p className='mt-1 text-xs text-red-500'>{errors.name}</p>}
+                {errors.name && <p className='mt-1 text-xs text-primary'>{errors.name}</p>}
               </div>
 
               <div>
                 <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-                  {STAKEHOLDER_UI.FIELD_EMAIL} <span className='text-red-500'>*</span>
+                  {STAKEHOLDER_UI.FIELD_EMAIL} <span className='text-primary'>*</span>
                 </label>
                 <input
                   disabled={!!editingStakeholderId}
@@ -362,10 +362,10 @@ export default function StakeholderTab() {
                     setStakeholderForm({ ...stakeholderForm, email: e.target.value });
                     if (errors.email) setErrors({ ...errors, email: null });
                   }}
-                  className={`w-full rounded-xl border ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500'} px-4 py-2.5 text-sm outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500 focus:ring-1`}
+                  className={`w-full rounded-xl border ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-primary focus:ring-primary/20'} px-4 py-2.5 text-sm outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500 focus:ring-1`}
                   placeholder={STAKEHOLDER_UI.PLACEHOLDER_EMAIL}
                 />
-                {errors.email && <p className='mt-1 text-xs text-red-500'>{errors.email}</p>}
+                {errors.email && <p className='mt-1 text-xs text-primary'>{errors.email}</p>}
               </div>
 
               <div>
@@ -378,7 +378,7 @@ export default function StakeholderTab() {
                     setStakeholderForm({ ...stakeholderForm, role: e.target.value });
                     if (errors.role) setErrors({ ...errors, role: null });
                   }}
-                  className={`w-full rounded-xl border ${errors.role ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 bg-white`}
+                  className={`w-full rounded-xl border ${errors.role ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-primary focus:ring-primary/20'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1 bg-white`}
                 >
                   <option value='' disabled>
                     {STAKEHOLDER_UI.ROLE_SELECT}
@@ -388,7 +388,7 @@ export default function StakeholderTab() {
                   <option value='Lecturer'>{STAKEHOLDER_UI.ROLE_LECTURER}</option>
                   <option value='Team Member'>{STAKEHOLDER_UI.ROLE_MEMBER}</option>
                 </select>
-                {errors.role && <p className='mt-1 text-xs text-red-500'>{errors.role}</p>}
+                {errors.role && <p className='mt-1 text-xs text-primary'>{errors.role}</p>}
               </div>
 
               <div>
@@ -401,11 +401,11 @@ export default function StakeholderTab() {
                     setStakeholderForm({ ...stakeholderForm, phoneNumber: e.target.value });
                     if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: null });
                   }}
-                  className={`w-full rounded-xl border ${errors.phoneNumber ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1`}
+                  className={`w-full rounded-xl border ${errors.phoneNumber ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-primary focus:ring-primary/20'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1`}
                   placeholder={STAKEHOLDER_UI.PLACEHOLDER_PHONE}
                 />
                 {errors.phoneNumber && (
-                  <p className='mt-1 text-xs text-red-500'>{errors.phoneNumber}</p>
+                  <p className='mt-1 text-xs text-primary'>{errors.phoneNumber}</p>
                 )}
               </div>
 
@@ -420,11 +420,11 @@ export default function StakeholderTab() {
                     setStakeholderForm({ ...stakeholderForm, description: e.target.value });
                     if (errors.description) setErrors({ ...errors, description: null });
                   }}
-                  className={`w-full resize-none rounded-xl border ${errors.description ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-blue-500 focus:ring-blue-500'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1`}
+                  className={`w-full resize-none rounded-xl border ${errors.description ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-200 focus:border-primary focus:ring-primary/20'} px-4 py-2.5 text-sm outline-none transition-all focus:ring-1`}
                   placeholder={STAKEHOLDER_UI.PLACEHOLDER_DESC}
                 />
                 {errors.description && (
-                  <p className='mt-1 text-xs text-red-500'>{errors.description}</p>
+                  <p className='mt-1 text-xs text-primary'>{errors.description}</p>
                 )}
               </div>
             </div>
@@ -441,7 +441,7 @@ export default function StakeholderTab() {
               </button>
               <button
                 onClick={handleSaveStakeholder}
-                className='rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 shadow-sm'
+                className='rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-hover shadow-sm'
               >
                 {editingStakeholderId ? STAKEHOLDER_UI.UPDATE : STAKEHOLDER_UI.SAVE}
               </button>
