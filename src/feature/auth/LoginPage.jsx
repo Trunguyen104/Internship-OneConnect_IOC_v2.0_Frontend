@@ -6,6 +6,7 @@ import { login } from '@/services/authService';
 import { setAccessToken } from '@/services/authStorage';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/providers/ToastProvider';
+import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -54,6 +55,35 @@ export default function LoginPage() {
       }
 
       setAccessToken(token, form.rememberMe);
+
+      setAccessToken(token, form.rememberMe);
+
+      try {
+        const decoded = jwtDecode(token);
+        console.log('Decoded Token:', decoded);
+
+        // .NET Identity typically puts roles here:
+        const roleClaim =
+          decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+          decoded.role ||
+          decoded.Role;
+
+        // Ensure roleClaim is an array if multiple roles exist, or just check the string
+        const roles = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+
+        const isEnterprise = roles.some(
+          (r) =>
+            r === '4' || r === '5' || r === 4 || r === 5 || r === 'EnterpriseAdmin' || r === 'HR',
+        );
+
+        if (isEnterprise) {
+          toast.success('Đăng nhập thành công (HR/Enterprise)');
+          router.push('/dashboard');
+          return;
+        }
+      } catch (err) {
+        console.warn('Failed to decode token for role routing', err);
+      }
 
       toast.success('Đăng nhập thành công');
       router.push('/internship-groups');

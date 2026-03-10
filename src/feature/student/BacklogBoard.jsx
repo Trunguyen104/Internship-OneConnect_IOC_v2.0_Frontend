@@ -291,7 +291,12 @@ export default function BacklogBoard() {
     return map;
   }, [backlogItems, sprints]);
   const handleDeleteSprint = async (sprintId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.')) return;
+    if (
+      !window.confirm(
+        'Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.',
+      )
+    )
+      return;
 
     try {
       // Giả sử service của bạn có hàm deleteSprint
@@ -300,7 +305,7 @@ export default function BacklogBoard() {
       if (res && res.isSuccess !== false) {
         toast.success('Xóa Sprint thành công');
         // Cập nhật lại state danh sách sprint ngay lập tức
-        setSprints(prev => prev.filter(s => s.sprintId !== sprintId));
+        setSprints((prev) => prev.filter((s) => s.sprintId !== sprintId));
         fetchData(projectId, false); // Fetch lại để đồng bộ Backlog
       } else {
         toast.error(res.message || 'Không thể xóa Sprint');
@@ -365,10 +370,11 @@ export default function BacklogBoard() {
           <div className='flex flex-col gap-1'>
             <button
               onClick={() => setSelectedEpicId('ALL')}
-              className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === 'ALL'
-                ? 'bg-[#F4F0FF] text-[#6333FF]'
-                : 'text-gray-700 hover:bg-gray-50'
-                }`}
+              className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${
+                selectedEpicId === 'ALL'
+                  ? 'bg-[#F4F0FF] text-[#6333FF]'
+                  : 'text-gray-700 hover:bg-gray-50'
+              }`}
             >
               Tất cả
             </button>
@@ -377,10 +383,11 @@ export default function BacklogBoard() {
               <button
                 key={epic.id}
                 onClick={() => setSelectedEpicId(epic.id)}
-                className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${selectedEpicId === epic.id
-                  ? 'bg-[#F4F0FF] text-[#6333FF]'
-                  : 'text-gray-700 hover:bg-gray-50'
-                  }`}
+                className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${
+                  selectedEpicId === epic.id
+                    ? 'bg-[#F4F0FF] text-[#6333FF]'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 <div className='truncate'>{epic.title || epic.name || 'Untitled Epic'}</div>
               </button>
@@ -443,7 +450,7 @@ export default function BacklogBoard() {
 
                       {/* Dynamic Start/Complete Sprint button based on status */}
                       {sprint.status?.toUpperCase() === 'ACTIVE' ||
-                        sprint.status?.toUpperCase() === 'IN_PROGRESS' ? (
+                      sprint.status?.toUpperCase() === 'IN_PROGRESS' ? (
                         <button
                           onClick={() => handleSprintActionClick(sprint, false)}
                           className='h-[34px] px-5 border border-green-200 bg-green-50 rounded-full text-[13px] font-medium text-green-700 hover:bg-green-100 transition-colors flex items-center shadow-sm'
@@ -463,32 +470,37 @@ export default function BacklogBoard() {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className='ml-3 p-1.5 text-gray-500 hover:bg-gray-100 rounded-full transition-all outline-none 
-      data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:bg-gray-50'>
+                          <button
+                            className='ml-3 p-1.5 text-gray-500 hover:bg-gray-100 rounded-full transition-all outline-none 
+      data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:bg-gray-50'
+                          >
                             <MoreVertical className='w-4 h-4' />
                           </button>
                         </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end" className="w-52 rounded-2xl shadow-xl border-gray-100 p-1">
+                        <DropdownMenuContent
+                          align='end'
+                          className='w-52 rounded-2xl shadow-xl border-gray-100 p-1'
+                        >
                           {/* Nút Chỉnh sửa */}
                           <DropdownMenuItem
                             onClick={() => {
                               // Logic mở modal sửa sprint (ví dụ setOpenUpdateSprint(true))
                               setSelectedSprintAction(sprint);
-                              console.log("Mở modal sửa cho sprint:", sprint.sprintId);
+                              console.log('Mở modal sửa cho sprint:', sprint.sprintId);
                             }}
-                            className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl font-semibold text-gray-700 focus:bg-gray-50 transition-colors"
+                            className='flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl font-semibold text-gray-700 focus:bg-gray-50 transition-colors'
                           >
-                            <Pencil className="w-4 h-4 text-blue-600" />
+                            <Pencil className='w-4 h-4 text-blue-600' />
                             Chỉnh sửa Sprint
                           </DropdownMenuItem>
 
                           {/* Nút Xóa - Sử dụng màu danger từ file CSS của bạn */}
                           <DropdownMenuItem
                             onClick={() => handleDeleteSprint(sprint.sprintId)}
-                            className="flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl font-semibold text-danger focus:text-danger focus:bg-red-50 transition-colors"
+                            className='flex items-center gap-3 px-4 py-3 cursor-pointer rounded-xl font-semibold text-danger focus:text-danger focus:bg-red-50 transition-colors'
                           >
-                            <Trash2 className="w-4 h-4 text-danger" />
+                            <Trash2 className='w-4 h-4 text-danger' />
                             Xóa Sprint
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -785,10 +797,10 @@ export default function BacklogBoard() {
                 prev.map((s) =>
                   s.sprintId === targetSprintId
                     ? {
-                      ...s,
-                      items: [...(s.items || []), optimisticItem],
-                      itemCount: (s.itemCount || 0) + 1,
-                    }
+                        ...s,
+                        items: [...(s.items || []), optimisticItem],
+                        itemCount: (s.itemCount || 0) + 1,
+                      }
                     : s,
                 ),
               );

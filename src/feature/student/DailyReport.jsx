@@ -208,8 +208,8 @@ export default function DailyReport() {
       } else {
         messageApi.error(
           res?.message ||
-          res?.data?.message ||
-          (editingId ? 'Failed to update logbook' : 'Failed to create logbook'),
+            res?.data?.message ||
+            (editingId ? 'Failed to update logbook' : 'Failed to create logbook'),
         );
       }
     } catch (error) {
