@@ -1,5 +1,3 @@
-'use client';
-
 import { Search, Filter } from 'lucide-react';
 import { useToast } from '@/providers/ToastProvider';
 import { productBacklogService } from '@/services/productbacklog.service';
@@ -9,20 +7,29 @@ import UpdateTaskModal from '@/shared/components/UpdateTaskModal';
 import CreateEpicModal from '@/feature/student/backlog-board/components/CreateEpicModal';
 import StartSprintModal from '@/feature/student/backlog-board/components/StartSprintModal';
 import CompleteSprintModal from '@/feature/student/backlog-board/components/CompleteSprintModal';
+import CreateSprintModal from '@/feature/student/backlog-board/components/CreateSprintModal';
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 
 import { useBacklogBoard } from './hooks/useBacklogBoard';
 import { EpicSidebar } from './components/EpicSidebar';
 import { SprintSection } from './components/SprintSection';
 import { BacklogSection } from './components/BacklogSection';
 
+import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@/constants/enums';
+
 export default function BacklogBoard() {
   const toast = useToast();
-  
+
   const {
     projectId,
     epics, setEpics,
     sprints, setSprints,
-    backlogItems, setBacklogItems,
+    setBacklogItems,
     loading,
     selectedEpicId, setSelectedEpicId,
     isSidebarOpen, setIsSidebarOpen,
@@ -30,7 +37,7 @@ export default function BacklogBoard() {
     filteredSprints,
     itemOrders,
     activeSprintForTask, setActiveSprintForTask,
-    
+
     openCreateEpic, setOpenCreateEpic,
     openCreateTask, setOpenCreateTask,
     openUpdateTask, setOpenUpdateTask,
@@ -38,12 +45,22 @@ export default function BacklogBoard() {
     openStartSprint, setOpenStartSprint,
     openCompleteSprint, setOpenCompleteSprint,
     selectedSprintAction, setSelectedSprintAction,
-    
-    fetchData,
+
+    handleQuickCreateSprint,
     handleDeleteSprint,
     handleSprintActionClick,
-    handleQuickCreateSprint
+    fetchData,
+    openCreateSprint, setOpenCreateSprint,
+    handleDragEnd,
   } = useBacklogBoard();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3,
+      },
+    }),
+  );
 
   const formatToDateOnly = (dateString) => {
     if (!dateString) return null;
@@ -57,7 +74,7 @@ export default function BacklogBoard() {
   return (
     <div className='flex gap-6 w-full h-[calc(100vh-140px)] bg-slate-50 relative'>
       {/* Sidebar Epics */}
-      <EpicSidebar 
+      <EpicSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         epics={epics}
@@ -84,42 +101,44 @@ export default function BacklogBoard() {
           </button>
         </div>
 
-        {loading ? (
-          <div className='text-center py-10 text-slate-500'>Đang tải dữ liệu...</div>
-        ) : (
-          <div className='overflow-x-auto pb-4'>
-            <div className='min-w-[1000px] pr-2'>
-              {/* SPRINTS */}
-              {filteredSprints.map((sprint) => (
-                <SprintSection 
-                  key={sprint.sprintId}
-                  sprint={sprint}
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+          {loading ? (
+            <div className='text-center py-10 text-slate-500'>Đang tải dữ liệu...</div>
+          ) : (
+            <div className='overflow-x-auto pb-4'>
+              <div className='min-w-[1000px] pr-2'>
+                {/* SPRINTS */}
+                {filteredSprints.map((sprint) => (
+                  <SprintSection
+                    key={sprint.sprintId}
+                    sprint={sprint}
+                    projectId={projectId}
+                    itemOrders={itemOrders}
+                    handleSprintActionClick={handleSprintActionClick}
+                    handleDeleteSprint={handleDeleteSprint}
+                    setSelectedSprintAction={setSelectedSprintAction}
+                    setSelectedTask={setSelectedTask}
+                    setOpenUpdateTask={setOpenUpdateTask}
+                    setActiveSprintForTask={setActiveSprintForTask}
+                    setOpenCreateTask={setOpenCreateTask}
+                  />
+                ))}
+
+                {/* BACKLOG (Unassigned) */}
+                <BacklogSection
+                  filteredBacklogItems={filteredBacklogItems}
                   projectId={projectId}
                   itemOrders={itemOrders}
-                  handleSprintActionClick={handleSprintActionClick}
-                  handleDeleteSprint={handleDeleteSprint}
-                  setSelectedSprintAction={setSelectedSprintAction}
+                  handleQuickCreateSprint={handleQuickCreateSprint}
                   setSelectedTask={setSelectedTask}
                   setOpenUpdateTask={setOpenUpdateTask}
                   setActiveSprintForTask={setActiveSprintForTask}
                   setOpenCreateTask={setOpenCreateTask}
                 />
-              ))}
-
-              {/* BACKLOG (Unassigned) */}
-              <BacklogSection 
-                filteredBacklogItems={filteredBacklogItems}
-                projectId={projectId}
-                itemOrders={itemOrders}
-                handleQuickCreateSprint={handleQuickCreateSprint}
-                setSelectedTask={setSelectedTask}
-                setOpenUpdateTask={setOpenUpdateTask}
-                setActiveSprintForTask={setActiveSprintForTask}
-                setOpenCreateTask={setOpenCreateTask}
-              />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </DndContext>
       </div>
 
       {/* Modals */}
@@ -129,24 +148,34 @@ export default function BacklogBoard() {
         onSubmit={async (payload) => {
           try {
             const apiPayload = {
-              title: payload.name,
+              projectId,
               name: payload.name,
+              title: payload.name, // Cover both Name and Title common patterns
+              nane: payload.name,  // Cover suspicious typo from Swagger screenshot
               description: payload.description,
               endDate: payload.endDate,
             };
             const res = await productBacklogService.createEpic(projectId, apiPayload);
             if (res && res.isSuccess === false) {
-              toast.error('Lỗi khi tạo epic');
+              toast.error(res.message || 'Lỗi khi tạo epic');
               return;
             }
             toast.success('Tạo Epic thành công');
             setOpenCreateEpic(false);
+
             if (res?.data) {
-              setEpics((prev) => [...prev, res.data]);
+              // Normalize the new epic immediately so sidebar works
+              const newEpic = {
+                ...res.data,
+                id: res.data.id || res.data.workItemId,
+                title: res.data.title || res.data.name || payload.name,
+              };
+              setEpics((prev) => [...prev, newEpic]);
             } else {
               fetchData(projectId);
             }
-          } catch {
+          } catch (error) {
+            console.error('CREATE EPIC ERROR:', error);
             toast.error('Lỗi mạng khi tạo Epic');
           }
         }}
@@ -160,14 +189,20 @@ export default function BacklogBoard() {
         onSubmit={async (payload) => {
           try {
             if (!selectedSprintAction) return;
+
+            const targetId = selectedSprintAction.sprintId || selectedSprintAction.id;
+
             const startPayload = {
+              projectId,
+              name: payload.name,
+              goal: payload.goal,
               startDate: formatToDateOnly(payload.startDate),
               endDate: formatToDateOnly(payload.endDate),
             };
 
             const resStart = await productBacklogService.startSprint(
               projectId,
-              selectedSprintAction.sprintId,
+              targetId,
               startPayload,
             );
 
@@ -176,7 +211,7 @@ export default function BacklogBoard() {
               setSprints((prevSprints) =>
                 prevSprints.map((s) =>
                   s.sprintId === selectedSprintAction.sprintId
-                    ? { ...s, status: 'ACTIVE' }
+                    ? { ...s, status: SPRINT_STATUS.ACTIVE }
                     : s,
                 ),
               );
@@ -199,6 +234,7 @@ export default function BacklogBoard() {
             if (!selectedSprintAction) return;
 
             const completePayload = {
+              projectId,
               incompleteItemsOption: payload.incompleteItemsOption,
               targetSprintId: payload.targetSprintId,
               newSprintName: payload.newSprintName || '',
@@ -206,7 +242,7 @@ export default function BacklogBoard() {
 
             const resComp = await productBacklogService.completeSprint(
               projectId,
-              selectedSprintAction.sprintId,
+              selectedSprintAction.sprintId || selectedSprintAction.id,
               completePayload,
             );
 
@@ -217,16 +253,16 @@ export default function BacklogBoard() {
             toast.success('Hoàn thành Sprint thành công');
             setOpenCompleteSprint(false);
 
-            if (payload.incompleteItemsOption === 'ToBacklog') {
+            if (payload.incompleteItemsOption === MOVE_INCOMPLETE_ITEMS_OPTION.TO_BACKLOG) {
               const undoneItems = selectedSprintAction.items.filter((it) => {
-                const status = (it.status?.name || it.status || '').toUpperCase();
-                return !['DONE', 'COMPLETED', 'CLOSED'].includes(status);
+                const status = it.status?.name || it.status;
+                return status !== WORK_ITEM_STATUS.DONE && status !== 'DONE';
               });
 
               setBacklogItems((prev) => [...prev, ...undoneItems]);
             }
 
-            setSprints((prev) => prev.filter((s) => s.sprintId !== selectedSprintAction.sprintId));
+            setSprints((prev) => prev.filter((s) => (s.sprintId || s.id) !== (selectedSprintAction.sprintId || selectedSprintAction.id)));
 
             setTimeout(() => {
               fetchData(projectId, false);
@@ -237,7 +273,7 @@ export default function BacklogBoard() {
           }
         }}
       />
-      
+
       <CreateTaskModal
         open={openCreateTask}
         epics={epics}
@@ -252,15 +288,17 @@ export default function BacklogBoard() {
             const targetSprintId = payload.sprintId || activeSprintForTask;
 
             const apiPayload = {
+              projectId,
               title: payload.summary,
+              name: payload.summary, // Redundant field for compatibility
               description: payload.description,
               type: payload.type,
               status: payload.status,
               priority: payload.priority,
               parentId: payload.epic || null,
               assigneeId: payload.assignee || null,
-              dueDate: payload.dueDate,
-              storyPoint: payload.points || 0,
+              dueDate: formatToDateOnly(payload.dueDate),
+              storyPoint: payload.points,
               sprintId: targetSprintId || null,
             };
 
@@ -330,15 +368,17 @@ export default function BacklogBoard() {
         onSubmit={async (payload) => {
           try {
             const apiPayload = {
+              projectId,
               title: payload.summary,
+              name: payload.summary, // Redundancy
               description: payload.description,
               type: payload.type,
               status: payload.status,
               priority: payload.priority,
               parentId: payload.epic || null,
               assigneeId: payload.assignee || null,
-              dueDate: payload.dueDate,
-              storyPoint: payload.points || 0,
+              dueDate: formatToDateOnly(payload.dueDate),
+              storyPoint: payload.points,
             };
 
             const currentSprintId = selectedTask?.sprintId;
@@ -374,6 +414,32 @@ export default function BacklogBoard() {
           } catch (error) {
             console.error('UPDATE ERROR:', error);
             toast.error('Lỗi khi cập nhật nhiệm vụ');
+          }
+        }}
+      />
+
+      <CreateSprintModal
+        open={openCreateSprint}
+        projectId={projectId}
+        onClose={() => setOpenCreateSprint(false)}
+        onSubmit={async (payload) => {
+          try {
+            const apiPayload = {
+              projectId,
+              ...payload,
+            };
+            const res = await productBacklogService.createSprint(projectId, apiPayload);
+            if (res && res.isSuccess === false) {
+              toast.error(res.message || 'Lỗi khi tạo Sprint');
+              return;
+            }
+
+            toast.success('Tạo Sprint thành công!');
+            setOpenCreateSprint(false);
+            fetchData(projectId, false);
+          } catch (err) {
+            console.error('CREATE SPRINT ERROR:', err);
+            toast.error('Lỗi server khi tạo Sprint');
           }
         }}
       />

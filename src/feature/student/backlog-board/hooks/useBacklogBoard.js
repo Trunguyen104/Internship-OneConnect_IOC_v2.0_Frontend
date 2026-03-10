@@ -28,6 +28,7 @@ export function useBacklogBoard() {
   const [openStartSprint, setOpenStartSprint] = useState(false);
   const [openCompleteSprint, setOpenCompleteSprint] = useState(false);
   const [selectedSprintAction, setSelectedSprintAction] = useState(null);
+  const [openCreateSprint, setOpenCreateSprint] = useState(false);
 
   // Initialize Project
   useEffect(() => {
@@ -62,11 +63,29 @@ export function useBacklogBoard() {
         if (resEpics?.data?.items) epicsData = resEpics.data.items;
         else if (resEpics?.data) epicsData = resEpics.data;
         else if (Array.isArray(resEpics)) epicsData = resEpics;
-        setEpics(Array.isArray(epicsData) ? epicsData : []);
+
+        // Ensure each epic has an 'id' field (mapped from workItemId if necessary)
+        const normalizedEpics = Array.isArray(epicsData)
+          ? epicsData.map((e) => ({
+              ...e,
+              id: e.id || e.workItemId,
+            }))
+          : [];
+
+        setEpics(normalizedEpics);
 
         // Parse Sprint/Backlog
         if (resBacklog?.data) {
-          setSprints(resBacklog.data.sprints || []);
+          const rawSprints = resBacklog.data.sprints || [];
+          const normalizedSprints = rawSprints.map((s) => ({
+            ...s,
+            sprintId: s.sprintId || s.id,
+            items: (s.items || []).map((it) => ({
+              ...it,
+              id: it.workItemId || it.id,
+            })),
+          }));
+          setSprints(normalizedSprints);
 
           let bkItems = [];
           if (resBacklog.data.productBacklog?.items) {
@@ -74,7 +93,12 @@ export function useBacklogBoard() {
           } else if (resBacklog.data.items) {
             bkItems = resBacklog.data.items;
           }
-          setBacklogItems(bkItems);
+          
+          const normalizedBkItems = bkItems.map((it) => ({
+            ...it,
+            id: it.workItemId || it.id,
+          }));
+          setBacklogItems(normalizedBkItems);
         }
       } catch (err) {
         console.error('Fetch Data failed:', err);
@@ -168,19 +192,8 @@ export function useBacklogBoard() {
   };
 
   const handleQuickCreateSprint = async () => {
-    try {
-      const sprintNum = sprints.length + 1;
-      const payload = { name: `Sprint ${sprintNum}`, title: `Sprint ${sprintNum}` };
-      const res = await productBacklogService.createSprint(projectId, payload);
-      if (res && res.isSuccess === false) {
-        toast.error(res.message || 'Lỗi khi tạo Sprint');
-      } else {
-        toast.success('Đã tạo một Sprint mới');
-        fetchData(projectId);
-      }
-    } catch {
-      toast.error('Lỗi khi tạo Sprint');
-    }
+    // Instead of quick creation, we now open the dedicated modal
+    setOpenCreateSprint(true);
   };
 
   return {
@@ -210,11 +223,108 @@ export function useBacklogBoard() {
     openStartSprint, setOpenStartSprint,
     openCompleteSprint, setOpenCompleteSprint,
     selectedSprintAction, setSelectedSprintAction,
+    openCreateSprint, setOpenCreateSprint,
     
     // Actions
     fetchData,
     handleDeleteSprint,
     handleSprintActionClick,
-    handleQuickCreateSprint
+    handleQuickCreateSprint,
+    
+    // Drag and Drop Handler
+    handleDragEnd: async (event) => {
+      const { active, over } = event;
+      if (!over) return;
+
+      const activeId = active.id;
+      const overId = over.id;
+
+      let sourceSprintId = null;
+      let draggedItem = null;
+
+      // Find identifying the source and the item
+      for (const s of sprints) {
+        const found = (s.items || []).find((it) => (it.workItemId || it.id) === activeId);
+        if (found) {
+          sourceSprintId = s.sprintId;
+          draggedItem = { ...found, workItemId: found.workItemId || found.id };
+          break;
+        }
+      }
+
+      if (!draggedItem) {
+        const found = backlogItems.find((it) => (it.workItemId || it.id) === activeId);
+        if (found) {
+          draggedItem = { ...found, workItemId: found.workItemId || found.id };
+        }
+      }
+
+      if (!draggedItem) return;
+      
+      const workItemId = draggedItem.workItemId;
+
+      // Destination logic
+      if (overId === 'BACKLOG') {
+        if (sourceSprintId === null) return; // Already in backlog
+
+        // CASE 2: Sprint to Backlog
+        try {
+          // Optimistic local update
+          setSprints(prev => prev.map(s => 
+            s.sprintId === sourceSprintId 
+              ? { ...s, items: s.items.filter(it => (it.workItemId || it.id) !== activeId) }
+              : s
+          ));
+          setBacklogItems(prev => [...prev, draggedItem]);
+
+          const res = await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
+          if (res?.isSuccess === false || res?.success === false) {
+            throw new Error(res.message || res.data?.message || 'Không thể chuyển về Backlog');
+          }
+          toast.success('Đã chuyển nhiệm vụ về Backlog');
+        } catch (err) {
+          console.error('DND Error:', err);
+          toast.error(err.message || 'Lỗi khi chuyển về Backlog');
+          fetchData(projectId, false);
+        }
+      } else {
+        // Destination is a Sprint (overId is sprintId)
+        const targetSprintId = overId;
+        if (sourceSprintId === targetSprintId) return;
+
+        // CASE 1 & 3: Backlog to Sprint or Sprint to Sprint
+        try {
+          // Optimistic local update
+          if (sourceSprintId) {
+            setSprints(prev => prev.map(s => 
+              s.sprintId === sourceSprintId 
+                ? { ...s, items: s.items.filter(it => (it.workItemId || it.id) !== activeId) }
+                : s.sprintId === targetSprintId
+                ? { ...s, items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }] }
+                : s
+            ));
+          } else {
+            setBacklogItems(prev => prev.filter(it => (it.workItemId || it.id) !== activeId));
+            setSprints(prev => prev.map(s => 
+              s.sprintId === targetSprintId
+                ? { ...s, items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }] }
+                : s
+            ));
+          }
+
+          console.log(`Moving item ${workItemId} to sprint ${targetSprintId}`);
+          const res = await productBacklogService.moveWorkItemToSprint(projectId, workItemId, targetSprintId);
+          
+          if (res?.isSuccess === false || res?.success === false) {
+            throw new Error(res.message || res.data?.message || 'Không thể chuyển vào Sprint');
+          }
+          toast.success('Đã chuyển nhiệm vụ vào Sprint');
+        } catch (err) {
+          console.error('DND Error:', err);
+          toast.error(err.message || 'Lỗi khi chuyển vào Sprint');
+          fetchData(projectId, false);
+        }
+      }
+    }
   };
 }

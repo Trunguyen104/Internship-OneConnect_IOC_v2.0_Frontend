@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@/constants/enums';
 
 export default function CompleteSprintModal({ open, sprint, sprints, onClose, onSubmit }) {
   const [moveOption, setMoveOption] = useState('backlog'); // Mặc định chọn Backlog cho an toàn
@@ -9,14 +10,16 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
 
   const sprintItems = sprint?.items || [];
   const undoneItems = sprintItems.filter((it) => {
-    const status = (it.status?.name || it.status || '').toUpperCase();
-    return !['DONE', 'COMPLETED', 'CLOSED'].includes(status);
+    const status = it.status?.name || it.status;
+    return status !== WORK_ITEM_STATUS.DONE && status !== 'DONE';
   });
 
   // SỬA LỖI: Lọc Sprint dự kiến (Chấp nhận cả khi status bị null/undefined như trong log của bạn)
   const futureSprints = useMemo(() => {
     return (sprints || []).filter(
-      (s) => s.sprintId !== sprint?.sprintId && (!s.status || s.status.toUpperCase() === 'PLANNED'),
+      (s) =>
+        s.sprintId !== sprint?.sprintId &&
+        (!s.status || s.status === SPRINT_STATUS.PLANNED || (typeof s.status === 'string' && s.status.toUpperCase() === 'PLANNED')),
     );
   }, [sprints, sprint]);
 
@@ -30,14 +33,14 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
   if (!open) return null;
 
   const handleSubmit = () => {
-    let option = 'ToBacklog';
+    let option = MOVE_INCOMPLETE_ITEMS_OPTION.TO_BACKLOG;
     let targetId = null;
 
     if (moveOption === 'next') {
-      option = 'ToNextPlannedSprint';
+      option = MOVE_INCOMPLETE_ITEMS_OPTION.TO_NEXT_PLANNED_SPRINT;
       targetId = selectedNextSprintId;
     } else if (moveOption === 'new') {
-      option = 'CreateNewSprint';
+      option = MOVE_INCOMPLETE_ITEMS_OPTION.CREATE_NEW_SPRINT;
     }
 
     // Gửi đúng 3 trường Backend cần để xử lý logic "quăng" issue

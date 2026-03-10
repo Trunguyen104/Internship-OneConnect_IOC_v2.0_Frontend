@@ -89,6 +89,8 @@ function TextInput({ value, onChange, placeholder = '' }) {
   );
 }
 
+import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
+
 export default function UpdateTaskModal({
   open,
   onClose,
@@ -100,10 +102,10 @@ export default function UpdateTaskModal({
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
 
-  const [type, setType] = useState('UserStory');
-  const [status, setStatus] = useState('TODO');
+  const [type, setType] = useState(WORK_ITEM_TYPE.USER_STORY);
+  const [status, setStatus] = useState(WORK_ITEM_STATUS.TODO);
   const [assignee, setAssignee] = useState('');
-  const [priority, setPriority] = useState('MEDIUM');
+  const [priority, setPriority] = useState(WORK_ITEM_PRIORITY.MEDIUM);
 
   const [epic, setEpic] = useState('');
   const [sprintId, setSprintId] = useState('');
@@ -115,13 +117,34 @@ export default function UpdateTaskModal({
       /* eslint-disable react-hooks/set-state-in-effect */
       setSummary(initialData.title || initialData.name || '');
       setDesc(initialData.description || '');
-      setType(initialData.type || 'UserStory');
-      const st = initialData.status?.toUpperCase() || 'TODO';
-      setStatus(st);
+
+      // Determine mapping for numeric or string types
+      const t = initialData.type;
+      if (typeof t === 'number') setType(t);
+      else if (t === 'Epic') setType(WORK_ITEM_TYPE.EPIC);
+      else if (t === 'UserStory') setType(WORK_ITEM_TYPE.USER_STORY);
+      else if (t === 'Task') setType(WORK_ITEM_TYPE.TASK);
+      else if (t === 'Subtask') setType(WORK_ITEM_TYPE.SUBTASK);
+      else setType(WORK_ITEM_TYPE.USER_STORY);
+
+      const st = initialData.status?.name || initialData.status;
+      if (typeof st === 'number') setStatus(st);
+      else if (st === 'TODO') setStatus(WORK_ITEM_STATUS.TODO);
+      else if (st === 'IN_PROGRESS') setStatus(WORK_ITEM_STATUS.IN_PROGRESS);
+      else if (st === 'REVIEW') setStatus(WORK_ITEM_STATUS.REVIEW);
+      else if (st === 'DONE') setStatus(WORK_ITEM_STATUS.DONE);
+      else if (st === 'CANCELLED') setStatus(WORK_ITEM_STATUS.CANCELLED);
+      else setStatus(WORK_ITEM_STATUS.TODO);
+
       setAssignee(initialData.assigneeId || '');
 
-      const pr = initialData.priority?.toUpperCase() || 'MEDIUM';
-      setPriority(pr);
+      const pr = initialData.priority?.name || initialData.priority;
+      if (typeof pr === 'number') setPriority(pr);
+      else if (pr === 'LOW') setPriority(WORK_ITEM_PRIORITY.LOW);
+      else if (pr === 'MEDIUM') setPriority(WORK_ITEM_PRIORITY.MEDIUM);
+      else if (pr === 'HIGH') setPriority(WORK_ITEM_PRIORITY.HIGH);
+      else if (pr === 'CRITICAL') setPriority(WORK_ITEM_PRIORITY.CRITICAL);
+      else setPriority(WORK_ITEM_PRIORITY.MEDIUM);
 
       setEpic(initialData.parentId || '');
 
@@ -254,11 +277,11 @@ export default function UpdateTaskModal({
                         value={status}
                         onChange={setStatus}
                         options={[
-                          { value: 'TODO', label: 'To Do' },
-                          { value: 'IN_PROGRESS', label: 'In Progress' },
-                          { value: 'IN_REVIEW', label: 'In Review' },
-                          { value: 'DONE', label: 'Done' },
-                          { value: 'CLOSED', label: 'Closed' },
+                          { value: WORK_ITEM_STATUS.TODO, label: 'To Do' },
+                          { value: WORK_ITEM_STATUS.IN_PROGRESS, label: 'In Progress' },
+                          { value: WORK_ITEM_STATUS.REVIEW, label: 'Review' },
+                          { value: WORK_ITEM_STATUS.DONE, label: 'Done' },
+                          { value: WORK_ITEM_STATUS.CANCELLED, label: 'Cancelled' },
                         ]}
                       />
                     </div>
@@ -274,10 +297,10 @@ export default function UpdateTaskModal({
                         value={type}
                         onChange={setType}
                         options={[
-                          { value: 'UserStory', label: 'User Story' },
-                          { value: 'Task', label: 'Task' },
-                          { value: 'Subtask', label: 'Subtask' },
-                          { value: 'Bug', label: 'Bug' },
+                          { value: WORK_ITEM_TYPE.EPIC, label: 'Epic' },
+                          { value: WORK_ITEM_TYPE.USER_STORY, label: 'User Story' },
+                          { value: WORK_ITEM_TYPE.TASK, label: 'Task' },
+                          { value: WORK_ITEM_TYPE.SUBTASK, label: 'Subtask' },
                         ]}
                       />
                     </div>
@@ -343,9 +366,10 @@ export default function UpdateTaskModal({
                         value={priority}
                         onChange={setPriority}
                         options={[
-                          { value: 'LOW', label: 'Low' },
-                          { value: 'MEDIUM', label: 'Medium' },
-                          { value: 'HIGH', label: 'High' },
+                          { value: WORK_ITEM_PRIORITY.LOW, label: 'Low' },
+                          { value: WORK_ITEM_PRIORITY.MEDIUM, label: 'Medium' },
+                          { value: WORK_ITEM_PRIORITY.HIGH, label: 'High' },
+                          { value: WORK_ITEM_PRIORITY.CRITICAL, label: 'Critical' },
                         ]}
                       />
                     </div>

@@ -1,3 +1,4 @@
+import { useDroppable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { WorkItem, ColumnHeaders } from './WorkItem';
 import { productBacklogService } from '@/services/productbacklog.service';
@@ -12,8 +13,17 @@ export function BacklogSection({
   setActiveSprintForTask,
   setOpenCreateTask
 }) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: 'BACKLOG',
+  });
+
   return (
-    <div className='rounded-3xl bg-white border border-gray-100 shadow-sm p-6 mt-8'>
+    <div 
+      ref={setNodeRef}
+      className={`rounded-3xl bg-white border shadow-sm p-6 mt-8 transition-colors ${
+        isOver ? 'bg-blue-50/50 border-primary border-dashed' : 'border-gray-100'
+      }`}
+    >
       <div className='flex items-center mb-6 pl-2 pr-1'>
         <div className='w-4 h-4 rounded border border-gray-300 mr-4 flex-shrink-0' />
         <h3 className='text-[16px] font-bold text-gray-900'>Backlog</h3>
@@ -50,6 +60,11 @@ export function BacklogSection({
             }}
           />
         ))}
+        {isOver && (
+          <div className='h-16 border-2 border-dashed border-primary/30 rounded-xl bg-primary/5 flex items-center justify-center text-primary text-sm font-medium'>
+            Thả vào đây để đưa về Backlog
+          </div>
+        )}
       </div>
 
       <div className='flex items-center gap-6 mt-4 pl-2'>
