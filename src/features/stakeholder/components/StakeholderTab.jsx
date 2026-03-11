@@ -2,7 +2,7 @@
 
 import SearchBar from '@/components/ui/SearchBar';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-import { useStakeholderTab } from './hooks/useStakeholderTab';
+import { useStakeholderTab } from '../hooks/useStakeholderTab';
 import StakeholderList from './StakeholderList';
 import StakeholderFormModal from './StakeholderFormModal';
 

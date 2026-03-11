@@ -4,7 +4,7 @@ import Card from '@/components/ui/Card';
 import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
-import { useIssueTab } from './hooks/useIssueTab';
+import { useIssueTab } from '../hooks/useIssueTab';
 import IssueTable from './IssueTable';
 import IssueFormModal from './IssueFormModal';
 import IssueDetailModal from './IssueDetailModal';

@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { useLogin } from './hooks/useLogin';
-import LoginHeader from './components/LoginHeader';
-import LoginForm from './components/LoginForm';
-import LoginBranding from './components/LoginBranding';
+import { useLogin } from '../hooks/useLogin';
+import LoginHeader from './LoginHeader';
+import LoginForm from './LoginForm';
+import LoginBranding from './LoginBranding';
 
 export default function LoginPage() {
   const { form, errors, handleChange, handleSubmit } = useLogin();

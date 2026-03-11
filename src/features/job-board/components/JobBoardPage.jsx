@@ -1,9 +1,9 @@
 'use client';
 
 import { Row, Col } from 'antd';
-import SearchBar from './components/SearchBar';
-import FilterBar from './components/FilterBar';
-import JobCard from './components/JobCard';
+import SearchBar from './SearchBar';
+import FilterBar from './FilterBar';
+import JobCard from './JobCard';
 
 const MOCK_JOBS = Array(6).fill({
   title: 'Nhân Viên Kinh Doanh',

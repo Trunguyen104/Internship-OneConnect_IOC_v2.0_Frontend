@@ -2,9 +2,9 @@ import React from 'react';
 import { Skeleton, Empty } from 'antd';
 import Header from '@/components/layout/Header';
 
-import { useInternshipPlacement } from './hooks/useInternshipPlacement';
-import { CurrentCycle } from './components/CurrentCycle';
-import { CompletedCycles } from './components/CompletedCycles';
+import { useInternshipPlacement } from '../hooks/useInternshipPlacement';
+import { CurrentCycle } from './CurrentCycle';
+import { CompletedCycles } from './CompletedCycles';
 
 const InternshipPlacementDashboard = () => {
   const { loading, activeCycle, completedCycles, placementData, placementStatus } = useInternshipPlacement();

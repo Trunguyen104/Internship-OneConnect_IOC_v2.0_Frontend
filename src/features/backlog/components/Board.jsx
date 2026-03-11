@@ -12,7 +12,7 @@ import {
 
 import UpdateTaskModal from '@/features/backlog/components/UpdateTaskModal';
 
-import { useBoard, COLUMNS } from './hooks/useBoard';
+import { useBoard, COLUMNS } from '../hooks/useBoard';
 import { BoardColumn } from './BoardColumn';
 import { IssueCard } from './IssueCard';
 

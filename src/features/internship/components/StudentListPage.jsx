@@ -3,9 +3,9 @@
 import React from 'react';
 import { Input, Empty } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
-import { useStudentList } from './hooks/useStudentList';
-import GroupInfoCard from './components/GroupInfoCard';
-import StudentTable from './components/StudentTable';
+import { useStudentList } from '../hooks/useStudentList';
+import GroupInfoCard from './GroupInfoCard';
+import StudentTable from './StudentTable';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
