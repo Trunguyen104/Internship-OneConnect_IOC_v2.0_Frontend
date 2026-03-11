@@ -1,4 +1,4 @@
-import ChangePass from '@/features/user/components/ChangePass';
+import ChangePass from '@/components/features/user/components/ChangePass';
 import React from 'react';
 
 function page() {

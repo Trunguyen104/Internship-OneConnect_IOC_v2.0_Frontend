@@ -1,4 +1,4 @@
-import ForgotPasswordPage from '@/features/auth/components/ForgotPassword';
+import ForgotPasswordPage from '@/components/features/auth/components/ForgotPassword';
 import React from 'react';
 
 export const metadata = {
