@@ -5,9 +5,9 @@ import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 import { useIssueTab } from './hooks/useIssueTab';
-import IssueTable from './components/IssueTable';
-import IssueFormModal from './components/IssueFormModal';
-import IssueDetailModal from './components/IssueDetailModal';
+import IssueTable from './IssueTable';
+import IssueFormModal from './IssueFormModal';
+import IssueDetailModal from './IssueDetailModal';
 
 export default function IssueTab() {
   const {
@@ -89,4 +89,3 @@ export default function IssueTab() {
     </>
   );
 }
-

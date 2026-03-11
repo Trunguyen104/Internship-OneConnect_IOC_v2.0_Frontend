@@ -2,7 +2,8 @@
 
 import dayjs from 'dayjs';
 import { Popconfirm } from 'antd';
-import { CheckCircleOutlined, SyncOutlined, DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
+import IssueStatusTag from './ui/IssueStatusTag';
 
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
@@ -92,20 +93,7 @@ export default function IssueTable({
                         </div>
                       </td>
                       <td className='px-6 py-4'>
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${
-                            i.status === ISSUE_STATUS.RESOLVED || i.status === 'Đã giải quyết'
-                              ? 'border-green-200 bg-green-50 text-green-700'
-                              : 'border-orange-200 bg-orange-50 text-orange-700'
-                          }`}
-                        >
-                          {i.status === ISSUE_STATUS.RESOLVED || i.status === 'Đã giải quyết' ? (
-                            <CheckCircleOutlined />
-                          ) : (
-                            <SyncOutlined spin />
-                          )}
-                          {ISSUE_STATUS_LABEL[i.status] || ISSUE_UI.STATUS.PROCESSING}
-                        </span>
+                        <IssueStatusTag status={i.status} />
                       </td>
                       <td className='px-6 py-4 text-sm text-slate-600'>
                         {dayjs(i.createdAt).format('DD/MM/YYYY')}
@@ -148,4 +136,3 @@ export default function IssueTable({
     </div>
   );
 }
-

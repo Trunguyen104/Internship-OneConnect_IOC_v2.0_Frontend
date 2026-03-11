@@ -5,9 +5,9 @@ import { PlusOutlined, FilterOutlined } from '@ant-design/icons';
 import { Select, Button } from 'antd';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
-import LogbookTable from './components/LogbookTable';
-import LogbookFormModal from './components/LogbookFormModal';
-import LogbookDetailModal from './components/LogbookDetailModal';
+import LogbookTable from './LogbookTable';
+import LogbookFormModal from './LogbookFormModal';
+import LogbookDetailModal from './LogbookDetailModal';
 import { useLogbook } from './hooks/useLogbook';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
@@ -201,4 +201,3 @@ export default function LogbookPage() {
     </section>
   );
 }
-

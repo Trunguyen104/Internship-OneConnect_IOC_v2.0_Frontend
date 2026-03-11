@@ -3,6 +3,7 @@
 import dayjs from 'dayjs';
 import { CloseOutlined } from '@ant-design/icons';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+import IssueStatusTag from './ui/IssueStatusTag';
 
 export default function IssueDetailModal({ issue, onClose }) {
   if (!issue) return null;
@@ -35,7 +36,9 @@ export default function IssueDetailModal({ issue, onClose }) {
 
           <div>
             <p className='text-slate-500'>{ISSUE_UI.TABLE.STATUS}</p>
-            <p>{issue.status}</p>
+            <div className='mt-1'>
+              <IssueStatusTag status={issue.status} />
+            </div>
           </div>
 
           <div className='grid grid-cols-2 gap-4'>
@@ -54,4 +57,3 @@ export default function IssueDetailModal({ issue, onClose }) {
     </div>
   );
 }
-

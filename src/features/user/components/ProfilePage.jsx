@@ -5,63 +5,40 @@ import ProfileInfo from './components/ProfileInfo';
 import SkillList from './components/SkillList';
 
 export default function ProfilePage() {
-  const {
-    userInfo,
-    loadingUser,
-    avatarUrl,
-    setAvatarUrl,
-    skills,
-    showAddForm,
-    setShowAddForm,
-    newSkill,
-    setNewSkill,
-    skillError,
-    setSkillError,
-    editMode,
-    setEditMode,
-    editingSkill,
-    setEditingSkill,
-    editForm,
-    setEditForm,
-    handleAddSkill,
-    handleDeleteSelected,
-    updateSkill,
-    deleteSkill,
-    selectMode,
-    selectedSkills,
-  } = useProfile();
+  const profile = useProfile();
+
+  const skillProps = {
+    skills: profile.skills,
+    showAddForm: profile.showAddForm,
+    setShowAddForm: profile.setShowAddForm,
+    newSkill: profile.newSkill,
+    setNewSkill: profile.setNewSkill,
+    skillError: profile.skillError,
+    setSkillError: profile.setSkillError,
+    editMode: profile.editMode,
+    setEditMode: profile.setEditMode,
+    editingSkill: profile.editingSkill,
+    setEditingSkill: profile.setEditingSkill,
+    editForm: profile.editForm,
+    setEditForm: profile.setEditForm,
+    handleAddSkill: profile.handleAddSkill,
+    handleDeleteSelected: profile.handleDeleteSelected,
+    updateSkill: profile.updateSkill,
+    deleteSkill: profile.deleteSkill,
+    selectMode: profile.selectMode,
+    selectedSkills: profile.selectedSkills,
+  };
 
   return (
-    <section className='animate-in fade-in space-y-6 duration-700'>
+    <section className='space-y-6'>
       <ProfileInfo
-        userInfo={userInfo}
-        loadingUser={loadingUser}
-        avatarUrl={avatarUrl}
-        onAvatarChange={setAvatarUrl}
+        userInfo={profile.userInfo}
+        loadingUser={profile.loadingUser}
+        avatarUrl={profile.avatarUrl}
+        onAvatarChange={profile.setAvatarUrl}
       />
 
-      <SkillList
-        skills={skills}
-        showAddForm={showAddForm}
-        setShowAddForm={setShowAddForm}
-        newSkill={newSkill}
-        setNewSkill={setNewSkill}
-        skillError={skillError}
-        setSkillError={setSkillError}
-        editMode={editMode}
-        setEditMode={setEditMode}
-        editingSkill={editingSkill}
-        setEditingSkill={setEditingSkill}
-        editForm={editForm}
-        setEditForm={setEditForm}
-        handleAddSkill={handleAddSkill}
-        handleDeleteSelected={handleDeleteSelected}
-        updateSkill={updateSkill}
-        deleteSkill={deleteSkill}
-        selectMode={selectMode}
-        selectedSkills={selectedSkills}
-      />
+      <SkillList {...skillProps} />
     </section>
   );
 }
-
