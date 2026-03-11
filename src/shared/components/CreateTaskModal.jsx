@@ -89,6 +89,8 @@ function TextInput({ value, onChange, placeholder = '' }) {
   );
 }
 
+import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
+
 export default function CreateTaskModal({
   open,
   onClose,
@@ -100,10 +102,10 @@ export default function CreateTaskModal({
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
 
-  const [type, setType] = useState('UserStory');
-  const [status, setStatus] = useState('TODO');
+  const [type, setType] = useState(WORK_ITEM_TYPE.USER_STORY);
+  const [status, setStatus] = useState(WORK_ITEM_STATUS.TODO);
   const [assignee, setAssignee] = useState('');
-  const [priority, setPriority] = useState('MEDIUM');
+  const [priority, setPriority] = useState(WORK_ITEM_PRIORITY.MEDIUM);
 
   const [epic, setEpic] = useState('');
   const [sprintId, setSprintId] = useState(initialSprintId || '');
@@ -124,10 +126,10 @@ export default function CreateTaskModal({
   function reset() {
     setSummary('');
     setDesc('');
-    setType('UserStory');
-    setStatus('TODO');
+    setType(WORK_ITEM_TYPE.USER_STORY);
+    setStatus(WORK_ITEM_STATUS.TODO);
     setAssignee('');
-    setPriority('MEDIUM');
+    setPriority(WORK_ITEM_PRIORITY.MEDIUM);
     setEpic('');
     setSprintId('');
     setDueDate('');
@@ -221,9 +223,11 @@ export default function CreateTaskModal({
                         value={status}
                         onChange={setStatus}
                         options={[
-                          { value: 'TODO', label: 'To Do' },
-                          { value: 'IN_PROGRESS', label: 'In Progress' },
-                          { value: 'DONE', label: 'Done' },
+                          { value: WORK_ITEM_STATUS.TODO, label: 'To Do' },
+                          { value: WORK_ITEM_STATUS.IN_PROGRESS, label: 'In Progress' },
+                          { value: WORK_ITEM_STATUS.REVIEW, label: 'Review' },
+                          { value: WORK_ITEM_STATUS.DONE, label: 'Done' },
+                          { value: WORK_ITEM_STATUS.CANCELLED, label: 'Cancelled' },
                         ]}
                       />
                     </div>
@@ -239,9 +243,10 @@ export default function CreateTaskModal({
                         value={type}
                         onChange={setType}
                         options={[
-                          { value: 'UserStory', label: 'User Story' },
-                          { value: 'Task', label: 'Task' },
-                          { value: 'Subtask', label: 'Subtask' },
+                          { value: WORK_ITEM_TYPE.EPIC, label: 'Epic' },
+                          { value: WORK_ITEM_TYPE.USER_STORY, label: 'User Story' },
+                          { value: WORK_ITEM_TYPE.TASK, label: 'Task' },
+                          { value: WORK_ITEM_TYPE.SUBTASK, label: 'Subtask' },
                         ]}
                       />
                     </div>
@@ -307,9 +312,10 @@ export default function CreateTaskModal({
                         value={priority}
                         onChange={setPriority}
                         options={[
-                          { value: 'LOW', label: 'Low' },
-                          { value: 'MEDIUM', label: 'Medium' },
-                          { value: 'HIGH', label: 'High' },
+                          { value: WORK_ITEM_PRIORITY.LOW, label: 'Low' },
+                          { value: WORK_ITEM_PRIORITY.MEDIUM, label: 'Medium' },
+                          { value: WORK_ITEM_PRIORITY.HIGH, label: 'High' },
+                          { value: WORK_ITEM_PRIORITY.CRITICAL, label: 'Critical' },
                         ]}
                       />
                     </div>

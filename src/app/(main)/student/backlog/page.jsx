@@ -2,7 +2,7 @@
 
 import PageShell from '@/shared/components/PageShell';
 import StudentTabs from '@/shared/components/StudentTabs';
-import BacklogBoard from '@/feature/student/BacklogBoard';
+import BacklogBoard from '@/feature/student/backlog-board/BacklogBoard';
 
 export default function BacklogBoardPage() {
   return (
