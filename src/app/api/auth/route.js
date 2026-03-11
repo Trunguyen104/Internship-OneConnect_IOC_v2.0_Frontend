@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 
 const GENERIC_BE_URL = process.env.BE_URL || 'http://localhost:5050';
-const BE_URL = GENERIC_BE_URL.includes('/api/auth') ? GENERIC_BE_URL : `${GENERIC_BE_URL}/api/auth`;
+const BE_URL = GENERIC_BE_URL.includes('/api/v1/auth')
+  ? GENERIC_BE_URL
+  : `${GENERIC_BE_URL}/api/v1/auth`;
 
 /**
  * LOGIN
@@ -131,7 +133,14 @@ export async function PUT(req) {
       return NextResponse.json({ message: 'Refresh failed' }, { status: 401 });
     }
 
-    const data = await res.json();
+    // const data = await res.json();
+    let data = null;
+
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
     const setCookies = res.headers.getSetCookie();
     let newAccessToken = null;
 
