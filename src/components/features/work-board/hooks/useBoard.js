@@ -48,7 +48,6 @@ export function useBoard() {
       setEpics(epicsRes?.data?.items || epicsRes?.data || []);
       const sprintsData = sprintsRes?.data?.sprints || [];
       setSprints(sprintsData);
-      console.log('DEBUG: sprintsData', sprintsData);
 
       const activeSprint =
         sprintsData.find((s) => {
@@ -60,15 +59,10 @@ export function useBoard() {
           );
         }) || sprintsData[0];
 
-      console.log('DEBUG: activeSprint found', activeSprint);
-
       if (activeSprint) {
-        // Items can be in featureWorkItems or items
         const itemsToMap = activeSprint.items || activeSprint.featureWorkItems || [];
-        console.log('DEBUG: itemsToMap length', itemsToMap.length);
 
         const mappedItems = itemsToMap.map((it, idx) => {
-          // Normalize status robustly
           let s = it.status?.id || it.status;
           if (typeof s === 'string') {
             const upper = s.toUpperCase().replace(/\s|_/g, '');
@@ -79,7 +73,6 @@ export function useBoard() {
             else s = WORK_ITEM_STATUS.TODO;
           }
 
-          // Normalize type
           let t = it.type?.id || it.type;
           if (typeof t === 'string') {
             const upper = t.toUpperCase().replace(/\s|_/g, '');
@@ -90,7 +83,6 @@ export function useBoard() {
             else t = WORK_ITEM_TYPE.USER_STORY;
           }
 
-          // Normalize priority
           let p = it.priority?.id || it.priority;
           if (typeof p === 'string') {
             const upper = p.toUpperCase();
@@ -111,7 +103,6 @@ export function useBoard() {
           };
         });
         setItems(mappedItems);
-        console.log('DEBUG: mappedItems', mappedItems);
       }
     } catch (err) {
       console.error('FETCH BOARD ERROR:', err);
@@ -169,8 +160,6 @@ export function useBoard() {
         storyPoint: payload.points || 0,
       };
 
-      console.log('DEBUG: handleUpdateSubmit apiPayload:', apiPayload);
-
       const workItemId = payload.id;
       const currentSprintId = selectedTask?.sprintId;
       const newSprintId = payload.sprintId;
@@ -227,14 +216,11 @@ export function useBoard() {
     const currentTask = items.find((i) => i.id === activeId);
     if (!currentTask) return;
 
-    console.log('DEBUG: onDragEnd activeId:', activeId, 'status:', currentTask.status);
-
     try {
       const taskRes = await productBacklogService.getWorkItemById(projectId, activeId);
       if (taskRes && taskRes.data) {
         const d = taskRes.data;
 
-        // Helper string-to-int conversion
         const toInt = (val, enumObj, defaultVal) => {
           if (!val) return defaultVal;
           const id = val.id !== undefined ? val.id : val;
@@ -251,25 +237,21 @@ export function useBoard() {
         const payload = {
           projectId,
           title: d.title,
-          name: d.title, // Add name field as seen in BacklogBoard
+          name: d.title,
           description: d.description || '',
           type: toInt(d.type, WORK_ITEM_TYPE, WORK_ITEM_TYPE.USER_STORY),
-          status: currentTask.status, // integer from onDragOver
+          status: currentTask.status,
           priority: toInt(d.priority, WORK_ITEM_PRIORITY, WORK_ITEM_PRIORITY.MEDIUM),
           parentId: d.parentId || null,
           assigneeId: d.assigneeId || null,
           storyPoint: d.storyPoint || 0,
         };
 
-        console.log('DEBUG: Updating item with payload:', payload);
         const updateRes = await productBacklogService.updateWorkItem(projectId, activeId, payload);
         
         if (updateRes?.isSuccess || updateRes?.status === 200 || updateRes?.data) {
-          console.log('DEBUG: Update persistence success!');
-          // Force fetch to verify server state
           fetchSprints(false);
         } else {
-          console.error('DEBUG: Update persistence failed', updateRes);
           toast.error('Không thể lưu trạng thái mới');
           fetchSprints(false);
         }
@@ -302,4 +284,3 @@ export function useBoard() {
     onDragEnd
   };
 }
-

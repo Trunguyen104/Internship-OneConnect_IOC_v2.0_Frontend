@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { useToast } from '@/providers/ToastProvider';
+import { SPRINT_STATUS } from '@/constants/enums';
 
 export function useBacklogBoard() {
   const toast = useToast();
@@ -77,14 +78,26 @@ export function useBacklogBoard() {
         // Parse Sprint/Backlog
         if (resBacklog?.data) {
           const rawSprints = resBacklog.data.sprints || [];
-          const normalizedSprints = rawSprints.map((s) => ({
-            ...s,
-            sprintId: s.sprintId || s.id,
-            items: (s.items || []).map((it) => ({
-              ...it,
-              id: it.workItemId || it.id,
-            })),
-          }));
+          const normalizedSprints = rawSprints.map((s) => {
+            // Robust status normalization
+            let st = s.status?.name || s.status;
+            if (typeof st === 'string') {
+              const upper = st.toUpperCase();
+              if (upper === 'PLANNED' || upper === 'PLANNING') st = SPRINT_STATUS.PLANNED;
+              else if (upper === 'ACTIVE') st = SPRINT_STATUS.ACTIVE;
+              else if (upper === 'COMPLETED' || upper === 'DONE') st = SPRINT_STATUS.COMPLETED;
+            }
+
+            return {
+              ...s,
+              status: st,
+              sprintId: s.sprintId || s.id,
+              items: (s.items || []).map((it) => ({
+                ...it,
+                id: it.workItemId || it.id,
+              })),
+            };
+          });
           setSprints(normalizedSprints);
 
           let bkItems = [];

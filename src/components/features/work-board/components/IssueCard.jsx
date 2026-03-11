@@ -4,7 +4,6 @@ import { WORK_ITEM_PRIORITY, PRIORITY_MAP, TYPE_MAP } from '@/constants/enums';
 
 export function IssueCard({ task, isOverlay }) {
   const getPriorityStyle = (priority) => {
-    // Chấp nhận cả string (cũ) và number (mới)
     const val = typeof priority === 'string' ? WORK_ITEM_PRIORITY[priority.toUpperCase()] : priority;
 
     if (val === WORK_ITEM_PRIORITY.HIGH || val === WORK_ITEM_PRIORITY.CRITICAL) return 'bg-orange-50 text-orange-700';
@@ -72,4 +71,3 @@ export function SortableIssueCard({ task, onClick }) {
     </div>
   );
 }
-

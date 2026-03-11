@@ -236,7 +236,7 @@ export default function UpdateTaskModal({
           className='flex flex-1 flex-col overflow-y-auto px-8 pb-3'
           style={{ scrollbarWidth: 'thin' }}
         >
-          <div className='flex h-full flex-col gap-8 lg:flex-row items-stretch'>
+          <div className='flex flex-col gap-8 lg:flex-row'>
             {/* Cột trái (Main) */}
             <div className='flex flex-1 flex-col space-y-6'>
               {/* Tóm tắt */}

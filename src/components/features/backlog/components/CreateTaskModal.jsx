@@ -62,11 +62,10 @@ function Select({ value, onChange, options = [], placeholder = 'Select' }) {
                   onChange?.(op.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${
-                  isSelected
+                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${isSelected
                     ? 'bg-red-50 text-[#A32A2A] font-bold'
                     : 'text-slate-600 hover:bg-slate-50 font-medium'
-                }`}
+                  }`}
               >
                 {op.label}
               </button>
@@ -182,7 +181,7 @@ export default function CreateTaskModal({
           className='flex flex-1 flex-col overflow-y-auto px-8 pb-3'
           style={{ scrollbarWidth: 'thin' }}
         >
-          <div className='flex h-full flex-col gap-8 lg:flex-row items-stretch'>
+          <div className='flex flex-col gap-8 lg:flex-row'>
             {/* Cột trái (Main) */}
             <div className='flex flex-1 flex-col space-y-6'>
               {/* Tóm tắt */}

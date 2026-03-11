@@ -28,4 +28,3 @@ export function BoardColumn({ column, tasks, onCardClick }) {
     </div>
   );
 }
-
