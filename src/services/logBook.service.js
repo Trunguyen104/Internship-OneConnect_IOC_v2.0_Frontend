@@ -6,22 +6,22 @@ export const LogBookService = {
       ...params,
     }).toString();
 
-    return httpGet(`/logbooks?${query}`);
+    return httpGet(`/logbook?${query}`);
   },
 
   getById: (id) => {
-    return httpGet(`/logbooks/${id}`);
+    return httpGet(`/logbook/${id}`);
   },
 
   create: (payload) => {
-    return httpPost('/logbooks', payload);
+    return httpPost('/logbook', payload);
   },
 
   update: (id, payload) => {
-    return httpPut(`/logbooks/${id}`, payload);
+    return httpPut(`/logbook/${id}`, payload);
   },
 
   delete: (id) => {
-    return httpDelete(`/logbooks/${id}`);
+    return httpDelete(`/logbook/${id}`);
   },
 };
