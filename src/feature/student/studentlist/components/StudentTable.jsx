@@ -10,11 +10,11 @@ const { Text } = Typography;
 
 export default function StudentTable({ data, loading, onDelete }) {
   const ROLE_MAP = {
-    0: {
+    Member: {
       label: 'Member',
       color: 'default',
     },
-    1: {
+    Leader: {
       label: 'Leader',
       color: 'gold',
     },
@@ -54,15 +54,7 @@ export default function StudentTable({ data, loading, onDelete }) {
       render: (role) => {
         const r = ROLE_MAP[role] || { label: 'Unknown', color: 'default' };
 
-        return (
-          <Tag
-            className={`rounded-full border-0 px-3 py-1 font-medium ${
-              role === 1 ? 'bg-amber-100 text-amber-700' : 'bg-indigo-50 text-indigo-600'
-            }`}
-          >
-            {r.label}
-          </Tag>
-        );
+        return <Tag color={r.color}>{r.label}</Tag>;
       },
     },
     {
@@ -70,18 +62,44 @@ export default function StudentTable({ data, loading, onDelete }) {
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
+        // const STATUS_MAP = {
+        //   1: { label: 'Registered', style: 'bg-gray-100 text-gray-600', dot: 'bg-gray-400' },
+        //   2: { label: 'Onboarded', style: 'bg-purple-50 text-purple-600', dot: 'bg-purple-500' },
+        //   3: {
+        //     label: 'In Progress',
+        //     style: 'bg-emerald-50 text-emerald-600',
+        //     dot: 'bg-emerald-500',
+        //   },
+        //   4: { label: 'Completed', style: 'bg-blue-50 text-blue-600', dot: 'bg-blue-500' },
+        //   5: { label: 'Failed', style: 'bg-red-50 text-red-600', dot: 'bg-red-500' },
+        // };
         const STATUS_MAP = {
-          1: { label: 'Registered', style: 'bg-gray-100 text-gray-600', dot: 'bg-gray-400' },
-          2: { label: 'Onboarded', style: 'bg-purple-50 text-purple-600', dot: 'bg-purple-500' },
-          3: {
+          Registered: {
+            label: 'Registered',
+            style: 'bg-gray-100 text-gray-600',
+            dot: 'bg-gray-400',
+          },
+          Onboarded: {
+            label: 'Onboarded',
+            style: 'bg-purple-50 text-purple-600',
+            dot: 'bg-purple-500',
+          },
+          InProgress: {
             label: 'In Progress',
             style: 'bg-emerald-50 text-emerald-600',
             dot: 'bg-emerald-500',
           },
-          4: { label: 'Completed', style: 'bg-blue-50 text-blue-600', dot: 'bg-blue-500' },
-          5: { label: 'Failed', style: 'bg-red-50 text-red-600', dot: 'bg-red-500' },
+          Completed: {
+            label: 'Completed',
+            style: 'bg-blue-50 text-blue-600',
+            dot: 'bg-blue-500',
+          },
+          Failed: {
+            label: 'Failed',
+            style: 'bg-red-50 text-red-600',
+            dot: 'bg-red-500',
+          },
         };
-
         const s = STATUS_MAP[status] || {
           label: 'Unknown',
           style: 'bg-gray-100 text-gray-600',
