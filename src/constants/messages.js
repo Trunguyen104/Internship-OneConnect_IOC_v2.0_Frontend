@@ -10,3 +10,4 @@ export const STAKEHOLDER_MESSAGES = {
   DELETE_FAILED: 'Failed to delete stakeholder',
   LOAD_FAILED: 'Failed to load stakeholders',
 };
+

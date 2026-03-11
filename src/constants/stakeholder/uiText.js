@@ -39,3 +39,4 @@ export const STAKEHOLDER_UI = {
   FIELD_DESC: 'Description',
   FIELD_TYPE: 'Type',
 };
+

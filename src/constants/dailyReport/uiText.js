@@ -64,3 +64,4 @@ export const DAILY_REPORT_UI = {
     CANCEL: 'Cancel',
   },
 };
+

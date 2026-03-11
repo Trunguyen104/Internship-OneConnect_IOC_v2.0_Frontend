@@ -10,3 +10,4 @@ export const STUDENT_LIST_MESSAGES = {
     REMOVE_STUDENT: 'Student removed successfully!',
   },
 };
+

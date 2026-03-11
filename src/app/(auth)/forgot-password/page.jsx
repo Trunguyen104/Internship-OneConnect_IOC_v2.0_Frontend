@@ -1,4 +1,4 @@
-import ForgotPasswordPage from '@/components/feature/auth/ForgotPassword';
+import ForgotPasswordPage from '@/features/auth/components/ForgotPassword';
 import React from 'react';
 
 export const metadata = {
@@ -13,3 +13,4 @@ export default function page() {
     </>
   );
 }
+

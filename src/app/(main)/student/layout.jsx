@@ -1,5 +1,5 @@
-import Header from '@/components/shared/Header';
-import Sidebar from '@/components/shared/Sidebar';
+import Header from '@/components/layout/Header';
+import Sidebar from '@/components/layout/Sidebar';
 
 export default function Space({ children }) {
   return (
@@ -13,3 +13,4 @@ export default function Space({ children }) {
     </div>
   );
 }
+

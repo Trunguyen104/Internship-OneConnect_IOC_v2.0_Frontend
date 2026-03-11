@@ -18,3 +18,4 @@ export const PROJECT_MESSAGES = {
     FILE_REQUIRED: 'Please select a file!',
   },
 };
+

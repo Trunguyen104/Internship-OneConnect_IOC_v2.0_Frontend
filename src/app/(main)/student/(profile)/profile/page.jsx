@@ -1,4 +1,4 @@
-import ProfilePage from '@/components/feature/student/profile/ProfilePage';
+import ProfilePage from '@/features/user/components/ProfilePage';
 import React from 'react';
 
 function page() {
@@ -10,3 +10,4 @@ function page() {
 }
 
 export default page;
+

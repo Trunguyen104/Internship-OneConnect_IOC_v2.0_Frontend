@@ -15,3 +15,4 @@ export const DAILY_REPORT_MESSAGES = {
     DELETE: 'Logbook deleted successfully!',
   },
 };
+

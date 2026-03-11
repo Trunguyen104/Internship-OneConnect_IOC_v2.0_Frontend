@@ -1,5 +1,5 @@
-import JobBoardPage from '@/components/feature/job-board/JobBoardPage';
-import Header from '@/components/shared/Header';
+import JobBoardPage from '@/features/job-board/components/JobBoardPage';
+import Header from '@/components/layout/Header';
 import React from 'react';
 
 function page() {
@@ -12,3 +12,4 @@ function page() {
 }
 
 export default page;
+

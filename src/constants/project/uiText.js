@@ -36,3 +36,4 @@ export const PROJECT_UI = {
     DELETE_RESOURCE: 'Are you sure you want to delete this resource?',
   },
 };
+

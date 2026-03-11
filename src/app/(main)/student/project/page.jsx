@@ -1,5 +1,5 @@
 'use client';
-import ProjectPage from '@/components/feature/student/project/ProjectPage';
+import ProjectPage from '@/features/project/components/ProjectPage';
 import React from 'react';
 
 export default function page() {
@@ -9,3 +9,4 @@ export default function page() {
     </>
   );
 }
+

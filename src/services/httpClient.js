@@ -132,3 +132,4 @@ export default {
   httpDelete,
   httpPatch,
 };
+
