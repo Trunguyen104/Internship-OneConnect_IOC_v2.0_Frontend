@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useMemo, memo } from 'react';
 import {
   Table,
@@ -13,6 +12,8 @@ import {
   message,
   Drawer,
   Dropdown,
+  Avatar,
+  Pagination,
 } from 'antd';
 const { Dragger } = Upload;
 import {
@@ -26,17 +27,18 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   UserOutlined,
+  InfoCircleOutlined,
+  CloseOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+  StarFilled,
   IdcardOutlined,
   MailOutlined,
   PhoneOutlined,
   CalendarOutlined,
-  SettingOutlined,
-  HistoryOutlined,
-  InfoCircleOutlined,
-  StarFilled,
+  LeftOutlined,
+  RightOutlined,
 } from '@ant-design/icons';
-
-// --- MOCK DATA ---
 const MOCK_STUDENTS = [
   {
     id: 'STD-2024-001',
@@ -78,32 +80,86 @@ const MOCK_STUDENTS = [
     avatar:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
   },
+  {
+    id: 'STD-2024-088',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
+  {
+    id: 'STD-2024-088',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
+  {
+    id: 'STD-2024-088',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
+  {
+    id: 'STD-2024-088',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
+  {
+    id: 'STD-2024-088',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
+  {
+    id: 'STD-2024-081',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
+  {
+    id: 'STD-2024-088',
+    name: 'David Wilson',
+    major: 'Business Administration',
+    status: 'unplaced',
+    avatar:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAPdbJv1cp6TT-CGnLpDk9CRuAQr0wxEsDCj_NC-56Q3zczU4x2OXumHX7ScPhgNgEsqMe2ZQA_q7vqeKer-sU_CqosTfYWc0lGCl6Wku3vCfFcvIDlSoVLT8RF6tHBEu079vdovQHB9fyy-BuVVuYo5ZdrGUuemHAawNS2j1HmrYgRgSnlk0XDO4X_bVyPCOTp7_y5qQC-soh-Q_G_OEEV6F0Vmu9cla-LiPmimxNXjyOPtmxb_R4I_-3_V3I3lNm4iDkdnbTE8ps',
+  },
 ];
-
-const STATUS_CONFIG = {
+const STATUS_STYLES = {
   placed: {
+    bg: 'bg-green-100',
+    text: 'text-green-700',
+    border: 'border-green-200',
     label: 'Placed',
-    bgClass: 'bg-green-100',
-    textClass: 'text-green-700',
-    borderClass: 'border-green-200',
-    dotClass: 'bg-green-500',
+    dot: 'bg-green-500',
   },
   unplaced: {
+    bg: 'bg-slate-100',
+    text: 'text-slate-600',
+    border: 'border-slate-200',
     label: 'Unplaced',
-    bgClass: 'bg-slate-100',
-    textClass: 'text-slate-600',
-    borderClass: 'border-slate-200',
-    dotClass: 'bg-slate-400',
+    dot: 'bg-slate-400',
   },
   withdrawn: {
+    bg: 'bg-red-100',
+    text: 'text-red-700',
+    border: 'border-red-200',
     label: 'Withdrawn',
-    bgClass: 'bg-red-100',
-    textClass: 'text-red-700',
-    borderClass: 'border-red-200',
-    dotClass: 'bg-red-500',
+    dot: 'bg-red-500',
   },
 };
-
 const MOCK_IMPORT_PREVIEW = [
   { id: '1', name: 'Michael Jordan', studentId: 'ST010', email: 'm.j@edu.com', valid: true },
   {
@@ -123,13 +179,12 @@ const MOCK_IMPORT_PREVIEW = [
     error: 'Invalid Email',
   },
 ];
-
 const HeaderActions = memo(function HeaderActions({ onImport, onAdd }) {
   return (
-    <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8'>
+    <div className='mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
       <div>
-        <h1 className='text-4xl font-bold text-slate-900'>Term Students</h1>
-        <p className='text-slate-500 mt-2'>
+        <h1 className='text-2xl font-bold text-slate-900'>Term Students</h1>
+        <p className='mt-2 text-slate-500'>
           Manage enrollment and placement for the current academic term.
         </p>
       </div>
@@ -137,24 +192,24 @@ const HeaderActions = memo(function HeaderActions({ onImport, onAdd }) {
         <Button
           type='primary'
           icon={<UserAddOutlined />}
-          size='large'
-          className='bg-[#d52020] hover:!bg-[#d52020]/90 font-bold rounded-full border-none shadow-md shadow-[#d52020]/20'
+          size='medium'
+          className='rounded-full border-none bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
           onClick={onAdd}
         >
           Thêm sinh viên
         </Button>
         <Button
           icon={<UploadOutlined />}
-          size='large'
-          className='text-[#d52020] font-bold rounded-full border-[#d52020]/20 hover:!text-[#d52020] hover:!border-[#d52020] hover:!bg-[#d52020]/5 focus:!text-[#d52020] focus:!border-[#d52020]'
+          size='medium'
+          className='rounded-full border-[#d52020]/20 font-bold text-[#d52020] hover:!border-[#d52020] hover:!bg-[#d52020]/5 hover:!text-[#d52020] focus:!border-[#d52020] focus:!text-[#d52020]'
           onClick={onImport}
         >
           Nhập từ Excel
         </Button>
         <Button
           icon={<UserDeleteOutlined />}
-          size='large'
-          className='rounded-full text-slate-400 bg-slate-50 border-slate-200'
+          size='medium'
+          className='rounded-full border-slate-200 bg-slate-50 text-slate-400'
           disabled
         >
           Rút lui
@@ -163,7 +218,6 @@ const HeaderActions = memo(function HeaderActions({ onImport, onAdd }) {
     </div>
   );
 });
-
 const FiltersAndSearch = memo(function FiltersAndSearch({
   searchTerm,
   onSearchChange,
@@ -173,26 +227,24 @@ const FiltersAndSearch = memo(function FiltersAndSearch({
   onMajorFilterChange,
 }) {
   return (
-    <div className='bg-white rounded-[2rem] p-2 pl-4 pr-3 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-slate-100 mb-6 flex flex-col md:flex-row gap-4 items-center'>
-      <div className='flex-1 w-full'>
+    <div className='mb-6 flex flex-row items-center gap-4 rounded-[2rem] border border-slate-100 bg-white p-2 pr-3 pl-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] md:flex-row'>
+      <div className='w-full flex-1'>
         <Input
-          prefix={<SearchOutlined className='text-slate-400 mr-2 text-lg' />}
+          prefix={<SearchOutlined className='mr-2 text-lg text-slate-400' />}
           placeholder='Tìm kiếm theo tên hoặc MSSV...'
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          size='large'
-          className='w-full border-none shadow-none hover:bg-slate-50 focus-within:bg-slate-50 rounded-full bg-transparent'
+          size='medium'
+          className='w-full rounded-full border-none bg-transparent shadow-none focus-within:bg-slate-50 hover:bg-slate-50'
           style={{ padding: '8px 16px' }}
         />
       </div>
-
-      <div className='h-8 w-[1px] bg-slate-200 hidden md:block'></div>
-
-      <Space size='middle' className='w-full md:w-auto flex-wrap md:flex-nowrap' wrap={false}>
+      <div className='hidden h-8 w-[1px] bg-slate-200 md:block'></div>
+      <Space size='middle' className='w-full flex-wrap md:w-auto md:flex-nowrap' wrap={false}>
         <Select
           allowClear
           placeholder='Trạng thái: Tất cả'
-          size='large'
+          size='medium'
           value={statusFilter || undefined}
           onChange={(value) => onStatusFilterChange(value || '')}
           className='min-w-[160px]'
@@ -203,13 +255,11 @@ const FiltersAndSearch = memo(function FiltersAndSearch({
             { value: 'withdrawn', label: 'Đã rút' },
           ]}
         />
-
-        <div className='h-6 w-[1px] bg-slate-200 hidden md:block'></div>
-
+        <div className='hidden h-6 w-[1px] bg-slate-200 md:block'></div>
         <Select
           allowClear
           placeholder='Ngành học: Tất cả'
-          size='large'
+          size='medium'
           value={majorFilter || undefined}
           onChange={(value) => onMajorFilterChange(value || '')}
           className='min-w-[180px]'
@@ -225,25 +275,19 @@ const FiltersAndSearch = memo(function FiltersAndSearch({
     </div>
   );
 });
-
 const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) {
   const columns = [
     {
       title: 'Họ và Tên',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => (
-        <div className='flex items-center gap-3'>
-          <div className='w-8 h-8 rounded-full bg-slate-200 overflow-hidden flex-shrink-0'>
-            <img
-              className='w-full h-full object-cover'
-              alt={`Avatar của ${text}`}
-              src={record.avatar}
-              loading='lazy'
-            />
-          </div>
-          <span className='font-medium text-slate-900'>{text}</span>
-        </div>
+      render: (name) => (
+        <Space>
+          <Avatar size={32} className='bg-slate-200 text-slate-700'>
+            {name?.[0]}
+          </Avatar>
+          <span className='font-medium'>{name}</span>
+        </Space>
       ),
     },
     {
@@ -263,13 +307,12 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
-        const config = STATUS_CONFIG[status] || STATUS_CONFIG.unplaced;
+        const style = STATUS_STYLES[status] || STATUS_STYLES.unplaced;
         return (
           <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${config.bgClass} ${config.textClass} ${config.borderClass}`}
+            className={`rounded-full border px-3 py-1 text-xs ${style.bg} ${style.text} ${style.border}`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${config.dotClass}`}></span>
-            {config.label}
+            {style.label}
           </span>
         );
       },
@@ -284,7 +327,7 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
               type='text'
               shape='circle'
               icon={<EyeOutlined />}
-              className='hover:text-[#d52020] hover:bg-[#d52020]/5'
+              className='hover:bg-[#d52020]/5 hover:text-[#d52020]'
               onClick={(e) => {
                 e.stopPropagation();
                 onView(record);
@@ -296,7 +339,7 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
               type='text'
               shape='circle'
               icon={<EditOutlined />}
-              className='hover:text-[#d52020] hover:bg-[#d52020]/5'
+              className='hover:bg-[#d52020]/5 hover:text-[#d52020]'
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(record);
@@ -325,7 +368,7 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
                 type='text'
                 shape='circle'
                 icon={<MoreOutlined />}
-                className='hover:text-[#d52020] hover:bg-[#d52020]/5'
+                className='hover:bg-[#d52020]/5 hover:text-[#d52020]'
                 onClick={(e) => e.stopPropagation()}
               />
             </Tooltip>
@@ -335,37 +378,19 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
       width: 140,
     },
   ];
-
   return (
-    <div className='bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-slate-100 flex-1 overflow-hidden flex flex-col'>
+    <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)]'>
       <Table
         rowKey='id'
         columns={columns}
         dataSource={students}
-        scroll={{ x: 'max-content', y: 'calc(100vh - 400px)' }}
-        pagination={{
-          total: 124,
-          showTotal: (total, range) => (
-            <span className='text-slate-500'>
-              Hiển thị <span className='font-bold text-slate-900'>{range[0]}</span> đến{' '}
-              <span className='font-bold text-slate-900'>{range[1]}</span> trong{' '}
-              <span className='font-bold text-slate-900'>{total}</span> sinh viên
-            </span>
-          ),
-          defaultPageSize: 5,
-          showSizeChanger: true,
-          pageSizeOptions: ['5', '10', '20', '50'],
-          position: ['bottomCenter'],
-          className: '!px-4 !py-4 !m-0 border-t border-slate-100',
-        }}
-        rowSelection={{} /* Basic row selection */}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 300px)' }}
+        pagination={false}
         className='custom-antd-table flex-1'
-        style={{ '--ant-color-primary': '#d52020' }}
       />
     </div>
   );
 });
-
 const ImportModal = memo(function ImportModal({ visible, onClose }) {
   const uploadProps = {
     name: 'file',
@@ -386,13 +411,12 @@ const ImportModal = memo(function ImportModal({ visible, onClose }) {
       console.log('Dropped files', e.dataTransfer.files);
     },
   };
-
   const previewColumns = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <span className='text-slate-600 font-medium'>{text}</span>,
+      render: (text) => <span className='font-medium text-slate-600'>{text}</span>,
     },
     {
       title: 'ID',
@@ -413,16 +437,15 @@ const ImportModal = memo(function ImportModal({ visible, onClose }) {
       render: (_, record) =>
         record.valid ? (
           <Tooltip title='Valid'>
-            <CheckCircleOutlined className='text-green-500 text-lg' />
+            <CheckCircleOutlined className='text-lg text-green-500' />
           </Tooltip>
         ) : (
           <Tooltip title={record.error}>
-            <ExclamationCircleOutlined className='text-[#d52020] text-lg' />
+            <ExclamationCircleOutlined className='text-lg text-[#d52020]' />
           </Tooltip>
         ),
     },
   ];
-
   return (
     <Modal
       title={<span className='text-xl font-bold text-slate-900'>Import Students</span>}
@@ -435,7 +458,7 @@ const ImportModal = memo(function ImportModal({ visible, onClose }) {
           onClick={onClose}
           shape='round'
           size='large'
-          className='font-bold text-slate-600 border-none bg-slate-100 hover:!bg-slate-200'
+          className='border-none bg-slate-100 font-bold text-slate-600 hover:!bg-slate-200'
         >
           Cancel
         </Button>,
@@ -444,7 +467,7 @@ const ImportModal = memo(function ImportModal({ visible, onClose }) {
           type='primary'
           shape='round'
           size='large'
-          className='bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90 border-none'
+          className='border-none bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
           onClick={onClose}
         >
           Confirm Import
@@ -455,54 +478,48 @@ const ImportModal = memo(function ImportModal({ visible, onClose }) {
       <div className='py-2'>
         <Dragger
           {...uploadProps}
-          className='bg-[#d52020]/5 border-[#d52020]/30 hover:border-[#d52020]/50 transition-colors rounded-xl p-8 mb-6'
+          className='mb-6 rounded-xl border-[#d52020]/30 bg-[#d52020]/5 p-8 transition-colors hover:border-[#d52020]/50'
         >
           <p className='ant-upload-drag-icon'>
-            <div className='bg-[#d52020]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <UploadOutlined className='text-[#d52020] text-3xl' />
+            <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#d52020]/10'>
+              <UploadOutlined className='text-3xl text-[#d52020]' />
             </div>
           </p>
           <p className='ant-upload-text text-lg font-bold text-slate-900'>
             Drag &amp; Drop Excel File
           </p>
-          <p className='ant-upload-hint text-sm text-slate-500 mt-1'>
+          <p className='ant-upload-hint mt-1 text-sm text-slate-500'>
             or click to browse from your computer
           </p>
-          <Button shape='round' className='mt-6 font-bold border-[#d52020]/20 text-slate-700'>
+          <Button shape='round' className='mt-6 border-[#d52020]/20 font-bold text-slate-700'>
             Select File
           </Button>
         </Dragger>
-
-        <div className='relative flex items-center py-2 mb-2'>
+        <div className='relative mb-2 flex items-center py-2'>
           <div className='flex-grow border-t border-[#d52020]/10'></div>
-          <span className='flex-shrink mx-4 text-xs font-semibold uppercase tracking-wider text-slate-400'>
+          <span className='mx-4 flex-shrink text-xs font-semibold tracking-wider text-slate-400 uppercase'>
             Import Preview
           </span>
           <div className='flex-grow border-t border-[#d52020]/10'></div>
         </div>
-
         <Table
           dataSource={MOCK_IMPORT_PREVIEW}
           columns={previewColumns}
           pagination={false}
           size='middle'
           rowKey='id'
-          className='border border-[#d52020]/10 rounded-lg overflow-hidden custom-antd-table'
+          className='custom-antd-table overflow-hidden rounded-lg border border-[#d52020]/10'
           rowClassName={(record) => (record.valid ? '' : 'bg-red-50/50')}
         />
       </div>
     </Modal>
   );
 });
-
 const AddStudentModal = memo(function AddStudentModal({ visible, onClose }) {
   return (
     <Modal
       title={
         <div className='flex items-center gap-3 text-slate-900'>
-          <div className='bg-[#d52020]/10 p-2 rounded-lg text-[#d52020] inline-flex'>
-            <UserAddOutlined className='text-xl' />
-          </div>
           <span className='text-xl font-bold tracking-tight'>Add New Student</span>
         </div>
       }
@@ -510,12 +527,12 @@ const AddStudentModal = memo(function AddStudentModal({ visible, onClose }) {
       onCancel={onClose}
       width={560}
       footer={
-        <div className='px-2 py-2 flex items-center justify-end gap-4 mt-6'>
+        <div className='mt-6 flex items-center justify-end gap-4 px-2 py-2'>
           <Button
             onClick={onClose}
             shape='round'
             size='large'
-            className='font-semibold text-slate-600 border-none bg-slate-100 hover:!bg-slate-200'
+            className='border-none bg-slate-100 font-semibold text-slate-600 hover:!bg-slate-200'
           >
             Cancel
           </Button>
@@ -523,7 +540,7 @@ const AddStudentModal = memo(function AddStudentModal({ visible, onClose }) {
             type='primary'
             shape='round'
             size='large'
-            className='bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90 border-none flex items-center gap-2'
+            className='flex items-center gap-2 border-none bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
             onClick={onClose}
           >
             <span>Save Student</span>
@@ -532,63 +549,55 @@ const AddStudentModal = memo(function AddStudentModal({ visible, onClose }) {
         </div>
       }
       className='custom-add-student-modal'
-      closeIcon={
-        <span className='material-symbols-outlined text-slate-500 hover:text-slate-800 transition-colors'>
-          close
-        </span>
-      }
+      closeIcon={<CloseOutlined className='text-slate-500 hover:text-[#d52020]' />}
     >
-      <div className='pt-6 pb-2 space-y-6'>
+      <div className='space-y-6 pt-6 pb-2'>
         <div className='flex flex-col gap-2'>
-          <label className='text-slate-700 text-sm font-semibold'>Full Name</label>
+          <label className='text-sm font-semibold text-slate-700'>Full Name</label>
           <Input
             size='large'
-            prefix={<UserOutlined className='text-slate-400 text-lg mr-2' />}
+            prefix={<UserOutlined className='mr-2 text-lg text-slate-400' />}
             placeholder='e.g. John Doe'
-            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
           />
         </div>
-
         <div className='flex flex-col gap-2'>
-          <label className='text-slate-700 text-sm font-semibold'>Student Code</label>
+          <label className='text-sm font-semibold text-slate-700'>Student Code</label>
           <Input
             size='large'
-            prefix={<IdcardOutlined className='text-slate-400 text-lg mr-2' />}
+            prefix={<IdcardOutlined className='mr-2 text-lg text-slate-400' />}
             placeholder='e.g. STU-2024-001'
-            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
           />
         </div>
-
         <div className='flex flex-col gap-2'>
-          <label className='text-slate-700 text-sm font-semibold'>Email Address</label>
+          <label className='text-sm font-semibold text-slate-700'>Email Address</label>
           <Input
             size='large'
             type='email'
-            prefix={<MailOutlined className='text-slate-400 text-lg mr-2' />}
+            prefix={<MailOutlined className='mr-2 text-lg text-slate-400' />}
             placeholder='e.g. john@university.edu'
-            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
           />
         </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
           <div className='flex flex-col gap-2'>
-            <label className='text-slate-700 text-sm font-semibold'>Phone Number</label>
+            <label className='text-sm font-semibold text-slate-700'>Phone Number</label>
             <Input
               size='large'
               type='tel'
-              prefix={<PhoneOutlined className='text-slate-400 text-lg mr-2' />}
+              prefix={<PhoneOutlined className='mr-2 text-lg text-slate-400' />}
               placeholder='+1 (555) 000-0000'
-              className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+              className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
             />
           </div>
-
           <div className='flex flex-col gap-2'>
-            <label className='text-slate-700 text-sm font-semibold'>Date of Birth</label>
+            <label className='text-sm font-semibold text-slate-700'>Date of Birth</label>
             <Input
               size='large'
               type='date'
-              prefix={<CalendarOutlined className='text-slate-400 text-lg mr-2' />}
-              className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+              prefix={<CalendarOutlined className='mr-2 text-lg text-slate-400' />}
+              className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
             />
           </div>
         </div>
@@ -596,15 +605,13 @@ const AddStudentModal = memo(function AddStudentModal({ visible, onClose }) {
     </Modal>
   );
 });
-
 const EditStudentModal = memo(function EditStudentModal({ visible, onClose, student }) {
   if (!student) return null;
-
   return (
     <Modal
       title={
         <div className='flex items-center gap-3 text-slate-900'>
-          <div className='bg-[#d52020]/10 p-2 rounded-lg text-[#d52020] inline-flex'>
+          <div className='inline-flex rounded-lg bg-[#d52020]/10 p-2 text-[#d52020]'>
             <EditOutlined className='text-xl' />
           </div>
           <span className='text-xl font-bold tracking-tight'>Chỉnh sửa Sinh viên</span>
@@ -614,12 +621,12 @@ const EditStudentModal = memo(function EditStudentModal({ visible, onClose, stud
       onCancel={onClose}
       width={560}
       footer={
-        <div className='px-2 py-2 flex items-center justify-end gap-4 mt-6'>
+        <div className='mt-6 flex items-center justify-end gap-4 px-2 py-2'>
           <Button
             onClick={onClose}
             shape='round'
             size='large'
-            className='font-semibold text-slate-600 border-none bg-slate-100 hover:!bg-slate-200'
+            className='border-none bg-slate-100 font-semibold text-slate-600 hover:!bg-slate-200'
           >
             Cancel
           </Button>
@@ -627,7 +634,7 @@ const EditStudentModal = memo(function EditStudentModal({ visible, onClose, stud
             type='primary'
             shape='round'
             size='large'
-            className='bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90 border-none flex items-center gap-2'
+            className='flex items-center gap-2 border-none bg-[#d52020] font-bold shadow-md shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
             onClick={onClose}
           >
             <span>Save Changes</span>
@@ -636,62 +643,54 @@ const EditStudentModal = memo(function EditStudentModal({ visible, onClose, stud
         </div>
       }
       className='custom-add-student-modal'
-      closeIcon={
-        <span className='material-symbols-outlined text-slate-500 hover:text-slate-800 transition-colors'>
-          close
-        </span>
-      }
+      closeIcon={<CloseOutlined className='text-slate-500 hover:text-[#d52020]' />}
     >
-      <div className='pt-6 pb-2 space-y-6'>
+      <div className='space-y-6 pt-6 pb-2'>
         <div className='flex flex-col gap-2'>
-          <label className='text-slate-700 text-sm font-semibold'>Full Name</label>
+          <label className='text-sm font-semibold text-slate-700'>Full Name</label>
           <Input
             size='large'
-            prefix={<UserOutlined className='text-slate-400 text-lg mr-2' />}
+            prefix={<UserOutlined className='mr-2 text-lg text-slate-400' />}
             defaultValue={student.name}
-            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
           />
         </div>
-
         <div className='flex flex-col gap-2'>
-          <label className='text-slate-700 text-sm font-semibold'>Student Code</label>
+          <label className='text-sm font-semibold text-slate-700'>Student Code</label>
           <Input
             size='large'
-            prefix={<IdcardOutlined className='text-slate-400 text-lg mr-2' />}
+            prefix={<IdcardOutlined className='mr-2 text-lg text-slate-400' />}
             defaultValue={student.id}
-            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
           />
         </div>
-
         <div className='flex flex-col gap-2'>
-          <label className='text-slate-700 text-sm font-semibold'>Email Address</label>
+          <label className='text-sm font-semibold text-slate-700'>Email Address</label>
           <Input
             size='large'
             type='email'
-            prefix={<MailOutlined className='text-slate-400 text-lg mr-2' />}
+            prefix={<MailOutlined className='mr-2 text-lg text-slate-400' />}
             defaultValue={`${student.id.toLowerCase()}@university.edu`}
-            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:ring-2 focus-within:ring-[#d52020]/20 focus-within:border-[#d52020]'
+            className='rounded-xl border-slate-200 bg-slate-50 py-3 text-base focus-within:border-[#d52020] focus-within:ring-2 focus-within:ring-[#d52020]/20'
           />
         </div>
       </div>
     </Modal>
   );
 });
-
 const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClose, student }) {
   if (!student) return null;
-  const statusCfg = STATUS_CONFIG[student.status] || STATUS_CONFIG.unplaced;
-
+  const style = STATUS_STYLES[student.status] || STATUS_STYLES.unplaced;
   return (
     <Drawer
       title={
         <div className='flex items-center gap-4'>
-          <div className='bg-[#d52020]/10 p-2 rounded-full text-[#d52020]'>
+          <div className='rounded-full bg-[#d52020]/10 p-2 text-[#d52020]'>
             <UserOutlined className='text-xl' />
           </div>
           <div>
-            <h2 className='text-slate-900 text-xl font-bold leading-tight m-0'>Student Details</h2>
-            <p className='text-slate-500 text-xs font-medium uppercase tracking-wider m-0'>
+            <h2 className='m-0 text-xl leading-tight font-bold text-slate-900'>Student Details</h2>
+            <p className='m-0 text-xs font-medium tracking-wider text-slate-500 uppercase'>
               Placement Portal
             </p>
           </div>
@@ -701,11 +700,7 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClo
       onClose={onClose}
       open={visible}
       width={480}
-      closeIcon={
-        <span className='material-symbols-outlined text-slate-500 hover:text-[#d52020] transition-colors'>
-          close
-        </span>
-      }
+      closeIcon={<CloseOutlined className='text-slate-500 hover:text-[#d52020]' />}
       className='custom-student-drawer'
       styles={{
         header: { borderBottom: '1px solid rgba(213, 32, 32, 0.1)', padding: '24px' },
@@ -715,7 +710,7 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClo
         <div className='flex gap-4'>
           <Button
             size='large'
-            className='flex-1 rounded-xl border-2 border-[#d52020]/10 text-slate-600 font-bold'
+            className='flex-1 rounded-xl border-2 border-[#d52020]/10 font-bold text-slate-600'
             onClick={onClose}
           >
             Cancel
@@ -723,75 +718,73 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClo
           <Button
             type='primary'
             size='large'
-            className='flex-1 rounded-xl bg-[#d52020] font-bold shadow-lg shadow-[#d52020]/20 border-none hover:!bg-[#d52020]/90'
+            className='flex-1 rounded-xl border-none bg-[#d52020] font-bold shadow-lg shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
           >
             Update Details
           </Button>
         </div>
       }
     >
-      <div className='p-6 space-y-8 bg-[#f8f6f6] h-full'>
+      <div className='h-full space-y-8 bg-[#f8f6f6] p-6'>
         {/* Header Profile Section */}
         <div className='flex items-start gap-6 pt-2'>
           <div
-            className='bg-center bg-no-repeat bg-cover rounded-xl min-h-24 w-24 border-4 border-white shadow-sm flex-shrink-0'
+            className='min-h-24 w-24 flex-shrink-0 rounded-xl border-4 border-white bg-cover bg-center bg-no-repeat shadow-sm'
             style={{ backgroundImage: `url("${student.avatar}")`, aspectRatio: '1/1' }}
           />
           <div className='flex flex-col justify-center gap-1'>
-            <h3 className='text-slate-900 text-2xl font-bold tracking-tight m-0'>{student.name}</h3>
-            <p className='text-slate-500 text-sm font-medium m-0'>
+            <h3 className='m-0 text-2xl font-bold tracking-tight text-slate-900'>{student.name}</h3>
+            <p className='m-0 text-sm font-medium text-slate-500'>
               ID: <span className='text-[#d52020]'>{student.id}</span>
             </p>
             <div className='mt-2 flex'>
               <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-${statusCfg.bgClass.split('-')[1]}-100 text-${statusCfg.textClass.split('-')[1]}-700 border ${statusCfg.borderClass}`}
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold ${style.bg} ${style.text} ${style.border}`}
               >
-                <span className={`size-2 rounded-full ${statusCfg.dotClass} mr-2`}></span>
-                {statusCfg.label}
+                <span className={`size-2 rounded-full ${style.dot} mr-2`}></span>
+                {style.label}
               </span>
             </div>
           </div>
         </div>
-
         {/* Personal Information */}
         <section>
-          <div className='flex items-center gap-2 mb-4'>
-            <InfoCircleOutlined className='text-[#d52020] text-xl' />
-            <h2 className='text-slate-900 text-lg font-bold m-0'>Personal Information</h2>
+          <div className='mb-4 flex items-center gap-2'>
+            <InfoCircleOutlined className='text-xl text-[#d52020]' />
+            <h2 className='m-0 text-lg font-bold text-slate-900'>Personal Information</h2>
           </div>
-          <div className='bg-white rounded-2xl border border-[#d52020]/5 p-1'>
-            <div className='grid grid-cols-3 border-b border-[#d52020]/5 py-4 px-4'>
-              <p className='text-slate-500 text-sm font-medium m-0'>Email</p>
-              <p className='text-slate-900 text-sm font-medium col-span-2 m-0'>
+          <div className='rounded-2xl border border-[#d52020]/5 bg-white p-1'>
+            <div className='grid grid-cols-3 border-b border-[#d52020]/5 px-4 py-4'>
+              <p className='m-0 text-sm font-medium text-slate-500'>Email</p>
+              <p className='col-span-2 m-0 text-sm font-medium text-slate-900'>
                 {student.id.toLowerCase()}@university.edu
               </p>
             </div>
-            <div className='grid grid-cols-3 border-b border-[#d52020]/5 py-4 px-4'>
-              <p className='text-slate-500 text-sm font-medium m-0'>Phone</p>
-              <p className='text-slate-900 text-sm font-medium col-span-2 m-0'>+1 (555) 012-3456</p>
+            <div className='grid grid-cols-3 border-b border-[#d52020]/5 px-4 py-4'>
+              <p className='m-0 text-sm font-medium text-slate-500'>Phone</p>
+              <p className='col-span-2 m-0 text-sm font-medium text-slate-900'>+1 (555) 012-3456</p>
             </div>
-            <div className='grid grid-cols-3 py-4 px-4'>
-              <p className='text-slate-500 text-sm font-medium m-0'>Major</p>
-              <p className='text-slate-900 text-sm font-medium col-span-2 m-0'>{student.major}</p>
+            <div className='grid grid-cols-3 px-4 py-4'>
+              <p className='m-0 text-sm font-medium text-slate-500'>Major</p>
+              <p className='col-span-2 m-0 text-sm font-medium text-slate-900'>{student.major}</p>
             </div>
           </div>
         </section>
-
         {/* Placement Settings */}
         <section>
-          <div className='flex items-center gap-2 mb-4'>
-            <SettingOutlined className='text-[#d52020] text-xl' />
-            <h2 className='text-slate-900 text-lg font-bold m-0'>Placement Settings</h2>
+          <div className='mb-4 flex items-center gap-2'>
+            <SettingOutlined className='text-xl text-[#d52020]' />
+            <h2 className='m-0 text-lg font-bold text-slate-900'>Placement Settings</h2>
           </div>
           <div className='space-y-4'>
             <div>
-              <label className='block text-sm font-bold text-slate-700 mb-2'>
+              <label className='mb-2 block text-sm font-bold text-slate-700'>
                 Placement Status
               </label>
               <Select
                 defaultValue={student.status}
                 size='large'
-                className='w-full custom-details-select'
+                className='custom-details-select w-full'
                 options={[
                   { value: 'unplaced', label: 'Unplaced' },
                   { value: 'placed', label: 'Placed' },
@@ -800,10 +793,10 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClo
               />
             </div>
             <div>
-              <label className='block text-sm font-bold text-slate-700 mb-2'>Enterprise</label>
+              <label className='mb-2 block text-sm font-bold text-slate-700'>Enterprise</label>
               <Input
                 size='large'
-                prefix={<SearchOutlined className='text-slate-400 text-lg mr-2' />}
+                prefix={<SearchOutlined className='mr-2 text-lg text-slate-400' />}
                 placeholder='Search enterprise...'
                 defaultValue={student.status === 'placed' ? 'Global Tech Solutions' : ''}
                 className='rounded-xl border-[#d52020]/20 py-3'
@@ -811,41 +804,40 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClo
             </div>
           </div>
         </section>
-
         {/* Feedback History */}
         <section>
-          <div className='flex items-center justify-between mb-4'>
+          <div className='mb-4 flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <HistoryOutlined className='text-[#d52020] text-xl' />
-              <h2 className='text-slate-900 text-lg font-bold m-0'>Feedback History</h2>
+              <HistoryOutlined className='text-xl text-[#d52020]' />
+              <h2 className='m-0 text-lg font-bold text-slate-900'>Feedback History</h2>
             </div>
-            <button className='text-[#d52020] text-sm font-bold flex items-center gap-1 hover:underline bg-transparent border-none cursor-pointer'>
+            <button className='flex cursor-pointer items-center gap-1 border-none bg-transparent text-sm font-bold text-[#d52020] hover:underline'>
               View All
             </button>
           </div>
           <div className='space-y-3'>
-            <div className='bg-white p-4 rounded-xl border border-[#d52020]/10 shadow-sm'>
-              <div className='flex justify-between items-start mb-2'>
-                <p className='text-slate-900 font-bold text-sm m-0'>Final Technical Interview</p>
+            <div className='rounded-xl border border-[#d52020]/10 bg-white p-4 shadow-sm'>
+              <div className='mb-2 flex items-start justify-between'>
+                <p className='m-0 text-sm font-bold text-slate-900'>Final Technical Interview</p>
                 <span className='text-[10px] font-bold text-slate-400 uppercase'>2 days ago</span>
               </div>
-              <p className='text-slate-600 text-xs leading-relaxed m-0'>
+              <p className='m-0 text-xs leading-relaxed text-slate-600'>
                 Candidate showed exceptional problem-solving skills and knowledge of distributed
                 systems. Highly recommended.
               </p>
               <div className='mt-3 flex items-center gap-2'>
-                <div className='size-6 rounded-full bg-[#d52020]/20 flex items-center justify-center'>
-                  <StarFilled className='text-[#d52020] text-[12px]' />
+                <div className='flex size-6 items-center justify-center rounded-full bg-[#d52020]/20'>
+                  <StarFilled className='text-[12px] text-[#d52020]' />
                 </div>
                 <span className='text-xs font-bold text-slate-700'>Rating: 4.8/5.0</span>
               </div>
             </div>
-            <div className='bg-white p-4 rounded-xl border border-[#d52020]/10 shadow-sm'>
-              <div className='flex justify-between items-start mb-2'>
-                <p className='text-slate-900 font-bold text-sm m-0'>HR Culture Fit</p>
+            <div className='rounded-xl border border-[#d52020]/10 bg-white p-4 shadow-sm'>
+              <div className='mb-2 flex items-start justify-between'>
+                <p className='m-0 text-sm font-bold text-slate-900'>HR Culture Fit</p>
                 <span className='text-[10px] font-bold text-slate-400 uppercase'>1 week ago</span>
               </div>
-              <p className='text-slate-600 text-xs leading-relaxed m-0'>
+              <p className='m-0 text-xs leading-relaxed text-slate-600'>
                 Good communication skills and alignment with company values.
               </p>
             </div>
@@ -855,43 +847,66 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({ visible, onClo
     </Drawer>
   );
 });
-
-// --- MAIN COMPONENT ---
-
 export default function StudentEnrollment() {
   const [students, setStudents] = useState(MOCK_STUDENTS);
   const [searchTerm, setSearchTerm] = useState('');
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 5,
+  });
   const [statusFilter, setStatusFilter] = useState('');
   const [majorFilter, setMajorFilter] = useState('');
-
   const [isImportModalVisible, setIsImportModalVisible] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-
   const [isViewDrawerVisible, setIsViewDrawerVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const filteredStudents = useMemo(() => {
-    return students.filter((student) => {
-      const matchSearch =
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.id.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchStatus = statusFilter ? student.status === statusFilter : true;
-      const matchMajor = majorFilter ? student.major === majorFilter : true;
-      return matchSearch && matchStatus && matchMajor;
-    });
+    const s = searchTerm.trim().toLowerCase();
+    return students.filter(
+      (st) =>
+        (!s || st.name.toLowerCase().includes(s) || st.id.toLowerCase().includes(s)) &&
+        (!statusFilter || st.status === statusFilter) &&
+        (!majorFilter || st.major === majorFilter),
+    );
   }, [students, searchTerm, statusFilter, majorFilter]);
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
+  const handleStatusChange = (value) => {
+    setStatusFilter(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
+  const handleMajorChange = (value) => {
+    setMajorFilter(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+  const paginatedStudents = useMemo(() => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    const end = start + pagination.pageSize;
+    return filteredStudents.slice(start, end);
+  }, [filteredStudents, pagination]);
+
+  // useEffect(() => {
+  //   setPagination((prev) => ({ ...prev, current: 1 }));
+  // }, [searchTerm, statusFilter, majorFilter]);
+
+  const handleTableChange = (page) => {
+    setPagination((prev) => ({ ...prev, current: page }));
+  };
 
   const handleView = (student) => {
     setSelectedStudent(student);
     setIsViewDrawerVisible(true);
   };
-
   const handleEdit = (student) => {
     setSelectedStudent(student);
     setIsEditModalVisible(true);
   };
-
   const handleDelete = (student) => {
     Modal.confirm({
       title: 'Xóa sinh viên',
@@ -905,33 +920,49 @@ export default function StudentEnrollment() {
       },
     });
   };
-
   return (
-    <div className='flex-1 flex flex-col p-6 lg:p-10 font-[family-name:var(--font-primary)] overflow-hidden bg-[#FCFAFA] h-full'>
-      <div className='max-w-7xl mx-auto flex flex-col flex-1 overflow-hidden w-full'>
+    <div className='flex h-[calc(100vh-48px)] w-full flex-col overflow-hidden'>
+      <div className='mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col space-y-6 overflow-hidden'>
         <HeaderActions
           onImport={() => setIsImportModalVisible(true)}
           onAdd={() => setIsAddModalVisible(true)}
         />
         <FiltersAndSearch
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
+          // onSearchChange={setSearchTerm}
+          onSearchChange={handleSearchChange}
           statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
+          // onStatusFilterChange={setStatusFilter}
+          onStatusFilterChange={handleStatusChange}
           majorFilter={majorFilter}
-          onMajorFilterChange={setMajorFilter}
+          // onMajorFilterChange={setMajorFilter}
+          onMajorFilterChange={handleMajorChange}
         />
         <DataGrid
-          students={filteredStudents}
+          students={paginatedStudents}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
+        <div className='mt-auto flex items-center justify-between border-t border-slate-100 px-2 pt-6'>
+          <div className='text-xs font-semibold tracking-widest text-slate-400 uppercase'>
+            Total: {filteredStudents.length}
+          </div>
+          <Pagination
+            {...pagination}
+            total={filteredStudents.length}
+            showSizeChanger={false}
+            onChange={handleTableChange}
+            itemRender={(page, type, originalElement) => {
+              if (type === 'prev') return <LeftOutlined />;
+              if (type === 'next') return <RightOutlined />;
+              return originalElement;
+            }}
+          />
+        </div>
       </div>
-
       <ImportModal visible={isImportModalVisible} onClose={() => setIsImportModalVisible(false)} />
       <AddStudentModal visible={isAddModalVisible} onClose={() => setIsAddModalVisible(false)} />
-
       <EditStudentModal
         visible={isEditModalVisible}
         onClose={() => {
@@ -940,7 +971,6 @@ export default function StudentEnrollment() {
         }}
         student={selectedStudent}
       />
-
       <StudentDetailsDrawer
         visible={isViewDrawerVisible}
         onClose={() => {

@@ -24,7 +24,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { LogBookService } from '@/services/logBook.service';
-import { ProjectService } from '@/services/projectService';
+// import { ProjectService } from '@/services/projectService';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import dayjs from 'dayjs';
@@ -33,10 +33,11 @@ import Card from '@/shared/components/Card';
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-export default function DailyReport() {
+export default function DailyReport({ internshipId }) {
   const [messageApi, contextHolder] = message.useMessage();
   const searchParams = useSearchParams();
-  const internshipId = searchParams.get('id');
+  const internshipIdFromUrl = searchParams.get('id');
+  const effectiveInternshipId = internshipId || internshipIdFromUrl;
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,12 +47,13 @@ export default function DailyReport() {
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState(undefined);
   const [sortOrder, setSortOrder] = useState('desc');
-  const [projectId, setProjectId] = useState(null);
+  // const [projectId, setProjectId] = useState(initialProjectId || null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewRecord, setViewRecord] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [editingRecord, setEditingRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
@@ -81,39 +83,92 @@ export default function DailyReport() {
     }
   }, []);
 
+  // const fetchLogbooks = useCallback(async () => {
+  //   let idToFetch = projectId;
+  //   setLoading(true);
+
+  //   try {
+  //     let matchedId = effectiveInternshipId;
+
+  //     if (!idToFetch) {
+  //       let projectRes;
+
+  //       if (effectiveInternshipId) {
+  //         projectRes = await ProjectService.getByInternshipGroup(effectiveInternshipId);
+  //       } else {
+  //         projectRes = await ProjectService.getAll();
+  //       }
+
+  //       if (projectRes && projectRes.isSuccess !== false && projectRes.data) {
+  //         const projectItems = projectRes.data.items || projectRes.items || [];
+  //         console.log('DAILY_REPORT: Projects found:', projectItems);
+  //         if (projectItems.length > 0) {
+  //           const matchedProject = effectiveInternshipId
+  //             ? projectItems.find((p) => p.internshipId === effectiveInternshipId) ||
+  //               projectItems[0]
+  //             : projectItems[0];
+
+  //           idToFetch = matchedProject.projectId;
+  //           matchedId =
+  //             matchedProject.internshipId || matchedProject.internshipGroupId || idToFetch;
+  //           console.log('DAILY_REPORT: Using IDs:', {
+  //             projectId: idToFetch,
+  //             internshipId: matchedId,
+  //           });
+  //           setProjectId(idToFetch);
+  //         }
+  //       }
+  //     }
+
+  //     if (!matchedId) {
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     const res = await LogBookService.getAll(matchedId, {
+  //       Status: statusFilter,
+  //       PageNumber: pageNumber,
+  //       PageSize: pageSize,
+  //       SortColumn: 'dateReport',
+  //       SortOrder: sortOrder,
+  //     });
+
+  //     if (res && res.isSuccess !== false) {
+  //       let items = [];
+  //       if (Array.isArray(res.data)) {
+  //         items = res.data;
+  //       } else if (res.data?.items && Array.isArray(res.data.items)) {
+  //         items = res.data.items;
+  //       } else if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
+  //         items = [res.data];
+  //       } else if (Array.isArray(res.items)) {
+  //         items = res.items;
+  //       }
+
+  //       if (statusFilter) {
+  //         items = items.filter((item) => {
+  //           const itemStatus = item.status ? String(item.status).toUpperCase() : '';
+  //           return itemStatus === String(statusFilter).toUpperCase();
+  //         });
+  //       }
+
+  //       const startIndex = (pageNumber - 1) * pageSize;
+  //       const pagedItems = items.slice(startIndex, startIndex + pageSize);
+
+  //       setData(pagedItems);
+  //       setTotal(items.length);
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [effectiveInternshipId, projectId, statusFilter, pageNumber, pageSize, sortOrder, messageApi]);
   const fetchLogbooks = useCallback(async () => {
-    let idToFetch = projectId;
+    if (!effectiveInternshipId) return;
+
     setLoading(true);
 
     try {
-      if (!idToFetch) {
-        let projectRes;
-
-        if (internshipId) {
-          projectRes = await ProjectService.getByInternshipGroup(internshipId);
-        } else {
-          projectRes = await ProjectService.getAll();
-        }
-
-        if (projectRes && projectRes.isSuccess !== false && projectRes.data) {
-          const items = projectRes.data.items || projectRes.items || [];
-          if (items.length > 0) {
-            const matchedProject = internshipId
-              ? items.find((p) => p.internshipId === internshipId) || items[0]
-              : items[0];
-
-            idToFetch = matchedProject.projectId;
-            setProjectId(idToFetch);
-          }
-        }
-      }
-
-      if (!idToFetch) {
-        setLoading(false);
-        return;
-      }
-
-      const res = await LogBookService.getAll(idToFetch, {
+      const res = await LogBookService.getAll(effectiveInternshipId, {
         Status: statusFilter,
         PageNumber: pageNumber,
         PageSize: pageSize,
@@ -121,35 +176,29 @@ export default function DailyReport() {
         SortOrder: sortOrder,
       });
 
-      if (res && res.isSuccess !== false) {
+      if (res && (res.isSuccess !== false || res.success !== false)) {
+        // Handle different response shapes
         let items = [];
-        if (Array.isArray(res.data)) {
-          items = res.data;
-        } else if (res.data?.items && Array.isArray(res.data.items)) {
+        let totalCount = 0;
+
+        if (res.data?.items) {
           items = res.data.items;
-        } else if (res.data && typeof res.data === 'object' && !Array.isArray(res.data)) {
-          items = [res.data];
-        } else if (Array.isArray(res.items)) {
+          totalCount = res.data.totalCount || items.length;
+        } else if (Array.isArray(res.data)) {
+          items = res.data;
+          totalCount = items.length;
+        } else if (res.items) {
           items = res.items;
+          totalCount = res.totalCount || items.length;
         }
 
-        if (statusFilter) {
-          items = items.filter((item) => {
-            const itemStatus = item.status ? String(item.status).toUpperCase() : '';
-            return itemStatus === String(statusFilter).toUpperCase();
-          });
-        }
-
-        const startIndex = (pageNumber - 1) * pageSize;
-        const pagedItems = items.slice(startIndex, startIndex + pageSize);
-
-        setData(pagedItems);
-        setTotal(items.length);
+        setData(items);
+        setTotal(totalCount);
       }
     } finally {
       setLoading(false);
     }
-  }, [internshipId, projectId, statusFilter, pageNumber, pageSize, sortOrder, messageApi]);
+  }, [effectiveInternshipId, statusFilter, pageNumber, pageSize, sortOrder]);
 
   useEffect(() => {
     fetchLogbooks();
@@ -167,8 +216,8 @@ export default function DailyReport() {
   };
 
   const handleCreateOrUpdate = async (values) => {
-    const targetId = projectId;
-    if (!targetId) {
+    // if (!effectiveInternshipId && !projectId) {
+    if (!effectiveInternshipId) {
       messageApi.error(DAILY_REPORT_MESSAGES.ERROR.MISSING_PROJECT_ID);
       return;
     }
@@ -180,32 +229,41 @@ export default function DailyReport() {
     setSubmitting(true);
     try {
       let res;
+      const SUBMITTED_STATUS = 0;
+      const PUNCTUAL_STATUS = 3;
+
       if (editingId) {
         const updatePayload = {
-          projectId: targetId,
-          logbookId: editingId,
-          summary: values.summary,
-          issue: values.issue || '',
-          plan: values.plan,
-          dateReport: values.dateReport.toISOString(),
+          InternshipId: editingRecord?.internshipId || effectiveInternshipId,
+          Summary: values.summary,
+          Issue: values.issue || '',
+          Plan: values.plan,
+          DateReport: values.dateReport.toISOString(),
+          Status: PUNCTUAL_STATUS,
         };
-        res = await LogBookService.update(targetId, editingId, updatePayload);
+        console.log('DAILY_REPORT: Updating logbook:', updatePayload);
+        res = await LogBookService.update(editingId, updatePayload);
       } else {
         const createPayload = {
-          projectId: targetId,
-          summary: values.summary,
-          issue: values.issue || '',
-          plan: values.plan,
-          dateReport: values.dateReport.toISOString(),
+          InternshipId: effectiveInternshipId,
+          Summary: values.summary,
+          Issue: values.issue || '',
+          Plan: values.plan,
+          DateReport: values.dateReport.toISOString(),
+          Status: SUBMITTED_STATUS,
         };
-        res = await LogBookService.create(targetId, createPayload);
+        console.log('DAILY_REPORT: Creating logbook:', createPayload);
+        res = await LogBookService.create(createPayload);
       }
 
-      if (res && res.isSuccess !== false) {
+      if (res && (res.isSuccess !== false || res.success !== false)) {
         messageApi.success(
           editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
         );
         closeModal();
+        if (!editingId) {
+          setPageNumber(1);
+        }
         fetchLogbooks();
       } else {
         messageApi.error(
@@ -226,6 +284,7 @@ export default function DailyReport() {
 
   const handleEdit = (record) => {
     setEditingId(record.logbookId);
+    setEditingRecord(record);
 
     form.setFieldsValue({
       dateReport: record.dateReport ? dayjs(record.dateReport) : null,
@@ -244,13 +303,13 @@ export default function DailyReport() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
+    setEditingRecord(null);
     form.resetFields();
   };
 
   const handleDelete = async (id) => {
     try {
-      if (!projectId) return;
-      const res = await LogBookService.delete(projectId, id);
+      const res = await LogBookService.delete(id);
       if (res && res.isSuccess !== false) {
         messageApi.success(DAILY_REPORT_MESSAGES.SUCCESS.DELETE);
         if (data.length === 1 && pageNumber > 1) {
@@ -265,12 +324,27 @@ export default function DailyReport() {
       messageApi.error(DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
     }
   };
-
   const renderStatus = (status) => {
     const config = {
+      0: {
+        label: DAILY_REPORT_UI.STATUS.SUBMITTED,
+        style: 'bg-blue-50 text-blue-600 border-blue-200 border',
+      },
+      SUBMITTED: {
+        label: DAILY_REPORT_UI.STATUS.SUBMITTED,
+        style: 'bg-blue-50 text-blue-600 border-blue-200 border',
+      },
+      3: {
+        label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
+        style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      },
       PUNCTUAL: {
         label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
         style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      },
+      4: {
+        label: DAILY_REPORT_UI.STATUS.LATE,
+        style: 'bg-red-50 text-red-600 border-red-200 border',
       },
       LATE: {
         label: DAILY_REPORT_UI.STATUS.LATE,
@@ -284,11 +358,12 @@ export default function DailyReport() {
     };
 
     return (
-      <div className={`inline-flex px-3 py-1 rounded-full text-[13px] font-semibold ${c.style}`}>
+      <div className={`inline-flex rounded-full px-3 py-1 text-[13px] font-semibold ${c.style}`}>
         {c.label}
       </div>
     );
   };
+
   const columns = [
     {
       title: DAILY_REPORT_UI.TABLE.REPORT_DATE,
@@ -350,13 +425,13 @@ export default function DailyReport() {
             <Button
               type='text'
               icon={
-                <FileTextOutlined className='text-gray-500 hover:text-blue-600 transition-colors' />
+                <FileTextOutlined className='text-gray-500 transition-colors hover:text-blue-600' />
               }
               onClick={(e) => {
                 e.stopPropagation();
                 handleView(record);
               }}
-              className='hover:bg-blue-50 w-8 h-8 rounded-lg flex items-center justify-center'
+              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-blue-50'
             />
           </Tooltip>
 
@@ -364,13 +439,13 @@ export default function DailyReport() {
             <Button
               type='text'
               icon={
-                <EditOutlined className='text-gray-500 hover:text-blue-600 transition-colors' />
+                <EditOutlined className='text-gray-500 transition-colors hover:text-blue-600' />
               }
               onClick={(e) => {
                 e.stopPropagation();
                 handleEdit(record);
               }}
-              className='hover:bg-blue-50 w-8 h-8 rounded-lg flex items-center justify-center'
+              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-blue-50'
             />
           </Tooltip>
 
@@ -379,7 +454,7 @@ export default function DailyReport() {
               type='text'
               danger
               icon={
-                <DeleteOutlined className='text-gray-400 hover:text-red-500 transition-colors' />
+                <DeleteOutlined className='text-gray-400 transition-colors hover:text-red-500' />
               }
               onClick={(e) => {
                 e.stopPropagation();
@@ -395,7 +470,7 @@ export default function DailyReport() {
                   cancelButtonProps: { className: 'rounded-lg font-medium' },
                 });
               }}
-              className='hover:bg-red-50 w-8 h-8 rounded-lg flex items-center justify-center'
+              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50'
             />
           </Tooltip>
         </div>
@@ -403,14 +478,15 @@ export default function DailyReport() {
     },
   ];
 
-  if (!projectId && !loading && total === 0) {
+  // if (!projectId && !loading && total === 0) {
+  if (!effectiveInternshipId && !loading) {
     return (
-      <div className='flex h-[400px] items-center justify-center bg-gray-50/50 rounded-[24px] border border-gray-200/50 m-6'>
+      <div className='m-6 flex h-[400px] items-center justify-center rounded-[24px] border border-gray-200/50 bg-gray-50/50'>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           className='my-auto'
           description={
-            <span className='text-gray-500 font-medium'>{DAILY_REPORT_UI.EMPTY.NO_PROJECT}</span>
+            <span className='font-medium text-gray-500'>{DAILY_REPORT_UI.EMPTY.NO_PROJECT}</span>
           }
         />
       </div>
@@ -418,20 +494,20 @@ export default function DailyReport() {
   }
 
   return (
-    <div className='max-w-[1400px] mx-auto pb-4 gap-4'>
+    <div className='mx-auto max-w-[1400px] gap-4 pb-4'>
       {contextHolder}
 
-      <div className='flex items-center justify-between mt-4 px-2 shrink-0 mb-4'>
+      <div className='mt-4 mb-4 flex shrink-0 items-center justify-between px-2'>
         <div>
           <Title level={2} className='!mb-1 tracking-tight text-gray-900'>
             {DAILY_REPORT_UI.TITLE}
           </Title>
-          <Text className='text-gray-500 text-[15px]'>{DAILY_REPORT_UI.DESCRIPTION}</Text>
+          <Text className='text-[15px] text-gray-500'>{DAILY_REPORT_UI.DESCRIPTION}</Text>
         </div>
       </div>
 
       <Card>
-        <div className='px-2 py-2 border-none flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0'>
+        <div className='flex shrink-0 flex-col justify-between gap-4 border-none px-2 py-2 md:flex-row md:items-center'>
           <div className='flex items-center gap-4'>
             <Select
               allowClear
@@ -446,8 +522,9 @@ export default function DailyReport() {
               classNames={{ popup: '!rounded-xl shadow-lg border border-gray-100' }}
               suffixIcon={<FilterOutlined />}
               options={[
-                { value: 'PUNCTUAL', label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-                { value: 'LATE', label: DAILY_REPORT_UI.STATUS.LATE },
+                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
+                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
             />
           </div>
@@ -456,15 +533,15 @@ export default function DailyReport() {
             type='primary'
             icon={<PlusOutlined />}
             onClick={() => setIsModalOpen(true)}
-            className='bg-black hover:bg-gray-800 text-white rounded-xl h-10 px-6 font-semibold shadow-sm border-0 transition-all hover:scale-105'
+            className='h-10 rounded-xl border-0 bg-black px-6 font-semibold text-white shadow-sm transition-all hover:scale-105 hover:bg-gray-800'
           >
             {DAILY_REPORT_UI.CREATE_BUTTON}
           </Button>
         </div>
 
-        <div className='px-2 pb-2 mt-2 flex-grow'>
+        <div className='mt-2 flex-grow px-2 pb-2'>
           {loading ? (
-            <div className='p-6 space-y-4'>
+            <div className='space-y-4 p-6'>
               <Skeleton active paragraph={{ rows: 6 }} />
             </div>
           ) : (
@@ -488,7 +565,7 @@ export default function DailyReport() {
                     <Empty
                       image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description={
-                        <span className='text-gray-400 font-medium'>
+                        <span className='font-medium text-gray-400'>
                           {DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}
                         </span>
                       }
@@ -503,12 +580,12 @@ export default function DailyReport() {
 
       <Modal
         title={
-          <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
+          <div className='mb-4 flex items-center gap-3 border-b border-gray-100 py-2'>
             <div>
-              <h3 className='text-lg font-bold text-gray-900 m-0'>
+              <h3 className='m-0 text-lg font-bold text-gray-900'>
                 {editingId ? DAILY_REPORT_UI.MODAL.EDIT_TITLE : DAILY_REPORT_UI.MODAL.CREATE_TITLE}
               </h3>
-              <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
+              <p className='m-0 mt-0.5 text-sm font-medium text-gray-500'>
                 {editingId ? DAILY_REPORT_UI.MODAL.EDIT_DESC : DAILY_REPORT_UI.MODAL.CREATE_DESC}
               </p>
             </div>
@@ -532,9 +609,9 @@ export default function DailyReport() {
             'rounded-lg h-10 px-5 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600',
         }}
       >
-        <div className='max-h-[60vh] overflow-y-auto px-1 custom-scrollbar'>
+        <div className='custom-scrollbar max-h-[60vh] overflow-y-auto px-1'>
           <Form form={form} layout='vertical' onFinish={handleCreateOrUpdate} className='mt-2'>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6'>
+            <div className='grid grid-cols-1 gap-x-6 md:grid-cols-2'>
               <Form.Item
                 label={
                   <span className='text-sm font-semibold text-gray-700'>
@@ -545,7 +622,7 @@ export default function DailyReport() {
                 rules={[{ required: true, message: 'Please select a date!' }]}
               >
                 <DatePicker
-                  className='w-full h-[44px] rounded-xl'
+                  className='h-[44px] w-full rounded-xl'
                   format='DD/MM/YYYY'
                   disabledDate={(current) => current && current > dayjs().endOf('day')}
                 />
@@ -609,15 +686,15 @@ export default function DailyReport() {
 
       <Modal
         title={
-          <div className='flex items-center gap-3 py-2 border-b border-gray-100 mb-4'>
-            <div className='w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shrink-0'>
+          <div className='mb-4 flex items-center gap-3 border-b border-gray-100 py-2'>
+            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600'>
               <FileTextOutlined className='text-lg' />
             </div>
             <div>
-              <h3 className='text-lg font-bold text-gray-900 m-0'>
+              <h3 className='m-0 text-lg font-bold text-gray-900'>
                 {DAILY_REPORT_UI.VIEW_MODAL.TITLE}
               </h3>
-              <p className='text-sm text-gray-500 font-medium m-0 mt-0.5'>
+              <p className='m-0 mt-0.5 text-sm font-medium text-gray-500'>
                 {viewRecord ? dayjs(viewRecord.dateReport).format('DD/MM/YYYY') : ''}
               </p>
             </div>
@@ -629,7 +706,7 @@ export default function DailyReport() {
           <Button
             key='close'
             onClick={() => setIsViewModalOpen(false)}
-            className='rounded-lg h-10 px-6 font-medium border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-600'
+            className='h-10 rounded-lg border-gray-200 px-6 font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50'
           >
             {DAILY_REPORT_UI.VIEW_MODAL.CLOSE}
           </Button>,
@@ -639,10 +716,10 @@ export default function DailyReport() {
         centered
       >
         {viewRecord && (
-          <div className='space-y-6 mt-2 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar'>
-            <div className='grid grid-cols-2 gap-4 pb-4 border-b border-gray-100'>
+          <div className='custom-scrollbar mt-2 max-h-[60vh] space-y-6 overflow-y-auto px-1'>
+            <div className='grid grid-cols-2 gap-4 border-b border-gray-100 pb-4'>
               <div>
-                <span className='block text-sm font-semibold text-gray-500 mb-1'>
+                <span className='mb-1 block text-sm font-semibold text-gray-500'>
                   {DAILY_REPORT_UI.TABLE.STUDENT}
                 </span>
                 <span className='text-base font-medium text-gray-900'>
@@ -650,7 +727,7 @@ export default function DailyReport() {
                 </span>
               </div>
               <div>
-                <span className='block text-sm font-semibold text-gray-500 mb-1'>
+                <span className='mb-1 block text-sm font-semibold text-gray-500'>
                   {DAILY_REPORT_UI.TABLE.STATUS}
                 </span>
                 {renderStatus(viewRecord.status)}
@@ -658,28 +735,28 @@ export default function DailyReport() {
             </div>
 
             <div>
-              <span className='block text-md font-semibold text-gray-800 mb-2'>
+              <span className='text-md mb-2 block font-semibold text-gray-800'>
                 {DAILY_REPORT_UI.FORM.SUMMARY}
               </span>
-              <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
+              <div className='rounded-xl bg-gray-50 p-4 whitespace-pre-wrap text-gray-700'>
                 {viewRecord.summary || DAILY_REPORT_UI.VIEW_MODAL.NO_SUMMARY}
               </div>
             </div>
 
             <div>
-              <span className='block text-md font-semibold text-gray-800 mb-2'>
+              <span className='text-md mb-2 block font-semibold text-gray-800'>
                 {DAILY_REPORT_UI.FORM.ISSUE}
               </span>
-              <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
+              <div className='rounded-xl bg-gray-50 p-4 whitespace-pre-wrap text-gray-700'>
                 {viewRecord.issue || 'No issues reported.'}
               </div>
             </div>
 
             <div>
-              <span className='block text-md font-semibold text-gray-800 mb-2'>
+              <span className='text-md mb-2 block font-semibold text-gray-800'>
                 {DAILY_REPORT_UI.FORM.PLAN}
               </span>
-              <div className='bg-gray-50 p-4 rounded-xl text-gray-700 whitespace-pre-wrap'>
+              <div className='rounded-xl bg-gray-50 p-4 whitespace-pre-wrap text-gray-700'>
                 {viewRecord.plan || 'No plan outlined.'}
               </div>
             </div>

@@ -4,8 +4,9 @@ import { useEffect, useState, useRef } from 'react';
 import Card from '@/shared/components/Card';
 // import { getViolationList } from '@/mocks/mockViolationList';
 import SearchBar from '@/shared/components/SearchBar';
-import { PlusOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import Footer from '@/shared/components/Footer';
+import AppTable from '@/shared/components/AppTable';
 
 export default function ViolationList() {
   const [violations] = useState([]);
@@ -15,6 +16,57 @@ export default function ViolationList() {
   const [sortOrder, setSortOrder] = useState('desc');
 
   const tableRef = useRef(null);
+  const handleSortDate = () => {
+    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+  };
+  const columns = [
+    {
+      title: 'STT',
+      width: 60,
+      render: (_, __, index) => (page - 1) * pageSize + index + 1,
+    },
+    {
+      title: 'Violation Type',
+      dataIndex: 'type',
+      key: 'type',
+      width: 180,
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      width: 250,
+    },
+    {
+      title: 'Violation Time',
+      dataIndex: 'violationTime',
+      key: 'violationTime',
+      width: 180,
+      render: (text) => formatDateTime(text),
+    },
+    {
+      title: 'Reporter',
+      dataIndex: 'reporter',
+      key: 'reporter',
+      width: 150,
+    },
+    {
+      title: (
+        <div className='flex cursor-pointer items-center gap-1' onClick={handleSortDate}>
+          Created Date
+          <div className='flex flex-col text-[8px]'>
+            <CaretUpOutlined className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'} />
+            <CaretDownOutlined
+              className={sortOrder === 'desc' ? 'text-blue-600' : 'text-slate-300'}
+            />
+          </div>
+        </div>
+      ),
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text) => formatDate(text),
+    },
+  ];
 
   useEffect(() => {
     tableRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -44,12 +96,8 @@ export default function ViolationList() {
   const totalPages = Math.ceil(total / pageSize);
   const paginatedViolations = sortedViolations.slice((page - 1) * pageSize, page * pageSize);
 
-  const handleSortDate = () => {
-    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
-  };
-
   return (
-    <section className='flex flex-col h-full space-y-6'>
+    <section className='flex h-full flex-col space-y-6'>
       <h1 className='text-2xl font-bold text-slate-900'>Violation</h1>
       <Card>
         <div className='mb-5'>
@@ -61,12 +109,13 @@ export default function ViolationList() {
               setPage(1);
             }}
             showFilter
-            actionIcon={<PlusOutlined />}
+            // size="large"
+            onActionClick={() => {}}
           />
         </div>
 
-        <div className='overflow-auto max-h-96 border-t border-slate-200' ref={tableRef}>
-          <table className='w-full text-left table-fixed'>
+        <div className='max-h-96 overflow-auto border-t border-slate-200' ref={tableRef}>
+          {/* <table className='w-full text-left table-fixed'>
             <thead className='border-b border-slate-300 text-xs text-slate-400 bg-slate-50 sticky top-0 z-10'>
               <tr>
                 <th className='px-6 py-4 w-[60px]'>STT</th>
@@ -120,7 +169,14 @@ export default function ViolationList() {
                 </tr>
               )}
             </tbody>
-          </table>
+          </table> */}
+          <AppTable
+            columns={columns}
+            data={paginatedViolations}
+            rowKey='id'
+            pagination={false}
+            emptyText='No violations found'
+          />
         </div>
       </Card>
 
