@@ -1,5 +1,5 @@
-import Header from '@/shared/components/Header';
-import Sidebar from '@/shared/components/Sidebar';
+import Header from '@/components/shared/Header';
+import Sidebar from '@/components/shared/Sidebar';
 
 export default function Space({ children }) {
   return (

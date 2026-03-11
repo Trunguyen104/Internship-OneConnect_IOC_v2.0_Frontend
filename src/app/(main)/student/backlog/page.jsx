@@ -1,8 +1,8 @@
 'use client';
 
-import PageShell from '@/shared/components/PageShell';
-import StudentTabs from '@/shared/components/StudentTabs';
-import BacklogBoard from '@/feature/student/backlog-board/BacklogBoard';
+import PageShell from '@/components/shared/PageShell';
+import StudentTabs from '@/components/shared/StudentTabs';
+import BacklogBoard from '@/components/feature/student/backlog-board/BacklogBoard';
 
 export default function BacklogBoardPage() {
   return (

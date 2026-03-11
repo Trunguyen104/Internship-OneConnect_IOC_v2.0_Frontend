@@ -1,4 +1,4 @@
-import StudentEnrollment from '@/feature/uni-admin/StudentEnrollment';
+import StudentEnrollment from '@/components/feature/uni-admin/StudentEnrollment';
 import React from 'react';
 export const dynamic = 'force-dynamic';
 export default function page() {

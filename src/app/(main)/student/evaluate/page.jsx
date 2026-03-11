@@ -1,5 +1,5 @@
-// import Evaluate from '@/feature/student/Evaluate';
-import EvaluationPage from '@/feature/student/evaluate/EvaluationPage';
+// import Evaluate from '@/components/feature/student/Evaluate';
+import EvaluationPage from '@/components/feature/student/evaluate/EvaluationPage';
 import React from 'react';
 
 export default function page() {

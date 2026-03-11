@@ -1,5 +1,5 @@
-import JobBoardPage from '@/feature/job-board/JobBoardPage';
-import Header from '@/shared/components/Header';
+import JobBoardPage from '@/components/feature/job-board/JobBoardPage';
+import Header from '@/components/shared/Header';
 import React from 'react';
 
 function page() {

@@ -1,4 +1,4 @@
-// import Sidebar from '@/shared/components/Sidebar';
+// import Sidebar from '@/components/shared/Sidebar';
 
 export default function Profile({ children }) {
   return (
