@@ -19,10 +19,9 @@ const StakeholderIssueService = {
 
   updateStatus: (id, status) => {
     return httpPatch(`/stakeholder-issues/${id}/status`, {
-      status: status,
+      status: Number(status),
     });
   },
 };
 
 export default StakeholderIssueService;
-

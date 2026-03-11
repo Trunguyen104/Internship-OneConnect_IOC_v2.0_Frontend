@@ -40,7 +40,17 @@ export function useIssueTab() {
   const handleViewDetail = async (id) => {
     try {
       const res = await StakeholderIssueService.getById(id);
-      setIssueDetail(res.data);
+      if (res?.data) {
+        const item = res.data;
+        const normalized = {
+          ...item,
+          status:
+            typeof item.status === 'string'
+              ? (ISSUE_STATUS[item.status.toUpperCase()] ?? item.status)
+              : item.status,
+        };
+        setIssueDetail(normalized);
+      }
     } catch {
       // toast.error('Failed to load detail');
     }
@@ -96,17 +106,24 @@ export function useIssueTab() {
 
   const handleToggleStatus = async (issue) => {
     try {
+      const currentStatus = Number(issue.status);
       const newStatus =
-        issue.status === ISSUE_STATUS.RESOLVED ? ISSUE_STATUS.OPEN : ISSUE_STATUS.RESOLVED;
+        currentStatus === ISSUE_STATUS.RESOLVED ? ISSUE_STATUS.OPEN : ISSUE_STATUS.RESOLVED;
 
-      await StakeholderIssueService.updateStatus(issue.id, newStatus);
+      const res = await StakeholderIssueService.updateStatus(issue.id, newStatus);
+
+      if (res && res.isSuccess === false) {
+        toast.error(res.message || ISSUE_MESSAGES.UPDATE_STATUS_FAILED);
+        return;
+      }
 
       toast.success(
         newStatus === ISSUE_STATUS.RESOLVED ? ISSUE_MESSAGES.RESOLVED : ISSUE_MESSAGES.REOPENED,
       );
 
       fetchIssues();
-    } catch {
+    } catch (err) {
+      console.error('Update status error:', err);
       toast.error(ISSUE_MESSAGES.UPDATE_STATUS_FAILED);
     }
   };
@@ -163,7 +180,14 @@ export function useIssueTab() {
       const res = await StakeholderIssueService.getAll(params);
 
       if (res?.data?.items) {
-        setIssues(res.data.items);
+        const normalizedItems = res.data.items.map((item) => ({
+          ...item,
+          status:
+            typeof item.status === 'string'
+              ? (ISSUE_STATUS[item.status.toUpperCase()] ?? item.status)
+              : item.status,
+        }));
+        setIssues(normalizedItems);
         setTotal(res.data.totalCount || 0);
       }
     } finally {
@@ -205,4 +229,3 @@ export function useIssueTab() {
     fetchIssues,
   };
 }
-
