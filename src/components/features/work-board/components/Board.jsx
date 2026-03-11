@@ -42,7 +42,7 @@ export default function Board() {
       <div className='flex flex-col gap-4 mb-4'>
         <StudentTabs />
         <div className='flex items-center gap-2'>
-          <div className='w-full max-w-sm border rounded-full px-4 py-2 bg-white'>
+          <div className='w-full max-sm:max-w-xs max-w-sm border rounded-full px-4 py-2 bg-white'>
             <input
               placeholder='Search tasks...'
               className='bg-transparent outline-none w-full text-sm'
@@ -94,4 +94,3 @@ export default function Board() {
     </PageShell>
   );
 }
-

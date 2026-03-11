@@ -50,7 +50,7 @@ export function SprintSection({
         <div className='flex-1' />
 
         {/* Dynamic Start/Complete Sprint button based on status */}
-        {sprint.status === SPRINT_STATUS.ACTIVE ? (
+        {((sprint.status === SPRINT_STATUS.ACTIVE) || (sprint.status === 'ACTIVE')) ? (
           <button
             onClick={() => handleSprintActionClick(sprint, false)}
             className='h-[34px] px-5 border border-green-200 bg-green-50 rounded-full text-[13px] font-medium text-green-700 hover:bg-green-100 transition-colors flex items-center shadow-sm'

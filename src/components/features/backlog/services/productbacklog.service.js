@@ -5,10 +5,10 @@ import { httpGet, httpPost, httpPut, httpDelete, httpPatch } from '@/services/ht
 export const productBacklogService = {
   // Epics
   getEpics(projectId) {
-    return httpGet(`/epics?projectId=${projectId}`);
+    return httpGet('/epics', { projectId });
   },
   createEpic(projectId, payload) {
-    return httpPost(`/epics`, payload);
+    return httpPost('/epics', payload);
   },
   getEpicById(projectId, id) {
     return httpGet(`/projects/${projectId}/epics/${id}`);
@@ -22,21 +22,21 @@ export const productBacklogService = {
 
   // WorkItems
   getWorkItemsBacklog(projectId) {
-    return httpGet(`/work-items/backlog?projectId=${projectId}`);
+    return httpGet('/workitems/backlog', { projectId });
   },
   getWorkItemById(projectId, workItemId) {
-    return httpGet(`/work-items/${workItemId}?projectId=${projectId}`);
+    return httpGet(`/workitems/${workItemId}`, { projectId });
   },
   createWorkItem(projectId, payload) {
-    return httpPost(`/work-items?projectId=${projectId}`, payload);
+    return httpPost(`/workitems?projectId=${projectId}`, payload);
   },
   updateWorkItem(projectId, workItemId, payload) {
-    return httpPut(`/work-items/${workItemId}?projectId=${projectId}`, payload);
+    return httpPut(`/workitems/${workItemId}`, { ...payload, projectId });
   },
 
   // FIX: API PATCH để chuyển vào Sprint theo đúng ảnh Swagger của bạn
   moveWorkItemToSprint(projectId, workItemId, sprintId) {
-    return httpPatch(`/work-items/${workItemId}/sprint?projectId=${projectId}`, { 
+    return httpPatch(`/workitems/${workItemId}/sprint`, { 
       projectId,
       workItemId,
       targetSprintId: sprintId 
@@ -45,7 +45,7 @@ export const productBacklogService = {
 
   // FIX: API PATCH để đưa ngược về Backlog theo đúng ảnh Swagger
   moveWorkItemToBacklog(projectId, workItemId) {
-    return httpPatch(`/work-items/${workItemId}/backlog?projectId=${projectId}`, {
+    return httpPatch(`/workitems/${workItemId}/backlog`, {
       projectId,
       workItemId
     });
@@ -53,19 +53,21 @@ export const productBacklogService = {
 
   // Sprints
   getSprints(projectId) {
-    return httpGet(`/sprints?projectId=${projectId}`);
+    return httpGet('/sprints', { projectId });
   },
   createSprint(projectId, payload) {
+    // Standardize to use params object if proxy expects it, 
+    // but usually POST payload contains the data and projectId is in query.
     return httpPost(`/sprints?projectId=${projectId}`, payload);
   },
   getSprintById(projectId, sprintId) {
-    return httpGet(`/sprints/${sprintId}?projectId=${projectId}`);
+    return httpGet(`/sprints/${sprintId}`, { projectId });
   },
   updateSprint(projectId, sprintId, payload) {
-    return httpPut(`/sprints/${sprintId}?projectId=${projectId}`, payload);
+    return httpPut(`/sprints/${sprintId}`, { ...payload, projectId });
   },
   deleteSprint(projectId, sprintId) {
-    return httpDelete(`/sprints/${sprintId}?projectId=${projectId}`);
+    return httpDelete(`/sprints/${sprintId}`, { projectId });
   },
 
   // Start/Complete Sprint
