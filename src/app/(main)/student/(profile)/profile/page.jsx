@@ -1,4 +1,4 @@
-import ProfilePage from '@/feature/student/ProfilePage';
+import ProfilePage from '@/feature/student/profile/ProfilePage';
 import React from 'react';
 
 function page() {

@@ -2,8 +2,7 @@ import { httpGet, httpPost, httpDelete, httpPatch } from './httpClient';
 
 const StakeholderIssueService = {
   getAll: (params) => {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/stakeholder-issues${query ? `?${query}` : ''}`);
+    return httpGet('/stakeholder-issues', params);
   },
 
   create: (data) => {
@@ -19,7 +18,9 @@ const StakeholderIssueService = {
   },
 
   updateStatus: (id, status) => {
-    return httpPatch(`/stakeholder-issues/${id}/status`, { status });
+    return httpPatch(`/stakeholder-issues/${id}/status`, {
+      status: status,
+    });
   },
 };
 
