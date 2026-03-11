@@ -16,6 +16,9 @@ export const DAILY_REPORT_UI = {
   },
 
   STATUS: {
+    SUBMITTED: 'Submitted',
+    APPROVED: 'Approved',
+    NEEDS_REVISION: 'Needs Revision',
     PUNCTUAL: 'Punctual',
     LATE: 'Late',
     UNKNOWN: 'Unknown',

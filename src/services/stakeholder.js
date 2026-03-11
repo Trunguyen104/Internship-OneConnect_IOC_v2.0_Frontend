@@ -1,24 +1,28 @@
 import httpClient from './httpClient';
 
 export const StakeholderService = {
-  getByProject(projectId, params) {
-    const query = params ? new URLSearchParams(params).toString() : '';
-    return httpClient.httpGet(`/projects/${projectId}/stakeholders${query ? `?${query}` : ''}`);
+  getByProject(internshipId, params = {}) {
+    return httpClient.httpGet('/stakeholders', {
+      internshipId,
+      ...params,
+    });
   },
-
   getById(id) {
-    return httpClient.httpGet(`/Stakeholders/${id}`);
+    return httpClient.httpGet(`/stakeholders/${id}`);
   },
 
   create(data) {
-    return httpClient.httpPost('/Stakeholders', data);
+    return httpClient.httpPost('/stakeholders', data);
   },
 
   update(id, data) {
-    return httpClient.httpPut(`/Stakeholders/${id}`, data);
+    return httpClient.httpPut(`/stakeholders/${id}`, data);
   },
 
-  remove(id) {
-    return httpClient.httpDelete(`/Stakeholders/${id}`);
+  remove(stakeholderId, internshipId) {
+    return httpClient.httpDelete(`/stakeholders/${stakeholderId}`, {
+      stakeholderId,
+      internshipId,
+    });
   },
 };

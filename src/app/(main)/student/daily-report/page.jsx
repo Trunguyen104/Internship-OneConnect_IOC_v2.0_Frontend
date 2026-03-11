@@ -1,10 +1,10 @@
-import DailyReport from '@/feature/student/DailyReport';
+import LogbookPage from '@/feature/student/logbook/LogbookPage';
 import React from 'react';
 export const dynamic = 'force-dynamic';
 export default function page() {
   return (
     <>
-      <DailyReport />
+      <LogbookPage />
     </>
   );
 }

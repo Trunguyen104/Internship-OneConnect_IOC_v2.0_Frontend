@@ -46,47 +46,34 @@ async function request(path, options = {}) {
   }
 
   if (!res.ok) {
-    // if (res.status === 401 && typeof window !== 'undefined') {
-    //   const authHeader = res.headers.get('www-authenticate') || '';
-    //   if (authHeader.includes('invalid_token') || authHeader.includes('expired') || !authHeader) {
-    //     sessionStorage.removeItem('accessToken');
-    //     window.location.href = '/login';
-    //   }
-    // }
-    if (!res.ok) {
-      if (res.status === 401 && typeof window !== 'undefined') {
-        try {
-          // thử refresh token
-          const refreshRes = await fetch('/api/auth', {
-            method: 'PUT',
-            credentials: 'include',
+    if (res.status === 401 && typeof window !== 'undefined') {
+      console.log('HTTP: 401 Detected, attempting refresh...');
+      try {
+        // thử refresh token
+        const refreshRes = await fetch('/api/auth', {
+          method: 'PUT',
+          credentials: 'include',
+        });
+
+        console.log('HTTP: Refresh response status:', refreshRes.status);
+        if (refreshRes.ok) {
+          const { accessToken } = await refreshRes.json();
+          sessionStorage.setItem('accessToken', accessToken);
+
+          // retry request ban đầu
+          const retryRes = await fetch(`${API_BASE}${path}`, {
+            ...options,
+            headers: {
+              ...headers,
+              Authorization: `Bearer ${accessToken}`,
+            },
           });
 
-          if (refreshRes.ok) {
-            const { accessToken } = await refreshRes.json();
-            sessionStorage.setItem('accessToken', accessToken);
-
-            // retry request ban đầu
-            const retryRes = await fetch(`${API_BASE}${path}`, {
-              ...options,
-              headers: {
-                ...headers,
-                Authorization: `Bearer ${accessToken}`,
-              },
-            });
-
-            return retryRes.json();
-          }
-        } catch (e) {
-          console.error('Refresh token failed', e);
+          return retryRes.json();
         }
+      } catch (e) {
+        console.error('Refresh token failed', e);
       }
-
-      return {
-        isSuccess: false,
-        status: res.status,
-        data,
-      };
     }
 
     return {
@@ -99,10 +86,25 @@ async function request(path, options = {}) {
   return data;
 }
 
-export const httpGet = (path, options) => request(path, { method: 'GET', ...options });
+// export const httpGet = (path, options) => request(path, { method: 'GET', ...options });
+export const httpGet = (path, params = {}, options = {}) => {
+  // Filter out undefined and null values
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null),
+  );
 
-export const httpDelete = (path, options) => request(path, { method: 'DELETE', ...options });
+  const query = new URLSearchParams(cleanParams).toString();
+  const url = query ? `${path}?${query}` : path;
 
+  return request(url, { method: 'GET', ...options });
+};
+// export const httpDelete = (path, options) => request(path, { method: 'DELETE', ...options });
+export const httpDelete = (path, body, options = {}) =>
+  request(path, {
+    method: 'DELETE',
+    body: body ? JSON.stringify(body) : undefined,
+    ...options,
+  });
 export const httpPost = (path, body, options = {}) =>
   request(path, {
     method: 'POST',
