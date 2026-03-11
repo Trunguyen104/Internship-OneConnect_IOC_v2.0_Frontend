@@ -26,7 +26,10 @@ export const ProjectService = {
     return httpDelete(`/projects/${projectId}`);
   },
 
-  getByInternshipGroup(internshipId) {
-    return httpGet(`/projects/internship-group/${internshipId}`);
+  // getByInternshipGroup(internshipId) {
+  //   return httpGet(`/projects/internship-group/${internshipId}`);
+  // },
+  getByInternshipGroup(internshipGroupId) {
+    return httpGet(`/projects/internship-group?internshipGroupId=${internshipGroupId}`);
   },
 };

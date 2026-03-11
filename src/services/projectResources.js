@@ -1,15 +1,15 @@
 import httpClient from './httpClient';
 
 export const getProjectResources = (projectId) =>
-  httpClient.httpGet(`/project-resources?ProjectId=${projectId}`);
+  httpClient.httpGet(`/projectresources?ProjectId=${projectId}`);
 
 export const getProjectResourceById = (resourceId) =>
-  httpClient.httpGet(`/project-resources/${resourceId}`);
+  httpClient.httpGet(`/projectresources/${resourceId}`);
 
 export const createProjectResource = (formData) =>
-  httpClient.httpPost(`/project-resources`, formData);
+  httpClient.httpPost(`/projectresources`, formData);
 
 export const updateProjectResource = (resourceId, payload) =>
-  httpClient.httpPut(`/project-resources/${resourceId}`, payload);
+  httpClient.httpPut(`/projectresources/${resourceId}`, payload);
 
-export const deleteProjectResource = (id) => httpClient.httpDelete(`/project-resources/${id}`);
+export const deleteProjectResource = (id) => httpClient.httpDelete(`/projectresources/${id}`);

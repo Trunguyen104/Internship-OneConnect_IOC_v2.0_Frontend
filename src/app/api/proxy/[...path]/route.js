@@ -19,7 +19,7 @@ async function handler(req, { params }) {
     const pathStr = path.join('/');
     const url = baseUrl.toLowerCase().endsWith('/api')
       ? `${baseUrl}/${pathStr}${searchString}`
-      : `${baseUrl}/api/${pathStr}${searchString}`;
+      : `${baseUrl}/api/v1/${pathStr}${searchString}`;
 
     console.log(`PROXY: ${req.method} ${url}`);
 
