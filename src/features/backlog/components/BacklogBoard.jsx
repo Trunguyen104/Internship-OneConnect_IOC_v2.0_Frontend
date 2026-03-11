@@ -15,7 +15,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 
-import { useBacklogBoard } from './hooks/useBacklogBoard';
+import { useBacklogBoard } from '../hooks/useBacklogBoard';
 import { EpicSidebar } from './EpicSidebar';
 import { SprintSection } from './SprintSection';
 import { BacklogSection } from './BacklogSection';

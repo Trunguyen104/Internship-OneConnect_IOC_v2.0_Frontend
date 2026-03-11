@@ -2,7 +2,7 @@
 
 import { CloseOutlined } from '@ant-design/icons';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
-import FormGroup from './ui/FormGroup';
+import FormGroup from './FormGroup';
 
 export default function IssueFormModal({ isOpen, onClose, form, setForm, stakeholders, onSave }) {
   if (!isOpen) return null;

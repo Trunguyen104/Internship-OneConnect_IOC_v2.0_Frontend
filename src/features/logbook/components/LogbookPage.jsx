@@ -8,7 +8,7 @@ import Pagination from '@/components/ui/Pagination';
 import LogbookTable from './LogbookTable';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookDetailModal from './LogbookDetailModal';
-import { useLogbook } from './hooks/useLogbook';
+import { useLogbook } from '../hooks/useLogbook';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { LogBookService } from '@/features/logbook/services/logBook.service';
@@ -153,7 +153,7 @@ export default function LogbookPage() {
           <Button
             icon={<PlusOutlined />}
             onClick={() => openFormModal()}
-            className='!bg-primary hover:!bg-primary-hover flex items-center gap-2 !rounded-xl !border-none !px-6 !py-2.5 !text-sm !font-medium !text-white shadow-sm transition-colors'
+            className='bg-primary! hover:bg-primary-hover! flex items-center gap-2 rounded-xl! border-none! px-6! py-2.5! text-sm! font-medium! text-white! shadow-sm transition-colors'
           >
             {DAILY_REPORT_UI.CREATE_BUTTON}
           </Button>

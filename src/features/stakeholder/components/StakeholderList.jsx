@@ -2,7 +2,7 @@
 
 import { InboxOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-import StakeholderCard from './ui/StakeholderCard';
+import StakeholderCard from './StakeholderCard';
 
 export default function StakeholderList({ stakeholders, loading, onEdit, onDelete }) {
   if (loading) {

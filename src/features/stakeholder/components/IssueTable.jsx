@@ -3,7 +3,7 @@
 import dayjs from 'dayjs';
 import { Popconfirm } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import IssueStatusTag from './ui/IssueStatusTag';
+import IssueStatusTag from './IssueStatusTag';
 
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 

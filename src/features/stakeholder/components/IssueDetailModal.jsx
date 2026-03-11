@@ -3,7 +3,7 @@
 import dayjs from 'dayjs';
 import { CloseOutlined } from '@ant-design/icons';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
-import IssueStatusTag from './ui/IssueStatusTag';
+import IssueStatusTag from './IssueStatusTag';
 
 export default function IssueDetailModal({ issue, onClose }) {
   if (!issue) return null;

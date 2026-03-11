@@ -3,8 +3,8 @@
 import Card from '@/components/ui/Card';
 import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
-import ViolationTable from './components/ViolationTable';
-import { useViolation } from './hooks/useViolation';
+import ViolationTable from './ViolationTable';
+import { useViolation } from '../hooks/useViolation';
 
 export default function ViolationPage() {
   const {

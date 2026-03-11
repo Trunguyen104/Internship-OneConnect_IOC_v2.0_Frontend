@@ -1,8 +1,8 @@
 'use client';
 
-import { useProfile } from './hooks/useProfile';
-import ProfileInfo from './components/ProfileInfo';
-import SkillList from './components/SkillList';
+import { useProfile } from '../hooks/useProfile';
+import ProfileInfo from './ProfileInfo';
+import SkillList from './SkillList';
 
 export default function ProfilePage() {
   const profile = useProfile();

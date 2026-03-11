@@ -2,10 +2,10 @@
 
 import Card from '@/components/ui/Card';
 // import Footer from '@/components/layout/Footer';
-import CycleTable from './components/CycleTable';
-import TeamEvaluationsModal from './components/TeamEvaluationsModal';
-import ScoreDetailDrawer from './components/ScoreDetailDrawer';
-import { useEvaluation } from './hooks/useEvaluation';
+import CycleTable from './CycleTable';
+import TeamEvaluationsModal from './TeamEvaluationsModal';
+import ScoreDetailDrawer from './ScoreDetailDrawer';
+import { useEvaluation } from '../hooks/useEvaluation';
 import Pagination from '@/components/ui/Pagination';
 
 export default function EvaluationPage() {

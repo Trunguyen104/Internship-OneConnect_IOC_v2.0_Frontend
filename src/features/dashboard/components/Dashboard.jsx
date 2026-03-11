@@ -3,7 +3,7 @@ import { Download, LayoutList, Clock, CheckCircle2, AlertCircle } from 'lucide-r
 import StudentTabs from '@/components/layout/StudentTabs';
 import PageShell from '@/components/layout/PageShell';
 
-import { useDashboard } from './hooks/useDashboard';
+import { useDashboard } from '../hooks/useDashboard';
 import { StatCard, Loading, ErrorBox } from './atoms';
 import { 
   BurndownChart, 

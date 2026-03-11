@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Spin as AntdSpin, Space as AntdSpace } from 'antd';
-import { useProject } from './hooks/useProject';
-import ProjectOverview from './components/ProjectOverview';
-import ProjectResources from './components/ProjectResources';
+import { useProject } from '../hooks/useProject';
+import ProjectOverview from './ProjectOverview';
+import ProjectResources from './ProjectResources';
 
 // const { Title, Text } = AntdTypography;
 

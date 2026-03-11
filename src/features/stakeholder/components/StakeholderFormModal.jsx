@@ -2,7 +2,7 @@
 
 import { CloseOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-import FormGroup from './ui/FormGroup';
+import FormGroup from './FormGroup';
 
 export default function StakeholderFormModal({
   isOpen,
