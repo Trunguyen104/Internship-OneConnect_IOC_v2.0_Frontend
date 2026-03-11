@@ -37,4 +37,3 @@ export default function DeleteConfirmModal({ open, onCancel, onConfirm, loading 
     </Modal>
   );
 }
-

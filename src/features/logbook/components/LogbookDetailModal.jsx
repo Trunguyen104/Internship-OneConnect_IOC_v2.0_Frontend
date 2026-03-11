@@ -3,37 +3,11 @@
 import { Modal } from 'antd';
 import dayjs from 'dayjs';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import LogbookStatusTag from './LogbookStatusTag';
 
 // const { Text } = Typography;
 
 export default function LogbookDetailModal({ visible, record, onClose }) {
-  const renderStatus = (status) => {
-    const config = {
-      PUNCTUAL: {
-        label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-        style: 'bg-emerald-50 text-emerald-600 border-emerald-200',
-      },
-      LATE: {
-        label: DAILY_REPORT_UI.STATUS.LATE,
-        style: 'bg-red-50 text-red-600 border-red-200',
-      },
-      UNKNOWN: {
-        label: DAILY_REPORT_UI.STATUS.UNKNOWN,
-        style: 'bg-gray-50 text-gray-600 border-gray-200',
-      },
-    };
-
-    const c = config[status] || config.UNKNOWN;
-
-    return (
-      <span
-        className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-wide uppercase ${c.style}`}
-      >
-        {c.label}
-      </span>
-    );
-  };
-
   return (
     <Modal
       open={visible}
@@ -65,7 +39,7 @@ export default function LogbookDetailModal({ visible, record, onClose }) {
 
             <div>
               <p className='text-sm font-medium text-gray-500'>{DAILY_REPORT_UI.TABLE.STATUS}</p>
-              {renderStatus(record.status)}
+              <LogbookStatusTag status={record.status} />
             </div>
           </div>
 
@@ -97,4 +71,3 @@ export default function LogbookDetailModal({ visible, record, onClose }) {
     </Modal>
   );
 }
-

@@ -1,22 +1,14 @@
 'use client';
 
-import AppTable from '@/components/ui/AppTable';
+// import AppTable from '@/components/shared/AppTable';
 import { Typography, Tag } from 'antd';
 import { WarningOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import AppTable from '@/components/ui/AppTable';
 
 const { Text } = Typography;
 
 export default function ViolationTable({ data, page, pageSize, sortOrder, onSort }) {
-  // const getSeverityColor = (severity) => {
-  //   switch (severity) {
-  //     case 'HIGH': return 'error';
-  //     case 'MEDIUM': return 'warning';
-  //     case 'LOW': return 'blue';
-  //     default: return 'default';
-  //   }
-  // };
-
   const columns = [
     {
       title: 'STT',
@@ -109,4 +101,3 @@ export default function ViolationTable({ data, page, pageSize, sortOrder, onSort
     </div>
   );
 }
-

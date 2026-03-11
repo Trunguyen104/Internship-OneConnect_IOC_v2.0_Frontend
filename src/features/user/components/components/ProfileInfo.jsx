@@ -1,17 +1,11 @@
 'use client';
 
+// import AvatarUploader from '@/components/shared/AvatarUploader';
+// import Card from '@/components/shared/Card';
+import InfoItem from './InfoItem';
+import { Button, Space, Spin } from 'antd';
 import AvatarUploader from '@/components/ui/AvatarUploader';
 import Card from '@/components/ui/Card';
-
-function InfoItem({ label, value, children }) {
-  return (
-    <div>
-      <p className='mb-1 text-sm font-medium text-slate-500'>{label}</p>
-      {value && <p className='text-base font-semibold text-slate-900'>{value}</p>}
-      {children}
-    </div>
-  );
-}
 
 export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatarChange }) {
   return (
@@ -33,19 +27,18 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
             </p>
           </div>
 
-          <div className='mt-4 ml-auto flex gap-2'>
-            <button className='cursor-pointer rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-700'>
+          <Space className='mt-4 ml-auto flex gap-2'>
+            <Button type='primary' danger>
               Edit
-            </button>
-            <button className='cursor-pointer rounded-full bg-red-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-red-700'>
-              Upload CV
-            </button>
-          </div>
+            </Button>
+
+            <Button>Upload CV</Button>
+          </Space>
         </div>
 
         <div className='pt-6'>
           {loadingUser ? (
-            <div className='text-sm text-slate-500'>Đang tải thông tin cá nhân...</div>
+            <Spin tip='Loading profile...' />
           ) : (
             <div className='grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-4'>
               <InfoItem label='Full Name' value={userInfo?.fullName || '—'} />
@@ -75,4 +68,3 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
     </>
   );
 }
-

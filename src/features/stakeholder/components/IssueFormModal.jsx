@@ -2,6 +2,7 @@
 
 import { CloseOutlined } from '@ant-design/icons';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+import FormGroup from './ui/FormGroup';
 
 export default function IssueFormModal({ isOpen, onClose, form, setForm, stakeholders, onSave }) {
   if (!isOpen) return null;
@@ -26,26 +27,20 @@ export default function IssueFormModal({ isOpen, onClose, form, setForm, stakeho
         </div>
 
         <div className='space-y-4 overflow-y-auto px-6 py-5'>
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {ISSUE_UI.TABLE.TITLE} <span className='text-red-500'>*</span>
-            </label>
+          <FormGroup label={ISSUE_UI.TABLE.TITLE} required>
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className='w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+              className='focus:border-primary focus:ring-primary/20 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1'
               placeholder={ISSUE_UI.FORM.TITLE_PLACEHOLDER}
             />
-          </div>
+          </FormGroup>
 
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {ISSUE_UI.TABLE.STAKEHOLDER} <span className='text-red-500'>*</span>
-            </label>
+          <FormGroup label={ISSUE_UI.TABLE.STAKEHOLDER} required>
             <select
               value={form.stakeholderId}
               onChange={(e) => setForm({ ...form, stakeholderId: e.target.value })}
-              className='w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+              className='focus:border-primary focus:ring-primary/20 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1'
             >
               <option value=''>{ISSUE_UI.FORM.STAKEHOLDER_PLACEHOLDER}</option>
               {stakeholders.map((s) => (
@@ -54,32 +49,29 @@ export default function IssueFormModal({ isOpen, onClose, form, setForm, stakeho
                 </option>
               ))}
             </select>
-          </div>
+          </FormGroup>
 
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {ISSUE_UI.TABLE.DESCRIPTION}
-            </label>
+          <FormGroup label={ISSUE_UI.TABLE.DESCRIPTION}>
             <textarea
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className='w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm transition-all outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+              className='focus:border-primary focus:ring-primary/20 w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm transition-all outline-none focus:ring-1'
               placeholder={ISSUE_UI.FORM.DESCRIPTION_PLACEHOLDER}
             />
-          </div>
+          </FormGroup>
         </div>
 
         <div className='flex justify-end gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-4'>
           <button
             onClick={onClose}
-            className='rounded-xl bg-white px-5 py-2.5 text-sm font-medium text-slate-600'
+            className='rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50'
           >
             {ISSUE_UI.BUTTON.CANCEL}
           </button>
           <button
             onClick={onSave}
-            className='rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700'
+            className='bg-primary hover:bg-primary-hover rounded-xl px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors'
           >
             {ISSUE_UI.BUTTON.SAVE}
           </button>
@@ -88,4 +80,3 @@ export default function IssueFormModal({ isOpen, onClose, form, setForm, stakeho
     </div>
   );
 }
-

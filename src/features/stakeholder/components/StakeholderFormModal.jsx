@@ -2,6 +2,7 @@
 
 import { CloseOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
+import FormGroup from './ui/FormGroup';
 
 export default function StakeholderFormModal({
   isOpen,
@@ -31,10 +32,7 @@ export default function StakeholderFormModal({
         </div>
 
         <div className='space-y-4 overflow-y-auto px-6 py-5'>
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {STAKEHOLDER_UI.FIELD_NAME} <span className='text-primary'>*</span>
-            </label>
+          <FormGroup label={STAKEHOLDER_UI.FIELD_NAME} required error={errors.name}>
             <input
               value={form.name}
               onChange={(e) => {
@@ -44,13 +42,9 @@ export default function StakeholderFormModal({
               className={`w-full rounded-xl border ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-primary focus:ring-primary/20 border-slate-200'} px-4 py-2.5 text-sm transition-all outline-none focus:ring-1`}
               placeholder={STAKEHOLDER_UI.PLACEHOLDER_NAME}
             />
-            {errors.name && <p className='text-primary mt-1 text-xs'>{errors.name}</p>}
-          </div>
+          </FormGroup>
 
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {STAKEHOLDER_UI.FIELD_EMAIL} <span className='text-primary'>*</span>
-            </label>
+          <FormGroup label={STAKEHOLDER_UI.FIELD_EMAIL} required error={errors.email}>
             <input
               disabled={!!editingId}
               type='email'
@@ -62,13 +56,9 @@ export default function StakeholderFormModal({
               className={`w-full rounded-xl border ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-primary focus:ring-primary/20 border-slate-200'} px-4 py-2.5 text-sm transition-all outline-none focus:ring-1 disabled:bg-slate-50 disabled:text-slate-500`}
               placeholder={STAKEHOLDER_UI.PLACEHOLDER_EMAIL}
             />
-            {errors.email && <p className='text-primary mt-1 text-xs'>{errors.email}</p>}
-          </div>
+          </FormGroup>
 
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {STAKEHOLDER_UI.FIELD_ROLE}
-            </label>
+          <FormGroup label={STAKEHOLDER_UI.FIELD_ROLE} error={errors.role}>
             <select
               value={form.role}
               onChange={(e) => {
@@ -85,13 +75,9 @@ export default function StakeholderFormModal({
               <option value='Lecturer'>{STAKEHOLDER_UI.ROLE_LECTURER}</option>
               <option value='Team Member'>{STAKEHOLDER_UI.ROLE_MEMBER}</option>
             </select>
-            {errors.role && <p className='text-primary mt-1 text-xs'>{errors.role}</p>}
-          </div>
+          </FormGroup>
 
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {STAKEHOLDER_UI.FIELD_PHONE}
-            </label>
+          <FormGroup label={STAKEHOLDER_UI.FIELD_PHONE} error={errors.phoneNumber}>
             <input
               value={form.phoneNumber}
               onChange={(e) => {
@@ -101,15 +87,9 @@ export default function StakeholderFormModal({
               className={`w-full rounded-xl border ${errors.phoneNumber ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-primary focus:ring-primary/20 border-slate-200'} px-4 py-2.5 text-sm transition-all outline-none focus:ring-1`}
               placeholder={STAKEHOLDER_UI.PLACEHOLDER_PHONE}
             />
-            {errors.phoneNumber && (
-              <p className='text-primary mt-1 text-xs'>{errors.phoneNumber}</p>
-            )}
-          </div>
+          </FormGroup>
 
-          <div>
-            <label className='mb-1.5 block text-sm font-medium text-slate-700'>
-              {STAKEHOLDER_UI.FIELD_DESC}
-            </label>
+          <FormGroup label={STAKEHOLDER_UI.FIELD_DESC} error={errors.description}>
             <textarea
               rows={3}
               value={form.description}
@@ -120,10 +100,7 @@ export default function StakeholderFormModal({
               className={`w-full resize-none rounded-xl border ${errors.description ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-primary focus:ring-primary/20 border-slate-200'} px-4 py-2.5 text-sm transition-all outline-none focus:ring-1`}
               placeholder={STAKEHOLDER_UI.PLACEHOLDER_DESC}
             />
-            {errors.description && (
-              <p className='text-primary mt-1 text-xs'>{errors.description}</p>
-            )}
-          </div>
+          </FormGroup>
         </div>
 
         <div className='flex justify-end gap-3 border-t border-slate-100 bg-slate-50/50 px-6 py-4'>
@@ -144,4 +121,3 @@ export default function StakeholderFormModal({
     </div>
   );
 }
-

@@ -3,8 +3,8 @@
 import SearchBar from '@/components/ui/SearchBar';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 import { useStakeholderTab } from './hooks/useStakeholderTab';
-import StakeholderList from './components/StakeholderList';
-import StakeholderFormModal from './components/StakeholderFormModal';
+import StakeholderList from './StakeholderList';
+import StakeholderFormModal from './StakeholderFormModal';
 
 export default function StakeholderTab() {
   const {
@@ -86,4 +86,3 @@ export default function StakeholderTab() {
     </>
   );
 }
-
