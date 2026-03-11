@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Dropdown, Avatar } from 'antd';
-import { logout } from '@/features/auth/services/authService';
-import { clearAuth } from '@/features/auth/services/authStorage';
+import { logout } from '@/components/features/auth/services/authService';
+import { clearAuth } from '@/components/features/auth/services/authStorage';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function Header() {
