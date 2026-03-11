@@ -1,7 +1,8 @@
 'use client';
 
-import InternshipPlacementDashboard from '@/components/feature/student/internship-placement/InternshipPlacementDashboard';
+import InternshipPlacementDashboard from '@/features/internship/components/InternshipPlacementDashboard';
 
 export default function InternshipGroupsPage() {
   return <InternshipPlacementDashboard />;
 }
+

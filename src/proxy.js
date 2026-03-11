@@ -41,3 +41,4 @@ export function proxy(request) {
 export const config = {
   matcher: ['/student/:path*', '/dashboard/:path*', '/profile/:path*', '/login'],
 };
+

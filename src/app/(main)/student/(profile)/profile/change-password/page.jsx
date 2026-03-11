@@ -1,4 +1,4 @@
-import ChangePass from '@/components/feature/student/ChangePass';
+import ChangePass from '@/features/user/components/ChangePass';
 import React from 'react';
 
 function page() {
@@ -10,3 +10,4 @@ function page() {
 }
 
 export default page;
+

@@ -28,3 +28,4 @@ export const STAKEHOLDER_MESSAGES = {
     PHONE_MAX_LENGTH: 'Phone number cannot exceed 15 characters',
   },
 };
+

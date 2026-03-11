@@ -1,4 +1,4 @@
-// import Sidebar from '@/components/shared/Sidebar';
+// import Sidebar from '@/components/layout/Sidebar';
 
 export default function Profile({ children }) {
   return (
@@ -9,3 +9,4 @@ export default function Profile({ children }) {
     </div>
   );
 }
+

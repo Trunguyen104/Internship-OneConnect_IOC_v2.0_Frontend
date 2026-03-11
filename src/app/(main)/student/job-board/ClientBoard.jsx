@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Board from '@/components/feature/student/board/Board';
+import Board from '@/features/backlog/components/Board';
 
 export default function ClientBoard() {
   const [mounted, setMounted] = useState(false);
@@ -13,3 +13,4 @@ export default function ClientBoard() {
 
   return <Board />;
 }
+

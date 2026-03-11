@@ -7,3 +7,4 @@ export const RESOURCE_TYPES = [
   { value: 6, label: 'Video (MP4)' },
   { value: 7, label: 'Other' },
 ];
+

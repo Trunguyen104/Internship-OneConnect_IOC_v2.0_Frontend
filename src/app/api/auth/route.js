@@ -113,7 +113,7 @@ export async function DELETE(req) {
  * PUT /api/auth
  */
 export async function PUT(req) {
-  try {
+try {
     const refreshToken = req.cookies.get('refreshToken')?.value;
 
     if (!refreshToken) {
@@ -173,3 +173,4 @@ export async function PUT(req) {
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
 }
+

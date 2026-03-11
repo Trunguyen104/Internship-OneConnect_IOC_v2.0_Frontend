@@ -1,4 +1,4 @@
-import SidebarAdmin from '@/components/shared/SidebarAdmin';
+import SidebarAdmin from '@/components/layout/SidebarAdmin';
 
 export default function Admin({ children }) {
   return (
@@ -8,3 +8,4 @@ export default function Admin({ children }) {
     </div>
   );
 }
+
