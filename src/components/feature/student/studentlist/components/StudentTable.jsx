@@ -3,7 +3,7 @@
 import React from 'react';
 import { Typography, Avatar, Tag, Tooltip, Popconfirm, Button } from 'antd';
 import { UserOutlined, DeleteOutlined } from '@ant-design/icons';
-import AppTable from '@/shared/components/AppTable';
+import AppTable from '@/components/shared/AppTable';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 
 const { Text } = Typography;
