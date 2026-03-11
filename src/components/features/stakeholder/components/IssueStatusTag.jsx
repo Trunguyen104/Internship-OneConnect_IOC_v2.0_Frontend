@@ -4,7 +4,8 @@ import { CheckCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import { ISSUE_STATUS, ISSUE_STATUS_LABEL } from './IssueTable';
 
 export default function IssueStatusTag({ status }) {
-  const isResolved = status === ISSUE_STATUS.RESOLVED || status === 'Đã giải quyết';
+  const isResolved =
+    status === ISSUE_STATUS.RESOLVED || status === 'Resolved' || status === 'Đã giải quyết';
 
   return (
     <span
@@ -15,7 +16,7 @@ export default function IssueStatusTag({ status }) {
       }`}
     >
       {isResolved ? <CheckCircleOutlined /> : <SyncOutlined spin />}
-      {ISSUE_STATUS_LABEL[status] || 'Processing'}
+      {ISSUE_STATUS_LABEL[status] || status || 'Processing'}
     </span>
   );
 }
