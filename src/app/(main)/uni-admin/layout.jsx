@@ -1,4 +1,4 @@
-import SidebarAdmin from '@/shared/components/SidebarAdmin';
+import SidebarAdmin from '@/components/shared/SidebarAdmin';
 
 export default function Admin({ children }) {
   return (

@@ -1,4 +1,4 @@
-import EnterpriseSidebar from '@/shared/components/EnterpriseSidebar';
+import EnterpriseSidebar from '@/components/shared/EnterpriseSidebar';
 
 export default function EnterpriseLayout({ children }) {
   return (

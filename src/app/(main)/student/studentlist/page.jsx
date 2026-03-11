@@ -1,4 +1,4 @@
-import StudentListPage from '@/feature/student/studentlist/StudentListPage';
+import StudentListPage from '@/components/feature/student/studentlist/StudentListPage';
 
 export const dynamic = 'force-dynamic';
 

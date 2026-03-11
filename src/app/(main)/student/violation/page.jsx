@@ -1,5 +1,5 @@
-// import Violation from '@/feature/student/Violation';
-import ViolationPage from '@/feature/student/violation/ViolationPage';
+// import Violation from '@/components/feature/student/Violation';
+import ViolationPage from '@/components/feature/student/violation/ViolationPage';
 import React from 'react';
 
 export default function page() {
