@@ -10,7 +10,8 @@ import Pagination from '@/components/ui/Pagination';
 
 export default function EvaluationPage() {
   const {
-    MY_STUDENT_ID,
+    loading,
+    myStudentId,
     page,
     pageSize,
     paginated,
@@ -28,6 +29,14 @@ export default function EvaluationPage() {
     closeTeam,
     closeDetail,
   } = useEvaluation();
+
+  if (loading && paginated.length === 0) {
+    return (
+      <div className='flex h-64 items-center justify-center'>
+        <div className='h-8 w-8 animate-spin rounded-full border-4 border-[#d52020] border-t-transparent'></div>
+      </div>
+    );
+  }
 
   return (
     <section className='flex flex-col space-y-6'>
@@ -54,7 +63,7 @@ export default function EvaluationPage() {
         onClose={closeTeam}
         onViewDetails={openDetail}
         teamData={teamData}
-        myStudentId={MY_STUDENT_ID}
+        myStudentId={myStudentId}
       />
 
       <ScoreDetailDrawer
@@ -66,4 +75,3 @@ export default function EvaluationPage() {
     </section>
   );
 }
-

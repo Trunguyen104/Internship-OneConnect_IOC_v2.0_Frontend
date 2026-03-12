@@ -55,11 +55,27 @@ export const EvaluationService = {
   },
 
   submitEvaluations(cycleId, internshipId) {
-    return httpPatch(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`);
+    return httpPatch(
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`,
+    );
   },
 
   publishEvaluations(cycleId, internshipId) {
-    return httpPatch(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`);
-  }
-};
+    return httpPatch(
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`,
+    );
+  },
 
+  // --- Student Endpoints ---
+  getStudentEvaluationCycles(internshipId) {
+    return httpGet(`/students/me/internships/${internshipId}/evaluation-cycles`);
+  },
+
+  getStudentTeamEvaluations(cycleId) {
+    return httpGet(`/students/me/evaluation-cycles/${cycleId}/team-evaluations`);
+  },
+
+  getStudentMyEvaluation(cycleId) {
+    return httpGet(`/students/me/evaluation-cycles/${cycleId}/my-evaluation`);
+  },
+};
