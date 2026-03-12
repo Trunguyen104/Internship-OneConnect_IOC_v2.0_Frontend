@@ -20,7 +20,6 @@ export function useLogbook() {
   const [statusFilter, setStatusFilter] = useState();
   const [sortOrder, setSortOrder] = useState('desc');
 
-  // 1️⃣ Lấy internshipId từ internshipgroups
   useEffect(() => {
     const fetchInternship = async () => {
       try {
@@ -28,7 +27,6 @@ export function useLogbook() {
         const items = res?.data?.items || res?.data || [];
 
         if (items.length > 0) {
-          // tùy response BE: internshipId hoặc id
           setInternshipId(items[0].internshipId || items[0].id);
         }
       } catch (err) {
@@ -39,7 +37,6 @@ export function useLogbook() {
     fetchInternship();
   }, []);
 
-  // 1.5️⃣ Lấy thông tin User hiện tại
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -56,7 +53,7 @@ export function useLogbook() {
 
   const fetchLogbooks = useCallback(async () => {
     if (!internshipId) {
-      setLoading(false); // 👈 thêm dòng này
+      setLoading(false);
       return;
     }
 
