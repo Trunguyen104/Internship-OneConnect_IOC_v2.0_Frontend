@@ -28,7 +28,7 @@ export function AssignMentorModal({ open, group, onCancel, onFinish }) {
             Assign Mentor & Project
           </h2>
           <div className='mt-1 flex items-center gap-2'>
-            <span className="material-symbols-outlined font-variation-settings-['FILL'_0,'wght'_400] text-sm text-blue-600">
+            <span className="material-symbols-outlined text-primary font-variation-settings-['FILL'_0,'wght'_400] text-sm">
               group
             </span>
             <p className='text-sm font-medium text-slate-500'>
@@ -107,7 +107,7 @@ export function AssignMentorModal({ open, group, onCancel, onFinish }) {
               >
                 <Input.TextArea
                   placeholder='e.g. Schedule conflict, project reorganization'
-                  className='rounded-xl border-slate-200 bg-slate-50 transition-all hover:border-blue-500 focus:border-blue-500'
+                  className='hover:border-primary focus:border-primary rounded-xl border-slate-200 bg-slate-50 transition-all'
                   rows={3}
                 />
               </Form.Item>
@@ -115,7 +115,7 @@ export function AssignMentorModal({ open, group, onCancel, onFinish }) {
           )}
 
           <div className='bg-primary/5 border-primary/10 mb-6 flex gap-3 rounded-xl border p-4'>
-            <span className='material-symbols-outlined text-[20px] text-blue-600'>info</span>
+            <span className='material-symbols-outlined text-primary text-[20px]'>info</span>
             <p className='text-xs leading-relaxed text-slate-600'>
               Assigning a mentor will notify all students in the group and the mentor via email. The
               project dashboard will be updated immediately upon confirmation.
@@ -135,7 +135,7 @@ export function AssignMentorModal({ open, group, onCancel, onFinish }) {
             <Button
               type='primary'
               htmlType='submit'
-              className='h-11 rounded-full border-none bg-blue-600 px-8 text-sm font-bold shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-95'
+              className='bg-primary shadow-primary/20 h-11 rounded-full border-none px-8 text-sm font-bold shadow-lg transition-all hover:bg-red-700 active:scale-95'
             >
               Assign Mentor
             </Button>

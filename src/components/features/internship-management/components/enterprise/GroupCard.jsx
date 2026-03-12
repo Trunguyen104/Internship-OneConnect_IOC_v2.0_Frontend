@@ -19,7 +19,7 @@ export function GroupCard({ group, onAssign, onDelete, onView }) {
     >
       <div className='mb-6 flex items-start justify-between'>
         <div
-          className={`rounded-2xl p-4 ${isArchived ? 'bg-slate-100 text-slate-400' : 'bg-primary/5 text-primary'}`}
+          className={`rounded-2xl p-4 ${isArchived ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-blue-600'}`}
         >
           <CodeOutlined className='text-xl' />
         </div>
@@ -52,14 +52,14 @@ export function GroupCard({ group, onAssign, onDelete, onView }) {
         </Title>
         <div className='flex items-center gap-2.5 font-medium text-slate-500'>
           {mentor ? (
-            <UserOutlined className='text-primary' />
+            <UserOutlined className='text-blue-600' />
           ) : (
             <PlusOutlined className='text-slate-300' />
           )}
           <span className='text-sm'>
             Mentor:{' '}
             <span
-              className={`${mentor ? 'decoration-primary/30 text-slate-900 underline' : 'text-slate-400 italic'}`}
+              className={`${mentor ? 'text-slate-900 underline decoration-blue-400/30' : 'text-slate-400 italic'}`}
             >
               {mentor?.name || 'Not Assigned'}
             </span>
@@ -87,13 +87,13 @@ export function GroupCard({ group, onAssign, onDelete, onView }) {
 
         <div className='flex flex-col gap-4 pt-6'>
           <Button
-            className={`h-14 w-full rounded-2xl border-none py-3 text-sm font-extrabold shadow-sm transition-all ${isArchived ? 'bg-slate-100 text-slate-400' : 'bg-primary text-white hover:bg-red-700 hover:shadow-lg active:scale-[0.98]'}`}
+            className={`h-14 w-full rounded-2xl border-none py-3 text-sm font-extrabold shadow-sm transition-all ${isArchived ? 'bg-slate-100 text-slate-400' : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]'}`}
             onClick={() => !isArchived && onAssign(group)}
           >
             {mentor ? 'Change Mentor' : 'Assign Mentor'}
           </Button>
           <button
-            className={`hover:letter-spacing-[0.25em] cursor-pointer text-center text-[11px] font-extrabold tracking-[0.2em] uppercase transition-all ${isArchived ? 'text-slate-300' : 'hover:text-primary text-slate-400 hover:tracking-[0.3em]'}`}
+            className={`hover:letter-spacing-[0.25em] cursor-pointer text-center text-[11px] font-extrabold tracking-[0.2em] uppercase transition-all ${isArchived ? 'text-slate-300' : 'text-slate-400 hover:tracking-[0.3em] hover:text-blue-600'}`}
             onClick={() => onView(group)}
           >
             {isArchived ? 'View Archive' : 'View Details'}
