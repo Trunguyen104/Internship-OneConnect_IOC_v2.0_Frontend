@@ -1054,4 +1054,3 @@ export default function InternshipManagement() {
     </div>
   );
 }
-

@@ -982,4 +982,3 @@ export default function StudentEnrollment() {
     </div>
   );
 }
-
