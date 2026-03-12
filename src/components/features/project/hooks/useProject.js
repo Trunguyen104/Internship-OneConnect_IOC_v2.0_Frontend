@@ -10,6 +10,7 @@ import {
 } from '@/components/features/project/services/projectResources';
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
+import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 
 export function useProject() {
   const [projectId, setProjectId] = useState(null);
@@ -27,8 +28,17 @@ export function useProject() {
     if (!id) return;
     setLoading(true);
     try {
-      const data = await getProjectResources(id);
-      setResources(data?.data?.items || []);
+      const res = await getProjectResources(id);
+      const items = (res?.data?.items || []).map((item) => {
+        // Handle string resourceType from backend
+        let type = item.resourceType;
+        if (typeof type === 'string') {
+          const matched = RESOURCE_TYPES.find((t) => t.key === type);
+          if (matched) type = matched.value;
+        }
+        return { ...item, resourceType: type };
+      });
+      setResources(items);
     } catch (err) {
       console.error('Load resources error:', err);
       message.error(PROJECT_MESSAGES.ERROR.LOAD_RESOURCES);
@@ -142,4 +152,3 @@ export function useProject() {
     loadResources,
   };
 }
-

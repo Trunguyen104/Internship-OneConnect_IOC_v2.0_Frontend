@@ -17,9 +17,15 @@ async function handler(req, { params }) {
     // Construct target URL carefully
     const baseUrl = BE_URL.endsWith('/') ? BE_URL.slice(0, -1) : BE_URL;
     const pathStr = path.join('/');
-    const url = baseUrl.toLowerCase().endsWith('/api')
-      ? `${baseUrl}/${pathStr}${searchString}`
-      : `${baseUrl}/api/v1/${pathStr}${searchString}`;
+
+    // Bypass v1 for specific routes (like student evaluations)
+    const isV1Bypass = pathStr.startsWith('students/me');
+
+    const url = isV1Bypass
+      ? `${baseUrl}/api/${pathStr}${searchString}`
+      : baseUrl.toLowerCase().endsWith('/api')
+        ? `${baseUrl}/${pathStr}${searchString}`
+        : `${baseUrl}/api/v1/${pathStr}${searchString}`;
 
     console.log(`PROXY: ${req.method} ${url}`);
 

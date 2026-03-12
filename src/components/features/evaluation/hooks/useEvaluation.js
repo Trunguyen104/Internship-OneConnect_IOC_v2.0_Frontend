@@ -1,217 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-
-const MY_STUDENT_ID = 'STU001';
-
-const MOCK_CYCLES = [
-  {
-    cycleId: 'CYC-01',
-    name: 'Đánh giá Giữa kỳ Thực tập',
-    startDate: '2024-03-01',
-    endDate: '2024-03-15',
-    status: 'COMPLETED',
-    totalStudentsScored: 5,
-    totalTeamStudents: 5,
-  },
-  {
-    cycleId: 'CYC-02',
-    name: 'Đánh giá Cuối kỳ Thực tập',
-    startDate: '2024-05-10',
-    endDate: '2024-05-25',
-    status: 'ONGOING',
-    totalStudentsScored: 2,
-    totalTeamStudents: 5,
-  },
-  {
-    cycleId: 'CYC-03',
-    name: 'Bảo vệ Đồ án',
-    startDate: '2024-06-01',
-    endDate: '2024-06-10',
-    status: 'UPCOMING',
-    totalStudentsScored: 0,
-    totalTeamStudents: 5,
-  },
-];
-
-const MOCK_TEAM_EVALUATIONS = {
-  'CYC-01': [
-    {
-      studentId: 'STU002',
-      fullName: 'Bùi Văn Lập',
-      studentCode: 'SE150002',
-      evaluationStatus: 3,
-      totalScore: 8.5,
-    },
-    {
-      studentId: 'STU001',
-      fullName: 'Vũ Minh Anh (You)',
-      studentCode: 'SE150001',
-      evaluationStatus: 3,
-      totalScore: 9.0,
-    },
-    {
-      studentId: 'STU003',
-      fullName: 'Trần Thị Trang',
-      studentCode: 'SE150003',
-      evaluationStatus: 3,
-      totalScore: 7.5,
-    },
-    {
-      studentId: 'STU004',
-      fullName: 'Lê Hoàng Hải',
-      studentCode: 'SE150004',
-      evaluationStatus: 3,
-      totalScore: 8.0,
-    },
-    {
-      studentId: 'STU005',
-      fullName: 'Ngô Tấn Tài',
-      studentCode: 'SE150005',
-      evaluationStatus: 3,
-      totalScore: 6.5,
-    },
-  ],
-  'CYC-02': [
-    {
-      studentId: 'STU002',
-      fullName: 'Bùi Văn Lập',
-      studentCode: 'SE150002',
-      evaluationStatus: 2,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU001',
-      fullName: 'Vũ Minh Anh (You)',
-      studentCode: 'SE150001',
-      evaluationStatus: 3,
-      totalScore: 9.5,
-    },
-    {
-      studentId: 'STU003',
-      fullName: 'Trần Thị Trang',
-      studentCode: 'SE150003',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU004',
-      fullName: 'Lê Hoàng Hải',
-      studentCode: 'SE150004',
-      evaluationStatus: 1,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU005',
-      fullName: 'Ngô Tấn Tài',
-      studentCode: 'SE150005',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-  ],
-  'CYC-03': [
-    {
-      studentId: 'STU002',
-      fullName: 'Bùi Văn Lập',
-      studentCode: 'SE150002',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU001',
-      fullName: 'Vũ Minh Anh (You)',
-      studentCode: 'SE150001',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU003',
-      fullName: 'Trần Thị Trang',
-      studentCode: 'SE150003',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU004',
-      fullName: 'Lê Hoàng Hải',
-      studentCode: 'SE150004',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-    {
-      studentId: 'STU005',
-      fullName: 'Ngô Tấn Tài',
-      studentCode: 'SE150005',
-      evaluationStatus: 0,
-      totalScore: null,
-    },
-  ],
-};
-
-const MOCK_MY_EVALUATION = {
-  'CYC-01': {
-    evaluationId: 'EVAL-001',
-    cycleName: 'Đánh giá Giữa kỳ Thực tập',
-    evaluatorName: 'John Doe (Senior Engineer @ Global Tech)',
-    gradedAt: '2024-03-16T10:30:00',
-    totalScore: 9.0,
-    generalComment:
-      'Minh Anh đã hòa nhập rất tốt với team, khả năng nắm bắt công nghệ nhanh. Cần chủ động hơn trong việc raise các block issues sớm.',
-    criteriaScores: [
-      {
-        criteriaName: 'Chuyên cần & Thái độ làm việc',
-        score: 10,
-        maxScore: 10,
-        comment: 'Luôn đúng giờ, tham gia đầy đủ các buổi Daily Scrum.',
-      },
-      {
-        criteriaName: 'Kỹ năng chuyên chuyên môn (Hard skills)',
-        score: 8,
-        maxScore: 10,
-        comment:
-          'Hoàn thành tốt các tasks ReactJS cơ bản, tuy nhiên cần cải thiện thêm kỹ năng xử lý logic Asynchronous.',
-      },
-      {
-        criteriaName: 'Kỹ năng mềm (Soft skills)',
-        score: 9,
-        maxScore: 10,
-        comment: 'Giao tiếp tốt với các members trong team Backend để lấy API.',
-      },
-    ],
-  },
-  'CYC-02': {
-    evaluationId: 'EVAL-002',
-    cycleName: 'Đánh giá Cuối kỳ Thực tập',
-    evaluatorName: 'Jane Smith (Tech Lead @ Global Tech)',
-    gradedAt: '2024-05-20T14:15:00',
-    totalScore: 9.5,
-    generalComment:
-      'Hoàn thành xuất sắc nhiệm vụ được giao. Là một trong những intern nổi bật nhất kỳ, có khả năng deliver các feature lớn độc lập.',
-    criteriaScores: [
-      {
-        criteriaName: 'Chuyên cần & Thái độ làm việc',
-        score: 10,
-        maxScore: 10,
-        comment: 'Thái độ làm việc vô cùng chuyên nghiệp.',
-      },
-      {
-        criteriaName: 'Kỹ năng chuyên môn (Hard skills)',
-        score: 9.5,
-        maxScore: 10,
-        comment: 'Code clean, ít bugs, đã làm quen được với luồng CI/CD của team.',
-      },
-      {
-        criteriaName: 'Kỹ năng mềm (Soft skills)',
-        score: 9,
-        maxScore: 10,
-        comment: 'Chủ động thuyết trình Demo tốt.',
-      },
-    ],
-  },
-};
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { EvaluationService } from '../services/evaluation.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { message } from 'antd';
 
 export function useEvaluation() {
+  const [internshipId, setInternshipId] = useState(null);
+  const [myStudentId, setMyStudentId] = useState(null);
+  const [cycles, setCycles] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCycle, setSelectedCycle] = useState(null);
+
+  const [teamData, setTeamData] = useState([]);
+  const [myEvaluation, setMyEvaluation] = useState(null);
+  const [loadingTeam, setLoadingTeam] = useState(false);
+  const [loadingMyEval, setLoadingMyEval] = useState(false);
 
   const [teamVisible, setTeamVisible] = useState(false);
   const [detailVisible, setDetailVisible] = useState(false);
@@ -219,15 +23,79 @@ export function useEvaluation() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const cycles = useMemo(() => MOCK_CYCLES, []);
-  const teamData = useMemo(
-    () => (selectedCycle ? MOCK_TEAM_EVALUATIONS[selectedCycle.cycleId] || [] : []),
-    [selectedCycle],
-  );
-  const myEvaluation = useMemo(
-    () => (selectedCycle ? MOCK_MY_EVALUATION[selectedCycle.cycleId] || null : null),
-    [selectedCycle],
-  );
+  // 1. Fetch Internship ID first
+  useEffect(() => {
+    const fetchInternship = async () => {
+      try {
+        const res = await InternshipGroupService.getAll();
+        const items = res?.data?.items || res?.items || [];
+        if (items.length > 0) {
+          const id = items[0].internshipId || items[0].id;
+          const sId = items[0].studentId;
+          setInternshipId(id);
+          setMyStudentId(sId);
+        } else {
+          setLoading(false);
+          message.warning('Bạn hiện không tham gia kỳ thực tập nào.');
+        }
+      } catch (error) {
+        console.error('Error fetching internship:', error);
+        setLoading(false);
+      }
+    };
+    fetchInternship();
+  }, []);
+
+  // 2. Fetch Cycles when internshipId is available
+  useEffect(() => {
+    if (!internshipId) return;
+
+    const fetchCycles = async () => {
+      try {
+        setLoading(true);
+        const res = await EvaluationService.getStudentEvaluationCycles(internshipId);
+        const data = res?.data || res || [];
+        setCycles(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching evaluation cycles:', error);
+        message.error('Không thể tải danh sách đợt đánh giá.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCycles();
+  }, [internshipId]);
+
+  // 3. Fetch Team Evaluations when a cycle is selected
+  const fetchTeamData = useCallback(async (cycleId) => {
+    try {
+      setLoadingTeam(true);
+      const res = await EvaluationService.getStudentTeamEvaluations(cycleId);
+      const data = res?.data || res || [];
+      setTeamData(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching team evaluations:', error);
+      message.error('Không thể tải danh sách đánh giá nhóm.');
+    } finally {
+      setLoadingTeam(false);
+    }
+  }, []);
+
+  // 4. Fetch My Evaluation details
+  const fetchMyEvalData = useCallback(async (cycleId) => {
+    try {
+      setLoadingMyEval(true);
+      const res = await EvaluationService.getStudentMyEvaluation(cycleId);
+      const data = res?.data || res || null;
+      setMyEvaluation(data);
+    } catch (error) {
+      console.error('Error fetching my evaluation:', error);
+      message.error('Không thể tải chi tiết đánh giá cá nhân.');
+    } finally {
+      setLoadingMyEval(false);
+    }
+  }, []);
 
   const total = cycles.length;
   const totalPages = Math.ceil(total / pageSize);
@@ -240,6 +108,7 @@ export function useEvaluation() {
   const openTeamOverview = (cycle) => {
     setSelectedCycle(cycle);
     setTeamVisible(true);
+    fetchTeamData(cycle.cycleId);
   };
 
   const closeTeam = () => {
@@ -247,8 +116,13 @@ export function useEvaluation() {
   };
 
   const openDetail = (cycle) => {
-    setSelectedCycle(cycle);
+    // If cycle is passed from Team Modal, it might already be selected
+    const targetCycle = cycle || selectedCycle;
+    if (!targetCycle) return;
+
+    setSelectedCycle(targetCycle);
     setTeamVisible(false);
+    fetchMyEvalData(targetCycle.cycleId);
 
     setTimeout(() => {
       setDetailVisible(true);
@@ -260,8 +134,11 @@ export function useEvaluation() {
   };
 
   return {
-    MY_STUDENT_ID,
+    loading,
+    loadingTeam,
+    loadingMyEval,
 
+    myStudentId,
     page,
     pageSize,
     paginated,
@@ -284,4 +161,3 @@ export function useEvaluation() {
     closeDetail,
   };
 }
-

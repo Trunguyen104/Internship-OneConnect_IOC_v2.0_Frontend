@@ -2,30 +2,47 @@
 
 // import AppTable from '@/components/shared/AppTable';
 import { Button, Typography } from 'antd';
-import { ClockCircleFilled, CheckCircleFilled, EyeOutlined } from '@ant-design/icons';
+import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AppTable from '@/components/ui/AppTable';
 
 const { Text } = Typography;
 
 const STATUS_CONFIG = {
-  ONGOING: {
-    label: 'Đang diễn ra',
-    bg: 'bg-blue-50',
-    text: 'text-blue-600',
-    icon: <ClockCircleFilled className='text-blue-500' />,
-  },
-  UPCOMING: {
-    label: 'Sắp diễn ra',
+  0: {
+    label: 'Pending',
     bg: 'bg-orange-50',
     text: 'text-orange-600',
-    icon: <ClockCircleFilled className='text-orange-500' />,
   },
-  COMPLETED: {
-    label: 'Đã kết thúc',
+  1: {
+    label: 'Ongoing',
+    bg: 'bg-blue-50',
+    text: 'text-blue-600',
+  },
+  2: {
+    label: 'Completed',
     bg: 'bg-green-50',
     text: 'text-green-600',
-    icon: <CheckCircleFilled className='text-green-500' />,
+  },
+  ONGOING: {
+    label: 'Ongoing',
+    bg: 'bg-blue-50',
+    text: 'text-blue-600',
+  },
+  UPCOMING: {
+    label: 'Pending',
+    bg: 'bg-orange-50',
+    text: 'text-orange-600',
+  },
+  PENDING: {
+    label: 'Pending',
+    bg: 'bg-orange-50',
+    text: 'text-orange-600',
+  },
+  COMPLETED: {
+    label: 'Completed',
+    bg: 'bg-green-50',
+    text: 'text-green-600',
   },
 };
 
@@ -68,12 +85,14 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
       dataIndex: 'status',
       width: 150,
       render: (status) => {
-        const cfg = STATUS_CONFIG[status] || {
-          label: 'Unknown',
-          bg: 'bg-slate-50',
-          text: 'text-slate-600',
-          icon: null,
-        };
+        const normalized = status ? String(status).toUpperCase() : '';
+        const cfg = STATUS_CONFIG[normalized] ||
+          STATUS_CONFIG[status] || {
+            label: status || 'Chưa xác định',
+            bg: 'bg-slate-50',
+            text: 'text-slate-600',
+            icon: null,
+          };
 
         return (
           <span
@@ -90,9 +109,9 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
       width: 120,
       render: (_, record) => (
         <Text className='font-bold text-slate-700'>
-          {record.totalStudentsScored}
+          {record.totalStudentsScored ?? 0}
           <span className='mx-0.5 font-normal text-slate-300'>/</span>
-          {record.totalTeamStudents}
+          {record.totalTeamStudents ?? 0}
         </Text>
       ),
     },
@@ -102,14 +121,11 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
       width: 120,
       render: (_, record) => (
         <Button
-          type='primary'
           size='small'
           icon={<EyeOutlined />}
           onClick={() => onDetail(record)}
           className='rounded-full border-none bg-[#d52020] font-bold shadow-sm shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
-        >
-          Chi Tiết
-        </Button>
+        />
       ),
     },
   ];
