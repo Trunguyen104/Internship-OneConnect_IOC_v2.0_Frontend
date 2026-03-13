@@ -6,6 +6,14 @@ export const InternshipGroupService = {
     return httpGet(`/internshipgroups${query ? `?${query}` : ''}`);
   },
 
+  getMine() {
+    return httpGet('/mine');
+  },
+
+  getTermById(id) {
+    return httpGet(`/terms/${id}`);
+  },
+
   getById(id) {
     return httpGet(`/internshipgroups/${id}`);
   },
