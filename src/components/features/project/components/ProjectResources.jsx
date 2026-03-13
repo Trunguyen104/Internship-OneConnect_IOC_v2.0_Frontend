@@ -7,11 +7,13 @@ import {
   DownloadOutlined,
   EditOutlined,
   DeleteOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
 import ProjectResourceEditModal from './ProjectResourceEditModal';
+import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 const { Title, Text } = Typography;
 
@@ -69,12 +71,22 @@ export default function ProjectResources({
               <List.Item
                 actions={[
                   <Button
+                    key='view'
+                    type='link'
+                    icon={<EyeOutlined />}
+                    href={resolveResourceUrl(item.fileUrl || item.resourceUrl)}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    {PROJECT_UI.BUTTON.VIEW}
+                  </Button>,
+                  <Button
                     key='download'
                     type='link'
                     icon={<DownloadOutlined />}
-                    href={item.resourceUrl}
+                    href={resolveResourceUrl(item.fileUrl || item.resourceUrl)}
                     target='_blank'
-                    rel='noopener noreferrer'
+                    download={item.resourceName}
                   >
                     {PROJECT_UI.BUTTON.DOWNLOAD}
                   </Button>,
@@ -110,7 +122,7 @@ export default function ProjectResources({
                     />
                   }
                   title={<Text strong>{item.resourceName || 'Untitled Resource'}</Text>}
-                  description={`Type: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType)?.label || 'Other'}`}
+                  description={`Type: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType || t.key === item.resourceType)?.label || 'Other'}`}
                 />
               </List.Item>
             )}
@@ -128,4 +140,3 @@ export default function ProjectResources({
     </Card>
   );
 }
-

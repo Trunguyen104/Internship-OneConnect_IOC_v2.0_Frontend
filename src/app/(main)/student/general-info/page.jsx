@@ -1,4 +1,4 @@
-import GeneralInfo from '@/components/features/user/components/GeneralInfo';
+import GeneralInfo from '@/components/features/generalinfo/components/GeneralInfo';
 import React from 'react';
 
 export default function page() {
@@ -8,4 +8,3 @@ export default function page() {
     </>
   );
 }
-

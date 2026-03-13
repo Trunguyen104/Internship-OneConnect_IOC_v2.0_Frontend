@@ -10,7 +10,15 @@ import LogbookStatusTag from './LogbookStatusTag';
 
 const { Text } = Typography;
 
-export default function LogbookTable({ data, loading, onView, onEdit, onDelete, onTableChange }) {
+export default function LogbookTable({
+  data,
+  loading,
+  userProfile,
+  onView,
+  onEdit,
+  onDelete,
+  onTableChange,
+}) {
   const [deleteModal, setDeleteModal] = useState({
     open: false,
     id: null,
@@ -19,6 +27,9 @@ export default function LogbookTable({ data, loading, onView, onEdit, onDelete, 
     onDelete(deleteModal.id);
     setDeleteModal({ open: false, id: null });
   };
+
+  const currentStudentId = userProfile?.studentId;
+
   const columns = [
     {
       title: DAILY_REPORT_UI.TABLE.REPORT_DATE,
@@ -76,42 +87,50 @@ export default function LogbookTable({ data, loading, onView, onEdit, onDelete, 
       key: 'action',
       width: 140,
       align: 'center',
-      render: (_, record) => (
-        <div className='flex items-center justify-center gap-2'>
-          <Tooltip title='View Details'>
-            <Button
-              type='text'
-              icon={<FileTextOutlined className='text-gray-500 hover:text-blue-600' />}
-              onClick={() => onView(record)}
-              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-blue-50'
-            />
-          </Tooltip>
+      render: (_, record) => {
+        const isOwner = record.studentId === currentStudentId;
 
-          <Tooltip title='Edit Report'>
-            <Button
-              type='text'
-              icon={<EditOutlined className='text-gray-500 hover:text-amber-500' />}
-              onClick={() => onEdit(record)}
-              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-amber-50'
-            />
-          </Tooltip>
+        return (
+          <div className='flex items-center justify-center gap-2'>
+            <Tooltip title='View Details'>
+              <Button
+                type='text'
+                icon={<FileTextOutlined className='text-gray-500 hover:text-blue-600' />}
+                onClick={() => onView(record)}
+                className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-blue-50'
+              />
+            </Tooltip>
 
-          <Tooltip title='Delete Report'>
-            <Button
-              type='text'
-              danger
-              icon={<DeleteOutlined className='text-gray-400 hover:text-red-500' />}
-              onClick={() =>
-                setDeleteModal({
-                  open: true,
-                  id: record.logbookId,
-                })
-              }
-              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50'
-            />
-          </Tooltip>
-        </div>
-      ),
+            {isOwner && (
+              <>
+                <Tooltip title='Edit Report'>
+                  <Button
+                    type='text'
+                    icon={<EditOutlined className='text-gray-500 hover:text-amber-500' />}
+                    onClick={() => onEdit(record)}
+                    className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-amber-50'
+                  />
+                </Tooltip>
+
+                <Tooltip title='Delete Report'>
+                  <Button
+                    type='text'
+                    danger
+                    icon={<DeleteOutlined className='text-gray-400 hover:text-red-500' />}
+                    onClick={() =>
+                      setDeleteModal({
+                        open: true,
+                        id: record.logbookId,
+                      })
+                    }
+                    className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50'
+                  />
+                </Tooltip>
+              </>
+            )}
+          </div>
+        );
+      },
     },
   ];
 

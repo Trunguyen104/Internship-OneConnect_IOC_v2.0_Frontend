@@ -1,30 +1,30 @@
 'use client';
 
 // import AppTable from '@/components/shared/AppTable';
-import { Modal, Typography, Tag, Button, Tooltip, Alert, Space } from 'antd';
-import {
-  TeamOutlined,
-  LockOutlined,
-  ExclamationCircleFilled,
-  EyeOutlined,
-  ClockCircleFilled,
-} from '@ant-design/icons';
+import { Modal, Typography, Tag, Button, Tooltip, Space } from 'antd';
+import { TeamOutlined, LockOutlined, EyeOutlined, ClockCircleFilled } from '@ant-design/icons';
 import AppTable from '@/components/ui/AppTable';
 
 const { Text, Title } = Typography;
 
 const getEvalStatusText = (evalStatus) => {
-  switch (evalStatus) {
+  const status = typeof evalStatus === 'string' ? evalStatus.toUpperCase() : evalStatus;
+
+  switch (status) {
     case 0:
-      return { label: 'Chưa đánh giá', color: 'default' };
+    case 'PENDING':
+      return { label: 'Pending', color: 'default' };
     case 1:
-      return { label: 'Bản nháp', color: 'warning' };
+    case 'DRAFT':
+      return { label: 'Draft', color: 'warning' };
     case 2:
-      return { label: 'Đã gửi (Chờ duyệt)', color: 'processing' };
+    case 'SUBMITTED':
+      return { label: 'Submitted', color: 'processing' };
     case 3:
-      return { label: 'Đã công bố', color: 'success' };
+    case 'PUBLISHED':
+      return { label: 'Published', color: 'success' };
     default:
-      return { label: 'N/A', color: 'default' };
+      return { label: evalStatus || 'N/A', color: 'default' };
   }
 };
 
@@ -71,7 +71,11 @@ export default function TeamEvaluationsModal({
       dataIndex: 'totalScore',
       align: 'center',
       render: (score, record) => {
-        if (record.evaluationStatus < 3) {
+        const status = record.evaluationStatus;
+        const isPublished =
+          status === 3 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
+
+        if (!isPublished) {
           return <Text type='secondary'>--</Text>;
         }
 
@@ -92,7 +96,11 @@ export default function TeamEvaluationsModal({
       render: (_, record) => {
         if (record.studentId !== myStudentId) return null;
 
-        if (record.evaluationStatus < 3) {
+        const status = record.evaluationStatus;
+        const isPublished =
+          status === 3 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
+
+        if (!isPublished) {
           return (
             <Tooltip title='Phiếu điểm chưa được công bố'>
               <Button type='text' disabled icon={<ClockCircleFilled />}>
@@ -134,14 +142,6 @@ export default function TeamEvaluationsModal({
     >
       <Space direction='vertical' size='large' style={{ width: '100%' }}>
         <AppTable columns={columns} data={teamData} pagination={false} rowKey='studentId' />
-
-        <Alert
-          icon={<ExclamationCircleFilled />}
-          type='info'
-          showIcon
-          message='Bảo mật điểm số'
-          description="Vì lý do bảo mật, điểm số của các thành viên khác trong nhóm sẽ được ẩn (***). Bạn chỉ có thể xem chi tiết phiếu điểm của chính mình khi trạng thái là 'Đã công bố'."
-        />
       </Space>
     </Modal>
   );

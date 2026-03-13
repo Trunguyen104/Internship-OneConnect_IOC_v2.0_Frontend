@@ -17,6 +17,7 @@ export const PROJECT_UI = {
   BUTTON: {
     UPLOAD: 'Upload',
     SELECT_FILE: 'Select File',
+    VIEW: 'View',
     DOWNLOAD: 'Download',
     EDIT: 'Edit',
     DELETE: 'Delete',
@@ -36,4 +37,3 @@ export const PROJECT_UI = {
     DELETE_RESOURCE: 'Are you sure you want to delete this resource?',
   },
 };
-

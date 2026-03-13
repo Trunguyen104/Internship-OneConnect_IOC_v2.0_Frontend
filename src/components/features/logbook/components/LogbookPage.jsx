@@ -32,6 +32,7 @@ export default function LogbookPage() {
     contextHolder,
     messageApi,
     internshipId,
+    userProfile,
   } = useLogbook();
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -162,6 +163,7 @@ export default function LogbookPage() {
         <LogbookTable
           data={data}
           loading={loading}
+          userProfile={userProfile}
           onView={openDetailModal}
           onEdit={openFormModal}
           onDelete={handleDelete}
