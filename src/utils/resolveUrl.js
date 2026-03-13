@@ -4,28 +4,28 @@ export const resolveResourceUrl = (url) => {
   // external URL
   if (url.startsWith('http')) return url;
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
-  const normalizedBase = baseUrl.replace(/\/$/, '');
+  // Determine the target backend root (port 5050)
+  const backendRoot = 'http://localhost:5050';
 
-  // normalize path
-  let cleanPath = url.replace(/\\/g, '/');
+  let cleanPath = url.replace(/\\/g, '/').trim();
 
-  // Find the position of 'Uploads' (case-insensitive) and keep everything from that point
-  // This preserves the casing of the 'Uploads' part and everything after it.
-  const uploadsMatch = cleanPath.match(/\/Uploads\//i);
-  if (uploadsMatch) {
-    cleanPath = cleanPath.substring(uploadsMatch.index);
-  } else {
-    // If 'Uploads' not found, just strip '/app' prefix if it exists
-    cleanPath = cleanPath.replace(/^\/app/, '');
+  // If it starts with localhost:5050 or similar but no protocol
+  if (
+    cleanPath.startsWith('localhost:') ||
+    (cleanPath.includes(':') && !cleanPath.includes('://'))
+  ) {
+    cleanPath = 'http://' + cleanPath;
   }
 
-  if (!cleanPath.startsWith('/')) {
-    cleanPath = '/' + cleanPath;
+  // If already full URL, return it
+  if (cleanPath.startsWith('http')) {
+    // Ensure we solve potential protocol-relative or missing protocol issues
+    return cleanPath;
   }
 
-  const resolved = normalizedBase + cleanPath;
-  console.log('Resolved resource URL:', { original: url, resolved });
+  // Special handling for Uploads to ensure they use backendRoot
+  const resolved = backendRoot + (cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath);
+  console.log('🔗 URL RECONSTRUCTION:', { original: url, resolved });
 
   return resolved;
 };

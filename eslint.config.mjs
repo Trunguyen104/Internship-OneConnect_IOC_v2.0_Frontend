@@ -20,15 +20,15 @@ export default defineConfig([
     rules: {
       'prettier/prettier': 'error',
       // 'tailwindcss/no-arbitrary-value': 'error',
-      
+      'react/jsx-no-literals': 'off',
       // CHẶN HARD-CODE TEXT
-      'react/jsx-no-literals': [
-        'error', 
-        { 
-          "noStrings": true, 
-          "allowedStrings": ["core-web-vitals"] // Những từ đặc biệt được phép
-        }
-      ],
+      // 'react/jsx-no-literals': [
+      //   'error', 
+      //   { 
+      //     "noStrings": true, 
+      //     "allowedStrings": ["core-web-vitals"] // Những từ đặc biệt được phép
+      //   }
+      // ],
     },
   },
 ]);

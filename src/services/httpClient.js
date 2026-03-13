@@ -38,7 +38,10 @@ async function request(path, options = {}) {
   const contentType = res.headers.get('content-type');
   let data = null;
 
-  if (contentType && contentType.includes('application/json')) {
+  if (options.responseType === 'blob') {
+    // DO NOT read as text or JSON if blob is requested
+    data = await res.blob();
+  } else if (contentType && contentType.includes('application/json')) {
     const text = await res.text();
     data = text ? JSON.parse(text) : null;
   } else {
@@ -69,7 +72,23 @@ async function request(path, options = {}) {
             },
           });
 
-          return retryRes.json();
+          if (!retryRes.ok) {
+            return {
+              isSuccess: false,
+              status: retryRes.status,
+              data: await retryRes.text(),
+            };
+          }
+
+          // Process retry response using the same logic as the original
+          if (options.responseType === 'blob') {
+            return await retryRes.blob();
+          }
+          const retryContentType = retryRes.headers.get('content-type');
+          if (retryContentType && retryContentType.includes('application/json')) {
+            return await retryRes.json();
+          }
+          return await retryRes.text();
         }
       } catch (e) {
         console.error('Refresh token failed', e);
@@ -125,7 +144,7 @@ export const httpPatch = (path, body, options = {}) =>
     body: body instanceof FormData ? body : JSON.stringify(body),
     ...options,
   });
-export default {
+const httpClient = {
   httpGet,
   httpPost,
   httpPut,
@@ -133,3 +152,4 @@ export default {
   httpPatch,
 };
 
+export default httpClient;

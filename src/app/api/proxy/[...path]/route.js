@@ -19,15 +19,20 @@ async function handler(req, { params }) {
     const pathStr = path.join('/');
 
     // Bypass v1 for specific routes (like student evaluations)
-    const isV1Bypass = pathStr.startsWith('students/me');
+    const isV1Bypass = pathStr.startsWith('students/me') || pathStr.startsWith('project-resources');
+
+    // Construct target URL robustly
+    const targetRoot = baseUrl.toLowerCase().endsWith('/api')
+      ? baseUrl.slice(0, -4)
+      : baseUrl.endsWith('/')
+        ? baseUrl.slice(0, -1)
+        : baseUrl;
 
     const url = isV1Bypass
-      ? `${baseUrl}/api/${pathStr}${searchString}`
-      : baseUrl.toLowerCase().endsWith('/api')
-        ? `${baseUrl}/${pathStr}${searchString}`
-        : `${baseUrl}/api/v1/${pathStr}${searchString}`;
+      ? `${targetRoot}/api/${pathStr}${searchString}`
+      : `${targetRoot}/api/v1/${pathStr}${searchString}`;
 
-    console.log(`PROXY: ${req.method} ${url}`);
+    console.log(`PROXY TARGET: ${req.method} ${url}`);
 
     const headers = new Headers();
     const contentType = req.headers.get('content-type');
@@ -46,29 +51,39 @@ async function handler(req, { params }) {
     };
 
     if (!['GET', 'HEAD'].includes(req.method)) {
-      // Clone the request text to avoid stream consumption issues
-      const bodyText = await req.text();
-      requestOptions.body = bodyText;
-      console.log(
-        `PROXY PAYLOAD: ${bodyText.substring(0, 500)}${bodyText.length > 500 ? '...' : ''}`,
-      );
+      // Use arrayBuffer to preserve binary data (important for multipart/form-data uploads)
+      const buffer = await req.arrayBuffer();
+      requestOptions.body = buffer;
+      // 'duplex' is required when passing a body stream/buffer in some environments
+      requestOptions.duplex = 'half';
     }
 
     const res = await fetch(url, requestOptions);
     console.log(`PROXY RESPONSE: ${res.status} from ${url}`);
 
     const contentTypeRes = res.headers.get('content-type');
-    const data = await res.text();
+    const contentDisposition = res.headers.get('content-disposition');
 
     if (!res.ok) {
-      console.error(`PROXY BACKEND ERROR: ${res.status} - ${data}`);
+      const errorText = await res.text();
+      console.error(`PROXY BACKEND ERROR: ${res.status} - ${errorText}`);
+      return new NextResponse(errorText, {
+        status: res.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    return new NextResponse(data, {
+    // Zero-Touch Streaming for data integrity
+    const responseHeaders = new Headers();
+    if (contentTypeRes) responseHeaders.set('Content-Type', contentTypeRes);
+    if (contentDisposition) responseHeaders.set('Content-Disposition', contentDisposition);
+
+    // Explicitly do NOT set Content-Length as streaming might change the encoding/framing
+    // and Next.js/Vercel often handle this automatically with res.body
+
+    return new NextResponse(res.body, {
       status: res.status,
-      headers: {
-        'Content-Type': contentTypeRes || 'application/json',
-      },
+      headers: responseHeaders,
     });
   } catch (error) {
     console.error(`PROXY EXCEPTION: ${error.message}`);
