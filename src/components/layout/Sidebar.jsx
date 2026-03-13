@@ -53,13 +53,15 @@ export default function Sidebar() {
           Back
         </Link>
       ) : (
-        <Link
-          href='/internship-groups'
-          className='mx-5 mb-6 flex items-center gap-2 text-[14px] font-bold text-[var(--primary-700)] hover:text-[var(--primary-800)] cursor-pointer'
-        >
-          <ArrowLeftOutlined />
-          Trở lại trang trước
-        </Link>
+        !isProfile && pathname !== '/internship-groups' && (
+          <Link
+            href='/student/space'
+            className='mx-5 mb-6 flex items-center gap-2 text-[14px] font-bold text-(--primary-700) hover:text-(--primary-800) cursor-pointer'
+          >
+            <ArrowLeftOutlined />
+            Quay lại Dashboard
+          </Link>
+        )
       )}
 
       <nav className='flex-1 space-y-1'>
