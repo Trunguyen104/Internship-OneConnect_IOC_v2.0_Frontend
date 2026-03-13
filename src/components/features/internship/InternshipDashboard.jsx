@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Skeleton, Empty, notification } from 'antd';
 import { InternshipGroupService } from './services/internshipGroup.service';
 import InternshipCard from './components/InternshipCard';
-import { INTERNSHIP_STATUS } from '../studentlist/constants/internshipStatus.js';
+import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
 
 const TEXT = {
   DIAGNOSTIC_MSG: '--- InternshipDashboard (Direct Term Mapping) ---',
