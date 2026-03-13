@@ -25,14 +25,15 @@ export default function ProjectPage() {
     handleDelete,
     openEditModal,
     handleUpdate,
+    handleDownload,
+    handleView,
   } = useProject();
 
   return (
-    <div className='animate-in fade-in mx-auto w-full max-w-7xl space-y-6 duration-700'>
-      <StudentPageHeader title='Project Information' />
-
-      <AntdSpin spinning={loading && !projectId} size='large'>
-        <div className='flex flex-col gap-6'>
+    <div className={'animate-in fade-in mx-auto w-full max-w-7xl space-y-6 duration-700'}>
+      <StudentPageHeader title={'Project Information'} />
+      <AntdSpin spinning={loading && !projectId} size={'large'}>
+        <div className={'flex flex-col gap-6'}>
           <Card>
             <ProjectOverview project={projectInfo} />
           </Card>
@@ -52,6 +53,8 @@ export default function ProjectPage() {
               setIsEditModalVisible={setIsEditModalVisible}
               onUpdate={handleUpdate}
               editForm={editForm}
+              onDownload={handleDownload}
+              onView={handleView}
             />
           </Card>
         </div>

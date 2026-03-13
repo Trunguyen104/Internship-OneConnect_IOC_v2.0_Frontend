@@ -56,30 +56,31 @@ export default function ProjectResourceUpload({
     },
     fileList,
     maxCount: 1,
+    accept: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.zip,.rar,.mp4',
   };
 
   return (
-    <div className='rounded-2xl border border-slate-100 bg-slate-50/50 p-6'>
-      <div className='mb-6'>
+    <div className={'rounded-2xl border border-slate-100 bg-slate-50/50 p-6'}>
+      <div className={'mb-6'}>
         <Title
           level={5}
-          className='!m-0 !text-sm !font-bold tracking-wider !text-slate-800 uppercase'
+          className={'!m-0 !text-sm !font-bold tracking-wider !text-slate-800 uppercase'}
         >
           {PROJECT_UI.TITLE.ADD_RESOURCE}
         </Title>
       </div>
-      <Form form={form} layout='vertical' onFinish={onUpload} className='space-y-4'>
+      <Form form={form} layout={'vertical'} onFinish={onUpload} className={'space-y-4'}>
         <Form.Item
           label={PROJECT_UI.FORM.RESOURCE_NAME}
-          name='resourceName'
-          tooltip='If left blank, the attached filename will be used'
+          name={'resourceName'}
+          tooltip={{ title: 'If left blank, the attached filename will be used' }}
         >
           <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
         </Form.Item>
 
         <Form.Item
           label={PROJECT_UI.FORM.RESOURCE_TYPE}
-          name='resourceType'
+          name={'resourceType'}
           initialValue={1}
           required
         >
@@ -94,8 +95,8 @@ export default function ProjectResourceUpload({
 
         <Form.Item style={{ marginBottom: 0 }}>
           <Button
-            type='primary'
-            htmlType='submit'
+            type={'primary'}
+            htmlType={'submit'}
             loading={uploading}
             disabled={fileList.length === 0}
             block
