@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Check, User, Search, FileText, MapPin, GraduationCap } from 'lucide-react';
-import { INTERNSHIP_STEPS, getStepStatus } from '../../studentlist/constants/internshipStatus.js';
+import { INTERNSHIP_STEPS, getStepStatus } from '../constants/internshipStatus.js';
 
 const STEP_ICONS = {
   registration: GraduationCap,
