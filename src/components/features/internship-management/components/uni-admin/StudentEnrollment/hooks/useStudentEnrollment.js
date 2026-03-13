@@ -1,5 +1,6 @@
 'use client';
 import { useState, useMemo, useCallback } from 'react';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 export const useStudentEnrollment = (initialStudents) => {
   const [students, setStudents] = useState(initialStudents);
@@ -36,9 +37,14 @@ export const useStudentEnrollment = (initialStudents) => {
   }, []);
 
   const handleDelete = useCallback((student) => {
-    console.log('Delete student', student);
-    // Implementation for delete logic could go here
-    // setStudents(prev => prev.filter(s => s.id !== student.id));
+    showDeleteConfirm({
+      title: 'Delete Student',
+      content: `Are you sure you want to delete student "${student.name}"? This action cannot be undone and the student will be removed from the enrollment list.`,
+      onOk: () => {
+        setStudents((prev) => prev.filter((s) => s.id !== student.id));
+        // Add toast success here if useToast was available in this hook
+      },
+    });
   }, []);
 
   const handleUpdateStudent = useCallback((updatedStudent) => {

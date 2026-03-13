@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { message, Form } from 'antd';
+import { Form } from 'antd';
+import { useToast } from '@/providers/ToastProvider';
 import {
   getProjectResources,
   createProjectResource,
@@ -13,7 +14,9 @@ import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 
 export function useProject() {
+  const toast = useToast();
   const [projectId, setProjectId] = useState(null);
+  const [projectInfo, setProjectInfo] = useState(null);
   const [resources, setResources] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,28 +27,31 @@ export function useProject() {
   const [editingResource, setEditingResource] = useState(null);
   const [editForm] = Form.useForm();
 
-  const loadResources = useCallback(async (id) => {
-    if (!id) return;
-    setLoading(true);
-    try {
-      const res = await getProjectResources(id);
-      const items = (res?.data?.items || []).map((item) => {
-        // Handle string resourceType from backend
-        let type = item.resourceType;
-        if (typeof type === 'string') {
-          const matched = RESOURCE_TYPES.find((t) => t.key === type);
-          if (matched) type = matched.value;
-        }
-        return { ...item, resourceType: type };
-      });
-      setResources(items);
-    } catch (err) {
-      console.error('Load resources error:', err);
-      message.error(PROJECT_MESSAGES.ERROR.LOAD_RESOURCES);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const loadResources = useCallback(
+    async (id) => {
+      if (!id) return;
+      setLoading(true);
+      try {
+        const res = await getProjectResources(id);
+        const items = (res?.data?.items || []).map((item) => {
+          // Handle string resourceType from backend
+          let type = item.resourceType;
+          if (typeof type === 'string') {
+            const matched = RESOURCE_TYPES.find((t) => t.key === type);
+            if (matched) type = matched.value;
+          }
+          return { ...item, resourceType: type };
+        });
+        setResources(items);
+      } catch (err) {
+        console.error('Load resources error:', err);
+        toast.error(PROJECT_MESSAGES.ERROR.LOAD_RESOURCES);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [toast],
+  );
 
   const initProject = useCallback(async () => {
     try {
@@ -54,15 +60,24 @@ export function useProject() {
       if (res && res.data && res.data.items && res.data.items.length > 0) {
         const id = res.data.items[0].projectId;
         setProjectId(id);
+
+        // Fetch full project details
+        const detailRes = await ProjectService.getById(id);
+        if (detailRes && detailRes.data) {
+          setProjectInfo(detailRes.data);
+        } else {
+          setProjectInfo(res.data.items[0]); // Fallback to list info
+        }
+
         await loadResources(id);
       }
     } catch (error) {
       console.error('Failed to init project', error);
-      message.error(PROJECT_MESSAGES.ERROR.LOAD_PROJECT_FAILED);
+      toast.error(PROJECT_MESSAGES.ERROR.LOAD_PROJECT_FAILED);
     } finally {
       setLoading(false);
     }
-  }, [loadResources]);
+  }, [loadResources, toast]);
 
   useEffect(() => {
     initProject();
@@ -70,7 +85,7 @@ export function useProject() {
 
   const handleUpload = async (values) => {
     if (fileList.length === 0) {
-      message.warning(PROJECT_MESSAGES.WARNING.FILE_REQUIRED);
+      toast.warning(PROJECT_MESSAGES.WARNING.FILE_REQUIRED);
       return;
     }
 
@@ -88,10 +103,10 @@ export function useProject() {
       await loadResources(projectId);
       setFileList([]);
       form.resetFields();
-      message.success(PROJECT_MESSAGES.SUCCESS.UPLOAD);
+      toast.success(PROJECT_MESSAGES.SUCCESS.UPLOAD);
     } catch (err) {
       console.error('Upload error:', err);
-      message.error(PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
+      toast.error(PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
     } finally {
       setUploading(false);
     }
@@ -100,11 +115,11 @@ export function useProject() {
   const handleDelete = async (id) => {
     try {
       await deleteProjectResource(id);
-      message.success(PROJECT_MESSAGES.SUCCESS.DELETE);
+      toast.success(PROJECT_MESSAGES.SUCCESS.DELETE);
       await loadResources(projectId);
     } catch (err) {
       console.error('Delete error:', err);
-      message.error(PROJECT_MESSAGES.ERROR.DELETE_FAILED);
+      toast.error(PROJECT_MESSAGES.ERROR.DELETE_FAILED);
     }
   };
 
@@ -124,17 +139,18 @@ export function useProject() {
         resourceName: values.resourceName,
         resourceType: values.resourceType || editingResource.resourceType || 1,
       });
-      message.success(PROJECT_MESSAGES.SUCCESS.UPDATE);
+      toast.success(PROJECT_MESSAGES.SUCCESS.UPDATE);
       setIsEditModalVisible(false);
       await loadResources(projectId);
     } catch (err) {
       console.error('Update error:', err);
-      message.error(PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
+      toast.error(PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
     }
   };
 
   return {
     projectId,
+    projectInfo,
     resources,
     fileList,
     setFileList,

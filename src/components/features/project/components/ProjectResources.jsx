@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Typography, Row, Col, List, Button, Popconfirm, Tag, Space } from 'antd';
+import { Typography, Row, Col, List, Button, Tag } from 'antd';
 import {
   FileTextOutlined,
   DownloadOutlined,
@@ -14,6 +14,7 @@ import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
 import ProjectResourceEditModal from './ProjectResourceEditModal';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 const { Title, Text } = Typography;
 
@@ -33,34 +34,32 @@ export default function ProjectResources({
   editForm,
 }) {
   return (
-    <Card
-      variant='borderless'
-      title={
-        <Title level={4} style={{ margin: 0 }}>
-          Tài liệu dự án
-        </Title>
-      }
-      className='shadow-sm'
-      style={{ borderRadius: 12 }}
-    >
+    <div className='space-y-6'>
       <Row gutter={[32, 32]}>
         <Col xs={24} lg={9} xl={8}>
-          <ProjectResourceUpload
-            form={form}
-            onUpload={onUpload}
-            uploading={uploading}
-            fileList={fileList}
-            setFileList={setFileList}
-          />
+          <div className='sticky top-6'>
+            <ProjectResourceUpload
+              form={form}
+              onUpload={onUpload}
+              uploading={uploading}
+              fileList={fileList}
+              setFileList={setFileList}
+            />
+          </div>
         </Col>
 
         <Col xs={24} lg={15} xl={16}>
-          <Space style={{ marginBottom: 16 }} size='small' align='center'>
-            <Title level={5} style={{ margin: 0 }}>
+          <div className='mb-6 flex items-center gap-3'>
+            <Title level={5} className='!m-0'>
               {PROJECT_UI.TITLE.RESOURCE_LIST}
             </Title>
-            <Tag color='geekblue'>{resources.length} files</Tag>
-          </Space>
+            <Tag
+              color='geekblue'
+              className='rounded-full border-none bg-blue-50 px-3 text-[10px] font-bold text-blue-600'
+            >
+              {resources.length} FILES
+            </Tag>
+          </div>
 
           <List
             itemLayout='horizontal'
@@ -69,60 +68,79 @@ export default function ProjectResources({
             locale={{ emptyText: PROJECT_UI.EMPTY.NO_RESOURCE }}
             renderItem={(item) => (
               <List.Item
+                className='group mb-2 rounded-xl border-slate-100 px-4 transition-all hover:bg-slate-50/80'
                 actions={[
                   <Button
                     key='view'
-                    type='link'
+                    type='text'
+                    size='small'
                     icon={<EyeOutlined />}
                     href={resolveResourceUrl(item.fileUrl || item.resourceUrl)}
                     target='_blank'
                     rel='noopener noreferrer'
-                  >
-                    {PROJECT_UI.BUTTON.VIEW}
-                  </Button>,
+                    className='hover:text-primary text-slate-400 transition-colors'
+                    title={PROJECT_UI.BUTTON.VIEW}
+                  />,
                   <Button
                     key='download'
-                    type='link'
+                    type='text'
+                    size='small'
                     icon={<DownloadOutlined />}
                     href={resolveResourceUrl(item.fileUrl || item.resourceUrl)}
                     target='_blank'
                     download={item.resourceName}
-                  >
-                    {PROJECT_UI.BUTTON.DOWNLOAD}
-                  </Button>,
+                    className='text-slate-400 transition-colors hover:text-blue-600'
+                    title={PROJECT_UI.BUTTON.DOWNLOAD}
+                  />,
                   <Button
                     key='edit'
-                    type='link'
+                    type='text'
+                    size='small'
                     icon={<EditOutlined />}
                     onClick={() => openEditModal(item)}
-                  >
-                    {PROJECT_UI.BUTTON.EDIT}
-                  </Button>,
-                  <Popconfirm
+                    className='text-slate-400 transition-colors hover:text-slate-800'
+                    title={PROJECT_UI.BUTTON.EDIT}
+                  />,
+                  <Button
                     key='delete'
-                    title={PROJECT_UI.CONFIRM.DELETE_RESOURCE}
-                    onConfirm={() => onDelete(item.projectResourceId)}
-                    okText='Yes'
-                    cancelText='No'
-                  >
-                    <Button type='link' danger icon={<DeleteOutlined />}>
-                      {PROJECT_UI.BUTTON.DELETE}
-                    </Button>
-                  </Popconfirm>,
+                    type='text'
+                    size='small'
+                    danger
+                    icon={<DeleteOutlined />}
+                    className='text-slate-300 transition-colors hover:text-red-500'
+                    title={PROJECT_UI.BUTTON.DELETE}
+                    onClick={() =>
+                      showDeleteConfirm({
+                        title: 'Delete Resource',
+                        content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
+                        onOk: () => onDelete(item.projectResourceId),
+                      })
+                    }
+                  />,
                 ]}
               >
                 <List.Item.Meta
                   avatar={
-                    <FileTextOutlined
-                      style={{
-                        fontSize: 28,
-                        color: '#1890ff',
-                        marginTop: 4,
-                      }}
-                    />
+                    <div className='bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg transition-transform group-hover:scale-110'>
+                      <FileTextOutlined className='text-xl' />
+                    </div>
                   }
-                  title={<Text strong>{item.resourceName || 'Untitled Resource'}</Text>}
-                  description={`Type: ${RESOURCE_TYPES.find((t) => t.value === item.resourceType || t.key === item.resourceType)?.label || 'Other'}`}
+                  title={
+                    <Text
+                      strong
+                      className='block max-w-[200px] truncate text-sm text-slate-800 sm:max-w-[300px]'
+                      title={item.resourceName}
+                    >
+                      {item.resourceName || 'Untitled Resource'}
+                    </Text>
+                  }
+                  description={
+                    <Text type='secondary' className='text-[11px] font-medium'>
+                      {RESOURCE_TYPES.find(
+                        (t) => t.value === item.resourceType || t.key === item.resourceType,
+                      )?.label || 'Other'}
+                    </Text>
+                  }
                 />
               </List.Item>
             )}
@@ -137,6 +155,6 @@ export default function ProjectResources({
         form={editForm}
         loading={loading}
       />
-    </Card>
+    </div>
   );
 }

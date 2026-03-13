@@ -8,7 +8,6 @@ import TermHeader from './components/TermHeader';
 import TermFilterBar from './components/TermFilterBar';
 import TermTable from './components/TermTable';
 import TermFormDrawer from './components/TermFormDrawer';
-import TermDeleteModal from './components/TermDeleteModal';
 import TermStatusModal from './components/TermStatusModal';
 import { INITIAL_TERMS } from './constants/termData';
 
@@ -21,12 +20,10 @@ export default function InternshipTermManagement() {
     modalVisible,
     submitLoading,
     editingRecord,
-    deleteModalState,
     statusModalState,
     filteredData,
     paginatedData,
     setModalVisible,
-    setDeleteModalState,
     setStatusModalState,
     handleSearchChange,
     handleStatusChange,
@@ -35,7 +32,6 @@ export default function InternshipTermManagement() {
     handleEdit,
     handleRequestDelete,
     handleRequestChangeStatus,
-    handleDelete,
     handleChangeStatus,
     handleSaveModal,
   } = useTermManagement(INITIAL_TERMS);
@@ -85,13 +81,6 @@ export default function InternshipTermManagement() {
         onSave={handleSaveModal}
         loading={submitLoading}
         initialValues={editingRecord}
-      />
-
-      <TermDeleteModal
-        open={deleteModalState.open}
-        record={deleteModalState.record}
-        onCancel={() => setDeleteModalState({ open: false, record: null })}
-        onConfirm={handleDelete}
       />
 
       <TermStatusModal

@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { userService } from '@/components/features/user/services/userService';
-import { message } from 'antd';
+import { useToast } from '@/providers/ToastProvider';
 
 export function useLogbook() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const toast = useToast();
 
   const [internshipId, setInternshipId] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
@@ -94,7 +94,7 @@ export function useLogbook() {
     try {
       const res = await LogBookService.delete(id);
       if (res && (res.isSuccess !== false || res.success !== false)) {
-        messageApi.success('Logbook deleted successfully!');
+        toast.success('Logbook deleted successfully!');
 
         if (data.length === 1 && pageNumber > 1) {
           setPageNumber((prev) => prev - 1);
@@ -103,12 +103,12 @@ export function useLogbook() {
         }
         return true;
       } else {
-        messageApi.error(res?.message || 'Failed to delete logbook');
+        toast.error(res?.message || 'Failed to delete logbook');
         return false;
       }
     } catch (error) {
       console.error('Delete logbook error', error);
-      messageApi.error('An unexpected error occurred during deletion');
+      toast.error('An unexpected error occurred during deletion');
       return false;
     }
   };
@@ -127,8 +127,6 @@ export function useLogbook() {
     setSortOrder,
     fetchLogbooks,
     handleDelete,
-    contextHolder,
-    messageApi,
     internshipId,
     userProfile,
   };

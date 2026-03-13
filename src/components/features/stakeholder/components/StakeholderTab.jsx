@@ -5,6 +5,7 @@ import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 import { useStakeholderTab } from '../hooks/useStakeholderTab';
 import StakeholderList from './StakeholderList';
 import StakeholderFormModal from './StakeholderFormModal';
+import Card from '@/components/ui/Card';
 
 export default function StakeholderTab() {
   const {
@@ -26,63 +27,63 @@ export default function StakeholderTab() {
 
   return (
     <>
-      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between'>
-        <SearchBar
-          placeholder={STAKEHOLDER_UI.SEARCH_PLACEHOLDER}
-          value={search}
-          onChange={setSearch}
-          showFilter
-          showAction
-          actionLabel={STAKEHOLDER_UI.ADD_BUTTON}
-          onActionClick={() => {
-            setStakeholderForm({
-              name: '',
-              type: 0,
-              role: '',
-              description: '',
-              email: '',
-              phoneNumber: '',
-            });
-            setErrors({});
-            setOpenStakeholderForm(true);
-          }}
-        />
-      </div>
+      <section className='animate-in fade-in flex h-full flex-col space-y-6 duration-500'>
+        <Card>
+          <SearchBar
+            placeholder={STAKEHOLDER_UI.SEARCH_PLACEHOLDER}
+            value={search}
+            onChange={setSearch}
+            showFilter
+            showAction
+            actionLabel={STAKEHOLDER_UI.ADD_BUTTON}
+            onActionClick={() => {
+              setStakeholderForm({
+                name: '',
+                type: 0,
+                role: '',
+                description: '',
+                email: '',
+                phoneNumber: '',
+              });
+              setErrors({});
+              setOpenStakeholderForm(true);
+            }}
+          />
 
-      <div className='min-h-screen bg-slate-50/50 px-4 pt-6 pb-12 md:px-6 lg:pt-8'>
-        <StakeholderList
-          stakeholders={stakeholders}
-          loading={stakeholderLoading}
-          onEdit={(s) => {
-            setEditingStakeholderId(s.id);
-            setStakeholderForm({
-              name: s.name || '',
-              type: s.type || 0,
-              role: s.role || '',
-              description: s.description || '',
-              email: s.email || '',
-              phoneNumber: s.phoneNumber || '',
-            });
-            setErrors({});
-            setOpenStakeholderForm(true);
-          }}
-          onDelete={handleDeleteStakeholder}
-        />
-      </div>
+          <StakeholderList
+            stakeholders={stakeholders}
+            loading={stakeholderLoading}
+            onEdit={(s) => {
+              setEditingStakeholderId(s.id);
+              setStakeholderForm({
+                name: s.name || '',
+                type: s.type || 0,
+                role: s.role || '',
+                description: s.description || '',
+                email: s.email || '',
+                phoneNumber: s.phoneNumber || '',
+              });
+              setErrors({});
+              setOpenStakeholderForm(true);
+            }}
+            onDelete={handleDeleteStakeholder}
+          />
+        </Card>
 
-      <StakeholderFormModal
-        isOpen={openStakeholderForm}
-        onClose={() => {
-          setOpenStakeholderForm(false);
-          setErrors({});
-        }}
-        editingId={editingStakeholderId}
-        form={stakeholderForm}
-        setForm={setStakeholderForm}
-        errors={errors}
-        setErrors={setErrors}
-        onSave={handleSaveStakeholder}
-      />
+        <StakeholderFormModal
+          isOpen={openStakeholderForm}
+          onClose={() => {
+            setOpenStakeholderForm(false);
+            setErrors({});
+          }}
+          editingId={editingStakeholderId}
+          form={stakeholderForm}
+          setForm={setStakeholderForm}
+          errors={errors}
+          setErrors={setErrors}
+          onSave={handleSaveStakeholder}
+        />
+      </section>
     </>
   );
 }

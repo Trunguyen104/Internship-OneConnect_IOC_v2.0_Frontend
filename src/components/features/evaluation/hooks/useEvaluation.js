@@ -3,9 +3,10 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { EvaluationService } from '../services/evaluation.service';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
-import { message } from 'antd';
+import { useToast } from '@/providers/ToastProvider';
 
 export function useEvaluation() {
+  const toast = useToast();
   const [internshipId, setInternshipId] = useState(null);
   const [myStudentId, setMyStudentId] = useState(null);
   const [cycles, setCycles] = useState([]);
@@ -36,7 +37,7 @@ export function useEvaluation() {
           setMyStudentId(sId);
         } else {
           setLoading(false);
-          message.warning('Bạn hiện không tham gia kỳ thực tập nào.');
+          toast.warning('You are not currently enrolled in any internship.');
         }
       } catch (error) {
         console.error('Error fetching internship:', error);
@@ -58,7 +59,7 @@ export function useEvaluation() {
         setCycles(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching evaluation cycles:', error);
-        message.error('Không thể tải danh sách đợt đánh giá.');
+        toast.error('Failed to load evaluation cycles.');
       } finally {
         setLoading(false);
       }
@@ -76,7 +77,7 @@ export function useEvaluation() {
       setTeamData(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching team evaluations:', error);
-      message.error('Không thể tải danh sách đánh giá nhóm.');
+      toast.error('Failed to load team evaluations.');
     } finally {
       setLoadingTeam(false);
     }
@@ -91,7 +92,7 @@ export function useEvaluation() {
       setMyEvaluation(data);
     } catch (error) {
       console.error('Error fetching my evaluation:', error);
-      message.error('Không thể tải chi tiết đánh giá cá nhân.');
+      toast.error('Failed to load individual evaluation details.');
     } finally {
       setLoadingMyEval(false);
     }

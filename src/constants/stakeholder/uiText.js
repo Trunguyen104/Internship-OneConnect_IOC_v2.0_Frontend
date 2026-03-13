@@ -38,5 +38,6 @@ export const STAKEHOLDER_UI = {
   FIELD_PHONE: 'Phone number',
   FIELD_DESC: 'Description',
   FIELD_TYPE: 'Type',
+  TABLE_NO: '#',
+  ACTIONS: 'Actions',
 };
-

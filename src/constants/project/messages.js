@@ -6,6 +6,7 @@ export const PROJECT_MESSAGES = {
     UPDATE_FAILED: 'Error updating resource!',
     INVALID_FILE_TYPE: 'Unsupported file type!',
     FILE_TOO_LARGE: 'File size exceeds 10MB limit!',
+    LOAD_PROJECT_FAILED: 'Failed to load project information.',
   },
 
   SUCCESS: {
@@ -18,4 +19,3 @@ export const PROJECT_MESSAGES = {
     FILE_REQUIRED: 'Please select a file!',
   },
 };
-

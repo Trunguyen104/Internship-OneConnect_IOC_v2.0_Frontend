@@ -1,8 +1,8 @@
 'use client';
 
 import dayjs from 'dayjs';
-import { Popconfirm } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import IssueStatusTag from './IssueStatusTag';
 
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
@@ -109,20 +109,19 @@ export default function IssueTable({
                           >
                             {i.status === 2 ? ISSUE_UI.BUTTON.REOPEN : ISSUE_UI.BUTTON.RESOLVE}
                           </button>
-                          <Popconfirm
-                            title={ISSUE_UI.BUTTON.DELETE}
-                            onConfirm={(e) => {
-                              e?.stopPropagation();
-                              onDelete(i.id);
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              showDeleteConfirm({
+                                title: ISSUE_UI.BUTTON.DELETE,
+                                content: 'Are you sure you want to delete this issue?',
+                                onOk: () => onDelete(i.id),
+                              });
                             }}
+                            className='px-2 text-slate-400 hover:text-red-600'
                           >
-                            <button
-                              onClick={(e) => e.stopPropagation()}
-                              className='px-2 text-slate-400 hover:text-red-600'
-                            >
-                              <DeleteOutlined />
-                            </button>
-                          </Popconfirm>
+                            <DeleteOutlined />
+                          </button>
                         </div>
                       </td>
                     </tr>

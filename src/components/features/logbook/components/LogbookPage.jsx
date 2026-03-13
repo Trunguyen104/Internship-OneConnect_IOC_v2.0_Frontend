@@ -8,9 +8,11 @@ import Pagination from '@/components/ui/Pagination';
 import LogbookTable from './LogbookTable';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookDetailModal from './LogbookDetailModal';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { useLogbook } from '../hooks/useLogbook';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
+import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import dayjs from 'dayjs';
 import { useState } from 'react';
@@ -29,11 +31,10 @@ export default function LogbookPage() {
     setSortOrder,
     fetchLogbooks,
     handleDelete,
-    contextHolder,
-    messageApi,
     internshipId,
     userProfile,
   } = useLogbook();
+  const toast = useToast();
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -73,7 +74,7 @@ export default function LogbookPage() {
         res = await LogBookService.create(createPayload);
       }
       if (res && (res.isSuccess !== false || res.success !== false)) {
-        messageApi.success(
+        toast.success(
           editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
         );
 
@@ -85,10 +86,10 @@ export default function LogbookPage() {
         }
         closeFormModal();
       } else {
-        messageApi.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
+        toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
       }
     } catch {
-      messageApi.error(DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
+      toast.error(DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
     } finally {
       setSubmitting(false);
     }
@@ -127,9 +128,8 @@ export default function LogbookPage() {
   };
 
   return (
-    <section className='animate-in fade-in flex h-full flex-col space-y-6 duration-500'>
-      {contextHolder}
-      <h1 className='text-2xl font-bold text-slate-900'>{DAILY_REPORT_UI.TITLE}</h1>
+    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
+      <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
       <Card className='flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
         <div className='flex flex-wrap items-center justify-between gap-4 border-b border-slate-50 bg-slate-50/20 py-4'>

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { Modal, notification } from 'antd';
+import { useState, useMemo, useCallback } from 'react';
+import { useToast } from '@/providers/ToastProvider';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import { MOCK_MENTORS, MOCK_GROUPS } from '../constants/internshipData';
 
 export const useInternshipManagement = (initialStudents) => {
+  const toast = useToast();
   const [students, setStudents] = useState(initialStudents);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -60,60 +62,67 @@ export const useInternshipManagement = (initialStudents) => {
     setPagination((prev) => ({ ...prev, current: page }));
   }, []);
 
-  const handleAcceptStudent = useCallback((student) => {
-    Modal.confirm({
-      title: <span className='text-lg font-bold'>Tiếp nhận sinh viên</span>,
-      content: `Bạn có chắc muốn tiếp nhận sinh viên ${student.fullName} không?`,
-      okText: 'Tiếp nhận',
-      cancelText: 'Hủy',
-      okButtonProps: {
-        className: 'bg-primary hover:bg-red-700 border-none rounded-full px-6 font-bold',
-      },
-      cancelButtonProps: { className: 'rounded-full px-6 font-bold' },
-      onOk: () => {
-        setStudents((prev) =>
-          prev.map((s) => (s.id === student.id ? { ...s, status: 'ACCEPTED' } : s)),
-        );
-        notification.success({
-          message: 'Thành công',
-          description: 'Đã tiếp nhận sinh viên thành công',
-        });
-      },
-    });
-  }, []);
+  const handleAcceptStudent = useCallback(
+    (student) => {
+      showDeleteConfirm({
+        title: 'Accept Student',
+        content: `Are you sure you want to accept student ${student.fullName}?`,
+        okText: 'Accept',
+        type: 'warning',
+        onOk: () => {
+          setStudents((prev) =>
+            prev.map((s) => (s.id === student.id ? { ...s, status: 'ACCEPTED' } : s)),
+          );
+          toast.success('Student accepted successfully');
+        },
+      });
+    },
+    [toast],
+  );
 
-  const handleAddStudent = useCallback((values) => {
-    const newStudent = {
-      key: Date.now().toString(),
-      id: Date.now(),
-      fullName: values.fullName,
-      studentId: values.studentId,
-      email: values.email,
-      major: values.major,
-      status: 'PENDING',
-      mentorId: null,
-      avatar: values.fullName
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase(),
-    };
-    setStudents((prev) => [newStudent, ...prev]);
-    setIsAddModalOpen(false);
-    notification.success({ message: 'Đã thêm sinh viên thành công' });
-  }, []);
+  const handleAddStudent = useCallback(
+    (values) => {
+      const newStudent = {
+        key: Date.now().toString(),
+        id: Date.now(),
+        fullName: values.fullName,
+        studentId: values.studentId,
+        email: values.email,
+        major: values.major,
+        status: 'PENDING',
+        mentorId: null,
+        avatar: values.fullName
+          .split(' ')
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase(),
+      };
+      setStudents((prev) => [newStudent, ...prev]);
+      setIsAddModalOpen(false);
+      toast.success('Student added successfully');
+    },
+    [toast],
+  );
 
-  const handleRejectStudent = useCallback((studentId) => {
-    setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s)));
-    setRejectModal({ open: false, student: null });
-    notification.warning({ message: 'Đã từ chối tiếp nhận sinh viên' });
-  }, []);
+  const handleRejectStudent = useCallback(
+    (studentId) => {
+      setStudents((prev) =>
+        prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s)),
+      );
+      setRejectModal({ open: false, student: null });
+      toast.warning('Internship request rejected');
+    },
+    [toast],
+  );
 
-  const handleAssignMentor = useCallback((studentId, mentorId) => {
-    setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, mentorId } : s)));
-    setAssignModal({ open: false, student: null });
-    notification.success({ message: 'Đã gán Mentor & Dự án thành công' });
-  }, []);
+  const handleAssignMentor = useCallback(
+    (studentId, mentorId) => {
+      setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, mentorId } : s)));
+      setAssignModal({ open: false, student: null });
+      toast.success('Mentor & Project assigned successfully');
+    },
+    [toast],
+  );
 
   const handleGroupSubmit = useCallback(
     (values) => {
@@ -133,17 +142,14 @@ export const useInternshipManagement = (initialStudents) => {
       );
 
       if (type === 'ADD') {
-        notification.success({ message: 'Đã thêm vào nhóm thành công' });
+        toast.success('Added to group successfully');
       } else {
-        notification.success({
-          message: 'Đã đổi nhóm thành công',
-          // description: `Lý do: ${values.reason}`,
-        });
+        toast.success('Group changed successfully');
       }
 
       setGroupModal({ open: false, student: null, type: 'ADD' });
     },
-    [groupModal],
+    [groupModal, toast],
   );
 
   return {

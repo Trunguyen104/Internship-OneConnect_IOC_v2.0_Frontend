@@ -7,6 +7,7 @@ import TeamEvaluationsModal from './TeamEvaluationsModal';
 import ScoreDetailDrawer from './ScoreDetailDrawer';
 import { useEvaluation } from '../hooks/useEvaluation';
 import Pagination from '@/components/ui/Pagination';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 export default function EvaluationPage() {
   const {
@@ -40,7 +41,8 @@ export default function EvaluationPage() {
 
   return (
     <section className='flex flex-col space-y-6'>
-      <h1 className='text-2xl font-bold text-slate-900'>Evaluation</h1>
+      {/* <h1 className='text-2xl font-bold text-slate-900'>Evaluation</h1> */}
+      <StudentPageHeader title='Evaluation' />
 
       <Card>
         <CycleTable data={paginated} page={page} pageSize={pageSize} onDetail={openTeamOverview} />

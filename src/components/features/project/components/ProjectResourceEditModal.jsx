@@ -20,7 +20,7 @@ export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, 
         <Form.Item
           name='resourceName'
           label={PROJECT_UI.FORM.RESOURCE_NAME}
-          rules={[{ required: true, message: 'Vui lòng nhập tên tài liệu!' }]}
+          rules={[{ required: true, message: 'Please enter the resource name!' }]}
         >
           <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
         </Form.Item>
@@ -28,7 +28,7 @@ export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, 
         <Form.Item
           name='resourceType'
           label={PROJECT_UI.FORM.RESOURCE_TYPE}
-          rules={[{ required: true, message: 'Vui lòng chọn loại tài liệu!' }]}
+          rules={[{ required: true, message: 'Please select the resource type!' }]}
         >
           <Select options={RESOURCE_TYPES} />
         </Form.Item>
@@ -36,4 +36,3 @@ export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, 
     </Modal>
   );
 }
-

@@ -40,7 +40,7 @@ export default function TeamEvaluationsModal({
 
   const columns = [
     {
-      title: 'Họ và Tên',
+      title: 'Full Name',
       dataIndex: 'fullName',
       render: (text, record) => (
         <Text strong type={record.studentId === myStudentId ? 'danger' : undefined}>
@@ -49,7 +49,7 @@ export default function TeamEvaluationsModal({
       ),
     },
     {
-      title: 'MSSV',
+      title: 'Student Code',
       dataIndex: 'studentCode',
       render: (text) => (
         <Text type='secondary' code>
@@ -58,7 +58,7 @@ export default function TeamEvaluationsModal({
       ),
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'evaluationStatus',
       align: 'center',
       render: (status) => {
@@ -67,7 +67,7 @@ export default function TeamEvaluationsModal({
       },
     },
     {
-      title: 'Điểm số',
+      title: 'Score',
       dataIndex: 'totalScore',
       align: 'center',
       render: (score, record) => {
@@ -81,7 +81,7 @@ export default function TeamEvaluationsModal({
 
         if (record.studentId !== myStudentId) {
           return (
-            <Tooltip title='Điểm số được bảo mật'>
+            <Tooltip title='Scores are confidential'>
               <Tag icon={<LockOutlined />}>***</Tag>
             </Tooltip>
           );
@@ -91,7 +91,7 @@ export default function TeamEvaluationsModal({
       },
     },
     {
-      title: 'Thao tác',
+      title: 'Actions',
       align: 'right',
       render: (_, record) => {
         if (record.studentId !== myStudentId) return null;
@@ -102,9 +102,9 @@ export default function TeamEvaluationsModal({
 
         if (!isPublished) {
           return (
-            <Tooltip title='Phiếu điểm chưa được công bố'>
+            <Tooltip title='Scorecard not yet published'>
               <Button type='text' disabled icon={<ClockCircleFilled />}>
-                Chờ kết quả
+                Awaiting results
               </Button>
             </Tooltip>
           );
@@ -117,7 +117,7 @@ export default function TeamEvaluationsModal({
             icon={<EyeOutlined />}
             onClick={() => onViewDetails(cycle)}
           >
-            Xem Phiếu
+            View Report
           </Button>
         );
       },
@@ -130,7 +130,7 @@ export default function TeamEvaluationsModal({
         <Space>
           <TeamOutlined />
           <Title level={4} style={{ margin: 0 }}>
-            Tiến độ Đánh giá Nhóm
+            Team Evaluation Progress
           </Title>
         </Space>
       }

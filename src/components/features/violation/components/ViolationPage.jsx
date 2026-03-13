@@ -4,6 +4,7 @@ import Card from '@/components/ui/Card';
 import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
 import ViolationTable from './ViolationTable';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { useViolation } from '../hooks/useViolation';
 
 export default function ViolationPage() {
@@ -22,8 +23,8 @@ export default function ViolationPage() {
   } = useViolation();
 
   return (
-    <section className='animate-in fade-in flex h-full flex-col space-y-6 duration-500'>
-      <h1 className='text-2xl font-bold text-slate-900'>Violation</h1>
+    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
+      <StudentPageHeader title='Violation' />
 
       <Card className='overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
         <div className='mb-5'>
@@ -61,4 +62,3 @@ export default function ViolationPage() {
     </section>
   );
 }
-

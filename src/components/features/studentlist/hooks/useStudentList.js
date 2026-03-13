@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { message } from 'antd';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { STUDENT_LIST_MESSAGES } from '@/constants/studentList/messages';
+import { useToast } from '@/providers/ToastProvider';
 
 export function useStudentList() {
-  const [messageApi, contextHolder] = message.useMessage();
+  const toast = useToast();
   const searchParams = useSearchParams();
   const internshipId = searchParams.get('id');
 
@@ -42,17 +42,17 @@ export function useStudentList() {
       if (res && res.isSuccess !== false) {
         setGroupDetail(res.data);
       } else {
-        messageApi.error(
+        toast.error(
           res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED,
         );
       }
     } catch (error) {
       console.error('Error fetching group detail:', error);
-      messageApi.error(STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_EXCEPTION);
+      toast.error(STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_EXCEPTION);
     } finally {
       setLoading(false);
     }
-  }, [internshipId, currentId, messageApi]);
+  }, [internshipId, currentId, toast]);
 
   useEffect(() => {
     fetchGroupDetail();
@@ -70,19 +70,19 @@ export function useStudentList() {
         };
         const res = await InternshipGroupService.removeStudents(targetId, payload);
         if (res && res.isSuccess !== false) {
-          messageApi.success(STUDENT_LIST_MESSAGES.SUCCESS.REMOVE_STUDENT);
+          toast.success(STUDENT_LIST_MESSAGES.SUCCESS.REMOVE_STUDENT);
           fetchGroupDetail();
         } else {
-          messageApi.error(
+          toast.error(
             res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.REMOVE_FAILED,
           );
         }
       } catch (error) {
         console.error('Error removing student:', error);
-        messageApi.error(STUDENT_LIST_MESSAGES.ERROR.REMOVE_EXCEPTION);
+        toast.error(STUDENT_LIST_MESSAGES.ERROR.REMOVE_EXCEPTION);
       }
     },
-    [currentId, internshipId, fetchGroupDetail, messageApi],
+    [currentId, internshipId, fetchGroupDetail, toast],
   );
 
   const filteredMembers = useMemo(() => {
@@ -107,8 +107,6 @@ export function useStudentList() {
     setSearchText,
     filteredMembers,
     handleDeleteStudent,
-    messageApi,
-    contextHolder,
     internshipId,
     currentId,
     page,
