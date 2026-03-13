@@ -12,21 +12,24 @@ export default defineConfig([
 
   // JS / JSX (client + server)
   {
+    {
     files: ['**/*.{js,jsx}'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
     plugins: {
+      tailwindcss: tailwind,
       prettier,
     },
     rules: {
       'prettier/prettier': 'error',
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'tailwindcss/no-arbitrary-value': 'error',
+      
+      // CHẶN HARD-CODE TEXT
+      'react/jsx-no-literals': [
+        'error', 
+        { 
+          "noStrings": true, 
+          "allowedStrings": ["core-web-vitals"] // Những từ đặc biệt được phép
+        }
+      ],
     },
   },
 ]);
