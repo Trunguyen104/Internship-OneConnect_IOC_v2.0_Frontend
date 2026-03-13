@@ -4,8 +4,7 @@ import AppTable from '@/components/ui/AppTable';
 import { Typography, Tooltip, Button } from 'antd';
 import { FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
-import { useState } from 'react';
-import DeleteConfirmModal from './DeleteConfirmModal';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import LogbookStatusTag from './LogbookStatusTag';
 
 const { Text } = Typography;
@@ -19,15 +18,6 @@ export default function LogbookTable({
   onDelete,
   onTableChange,
 }) {
-  const [deleteModal, setDeleteModal] = useState({
-    open: false,
-    id: null,
-  });
-  const handleConfirmDelete = () => {
-    onDelete(deleteModal.id);
-    setDeleteModal({ open: false, id: null });
-  };
-
   const currentStudentId = userProfile?.studentId;
 
   const columns = [
@@ -118,9 +108,10 @@ export default function LogbookTable({
                     danger
                     icon={<DeleteOutlined className='text-gray-400 hover:text-red-500' />}
                     onClick={() =>
-                      setDeleteModal({
-                        open: true,
-                        id: record.logbookId,
+                      showDeleteConfirm({
+                        title: DAILY_REPORT_UI.DELETE_MODAL.TITLE,
+                        content: DAILY_REPORT_UI.DELETE_MODAL.CONTENT,
+                        onOk: () => onDelete(record.logbookId),
                       })
                     }
                     className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50'
@@ -135,24 +126,17 @@ export default function LogbookTable({
   ];
 
   return (
-    <>
-      <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm'>
-        <AppTable
-          columns={columns}
-          data={data}
-          rowKey='logbookId'
-          loading={loading}
-          onChange={onTableChange}
-          pagination={false}
-          scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
-          emptyText={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}
-        />
-      </div>
-      <DeleteConfirmModal
-        open={deleteModal.open}
-        onCancel={() => setDeleteModal({ open: false, id: null })}
-        onConfirm={handleConfirmDelete}
+    <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm'>
+      <AppTable
+        columns={columns}
+        data={data}
+        rowKey='logbookId'
+        loading={loading}
+        onChange={onTableChange}
+        pagination={false}
+        scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
+        emptyText={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}
       />
-    </>
+    </div>
   );
 }

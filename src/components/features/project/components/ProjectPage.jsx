@@ -1,16 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Spin as AntdSpin, Space as AntdSpace } from 'antd';
+import { Spin as AntdSpin } from 'antd';
 import { useProject } from '../hooks/useProject';
 import ProjectOverview from './ProjectOverview';
 import ProjectResources from './ProjectResources';
-
-// const { Title, Text } = AntdTypography;
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import Card from '@/components/ui/Card';
 
 export default function ProjectPage() {
   const {
     projectId,
+    projectInfo,
     resources,
     fileList,
     setFileList,
@@ -27,17 +28,16 @@ export default function ProjectPage() {
   } = useProject();
 
   return (
-    <div
-      style={{ paddingBottom: 40, maxWidth: 1200, margin: '0 auto', width: '100%' }}
-      className='animate-in fade-in duration-700'
-    >
-      <AntdSpace direction='vertical' size='large' style={{ width: '100%' }}>
-        <h1 className='text-2xl font-bold text-slate-900'>Thông tin dự án</h1>
+    <div className='animate-in fade-in mx-auto w-full max-w-7xl space-y-6 duration-700'>
+      <StudentPageHeader title='Project Information' />
 
-        <AntdSpin spinning={loading && !projectId} size='large'>
-          <ProjectOverview />
+      <AntdSpin spinning={loading && !projectId} size='large'>
+        <div className='flex flex-col gap-6'>
+          <Card>
+            <ProjectOverview project={projectInfo} />
+          </Card>
 
-          <div style={{ marginTop: 24 }}>
+          <Card>
             <ProjectResources
               resources={resources}
               loading={loading}
@@ -53,10 +53,9 @@ export default function ProjectPage() {
               onUpdate={handleUpdate}
               editForm={editForm}
             />
-          </div>
-        </AntdSpin>
-      </AntdSpace>
+          </Card>
+        </div>
+      </AntdSpin>
     </div>
   );
 }
-

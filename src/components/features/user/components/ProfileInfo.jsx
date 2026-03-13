@@ -38,7 +38,11 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
 
         <div className='pt-6'>
           {loadingUser ? (
-            <Spin tip='Loading profile...' />
+            <div className='flex w-full items-center justify-center py-12'>
+              <Spin tip='Loading profile...'>
+                <div className='px-20' />
+              </Spin>
+            </div>
           ) : (
             <div className='grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-4'>
               <InfoItem label='Full Name' value={userInfo?.fullName || '—'} />

@@ -1,8 +1,10 @@
 'use client';
 import { useState, useCallback, useMemo } from 'react';
-import { message } from 'antd';
+import { useToast } from '@/providers/ToastProvider';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 export const useTermManagement = (initialData) => {
+  const toast = useToast();
   const [data, setData] = useState(initialData);
   const [loading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,57 +63,58 @@ export const useTermManagement = (initialData) => {
     setModalVisible(true);
   }, []);
 
-  const handleRequestDelete = useCallback((record) => {
-    setDeleteModalState({ open: true, record });
-  }, []);
+  const handleRequestDelete = useCallback(
+    (record) => {
+      showDeleteConfirm({
+        title: 'Delete Internship Term',
+        content: `Are you sure you want to delete the term "${record.name}"? This action cannot be undone.`,
+        onOk: () => {
+          setData((prev) => prev.filter((item) => item.termId !== record.termId));
+          toast.success('Term deleted successfully');
+        },
+      });
+    },
+    [toast],
+  );
 
-  const handleRequestChangeStatus = useCallback((record, newStatus) => {
-    setStatusModalState({ open: true, record, newStatus });
-  }, []);
-
-  const handleDelete = useCallback(() => {
-    if (!deleteModalState.record) return;
-    setData((prev) => prev.filter((item) => item.termId !== deleteModalState.record.termId));
-    message.success('Xóa kỳ thực tập thành công');
-    setDeleteModalState({ open: false, record: null });
-  }, [deleteModalState.record]);
+  const { record, newStatus } = statusModalState;
 
   const handleChangeStatus = useCallback(() => {
-    if (!statusModalState.record || statusModalState.newStatus === null) return;
+    if (!record || newStatus === null) return;
+
     setData((prev) =>
-      prev.map((item) =>
-        item.termId === statusModalState.record.termId
-          ? { ...item, status: statusModalState.newStatus }
-          : item,
-      ),
+      prev.map((item) => (item.termId === record.termId ? { ...item, status: newStatus } : item)),
     );
-    message.success('Cập nhật trạng thái thành công');
+
+    toast.success('Status updated successfully');
     setStatusModalState({ open: false, record: null, newStatus: null });
-  }, [statusModalState.record, statusModalState.newStatus]);
+  }, [record, newStatus, toast]);
+  const handleSaveModal = useCallback(
+    (payload, termId) => {
+      setSubmitLoading(true);
 
-  const handleSaveModal = useCallback((payload, termId) => {
-    setSubmitLoading(true);
+      setTimeout(() => {
+        if (termId) {
+          setData((prev) =>
+            prev.map((item) => (item.termId === termId ? { ...item, ...payload } : item)),
+          );
+          toast.success('Term updated successfully!');
+        } else {
+          const newTerm = {
+            termId: Date.now().toString(),
+            ...payload,
+          };
+          setData((prev) => [newTerm, ...prev]);
+          toast.success('New term created successfully!');
+        }
 
-    setTimeout(() => {
-      if (termId) {
-        setData((prev) =>
-          prev.map((item) => (item.termId === termId ? { ...item, ...payload } : item)),
-        );
-        message.success('Cập nhật kỳ thực tập thành công!');
-      } else {
-        const newTerm = {
-          termId: Date.now().toString(),
-          ...payload,
-        };
-        setData((prev) => [newTerm, ...prev]);
-        message.success('Tạo kỳ thực tập mới thành công!');
-      }
-
-      setSubmitLoading(false);
-      setModalVisible(false);
-      setPagination((prev) => ({ ...prev, current: 1 }));
-    }, 500);
-  }, []);
+        setSubmitLoading(false);
+        setModalVisible(false);
+        setPagination((prev) => ({ ...prev, current: 1 }));
+      }, 500);
+    },
+    [toast],
+  );
 
   return {
     // State
@@ -141,7 +144,6 @@ export const useTermManagement = (initialData) => {
     handleEdit,
     handleRequestDelete,
     handleRequestChangeStatus,
-    handleDelete,
     handleChangeStatus,
     handleSaveModal,
   };

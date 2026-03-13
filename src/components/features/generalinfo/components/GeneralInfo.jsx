@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card, Descriptions, Typography, Spin } from 'antd';
 import { useGeneralInfo } from '../hooks/useGeneralInfo';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 const { Text } = Typography;
 
@@ -12,16 +13,16 @@ export default function GeneralInfo() {
   if (loading) {
     return (
       <div className='flex min-h-[400px] items-center justify-center rounded-2xl bg-white/50 backdrop-blur-sm'>
-        <Spin size='large' tip='Đang tải thông tin...' />
+        <Spin size='large' tip='Loading information...'>
+          <div className='px-12' />
+        </Spin>
       </div>
     );
   }
 
-  // const status = getStatusConfig(info.status);
-
   return (
     <div className='animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-6 duration-700'>
-      <h1 className='text-2xl font-bold text-slate-900'> Thông tin chung </h1>
+      <StudentPageHeader title='General Information' />
 
       <Card
         className='overflow-hidden rounded-2xl border-none shadow-[0_4px_20px_rgb(0,0,0,0.03)]'
@@ -32,7 +33,7 @@ export default function GeneralInfo() {
             <div className='mb-6 flex items-center gap-3'>
               <div className='bg-primary h-6 w-1.5 rounded-full shadow-[0_0_10px_rgba(213,32,32,0.3)]'></div>
               <Text strong className='text-lg text-slate-800'>
-                Chi tiết nhóm thực tập
+                Internship Group Details
               </Text>
             </div>
           }
@@ -54,40 +55,40 @@ export default function GeneralInfo() {
           }}
           layout='vertical'
         >
-          <Descriptions.Item label='Mã nhóm'>
+          <Descriptions.Item label='Group Code'>
             <Text copyable={{ text: info.groupCode || info.internshipId }}>
               {info.groupCode || info.internshipId || 'N/A'}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label='Tên nhóm'>{info.groupName || 'Chưa đặt tên'}</Descriptions.Item>
-          <Descriptions.Item label='Kỳ thực tập'>
+          <Descriptions.Item label='Group Name'>{info.groupName || 'No name'}</Descriptions.Item>
+          <Descriptions.Item label='Internship Term'>
             {info.internshipTermName || info.internshipTerm || 'N/A'}
           </Descriptions.Item>
-          <Descriptions.Item label='Doanh nghiệp'>
+          <Descriptions.Item label='Enterprise'>
             {info.enterpriseName || info.company || 'N/A'}
           </Descriptions.Item>
-          <Descriptions.Item label='Trường'>
+          <Descriptions.Item label='University'>
             {info.schoolName || info.school || 'N/A'}
           </Descriptions.Item>
           <Descriptions.Item label='Mentor'>
             {info.mentorName || info.mentor || (
               <Text type='secondary' italic>
-                Chưa phân công
+                Unassigned
               </Text>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label='Ngày bắt đầu'>
+          <Descriptions.Item label='Start Date'>
             {info.startDate ? new Date(info.startDate).toLocaleDateString('en-GB') : 'N/A'}
           </Descriptions.Item>
-          <Descriptions.Item label='Ngày kết thúc'>
+          <Descriptions.Item label='End Date'>
             {info.endDate ? new Date(info.endDate).toLocaleDateString('en-GB') : 'N/A'}
           </Descriptions.Item>
-          <Descriptions.Item label='Số lượng sinh viên'>
+          <Descriptions.Item label='Student Count'>
             <Text className='text-primary text-2xl font-black'>
               {info.totalStudents || info.members?.length || 0}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label='Số lượng mentor'>
+          <Descriptions.Item label='Mentor Count'>
             <Text className='text-2xl font-black text-slate-700'>
               {info.totalMentors || (info.mentorName ? 1 : 0)}
             </Text>

@@ -4,11 +4,11 @@ import React from 'react';
 import { Input, Empty } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
 import { useStudentList } from '../hooks/useStudentList';
-import GroupInfoCard from './GroupInfoCard';
 import StudentTable from './StudentTable';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 export default function StudentListPage() {
   const {
@@ -47,7 +47,7 @@ export default function StudentListPage() {
 
   return (
     <section>
-      <GroupInfoCard groupDetail={groupDetail} />
+      <StudentPageHeader title='Student List' />
 
       <Card>
         <div className='mb-5 flex items-center justify-between border-b border-gray-100 pb-5'>
@@ -80,6 +80,8 @@ export default function StudentListPage() {
         <div className='mb-3 flex-1 overflow-hidden rounded-xl border border-gray-50 bg-white shadow-sm'>
           <StudentTable data={paginatedMembers} loading={loading} onDelete={handleDeleteStudent} />
         </div>
+      </Card>
+      <div className='mt-6 px-2'>
         <Pagination
           total={total}
           page={page}
@@ -87,7 +89,7 @@ export default function StudentListPage() {
           totalPages={totalPages}
           onPageChange={setPage}
         />
-      </Card>
+      </div>
     </section>
   );
 }

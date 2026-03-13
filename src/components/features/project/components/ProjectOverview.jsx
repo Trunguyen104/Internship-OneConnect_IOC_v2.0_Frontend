@@ -1,113 +1,96 @@
-'use client';
-
-import React from 'react';
-import { Card, Typography, Row, Col, Divider, Tag, Descriptions, Space } from 'antd';
+import dayjs from 'dayjs';
+import { Typography, Tag } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
 
-export default function ProjectOverview() {
+const STATUS_PROJECT_CONFIG = {
+  InProgress: { label: 'In Progress', color: 'blue' },
+  Pending: { label: 'Pending', color: 'orange' },
+  Completed: { label: 'Completed', color: 'green' },
+  Closed: { label: 'Closed', color: 'red' },
+};
+
+export default function ProjectOverview({ project }) {
+  if (!project) {
+    return (
+      <div className='flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-20'>
+        <Title level={5} className='!text-slate-400'>
+          Project information not found
+        </Title>
+      </div>
+    );
+  }
+
+  const statusInfo = STATUS_PROJECT_CONFIG[project.status] || {
+    label: project.status,
+    color: 'default',
+  };
+
   return (
-    <Card variant='borderless' className='shadow-sm' style={{ borderRadius: 12 }}>
-      <Descriptions
-        title={
-          <Title level={4} style={{ margin: 0 }}>
-            Tổng quan
-          </Title>
-        }
-        bordered
-        column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
-      >
-        <Descriptions.Item label='Tên dự án'>
-          <Text strong>IOC Version 2</Text>
-        </Descriptions.Item>
-        <Descriptions.Item label='Lĩnh vực'>
-          <Tag color='blue'>Công nghệ thông tin</Tag>
-        </Descriptions.Item>
-      </Descriptions>
+    <div className='space-y-10'>
+      {/* Top Grid Info */}
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <div className='col-span-1 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:col-span-2'>
+          <Text
+            type='secondary'
+            className='mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'
+          >
+            Project Name
+          </Text>
+          <Text
+            strong
+            className='block truncate text-lg leading-tight text-slate-800'
+            title={project?.projectName}
+          >
+            {project?.projectName}
+          </Text>
+        </div>
 
-      <Divider />
+        <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm'>
+          <Text
+            type='secondary'
+            className='mb-2 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'
+          >
+            Status
+          </Text>
+          <Tag
+            color={statusInfo.color}
+            className='bg-opacity-10 rounded-md border-none px-3 py-0.5 text-[11px] font-bold uppercase'
+          >
+            {statusInfo.label}
+          </Tag>
+        </div>
 
-      <Space orientation='vertical' size='large' style={{ width: '100%' }}>
-        <div>
-          <Title level={5} style={{ color: '#1890ff' }}>
-            1. Tổng quan dự án
-          </Title>
-          <Paragraph style={{ fontSize: 15, lineHeight: 1.8, marginBottom: 0 }}>
-            Internship OneConnect (IOC) là nền tảng chuyển đổi số toàn diện quy trình thực tập, giải
-            quyết bài toán kết nối rườm rà giữa ba bên: Nhà trường – Doanh nghiệp – Sinh viên. Hệ
-            thống thay thế các quy trình giấy tờ thủ công bằng workflow tự động, minh bạch và hiệu
-            quả cao.
+        <div className='rounded-2xl border border-slate-100 bg-white p-5 shadow-sm'>
+          <Text
+            type='secondary'
+            className='mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'
+          >
+            Timeline
+          </Text>
+          <div className='flex flex-col'>
+            <Text className='text-xs font-medium text-slate-600'>
+              {project?.startDate ? dayjs(project.startDate).format('DD/MM/YYYY') : '—'}
+              <span className='mx-1 text-slate-300'>to</span>
+              {project?.endDate ? dayjs(project.endDate).format('DD/MM/YYYY') : '—'}
+            </Text>
+          </div>
+        </div>
+      </div>
+
+      <div className='space-y-6'>
+        <section className='rounded-3xl border border-slate-100 bg-slate-50/50 p-8'>
+          <div className='mb-6 flex items-center gap-4'>
+            <div className='bg-primary h-10 w-1.5 rounded-full' />
+            <Title level={4} className='!m-0 !font-black !text-slate-800'>
+              Project Description
+            </Title>
+          </div>
+          <Paragraph className='text-[16px] leading-[1.8] font-medium text-slate-600'>
+            {project?.description || 'No detailed description available for this project.'}
           </Paragraph>
-        </div>
-
-        <div>
-          <Title level={5} style={{ color: '#1890ff' }}>
-            2. Chi tiết các Phân hệ (Modules)
-          </Title>
-          <Row gutter={[24, 24]}>
-            <Col xs={24} md={8}>
-              <Card title='Phân hệ Nhà trường' size='small' type='inner' style={{ height: '100%' }}>
-                <ul style={{ paddingLeft: 20, margin: 0, lineHeight: 1.8 }}>
-                  <li>
-                    Quản lý Kỳ thực tập: Tạo và cấu hình các đợt thực tập, thiết lập timeline, tiêu
-                    chí đánh giá.
-                  </li>
-                  <li>
-                    Quản lý Sinh viên: Import danh sách sinh viên, theo dõi trạng thái thực tập.
-                  </li>
-                  <li>Phân công Giảng viên hướng dẫn.</li>
-                  <li>
-                    Thống kê & Báo cáo: Dashboard theo dõi tỷ lệ sinh viên, điểm số, phản hồi.
-                  </li>
-                </ul>
-              </Card>
-            </Col>
-            <Col xs={24} md={8}>
-              <Card
-                title='Phân hệ Doanh nghiệp'
-                size='small'
-                type='inner'
-                style={{ height: '100%' }}
-              >
-                <ul style={{ paddingLeft: 20, margin: 0, lineHeight: 1.8 }}>
-                  <li>Hồ sơ Doanh nghiệp & thương hiệu tuyển dụng.</li>
-                  <li>Đăng tin tuyển dụng (JD), yêu cầu kỹ năng.</li>
-                  <li>Quy trình tuyển dụng: CV, phỏng vấn, Offer Letter.</li>
-                  <li>Quản lý OJT: Mentor, duyệt logbook, đánh giá năng lực.</li>
-                </ul>
-              </Card>
-            </Col>
-            <Col xs={24} md={8}>
-              <Card title='Phân hệ Sinh viên' size='small' type='inner' style={{ height: '100%' }}>
-                <ul style={{ paddingLeft: 20, margin: 0, lineHeight: 1.8 }}>
-                  <li>CV & Portfolio trực tuyến.</li>
-                  <li>Tìm kiếm và ứng tuyển vị trí thực tập.</li>
-                  <li>Báo cáo Daily / Weekly.</li>
-                  <li>Tra cứu kết quả, điểm số, chứng nhận.</li>
-                </ul>
-              </Card>
-            </Col>
-          </Row>
-        </div>
-
-        <div>
-          <Title level={5} style={{ color: '#1890ff' }}>
-            3. Các tính năng nâng cao
-          </Title>
-          <ul style={{ paddingLeft: 20, marginBottom: 0, lineHeight: 1.8 }}>
-            <li>
-              <Text>Hợp đồng điện tử (E-Sign)</Text>
-            </li>
-            <li>
-              <Text>AI Matching giữa CV & JD</Text>
-            </li>
-            <li>
-              <Text>Tích hợp Google Calendar</Text>
-            </li>
-          </ul>
-        </div>
-      </Space>
-    </Card>
+        </section>
+      </div>
+    </div>
   );
 }
-

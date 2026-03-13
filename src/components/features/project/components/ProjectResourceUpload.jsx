@@ -1,11 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Card, Form, Input, Select, Button, Upload, message } from 'antd';
+import { Form, Input, Select, Button, Upload, Typography } from 'antd';
+import { useToast } from '@/providers/ToastProvider';
 import { UploadOutlined } from '@ant-design/icons';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
+
+const { Title } = Typography;
 
 export default function ProjectResourceUpload({
   form,
@@ -14,6 +17,7 @@ export default function ProjectResourceUpload({
   fileList,
   setFileList,
 }) {
+  const toast = useToast();
   const uploadProps = {
     onRemove: () => {
       setFileList([]);
@@ -37,13 +41,13 @@ export default function ProjectResourceUpload({
       const currentExt = file.name.split('.').pop().toLowerCase();
       const isAllowed = allowedExtensions.includes(currentExt);
       if (!isAllowed) {
-        message.error(PROJECT_MESSAGES.ERROR.INVALID_FILE_TYPE);
+        toast.error(PROJECT_MESSAGES.ERROR.INVALID_FILE_TYPE);
         return Upload.LIST_IGNORE;
       }
 
       const isLt10M = file.size / 1024 / 1024 <= 10;
       if (!isLt10M) {
-        message.error(PROJECT_MESSAGES.ERROR.FILE_TOO_LARGE);
+        toast.error(PROJECT_MESSAGES.ERROR.FILE_TOO_LARGE);
         return Upload.LIST_IGNORE;
       }
 
@@ -55,17 +59,20 @@ export default function ProjectResourceUpload({
   };
 
   return (
-    <Card
-      type='inner'
-      title={PROJECT_UI.TITLE.ADD_RESOURCE}
-      variant='borderless'
-      style={{ background: '#fafafa' }}
-    >
-      <Form form={form} layout='vertical' onFinish={onUpload}>
+    <div className='rounded-2xl border border-slate-100 bg-slate-50/50 p-6'>
+      <div className='mb-6'>
+        <Title
+          level={5}
+          className='!m-0 !text-sm !font-bold tracking-wider !text-slate-800 uppercase'
+        >
+          {PROJECT_UI.TITLE.ADD_RESOURCE}
+        </Title>
+      </div>
+      <Form form={form} layout='vertical' onFinish={onUpload} className='space-y-4'>
         <Form.Item
           label={PROJECT_UI.FORM.RESOURCE_NAME}
           name='resourceName'
-          tooltip='Nếu để trống sẽ sử dụng tên file đính kèm'
+          tooltip='If left blank, the attached filename will be used'
         >
           <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
         </Form.Item>
@@ -97,7 +104,6 @@ export default function ProjectResourceUpload({
           </Button>
         </Form.Item>
       </Form>
-    </Card>
+    </div>
   );
 }
-

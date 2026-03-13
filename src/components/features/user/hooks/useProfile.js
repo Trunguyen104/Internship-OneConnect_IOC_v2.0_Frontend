@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { userService } from '@/components/features/user/services/userService';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 export function useProfile() {
   const toast = useToast();
@@ -76,11 +77,17 @@ export function useProfile() {
   };
 
   const handleDeleteSelected = () => {
-    const count = selectedSkills.length;
-    setSkills((prev) => prev.filter((s) => !selectedSkills.includes(s.name)));
-    setSelectedSkills([]);
-    setSelectMode(false);
-    toast.success('Skills deleted successfully', `Removed ${count} skills`);
+    showDeleteConfirm({
+      title: 'Delete Skills',
+      content: `Are you sure you want to delete ${selectedSkills.length} selected skills?`,
+      onOk: () => {
+        const count = selectedSkills.length;
+        setSkills((prev) => prev.filter((s) => !selectedSkills.includes(s.name)));
+        setSelectedSkills([]);
+        setSelectMode(false);
+        toast.success('Skills deleted successfully', `Removed ${count} skills`);
+      },
+    });
   };
 
   const updateSkill = () => {
@@ -124,4 +131,3 @@ export function useProfile() {
     setSelectedSkills,
   };
 }
-

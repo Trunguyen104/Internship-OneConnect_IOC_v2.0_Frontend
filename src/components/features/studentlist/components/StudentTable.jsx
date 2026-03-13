@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Typography, Tooltip, Popconfirm, Button } from 'antd';
+import { Typography, Tooltip, Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import StudentStatusTag from './StudentStatusTag';
 import StudentRoleTag from './StudentRoleTag';
 import StudentAvatar from './StudentAvatar';
 import AppTable from '@/components/ui/AppTable';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 const { Text } = Typography;
 
 export default function StudentTable({ data, loading, onDelete }) {
@@ -64,23 +65,19 @@ export default function StudentTable({ data, loading, onDelete }) {
       align: 'right',
       render: (_, record) => (
         <Tooltip title={STUDENT_LIST_UI.ACTION.REMOVE_STUDENT}>
-          <Popconfirm
-            title={STUDENT_LIST_UI.CONFIRM.REMOVE_TITLE}
-            description={STUDENT_LIST_UI.CONFIRM.REMOVE_DESC}
-            onConfirm={() => onDelete(record.studentId)}
-            okText={STUDENT_LIST_UI.CONFIRM.YES}
-            cancelText={STUDENT_LIST_UI.CONFIRM.NO}
-            okButtonProps={{ danger: true, shape: 'round' }}
-            cancelButtonProps={{ shape: 'round' }}
-            placement='topLeft'
-          >
-            <Button
-              danger
-              type='text'
-              icon={<DeleteOutlined />}
-              className='rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500'
-            />
-          </Popconfirm>
+          <Button
+            danger
+            type='text'
+            icon={<DeleteOutlined />}
+            className='rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500'
+            onClick={() =>
+              showDeleteConfirm({
+                title: STUDENT_LIST_UI.CONFIRM.REMOVE_TITLE,
+                content: STUDENT_LIST_UI.CONFIRM.REMOVE_DESC,
+                onOk: () => onDelete(record.studentId),
+              })
+            }
+          />
         </Tooltip>
       ),
     },

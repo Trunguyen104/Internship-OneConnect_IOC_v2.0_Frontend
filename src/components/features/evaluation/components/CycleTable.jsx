@@ -49,7 +49,7 @@ const STATUS_CONFIG = {
 export default function CycleTable({ data, page, pageSize, onDetail }) {
   const columns = [
     {
-      title: 'STT',
+      title: '#',
       width: 70,
       align: 'center',
       render: (_, __, index) => (
@@ -65,7 +65,7 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
       render: (text) => <Text className='font-bold tracking-tight text-slate-800'>{text}</Text>,
     },
     {
-      title: 'Start Time',
+      title: 'Start Date',
       dataIndex: 'startDate',
       width: 140,
       render: (date) => (
@@ -73,7 +73,7 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
       ),
     },
     {
-      title: 'End Time',
+      title: 'End Date',
       dataIndex: 'endDate',
       width: 140,
       render: (date) => (
@@ -88,7 +88,7 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
         const normalized = status ? String(status).toUpperCase() : '';
         const cfg = STATUS_CONFIG[normalized] ||
           STATUS_CONFIG[status] || {
-            label: status || 'Chưa xác định',
+            label: status || 'Unknown',
             bg: 'bg-slate-50',
             text: 'text-slate-600',
             icon: null,
@@ -116,7 +116,7 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
       ),
     },
     {
-      title: 'Thao tác',
+      title: 'Actions',
       align: 'right',
       width: 120,
       render: (_, record) => (

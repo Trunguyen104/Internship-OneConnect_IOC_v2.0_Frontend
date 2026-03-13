@@ -79,9 +79,11 @@ export default function StakeholderFormModal({
 
           <FormGroup label={STAKEHOLDER_UI.FIELD_PHONE} error={errors.phoneNumber}>
             <input
+              type='tel'
               value={form.phoneNumber}
               onChange={(e) => {
-                setForm({ ...form, phoneNumber: e.target.value });
+                const value = e.target.value.replace(/[^0-9+\-().\s]/g, '');
+                setForm({ ...form, phoneNumber: value });
                 if (errors.phoneNumber) setErrors({ ...errors, phoneNumber: null });
               }}
               className={`w-full rounded-xl border ${errors.phoneNumber ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'focus:border-primary focus:ring-primary/20 border-slate-200'} px-4 py-2.5 text-sm transition-all outline-none focus:ring-1`}

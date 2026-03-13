@@ -1,4 +1,5 @@
 import { ToastProvider } from '../providers/ToastProvider';
+import { PageHeaderProvider } from '../providers/PageHeaderProvider';
 import './globals.css';
 
 export const metadata = {
@@ -13,9 +14,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en'>
       <body>
-        <ToastProvider>{children}</ToastProvider>
+        <PageHeaderProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </PageHeaderProvider>
       </body>
     </html>
   );
 }
-

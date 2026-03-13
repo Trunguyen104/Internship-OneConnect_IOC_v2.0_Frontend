@@ -11,7 +11,7 @@ const { Text } = Typography;
 export default function ViolationTable({ data, page, pageSize, sortOrder, onSort }) {
   const columns = [
     {
-      title: 'STT',
+      title: '#',
       width: 70,
       align: 'center',
       render: (_, __, index) => (

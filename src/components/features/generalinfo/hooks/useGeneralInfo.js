@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { message } from 'antd';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
+import { useToast } from '@/providers/ToastProvider';
 
 export function useGeneralInfo() {
+  const toast = useToast();
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,17 +52,19 @@ export function useGeneralInfo() {
         setInfo({
           ...groupDetail,
           projectDescription:
-            projectInfo?.description || groupDetail?.description || 'Chưa có mô tả dự án.',
+            projectInfo?.description ||
+            groupDetail?.description ||
+            'No project description available.',
           displayCreatedAt: groupDetail?.createdAt
             ? new Date(groupDetail.createdAt).toLocaleDateString('en-GB')
             : 'N/A',
           displayUpdatedAt: groupDetail?.updatedAt
-            ? `Cập nhật ${new Date(groupDetail.updatedAt).toLocaleDateString('en-GB')}`
+            ? `Updated on ${new Date(groupDetail.updatedAt).toLocaleDateString('en-GB')}`
             : groupDetail?.updatedText || '',
         });
       } catch (error) {
         console.error('Error fetching general info:', error);
-        message.error('Không thể tải thông tin chung. Vui lòng thử lại sau.');
+        toast.error('Failed to load general information. Please try again later.');
       } finally {
         setLoading(false);
       }

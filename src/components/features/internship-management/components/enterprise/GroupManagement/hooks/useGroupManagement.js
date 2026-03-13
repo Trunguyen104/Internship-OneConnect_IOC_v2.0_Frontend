@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { App } from 'antd';
+import { useState, useMemo, useCallback } from 'react';
+import { useToast } from '@/providers/ToastProvider';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import { MOCK_GROUPS } from '../constants/groupData';
 
 export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
-  const { notification, modal } = App.useApp();
+  const toast = useToast();
   const [groups, setGroups] = useState(initialGroups);
   const [activeTab, setActiveTab] = useState('ALL');
   const [search, setSearch] = useState('');
@@ -44,43 +45,32 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
       setAssignModal({ open: false, group: null });
 
       if (isChangingMentor) {
-        notification.success({
-          message: 'Đã đổi Mentor thành công',
-          description: `Lý do: ${values.reason}`,
-        });
+        toast.success(`Mentor changed successfully. Reason: ${values.reason}`);
       } else {
-        notification.success({ message: 'Đã gán Mentor & Dự án thành công' });
+        toast.success('Mentor & Project assigned successfully');
       }
     },
-    [assignModal, notification],
+    [assignModal, toast],
   );
 
   const handleDeleteGroup = useCallback(
     (group) => {
       if (group.memberCount > 0) {
-        notification.error({
-          message: 'Thao tác thất bại',
-          description:
-            'Không thể xóa nhóm còn sinh viên. Vui lòng chuyển toàn bộ sinh viên sang nhóm khác trước.',
-          placement: 'top',
-        });
+        toast.error('Cannot delete group with active students. Please reassign students first.');
         return;
       }
 
-      modal.confirm({
-        title: <span className='text-lg font-bold'>Xóa nhóm</span>,
-        content: `Bạn có chắc muốn xóa [${group.name}] không?`,
-        okText: 'Xóa',
-        okType: 'danger',
-        cancelText: 'Hủy',
-        centered: true,
+      showDeleteConfirm({
+        title: 'Delete Group',
+        content: `Are you sure you want to delete [${group.name}]?`,
+        okText: 'Delete',
         onOk() {
           setGroups((prev) => prev.filter((g) => g.id !== group.id));
-          notification.success({ message: 'Đã giải thể nhóm thành công' });
+          toast.success('Group disbanded successfully');
         },
       });
     },
-    [notification, modal],
+    [toast],
   );
 
   const handleCreateGroup = useCallback(
@@ -96,9 +86,9 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
       };
       setGroups((prev) => [newGroup, ...prev]);
       setCreateModal(false);
-      notification.success({ message: 'Đã tạo nhóm thành công' });
+      toast.success('Group created successfully');
     },
-    [notification],
+    [toast],
   );
 
   return {

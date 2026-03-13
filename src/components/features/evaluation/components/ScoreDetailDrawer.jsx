@@ -22,20 +22,20 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
   return (
     <Drawer title={cycle.name} placement='right' size='large' onClose={onClose} open={visible}>
       {!evaluationDetail ? (
-        <Empty description='Phiếu điểm chưa sẵn sàng' />
+        <Empty description='Scorecard not ready' />
       ) : (
         <Space direction='vertical' size='large' style={{ width: '100%' }}>
           <Card>
             <Descriptions column={1} size='small'>
-              <Descriptions.Item label='Người đánh giá'>
+              <Descriptions.Item label='Evaluator'>
                 {evaluationDetail.evaluatorName}
               </Descriptions.Item>
 
-              <Descriptions.Item label='Thời gian'>
+              <Descriptions.Item label='Time'>
                 {dayjs(evaluationDetail.gradedAt).format('DD/MM/YYYY HH:mm')}
               </Descriptions.Item>
 
-              <Descriptions.Item label='Tổng điểm'>
+              <Descriptions.Item label='Total Score'>
                 <Title level={2} style={{ margin: 0 }}>
                   {Number(evaluationDetail.totalScore).toFixed(1)}
                   <Text type='secondary'> / 10</Text>
@@ -48,18 +48,20 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
             title={
               <Space>
                 <MessageOutlined />
-                Nhận xét từ Mentor
+                Mentor Comments
               </Space>
             }
           >
-            <Paragraph italic>{evaluationDetail.generalComment || 'Không có nhận xét'}</Paragraph>
+            <Paragraph italic>
+              {evaluationDetail.generalComment || 'No comments provided'}
+            </Paragraph>
           </Card>
 
           <Card
             title={
               <Space>
                 <StarFilled />
-                Điểm thành phần
+                Criteria Scores
               </Space>
             }
           >
@@ -81,7 +83,7 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
                       <Progress percent={percent} showInfo={false} />
 
                       <Text type='secondary' italic>
-                        {criteria.comment || 'Không có nhận xét chi tiết'}
+                        {criteria.comment || 'No detailed comments provided'}
                       </Text>
 
                       <Divider style={{ margin: '8px 0' }} />
