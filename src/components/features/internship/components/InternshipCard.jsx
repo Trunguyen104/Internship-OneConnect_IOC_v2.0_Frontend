@@ -3,7 +3,7 @@
 import React, { createContext, useContext } from 'react';
 import { Button, Tag } from 'antd';
 import { ExternalLink, Building2, User, BookOpen, Check } from 'lucide-react';
-import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from '@/components/features/studentlist/constants/internshipStatus';
+import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from '../../../studentlist/constants/internshipStatus.js';
 import ProgressStepper from './ProgressStepper';
 
 const InternshipCardContext = createContext(null);
