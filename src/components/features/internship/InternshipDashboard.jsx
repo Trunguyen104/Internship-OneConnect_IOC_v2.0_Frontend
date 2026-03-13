@@ -4,7 +4,17 @@ import React, { useEffect, useState } from 'react';
 import { Skeleton, Empty, notification } from 'antd';
 import { InternshipGroupService } from './services/internshipGroup.service';
 import InternshipCard from './components/InternshipCard';
-import { INTERNSHIP_STATUS } from './constants/internshipStatus';
+import { INTERNSHIP_STATUS } from '../studentlist/constants/internshipStatus.js';
+
+const TEXT = {
+  DIAGNOSTIC_MSG: '--- InternshipDashboard (Direct Term Mapping) ---',
+  LOADING_FALLBACK: 'Internship Cycle',
+  ERROR_FETCH: 'An unexpected error occurred while fetching dashboard data.',
+  NO_DATA: 'No internship placement found',
+  JOURNEY_TITLE: 'My Internship Journey',
+  JOURNEY_SUBTITLE: 'Track your progress and manage your internship placement in one place.',
+  JOURNEY_HIGHLIGHT: 'Journey',
+};
 
 const InternshipDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -14,12 +24,12 @@ const InternshipDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        console.log('--- InternshipDashboard (Direct Term Mapping) ---');
-        
+        console.log(TEXT.DIAGNOSTIC_MSG);
+
         // 1. Fetch from /mine
         const mineResponse = await InternshipGroupService.getMine();
         console.log('Mine API Response:', mineResponse);
-        
+
         if (!mineResponse || mineResponse.success !== true || !mineResponse.data) {
           setInternships([]);
           return;
@@ -28,13 +38,16 @@ const InternshipDashboard = () => {
         const mineDataList = mineResponse.data;
         const enrichedInternships = await Promise.all(mineDataList.map(async (mineItem) => {
           let termStatus = 1; // Default to Active (1)
-          // Priority: mineItem.term.name > mineItem.name
-          let termName = mineItem.term?.name || mineItem.name || 'Internship Cycle';
 
-          // 2. Fetch Term Details for status (Source of Truth)
-          // Use termId if available
+          // MAP DATA:
+          // termName -> Cycle name (e.g., "Spring 2026")
+          // groupName -> Group name (e.g., "Nhóm OJT .NET...")
+          let termName = mineItem.term?.name || TEXT.LOADING_FALLBACK;
+          let groupName = mineItem.name;
+
+          // 2. Fetch Term Details for state/status (Source of Truth)
           const targetTermId = mineItem.termId || mineItem.term?.id;
-          
+
           if (targetTermId) {
             try {
               const termRes = await InternshipGroupService.getTermById(targetTermId);
@@ -50,17 +63,11 @@ const InternshipDashboard = () => {
             }
           }
 
-          // 3. Map TermDisplayStatus to UI Status
-          /* 
-            Upcoming = 0
-            Active = 1
-            Ended = 2
-            Closed = 3
-          */
           return {
             id: mineItem.id,
             displayName: termName,
-            status: termStatus, // Use raw enum value
+            groupName: groupName,
+            status: termStatus,
             enterpriseName: mineItem.enterprise?.name,
             mentorName: mineItem.mentors?.[0]?.fullName,
             projectName: mineItem.project?.name || mineItem.name
@@ -72,7 +79,7 @@ const InternshipDashboard = () => {
         console.error('Dashboard Fetch Error:', error);
         notification.error({
           message: 'Error',
-          description: 'An unexpected error occurred while fetching dashboard data.',
+          description: TEXT.ERROR_FETCH,
         });
       } finally {
         setLoading(false);
@@ -97,7 +104,7 @@ const InternshipDashboard = () => {
   if (internships.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-20">
-        <Empty description="No internship placement found" />
+        <Empty description={TEXT.NO_DATA} />
       </div>
     );
   }
@@ -106,10 +113,10 @@ const InternshipDashboard = () => {
     <div className="mx-auto max-w-5xl space-y-8 px-6 py-12">
       <header className="mb-10">
         <h1 className="text-3xl font-black tracking-tight text-slate-900">
-          My Internship <span className="text-primary italic">Journey</span>
+          My Internship <span className="text-primary italic">{TEXT.JOURNEY_HIGHLIGHT}</span>
         </h1>
         <p className="mt-2 text-slate-500 font-medium">
-          Track your progress and manage your internship placement in one place.
+          {TEXT.JOURNEY_SUBTITLE}
         </p>
       </header>
 
@@ -124,6 +131,11 @@ const InternshipDashboard = () => {
               isCurrent={item.status === INTERNSHIP_STATUS.ACTIVE}
             />
             <InternshipCard.Stepper />
+
+            <InternshipCard.BodyTitle
+              title={item.groupName}
+            />
+
             <InternshipCard.Info
               enterprise={item.enterpriseName}
               mentor={item.mentorName}
