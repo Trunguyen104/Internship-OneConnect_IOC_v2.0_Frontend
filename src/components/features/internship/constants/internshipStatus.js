@@ -51,17 +51,17 @@ export const getStepStatus = (stepIndex, currentStatus) => {
   if (currentStatus === INTERNSHIP_STATUS.ENDED || currentStatus === INTERNSHIP_STATUS.CLOSED) {
     return 'completed';
   }
-  
+
   if (currentStatus === INTERNSHIP_STATUS.UPCOMING) {
     return stepIndex === 0 ? 'current' : 'upcoming';
   }
-  
+
   if (currentStatus === INTERNSHIP_STATUS.ACTIVE) {
     // For Active status, we assume items are moving through (simplified for now)
     if (stepIndex < 3) return 'completed';
     if (stepIndex === 3) return 'current';
     return 'upcoming';
   }
-  
+
   return 'upcoming';
 };

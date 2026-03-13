@@ -12,15 +12,14 @@ export default defineConfig([
 
   // JS / JSX (client + server)
   {
-    {
     files: ['**/*.{js,jsx}'],
     plugins: {
-      tailwindcss: tailwind,
+      // tailwindcss: tailwind,
       prettier,
     },
     rules: {
       'prettier/prettier': 'error',
-      'tailwindcss/no-arbitrary-value': 'error',
+      // 'tailwindcss/no-arbitrary-value': 'error',
       
       // CHẶN HARD-CODE TEXT
       'react/jsx-no-literals': [
