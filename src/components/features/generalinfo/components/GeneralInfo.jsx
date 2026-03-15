@@ -2,7 +2,7 @@
 
 import { Card, Descriptions, Typography, Spin } from 'antd';
 import { useGeneralInfo } from '../hooks/useGeneralInfo';
-import { GENERAL_INFO_UI } from '@/constants/general-info';
+import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 const { Text } = Typography;

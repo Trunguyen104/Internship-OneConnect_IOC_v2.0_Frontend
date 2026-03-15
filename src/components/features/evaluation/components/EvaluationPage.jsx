@@ -6,7 +6,7 @@ import CycleTable from './CycleTable';
 import TeamEvaluationsModal from './TeamEvaluationsModal';
 import ScoreDetailDrawer from './ScoreDetailDrawer';
 import { useEvaluation } from '../hooks/useEvaluation';
-import { EVALUATION_UI } from '@/constants/evaluation';
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import Pagination from '@/components/ui/Pagination';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 

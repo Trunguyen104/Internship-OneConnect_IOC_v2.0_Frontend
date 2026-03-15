@@ -1,66 +1,66 @@
 export const DAILY_REPORT_UI = {
-  TITLE: 'Báo cáo hằng ngày',
-  DESCRIPTION: 'Quản lý và nộp nhật ký thực tập hằng ngày của bạn',
+  TITLE: 'Daily Report',
+  DESCRIPTION: 'Manage and submit your daily internship logbook',
 
-  CREATE_BUTTON: 'Tạo báo cáo',
+  CREATE_BUTTON: 'Create Report',
 
-  FILTER_STATUS: 'Lọc theo trạng thái',
+  FILTER_STATUS: 'Filter by status',
 
   TABLE: {
-    REPORT_DATE: 'NGÀY BÁO CÁO',
-    STUDENT: 'SINH VIÊN',
-    SUMMARY: 'TÓM TẮT CÔNG VIỆC',
-    ISSUE: 'VẤN ĐỀ GẶP PHẢI',
-    STATUS: 'TRẠNG THÁI',
-    ACTION: 'THAO TÁC',
+    REPORT_DATE: 'REPORT DATE',
+    STUDENT: 'STUDENT',
+    SUMMARY: 'WORK SUMMARY',
+    ISSUE: 'ISSUES ENCOUNTERED',
+    STATUS: 'STATUS',
+    ACTION: 'ACTION',
   },
 
   STATUS: {
-    SUBMITTED: 'Đã nộp',
-    APPROVED: 'Đã duyệt',
-    NEEDS_REVISION: 'Cần chỉnh sửa',
-    PUNCTUAL: 'Đúng hạn',
-    LATE: 'Trễ hạn',
-    UNKNOWN: 'Không xác định',
+    SUBMITTED: 'Submitted',
+    APPROVED: 'Approved',
+    NEEDS_REVISION: 'Needs Revision',
+    PUNCTUAL: 'Punctual',
+    LATE: 'Late',
+    UNKNOWN: 'Unknown',
   },
 
   MODAL: {
-    CREATE_TITLE: 'Tạo báo cáo hằng ngày',
-    EDIT_TITLE: 'Chỉnh sửa báo cáo',
-    CREATE_DESC: 'Nộp tiến độ thực tập của bạn',
-    EDIT_DESC: 'Cập nhật chi tiết nhật ký đã nộp',
+    CREATE_TITLE: 'Create Daily Report',
+    EDIT_TITLE: 'Edit Report',
+    CREATE_DESC: 'Submit your internship progress',
+    EDIT_DESC: 'Update submitted logbook details',
 
-    SUBMIT: 'Nộp báo cáo',
-    SAVE: 'Lưu thay đổi',
-    CANCEL: 'Hủy bỏ',
+    SUBMIT: 'Submit Report',
+    SAVE: 'Save Changes',
+    CANCEL: 'Cancel',
   },
 
   FORM: {
-    REPORT_DATE: 'Ngày báo cáo',
-    SUMMARY: 'Tóm tắt công việc',
-    ISSUE: 'Vấn đề gặp phải (Tùy chọn)',
-    PLAN: 'Kế hoạch ngày tiếp theo',
+    REPORT_DATE: 'Report Date',
+    SUMMARY: 'Work Summary',
+    ISSUE: 'Issues Encountered (Optional)',
+    PLAN: 'Plan for Next Day',
 
-    PLACEHOLDER_SUMMARY: 'Mô tả các nhiệm vụ bạn đã làm hôm nay...',
-    PLACEHOLDER_ISSUE: 'Những khó khăn hoặc rào cản bạn gặp phải?',
-    PLACEHOLDER_PLAN: 'Các công việc dự kiến cho ngày mai là gì?',
+    PLACEHOLDER_SUMMARY: 'Describe the tasks you have done today...',
+    PLACEHOLDER_ISSUE: 'What difficulties or obstacles did you encounter?',
+    PLACEHOLDER_PLAN: 'What are the planned tasks for tomorrow?',
   },
 
   EMPTY: {
-    NO_PROJECT: 'Bạn chưa được phân công vào dự án nào.',
-    NO_LOGBOOK: 'Không tìm thấy nhật ký nào trong nhóm này',
+    NO_PROJECT: 'You have not been assigned to any project.',
+    NO_LOGBOOK: 'No logbook found in this group',
   },
 
   VIEW_MODAL: {
-    TITLE: 'Chi tiết nhật ký',
-    CLOSE: 'Đóng',
-    NO_SUMMARY: 'Không có tóm tắt.',
+    TITLE: 'Logbook Details',
+    CLOSE: 'Close',
+    NO_SUMMARY: 'No summary.',
   },
 
   DELETE_MODAL: {
-    TITLE: 'Xóa nhật ký',
-    CONTENT: 'Bạn có chắc chắn muốn xóa nhật ký này không?',
-    CONFIRM: 'Xác nhận xóa',
-    CANCEL: 'Hủy bỏ',
+    TITLE: 'Delete Logbook',
+    CONTENT: 'Are you sure you want to delete this logbook?',
+    CONFIRM: 'Confirm Delete',
+    CANCEL: 'Cancel',
   },
 };

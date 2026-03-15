@@ -10,7 +10,7 @@ import {
   PlusCircleOutlined,
   BookOutlined,
 } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Title, Text } = Typography;
 

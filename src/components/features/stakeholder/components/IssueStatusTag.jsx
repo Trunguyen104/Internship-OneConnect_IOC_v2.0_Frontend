@@ -11,19 +11,23 @@ import {
 import { ISSUE_STATUS } from '../constants/issueStatus';
 
 const ISSUE_STATUS_MAP = {
-  [ISSUE_STATUS.OPEN]: { label: 'Mở', color: 'blue', icon: <ClockCircleOutlined /> },
-  [ISSUE_STATUS.IN_PROGRESS]: { label: 'Đang xử lý', color: 'orange', icon: <SyncOutlined spin /> },
+  [ISSUE_STATUS.OPEN]: { label: 'Open', color: 'blue', icon: <ClockCircleOutlined /> },
+  [ISSUE_STATUS.IN_PROGRESS]: {
+    label: 'In Progress',
+    color: 'orange',
+    icon: <SyncOutlined spin />,
+  },
   [ISSUE_STATUS.RESOLVED]: {
-    label: 'Đã giải quyết',
+    label: 'Resolved',
     color: 'success',
     icon: <CheckCircleOutlined />,
   },
-  [ISSUE_STATUS.CLOSED]: { label: 'Đã đóng', color: 'default', icon: <CloseCircleOutlined /> },
+  [ISSUE_STATUS.CLOSED]: { label: 'Closed', color: 'default', icon: <CloseCircleOutlined /> },
 };
 
 const IssueStatusTag = memo(function IssueStatusTag({ status }) {
   const config = ISSUE_STATUS_MAP[status] || {
-    label: status === 'Resolved' ? 'Đã giải quyết' : 'Đang xử lý',
+    label: status === 'Resolved' ? 'Resolved' : 'In Progress',
     color: status === 'Resolved' ? 'success' : 'orange',
     icon: status === 'Resolved' ? <CheckCircleOutlined /> : <SyncOutlined spin />,
   };

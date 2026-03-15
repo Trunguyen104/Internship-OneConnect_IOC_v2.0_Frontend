@@ -10,7 +10,7 @@ import {
   SolutionOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Text } = Typography;
 

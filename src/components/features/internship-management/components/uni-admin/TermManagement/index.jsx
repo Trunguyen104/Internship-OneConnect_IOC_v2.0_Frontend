@@ -4,7 +4,7 @@ import React from 'react';
 import { Pagination } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import Card from '@/components/ui/Card';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useTermManagement } from './hooks/useTermManagement';
 import TermHeader from './components/TermHeader';
 import TermFilterBar from './components/TermFilterBar';

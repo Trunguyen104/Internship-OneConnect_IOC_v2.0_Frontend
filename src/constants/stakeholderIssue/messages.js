@@ -1,20 +1,20 @@
 export const ISSUE_MESSAGES = {
   REQUIRED_FIELDS: {
-    GENERAL: 'Vui lòng nhập Tiêu đề và chọn Người liên quan',
-    TITLE: 'Tiêu đề là bắt buộc',
-    STAKEHOLDER: 'Người liên quan là bắt buộc',
+    GENERAL: 'Please enter Title and select a Stakeholder',
+    TITLE: 'Title is required',
+    STAKEHOLDER: 'Stakeholder is required',
   },
 
-  CREATE_SUCCESS: 'Tạo vấn đề thành công',
-  CREATE_FAILED: 'Tạo vấn đề thất bại',
+  CREATE_SUCCESS: 'Issue created successfully',
+  CREATE_FAILED: 'Failed to create issue',
 
-  DELETE_SUCCESS: 'Xóa vấn đề thành công',
-  DELETE_FAILED: 'Xóa vấn đề thất bại',
+  DELETE_SUCCESS: 'Issue deleted successfully',
+  DELETE_FAILED: 'Failed to delete issue',
 
-  UPDATE_STATUS_FAILED: 'Cập nhật trạng thái vấn đề thất bại',
+  UPDATE_STATUS_FAILED: 'Failed to update issue status',
 
-  RESOLVED: 'Đã giải quyết vấn đề',
-  REOPENED: 'Đã mở lại vấn đề',
+  RESOLVED: 'Issue resolved',
+  REOPENED: 'Issue reopened',
 
-  LOAD_PROJECT_FAILED: 'Không thể tải thông tin dự án',
+  LOAD_PROJECT_FAILED: 'Failed to load project info',
 };
