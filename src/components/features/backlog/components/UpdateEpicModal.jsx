@@ -62,14 +62,16 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
         <div className='flex h-full max-h-[85vh] flex-col'>
           {/* Header */}
           <div className='shrink-0 px-8 pt-8 pb-4'>
-            <div className='text-text text-2xl font-bold'>Chỉnh sửa Epic</div>
+            <div className='text-text text-2xl font-bold'>
+              {BACKLOG_UI.UPDATE || 'Update'} {BACKLOG_UI.TYPE_EPIC || 'Epic'}
+            </div>
           </div>
 
           {/* Body */}
           <div className='flex flex-1 flex-col space-y-6 overflow-y-auto px-8 py-2'>
-            {/* Tên Epic */}
+            {/* Epic name */}
             <div>
-              <FieldLabel required>Tên Epic</FieldLabel>
+              <FieldLabel required>{BACKLOG_UI.FIELD_EPIC_NAME}</FieldLabel>
               <TextInput
                 value={epicName}
                 onChange={setEpicName}
@@ -77,9 +79,9 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
               />
             </div>
 
-            {/* Mô tả */}
+            {/* Description */}
             <div className='flex min-h-[250px] flex-1 flex-col overflow-hidden'>
-              <FieldLabel>Mô tả</FieldLabel>
+              <FieldLabel>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
               <div className='flex-1 overflow-y-auto rounded-2xl'>
                 <TiptapEditor
                   value={desc}
@@ -89,9 +91,9 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
               </div>
             </div>
 
-            {/* Ngày kết thúc */}
+            {/* End date */}
             <div>
-              <FieldLabel>Ngày kết thúc</FieldLabel>
+              <FieldLabel>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
               <div className='w-[200px]'>
                 <DateInput value={endDate} onChange={setEndDate} />
               </div>
@@ -104,7 +106,7 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
               onClick={handleClose}
               className='bg-primary-50/50 text-primary hover:bg-primary-50 h-11 rounded-full px-6 text-sm font-semibold transition-colors'
             >
-              Hủy
+              {BACKLOG_UI.CANCEL || 'Cancel'}
             </button>
 
             <button
@@ -113,7 +115,7 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
               onClick={handleSubmit}
               className='bg-primary hover:bg-primary-hover h-11 rounded-full px-8 text-sm font-semibold text-white shadow-md transition-colors disabled:cursor-not-allowed disabled:opacity-50'
             >
-              Lưu
+              {BACKLOG_UI.UPDATE || 'Update'}
             </button>
           </div>
         </div>

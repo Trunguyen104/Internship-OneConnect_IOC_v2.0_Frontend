@@ -85,40 +85,38 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
           <div className='shrink-0 px-8 pt-8 pb-4'>
             <div className='text-2xl font-bold text-gray-900'>{BACKLOG_UI.START_SPRINT}</div>
             <div className='mt-2 text-sm font-medium text-gray-500'>
-              {issueCount} {BACKLOG_UI.ISSUE_COUNT_SPRINT || 'issue sẽ được gộp vào sprint này'}
+              {issueCount} {issueCount === 1 ? 'issue' : 'issues'} will be included in this sprint
             </div>
           </div>
 
           {/* Body */}
           <div className='flex flex-1 flex-col space-y-5 overflow-y-auto px-8 py-2 pb-8'>
             <div>
-              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME || 'Tên Sprint'}</FieldLabel>
+              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
               <TextInput
                 value={name}
                 onChange={setName}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'VD: Sprint 1'}
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
               />
             </div>
 
             <div className='flex gap-4'>
               <div className='flex-1'>
-                <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE || 'Ngày bắt đầu'}</FieldLabel>
+                <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE}</FieldLabel>
                 <TextInput type='date' value={startDate} onChange={setStartDate} />
               </div>
               <div className='flex-1'>
-                <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE || 'Ngày kết thúc'}</FieldLabel>
+                <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
                 <TextInput type='date' value={endDate} onChange={setEndDate} />
               </div>
             </div>
 
             <div className='flex flex-1 flex-col'>
-              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL || 'Mục tiêu Sprint'}</FieldLabel>
+              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
               <textarea
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
-                placeholder={
-                  BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL || 'Nhập mục tiêu Sprint (tùy chọn)'
-                }
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
                 className='focus:border-primary focus:ring-primary min-h-[120px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 text-sm transition-shadow outline-none focus:ring-1'
               />
             </div>

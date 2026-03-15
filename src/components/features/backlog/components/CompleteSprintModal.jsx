@@ -5,7 +5,7 @@ import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@
 import { BACKLOG_UI } from '@/constants/backlog';
 
 export default function CompleteSprintModal({ open, sprint, sprints, onClose, onSubmit }) {
-  const [moveOption, setMoveOption] = useState('backlog'); // Mặc định chọn Backlog cho an toàn
+  const [moveOption, setMoveOption] = useState('backlog'); // Default to Backlog for safety
   const [userSelectedNextSprintId, setUserSelectedNextSprintId] = useState(null);
   const [newSprintName, setNewSprintName] = useState('');
 
@@ -15,7 +15,7 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
     return status !== WORK_ITEM_STATUS.DONE && status !== 'DONE';
   });
 
-  // SỬA LỖI: Lọc Sprint dự kiến (Chấp nhận cả khi status bị null/undefined như trong log của bạn)
+  // Filter planned (future) sprints (also accepts null/undefined statuses)
   const futureSprints = useMemo(() => {
     return (sprints || []).filter(
       (s) =>
@@ -41,7 +41,7 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
       option = MOVE_INCOMPLETE_ITEMS_OPTION.CREATE_NEW_SPRINT;
     }
 
-    // Gửi đúng 3 trường Backend cần để xử lý logic "quăng" issue
+    // Backend expects these 3 fields to handle incomplete items
     onSubmit?.({
       incompleteItemsOption: option,
       targetSprintId: targetId,
@@ -56,11 +56,11 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
           {BACKLOG_UI.COMPLETE_SPRINT_TITLE} {sprint?.name}
         </h2>
         <p className='mb-6 text-sm font-medium text-gray-500'>
-          Có {undoneItems.length} {BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT}
+          {BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT} ({undoneItems.length})
         </p>
 
         <div className='mb-8 space-y-4'>
-          {/* 1. Quăng ra Backlog */}
+          {/* 1. Move to backlog */}
           <label className='flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50'>
             <input
               type='radio'
@@ -73,7 +73,7 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
             </span>
           </label>
 
-          {/* 2. Quăng sang Sprint kế tiếp */}
+          {/* 2. Move to next planned sprint */}
           <div className='space-y-2'>
             <label className='flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50'>
               <input
@@ -105,8 +105,7 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
               </div>
             )}
           </div>
-          {/* 3. Quăng vô Sprint mới tạo */}
-          {/* 3. Quăng vô Sprint mới tạo */}
+          {/* 3. Move to a new sprint */}
           <div className='space-y-2'>
             <label className='flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50'>
               <input

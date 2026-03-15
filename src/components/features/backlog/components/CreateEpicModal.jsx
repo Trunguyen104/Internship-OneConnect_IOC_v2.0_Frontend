@@ -75,7 +75,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
 
           {/* Body */}
           <div className='flex flex-1 flex-col space-y-6 overflow-y-auto px-8 py-2'>
-            {/* Tên Epic */}
+            {/* Epic name */}
             <div>
               <FieldLabel required>{BACKLOG_UI.FIELD_EPIC_NAME}</FieldLabel>
               <TextInput
@@ -85,7 +85,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
               />
             </div>
 
-            {/* Mô tả */}
+            {/* Description */}
             <div className='flex min-h-[250px] flex-1 flex-col overflow-hidden'>
               <FieldLabel>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
               <div className='flex-1 overflow-y-auto rounded-2xl'>
@@ -97,7 +97,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
               </div>
             </div>
 
-            {/* Ngày kết thúc */}
+            {/* End date */}
             <div>
               <FieldLabel>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
               <div className='w-[200px]'>

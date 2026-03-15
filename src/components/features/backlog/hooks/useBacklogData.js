@@ -29,7 +29,7 @@ export function useBacklogData() {
           setProjectId(res.data.items[0].projectId);
         }
       } catch {
-        toast.error('Không lấy được project');
+        toast.error('Unable to load project');
       }
     };
     initProject();
@@ -75,7 +75,7 @@ export function useBacklogData() {
           setBacklogItems(bkItems.map((it) => ({ ...it, id: it.workItemId || it.id })));
         }
       } catch (err) {
-        toast.error('Lỗi khi tải dữ liệu Backlog Board');
+        toast.error('Error loading backlog board data');
       } finally {
         setLoading(false);
       }

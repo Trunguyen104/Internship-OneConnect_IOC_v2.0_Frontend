@@ -69,10 +69,11 @@ export function EpicSidebar({
       <div className='flex flex-col gap-1'>
         <button
           onClick={() => setSelectedEpicId('ALL')}
-          className={`rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${selectedEpicId === 'ALL'
-            ? 'bg-primary-50 text-primary'
-            : 'text-gray-700 hover:bg-gray-50'
-            }`}
+          className={`rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${
+            selectedEpicId === 'ALL'
+              ? 'bg-primary-50 text-primary'
+              : 'text-gray-700 hover:bg-gray-50'
+          }`}
         >
           {BACKLOG_UI.ALL}
         </button>
@@ -81,10 +82,11 @@ export function EpicSidebar({
           <div key={epic.id} className='group relative'>
             <button
               onClick={() => setSelectedEpicId(epic.id)}
-              className={`w-full rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${selectedEpicId === epic.id
-                ? 'bg-primary-50 text-primary'
-                : 'text-gray-700 hover:bg-gray-50'
-                }`}
+              className={`w-full rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${
+                selectedEpicId === epic.id
+                  ? 'bg-primary-50 text-primary'
+                  : 'text-gray-700 hover:bg-gray-50'
+              }`}
             >
               <div className='truncate pr-6'>{epic.title || epic.name || 'Untitled Epic'}</div>
             </button>
@@ -116,24 +118,25 @@ export function EpicSidebar({
                     className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50'
                   >
                     <Pencil className='text-primary h-3.5 w-3.5' />
-                    {BACKLOG_UI.UPDATE || 'Sửa'}
+                    {BACKLOG_UI.UPDATE || 'Edit'}
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setOpenMenuId(null);
                       showDeleteConfirm({
-                        title: 'Xóa Epic',
-                        content: 'Bạn có chắc chắn muốn xóa Epic này không? Hành động này không thể hoàn tác.',
+                        title: 'Delete Epic',
+                        content:
+                          'Are you sure you want to delete this epic? This action cannot be undone.',
                         onOk: () => handleDeleteEpic(epic.id),
-                        okText: 'Xóa',
-                        cancelText: 'Hủy',
+                        okText: BACKLOG_UI.DELETE || 'Delete',
+                        cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                       });
                     }}
                     className='text-primary hover:bg-primary-50 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium'
                   >
                     <Trash2 className='h-3.5 w-3.5' />
-                    {BACKLOG_UI.DELETE || 'Xóa'}
+                    {BACKLOG_UI.DELETE || 'Delete'}
                   </button>
                 </div>
               )}

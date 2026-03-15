@@ -90,25 +90,25 @@ export function SprintSection({
                 className='flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold text-gray-700 transition-colors hover:bg-gray-50'
               >
                 <Pencil className='h-4 w-4 text-blue-600' />
-                {BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
+                {BACKLOG_UI.EDIT_SPRINT || 'Edit Sprint'}
               </button>
 
               <button
                 onClick={() => {
                   setIsMenuOpen(false);
                   showDeleteConfirm({
-                    title: BACKLOG_UI.DELETE_SPRINT || 'Xóa Sprint',
+                    title: BACKLOG_UI.DELETE_SPRINT || 'Delete Sprint',
                     content:
-                      'Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.',
+                      'Are you sure you want to delete this sprint? All items inside will be moved back to the backlog.',
                     onOk: () => handleDeleteSprint(sprint.sprintId),
-                    okText: 'Xóa',
-                    cancelText: 'Hủy',
+                    okText: BACKLOG_UI.DELETE || 'Delete',
+                    cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                   });
                 }}
                 className='text-danger flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold transition-colors hover:bg-red-50'
               >
                 <Trash2 className='text-danger h-4 w-4' />
-                {BACKLOG_UI.DELETE_SPRINT || 'Xóa Sprint'}
+                {BACKLOG_UI.DELETE_SPRINT || 'Delete Sprint'}
               </button>
             </div>
           )}
@@ -146,7 +146,7 @@ export function SprintSection({
         )}
       </div>
 
-      {/* TẠO NHIỆM VỤ DƯỚI SPRINT */}
+      {/* Create task under sprint */}
       <div className='mt-4 flex items-center'>
         <button
           onClick={() => {

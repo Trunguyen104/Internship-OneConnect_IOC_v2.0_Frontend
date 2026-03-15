@@ -52,14 +52,14 @@ export function useBacklogBoard() {
     try {
       const res = await productBacklogService.deleteSprint(projectId, sprintId);
       if (res && res.isSuccess !== false) {
-        toast.success('Xóa Sprint thành công');
+        toast.success('Sprint deleted successfully');
         setSprints((prev) => prev.filter((s) => s.sprintId !== sprintId));
         fetchData(projectId, false);
       } else {
-        toast.error(res.message || 'Không thể xóa Sprint');
+        toast.error(res.message || 'Unable to delete sprint');
       }
     } catch {
-      toast.error('Lỗi server khi xóa Sprint');
+      toast.error('Server error while deleting sprint');
     }
   };
 
@@ -67,13 +67,13 @@ export function useBacklogBoard() {
     try {
       const res = await productBacklogService.deleteEpic(projectId, epicId);
       if (res && res.isSuccess !== false) {
-        toast.success('Xóa Epic thành công');
+        toast.success('Epic deleted successfully');
         fetchData(projectId, false);
       } else {
-        toast.error(res.message || 'Không thể xóa Epic');
+        toast.error(res.message || 'Unable to delete epic');
       }
     } catch {
-      toast.error('Lỗi server khi xóa Epic');
+      toast.error('Server error while deleting epic');
     }
   };
 
@@ -92,15 +92,15 @@ export function useBacklogBoard() {
     try {
       const res = await productBacklogService.deleteWorkItem(projectId, workItemId);
       if (res?.isSuccess === false) {
-        toast.error(res?.message || 'Không thể xóa work item');
+        toast.error(res?.message || 'Unable to delete work item');
         fetchData(projectId, false);
         return;
       }
 
-      toast.success('Xóa work item thành công');
+      toast.success('Work item deleted successfully');
       fetchData(projectId, false);
     } catch {
-      toast.error('Lỗi server khi xóa work item');
+      toast.error('Server error while deleting work item');
       fetchData(projectId, false);
     }
   };
@@ -165,11 +165,11 @@ export function useBacklogBoard() {
 
           const res = await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
           if (res?.isSuccess === false || res?.success === false) {
-            throw new Error(res.message || 'Không thể chuyển về Backlog');
+            throw new Error(res.message || 'Unable to move to backlog');
           }
-          toast.success('Đã chuyển nhiệm vụ về Backlog');
+          toast.success('Moved item to backlog');
         } catch (err) {
-          toast.error(err.message || 'Lỗi khi chuyển về Backlog');
+          toast.error(err.message || 'Error moving to backlog');
           fetchData(projectId, false);
         }
       } else {
@@ -211,11 +211,11 @@ export function useBacklogBoard() {
             targetSprintId,
           );
           if (res?.isSuccess === false || res?.success === false) {
-            throw new Error(res.message || 'Không thể chuyển vào Sprint');
+            throw new Error(res.message || 'Unable to move to sprint');
           }
-          toast.success('Đã chuyển nhiệm vụ vào Sprint');
+          toast.success('Moved item to sprint');
         } catch (err) {
-          toast.error(err.message || 'Lỗi khi chuyển vào Sprint');
+          toast.error(err.message || 'Error moving to sprint');
           fetchData(projectId, false);
         }
       }

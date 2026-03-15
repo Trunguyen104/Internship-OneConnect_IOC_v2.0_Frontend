@@ -64,7 +64,7 @@ export function useCreateSprint(projectId, open) {
           setBacklogItems(enhancedItems);
         } catch (error) {
           console.error('Failed to fetch backlog items', error);
-          toast.error('Lỗi khi tải danh sách Product Backlog');
+          toast.error('Failed to load product backlog list');
         } finally {
           setLoadingItems(false);
         }

@@ -136,7 +136,7 @@ export default function UpdateTaskModal({
       {/* Overlay */}
       <button
         type='button'
-        aria-label='Đóng modal'
+        aria-label='Close modal'
         onClick={handleClose}
         className='absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity'
       />
@@ -156,9 +156,9 @@ export default function UpdateTaskModal({
           style={{ scrollbarWidth: 'thin' }}
         >
           <div className='flex flex-col gap-8 lg:flex-row'>
-            {/* Cột trái (Main) */}
+            {/* Left column (Main) */}
             <div className='flex flex-1 flex-col space-y-6'>
-              {/* Tóm tắt */}
+              {/* Summary */}
               <div>
                 <FieldLabel required>{BACKLOG_UI.FIELD_SUMMARY || 'Summary'}</FieldLabel>
                 <TextInput
@@ -168,7 +168,7 @@ export default function UpdateTaskModal({
                 />
               </div>
 
-              {/* Mô tả */}
+              {/* Description */}
               <div className='flex min-h-[200px] flex-1 flex-col overflow-hidden'>
                 <FieldLabel required>{BACKLOG_UI.FIELD_DESCRIPTION || 'Description'}</FieldLabel>
                 <div className='flex-1 overflow-y-auto rounded-2xl'>
@@ -183,7 +183,7 @@ export default function UpdateTaskModal({
               </div>
             </div>
 
-            {/* Cột phải (Sidebar Chi tiết) */}
+            {/* Right column (Details sidebar) */}
             <TaskModalSidebar
               status={status}
               setStatus={setStatus}

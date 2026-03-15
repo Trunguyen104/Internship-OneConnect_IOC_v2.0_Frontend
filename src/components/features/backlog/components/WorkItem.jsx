@@ -179,18 +179,18 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
                   e.stopPropagation();
                   setIsMenuOpen(false);
                   showDeleteConfirm({
-                    title: 'Xóa Work Item',
+                    title: 'Delete Work Item',
                     content:
-                      'Bạn có chắc chắn muốn xóa work item này không? Hành động này không thể hoàn tác.',
+                      'Are you sure you want to delete this work item? This action cannot be undone.',
                     onOk: () => onDelete?.(),
-                    okText: 'Xóa',
-                    cancelText: 'Hủy',
+                    okText: BACKLOG_UI.DELETE || 'Delete',
+                    cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                   });
                 }}
                 className='text-danger flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-red-50'
               >
                 <Trash2 className='text-danger h-4 w-4' />
-                {BACKLOG_UI.DELETE || 'Xóa'}
+                {BACKLOG_UI.DELETE || 'Delete'}
               </button>
             </div>
           ) : null}

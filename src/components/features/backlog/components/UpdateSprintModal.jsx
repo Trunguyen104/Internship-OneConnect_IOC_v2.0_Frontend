@@ -48,29 +48,27 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
           {/* Header */}
           <div className='shrink-0 px-8 pt-8 pb-4'>
             <div className='text-2xl font-bold text-gray-900'>
-              {BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
+              {BACKLOG_UI.EDIT_SPRINT || 'Edit Sprint'}
             </div>
           </div>
 
           {/* Body */}
           <div className='flex flex-1 flex-col space-y-5 overflow-y-auto px-8 py-2 pb-8'>
             <div>
-              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME || 'Tên Sprint'}</FieldLabel>
+              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
               <TextInput
                 value={name}
                 onChange={setName}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'VD: Sprint 1'}
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
               />
             </div>
 
             <div className='flex flex-1 flex-col'>
-              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL || 'Mục tiêu Sprint'}</FieldLabel>
+              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
               <textarea
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
-                placeholder={
-                  BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL || 'Nhập mục tiêu Sprint (tùy chọn)'
-                }
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
                 className='focus:border-primary focus:ring-primary min-h-[120px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 text-sm transition-shadow outline-none focus:ring-1'
               />
             </div>
@@ -89,7 +87,7 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
               disabled={!canSubmit}
               className='bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white transition-opacity disabled:opacity-50'
             >
-              {BACKLOG_UI.UPDATE || 'Cập nhật'}
+              {BACKLOG_UI.UPDATE || 'Update'}
             </button>
           </div>
         </div>
