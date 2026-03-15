@@ -18,7 +18,7 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
       footer={null}
       centered
       width={440}
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <div className='flex flex-col items-center gap-4 text-center'>

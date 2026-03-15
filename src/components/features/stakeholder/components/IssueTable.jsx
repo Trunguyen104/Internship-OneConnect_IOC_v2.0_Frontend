@@ -107,7 +107,7 @@ const IssueTable = memo(function IssueTable({
               className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
             />
           </Tooltip>
-          <Tooltip title='Xem chi tiết'>
+          <Tooltip title={ISSUE_UI.TABLE.VIEW_DETAIL}>
             <Button
               type='text'
               icon={<EyeOutlined />}
@@ -123,7 +123,7 @@ const IssueTable = memo(function IssueTable({
               onClick={() =>
                 showDeleteConfirm({
                   title: ISSUE_UI.BUTTON.DELETE,
-                  content: 'Bạn có chắc chắn muốn xóa vấn đề này không?',
+                  content: ISSUE_UI.TABLE.DELETE_CONFIRM,
                   onOk: () => onDelete(record.id),
                 })
               }

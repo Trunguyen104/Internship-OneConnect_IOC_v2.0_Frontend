@@ -4,18 +4,15 @@ import React, { useState } from 'react';
 import StakeholderTab from './StakeholderTab';
 import IssueTab from './IssueTab';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import { UserOutlined, WarningOutlined } from '@ant-design/icons';
+import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
+import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
 export default function StakeholderPage() {
   const [tab, setTab] = useState('stakeholder');
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
-      <StudentPageHeader
-        title='Người liên quan & Vấn đề'
-        description='Quản lý thông tin các bên liên quan và các vấn đề phát sinh trong dự án'
-      />
-
+      <StudentPageHeader hidden />
       <div className='bg-muted/5 border-border flex w-fit items-center gap-2 rounded-2xl border p-1.5'>
         <button
           onClick={() => setTab('stakeholder')}
@@ -25,8 +22,7 @@ export default function StakeholderPage() {
               : 'text-muted hover:text-text hover:bg-surface/50'
           }`}
         >
-          <UserOutlined className={tab === 'stakeholder' ? 'text-primary' : ''} />
-          Người liên quan
+          {STAKEHOLDER_UI.TAB_STAKEHOLDER}
         </button>
 
         <button
@@ -37,8 +33,7 @@ export default function StakeholderPage() {
               : 'text-muted hover:text-text hover:bg-surface/50'
           }`}
         >
-          <WarningOutlined className={tab === 'issue' ? 'text-primary' : ''} />
-          Vấn đề
+          {STAKEHOLDER_UI.TAB_ISSUE}
         </button>
       </div>
 

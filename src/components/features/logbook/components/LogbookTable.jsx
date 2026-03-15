@@ -1,117 +1,133 @@
 'use client';
 
+import React, { memo } from 'react';
 import { Tooltip, Button } from 'antd';
 import { FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
-import dayjs from 'dayjs';
 import LogbookStatusTag from './LogbookStatusTag';
 
-export default function LogbookTable({ data, loading, userProfile, onView, onEdit, onDelete }) {
+const LogbookTable = memo(function LogbookTable({
+  data,
+  loading,
+  userProfile,
+  onView,
+  onEdit,
+  onDelete,
+}) {
   const currentStudentId = userProfile?.studentId;
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       {loading ? (
         <div className='flex items-center justify-center py-12'>
-          <div className='h-8 w-8 animate-spin rounded-full border-t-2 border-r-2 border-slate-400 border-r-transparent'></div>
+          <div className='border-muted h-8 w-8 animate-spin rounded-full border-t-2 border-r-2 border-r-transparent'></div>
         </div>
       ) : data?.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <p className='text-slate-400'>{DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}</p>
+          <p className='text-muted'>{DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}</p>
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>
           <div className='flex-1 overflow-auto'>
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
-              <thead className='sticky top-0 z-10 border-b border-slate-200 bg-slate-50'>
+              <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='w-[140px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[140px] px-6 py-4 text-xs font-semibold'>
                     {DAILY_REPORT_UI.TABLE.REPORT_DATE}
                   </th>
-                  <th className='w-[180px] px-6 py-4 text-xs font-semibold text-slate-500'>
+
+                  <th className='text-muted w-[200px] px-6 py-4 text-xs font-semibold'>
                     {DAILY_REPORT_UI.TABLE.STUDENT}
                   </th>
-                  <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+
+                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
                     {DAILY_REPORT_UI.TABLE.SUMMARY}
                   </th>
-                  <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+
+                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
                     {DAILY_REPORT_UI.TABLE.ISSUE}
                   </th>
-                  <th className='w-[120px] px-6 py-4 text-center text-xs font-semibold text-slate-500'>
+
+                  <th className='text-muted w-[120px] px-6 py-4 text-center text-xs font-semibold'>
                     {DAILY_REPORT_UI.TABLE.STATUS}
                   </th>
-                  <th className='w-[140px] px-6 py-4 text-center text-xs font-semibold text-slate-500'>
+
+                  <th className='text-muted w-[140px] px-6 py-4 text-center text-xs font-semibold'>
                     {DAILY_REPORT_UI.TABLE.ACTION}
                   </th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-slate-100'>
-                {data?.map((record) => {
+
+              <tbody className='divide-border/50 divide-y'>
+                {data.map((record) => {
                   const isOwner = record.studentId === currentStudentId;
 
                   return (
-                    <tr key={record.logbookId} className='transition-colors hover:bg-slate-50/80'>
-                      <td className='px-6 py-4 text-sm'>
-                        <span className='font-bold tracking-tight text-slate-800'>
-                          {record.dateReport
-                            ? dayjs(record.dateReport).format('DD/MM/YYYY')
-                            : 'N/A'}
-                        </span>
+                    <tr key={record.logbookId} className='hover:bg-bg h-[64px] transition-colors'>
+                      {/* DATE */}
+                      <td className='text-text px-6 py-4 align-middle text-sm font-bold'>
+                        {record.dateReport
+                          ? dayjs(record.dateReport).format('DD/MM/YYYY')
+                          : DAILY_REPORT_UI.VIEW_MODAL.NA}
                       </td>
-                      <td className='px-6 py-4 text-sm whitespace-nowrap'>
-                        <span className='font-semibold text-slate-700'>
-                          {record.studentName || 'N/A'}
-                        </span>
+
+                      {/* STUDENT */}
+                      <td className='text-text px-6 py-4 align-middle text-sm font-semibold whitespace-nowrap'>
+                        {record.studentName || DAILY_REPORT_UI.VIEW_MODAL.NA}
                       </td>
-                      <td className='px-6 py-4 text-sm'>
+
+                      {/* SUMMARY */}
+                      <td className='px-6 py-4 align-middle text-sm'>
                         <Tooltip placement='topLeft' title={record.summary}>
-                          <div className='truncate text-slate-600'>{record.summary}</div>
+                          <div className='text-muted max-w-[260px] truncate'>{record.summary}</div>
                         </Tooltip>
                       </td>
-                      <td className='px-6 py-4 text-sm'>
+
+                      {/* ISSUE */}
+                      <td className='px-6 py-4 align-middle text-sm'>
                         <Tooltip placement='topLeft' title={record.issue}>
-                          <div className='truncate text-slate-500 italic'>
+                          <div className='text-muted max-w-[220px] truncate'>
                             {record.issue || '-'}
                           </div>
                         </Tooltip>
                       </td>
-                      <td className='px-6 py-4 text-center'>
+
+                      {/* STATUS */}
+                      <td className='px-6 py-4 text-center align-middle'>
                         <LogbookStatusTag status={record.status} />
                       </td>
-                      <td className='px-6 py-4'>
+
+                      {/* ACTION */}
+                      <td className='px-6 py-4 align-middle'>
                         <div className='flex items-center justify-center gap-2'>
-                          <Tooltip title='View Details'>
+                          <Tooltip title={DAILY_REPORT_UI.VIEW_MODAL.TITLE}>
                             <Button
                               type='text'
-                              icon={
-                                <FileTextOutlined className='text-gray-500 hover:text-blue-600' />
-                              }
+                              icon={<FileTextOutlined className='text-muted hover:text-info' />}
                               onClick={() => onView(record)}
-                              className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-blue-50'
+                              className='hover:bg-info-surface flex h-8 w-8 items-center justify-center rounded-lg'
                             />
                           </Tooltip>
 
                           {isOwner && (
                             <>
-                              <Tooltip title='Edit Report'>
+                              <Tooltip title={DAILY_REPORT_UI.MODAL.EDIT_TITLE}>
                                 <Button
                                   type='text'
-                                  icon={
-                                    <EditOutlined className='text-gray-500 hover:text-amber-500' />
-                                  }
+                                  icon={<EditOutlined className='text-muted hover:text-warning' />}
                                   onClick={() => onEdit(record)}
-                                  className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-amber-50'
+                                  className='hover:bg-warning-surface flex h-8 w-8 items-center justify-center rounded-lg'
                                 />
                               </Tooltip>
 
-                              <Tooltip title='Delete Report'>
+                              <Tooltip title={DAILY_REPORT_UI.DELETE_MODAL.TITLE}>
                                 <Button
                                   type='text'
                                   danger
-                                  icon={
-                                    <DeleteOutlined className='text-gray-400 hover:text-red-500' />
-                                  }
+                                  icon={<DeleteOutlined className='text-muted hover:text-danger' />}
                                   onClick={() =>
                                     showDeleteConfirm({
                                       title: DAILY_REPORT_UI.DELETE_MODAL.TITLE,
@@ -119,7 +135,7 @@ export default function LogbookTable({ data, loading, userProfile, onView, onEdi
                                       onOk: () => onDelete(record.logbookId),
                                     })
                                   }
-                                  className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50'
+                                  className='hover:bg-danger-surface flex h-8 w-8 items-center justify-center rounded-lg'
                                 />
                               </Tooltip>
                             </>

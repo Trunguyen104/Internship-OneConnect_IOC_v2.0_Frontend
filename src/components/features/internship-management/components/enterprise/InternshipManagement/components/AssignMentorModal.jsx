@@ -31,7 +31,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
       onCancel={onCancel}
       footer={null}
       width={560}
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <Space direction='vertical' size='large' className='w-full'>

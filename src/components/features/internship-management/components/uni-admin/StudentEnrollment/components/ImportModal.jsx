@@ -90,7 +90,7 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport }) {
       width={720}
       footer={null}
       centered
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <div className='flex flex-col items-center gap-3 text-center'>

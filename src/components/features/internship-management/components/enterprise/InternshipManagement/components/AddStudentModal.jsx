@@ -32,7 +32,7 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
       onCancel={onCancel}
       footer={null}
       width={600}
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <div className='mb-6 flex flex-col items-center gap-3 text-center'>

@@ -1,67 +1,60 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Tag } from 'antd';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
 const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
   const config = {
     0: {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
-      color: 'processing',
+      color: 'text-info',
     },
     SUBMITTED: {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
-      color: 'processing',
+      color: 'text-info',
     },
     1: {
       label: DAILY_REPORT_UI.STATUS.APPROVED,
-      style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      color: 'text-success',
     },
     APPROVED: {
       label: DAILY_REPORT_UI.STATUS.APPROVED,
-      style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      color: 'text-success',
     },
     2: {
       label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION,
-      style: 'bg-amber-50 text-amber-600 border-amber-200 border',
+      color: 'text-warning',
     },
     NEEDS_REVISION: {
       label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION,
-      style: 'bg-amber-50 text-amber-600 border-amber-200 border',
+      color: 'text-warning',
     },
     3: {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-      style: 'bg-green-50 text-green-600 border-green-200 border',
+      color: 'text-success',
     },
     PUNCTUAL: {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-      style: 'bg-green-50 text-green-600 border-green-200 border',
+      color: 'text-success',
     },
     4: {
       label: DAILY_REPORT_UI.STATUS.LATE,
-      color: 'error',
+      color: 'text-danger',
     },
     LATE: {
       label: DAILY_REPORT_UI.STATUS.LATE,
-      color: 'error',
+      color: 'text-danger',
     },
     UNKNOWN: {
       label: DAILY_REPORT_UI.STATUS.UNKNOWN,
-      color: 'default',
+      color: 'text-muted',
     },
   };
 
   const c = config[status] || config.UNKNOWN;
 
   return (
-    <Tag
-      color={c.color}
-      variant='filled'
-      className='min-w-[100px] rounded-full py-0.5 text-center text-[10px] font-black tracking-widest uppercase'
-    >
-      {c.label}
-    </Tag>
+    <span className={`${c.color} text-xs font-semibold tracking-wide uppercase`}>{c.label}</span>
   );
 });
 

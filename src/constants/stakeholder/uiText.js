@@ -1,6 +1,8 @@
 export const STAKEHOLDER_UI = {
   SEARCH_PLACEHOLDER: 'Search stakeholder...',
   ADD_BUTTON: 'Add Stakeholder',
+  TAB_STAKEHOLDER: 'Stakeholders',
+  TAB_ISSUE: 'Issues',
 
   EMPTY_TITLE: 'No stakeholder',
   EMPTY_DESC: 'There are no stakeholders in this project yet.',

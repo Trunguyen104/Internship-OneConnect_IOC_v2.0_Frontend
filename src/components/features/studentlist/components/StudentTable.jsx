@@ -15,54 +15,54 @@ export default function StudentTable({ data, loading, onDelete }) {
     <div className='flex min-h-0 flex-1 flex-col'>
       {loading ? (
         <div className='flex items-center justify-center py-12'>
-          <div className='h-8 w-8 animate-spin rounded-full border-t-2 border-r-2 border-slate-400 border-r-transparent'></div>
+          <div className='border-muted h-8 w-8 animate-spin rounded-full border-t-2 border-r-2 border-r-transparent'></div>
         </div>
       ) : data?.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <p className='text-slate-400'>{STUDENT_LIST_UI.EMPTY.NO_MEMBERS}</p>
+          <p className='text-muted'>{STUDENT_LIST_UI.EMPTY.NO_MEMBERS}</p>
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>
           <div className='flex-1 overflow-auto'>
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
-              <thead className='sticky top-0 z-10 border-b border-slate-200 bg-slate-50'>
+              <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='w-[60px] px-6 py-4 text-xs font-semibold text-slate-500'>#</th>
-                  <th className='w-[300px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[60px] px-6 py-4 text-xs font-semibold'>#</th>
+                  <th className='text-muted w-[300px] px-6 py-4 text-xs font-semibold'>
                     {STUDENT_LIST_UI.TABLE.STUDENT}
                   </th>
-                  <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
                     {STUDENT_LIST_UI.TABLE.CODE}
                   </th>
-                  <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
                     {STUDENT_LIST_UI.TABLE.ROLE}
                   </th>
-                  <th className='w-[150px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>
                     {STUDENT_LIST_UI.TABLE.STATUS}
                   </th>
-                  <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
                     {STUDENT_LIST_UI.TABLE.JOINED_AT}
                   </th>
-                  <th className='px-6 py-4 text-right text-xs font-semibold text-slate-500'></th>
+                  <th className='text-muted px-6 py-4 text-right text-xs font-semibold'></th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-slate-100'>
+              <tbody className='divide-border/50 divide-y'>
                 {data?.map((record, index) => (
-                  <tr key={record.studentId} className='transition-colors hover:bg-slate-50/80'>
-                    <td className='px-6 py-4 text-sm text-slate-600'>{index + 1}</td>
+                  <tr key={record.studentId} className='hover:bg-bg/80 transition-colors'>
+                    <td className='text-muted px-6 py-4 text-sm'>{index + 1}</td>
                     <td className='px-6 py-4'>
                       <div className='flex items-center gap-3'>
                         <StudentAvatar name={record.fullName} />
                         <div className='flex flex-col'>
-                          <span className='text-[15px] font-semibold text-slate-800'>
+                          <span className='text-text text-[15px] font-semibold'>
                             {record.fullName || STUDENT_LIST_UI.DEFAULT.NA}
                           </span>
-                          <span className='text-[13px] text-slate-500'>{record.email}</span>
+                          <span className='text-muted text-[13px]'>{record.email}</span>
                         </div>
                       </div>
                     </td>
                     <td className='px-6 py-4'>
-                      <span className='font-medium text-slate-600'>{record.studentCode}</span>
+                      <span className='text-muted font-medium'>{record.studentCode}</span>
                     </td>
                     <td className='px-6 py-4'>
                       <StudentRoleTag role={record.role} />
@@ -71,7 +71,7 @@ export default function StudentTable({ data, loading, onDelete }) {
                       <StudentStatusTag status={record.status} />
                     </td>
                     <td className='px-6 py-4'>
-                      <span className='text-sm text-slate-600'>
+                      <span className='text-muted text-sm'>
                         {record.joinedAt
                           ? new Date(record.joinedAt).toLocaleDateString('en-GB')
                           : STUDENT_LIST_UI.DEFAULT.NA}
@@ -83,7 +83,7 @@ export default function StudentTable({ data, loading, onDelete }) {
                           danger
                           type='text'
                           icon={<DeleteOutlined />}
-                          className='rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500'
+                          className='text-muted hover:bg-danger-surface hover:text-danger rounded-lg transition-colors'
                           onClick={() =>
                             showDeleteConfirm({
                               title: STUDENT_LIST_UI.CONFIRM.REMOVE_TITLE,
