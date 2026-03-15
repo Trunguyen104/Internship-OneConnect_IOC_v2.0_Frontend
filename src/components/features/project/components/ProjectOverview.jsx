@@ -1,143 +1,108 @@
 'use client';
 
-import React, { memo } from 'react';
 import dayjs from 'dayjs';
-import { Typography, Tag, Divider } from 'antd';
-import {
-  InfoCircleOutlined,
-  ClockCircleOutlined,
-  FileTextOutlined,
-  SolutionOutlined,
-  ProjectOutlined,
-} from '@ant-design/icons';
-import Card from '@/components/ui/Card';
+import { Typography, Tag } from 'antd';
 
 const { Title, Text, Paragraph } = Typography;
 
 const STATUS_PROJECT_CONFIG = {
-  1: {
-    label: 'Đang triển khai',
-    color: 'orange',
-    bgColor: 'bg-orange-50',
-    textColor: 'text-orange-600',
-  },
-  2: { label: 'Đang chờ', color: 'blue', bgColor: 'bg-blue-50', textColor: 'text-blue-600' },
-  3: {
-    label: 'Đã hoàn thành',
-    color: 'green',
-    bgColor: 'bg-green-50',
-    textColor: 'text-green-600',
-  },
-  4: { label: 'Đã đóng', color: 'red', bgColor: 'bg-red-50', textColor: 'text-red-600' },
+  1: { label: 'In Progress', color: 'orange' },
+  2: { label: 'Pending', color: 'blue' },
+  3: { label: 'Completed', color: 'green' },
+  4: { label: 'Closed', color: 'red' },
 };
 
-const ProjectOverview = memo(function ProjectOverview({ project }) {
+export default function ProjectOverview({ project }) {
   if (!project) {
     return (
-      <Card className='flex flex-col items-center justify-center border-dashed py-20'>
-        <InfoCircleOutlined className='text-muted mb-4 text-5xl' />
-        <Title level={5} className='text-muted'>
-          Không tìm thấy thông tin dự án
+      <div
+        className={
+          'flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-20'
+        }
+      >
+        <Title level={5} className={'!text-slate-400'}>
+          {'Project information not found'}
         </Title>
-      </Card>
+      </div>
     );
   }
 
   const statusInfo = STATUS_PROJECT_CONFIG[project.status] || {
     label: project.status,
     color: 'default',
-    bgColor: 'bg-slate-50',
-    textColor: 'text-slate-600',
   };
 
   return (
-    <div className='flex flex-col gap-6'>
-      <Card className='bg-surface border-border overflow-hidden rounded-2xl border p-0 shadow-sm'>
-        {/* Header Section */}
-        <div className='bg-muted/5 border-border flex items-center justify-between border-b px-6 py-4'>
-          <div className='flex items-center gap-3'>
-            <div className='bg-primary/10 flex size-10 items-center justify-center rounded-xl'>
-              <ProjectOutlined className='text-primary text-xl' />
-            </div>
-            <div>
-              <Title level={5} className='text-text !m-0'>
-                Tổng quan dự án
-              </Title>
-              <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                Overview
-              </Text>
-            </div>
-          </div>
+    <div className={'space-y-10'}>
+      {/* Top Grid Info */}
+      <div className={'grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'}>
+        <div
+          className={
+            'col-span-1 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:col-span-2'
+          }
+        >
+          <Text
+            type={'secondary'}
+            className={'mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'}
+          >
+            {'Project Name'}
+          </Text>
+          <Text
+            strong
+            className={'block truncate text-lg leading-tight text-slate-800'}
+            title={project?.projectName}
+          >
+            {project?.projectName}
+          </Text>
+        </div>
+
+        <div className={'rounded-2xl border border-slate-100 bg-white p-5 shadow-sm'}>
+          <Text
+            type={'secondary'}
+            className={'mb-2 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'}
+          >
+            {'Status'}
+          </Text>
           <Tag
             color={statusInfo.color}
-            variant='filled'
-            className='m-0 rounded-full px-4 py-1 text-[11px] font-bold tracking-wider uppercase'
+            className={
+              'bg-opacity-10 rounded-md border-none px-3 py-0.5 text-[11px] font-bold uppercase'
+            }
           >
             {statusInfo.label}
           </Tag>
         </div>
 
-        <div className='p-6'>
-          <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
-            {/* Project Name */}
-            <div className='space-y-2 md:col-span-2'>
-              <div className='flex items-center gap-2'>
-                <FileTextOutlined className='text-primary' />
-                <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                  Tên dự án
-                </Text>
-              </div>
-              <Title level={4} className='text-text !m-0 leading-tight'>
-                {project?.projectName}
-              </Title>
-            </div>
-
-            {/* Timeline */}
-            <div className='space-y-2'>
-              <div className='flex items-center gap-2'>
-                <ClockCircleOutlined className='text-primary' />
-                <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                  Thời gian
-                </Text>
-              </div>
-              <div className='bg-muted/5 border-border flex items-center gap-3 rounded-xl border px-4 py-2'>
-                <div className='flex flex-col'>
-                  <Text className='text-muted text-[10px] font-bold uppercase'>Bắt đầu</Text>
-                  <Text className='text-text text-sm font-bold'>
-                    {project?.startDate ? dayjs(project.startDate).format('DD/MM/YYYY') : '—'}
-                  </Text>
-                </div>
-                <div className='bg-border h-8 w-px' />
-                <div className='flex flex-col'>
-                  <Text className='text-muted text-[10px] font-bold uppercase'>Kết thúc</Text>
-                  <Text className='text-text text-sm font-bold'>
-                    {project?.endDate ? dayjs(project.endDate).format('DD/MM/YYYY') : '—'}
-                  </Text>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <Divider className='border-border my-8' />
-
-          {/* Description */}
-          <div className='space-y-4'>
-            <div className='flex items-center gap-2'>
-              <SolutionOutlined className='text-primary' />
-              <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                Mô tả chi tiết
-              </Text>
-            </div>
-            <div className='bg-muted/5 border-border relative rounded-2xl border p-6'>
-              <Paragraph className='text-text mb-0 text-[16px] leading-relaxed font-medium'>
-                {project?.description || 'Không có mô tả chi tiết cho dự án này.'}
-              </Paragraph>
-            </div>
+        <div className={'rounded-2xl border border-slate-100 bg-white p-5 shadow-sm'}>
+          <Text
+            type={'secondary'}
+            className={'mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'}
+          >
+            {'Timeline'}
+          </Text>
+          <div className={'flex flex-col'}>
+            <Text className={'text-xs font-medium text-slate-600'}>
+              {project?.startDate ? dayjs(project.startDate).format('DD/MM/YYYY') : '—'}
+              <span className={'mx-1 text-slate-300'}>{'to'}</span>
+              {project?.endDate ? dayjs(project.endDate).format('DD/MM/YYYY') : '—'}
+            </Text>
           </div>
         </div>
-      </Card>
+      </div>
+
+      <div className={'space-y-6'}>
+        <section className={'rounded-3xl border border-slate-100 bg-slate-50/50 p-8'}>
+          <div className={'mb-6 flex items-center gap-4'}>
+            <div className={'bg-primary h-10 w-1.5 rounded-full'} />
+            <Title level={4} className={'!m-0 !font-black !text-slate-800'}>
+              {'Project Description'}
+            </Title>
+          </div>
+          <Paragraph className={'text-[16px] leading-[1.8] font-medium text-slate-600'}>
+            {project?.description || 'No detailed description available for this project.'}
+          </Paragraph>
+        </section>
+      </div>
     </div>
   );
-});
-
-export default ProjectOverview;
+}

@@ -1,21 +1,16 @@
 'use client';
 
-import React, { memo } from 'react';
-import { Form, Input, Select, Button, Upload, Typography, Divider } from 'antd';
+import React from 'react';
+import { Form, Input, Select, Button, Upload, Typography } from 'antd';
 import { useToast } from '@/providers/ToastProvider';
-import {
-  UploadOutlined,
-  InfoCircleOutlined,
-  TagOutlined,
-  FileAddOutlined,
-} from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 
-const { Text } = Typography;
+const { Title } = Typography;
 
-const ProjectResourceUpload = memo(function ProjectResourceUpload({
+export default function ProjectResourceUpload({
   form,
   onUpload,
   uploading,
@@ -23,8 +18,6 @@ const ProjectResourceUpload = memo(function ProjectResourceUpload({
   setFileList,
 }) {
   const toast = useToast();
-  const { FORM, BUTTON, PLACEHOLDER } = PROJECT_UI;
-
   const uploadProps = {
     onRemove: () => {
       setFileList([]);
@@ -67,73 +60,51 @@ const ProjectResourceUpload = memo(function ProjectResourceUpload({
   };
 
   return (
-    <Form
-      form={form}
-      layout='vertical'
-      onFinish={onUpload}
-      className='space-y-5'
-      autoComplete='off'
-    >
-      <Form.Item
-        label={<span className='text-text font-semibold'>{FORM.RESOURCE_NAME}</span>}
-        name='resourceName'
-        tooltip={{
-          title: 'Nếu bỏ trống, tên tệp tin sẽ được sử dụng làm tên tài liệu',
-          icon: <InfoCircleOutlined className='text-muted' />,
-        }}
-      >
-        <Input
-          prefix={<FileAddOutlined className='text-muted' />}
-          placeholder={PLACEHOLDER.RESOURCE_NAME}
-          className='bg-surface border-border hover:border-primary h-11 rounded-xl transition-all'
-        />
-      </Form.Item>
+    <div className={'rounded-2xl border border-slate-100 bg-slate-50/50 p-6'}>
+      <div className={'mb-6'}>
+        <Title
+          level={5}
+          className={'!m-0 !text-sm !font-bold tracking-wider !text-slate-800 uppercase'}
+        >
+          {PROJECT_UI.TITLE.ADD_RESOURCE}
+        </Title>
+      </div>
+      <Form form={form} layout={'vertical'} onFinish={onUpload} className={'space-y-4'}>
+        <Form.Item
+          label={PROJECT_UI.FORM.RESOURCE_NAME}
+          name={'resourceName'}
+          tooltip={{ title: 'If left blank, the attached filename will be used' }}
+        >
+          <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
+        </Form.Item>
 
-      <Form.Item
-        label={<span className='text-text font-semibold'>{FORM.RESOURCE_TYPE}</span>}
-        name='resourceType'
-        initialValue={1}
-        rules={[{ required: true, message: 'Vui lòng chọn loại tài liệu' }]}
-      >
-        <Select
-          options={RESOURCE_TYPES}
-          suffixIcon={<TagOutlined className='text-muted' />}
-          className='h-11'
-        />
-      </Form.Item>
+        <Form.Item
+          label={PROJECT_UI.FORM.RESOURCE_TYPE}
+          name={'resourceType'}
+          initialValue={1}
+          required
+        >
+          <Select options={RESOURCE_TYPES} />
+        </Form.Item>
 
-      <Form.Item
-        label={<span className='text-text font-semibold'>{FORM.ATTACH_FILE}</span>}
-        required
-        className='mb-6'
-      >
-        <Upload {...uploadProps} className='premium-upload'>
+        <Form.Item label={PROJECT_UI.FORM.ATTACH_FILE} required>
+          <Upload {...uploadProps}>
+            <Button icon={<UploadOutlined />}>{PROJECT_UI.BUTTON.SELECT_FILE}</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item style={{ marginBottom: 0 }}>
           <Button
-            icon={<UploadOutlined />}
-            className='border-border text-muted hover:text-primary hover:border-primary h-11 w-full rounded-xl border-dashed bg-slate-50 font-medium transition-all hover:bg-white'
+            type={'primary'}
+            htmlType={'submit'}
+            loading={uploading}
+            disabled={fileList.length === 0}
+            block
           >
-            {BUTTON.SELECT_FILE}
+            {PROJECT_UI.BUTTON.UPLOAD}
           </Button>
-        </Upload>
-        <div className='mt-2'>
-          <Text className='text-muted text-[10px] leading-tight'>
-            * Hỗ trợ: PDF, Word, Excel, PowerPoint, Image, Zip, MP4. Tối đa 10MB.
-          </Text>
-        </div>
-      </Form.Item>
-
-      <Button
-        type='primary'
-        htmlType='submit'
-        loading={uploading}
-        disabled={fileList.length === 0}
-        block
-        className='bg-primary h-12 rounded-xl border-none font-bold shadow-md transition-all hover:scale-105 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400'
-      >
-        {BUTTON.UPLOAD}
-      </Button>
-    </Form>
+        </Form.Item>
+      </Form>
+    </div>
   );
-});
-
-export default ProjectResourceUpload;
+}

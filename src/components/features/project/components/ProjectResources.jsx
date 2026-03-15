@@ -1,27 +1,24 @@
 'use client';
 
-import React, { memo } from 'react';
-import { Typography, Row, Col, List, Button, Tag, Divider, Avatar } from 'antd';
+import React from 'react';
+import { Typography, Row, Col, List, Button, Tag } from 'antd';
 import {
   FileTextOutlined,
   DownloadOutlined,
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
-  FolderOpenOutlined,
-  CloudUploadOutlined,
-  SearchOutlined,
 } from '@ant-design/icons';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
 import ProjectResourceEditModal from './ProjectResourceEditModal';
+import { resolveResourceUrl } from '@/utils/resolveUrl';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
-import Card from '@/components/ui/Card';
 
 const { Title, Text } = Typography;
 
-const ProjectResources = memo(function ProjectResources({
+export default function ProjectResources({
   resources,
   loading,
   uploading,
@@ -39,138 +36,125 @@ const ProjectResources = memo(function ProjectResources({
   onView,
 }) {
   return (
-    <div className='flex flex-col gap-6 pt-4'>
-      <Row gutter={[24, 24]}>
-        {/* Left Column: Upload */}
+    <div className={'space-y-6'}>
+      <Row gutter={[32, 32]}>
         <Col xs={24} lg={9} xl={8}>
-          <div className='sticky top-6'>
-            <Card className='bg-surface border-border overflow-hidden rounded-2xl border p-0 shadow-sm'>
-              <div className='bg-muted/5 border-border flex items-center gap-2 border-b px-6 py-4'>
-                <CloudUploadOutlined className='text-primary' />
-                <Text className='text-text text-xs font-bold tracking-widest uppercase'>
-                  Tải lên tài liệu
-                </Text>
-              </div>
-              <div className='p-6'>
-                <ProjectResourceUpload
-                  form={form}
-                  onUpload={onUpload}
-                  uploading={uploading}
-                  fileList={fileList}
-                  setFileList={setFileList}
-                />
-              </div>
-            </Card>
+          <div className={'sticky top-6'}>
+            <ProjectResourceUpload
+              form={form}
+              onUpload={onUpload}
+              uploading={uploading}
+              fileList={fileList}
+              setFileList={setFileList}
+            />
           </div>
         </Col>
 
-        {/* Right Column: List */}
         <Col xs={24} lg={15} xl={16}>
-          <Card className='bg-surface border-border overflow-hidden rounded-2xl border p-0 shadow-sm'>
-            <div className='bg-muted/5 border-border flex items-center justify-between border-b px-6 py-4'>
-              <div className='flex items-center gap-2'>
-                <FolderOpenOutlined className='text-primary' />
-                <Text className='text-text text-xs font-bold tracking-widest uppercase'>
-                  {PROJECT_UI.TITLE.RESOURCE_LIST}
-                </Text>
-              </div>
-              <Tag
-                color='processing'
-                variant='filled'
-                className='m-0 rounded-full px-4 py-0.5 text-[10px] font-black tracking-widest uppercase'
-              >
-                {resources.length} Tài liệu
-              </Tag>
-            </div>
+          <div className={'mb-6 flex items-center gap-3'}>
+            <Title level={5} className={'!m-0'}>
+              {PROJECT_UI.TITLE.RESOURCE_LIST}
+            </Title>
+            <Tag
+              color={'geekblue'}
+              className={
+                'rounded-full border-none bg-blue-50 px-3 text-[10px] font-bold text-blue-600'
+              }
+            >
+              {resources.length} {'FILES'}
+            </Tag>
+          </div>
 
-            <div className='premium-scrollbar max-h-[600px] overflow-y-auto px-2 py-4 lg:max-h-[65vh]'>
-              <List
-                itemLayout='horizontal'
-                dataSource={resources}
-                loading={loading}
-                locale={{
-                  emptyText: (
-                    <div className='py-20 text-center'>
-                      <SearchOutlined className='text-muted mb-4 text-4xl opacity-20' />
-                      <Text className='text-muted block text-sm italic'>
-                        {PROJECT_UI.EMPTY.NO_RESOURCE}
+          <div className={'custom-scrollbar max-h-[450px] overflow-y-auto pr-2 lg:max-h-[50vh]'}>
+            <List
+              itemLayout={'horizontal'}
+              dataSource={resources}
+              loading={loading}
+              locale={{ emptyText: PROJECT_UI.EMPTY.NO_RESOURCE }}
+              renderItem={(item) => (
+                <List.Item
+                  className={
+                    'group mb-2 rounded-xl border-slate-100 px-4 transition-all hover:bg-slate-50/80'
+                  }
+                  actions={[
+                    <Button
+                      key={'view'}
+                      type={'text'}
+                      size={'small'}
+                      icon={<EyeOutlined />}
+                      onClick={() => onView(item)}
+                      className={'hover:text-primary text-slate-400 transition-colors'}
+                      title={PROJECT_UI.BUTTON.VIEW}
+                    />,
+                    <Button
+                      key={'download'}
+                      type={'text'}
+                      size={'small'}
+                      icon={<DownloadOutlined />}
+                      onClick={() => onDownload(item)}
+                      className={'text-slate-400 transition-colors hover:text-blue-600'}
+                      title={PROJECT_UI.BUTTON.DOWNLOAD}
+                    />,
+                    <Button
+                      key={'edit'}
+                      type={'text'}
+                      size={'small'}
+                      icon={<EditOutlined />}
+                      onClick={() => openEditModal(item)}
+                      className={'text-slate-400 transition-colors hover:text-slate-800'}
+                      title={PROJECT_UI.BUTTON.EDIT}
+                    />,
+                    <Button
+                      key={'delete'}
+                      type={'text'}
+                      size={'small'}
+                      danger
+                      icon={<DeleteOutlined />}
+                      className={'text-slate-300 transition-colors hover:text-red-500'}
+                      title={PROJECT_UI.BUTTON.DELETE}
+                      onClick={() =>
+                        showDeleteConfirm({
+                          title: 'Delete Resource',
+                          content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
+                          onOk: () => onDelete(item.projectResourceId),
+                        })
+                      }
+                    />,
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={
+                      <div
+                        className={
+                          'bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-lg transition-transform group-hover:scale-110'
+                        }
+                      >
+                        <FileTextOutlined className={'text-xl'} />
+                      </div>
+                    }
+                    title={
+                      <Text
+                        strong
+                        className={
+                          'block max-w-[200px] truncate text-sm text-slate-800 sm:max-w-[300px]'
+                        }
+                        title={item.resourceName}
+                      >
+                        {item.resourceName || 'Untitled Resource'}
                       </Text>
-                    </div>
-                  ),
-                }}
-                renderItem={(item) => (
-                  <List.Item
-                    className='group hover:bg-muted/5 mb-2 rounded-2xl border-none p-4 transition-all duration-300'
-                    actions={[
-                      <div key='actions' className='flex gap-1'>
-                        <Tooltip title='Xem chi tiết'>
-                          <Button
-                            type='text'
-                            icon={<EyeOutlined />}
-                            onClick={() => onView(item)}
-                            className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
-                          />
-                        </Tooltip>
-                        <Tooltip title='Tải xuống'>
-                          <Button
-                            type='text'
-                            icon={<DownloadOutlined />}
-                            onClick={() => onDownload(item)}
-                            className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
-                          />
-                        </Tooltip>
-                        <Tooltip title='Sửa thông tin'>
-                          <Button
-                            type='text'
-                            icon={<EditOutlined />}
-                            onClick={() => openEditModal(item)}
-                            className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
-                          />
-                        </Tooltip>
-                        <Tooltip title='Xóa tài liệu'>
-                          <Button
-                            type='text'
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() =>
-                              showDeleteConfirm({
-                                title: 'Xóa tài liệu',
-                                content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
-                                onOk: () => onDelete(item.projectResourceId),
-                              })
-                            }
-                            className='hover:bg-danger/10 flex size-9 items-center justify-center rounded-xl p-0 transition-all'
-                          />
-                        </Tooltip>
-                      </div>,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      avatar={
-                        <div className='bg-primary/10 flex size-12 items-center justify-center rounded-2xl transition-all duration-300 group-hover:scale-110'>
-                          <FileTextOutlined className='text-primary text-2xl' />
-                        </div>
-                      }
-                      title={
-                        <Text strong className='text-text block truncate text-[15px]'>
-                          {item.resourceName || 'Tài liệu không tên'}
-                        </Text>
-                      }
-                      description={
-                        <div className='mt-1 flex items-center gap-2'>
-                          <Tag className='m-0 border-none bg-slate-100 text-[10px] font-bold text-slate-500 uppercase'>
-                            {RESOURCE_TYPES.find(
-                              (t) => t.value === item.resourceType || t.key === item.resourceType,
-                            )?.label || 'Khác'}
-                          </Tag>
-                        </div>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
-            </div>
-          </Card>
+                    }
+                    description={
+                      <Text type={'secondary'} className={'text-[11px] font-medium'}>
+                        {RESOURCE_TYPES.find(
+                          (t) => t.value === item.resourceType || t.key === item.resourceType,
+                        )?.label || 'Other'}
+                      </Text>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          </div>
         </Col>
       </Row>
 
@@ -183,8 +167,4 @@ const ProjectResources = memo(function ProjectResources({
       />
     </div>
   );
-});
-
-import { Tooltip } from 'antd';
-
-export default ProjectResources;
+}
