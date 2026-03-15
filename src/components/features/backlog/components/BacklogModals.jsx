@@ -73,16 +73,18 @@ export const BacklogModals = ({
         onSubmit={actions.handleCreateEpic}
       />
 
-      <UpdateEpicModal
-        open={openUpdateEpic}
-        initialData={selectedEpic}
-        onClose={() => {
-          setOpenUpdateEpic(false);
-          setSelectedEpic(null);
-        }}
-        onSubmit={(payload) => actions.handleUpdateEpic(selectedEpic?.id, payload)}
-        onDelete={() => actions.handleDeleteEpic(selectedEpic?.id)}
-      />
+      {openUpdateEpic ? (
+        <UpdateEpicModal
+          open={openUpdateEpic}
+          initialData={selectedEpic}
+          onClose={() => {
+            setOpenUpdateEpic(false);
+            setSelectedEpic(null);
+          }}
+          onSubmit={(payload) => actions.handleUpdateEpic(selectedEpic?.id, payload)}
+          onDelete={() => actions.handleDeleteEpic(selectedEpic?.id)}
+        />
+      ) : null}
 
       <StartSprintModal
         open={openStartSprint}
@@ -131,12 +133,16 @@ export const BacklogModals = ({
         onSubmit={actions.handleCreateSprint}
       />
 
-      <UpdateSprintModal
-        open={openUpdateSprint}
-        sprint={selectedSprintAction}
-        onClose={() => setOpenUpdateSprint(false)}
-        onSubmit={(payload) => actions.handleUpdateSprint(selectedSprintAction?.sprintId, payload)}
-      />
+      {openUpdateSprint ? (
+        <UpdateSprintModal
+          open={openUpdateSprint}
+          sprint={selectedSprintAction}
+          onClose={() => setOpenUpdateSprint(false)}
+          onSubmit={(payload) =>
+            actions.handleUpdateSprint(selectedSprintAction?.sprintId, payload)
+          }
+        />
+      ) : null}
     </>
   );
 };

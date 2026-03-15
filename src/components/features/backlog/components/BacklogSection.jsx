@@ -9,6 +9,7 @@ export function BacklogSection({
   projectId,
   itemOrders,
   handleQuickCreateSprint,
+  handleDeleteWorkItem,
   setSelectedTask,
   setOpenUpdateTask,
   setActiveSprintForTask,
@@ -46,6 +47,7 @@ export function BacklogSection({
             key={it.workItemId || it.id}
             it={it}
             itemOrder={itemOrders[it.workItemId || it.id]}
+            onDelete={() => handleDeleteWorkItem?.(it.workItemId || it.id)}
             onClick={async (task) => {
               try {
                 const res = await productBacklogService.getWorkItemById(

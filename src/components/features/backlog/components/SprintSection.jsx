@@ -13,6 +13,7 @@ export function SprintSection({
   itemOrders,
   handleSprintActionClick,
   handleDeleteSprint,
+  handleDeleteWorkItem,
   setSelectedSprintAction,
   setSelectedTask,
   setOpenUpdateTask,
@@ -97,7 +98,8 @@ export function SprintSection({
                   setIsMenuOpen(false);
                   showDeleteConfirm({
                     title: BACKLOG_UI.DELETE_SPRINT || 'Xóa Sprint',
-                    content: 'Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.',
+                    content:
+                      'Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.',
                     onOk: () => handleDeleteSprint(sprint.sprintId),
                     okText: 'Xóa',
                     cancelText: 'Hủy',
@@ -121,6 +123,7 @@ export function SprintSection({
             key={it.workItemId || it.id}
             it={it}
             itemOrder={itemOrders[it.workItemId || it.id]}
+            onDelete={() => handleDeleteWorkItem?.(it.workItemId || it.id)}
             onClick={async (task) => {
               try {
                 const res = await productBacklogService.getWorkItemById(

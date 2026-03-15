@@ -19,6 +19,8 @@ export default function BacklogBoard() {
     loading,
     selectedEpicId,
     setSelectedEpicId,
+    searchText,
+    setSearchText,
     isSidebarOpen,
     setIsSidebarOpen,
     filteredBacklogItems,
@@ -49,6 +51,7 @@ export default function BacklogBoard() {
     handleQuickCreateSprint,
     handleDeleteSprint,
     handleDeleteEpic,
+    handleDeleteWorkItem,
     handleSprintActionClick,
     fetchData,
     openCreateSprint,
@@ -83,7 +86,7 @@ export default function BacklogBoard() {
 
       {/* Main Board */}
       <div className='flex min-w-0 flex-1 flex-col overflow-y-auto pr-2 pb-10'>
-        <BoardHeader />
+        <BoardHeader searchText={searchText} setSearchText={setSearchText} />
 
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           {loading ? (
@@ -106,6 +109,7 @@ export default function BacklogBoard() {
                     setOpenUpdateSprint={setOpenUpdateSprint}
                     setActiveSprintForTask={setActiveSprintForTask}
                     setOpenCreateTask={setOpenCreateTask}
+                    handleDeleteWorkItem={handleDeleteWorkItem}
                   />
                 ))}
 
@@ -119,6 +123,7 @@ export default function BacklogBoard() {
                   setOpenUpdateTask={setOpenUpdateTask}
                   setActiveSprintForTask={setActiveSprintForTask}
                   setOpenCreateTask={setOpenCreateTask}
+                  handleDeleteWorkItem={handleDeleteWorkItem}
                 />
               </div>
             </div>

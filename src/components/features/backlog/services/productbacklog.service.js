@@ -33,6 +33,9 @@ export const productBacklogService = {
   updateWorkItem(projectId, workItemId, payload) {
     return httpPut(`/workitems/${workItemId}`, { ...payload, projectId });
   },
+  deleteWorkItem(projectId, workItemId) {
+    return httpDelete(`/workitems/${workItemId}`, { projectId });
+  },
 
   // FIX: API PATCH để chuyển vào Sprint theo đúng ảnh Swagger của bạn
   moveWorkItemToSprint(projectId, workItemId, sprintId) {

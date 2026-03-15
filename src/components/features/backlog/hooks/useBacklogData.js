@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useDeferredValue } from 'react';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { useToast } from '@/providers/ToastProvider';
@@ -17,6 +17,8 @@ export function useBacklogData() {
   const [loading, setLoading] = useState(true);
 
   const [selectedEpicId, setSelectedEpicId] = useState('ALL');
+  const [searchText, setSearchText] = useState('');
+  const deferredSearchText = useDeferredValue(searchText);
 
   // Initialize Project
   useEffect(() => {
@@ -95,19 +97,34 @@ export function useBacklogData() {
   );
 
   const filteredBacklogItems = useMemo(() => {
+    const query = deferredSearchText.trim().toLowerCase();
     return backlogItems
       .filter((it) => it && (selectedEpicId === 'ALL' || it.parentId === selectedEpicId))
+      .filter((it) => {
+        if (!query) return true;
+        const summary = (it.title || it.name || '').toString().replace(/<[^>]*>/g, '');
+        return summary.toLowerCase().includes(query);
+      })
       .map(appendEpicName);
-  }, [backlogItems, appendEpicName, selectedEpicId]);
+  }, [backlogItems, appendEpicName, selectedEpicId, deferredSearchText]);
 
   const filteredSprints = useMemo(() => {
-    return sprints.map((sp) => ({
+    const query = deferredSearchText.trim().toLowerCase();
+    const sprintsWithFilteredItems = sprints.map((sp) => ({
       ...sp,
       items: (sp.items || [])
         .filter((it) => it && (selectedEpicId === 'ALL' || it.parentId === selectedEpicId))
+        .filter((it) => {
+          if (!query) return true;
+          const summary = (it.title || it.name || '').toString().replace(/<[^>]*>/g, '');
+          return summary.toLowerCase().includes(query);
+        })
         .map(appendEpicName),
     }));
-  }, [sprints, appendEpicName, selectedEpicId]);
+
+    if (!query) return sprintsWithFilteredItems;
+    return sprintsWithFilteredItems.filter((sp) => (sp.items || []).length > 0);
+  }, [sprints, appendEpicName, selectedEpicId, deferredSearchText]);
 
   return {
     projectId,
@@ -120,6 +137,8 @@ export function useBacklogData() {
     loading,
     selectedEpicId,
     setSelectedEpicId,
+    searchText,
+    setSearchText,
     filteredBacklogItems,
     filteredSprints,
     fetchData,

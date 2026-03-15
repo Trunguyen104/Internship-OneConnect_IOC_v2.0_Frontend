@@ -1,7 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { MoreVertical, GripVertical } from 'lucide-react';
+import { MoreVertical, GripVertical, Trash2 } from 'lucide-react';
 import { WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/enums';
 import { BACKLOG_UI } from '@/constants/backlog';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 const statusToneText = {
   [WORK_ITEM_STATUS.TODO]: 'bg-gray-100 text-muted',
@@ -25,10 +27,23 @@ const stringToColorTuple = (str) => {
   return { bg: `hsl(${hue}, 70%, 90%)`, text: `hsl(${hue}, 70%, 30%)` };
 };
 
-export function WorkItem({ it, itemOrder, onClick }) {
+export function WorkItem({ it, itemOrder, onClick, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: it.workItemId || it.id,
   });
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const style = transform
     ? {
@@ -143,7 +158,43 @@ export function WorkItem({ it, itemOrder, onClick }) {
       </div>
 
       <div className='flex w-8 shrink-0 justify-center text-gray-400 opacity-50 transition-opacity hover:opacity-100'>
-        <MoreVertical className='h-4 w-4' />
+        <div ref={menuRef} className='relative'>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen((v) => !v);
+            }}
+            className='flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100'
+            aria-label='Work item actions'
+          >
+            <MoreVertical className='h-4 w-4' />
+          </button>
+
+          {isMenuOpen ? (
+            <div className='absolute top-full right-0 z-50 mt-1 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg'>
+              <button
+                type='button'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                  showDeleteConfirm({
+                    title: 'Xóa Work Item',
+                    content:
+                      'Bạn có chắc chắn muốn xóa work item này không? Hành động này không thể hoàn tác.',
+                    onOk: () => onDelete?.(),
+                    okText: 'Xóa',
+                    cancelText: 'Hủy',
+                  });
+                }}
+                className='text-danger flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-red-50'
+              >
+                <Trash2 className='text-danger h-4 w-4' />
+                {BACKLOG_UI.DELETE || 'Xóa'}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

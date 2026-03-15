@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import TiptapEditor from '@/components/ui/TiptapEditor';
 import DateInput from '@/components/ui/DateInput';
 import { BACKLOG_UI } from '@/constants/backlog';
@@ -26,17 +26,9 @@ function TextInput({ value, onChange, placeholder = '' }) {
 }
 
 export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }) {
-  const [epicName, setEpicName] = useState('');
-  const [desc, setDesc] = useState('');
-  const [endDate, setEndDate] = useState('');
-
-  useEffect(() => {
-    if (initialData) {
-      setEpicName(initialData.title || initialData.name || '');
-      setDesc(initialData.description || '');
-      setEndDate(initialData.endDate || '');
-    }
-  }, [initialData, open]);
+  const [epicName, setEpicName] = useState(() => initialData?.title || initialData?.name || '');
+  const [desc, setDesc] = useState(() => initialData?.description || '');
+  const [endDate, setEndDate] = useState(() => initialData?.endDate || '');
 
   const canSubmit = useMemo(() => epicName.trim() !== '', [epicName]);
 

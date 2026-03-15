@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { BACKLOG_UI } from '@/constants/backlog';
 
 function FieldLabel({ required, children }) {
@@ -26,15 +26,8 @@ function TextInput({ value, onChange, placeholder = '', type = 'text', readOnly 
 }
 
 export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
-  const [name, setName] = useState('');
-  const [goal, setGoal] = useState('');
-
-  useEffect(() => {
-    if (sprint && open) {
-      setName(sprint.name || sprint.title || '');
-      setGoal(sprint.goal || '');
-    }
-  }, [sprint, open]);
+  const [name, setName] = useState(() => sprint?.name || sprint?.title || '');
+  const [goal, setGoal] = useState(() => sprint?.goal || '');
 
   const canSubmit = useMemo(() => name.trim() !== '', [name]);
 
@@ -54,7 +47,9 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
         <div className='flex h-full max-h-[85vh] flex-col'>
           {/* Header */}
           <div className='shrink-0 px-8 pt-8 pb-4'>
-            <div className='text-2xl font-bold text-gray-900'>{BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}</div>
+            <div className='text-2xl font-bold text-gray-900'>
+              {BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
+            </div>
           </div>
 
           {/* Body */}

@@ -77,6 +77,34 @@ export function useBacklogBoard() {
     }
   };
 
+  const handleDeleteWorkItem = async (workItemId) => {
+    if (!workItemId) return;
+
+    // Optimistic local update
+    setBacklogItems((prev) => prev.filter((it) => (it.workItemId || it.id) !== workItemId));
+    setSprints((prev) =>
+      prev.map((s) => ({
+        ...s,
+        items: (s.items || []).filter((it) => (it.workItemId || it.id) !== workItemId),
+      })),
+    );
+
+    try {
+      const res = await productBacklogService.deleteWorkItem(projectId, workItemId);
+      if (res?.isSuccess === false) {
+        toast.error(res?.message || 'Không thể xóa work item');
+        fetchData(projectId, false);
+        return;
+      }
+
+      toast.success('Xóa work item thành công');
+      fetchData(projectId, false);
+    } catch {
+      toast.error('Lỗi server khi xóa work item');
+      fetchData(projectId, false);
+    }
+  };
+
   const handleSprintActionClick = (sprint, isStart) => {
     ui.setSelectedSprintAction(sprint);
     if (isStart) ui.setOpenStartSprint(true);
@@ -201,6 +229,7 @@ export function useBacklogBoard() {
     itemOrders,
     handleDeleteSprint,
     handleDeleteEpic,
+    handleDeleteWorkItem,
     handleSprintActionClick,
     handleQuickCreateSprint,
     handleDragEnd,

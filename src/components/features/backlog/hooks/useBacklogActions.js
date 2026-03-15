@@ -294,6 +294,32 @@ export function useBacklogActions({
 
   const handleUpdateSprint = async (sprintId, payload) => {
     try {
+      if (!sprintId) return;
+
+      const res = await productBacklogService.updateSprint(projectId, sprintId, {
+        projectId,
+        ...payload,
+      });
+      if (res && res.isSuccess === false) {
+        toast.error(res.message || 'Lá»—i khi cáº­p nháº­t Sprint');
+        return;
+      }
+
+      setSprints((prev) =>
+        prev.map((s) =>
+          String(s.sprintId || s.id) === String(sprintId) ? { ...s, ...payload } : s,
+        ),
+      );
+
+      toast.success('Cập nhật sprint thành công!');
+      ui.setOpenUpdateSprint(false);
+      fetchData(projectId, false);
+    } catch {
+      toast.error('Lỗi khi cập nhật sprint');
+    }
+  };
+
+  return {
     handleCreateEpic,
     handleUpdateEpic,
     handleDeleteEpic,
