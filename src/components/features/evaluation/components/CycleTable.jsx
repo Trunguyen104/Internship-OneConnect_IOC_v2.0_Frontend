@@ -6,39 +6,39 @@ import dayjs from 'dayjs';
 
 const STATUS_CONFIG = {
   0: {
-    label: 'Pending',
-    bg: 'bg-orange-50',
-    text: 'text-orange-600',
+    label: EVALUATION_UI.STATUS.PENDING,
+    bg: 'bg-warning-surface',
+    text: 'text-warning',
   },
   1: {
-    label: 'Ongoing',
-    bg: 'bg-blue-50',
-    text: 'text-blue-600',
+    label: EVALUATION_UI.STATUS.ONGOING,
+    bg: 'bg-info-surface',
+    text: 'text-info',
   },
   2: {
-    label: 'Completed',
-    bg: 'bg-green-50',
-    text: 'text-green-600',
+    label: EVALUATION_UI.STATUS.COMPLETED,
+    bg: 'bg-success-surface',
+    text: 'text-success',
   },
   ONGOING: {
-    label: 'Ongoing',
-    bg: 'bg-blue-50',
-    text: 'text-blue-600',
+    label: EVALUATION_UI.STATUS.ONGOING,
+    bg: 'bg-info-surface',
+    text: 'text-info',
   },
   UPCOMING: {
-    label: 'Pending',
-    bg: 'bg-orange-50',
-    text: 'text-orange-600',
+    label: EVALUATION_UI.STATUS.PENDING,
+    bg: 'bg-warning-surface',
+    text: 'text-warning',
   },
   PENDING: {
-    label: 'Pending',
-    bg: 'bg-orange-50',
-    text: 'text-orange-600',
+    label: EVALUATION_UI.STATUS.PENDING,
+    bg: 'bg-warning-surface',
+    text: 'text-warning',
   },
   COMPLETED: {
-    label: 'Completed',
-    bg: 'bg-green-50',
-    text: 'text-green-600',
+    label: EVALUATION_UI.STATUS.COMPLETED,
+    bg: 'bg-success-surface',
+    text: 'text-success',
   },
 };
 

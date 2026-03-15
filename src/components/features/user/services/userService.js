@@ -5,4 +5,3 @@ export const userService = {
     return httpGet('/Auth/me');
   },
 };
-

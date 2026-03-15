@@ -1,4 +1,3 @@
 export default function Card({ children }) {
-  return <div className='rounded-2xl bg-white shadow-sm p-5 h-112.5 flex flex-col'>{children}</div>;
+  return <div className='flex h-112.5 flex-col rounded-2xl bg-white p-5 shadow-sm'>{children}</div>;
 }
-

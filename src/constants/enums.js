@@ -37,9 +37,16 @@ export const MOVE_INCOMPLETE_ITEMS_OPTION = {
 };
 
 // Map numbers back to strings for UI logic if needed
-export const STATUS_MAP = Object.fromEntries(Object.entries(WORK_ITEM_STATUS).map(([k, v]) => [v, k]));
+export const STATUS_MAP = Object.fromEntries(
+  Object.entries(WORK_ITEM_STATUS).map(([k, v]) => [v, k]),
+);
 export const TYPE_MAP = Object.fromEntries(Object.entries(WORK_ITEM_TYPE).map(([k, v]) => [v, k]));
-export const PRIORITY_MAP = Object.fromEntries(Object.entries(WORK_ITEM_PRIORITY).map(([k, v]) => [v, k]));
-export const SPRINT_STATUS_MAP = Object.fromEntries(Object.entries(SPRINT_STATUS).map(([k, v]) => [v, k]));
-export const MOVE_INCOMPLETE_ITEMS_OPTION_MAP = Object.fromEntries(Object.entries(MOVE_INCOMPLETE_ITEMS_OPTION).map(([k, v]) => [v, k]));
-
+export const PRIORITY_MAP = Object.fromEntries(
+  Object.entries(WORK_ITEM_PRIORITY).map(([k, v]) => [v, k]),
+);
+export const SPRINT_STATUS_MAP = Object.fromEntries(
+  Object.entries(SPRINT_STATUS).map(([k, v]) => [v, k]),
+);
+export const MOVE_INCOMPLETE_ITEMS_OPTION_MAP = Object.fromEntries(
+  Object.entries(MOVE_INCOMPLETE_ITEMS_OPTION).map(([k, v]) => [v, k]),
+);

@@ -5,6 +5,8 @@ import { Modal, Typography, Tag, Button, Tooltip, Space } from 'antd';
 import { TeamOutlined, LockOutlined, EyeOutlined, ClockCircleFilled } from '@ant-design/icons';
 import AppTable from '@/components/ui/AppTable';
 
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+
 const { Text, Title } = Typography;
 
 const getEvalStatusText = (evalStatus) => {
@@ -13,18 +15,18 @@ const getEvalStatusText = (evalStatus) => {
   switch (status) {
     case 0:
     case 'PENDING':
-      return { label: 'Pending', color: 'default' };
+      return { label: EVALUATION_UI.STATUS.PENDING, color: 'default' };
     case 1:
     case 'DRAFT':
-      return { label: 'Draft', color: 'warning' };
+      return { label: EVALUATION_UI.STATUS.DRAFT, color: 'warning' };
     case 2:
     case 'SUBMITTED':
-      return { label: 'Submitted', color: 'processing' };
+      return { label: EVALUATION_UI.STATUS.SUBMITTED, color: 'processing' };
     case 3:
     case 'PUBLISHED':
-      return { label: 'Published', color: 'success' };
+      return { label: EVALUATION_UI.STATUS.PUBLISHED, color: 'success' };
     default:
-      return { label: evalStatus || 'N/A', color: 'default' };
+      return { label: evalStatus || EVALUATION_UI.STATUS.UNKNOWN, color: 'default' };
   }
 };
 
@@ -40,7 +42,7 @@ export default function TeamEvaluationsModal({
 
   const columns = [
     {
-      title: 'Full Name',
+      title: EVALUATION_UI.TABLE_COLUMNS.FULL_NAME,
       dataIndex: 'fullName',
       render: (text, record) => (
         <Text strong type={record.studentId === myStudentId ? 'danger' : undefined}>
@@ -49,7 +51,7 @@ export default function TeamEvaluationsModal({
       ),
     },
     {
-      title: 'Student Code',
+      title: EVALUATION_UI.TABLE_COLUMNS.STUDENT_CODE,
       dataIndex: 'studentCode',
       render: (text) => (
         <Text type='secondary' code>
@@ -58,7 +60,7 @@ export default function TeamEvaluationsModal({
       ),
     },
     {
-      title: 'Status',
+      title: EVALUATION_UI.TABLE_COLUMNS.STATUS,
       dataIndex: 'evaluationStatus',
       align: 'center',
       render: (status) => {
@@ -67,7 +69,7 @@ export default function TeamEvaluationsModal({
       },
     },
     {
-      title: 'Score',
+      title: EVALUATION_UI.TABLE_COLUMNS.SCORE,
       dataIndex: 'totalScore',
       align: 'center',
       render: (score, record) => {
@@ -81,7 +83,7 @@ export default function TeamEvaluationsModal({
 
         if (record.studentId !== myStudentId) {
           return (
-            <Tooltip title='Scores are confidential'>
+            <Tooltip title={EVALUATION_UI.LABELS.CONFIDENTIAL}>
               <Tag icon={<LockOutlined />}>***</Tag>
             </Tooltip>
           );
@@ -91,7 +93,7 @@ export default function TeamEvaluationsModal({
       },
     },
     {
-      title: 'Actions',
+      title: EVALUATION_UI.TABLE_COLUMNS.ACTIONS,
       align: 'right',
       render: (_, record) => {
         if (record.studentId !== myStudentId) return null;
@@ -102,9 +104,9 @@ export default function TeamEvaluationsModal({
 
         if (!isPublished) {
           return (
-            <Tooltip title='Scorecard not yet published'>
+            <Tooltip title={EVALUATION_UI.LABELS.NOT_PUBLISHED}>
               <Button type='text' disabled icon={<ClockCircleFilled />}>
-                Awaiting results
+                {EVALUATION_UI.LABELS.AWAITING_RESULTS}
               </Button>
             </Tooltip>
           );
@@ -116,8 +118,9 @@ export default function TeamEvaluationsModal({
             size='small'
             icon={<EyeOutlined />}
             onClick={() => onViewDetails(cycle)}
+            className='bg-primary'
           >
-            View Report
+            {EVALUATION_UI.LABELS.VIEW_REPORT}
           </Button>
         );
       },
@@ -128,9 +131,9 @@ export default function TeamEvaluationsModal({
     <Modal
       title={
         <Space>
-          <TeamOutlined />
+          <TeamOutlined className='text-primary' />
           <Title level={4} style={{ margin: 0 }}>
-            Team Evaluation Progress
+            {EVALUATION_UI.MODAL_TEAM_TITLE}
           </Title>
         </Space>
       }

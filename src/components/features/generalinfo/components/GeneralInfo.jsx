@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import { Card, Descriptions, Typography, Spin } from 'antd';
 import { useGeneralInfo } from '../hooks/useGeneralInfo';
+import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 const { Text } = Typography;
@@ -49,41 +49,47 @@ export default function GeneralInfo() {
           }}
           layout='vertical'
         >
-          <Descriptions.Item label='Group Code'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.GROUP_CODE}>
             <Text copyable={{ text: info.groupCode || info.internshipId }}>
-              {info.groupCode || info.internshipId || 'N/A'}
+              {info.groupCode || info.internshipId || GENERAL_INFO_UI.VALUES.NA}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label='Group Name'>{info.groupName || 'No name'}</Descriptions.Item>
-          <Descriptions.Item label='Internship Term'>
-            {info.internshipTermName || info.internshipTerm || 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.GROUP_NAME}>
+            {info.groupName || GENERAL_INFO_UI.VALUES.NO_NAME}
           </Descriptions.Item>
-          <Descriptions.Item label='Enterprise'>
-            {info.enterpriseName || info.company || 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.INTERNSHIP_TERM}>
+            {info.internshipTermName || info.internshipTerm || GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='University'>
-            {info.schoolName || info.school || 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.ENTERPRISE}>
+            {info.enterpriseName || info.company || GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='Mentor'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.UNIVERSITY}>
+            {info.schoolName || info.school || GENERAL_INFO_UI.VALUES.NA}
+          </Descriptions.Item>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR}>
             {info.mentorName || info.mentor || (
               <Text type='secondary' italic>
-                Unassigned
+                {GENERAL_INFO_UI.VALUES.UNASSIGNED}
               </Text>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label='Start Date'>
-            {info.startDate ? new Date(info.startDate).toLocaleDateString('en-GB') : 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.START_DATE}>
+            {info.startDate
+              ? new Date(info.startDate).toLocaleDateString('vi-VN')
+              : GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='End Date'>
-            {info.endDate ? new Date(info.endDate).toLocaleDateString('en-GB') : 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.END_DATE}>
+            {info.endDate
+              ? new Date(info.endDate).toLocaleDateString('vi-VN')
+              : GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='Student Count'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.STUDENT_COUNT}>
             <Text className='text-primary text-2xl font-black'>
               {info.totalStudents || info.members?.length || 0}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label='Mentor Count'>
-            <Text className='text-2xl font-black text-slate-700'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR_COUNT}>
+            <Text className='text-text text-2xl font-black'>
               {info.totalMentors || (info.mentorName ? 1 : 0)}
             </Text>
           </Descriptions.Item>

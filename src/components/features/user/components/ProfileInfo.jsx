@@ -6,33 +6,32 @@ import InfoItem from './InfoItem';
 import { Button, Space, Spin } from 'antd';
 import AvatarUploader from '@/components/ui/AvatarUploader';
 import Card from '@/components/ui/Card';
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatarChange }) {
   return (
     <>
-      <h1 className='text-2xl font-bold text-slate-900'>Personal Information</h1>
+      <h1 className='text-text text-2xl font-bold'>{PROFILE_UI.PERSONAL_INFO}</h1>
 
       <Card>
-        <div className='flex items-center gap-6 border-b border-slate-200 pb-6'>
+        <div className='border-border flex items-center gap-6 border-b pb-6'>
           <AvatarUploader
             value={avatarUrl}
             onChange={onAvatarChange}
-            fullName={userInfo?.fullName || 'Người dùng'}
+            fullName={userInfo?.fullName || PROFILE_UI.AVATAR.DEFAULT_NAME}
           />
 
           <div>
-            <h2 className='text-lg font-bold text-slate-900'>Avatar</h2>
-            <p className='mt-1 text-sm text-slate-500'>
-              JPG, PNG format, under 2MB, recommended size: 1200x1200px
-            </p>
+            <h2 className='text-text text-lg font-bold'>{PROFILE_UI.AVATAR.TITLE}</h2>
+            <p className='text-muted mt-1 text-sm'>{PROFILE_UI.AVATAR.HINT}</p>
           </div>
 
           <Space className='mt-4 ml-auto flex gap-2'>
             <Button type='primary' danger>
-              Edit
+              {PROFILE_UI.BUTTONS.EDIT}
             </Button>
 
-            <Button>Upload CV</Button>
+            <Button>{PROFILE_UI.BUTTONS.UPLOAD_CV}</Button>
           </Space>
         </div>
 
@@ -45,26 +44,26 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
             </div>
           ) : (
             <div className='grid grid-cols-1 gap-x-12 gap-y-6 md:grid-cols-4'>
-              <InfoItem label='Full Name' value={userInfo?.fullName || '—'} />
-              <InfoItem label='Email' value={userInfo?.email || '—'} />
-              <InfoItem label='Phone' value={userInfo?.phoneNumber || '—'} />
-              <InfoItem label='Role'>
-                <span className='inline-flex rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-600 uppercase'>
+              <InfoItem label={PROFILE_UI.LABELS.FULL_NAME} value={userInfo?.fullName || '—'} />
+              <InfoItem label={PROFILE_UI.LABELS.EMAIL} value={userInfo?.email || '—'} />
+              <InfoItem label={PROFILE_UI.LABELS.PHONE} value={userInfo?.phoneNumber || '—'} />
+              <InfoItem label={PROFILE_UI.LABELS.ROLE}>
+                <span className='bg-primary-surface text-primary inline-flex rounded-full px-3 py-1 text-sm font-medium uppercase'>
                   {userInfo?.role || 'Unknown'}
                 </span>
               </InfoItem>
 
-              <InfoItem label='User Code' value={userInfo?.userCode || '—'} />
+              <InfoItem label={PROFILE_UI.LABELS.USER_CODE} value={userInfo?.userCode || '—'} />
               <InfoItem
-                label='Date of Birth'
+                label={PROFILE_UI.LABELS.DATE_OF_BIRTH}
                 value={
                   userInfo?.dateOfBirth
-                    ? new Date(userInfo.dateOfBirth).toLocaleDateString('vi-VN')
+                    ? new Date(userInfo.dateOfBirth).toLocaleDateString('en-GB')
                     : '—'
                 }
               />
-              <InfoItem label='University' value='—' />
-              <InfoItem label='Gender' value='—' />
+              <InfoItem label={PROFILE_UI.LABELS.UNIVERSITY} value='—' />
+              <InfoItem label={PROFILE_UI.LABELS.GENDER} value='—' />
             </div>
           )}
         </div>

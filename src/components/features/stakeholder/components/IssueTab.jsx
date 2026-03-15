@@ -1,5 +1,6 @@
 'use client';
 
+import React, { memo } from 'react';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 import DataTableToolbar from '@/components/ui/DataTableToolbar';
@@ -9,7 +10,7 @@ import IssueTable from './IssueTable';
 import IssueFormModal from './IssueFormModal';
 import IssueDetailModal from './IssueDetailModal';
 
-export default function IssueTab() {
+const IssueTab = memo(function IssueTab() {
   const {
     issues,
     stakeholders,
@@ -67,17 +68,22 @@ export default function IssueTab() {
         />
       </Card>
 
-      <Pagination
-        total={total}
-        page={page}
-        pageSize={pageSize}
-        totalPages={Math.ceil(total / pageSize)}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
+      <div className='flex items-center justify-between px-2'>
+        <div className='text-muted text-xs font-bold tracking-widest uppercase'>
+          Tổng cộng: {total} vấn đề
+        </div>
+        <Pagination
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          totalPages={Math.ceil(total / pageSize)}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
+      </div>
 
       <IssueFormModal
         isOpen={openIssueForm}
@@ -89,6 +95,8 @@ export default function IssueTab() {
       />
 
       <IssueDetailModal issue={issueDetail} onClose={() => setIssueDetail(null)} />
-    </>
+    </div>
   );
-}
+});
+
+export default IssueTab;

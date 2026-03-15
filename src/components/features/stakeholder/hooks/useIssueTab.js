@@ -6,13 +6,7 @@ import { StakeholderService } from '@/components/features/stakeholder/services/s
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { useToast } from '@/providers/ToastProvider';
 import { ISSUE_MESSAGES } from '@/constants/stakeholderIssue/messages';
-
-export const ISSUE_STATUS = {
-  OPEN: 0,
-  IN_PROGRESS: 1,
-  RESOLVED: 2,
-  CLOSED: 3,
-};
+import { ISSUE_STATUS } from '../constants/issueStatus';
 
 export function useIssueTab() {
   const toast = useToast();

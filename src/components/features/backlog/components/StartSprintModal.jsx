@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 function FieldLabel({ required, children }) {
   return (
     <div className='mb-2 text-sm font-semibold text-gray-800'>
       {children}
-      {required ? <span className='text-red-500'> *</span> : null}
+      {required ? <span className='text-danger'> *</span> : null}
     </div>
   );
 }
@@ -19,39 +20,45 @@ function TextInput({ value, onChange, placeholder = '', type = 'text', readOnly 
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
       readOnly={readOnly}
-      className={`h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm outline-none focus:border-red-800 focus:ring-1 focus:ring-red-800 transition-shadow ${readOnly ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
+      className={`focus:border-primary focus:ring-primary h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm transition-shadow outline-none focus:ring-1 ${readOnly ? 'cursor-not-allowed bg-gray-50 text-gray-500' : ''}`}
     />
   );
 }
 
 export default function StartSprintModal({ open, sprint, issueCount, onClose, onSubmit }) {
-  const [name, setName] = useState('');
-  const [goal, setGoal] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const initialData = useMemo(() => {
+    if (!sprint) return { name: '', goal: '', startDate: '', endDate: '' };
+    const sName = sprint.name || sprint.title || '';
+    const sGoal = sprint.goal || '';
+    const sStart = sprint.startDate
+      ? new Date(sprint.startDate).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0];
 
-  useEffect(() => {
-    if (open && sprint) {
-      setName(sprint.name || sprint.title || '');
-      setGoal(sprint.goal || '');
-
-      if (sprint.startDate) {
-        setStartDate(new Date(sprint.startDate).toISOString().split('T')[0]);
-      } else {
-        // Default to today
-        setStartDate(new Date().toISOString().split('T')[0]);
-      }
-
-      if (sprint.endDate) {
-        setEndDate(new Date(sprint.endDate).toISOString().split('T')[0]);
-      } else {
-        // Default to 2 weeks from today
-        const twoWeeks = new Date();
-        twoWeeks.setDate(twoWeeks.getDate() + 14);
-        setEndDate(twoWeeks.toISOString().split('T')[0]);
-      }
+    let sEnd = '';
+    if (sprint.endDate) {
+      sEnd = new Date(sprint.endDate).toISOString().split('T')[0];
+    } else {
+      const twoWeeks = new Date();
+      twoWeeks.setDate(twoWeeks.getDate() + 14);
+      sEnd = twoWeeks.toISOString().split('T')[0];
     }
-  }, [open, sprint]);
+
+    return { name: sName, goal: sGoal, startDate: sStart, endDate: sEnd };
+  }, [sprint]);
+
+  const [name, setName] = useState(initialData.name);
+  const [goal, setGoal] = useState(initialData.goal);
+  const [startDate, setStartDate] = useState(initialData.startDate);
+  const [endDate, setEndDate] = useState(initialData.endDate);
+
+  const [prevInitialData, setPrevInitialData] = useState(initialData);
+  if (initialData !== prevInitialData) {
+    setPrevInitialData(initialData);
+    setName(initialData.name);
+    setGoal(initialData.goal);
+    setStartDate(initialData.startDate);
+    setEndDate(initialData.endDate);
+  }
 
   const canSubmit = useMemo(
     () => name.trim() !== '' && startDate && endDate,
@@ -65,66 +72,70 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
     onSubmit?.({
       name: name.trim(),
       goal: goal.trim(),
-      startDate: new Date(startDate).toISOString(),
-      endDate: new Date(endDate).toISOString(),
+      startDate: startDate,
+      endDate: endDate,
     });
   };
 
   return (
-    <div className='fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm bg-black/40 transition-opacity'>
-      <div className='relative w-full max-w-[600px] rounded-3xl bg-white shadow-2xl overflow-hidden flex flex-col'>
-        <div className='flex flex-col h-full max-h-[85vh]'>
+    <div className='fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity'>
+      <div className='relative flex w-full max-w-[600px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl'>
+        <div className='flex h-full max-h-[85vh] flex-col'>
           {/* Header */}
-          <div className='px-8 pt-8 pb-4 shrink-0'>
-            <div className='text-2xl font-bold text-gray-900'>Bắt đầu Sprint</div>
-            <div className='text-sm text-gray-500 mt-2 font-medium'>
-              {issueCount} issue sẽ được gộp vào sprint này
+          <div className='shrink-0 px-8 pt-8 pb-4'>
+            <div className='text-2xl font-bold text-gray-900'>{BACKLOG_UI.START_SPRINT}</div>
+            <div className='mt-2 text-sm font-medium text-gray-500'>
+              {issueCount} {issueCount === 1 ? 'issue' : 'issues'} will be included in this sprint
             </div>
           </div>
 
           {/* Body */}
-          <div className='flex-1 flex flex-col overflow-y-auto px-8 py-2 space-y-5 pb-8'>
+          <div className='flex flex-1 flex-col space-y-5 overflow-y-auto px-8 py-2 pb-8'>
             <div>
-              <FieldLabel required>Tên Sprint</FieldLabel>
-              <TextInput value={name} onChange={setName} placeholder='VD: Sprint 1' />
+              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
+              <TextInput
+                value={name}
+                onChange={setName}
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
+              />
             </div>
 
             <div className='flex gap-4'>
               <div className='flex-1'>
-                <FieldLabel required>Ngày bắt đầu</FieldLabel>
+                <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE}</FieldLabel>
                 <TextInput type='date' value={startDate} onChange={setStartDate} />
               </div>
               <div className='flex-1'>
-                <FieldLabel required>Ngày kết thúc</FieldLabel>
+                <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
                 <TextInput type='date' value={endDate} onChange={setEndDate} />
               </div>
             </div>
 
-            <div className='flex flex-col flex-1'>
-              <FieldLabel>Mục tiêu Sprint</FieldLabel>
+            <div className='flex flex-1 flex-col'>
+              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
               <textarea
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
-                placeholder='Nhập mục tiêu Sprint (tùy chọn)'
-                className='min-h-[120px] w-full rounded-2xl border border-gray-200 bg-white p-4 text-sm outline-none focus:border-red-800 focus:ring-1 focus:ring-red-800 transition-shadow resize-none'
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
+                className='focus:border-primary focus:ring-primary min-h-[120px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 text-sm transition-shadow outline-none focus:ring-1'
               />
             </div>
           </div>
 
           {/* Footer */}
-          <div className='flex items-center justify-end gap-3 border-t border-gray-100 bg-gray-50/50 px-8 py-5 shrink-0'>
+          <div className='flex shrink-0 items-center justify-end gap-3 border-t border-gray-100 bg-gray-50/50 px-8 py-5'>
             <button
               onClick={onClose}
-              className='h-11 px-6 rounded-full font-bold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-colors'
+              className='h-11 rounded-full border border-gray-200 bg-white px-6 font-bold text-gray-600 transition-colors hover:bg-gray-50'
             >
-              Hủy
+              {BACKLOG_UI.CANCEL}
             </button>
             <button
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className='h-11 px-8 rounded-full bg-[#A32A2A] font-bold text-white transition-opacity disabled:opacity-50 hover:bg-red-800'
+              className='bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white transition-opacity disabled:opacity-50'
             >
-              Bắt đầu Sprint
+              {BACKLOG_UI.START_SPRINT}
             </button>
           </div>
         </div>
@@ -132,4 +143,3 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
     </div>
   );
 }
-

@@ -1,15 +1,17 @@
 'use client';
 
+import React from 'react';
+
 export default function FormGroup({ label, required, error, children, className = '' }) {
   return (
-    <div className={`space-y-1.5 ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className='block text-sm font-medium text-slate-700'>
-          {label} {required && <span className='text-primary'>*</span>}
+        <label className='text-text block text-sm font-semibold'>
+          {label} {required && <span className='text-danger'>*</span>}
         </label>
       )}
       {children}
-      {error && <p className='text-primary mt-1 text-xs'>{error}</p>}
+      {error && <p className='text-danger mt-1 text-xs'>{error}</p>}
     </div>
   );
 }

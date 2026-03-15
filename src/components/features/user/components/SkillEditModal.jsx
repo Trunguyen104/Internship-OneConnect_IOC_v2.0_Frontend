@@ -1,6 +1,7 @@
 'use client';
 
 import { Modal, Form, Input, Select, Button, Typography, Space } from 'antd';
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 const { Text } = Typography;
 
@@ -15,7 +16,7 @@ export default function SkillEditModal({
   return (
     <Modal
       open={!!editingSkill}
-      title='Edit Skill'
+      title={PROFILE_UI.BUTTONS.EDIT + ' ' + PROFILE_UI.SKILLS.ADD_LABEL}
       onCancel={() => setEditingSkill(null)}
       footer={null}
       centered
@@ -24,7 +25,10 @@ export default function SkillEditModal({
         <Form.Item
           label={
             <>
-              Skill Name <Text type='secondary'>({editForm.name?.length || 0}/30)</Text>
+              {PROFILE_UI.SKILLS.ADD_LABEL} Name{' '}
+              <Text type='secondary'>
+                {PROFILE_UI.SKILLS.MAX_LENGTH_HINT(editForm.name?.length || 0, 30)}
+              </Text>
             </>
           }
         >
@@ -35,29 +39,25 @@ export default function SkillEditModal({
           />
         </Form.Item>
 
-        <Form.Item label='Level'>
+        <Form.Item label={PROFILE_UI.SKILLS.LEVEL_LABEL}>
           <Select
             value={editForm.level || undefined}
-            placeholder='Không bắt buộc'
+            placeholder={PROFILE_UI.SKILLS.LEVEL_PLACEHOLDER}
             onChange={(value) => setEditForm({ ...editForm, level: value })}
-            options={[
-              { value: 'Beginner', label: 'Beginner' },
-              { value: 'Intermediate', label: 'Intermediate' },
-              { value: 'Advanced', label: 'Advanced' },
-            ]}
+            options={PROFILE_UI.SKILLS.LEVELS}
           />
         </Form.Item>
 
         <div className='mt-6 flex justify-between'>
           <Button danger type='link' onClick={() => deleteSkill(editingSkill)}>
-            Delete
+            {PROFILE_UI.BUTTONS.DELETE}
           </Button>
 
           <Space>
-            <Button onClick={() => setEditingSkill(null)}>Cancel</Button>
+            <Button onClick={() => setEditingSkill(null)}>{PROFILE_UI.BUTTONS.CANCEL}</Button>
 
             <Button type='primary' danger onClick={updateSkill}>
-              Save Changes
+              {PROFILE_UI.BUTTONS.SAVE_CHANGES}
             </Button>
           </Space>
         </div>

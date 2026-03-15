@@ -81,7 +81,7 @@ export default function MoreMenuButton({
               role='menuitem'
               onClick={() => handleSelect(it)}
               className={[
-                'w-full flex items-center gap-3',
+                'flex w-full items-center gap-3',
                 'rounded-xl px-3 py-2',
                 'text-sm font-semibold',
                 'hover:bg-[var(--primary-50)]',
@@ -111,4 +111,3 @@ function TrashIcon() {
     </svg>
   );
 }
-

@@ -96,4 +96,3 @@ function getVisiblePages(page, totalPages) {
 
   return Array.from(pages).sort((a, b) => a - b);
 }
-

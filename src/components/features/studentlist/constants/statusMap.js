@@ -1,3 +1,5 @@
+import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
+
 export const STUDENT_STATUS_MAP = {
   0: {
     label: 'Pending',
@@ -30,28 +32,28 @@ export const STUDENT_STATUS_MAP = {
     dot: 'bg-red-500',
   },
   Registered: {
-    label: 'Registered',
-    style: 'bg-gray-100 text-gray-600',
-    dot: 'bg-gray-400',
+    label: STUDENT_LIST_UI.STATUS.REGISTERED,
+    style: 'bg-muted/10 text-muted',
+    dot: 'bg-muted/50',
   },
   Onboarded: {
-    label: 'Onboarded',
-    style: 'bg-purple-50 text-purple-600',
-    dot: 'bg-purple-500',
+    label: STUDENT_LIST_UI.STATUS.ONBOARDED,
+    style: 'bg-info-surface text-info',
+    dot: 'bg-info',
   },
   InProgress: {
-    label: 'In Progress',
-    style: 'bg-emerald-50 text-emerald-600',
-    dot: 'bg-emerald-500',
+    label: STUDENT_LIST_UI.STATUS.IN_PROGRESS,
+    style: 'bg-success-surface text-success',
+    dot: 'bg-success',
   },
   Completed: {
-    label: 'Completed',
-    style: 'bg-blue-50 text-blue-600',
-    dot: 'bg-blue-500',
+    label: STUDENT_LIST_UI.STATUS.COMPLETED,
+    style: 'bg-info-surface text-info',
+    dot: 'bg-info',
   },
   Failed: {
-    label: 'Failed',
-    style: 'bg-red-50 text-red-600',
-    dot: 'bg-red-500',
+    label: STUDENT_LIST_UI.STATUS.FAILED,
+    style: 'bg-danger-surface text-danger',
+    dot: 'bg-danger',
   },
 };

@@ -1,0 +1,44 @@
+export const EVALUATION_UI = {
+  TITLE: 'Evaluation',
+  MODAL_TEAM_TITLE: 'Team Evaluation Progress',
+  DRAWER_DETAIL_TITLE: 'Score Details',
+
+  TABLE_COLUMNS: {
+    STT: '#',
+    CYCLE: 'Evaluation Cycle',
+    START_DATE: 'Start Date',
+    END_DATE: 'End Date',
+    STATUS: 'Status',
+    SCORED: 'Scored',
+    ACTIONS: 'Actions',
+    FULL_NAME: 'Full Name',
+    STUDENT_CODE: 'Student ID',
+    SCORE: 'Score',
+  },
+
+  STATUS: {
+    PENDING: 'Pending',
+    ONGOING: 'Ongoing',
+    COMPLETED: 'Completed',
+    DRAFT: 'Draft',
+    SUBMITTED: 'Submitted',
+    PUBLISHED: 'Published',
+    UNKNOWN: 'Unknown',
+  },
+
+  LABELS: {
+    EVALUATOR: 'Evaluator',
+    TIME: 'Time',
+    TOTAL_SCORE: 'Total Score',
+    MENTOR_COMMENTS: 'Mentor Comments',
+    CRITERIA_SCORES: 'Criteria Scores',
+    NO_DATA: 'No evaluation data',
+    SCORECARD_NOT_READY: 'Scorecard not ready',
+    NO_COMMENTS: 'No comments',
+    NO_DETAILED_COMMENTS: 'No detailed comments',
+    CONFIDENTIAL: 'Score is confidential',
+    NOT_PUBLISHED: 'Scorecard not published yet',
+    AWAITING_RESULTS: 'Awaiting results',
+    VIEW_REPORT: 'View Report',
+  },
+};

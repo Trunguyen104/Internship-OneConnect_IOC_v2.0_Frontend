@@ -1,18 +1,18 @@
 export const DAILY_REPORT_UI = {
   TITLE: 'Daily Report',
-  DESCRIPTION: 'Manage and submit your daily internship logbooks',
+  DESCRIPTION: 'Manage and submit your daily internship logbook',
 
   CREATE_BUTTON: 'Create Report',
 
-  FILTER_STATUS: 'Filter by Status',
+  FILTER_STATUS: 'Filter by status',
 
   TABLE: {
-    REPORT_DATE: 'Report Date',
-    STUDENT: 'Student',
-    SUMMARY: 'Summary',
-    ISSUE: 'Issue',
-    STATUS: 'Status',
-    ACTION: 'Action',
+    REPORT_DATE: 'REPORT DATE',
+    STUDENT: 'STUDENT',
+    SUMMARY: 'WORK SUMMARY',
+    ISSUE: 'ISSUES ENCOUNTERED',
+    STATUS: 'STATUS',
+    ACTION: 'ACTION',
   },
 
   STATUS: {
@@ -26,9 +26,9 @@ export const DAILY_REPORT_UI = {
 
   MODAL: {
     CREATE_TITLE: 'Create Daily Report',
-    EDIT_TITLE: 'Edit Daily Report',
+    EDIT_TITLE: 'Edit Report',
     CREATE_DESC: 'Submit your internship progress',
-    EDIT_DESC: 'Update your submitted logbook details',
+    EDIT_DESC: 'Update submitted logbook details',
 
     SUBMIT: 'Submit Report',
     SAVE: 'Save Changes',
@@ -41,27 +41,26 @@ export const DAILY_REPORT_UI = {
     ISSUE: 'Issues Encountered (Optional)',
     PLAN: 'Plan for Next Day',
 
-    PLACEHOLDER_SUMMARY: 'Describe the tasks you worked on today...',
-    PLACEHOLDER_ISSUE: 'Any blockers or challenges you faced?',
-    PLACEHOLDER_PLAN: 'What are your tasks for tomorrow?',
+    PLACEHOLDER_SUMMARY: 'Describe the tasks you have done today...',
+    PLACEHOLDER_ISSUE: 'What difficulties or obstacles did you encounter?',
+    PLACEHOLDER_PLAN: 'What are the planned tasks for tomorrow?',
   },
 
   EMPTY: {
-    NO_PROJECT: 'You are not assigned to any projects yet.',
-    NO_LOGBOOK: 'No logbooks found for this group',
+    NO_PROJECT: 'You have not been assigned to any project.',
+    NO_LOGBOOK: 'No logbook found in this group',
   },
 
   VIEW_MODAL: {
     TITLE: 'Logbook Details',
     CLOSE: 'Close',
-    NO_SUMMARY: 'No summary provided.',
+    NO_SUMMARY: 'No summary.',
   },
 
   DELETE_MODAL: {
     TITLE: 'Delete Logbook',
-    CONTENT: 'Are you sure you want to delete this logbook entry?',
-    CONFIRM: 'Yes, Delete',
+    CONTENT: 'Are you sure you want to delete this logbook?',
+    CONFIRM: 'Confirm Delete',
     CANCEL: 'Cancel',
   },
 };
-

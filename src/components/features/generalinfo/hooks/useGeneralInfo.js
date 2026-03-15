@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
+import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useGeneralInfo() {
@@ -11,17 +12,50 @@ export function useGeneralInfo() {
   const [loading, setLoading] = useState(true);
 
   const GROUP_STATUS_MAP = {
-    1: { label: 'Registered', style: 'bg-slate-100 text-slate-700 border-slate-200' },
-    2: { label: 'Onboarded', style: 'bg-purple-100 text-purple-700 border-purple-200' },
-    3: { label: 'In Progress', style: 'bg-blue-100 text-blue-700 border-blue-200' },
-    4: { label: 'Completed', style: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-    5: { label: 'Failed', style: 'bg-rose-100 text-rose-700 border-rose-200' },
-    ACTIVE: { label: 'In Progress', style: 'bg-blue-100 text-blue-700 border-blue-200' },
-    INPROGRESS: { label: 'In Progress', style: 'bg-blue-100 text-blue-700 border-blue-200' },
-    IN_PROGRESS: { label: 'In Progress', style: 'bg-blue-100 text-blue-700 border-blue-200' },
-    COMPLETED: { label: 'Completed', style: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
-    REGISTERED: { label: 'Registered', style: 'bg-slate-100 text-slate-700 border-slate-200' },
-    ONBOARDED: { label: 'Onboarded', style: 'bg-purple-100 text-purple-700 border-purple-200' },
+    1: {
+      label: GENERAL_INFO_UI.STATUS.REGISTERED,
+      style: 'bg-muted text-muted-foreground border-border',
+    },
+    2: {
+      label: GENERAL_INFO_UI.STATUS.ONBOARDED,
+      style: 'bg-info-surface text-info border-info/20',
+    },
+    3: {
+      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
+      style: 'bg-primary-surface text-primary border-primary/20',
+    },
+    4: {
+      label: GENERAL_INFO_UI.STATUS.COMPLETED,
+      style: 'bg-success-surface text-success border-success/20',
+    },
+    5: {
+      label: GENERAL_INFO_UI.STATUS.FAILED,
+      style: 'bg-danger-surface text-danger border-danger/20',
+    },
+    ACTIVE: {
+      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
+      style: 'bg-primary-surface text-primary border-primary/20',
+    },
+    INPROGRESS: {
+      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
+      style: 'bg-primary-surface text-primary border-primary/20',
+    },
+    IN_PROGRESS: {
+      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
+      style: 'bg-primary-surface text-primary border-primary/20',
+    },
+    COMPLETED: {
+      label: GENERAL_INFO_UI.STATUS.COMPLETED,
+      style: 'bg-success-surface text-success border-success/20',
+    },
+    REGISTERED: {
+      label: GENERAL_INFO_UI.STATUS.REGISTERED,
+      style: 'bg-muted text-muted-foreground border-border',
+    },
+    ONBOARDED: {
+      label: GENERAL_INFO_UI.STATUS.ONBOARDED,
+      style: 'bg-info-surface text-info border-info/20',
+    },
   };
 
   useEffect(() => {
@@ -54,32 +88,32 @@ export function useGeneralInfo() {
           projectDescription:
             projectInfo?.description ||
             groupDetail?.description ||
-            'No project description available.',
+            GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC,
           displayCreatedAt: groupDetail?.createdAt
-            ? new Date(groupDetail.createdAt).toLocaleDateString('en-GB')
-            : 'N/A',
+            ? new Date(groupDetail.createdAt).toLocaleDateString('vi-VN')
+            : GENERAL_INFO_UI.VALUES.NA,
           displayUpdatedAt: groupDetail?.updatedAt
-            ? `Updated on ${new Date(groupDetail.updatedAt).toLocaleDateString('en-GB')}`
+            ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(groupDetail.updatedAt).toLocaleDateString('vi-VN')}`
             : groupDetail?.updatedText || '',
         });
       } catch (error) {
         console.error('Error fetching general info:', error);
-        toast.error('Failed to load general information. Please try again later.');
+        toast.error(GENERAL_INFO_UI.MESSAGES.FETCH_ERROR);
       } finally {
         setLoading(false);
       }
     };
 
     fetchGeneralData();
-  }, []);
+  }, [toast]);
 
   const getStatusConfig = (status) => {
     const normalizedStatus = status ? String(status).toUpperCase().replace(/_/g, '') : '';
     return (
       GROUP_STATUS_MAP[status] ||
       GROUP_STATUS_MAP[normalizedStatus] || {
-        label: status || 'Unknown',
-        style: 'bg-slate-100 text-slate-500 border-slate-200',
+        label: status || GENERAL_INFO_UI.STATUS.UNKNOWN,
+        style: 'bg-muted text-muted-foreground border-border',
       }
     );
   };

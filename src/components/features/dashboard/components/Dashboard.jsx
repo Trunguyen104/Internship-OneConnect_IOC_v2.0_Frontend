@@ -14,6 +14,8 @@ import {
 import { ViolationsList } from './ViolationsList';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
+import { DASHBOARD_UI } from '@/constants/dashboard';
+
 export default function DashboardPage() {
   const { data, err, completionPie } = useDashboard();
 
@@ -37,41 +39,41 @@ export default function DashboardPage() {
       {/* Top actions */}
       <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
         <StudentTabs />
-        <button className='border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium shadow-sm transition-colors'>
+        <button className='border-primary/20 bg-primary-surface text-primary hover:bg-primary-surface/80 flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium shadow-sm transition-colors'>
           <Download className='h-4 w-4' />
-          Export CSV
+          {DASHBOARD_UI.EXPORT_CSV}
         </button>
       </div>
 
       {/* Summary cards */}
       <div className='mb-6 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4'>
         <StatCard
-          label='Total Tasks'
+          label={DASHBOARD_UI.TOTAL_TASKS}
           value={data.summary.totalTasks}
           icon={<LayoutList className='h-5 w-5' />}
           color='var(--color-info)'
-          colorClass='text-info bg-info/10'
+          colorClass='text-info bg-info-surface'
         />
         <StatCard
-          label='In Progress'
+          label={DASHBOARD_UI.IN_PROGRESS}
           value={data.summary.inProgress}
           icon={<Clock className='h-5 w-5' />}
           color='var(--color-primary)'
-          colorClass='text-primary bg-primary/10'
+          colorClass='text-primary bg-primary-surface'
         />
         <StatCard
-          label='Completed'
+          label={DASHBOARD_UI.COMPLETED}
           value={data.summary.done}
           icon={<CheckCircle2 className='h-5 w-5' />}
           color='var(--color-success)'
-          colorClass='text-success bg-success/10'
+          colorClass='text-success bg-success-surface'
         />
         <StatCard
-          label='Overdue'
+          label={DASHBOARD_UI.OVERDUE}
           value={data.summary.overdue}
           icon={<AlertCircle className='h-5 w-5' />}
           color='var(--color-danger)'
-          colorClass='text-danger bg-danger/10'
+          colorClass='text-danger bg-danger-surface'
         />
       </div>
 

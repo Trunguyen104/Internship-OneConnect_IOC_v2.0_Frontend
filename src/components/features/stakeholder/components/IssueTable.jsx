@@ -1,27 +1,22 @@
 'use client';
 
+import React, { memo } from 'react';
+import { Table, Button, Tooltip, Empty, Spin, Avatar } from 'antd';
 import dayjs from 'dayjs';
-import { DeleteOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  UserOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  SyncOutlined,
+  EyeOutlined,
+} from '@ant-design/icons';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import IssueStatusTag from './IssueStatusTag';
-
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+import { ISSUE_STATUS } from '../constants/issueStatus';
 
-export const ISSUE_STATUS = {
-  OPEN: 0,
-  IN_PROGRESS: 1,
-  RESOLVED: 2,
-  CLOSED: 3,
-};
-
-export const ISSUE_STATUS_LABEL = {
-  0: 'Open',
-  1: 'In Progress',
-  2: 'Resolved',
-  3: 'Closed',
-};
-
-export default function IssueTable({
+const IssueTable = memo(function IssueTable({
   issues,
   stakeholders,
   loading,
@@ -32,106 +27,142 @@ export default function IssueTable({
   onView,
   tableBodyRef,
 }) {
-  return (
-    <div className='flex min-h-0 flex-1 flex-col'>
-      {loading ? (
-        <div className='flex items-center justify-center py-12'>
-          <div className='h-8 w-8 animate-spin rounded-full border-t-2 border-r-2 border-slate-400 border-r-transparent'></div>
+  const columns = [
+    {
+      title: ISSUE_UI.TABLE.NO,
+      key: 'index',
+      width: 70,
+      render: (_, __, index) => (
+        <span className='text-muted font-medium'>{(page - 1) * pageSize + index + 1}</span>
+      ),
+    },
+    {
+      title: ISSUE_UI.TABLE.TITLE,
+      dataIndex: 'title',
+      key: 'title',
+      render: (title, record) => (
+        <div className='flex min-w-0 flex-col'>
+          <span className='text-text block truncate text-[15px] font-bold'>{title}</span>
+          {record.description && (
+            <span className='text-muted block truncate text-[11px] font-medium'>
+              {record.description}
+            </span>
+          )}
         </div>
-      ) : issues.length === 0 ? (
-        <div className='flex flex-1 items-center justify-center'>
-          <p className='text-slate-400'>{ISSUE_UI.EMPTY.NO_DATA}</p>
-        </div>
-      ) : (
-        <>
-          <div className='mt-5 flex min-h-0 flex-1 flex-col'>
-            <div className='flex-1 overflow-auto' ref={tableBodyRef}>
-              <table className='w-full min-w-[900px] table-fixed border-collapse text-left'>
-                <thead className='sticky top-0 z-10 border-b border-slate-200 bg-slate-50'>
-                  <tr>
-                    <th className='w-[60px] px-6 py-4 text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.NO}
-                    </th>
-                    <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.TITLE}
-                    </th>
-                    <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.STAKEHOLDER}
-                    </th>
-                    <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.DESCRIPTION}
-                    </th>
-                    <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.STATUS}
-                    </th>
-                    <th className='px-6 py-4 text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.CREATED_DATE}
-                    </th>
-                    <th className='px-6 py-4 text-right text-xs font-semibold text-slate-500'>
-                      {ISSUE_UI.TABLE.ACTIONS}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className='divide-y divide-slate-100'>
-                  {issues.map((i, index) => (
-                    <tr
-                      key={i.id}
-                      onClick={() => onView(i.id)}
-                      className='cursor-pointer transition-colors hover:bg-slate-50/80'
-                    >
-                      <td className='px-6 py-4 text-sm text-slate-600'>
-                        {(page - 1) * pageSize + index + 1}
-                      </td>
-                      <td className='px-6 py-4 text-sm text-slate-600'>{i.title}</td>
-                      <td className='truncate px-6 py-4 text-sm text-slate-600'>
-                        {stakeholders.find((s) => s.id === i.stakeholderId)?.name ||
-                          ISSUE_UI.EMPTY.UNKNOWN}
-                      </td>
-                      <td className='px-6 py-4 text-sm text-slate-600'>
-                        <div className='max-w-[300px] truncate' title={i.description}>
-                          {i.description || '-'}
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <IssueStatusTag status={i.status} />
-                      </td>
-                      <td className='px-6 py-4 text-sm text-slate-600'>
-                        {dayjs(i.createdAt).format('DD/MM/YYYY')}
-                      </td>
-                      <td className='px-6 py-4 text-right'>
-                        <div className='flex items-center justify-end gap-2'>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onToggleStatus(i);
-                            }}
-                            className='px-2 text-slate-400 hover:text-blue-600'
-                          >
-                            {i.status === 2 ? ISSUE_UI.BUTTON.REOPEN : ISSUE_UI.BUTTON.RESOLVE}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              showDeleteConfirm({
-                                title: ISSUE_UI.BUTTON.DELETE,
-                                content: 'Are you sure you want to delete this issue?',
-                                onOk: () => onDelete(i.id),
-                              });
-                            }}
-                            className='px-2 text-slate-400 hover:text-red-600'
-                          >
-                            <DeleteOutlined />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      ),
+    },
+    {
+      title: ISSUE_UI.TABLE.STAKEHOLDER,
+      dataIndex: 'stakeholderId',
+      key: 'stakeholder',
+      width: 200,
+      render: (stakeholderId) => {
+        const stakeholder = stakeholders.find((s) => s.id === stakeholderId);
+        return (
+          <div className='flex items-center gap-2'>
+            <Avatar
+              size='small'
+              icon={<UserOutlined />}
+              className='bg-primary/10 text-primary border-none'
+            />
+            <span className='text-text text-sm font-medium'>
+              {stakeholder?.name || ISSUE_UI.EMPTY.UNKNOWN}
+            </span>
           </div>
-        </>
-      )}
+        );
+      },
+    },
+    {
+      title: ISSUE_UI.TABLE.STATUS,
+      dataIndex: 'status',
+      key: 'status',
+      width: 140,
+      render: (status) => <IssueStatusTag status={status} />,
+    },
+    {
+      title: ISSUE_UI.TABLE.CREATED_DATE,
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 160,
+      render: (date) => (
+        <div className='flex items-center gap-2'>
+          <ClockCircleOutlined className='text-muted text-xs' />
+          <span className='text-text text-sm font-medium'>{dayjs(date).format('DD/MM/YYYY')}</span>
+        </div>
+      ),
+    },
+    {
+      title: ISSUE_UI.TABLE.ACTIONS,
+      key: 'actions',
+      fixed: 'right',
+      width: 120,
+      align: 'right',
+      render: (_, record) => (
+        <div className='flex items-center justify-end gap-1'>
+          <Tooltip title={record.status === 2 ? ISSUE_UI.BUTTON.REOPEN : ISSUE_UI.BUTTON.RESOLVE}>
+            <Button
+              type='text'
+              icon={record.status === 2 ? <SyncOutlined /> : <CheckCircleOutlined />}
+              onClick={() => onToggleStatus(record)}
+              className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+            />
+          </Tooltip>
+          <Tooltip title='Xem chi tiết'>
+            <Button
+              type='text'
+              icon={<EyeOutlined />}
+              onClick={() => onView(record.id)}
+              className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+            />
+          </Tooltip>
+          <Tooltip title={ISSUE_UI.BUTTON.DELETE}>
+            <Button
+              type='text'
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() =>
+                showDeleteConfirm({
+                  title: ISSUE_UI.BUTTON.DELETE,
+                  content: 'Bạn có chắc chắn muốn xóa vấn đề này không?',
+                  onOk: () => onDelete(record.id),
+                })
+              }
+              className='hover:bg-danger/10 flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className='premium-table-container'>
+      <Table
+        columns={columns}
+        dataSource={issues}
+        rowKey='id'
+        loading={{
+          spinning: loading,
+          indicator: <Spin size='large' />,
+        }}
+        pagination={false}
+        scroll={{ x: 1000 }}
+        className='premium-table'
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <div className='flex flex-col items-center gap-1'>
+                  <span className='text-text font-bold'>{ISSUE_UI.EMPTY.NO_DATA}</span>
+                </div>
+              }
+            />
+          ),
+        }}
+      />
     </div>
   );
-}
+});
+
+export default IssueTable;

@@ -30,7 +30,7 @@ export const PROJECT_UI = {
   },
 
   EMPTY: {
-    NO_RESOURCE: 'No resources attached.',
+    NO_RESOURCE: 'No resources attached yet.',
   },
 
   CONFIRM: {

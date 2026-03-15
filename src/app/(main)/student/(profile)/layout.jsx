@@ -5,8 +5,7 @@ export default function Profile({ children }) {
     <div className='flex min-h-screen'>
       {/* <Sidebar /> */}
 
-      <main className='flex-1 p-6 bg-gray-100 '>{children}</main>
+      <main className='flex-1 bg-gray-100 p-6'>{children}</main>
     </div>
   );
 }
-

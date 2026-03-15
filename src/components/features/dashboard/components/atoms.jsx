@@ -1,15 +1,17 @@
 import { AlertCircle } from 'lucide-react';
 
+import { DASHBOARD_UI } from '@/constants/dashboard';
+
 export function StatCard({ label, value, icon, color, colorClass }) {
   return (
-    <div className='group relative overflow-hidden rounded-3xl bg-surface border border-border/60 shadow-sm p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-1'>
-      <div className='flex items-center justify-between mb-4'>
-        <div className='text-sm font-medium text-muted'>{label}</div>
-        <div className={`p-2.5 rounded-xl ${colorClass}`}>{icon}</div>
+    <div className='group bg-surface border-border/60 relative overflow-hidden rounded-3xl border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md'>
+      <div className='mb-4 flex items-center justify-between'>
+        <div className='text-muted text-sm font-medium'>{label}</div>
+        <div className={`rounded-xl p-2.5 ${colorClass}`}>{icon}</div>
       </div>
-      <div className='text-3xl font-bold text-text'>{value}</div>
+      <div className='text-text text-3xl font-bold'>{value}</div>
       <div
-        className='absolute bottom-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+        className='absolute bottom-0 left-0 h-1 w-full opacity-0 transition-opacity duration-300 group-hover:opacity-100'
         style={{ backgroundColor: color }}
       />
     </div>
@@ -20,7 +22,7 @@ export function Card({ children, className = '' }) {
   return (
     <div
       className={[
-        'rounded-3xl bg-surface border border-border/60 shadow-sm transition-shadow hover:shadow-md flex flex-col',
+        'bg-surface border-border/60 flex flex-col rounded-3xl border shadow-sm transition-shadow hover:shadow-md',
         className,
       ].join(' ')}
     >
@@ -31,8 +33,8 @@ export function Card({ children, className = '' }) {
 
 export function CardHeader({ title, right }) {
   return (
-    <div className='px-6 py-5 border-b border-border/60 flex items-center justify-between bg-surface/50 rounded-t-3xl'>
-      <div className='text-base font-semibold text-text'>{title}</div>
+    <div className='border-border/60 bg-surface/50 flex items-center justify-between rounded-t-3xl border-b px-6 py-5'>
+      <div className='text-text text-base font-semibold'>{title}</div>
       {right ? <div>{right}</div> : null}
     </div>
   );
@@ -40,9 +42,9 @@ export function CardHeader({ title, right }) {
 
 export function EmptyState({ text }) {
   return (
-    <div className='flex-1 min-h-[200px] flex flex-col items-center justify-center text-sm text-muted gap-3 p-6'>
-      <div className='w-12 h-12 rounded-full bg-bg flex items-center justify-center'>
-        <AlertCircle className='w-6 h-6 text-muted/50' />
+    <div className='text-muted flex min-h-[200px] flex-1 flex-col items-center justify-center gap-3 p-6 text-sm'>
+      <div className='bg-bg flex h-12 w-12 items-center justify-center rounded-full'>
+        <AlertCircle className='text-muted/50 h-6 w-6' />
       </div>
       {text}
     </div>
@@ -51,22 +53,21 @@ export function EmptyState({ text }) {
 
 export function Loading() {
   return (
-    <div className='rounded-3xl border border-border bg-surface p-12 flex flex-col items-center justify-center gap-4 text-sm text-muted shadow-sm'>
-      <div className='w-8 h-8 rounded-full border-4 border-muted/20 border-t-primary animate-spin' />
-      Loading dashboard data...
+    <div className='border-border bg-surface text-muted flex flex-col items-center justify-center gap-4 rounded-3xl border p-12 text-sm shadow-sm'>
+      <div className='border-muted/20 border-t-primary h-8 w-8 animate-spin rounded-full border-4' />
+      {DASHBOARD_UI.LOADING}
     </div>
   );
 }
 
 export function ErrorBox({ message }) {
   return (
-    <div className='rounded-3xl border border-danger/20 bg-danger/5 p-6 shadow-sm'>
-      <div className='flex items-center gap-2 text-danger font-semibold mb-2'>
-        <AlertCircle className='w-5 h-5' />
-        Error
+    <div className='border-danger/20 bg-danger-surface rounded-3xl border p-6 shadow-sm'>
+      <div className='text-danger mb-2 flex items-center gap-2 font-semibold'>
+        <AlertCircle className='h-5 w-5' />
+        {DASHBOARD_UI.ERROR}
       </div>
-      <div className='text-sm text-danger/80'>{message}</div>
+      <div className='text-danger/80 text-sm'>{message}</div>
     </div>
   );
 }
-

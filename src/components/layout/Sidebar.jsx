@@ -59,7 +59,7 @@ export default function Sidebar() {
             className='mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold text-(--primary-700) hover:text-(--primary-800)'
           >
             <ArrowLeftOutlined />
-            Quay lại Dashboard
+            Back to previous page
           </Link>
         )
       )}

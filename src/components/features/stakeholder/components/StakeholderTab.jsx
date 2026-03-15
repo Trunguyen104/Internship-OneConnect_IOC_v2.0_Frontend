@@ -8,7 +8,7 @@ import StakeholderFormModal from './StakeholderFormModal';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 
-export default function StakeholderTab() {
+const StakeholderTab = memo(function StakeholderTab() {
   const {
     stakeholders,
     stakeholderLoading,
@@ -94,15 +94,28 @@ export default function StakeholderTab() {
           onClose={() => {
             setOpenStakeholderForm(false);
             setErrors({});
+            setOpenStakeholderForm(true);
           }}
-          editingId={editingStakeholderId}
-          form={stakeholderForm}
-          setForm={setStakeholderForm}
-          errors={errors}
-          setErrors={setErrors}
-          onSave={handleSaveStakeholder}
+          onDelete={handleDeleteStakeholder}
         />
-      </section>
-    </>
+      </Card>
+
+      <StakeholderFormModal
+        isOpen={openStakeholderForm}
+        onClose={() => {
+          setOpenStakeholderForm(false);
+          setEditingStakeholderId(null);
+          setErrors({});
+        }}
+        editingId={editingStakeholderId}
+        form={stakeholderForm}
+        setForm={setStakeholderForm}
+        errors={errors}
+        setErrors={setErrors}
+        onSave={handleSaveStakeholder}
+      />
+    </div>
   );
-}
+});
+
+export default StakeholderTab;

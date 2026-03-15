@@ -1,9 +1,9 @@
 export default function InfoItem({ label, value, children }) {
   return (
     <div>
-      <p className='mb-1 text-sm font-medium text-slate-500'>{label}</p>
+      <p className='text-muted mb-1 text-sm font-medium'>{label}</p>
 
-      {value && <p className='text-base font-semibold text-slate-900'>{value}</p>}
+      {value && <p className='text-text text-base font-semibold'>{value}</p>}
 
       {children}
     </div>

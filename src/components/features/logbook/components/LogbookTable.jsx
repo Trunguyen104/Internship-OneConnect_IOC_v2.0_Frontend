@@ -136,4 +136,6 @@ export default function LogbookTable({ data, loading, userProfile, onView, onEdi
       )}
     </div>
   );
-}
+});
+
+export default LogbookTable;

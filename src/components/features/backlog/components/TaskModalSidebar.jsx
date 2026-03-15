@@ -1,41 +1,46 @@
 'use client';
 
-import { 
-  WORK_ITEM_STATUS, 
-  WORK_ITEM_TYPE, 
-  WORK_ITEM_PRIORITY 
-} from '@/constants/enums';
+import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
 import { Select, TextInput } from './TaskFields';
 import DateInput from '@/components/ui/DateInput';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 /**
  * Shared Sidebar for Create and Update Task Modals
  */
 export function TaskModalSidebar({
-  status, setStatus,
-  type, setType,
-  epic, setEpic,
+  status,
+  setStatus,
+  type,
+  setType,
+  epic,
+  setEpic,
   epics = [],
-  sprintId, setSprintId,
+  sprintId,
+  setSprintId,
   sprints = [],
-  assignee, setAssignee,
-  priority, setPriority,
-  dueDate, setDueDate,
-  points, setPoints
+  assignee,
+  setAssignee,
+  priority,
+  setPriority,
+  dueDate,
+  setDueDate,
+  points,
+  setPoints,
 }) {
   return (
-    <div className='w-full lg:w-[360px] shrink-0 flex flex-col'>
+    <div className='flex w-full shrink-0 flex-col lg:w-[360px]'>
       <div
-        className='rounded-3xl bg-white p-5 border border-slate-100 shadow-[0_2px_12px_rgba(0,0,0,0.04)] h-full overflow-y-auto'
+        className='border-border/50 h-full overflow-y-auto rounded-3xl border bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]'
         style={{ scrollbarWidth: 'none' }}
       >
-        <h3 className='mb-5 text-[17px] font-bold text-slate-800'>Details</h3>
+        <h3 className='text-text mb-5 text-[17px] font-bold'>{BACKLOG_UI.DETAILS || 'Details'}</h3>
 
         <div className='space-y-5'>
           {/* Status */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[130px] text-[13.5px] font-semibold text-slate-600'>
-              Status <span className='text-red-500'>*</span>
+            <span className='text-muted min-w-[130px] text-[13.5px] font-semibold'>
+              {BACKLOG_UI.FIELD_STATUS || 'Status'} <span className='text-danger'>*</span>
             </span>
             <div className='flex-1'>
               <Select
@@ -54,8 +59,8 @@ export function TaskModalSidebar({
 
           {/* Type */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-              Type <span className='text-red-500'>*</span>
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.FIELD_TYPE || 'Type'} <span className='text-danger'>*</span>
             </span>
             <div className='flex-1'>
               <Select
@@ -73,12 +78,14 @@ export function TaskModalSidebar({
 
           {/* Epic */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>Epic</span>
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.TYPE_EPIC || 'Epic'}
+            </span>
             <div className='flex-1'>
               <Select
                 value={epic}
                 onChange={setEpic}
-                placeholder='Select'
+                placeholder={BACKLOG_UI.SELECT || 'Select'}
                 options={epics.map((e) => ({
                   value: e.id,
                   label: e.title || e.name || 'Untitled',
@@ -89,12 +96,14 @@ export function TaskModalSidebar({
 
           {/* Sprint */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>Sprint</span>
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.FIELD_SPRINT || 'Sprint'}
+            </span>
             <div className='flex-1'>
               <Select
                 value={sprintId}
                 onChange={setSprintId}
-                placeholder='Select Sprint (Optional)'
+                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_OPTIONAL || 'Select Sprint (Optional)'}
                 options={sprints.map((s) => ({
                   value: s.sprintId || s.id,
                   label: s.name || s.title || 'Untitled Sprint',
@@ -105,14 +114,14 @@ export function TaskModalSidebar({
 
           {/* Assignee */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-              Assignee
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.FIELD_ASSIGNEE || 'Assignee'}
             </span>
             <div className='flex-1'>
               <Select
                 value={assignee}
                 onChange={setAssignee}
-                placeholder='Select'
+                placeholder={BACKLOG_UI.SELECT || 'Select'}
                 options={[
                   { value: 'dev1', label: 'Nguyen Van A' },
                   { value: 'dev2', label: 'Tran Thi B' },
@@ -123,8 +132,8 @@ export function TaskModalSidebar({
 
           {/* Priority */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-              Priority <span className='text-red-500'>*</span>
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.FIELD_PRIORITY || 'Priority'} <span className='text-danger'>*</span>
             </span>
             <div className='flex-1'>
               <Select
@@ -142,8 +151,8 @@ export function TaskModalSidebar({
 
           {/* Due Date */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-              Due Date
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
             </span>
             <div className='flex-1'>
               <DateInput value={dueDate} onChange={setDueDate} />
@@ -152,8 +161,8 @@ export function TaskModalSidebar({
 
           {/* Story Points */}
           <div className='flex items-center justify-between gap-4'>
-            <span className='min-w-[120px] text-sm font-medium text-slate-600'>
-              Story Points
+            <span className='text-muted min-w-[120px] text-sm font-medium'>
+              {BACKLOG_UI.FIELD_STORY_POINTS || 'Story Points'}
             </span>
             <div className='flex-1'>
               <TextInput value={points} onChange={setPoints} placeholder='' />

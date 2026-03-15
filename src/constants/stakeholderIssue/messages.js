@@ -1,6 +1,6 @@
 export const ISSUE_MESSAGES = {
   REQUIRED_FIELDS: {
-    GENERAL: 'Title and Stakeholder are required',
+    GENERAL: 'Please enter Title and select a Stakeholder',
     TITLE: 'Title is required',
     STAKEHOLDER: 'Stakeholder is required',
   },
@@ -13,9 +13,8 @@ export const ISSUE_MESSAGES = {
 
   UPDATE_STATUS_FAILED: 'Failed to update issue status',
 
-  RESOLVED: 'Issue marked as resolved',
+  RESOLVED: 'Issue resolved',
   REOPENED: 'Issue reopened',
 
-  LOAD_PROJECT_FAILED: 'Cannot load project',
+  LOAD_PROJECT_FAILED: 'Failed to load project info',
 };
-

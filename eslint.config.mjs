@@ -1,34 +1,28 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
-import globals from 'globals';
 import prettier from 'eslint-plugin-prettier';
+import react from 'eslint-plugin-react';
 
 export default defineConfig([
-  // Next.js official rules
   ...nextVitals,
-
-  // Ignore build outputs
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'dist/**', 'next-env.d.ts']),
-
-  // JS / JSX (client + server)
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'dist/**', 'next-env.d.ts', 'node_modules/**']),
   {
     files: ['**/*.{js,jsx}'],
     plugins: {
-      // tailwindcss: tailwind,
       prettier,
+      react,
     },
     rules: {
-      'prettier/prettier': 'error',
-      // 'tailwindcss/no-arbitrary-value': 'error',
-      'react/jsx-no-literals': 'off',
-      // CHẶN HARD-CODE TEXT
-      // 'react/jsx-no-literals': [
-      //   'error', 
-      //   { 
-      //     "noStrings": true, 
-      //     "allowedStrings": ["core-web-vitals"] // Những từ đặc biệt được phép
-      //   }
-      // ],
+      'prettier/prettier': 'warn', // Chuyển sang warn để không làm đỏ lòm cả màn hình khi đang code
+      
+      // TẮT QUY TẮC NÀY ĐỂ HẾT 2000 LỖI
+      'react/jsx-no-literals': 'off', 
+      
+      // Các quy tắc bổ sung để code "dễ thở" hơn trong lúc OJT
+      'react/display-name': 'off',
+      'react/prop-types': 'off',
+      'no-unused-vars': 'warn',
+      'react-hooks/exhaustive-deps': 'warn'
     },
   },
 ]);

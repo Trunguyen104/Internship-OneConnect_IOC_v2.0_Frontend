@@ -20,22 +20,12 @@ export default function DateInput({ value, onChange }) {
 
   // Calculate popup position when open
   useEffect(() => {
-    if (open) {
-      const initDate = value ? dayjs(value) : dayjs();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setViewDate(initDate);
-
-      setSelectedDate(value ? dayjs(value) : null);
-
-      setInputValue(value ? dayjs(value).format('MM/DD/YYYY') : '');
-
-      if (buttonRef.current && typeof window !== 'undefined') {
-        const rect = buttonRef.current.getBoundingClientRect();
-        setPopupStyle({
-          bottom: window.innerHeight - rect.top + 8,
-          left: Math.max(8, rect.right - 330),
-        });
-      }
+    if (open && buttonRef.current && typeof window !== 'undefined') {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPopupStyle({
+        bottom: window.innerHeight - rect.top + 8,
+        left: Math.max(8, rect.right - 330),
+      });
     }
   }, [open]);
 
@@ -98,49 +88,49 @@ export default function DateInput({ value, onChange }) {
         ref={buttonRef}
         type='button'
         onClick={handleOpen}
-        className='h-10 w-full rounded-full border border-red-100 bg-red-50/50 text-red-500 font-semibold text-[13.5px] flex items-center justify-between px-4 hover:bg-red-50 transition-colors'
+        className='flex h-10 w-full items-center justify-between rounded-full border border-red-100 bg-red-50/50 px-4 text-[13.5px] font-semibold text-red-500 transition-colors hover:bg-red-50'
       >
-        <span className={value ? 'text-slate-700' : 'text-slate-400 font-medium'}>
+        <span className={value ? 'text-slate-700' : 'font-medium text-slate-400'}>
           {value ? dayjs(value).format('MM/DD/YYYY') : 'Select Date'}
         </span>
-        <CalendarIcon className='w-4 h-4 text-red-500' />
+        <CalendarIcon className='h-4 w-4 text-red-500' />
       </button>
 
       {open &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className='fixed inset-0 z-100000 pointer-events-none'>
+          <div className='pointer-events-none fixed inset-0 z-100000'>
             {/* We do not block clicks outside because we handle it via mousedown listener, letting users interact naturally with the rest of the app */}
             <div
               ref={popupRef}
-              className='absolute bg-white rounded-[24px] shadow-[0px_4px_30px_rgba(0,0,0,0.12)] border border-slate-100 p-5 w-[330px] pointer-events-auto origin-bottom-right transition-all'
+              className='pointer-events-auto absolute w-[330px] origin-bottom-right rounded-[24px] border border-slate-100 bg-white p-5 shadow-[0px_4px_30px_rgba(0,0,0,0.12)] transition-all'
               style={popupStyle}
             >
               {/* Header */}
-              <div className='flex items-center justify-between mb-5 px-1'>
+              <div className='mb-5 flex items-center justify-between px-1'>
                 <button
                   type='button'
                   onClick={() => setViewDate(viewDate.subtract(1, 'month'))}
-                  className='text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-50 transition-colors'
+                  className='flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700'
                 >
-                  <ChevronLeft className='w-5 h-5' />
+                  <ChevronLeft className='h-5 w-5' />
                 </button>
-                <span className='font-bold text-[15px] text-slate-800'>
+                <span className='text-[15px] font-bold text-slate-800'>
                   {viewDate.format('MMMM YYYY')}
                 </span>
                 <button
                   type='button'
                   onClick={() => setViewDate(viewDate.add(1, 'month'))}
-                  className='text-slate-400 hover:text-slate-700 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-50 transition-colors'
+                  className='flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700'
                 >
-                  <ChevronRight className='w-5 h-5' />
+                  <ChevronRight className='h-5 w-5' />
                 </button>
               </div>
 
               {/* Quick Input Row */}
-              <div className='flex items-center gap-2 mb-5'>
+              <div className='mb-5 flex items-center gap-2'>
                 <input
-                  className='flex-1 h-10 border border-slate-200 rounded-full px-4 text-[13px] font-medium text-slate-700 outline-none focus:border-[#A32A2A] focus:ring-1 focus:ring-[#A32A2A] placeholder:text-slate-400'
+                  className='h-10 flex-1 rounded-full border border-slate-200 px-4 text-[13px] font-medium text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#A32A2A] focus:ring-1 focus:ring-[#A32A2A]'
                   placeholder='MM / DD / YYYY'
                   value={inputValue}
                   onChange={(e) => {
@@ -155,14 +145,14 @@ export default function DateInput({ value, onChange }) {
                 <button
                   type='button'
                   onClick={setToday}
-                  className='h-10 px-[14px] rounded-full text-[#A32A2A] font-bold text-[13px] bg-red-50 hover:bg-red-100 shrink-0 transition-colors'
+                  className='h-10 shrink-0 rounded-full bg-red-50 px-[14px] text-[13px] font-bold text-[#A32A2A] transition-colors hover:bg-red-100'
                 >
                   Today
                 </button>
               </div>
 
               {/* Weekdays */}
-              <div className='grid grid-cols-7 mb-2'>
+              <div className='mb-2 grid grid-cols-7'>
                 {weekDays.map((d) => (
                   <div key={d} className='text-center text-[12px] font-bold text-slate-800'>
                     {d}
@@ -171,7 +161,7 @@ export default function DateInput({ value, onChange }) {
               </div>
 
               {/* Days */}
-              <div className='grid grid-cols-7 gap-y-1 mb-5'>
+              <div className='mb-5 grid grid-cols-7 gap-y-1'>
                 {days.map((d) => {
                   const isCurrentMonth = d.month() === viewDate.month();
                   const isSelected = selectedDate && d.isSame(selectedDate, 'day');
@@ -180,7 +170,7 @@ export default function DateInput({ value, onChange }) {
                   return (
                     <div
                       key={d.format('YYYYMMDD')}
-                      className='flex items-center justify-center h-10'
+                      className='flex h-10 items-center justify-center'
                     >
                       <button
                         type='button'
@@ -188,14 +178,11 @@ export default function DateInput({ value, onChange }) {
                           setSelectedDate(d);
                           setInputValue(d.format('MM/DD/YYYY'));
                         }}
-                        className={`w-[32px] h-[32px] flex items-center justify-center rounded-full text-[13.5px] font-medium transition-colors relative
-                        ${!isCurrentMonth ? 'text-slate-300' : 'text-slate-700 hover:bg-slate-100'}
-                        ${isSelected ? 'bg-[#A32A2A] text-white hover:bg-red-800 font-bold' : ''}
-                      `}
+                        className={`relative flex h-[32px] w-[32px] items-center justify-center rounded-full text-[13.5px] font-medium transition-colors ${!isCurrentMonth ? 'text-slate-300' : 'text-slate-700 hover:bg-slate-100'} ${isSelected ? 'bg-[#A32A2A] font-bold text-white hover:bg-red-800' : ''} `}
                       >
                         {d.date()}
                         {isToday && !isSelected && (
-                          <span className='absolute bottom-[4px] w-1 h-[3px] bg-[#A32A2A] rounded-full' />
+                          <span className='absolute bottom-[4px] h-[3px] w-1 rounded-full bg-[#A32A2A]' />
                         )}
                       </button>
                     </div>
@@ -204,21 +191,21 @@ export default function DateInput({ value, onChange }) {
               </div>
 
               {/* Divider */}
-              <div className='h-px bg-slate-100 -mx-5 mb-4'></div>
+              <div className='-mx-5 mb-4 h-px bg-slate-100'></div>
 
               {/* Footer Buttons */}
               <div className='flex items-center gap-3'>
                 <button
                   type='button'
                   onClick={() => setOpen(false)}
-                  className='flex-1 h-11 rounded-full bg-red-50 text-[#A32A2A] font-bold text-[14px] hover:bg-red-100 transition-colors'
+                  className='h-11 flex-1 rounded-full bg-red-50 text-[14px] font-bold text-[#A32A2A] transition-colors hover:bg-red-100'
                 >
                   Cancel
                 </button>
                 <button
                   type='button'
                   onClick={handleApply}
-                  className='flex-1 h-11 rounded-full bg-[#A32A2A] text-white font-bold text-[14px] hover:bg-red-800 transition-colors'
+                  className='h-11 flex-1 rounded-full bg-[#A32A2A] text-[14px] font-bold text-white transition-colors hover:bg-red-800'
                 >
                   Apply
                 </button>
@@ -230,4 +217,3 @@ export default function DateInput({ value, onChange }) {
     </>
   );
 }
-

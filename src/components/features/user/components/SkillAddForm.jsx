@@ -1,6 +1,7 @@
 'use client';
 
 import { Form, Input, Select, Button, Row, Col, Typography } from 'antd';
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 const { Text } = Typography;
 
@@ -12,7 +13,7 @@ export default function SkillAddForm({
   handleAddSkill,
 }) {
   return (
-    <div className='rounded-lg border border-slate-200 bg-slate-50 p-6'>
+    <div className='border-border bg-surface rounded-lg border p-6'>
       <Form layout='vertical'>
         <Row gutter={16} align='bottom'>
           <Col flex='auto'>
@@ -20,14 +21,17 @@ export default function SkillAddForm({
               style={{ marginBottom: 0 }}
               label={
                 <>
-                  Skill <Text type='secondary'>({newSkill.name.length}/30)</Text>
+                  {PROFILE_UI.SKILLS.ADD_LABEL}{' '}
+                  <Text type='secondary'>
+                    {PROFILE_UI.SKILLS.MAX_LENGTH_HINT(newSkill.name.length, 30)}
+                  </Text>
                 </>
               }
             >
               <Input
                 value={newSkill.name}
                 maxLength={30}
-                placeholder='VD: React, Java, SQL'
+                placeholder={PROFILE_UI.SKILLS.PLACEHOLDER}
                 onChange={(e) => {
                   setNewSkill({ ...newSkill, name: e.target.value });
                   if (skillError) setSkillError('');
@@ -37,16 +41,12 @@ export default function SkillAddForm({
           </Col>
 
           <Col style={{ width: 200 }}>
-            <Form.Item style={{ marginBottom: 0 }} label='Level'>
+            <Form.Item style={{ marginBottom: 0 }} label={PROFILE_UI.SKILLS.LEVEL_LABEL}>
               <Select
                 value={newSkill.level || undefined}
-                placeholder='Không bắt buộc'
+                placeholder={PROFILE_UI.SKILLS.LEVEL_PLACEHOLDER}
                 onChange={(value) => setNewSkill({ ...newSkill, level: value })}
-                options={[
-                  { value: 'Beginner', label: 'Beginner' },
-                  { value: 'Intermediate', label: 'Intermediate' },
-                  { value: 'Advanced', label: 'Advanced' },
-                ]}
+                options={PROFILE_UI.SKILLS.LEVELS}
               />
             </Form.Item>
           </Col>
@@ -54,7 +54,7 @@ export default function SkillAddForm({
           <Col>
             <Form.Item style={{ marginBottom: 0 }}>
               <Button type='primary' danger onClick={handleAddSkill}>
-                Add
+                {PROFILE_UI.BUTTONS.ADD}
               </Button>
             </Form.Item>
           </Col>

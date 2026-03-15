@@ -8,4 +8,3 @@ export async function getGeneralInfo() {
 
   // return httpGet('/general-info');
 }
-
