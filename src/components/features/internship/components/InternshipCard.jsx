@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext } from 'react';
 import { Button, Tag } from 'antd';
+import Link from 'next/link';
 import { ExternalLink, Building2, User, BookOpen } from 'lucide-react';
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship.js';
 import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from '../constants/internshipStatus.js';
@@ -84,14 +85,24 @@ const Stepper = () => {
   return <ProgressStepper currentStatus={status} />;
 };
 
-const BodyTitle = ({ title }) => {
+const BodyTitle = ({ title, href = '/student/space' }) => {
   const { status } = useInternshipCard();
   const config = INTERNSHIP_STATUS_CONFIG[status];
 
   return (
     <div className='border-border mt-8 mb-6 border-t pt-8'>
       <div className='flex items-center gap-3'>
-        <h3 className='text-text text-xl font-bold'>{title}</h3>
+        {href ? (
+          <Link
+            href={href}
+            className='text-text text-xl font-bold hover:underline'
+            title='Go to Space'
+          >
+            {title}
+          </Link>
+        ) : (
+          <h3 className='text-text text-xl font-bold'>{title}</h3>
+        )}
         <Tag
           color='purple'
           className='bg-info-surface text-info border-none px-3 py-0.5 text-[10px] font-bold'

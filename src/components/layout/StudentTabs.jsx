@@ -7,8 +7,8 @@ export default function StudentTabs() {
   const pathname = usePathname();
 
   const items = [
-    { label: 'Tóm tắt', href: '/student/space' },
-    { label: 'Bảng công việc', href: '/student/work-board' },
+    { label: 'Summary', href: '/student/space' },
+    { label: 'Work Board', href: '/student/work-board' },
     { label: 'Backlog Board', href: '/student/backlog' },
   ];
 
@@ -36,7 +36,7 @@ export default function StudentTabs() {
                     ' ',
                   ),
 
-                // active — giống "Thông tin chung"
+                // active — matches "General Info"
                 active &&
                   [
                     'bg-[var(--primary-50)]',
