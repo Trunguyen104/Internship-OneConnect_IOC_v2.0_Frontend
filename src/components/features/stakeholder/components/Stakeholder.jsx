@@ -13,7 +13,7 @@ export default function StakeholderPage() {
   return (
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
       <StudentPageHeader hidden />
-      <div className='bg-muted/5 border-border flex w-fit items-center gap-2 rounded-2xl border p-1.5'>
+      <div className='bg-muted/5 border-border flex w-fit items-center gap-2 rounded-2xl border'>
         <button
           onClick={() => setTab('stakeholder')}
           className={`flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-bold transition-all ${
