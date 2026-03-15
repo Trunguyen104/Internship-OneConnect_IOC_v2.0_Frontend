@@ -19,7 +19,8 @@
       {
         "ignoreSelectors": ["/^ProseMirror/"]
       }
-    ]
+    ],
+    "import-notation": "string"
   },
   "overrides": [
     {
