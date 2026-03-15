@@ -38,4 +38,3 @@ export const STAKEHOLDER_UI = {
   SAVE: 'Save Stakeholder',
   UPDATE: 'Update Stakeholder',
 };
-

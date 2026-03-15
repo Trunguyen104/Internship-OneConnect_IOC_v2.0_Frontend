@@ -1,4 +1,5 @@
 export const STUDENT_LIST_UI = {
+  PAGE_TITLE: 'Student List',
   TABLE: {
     STUDENT: 'Student',
     CODE: 'Code',
@@ -13,8 +14,11 @@ export const STUDENT_LIST_UI = {
   },
 
   STATUS: {
-    ACTIVE: 'Active',
-    PENDING: 'Pending',
+    REGISTERED: 'Registered',
+    ONBOARDED: 'Onboarded',
+    IN_PROGRESS: 'In Progress',
+    COMPLETED: 'Completed',
+    FAILED: 'Failed',
     UNKNOWN: 'Unknown',
   },
 
@@ -56,4 +60,3 @@ export const STUDENT_LIST_UI = {
     UNNAMED_GROUP: 'Unnamed Group',
   },
 };
-

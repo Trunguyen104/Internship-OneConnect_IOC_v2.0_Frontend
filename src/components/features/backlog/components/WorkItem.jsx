@@ -1,18 +1,21 @@
+import { useEffect, useRef, useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { MoreVertical, GripVertical } from 'lucide-react';
+import { MoreVertical, GripVertical, Trash2 } from 'lucide-react';
 import { WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/enums';
+import { BACKLOG_UI } from '@/constants/backlog';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 const statusToneText = {
-  [WORK_ITEM_STATUS.TODO]: 'text-gray-500',
-  [WORK_ITEM_STATUS.IN_PROGRESS]: 'text-blue-500',
-  [WORK_ITEM_STATUS.REVIEW]: 'text-amber-500',
-  [WORK_ITEM_STATUS.DONE]: 'text-green-500',
-  [WORK_ITEM_STATUS.CANCELLED]: 'text-red-400',
+  [WORK_ITEM_STATUS.TODO]: 'bg-gray-100 text-muted',
+  [WORK_ITEM_STATUS.IN_PROGRESS]: 'bg-info-surface text-info',
+  [WORK_ITEM_STATUS.REVIEW]: 'bg-warning-surface text-warning-text border border-warning-border',
+  [WORK_ITEM_STATUS.DONE]: 'bg-success-surface text-success',
+  [WORK_ITEM_STATUS.CANCELLED]: 'bg-danger-surface text-danger',
   // Legacy string support
-  TODO: 'text-gray-500',
-  IN_PROGRESS: 'text-blue-500',
-  REVIEW: 'text-amber-500',
-  DONE: 'text-green-500',
+  TODO: 'bg-gray-100 text-muted',
+  IN_PROGRESS: 'bg-info-surface text-info',
+  REVIEW: 'bg-warning-surface text-warning-text border border-warning-border',
+  DONE: 'bg-success-surface text-success',
 };
 
 const stringToColorTuple = (str) => {
@@ -24,31 +27,52 @@ const stringToColorTuple = (str) => {
   return { bg: `hsl(${hue}, 70%, 90%)`, text: `hsl(${hue}, 70%, 30%)` };
 };
 
-export function WorkItem({ it, itemOrder, onClick }) {
+export function WorkItem({ it, itemOrder, onClick, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: it.workItemId || it.id,
   });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 999 : 1,
-  } : undefined;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 999 : 1,
+      }
+    : undefined;
 
   const currentStatus = it.status?.name || it.status;
   const statusConfig = statusToneText[currentStatus] || statusToneText[WORK_ITEM_STATUS.TODO];
 
   const getStatusLabel = (s) => {
-    if (s === WORK_ITEM_STATUS.TODO || s === 'TODO') return 'To Do';
-    if (s === WORK_ITEM_STATUS.IN_PROGRESS || s === 'IN_PROGRESS') return 'In Progress';
-    if (s === WORK_ITEM_STATUS.REVIEW || s === 'REVIEW') return 'Review';
-    if (s === WORK_ITEM_STATUS.DONE || s === 'DONE') return 'Done';
-    if (s === WORK_ITEM_STATUS.CANCELLED || s === 'CANCELLED') return 'Cancelled';
-    return s || 'To Do';
+    if (s === WORK_ITEM_STATUS.TODO || s === 'TODO') return BACKLOG_UI.STATUS_TODO || 'To Do';
+    if (s === WORK_ITEM_STATUS.IN_PROGRESS || s === 'IN_PROGRESS')
+      return BACKLOG_UI.STATUS_IN_PROGRESS || 'In Progress';
+    if (s === WORK_ITEM_STATUS.REVIEW || s === 'REVIEW')
+      return BACKLOG_UI.STATUS_REVIEW || 'Review';
+    if (s === WORK_ITEM_STATUS.DONE || s === 'DONE') return BACKLOG_UI.STATUS_DONE || 'Done';
+    if (s === WORK_ITEM_STATUS.CANCELLED || s === 'CANCELLED')
+      return BACKLOG_UI.STATUS_CANCELLED || 'Cancelled';
+    return s || BACKLOG_UI.STATUS_TODO || 'To Do';
   };
 
   const currentPriority = it.priority?.name || it.priority;
-  const isHigh = currentPriority === WORK_ITEM_PRIORITY.HIGH || currentPriority === 'HIGH' || currentPriority === WORK_ITEM_PRIORITY.CRITICAL;
+  const isHigh =
+    currentPriority === WORK_ITEM_PRIORITY.HIGH ||
+    currentPriority === 'HIGH' ||
+    currentPriority === WORK_ITEM_PRIORITY.CRITICAL;
   const isLow = currentPriority === WORK_ITEM_PRIORITY.LOW || currentPriority === 'LOW';
 
   return (
@@ -56,38 +80,41 @@ export function WorkItem({ it, itemOrder, onClick }) {
       ref={setNodeRef}
       style={style}
       onClick={() => onClick?.(it)}
-      className={`flex items-center justify-between py-3 mb-2 bg-white group hover:bg-gray-50/50 rounded-xl border border-transparent hover:border-gray-100 transition-colors cursor-pointer ${isDragging ? 'shadow-lg border-primary/20 z-50' : ''
-        }`}
+      className={`group mb-2 flex cursor-pointer items-center justify-between rounded-xl border border-transparent bg-white py-3 transition-colors hover:border-gray-100 hover:bg-gray-50/50 ${
+        isDragging ? 'border-primary/20 z-50 shadow-lg' : ''
+      }`}
     >
       <div
         {...attributes}
         {...listeners}
         onClick={(e) => e.stopPropagation()}
         style={{ touchAction: 'none' }}
-        className='w-8 h-8 flex items-center justify-center mr-2 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing'
+        className='mr-2 flex h-8 w-8 cursor-grab items-center justify-center text-gray-300 hover:text-gray-500 active:cursor-grabbing'
       >
-        <GripVertical className='w-4 h-4' />
+        <GripVertical className='h-4 w-4' />
       </div>
 
-      <div className='flex-1 flex items-center'>
-        <div className='w-32 shrink-0 text-[13px] text-gray-900 font-medium whitespace-nowrap pl-1 tracking-wide'>
-          Issue {itemOrder || '-'}
+      <div className='flex flex-1 items-center'>
+        <div className='text-text w-32 shrink-0 pl-1 text-[13px] font-medium tracking-wide whitespace-nowrap'>
+          {BACKLOG_UI.ISSUE || 'Issue'} {itemOrder || '-'}
         </div>
 
         <div
-          className='flex-1 min-w-0 text-[13.5px] text-gray-900 font-medium truncate pr-4'
+          className='text-text min-w-0 flex-1 truncate pr-4 text-[13.5px] font-medium'
           title={it.title || it.name}
         >
           {it.title || it.name}
         </div>
 
-        <div className={`w-28 shrink-0 text-[13px] font-medium ${statusConfig}`}>
-          {getStatusLabel(currentStatus)}
+        <div className='flex w-28 shrink-0 justify-start'>
+          <span className={`rounded-lg px-2.5 py-0.5 text-[12px] font-semibold ${statusConfig}`}>
+            {getStatusLabel(currentStatus)}
+          </span>
         </div>
 
-        <div className='w-44 shrink-0 px-2 flex justify-start'>
+        <div className='flex w-44 shrink-0 justify-start px-2'>
           {it.epicName ? (
-            <span className='px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 truncate w-full text-center'>
+            <span className='bg-primary-surface text-primary w-full truncate rounded-lg px-2.5 py-0.5 text-center text-xs font-semibold'>
               {it.epicName}
             </span>
           ) : (
@@ -95,23 +122,31 @@ export function WorkItem({ it, itemOrder, onClick }) {
           )}
         </div>
 
-        <div className='w-24 shrink-0 text-[13px] text-gray-500 text-center font-medium'>
+        <div className='text-muted w-24 shrink-0 text-center text-[13px] font-medium'>
           {it.dueDate ? new Date(it.dueDate).toLocaleDateString('vi-VN') : '-'}
         </div>
 
-        <div className='w-10 shrink-0 text-[13px] text-blue-600 font-bold text-center'>
+        <div className='text-primary w-10 shrink-0 text-center text-[13px] font-bold'>
           {it.storyPoint || it.points || '-'}
         </div>
 
-        <div
-          className={`w-24 shrink-0 text-[13px] font-medium text-center ${isHigh ? 'text-orange-500' : isLow ? 'text-green-600' : 'text-blue-500'}`}
-        >
-          {isHigh ? (currentPriority === WORK_ITEM_PRIORITY.CRITICAL ? 'Critical' : 'High') : isLow ? 'Low' : 'Medium'}
+        <div className='flex w-24 shrink-0 justify-center'>
+          <span
+            className={`rounded-lg px-2.5 py-0.5 text-[12px] font-semibold ${isHigh ? 'bg-danger-surface text-danger' : isLow ? 'bg-success-surface text-success' : 'bg-info-surface text-info'}`}
+          >
+            {isHigh
+              ? currentPriority === WORK_ITEM_PRIORITY.CRITICAL
+                ? BACKLOG_UI.PRIORITY_CRITICAL || 'Critical'
+                : BACKLOG_UI.PRIORITY_HIGH || 'High'
+              : isLow
+                ? BACKLOG_UI.PRIORITY_LOW || 'Low'
+                : BACKLOG_UI.PRIORITY_MEDIUM || 'Medium'}
+          </span>
         </div>
 
-        <div className='w-12 shrink-0 flex justify-center'>
+        <div className='flex w-12 shrink-0 justify-center'>
           <div
-            className='h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold'
+            className='flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold'
             style={{
               backgroundColor: stringToColorTuple(it.assigneeName || 'U').bg,
               color: stringToColorTuple(it.assigneeName || 'U').text,
@@ -122,8 +157,44 @@ export function WorkItem({ it, itemOrder, onClick }) {
         </div>
       </div>
 
-      <div className='w-8 shrink-0 flex justify-center text-gray-400 opacity-50 hover:opacity-100 transition-opacity'>
-        <MoreVertical className='w-4 h-4' />
+      <div className='flex w-8 shrink-0 justify-center text-gray-400 opacity-50 transition-opacity hover:opacity-100'>
+        <div ref={menuRef} className='relative'>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen((v) => !v);
+            }}
+            className='flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100'
+            aria-label='Work item actions'
+          >
+            <MoreVertical className='h-4 w-4' />
+          </button>
+
+          {isMenuOpen ? (
+            <div className='absolute top-full right-0 z-50 mt-1 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg'>
+              <button
+                type='button'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsMenuOpen(false);
+                  showDeleteConfirm({
+                    title: 'Delete Work Item',
+                    content:
+                      'Are you sure you want to delete this work item? This action cannot be undone.',
+                    onOk: () => onDelete?.(),
+                    okText: BACKLOG_UI.DELETE || 'Delete',
+                    cancelText: BACKLOG_UI.CANCEL || 'Cancel',
+                  });
+                }}
+                className='text-danger flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-red-50'
+              >
+                <Trash2 className='text-danger h-4 w-4' />
+                {BACKLOG_UI.DELETE || 'Delete'}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -131,34 +202,33 @@ export function WorkItem({ it, itemOrder, onClick }) {
 
 export function ColumnHeaders() {
   return (
-    <div className='flex items-center justify-between py-2 mb-2 bg-gray-50/80 rounded-lg px-2 border-b border-gray-100/50'>
-      <div className='w-4 mr-4 shrink-0' />
-      <div className='w-32 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider pl-1'>
-        Issue
+    <div className='mb-2 flex items-center justify-between rounded-lg border-b border-gray-100/50 bg-gray-50/80 px-2 py-2'>
+      <div className='mr-4 w-4 shrink-0' />
+      <div className='text-muted w-32 shrink-0 pl-1 text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.ISSUE || 'Issue'}
       </div>
-      <div className='flex-1 min-w-0 text-xs font-semibold text-gray-400 uppercase tracking-wider'>
-        Summary
+      <div className='text-muted min-w-0 flex-1 text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.FIELD_SUMMARY || 'Summary'}
       </div>
-      <div className='w-28 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider'>
-        Status
+      <div className='text-muted w-28 shrink-0 text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.FIELD_STATUS || 'Status'}
       </div>
-      <div className='w-44 shrink-0 px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
-        Epic
+      <div className='text-muted w-44 shrink-0 px-2 text-center text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.TYPE_EPIC || 'Epic'}
       </div>
-      <div className='w-24 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
-        Due Date
+      <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
       </div>
-      <div className='w-10 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
-        Pts
+      <div className='text-muted w-10 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.FIELD_STORY_POINTS || 'Pts'}
       </div>
-      <div className='w-24 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
-        Priority
+      <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.FIELD_PRIORITY || 'Priority'}
       </div>
-      <div className='w-12 shrink-0 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center'>
-        User
+      <div className='text-muted w-12 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+        {BACKLOG_UI.FIELD_ASSIGNEE || 'User'}
       </div>
       <div className='w-8 shrink-0' />
     </div>
   );
 }
-

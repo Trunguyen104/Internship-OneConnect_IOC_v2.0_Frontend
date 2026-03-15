@@ -1,10 +1,11 @@
 import { STUDENT_STATUS_MAP } from '../constants/statusMap';
+import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 
 export default function StudentStatusTag({ status }) {
   const s = STUDENT_STATUS_MAP[status] || {
-    label: 'Unknown',
-    style: 'bg-gray-100 text-gray-600',
-    dot: 'bg-gray-400',
+    label: STUDENT_LIST_UI.STATUS.UNKNOWN,
+    style: 'bg-muted/10 text-muted',
+    dot: 'bg-muted/50',
   };
 
   return (

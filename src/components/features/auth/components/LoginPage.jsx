@@ -117,13 +117,13 @@ export default function LoginPage() {
   }, []);
   return (
     <div
-      className='w-full h-screen overflow-hidden'
+      className='h-screen w-full overflow-hidden'
       style={{
         background:
           'radial-gradient(circle at top left, rgb(254, 202, 202) 0%, rgb(255, 255, 255) 65%)',
       }}
     >
-      <div className='grid grid-cols-1 lg:grid-cols-2 w-full h-full'>
+      <div className='grid h-full w-full grid-cols-1 lg:grid-cols-2'>
         {/* LEFT */}
         <div className='flex items-center justify-center px-4 lg:pr-1'>
           <div className='w-full max-w-125'>
@@ -132,11 +132,11 @@ export default function LoginPage() {
               alt='IOC Logo'
               width={200}
               height={60}
-              className='block mx-auto mb-8'
+              className='mx-auto mb-8 block'
             />
 
-            <p className='text-center font-bold text-4xl text-black mb-4'>Đăng nhập</p>
-            <p className='text-center text-gray-500 mb-8'>
+            <p className='mb-4 text-center text-4xl font-bold text-black'>Đăng nhập</p>
+            <p className='mb-8 text-center text-gray-500'>
               Chào mừng quay trở lại! Hãy nhập thông tin đăng nhập của bạn
             </p>
 
@@ -164,8 +164,8 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className='flex justify-between items-center'>
-                <label className='flex items-center gap-2 text-sm cursor-pointer'>
+              <div className='flex items-center justify-between'>
+                <label className='flex cursor-pointer items-center gap-2 text-sm'>
                   <input
                     type='checkbox'
                     name='rememberMe'
@@ -181,7 +181,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href='forgot-password'
-                  className='flex text-sm hover:underline text-(--primary-700) cursor-pointer'
+                  className='flex cursor-pointer text-sm text-(--primary-700) hover:underline'
                 >
                   Quên mật khẩu?
                 </Link>
@@ -189,24 +189,24 @@ export default function LoginPage() {
 
               <button
                 type='submit'
-                className='cursor-pointer w-full h-11 rounded-xl text-white font-semibold  bg-(--color-primary) hover:bg-(--color-primary-hover)'
+                className='h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)'
               >
                 Đăng nhập
               </button>
             </form>
 
-            <div className='text-center text-gray-500 text-sm mt-4'>
+            <div className='mt-4 text-center text-sm text-gray-500'>
               © 2026 Internship OneConnect
             </div>
           </div>
         </div>
 
         {/* RIGHT */}
-        <div className='hidden lg:flex items-center justify-center p-8'>
-          <div className='w-full max-w-175 h-full max-h-[90vh] rounded-4xl px-10 py-12 flex flex-col items-center justify-between shadow-xl bg-(--color-danger)'>
+        <div className='hidden items-center justify-center p-8 lg:flex'>
+          <div className='flex h-full max-h-[90vh] w-full max-w-175 flex-col items-center justify-between rounded-4xl bg-(--color-danger) px-10 py-12 shadow-xl'>
             <div className='text-center text-white'>
-              <h2 className='text-4xl font-extrabold mb-4'>Internship OneConnect</h2>
-              <p className='text-white/80 text-sm max-w-105 mx-auto'>
+              <h2 className='mb-4 text-4xl font-extrabold'>Internship OneConnect</h2>
+              <p className='mx-auto max-w-105 text-sm text-white/80'>
                 Tham gia chương trình thực tập để học hỏi từ các chuyên gia, rèn luyện kỹ năng thực
                 tế và chuẩn bị vững vàng cho sự nghiệp tương lai.
               </p>
@@ -217,7 +217,7 @@ export default function LoginPage() {
               alt='Mascot'
               width={400}
               height={400}
-              className='object-contain rounded-xl'
+              className='rounded-xl object-contain'
             />
           </div>
         </div>
@@ -225,4 +225,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

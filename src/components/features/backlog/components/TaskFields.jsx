@@ -8,9 +8,9 @@ import { useState, useRef, useEffect } from 'react';
 
 export function FieldLabel({ required, children }) {
   return (
-    <div className='mb-[6px] text-sm font-semibold text-slate-700'>
+    <div className='text-text mb-[6px] text-sm font-semibold'>
       {children}
-      {required ? <span className='text-red-500'> *</span> : null}
+      {required ? <span className='text-danger'> *</span> : null}
     </div>
   );
 }
@@ -37,13 +37,13 @@ export function Select({ value, onChange, options = [], placeholder = 'Select' }
       <button
         type='button'
         onClick={() => setOpen(!open)}
-        className='h-10 w-full rounded-2xl border border-slate-300 bg-white px-4 text-sm outline-none flex items-center justify-between hover:border-slate-400 transition-colors focus:border-red-400 focus:ring-1 focus:ring-red-400'
+        className='border-border/70 hover:border-border focus:border-primary focus:ring-primary flex h-10 w-full items-center justify-between rounded-2xl border bg-white px-4 text-sm transition-colors outline-none focus:ring-1'
       >
-        <span className={value ? 'text-slate-700 font-medium' : 'text-slate-400 font-medium'}>
+        <span className={value ? 'text-text font-medium' : 'text-muted font-medium'}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <svg
-          className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`text-muted h-4 w-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           fill='none'
           stroke='currentColor'
           viewBox='0 0 24 24'
@@ -53,7 +53,7 @@ export function Select({ value, onChange, options = [], placeholder = 'Select' }
       </button>
 
       {open && (
-        <div className='absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] py-2 overflow-hidden left-0 origin-top'>
+        <div className='border-border/50 absolute left-0 z-50 mt-2 w-full origin-top overflow-hidden rounded-2xl border bg-white py-2 shadow-[0_8px_30px_rgb(0,0,0,0.12)]'>
           {options.map((op) => {
             const isSelected = value === op.value;
             return (
@@ -64,10 +64,11 @@ export function Select({ value, onChange, options = [], placeholder = 'Select' }
                   onChange?.(op.value);
                   setOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 text-[14px] transition-colors ${isSelected
-                    ? 'bg-red-50 text-[#A32A2A] font-bold'
-                    : 'text-slate-600 hover:bg-slate-50 font-medium'
-                  }`}
+                className={`w-full px-4 py-2.5 text-left text-[14px] transition-colors ${
+                  isSelected
+                    ? 'bg-primary-50 text-primary font-bold'
+                    : 'text-text font-medium hover:bg-gray-50'
+                }`}
               >
                 {op.label}
               </button>
@@ -85,7 +86,7 @@ export function TextInput({ value, onChange, placeholder = '' }) {
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
-      className='h-10 w-full rounded-full border border-slate-300 bg-white px-4 text-sm text-slate-700 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400 placeholder:text-slate-400'
+      className='border-border/70 text-text focus:border-primary focus:ring-primary placeholder:text-muted h-10 w-full rounded-full border bg-white px-4 text-sm outline-none focus:ring-1'
     />
   );
 }

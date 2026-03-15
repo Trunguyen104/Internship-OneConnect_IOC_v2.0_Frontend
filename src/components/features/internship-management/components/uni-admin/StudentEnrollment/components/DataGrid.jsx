@@ -1,85 +1,82 @@
 'use client';
+
 import React, { memo } from 'react';
-import { Table, Space, Avatar, Tooltip, Button, Dropdown } from 'antd';
+import { Table, Avatar, Tooltip, Button, Dropdown, Tag } from 'antd';
 import { EyeOutlined, EditOutlined, MoreOutlined, UserDeleteOutlined } from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const STATUS_STYLES = {
-  placed: {
-    bg: 'bg-green-100',
-    text: 'text-green-700',
-    border: 'border-green-200',
-    label: 'Placed',
-    dot: 'bg-green-500',
-  },
-  unplaced: {
-    bg: 'bg-slate-100',
-    text: 'text-slate-600',
-    border: 'border-slate-200',
-    label: 'Unplaced',
-    dot: 'bg-slate-400',
-  },
-  withdrawn: {
-    bg: 'bg-red-100',
-    text: 'text-red-700',
-    border: 'border-red-200',
-    label: 'Withdrawn',
-    dot: 'bg-red-500',
-  },
+  placed: { color: 'success', label: 'Đã có chỗ' },
+  unplaced: { color: 'default', label: 'Chưa có chỗ' },
+  withdrawn: { color: 'error', label: 'Đã rút lui' },
 };
 
 const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) {
+  const { TABLE } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.STUDENT_ENROLLMENT;
+
   const columns = [
     {
-      title: 'Họ và Tên',
+      title: <span className='tracking-wider'>{TABLE.COLUMNS.FULL_NAME}</span>,
       dataIndex: 'name',
       key: 'name',
+      width: 220,
       render: (name) => (
-        <Space>
-          <Avatar size={32} className='bg-slate-200 text-slate-700'>
-            {name?.[0]}
+        <div className='flex items-center gap-3'>
+          <Avatar
+            size={36}
+            className='bg-primary/10 text-primary border-surface border-2 text-[10px] font-bold shadow-sm'
+          >
+            {name?.[0].toUpperCase()}
           </Avatar>
-          <span className='font-medium'>{name}</span>
-        </Space>
+          <span className='text-text text-sm font-bold'>{name}</span>
+        </div>
       ),
     },
     {
-      title: 'MSSV',
+      title: TABLE.COLUMNS.STUDENT_ID,
       dataIndex: 'id',
       key: 'id',
-      render: (text) => <span className='font-mono text-slate-600'>{text}</span>,
+      width: 120,
+      render: (text) => <span className='text-muted font-mono text-xs font-semibold'>{text}</span>,
     },
     {
-      title: 'Ngành học',
+      title: TABLE.COLUMNS.MAJOR,
       dataIndex: 'major',
       key: 'major',
-      render: (text) => <span className='text-slate-600'>{text}</span>,
+      width: 200,
+      render: (text) => <span className='text-text text-xs'>{text}</span>,
     },
     {
-      title: 'Trạng thái',
+      title: TABLE.COLUMNS.STATUS,
       dataIndex: 'status',
       key: 'status',
+      width: 150,
+      align: 'center',
       render: (status) => {
-        const style = STATUS_STYLES[status] || STATUS_STYLES.unplaced;
+        const config = STATUS_STYLES[status] || STATUS_STYLES.unplaced;
         return (
-          <span
-            className={`rounded-full border px-3 py-1 text-xs ${style.bg} ${style.text} ${style.border}`}
+          <Tag
+            color={config.color}
+            variant='filled'
+            className='min-w-[100px] rounded-full py-0.5 text-[10px] font-black tracking-widest uppercase'
           >
-            {style.label}
-          </span>
+            {config.label}
+          </Tag>
         );
       },
     },
     {
-      title: 'Thao tác',
+      title: TABLE.COLUMNS.ACTIONS,
       key: 'actions',
+      width: 120,
+      align: 'right',
       render: (_, record) => (
-        <div className='flex items-center gap-2 text-slate-400'>
+        <div className='flex items-center justify-end gap-1'>
           <Tooltip title='Xem chi tiết'>
             <Button
               type='text'
-              shape='circle'
               icon={<EyeOutlined />}
-              className='hover:bg-primary/5 hover:text-primary'
+              className='hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
               onClick={(e) => {
                 e.stopPropagation();
                 onView(record);
@@ -89,9 +86,8 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
           <Tooltip title='Chỉnh sửa'>
             <Button
               type='text'
-              shape='circle'
               icon={<EditOutlined />}
-              className='hover:bg-primary/5 hover:text-primary'
+              className='hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(record);
@@ -103,7 +99,7 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
               items: [
                 {
                   key: 'delete',
-                  label: 'Xóa sinh viên',
+                  label: 'Xóa khỏi đợt thực tập',
                   icon: <UserDeleteOutlined />,
                   danger: true,
                   onClick: (e) => {
@@ -114,20 +110,18 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
               ],
             }}
             trigger={['click']}
+            placement='bottomRight'
+            overlayClassName='min-w-[180px] rounded-xl overflow-hidden shadow-xl border border-border'
           >
-            <Tooltip title='Tùy chọn'>
-              <Button
-                type='text'
-                shape='circle'
-                icon={<MoreOutlined />}
-                className='hover:bg-primary/5 hover:text-primary'
-                onClick={(e) => e.stopPropagation()}
-              />
-            </Tooltip>
+            <Button
+              type='text'
+              icon={<MoreOutlined />}
+              className='hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
+              onClick={(e) => e.stopPropagation()}
+            />
           </Dropdown>
         </div>
       ),
-      width: 140,
     },
   ];
 
@@ -138,7 +132,8 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
       dataSource={students}
       scroll={{ x: 'max-content' }}
       pagination={false}
-      className='custom-antd-table'
+      className='premium-table'
+      rowClassName='group hover:bg-muted/5 transition-all duration-200 cursor-default'
     />
   );
 });

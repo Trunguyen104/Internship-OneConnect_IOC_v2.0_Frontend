@@ -2,7 +2,7 @@ export const STAKEHOLDER_UI = {
   SEARCH_PLACEHOLDER: 'Search stakeholder...',
   ADD_BUTTON: 'Add Stakeholder',
 
-  EMPTY_TITLE: 'No Stakeholders',
+  EMPTY_TITLE: 'No stakeholder',
   EMPTY_DESC: 'There are no stakeholders in this project yet.',
 
   DELETE_TITLE: 'Delete Stakeholder',
@@ -18,7 +18,7 @@ export const STAKEHOLDER_UI = {
 
   NO_ROLE: 'No role',
 
-  PLACEHOLDER_NAME: "Enter stakeholder's name",
+  PLACEHOLDER_NAME: 'Enter stakeholder name',
   PLACEHOLDER_EMAIL: 'Enter email address',
   PLACEHOLDER_PHONE: 'Enter phone number',
   PLACEHOLDER_DESC: 'Enter description',
@@ -26,7 +26,7 @@ export const STAKEHOLDER_UI = {
   MODAL_ADD: 'Add New Stakeholder',
   MODAL_EDIT: 'Edit Stakeholder',
 
-  ROLE_SELECT: 'Select a role',
+  ROLE_SELECT: 'Select Role',
   ROLE_MENTOR: 'Mentor',
   ROLE_SUPERVISOR: 'Supervisor',
   ROLE_LECTURER: 'Lecturer',
@@ -35,7 +35,7 @@ export const STAKEHOLDER_UI = {
   FIELD_NAME: 'Name',
   FIELD_EMAIL: 'Email',
   FIELD_ROLE: 'Role',
-  FIELD_PHONE: 'Phone number',
+  FIELD_PHONE: 'Phone Number',
   FIELD_DESC: 'Description',
   FIELD_TYPE: 'Type',
   TABLE_NO: '#',

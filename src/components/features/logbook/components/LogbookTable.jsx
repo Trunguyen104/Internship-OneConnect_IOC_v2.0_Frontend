@@ -1,15 +1,20 @@
 'use client';
 
-import AppTable from '@/components/ui/AppTable';
-import { Typography, Tooltip, Button } from 'antd';
-import { FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { memo } from 'react';
+import { Table, Typography, Tooltip, Button, Avatar } from 'antd';
+import {
+  FileTextOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CalendarOutlined,
+} from '@ant-design/icons';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import LogbookStatusTag from './LogbookStatusTag';
 
 const { Text } = Typography;
 
-export default function LogbookTable({
+const LogbookTable = memo(function LogbookTable({
   data,
   loading,
   userProfile,
@@ -22,33 +27,48 @@ export default function LogbookTable({
 
   const columns = [
     {
-      title: DAILY_REPORT_UI.TABLE.REPORT_DATE,
+      title: <span className='tracking-wider'>{DAILY_REPORT_UI.TABLE.REPORT_DATE}</span>,
       dataIndex: 'dateReport',
       key: 'dateReport',
       sorter: true,
-      width: 140,
+      width: 160,
       render: (text) => (
-        <span className='font-bold tracking-tight text-slate-800'>
-          {text ? new Date(text).toLocaleDateString('en-GB') : 'N/A'}
-        </span>
+        <div className='flex items-center gap-3'>
+          <div className='bg-primary/10 flex size-9 items-center justify-center rounded-xl'>
+            <CalendarOutlined className='text-primary text-lg' />
+          </div>
+          <span className='text-text text-sm font-bold tracking-tight'>
+            {text ? new Date(text).toLocaleDateString('vi-VN') : 'N/A'}
+          </span>
+        </div>
       ),
     },
     {
       title: DAILY_REPORT_UI.TABLE.STUDENT,
       dataIndex: 'studentName',
       key: 'studentName',
-      width: 180,
-      render: (text) => <Text className='font-semibold text-slate-700'>{text || 'N/A'}</Text>,
+      width: 220,
+      render: (text) => (
+        <div className='flex items-center gap-3'>
+          <Avatar
+            size={36}
+            className='bg-primary/10 text-primary border-surface border-2 text-[10px] font-bold shadow-sm'
+          >
+            {text?.[0].toUpperCase()}
+          </Avatar>
+          <span className='text-text text-sm font-bold'>{text || 'N/A'}</span>
+        </div>
+      ),
     },
     {
       title: DAILY_REPORT_UI.TABLE.SUMMARY,
       dataIndex: 'summary',
       key: 'summary',
-      width: 200,
+      width: 250,
       ellipsis: true,
       render: (text) => (
         <Tooltip placement='topLeft' title={text}>
-          <span className='text-sm text-slate-600'>{text}</span>
+          <span className='text-text text-xs leading-relaxed'>{text}</span>
         </Tooltip>
       ),
     },
@@ -60,7 +80,7 @@ export default function LogbookTable({
       ellipsis: true,
       render: (text) => (
         <Tooltip placement='topLeft' title={text}>
-          <span className='text-sm text-slate-500 italic'>{text || '-'}</span>
+          <span className='text-muted text-xs italic'>{text || '-'}</span>
         </Tooltip>
       ),
     },
@@ -68,45 +88,45 @@ export default function LogbookTable({
       title: DAILY_REPORT_UI.TABLE.STATUS,
       dataIndex: 'status',
       key: 'status',
-      width: 120,
+      width: 150,
       align: 'center',
       render: (status) => <LogbookStatusTag status={status} />,
     },
     {
-      title: DAILY_REPORT_UI.TABLE.ACTION,
+      title: <span className='pr-4'>{DAILY_REPORT_UI.TABLE.ACTION}</span>,
       key: 'action',
       width: 140,
-      align: 'center',
+      align: 'right',
       render: (_, record) => {
         const isOwner = record.studentId === currentStudentId;
 
         return (
-          <div className='flex items-center justify-center gap-2'>
-            <Tooltip title='View Details'>
+          <div className='flex items-center justify-end gap-1'>
+            <Tooltip title='Xem chi tiết'>
               <Button
                 type='text'
-                icon={<FileTextOutlined className='text-gray-500 hover:text-blue-600' />}
+                icon={<FileTextOutlined />}
                 onClick={() => onView(record)}
-                className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-blue-50'
+                className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
               />
             </Tooltip>
 
             {isOwner && (
               <>
-                <Tooltip title='Edit Report'>
+                <Tooltip title='Chỉnh sửa báo cáo'>
                   <Button
                     type='text'
-                    icon={<EditOutlined className='text-gray-500 hover:text-amber-500' />}
+                    icon={<EditOutlined />}
                     onClick={() => onEdit(record)}
-                    className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-amber-50'
+                    className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                   />
                 </Tooltip>
 
-                <Tooltip title='Delete Report'>
+                <Tooltip title='Xóa báo cáo'>
                   <Button
                     type='text'
                     danger
-                    icon={<DeleteOutlined className='text-gray-400 hover:text-red-500' />}
+                    icon={<DeleteOutlined />}
                     onClick={() =>
                       showDeleteConfirm({
                         title: DAILY_REPORT_UI.DELETE_MODAL.TITLE,
@@ -114,7 +134,7 @@ export default function LogbookTable({
                         onOk: () => onDelete(record.logbookId),
                       })
                     }
-                    className='flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50'
+                    className='hover:bg-danger/10 flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                   />
                 </Tooltip>
               </>
@@ -126,17 +146,27 @@ export default function LogbookTable({
   ];
 
   return (
-    <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/60 bg-white shadow-sm'>
-      <AppTable
+    <div className='flex-1 overflow-hidden px-2'>
+      <Table
         columns={columns}
-        data={data}
+        dataSource={data}
         rowKey='logbookId'
         loading={loading}
         onChange={onTableChange}
         pagination={false}
-        scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
-        emptyText={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}
+        className='premium-table'
+        rowClassName='group hover:bg-muted/5 transition-all duration-200 cursor-default'
+        scroll={{ x: 'max-content' }}
+        locale={{
+          emptyText: (
+            <div className='py-12 text-center'>
+              <Text className='text-muted italic'>{DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}</Text>
+            </div>
+          ),
+        }}
       />
     </div>
   );
-}
+});
+
+export default LogbookTable;

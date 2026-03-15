@@ -1,3 +1,5 @@
+'use client';
+
 import dayjs from 'dayjs';
 import { Typography, Tag } from 'antd';
 

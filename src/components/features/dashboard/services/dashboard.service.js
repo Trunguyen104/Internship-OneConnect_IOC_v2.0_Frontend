@@ -11,4 +11,3 @@ export async function getDashboardData() {
   // 2️⃣ Khi backend có → gọi API thật qua proxy Next
   return httpGet('/dashboard');
 }
-

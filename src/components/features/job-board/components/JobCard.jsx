@@ -2,45 +2,47 @@
 import { Card, Typography, Tag } from 'antd';
 import { HeartOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
+import { JOB_BOARD_UI } from '@/constants/job-board';
+
 const { Text } = Typography;
 
 export default function JobCard({ title, company, salary, location }) {
   return (
     <Card
       hoverable
-      className='border-none rounded-xl shadow-sm hover:shadow-md transition'
-      bodyStyle={{ padding: 16 }}
+      className='rounded-xl border-none shadow-sm transition hover:shadow-md'
+      styles={{ body: { padding: 16 } }}
     >
-      <div className='flex gap-4 h-full'>
+      <div className='flex h-full gap-4'>
         {/* LOGO */}
-        <div className='w-16 h-16 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center font-bold text-gray-300 text-[10px] shrink-0'>
+        <div className='flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 text-[10px] font-bold text-gray-300'>
           LOGO
         </div>
 
         {/* CONTENT */}
-        <div className='flex-1 min-w-0 flex flex-col justify-between'>
+        <div className='flex min-w-0 flex-1 flex-col justify-between'>
           <div>
-            <div className='flex justify-between items-start gap-2'>
-              <Text strong className='text-[15px] line-clamp-2 hover:text-[#00b14f] cursor-pointer'>
-                {title || 'Nhân Viên Kinh Doanh'}
+            <div className='flex items-start justify-between gap-2'>
+              <Text strong className='hover:text-success line-clamp-2 cursor-pointer text-[15px]'>
+                {title || JOB_BOARD_UI.DEFAULT_TITLE}
               </Text>
 
-              <HeartOutlined className='text-gray-400 hover:text-red-500 cursor-pointer' />
+              <HeartOutlined className='hover:text-danger cursor-pointer text-gray-400' />
             </div>
 
-            <Text className='text-gray-400 text-[12px] block truncate uppercase mb-2'>
-              {company || 'CÔNG TY TNHH ABC'}
+            <Text className='mb-2 block truncate text-[12px] text-gray-400 uppercase'>
+              {company || JOB_BOARD_UI.DEFAULT_COMPANY}
             </Text>
           </div>
 
-          <div className='flex items-center gap-2 mt-2'>
-            <Tag className='m-0 border-none bg-[#e6f7ef] text-[#00b14f] font-medium'>
-              {salary || '10 - 20 triệu'}
+          <div className='mt-2 flex items-center gap-2'>
+            <Tag className='bg-success-surface text-success m-0 border-none font-medium'>
+              {salary || JOB_BOARD_UI.DEFAULT_SALARY}
             </Tag>
 
-            <Text type='secondary' className='text-[12px] flex items-center'>
+            <Text type='secondary' className='flex items-center text-[12px]'>
               <EnvironmentOutlined className='mr-1' />
-              {location || 'Hồ Chí Minh'}
+              {location || JOB_BOARD_UI.DEFAULT_LOCATION}
             </Text>
           </div>
         </div>
@@ -48,4 +50,3 @@ export default function JobCard({ title, company, salary, location }) {
     </Card>
   );
 }
-

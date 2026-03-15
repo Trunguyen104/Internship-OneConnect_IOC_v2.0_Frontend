@@ -41,9 +41,9 @@ export default function DailyReportFormModal({
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'>
       <div className='w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl'>
-        <h2 className='text-xl font-semibold mb-6'>{title}</h2>
+        <h2 className='mb-6 text-xl font-semibold'>{title}</h2>
 
-        <div className='space-y-4 max-h-[60vh] overflow-y-auto pr-2'>
+        <div className='max-h-[60vh] space-y-4 overflow-y-auto pr-2'>
           <input
             type='date'
             value={form.reportDate}
@@ -55,32 +55,32 @@ export default function DailyReportFormModal({
             placeholder='Công việc đã làm hôm qua...'
             value={form.yesterdayWork}
             onChange={(e) => handleChange('yesterdayWork', e.target.value)}
-            className='w-full rounded-xl border px-4 py-2 min-h-[100px]'
+            className='min-h-[100px] w-full rounded-xl border px-4 py-2'
           />
 
           <textarea
             placeholder='Vấn đề gặp phải...'
             value={form.issues}
             onChange={(e) => handleChange('issues', e.target.value)}
-            className='w-full rounded-xl border px-4 py-2 min-h-[100px]'
+            className='min-h-[100px] w-full rounded-xl border px-4 py-2'
           />
 
           <textarea
             placeholder='Kế hoạch hôm nay...'
             value={form.todayPlan}
             onChange={(e) => handleChange('todayPlan', e.target.value)}
-            className='w-full rounded-xl border px-4 py-2 min-h-[100px]'
+            className='min-h-[100px] w-full rounded-xl border px-4 py-2'
           />
         </div>
 
         <div className='mt-6 flex justify-end gap-3'>
-          <button onClick={onClose} className='rounded-full px-5 py-2 bg-gray-200'>
+          <button onClick={onClose} className='rounded-full bg-gray-200 px-5 py-2'>
             Hủy
           </button>
 
           <button
             onClick={handleSubmit}
-            className='rounded-full px-6 py-2 bg-(--color-primary) text-white'
+            className='rounded-full bg-(--color-primary) px-6 py-2 text-white'
           >
             Tạo báo cáo
           </button>
@@ -89,4 +89,3 @@ export default function DailyReportFormModal({
     </div>
   );
 }
-

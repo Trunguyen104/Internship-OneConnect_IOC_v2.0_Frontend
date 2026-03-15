@@ -3,7 +3,7 @@ export const ISSUE_UI = {
   ADD_BUTTON: 'Add Issue',
 
   TABLE: {
-    NO: 'No',
+    NO: 'No.',
     TITLE: 'Title',
     STAKEHOLDER: 'Stakeholder',
     DESCRIPTION: 'Description',
@@ -33,14 +33,13 @@ export const ISSUE_UI = {
   },
 
   DETAIL: {
-    TITLE: 'Issue Detail',
+    TITLE: 'Issue Details',
     CREATED_AT: 'Created At',
     RESOLVED_AT: 'Resolved At',
   },
 
   EMPTY: {
-    NO_DATA: 'No issues found',
+    NO_DATA: 'No issue found',
     UNKNOWN: 'Unknown',
   },
 };
-

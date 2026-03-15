@@ -488,4 +488,3 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
     </div>
   );
 }
-

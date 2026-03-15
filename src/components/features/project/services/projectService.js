@@ -33,4 +33,3 @@ export const ProjectService = {
     return httpGet(`/projects/internship-group?internshipGroupId=${internshipGroupId}`);
   },
 };
-

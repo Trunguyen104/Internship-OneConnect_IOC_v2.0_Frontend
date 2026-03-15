@@ -15,6 +15,7 @@ import UpdateTaskModal from '@/components/features/backlog/components/UpdateTask
 import { useBoard, COLUMNS } from '../hooks/useBoard';
 import { BoardColumn } from './BoardColumn';
 import { IssueCard } from './IssueCard';
+import { WORK_BOARD_UI } from '@/constants/work-board';
 
 export default function Board() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
@@ -34,18 +35,18 @@ export default function Board() {
     handleUpdateSubmit,
     onDragStart,
     onDragOver,
-    onDragEnd
+    onDragEnd,
   } = useBoard();
 
   return (
     <PageShell>
-      <div className='flex flex-col gap-4 mb-4'>
+      <div className='mb-4 flex flex-col gap-4'>
         <StudentTabs />
         <div className='flex items-center gap-2'>
-          <div className='w-full max-sm:max-w-xs max-w-sm border rounded-full px-4 py-2 bg-white'>
+          <div className='border-border bg-surface flex w-full max-w-sm items-center rounded-full border px-4 py-2 max-sm:max-w-xs'>
             <input
-              placeholder='Search tasks...'
-              className='bg-transparent outline-none w-full text-sm'
+              placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
+              className='text-text w-full bg-transparent text-sm outline-none'
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -60,7 +61,7 @@ export default function Board() {
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
       >
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full'>
+        <div className='grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
           {COLUMNS.map((col) => (
             <BoardColumn
               key={col.id}

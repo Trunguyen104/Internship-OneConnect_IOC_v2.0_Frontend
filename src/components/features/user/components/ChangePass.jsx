@@ -3,8 +3,8 @@
 import Card from '@/components/ui/Card';
 import { useState } from 'react';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-// import { ToastProvider } from '@/providers/ToastProvider';
 import { useToast } from '@/providers/ToastProvider';
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function ChangePass() {
   const toast = useToast();
@@ -46,31 +46,31 @@ export default function ChangePass() {
       const text = await res.text();
 
       if (res.ok) {
-        toast.success('Password changed successfully');
+        toast.success(PROFILE_UI.CHANGE_PASSWORD.SUCCESS);
         setForm({
           currentPassword: '',
           newPassword: '',
           confirmPassword: '',
         });
       } else {
-        toast.error(text || 'Failed to change password');
+        toast.error(text || PROFILE_UI.CHANGE_PASSWORD.ERROR.FAILED);
       }
     } catch {
-      toast.error('An error occurred');
+      toast.error(PROFILE_UI.CHANGE_PASSWORD.ERROR.GENERAL);
     }
   };
 
   return (
     <>
       <div className='mb-5'>
-        <h1 className='text-2xl font-bold text-slate-900'>Change Password</h1>
-        <label className='text-sm'>Reset your password to protect your account.</label>
+        <h1 className='text-text text-2xl font-bold'>{PROFILE_UI.CHANGE_PASSWORD.TITLE}</h1>
+        <label className='text-muted text-sm'>{PROFILE_UI.CHANGE_PASSWORD.HINT}</label>
       </div>
       <Card>
         <div className='space-y-8'>
-          <div className='space-y-6 w-full'>
+          <div className='w-full space-y-6'>
             <PasswordField
-              label='Current Password'
+              label={PROFILE_UI.CHANGE_PASSWORD.CURRENT_PASSWORD}
               name='currentPassword'
               value={form.currentPassword}
               onChange={handleChange}
@@ -79,7 +79,7 @@ export default function ChangePass() {
             />
 
             <PasswordField
-              label='New Password'
+              label={PROFILE_UI.CHANGE_PASSWORD.NEW_PASSWORD}
               name='newPassword'
               value={form.newPassword}
               onChange={handleChange}
@@ -88,7 +88,7 @@ export default function ChangePass() {
             />
 
             <PasswordField
-              label='Confirm Password'
+              label={PROFILE_UI.CHANGE_PASSWORD.CONFIRM_PASSWORD}
               name='confirmPassword'
               value={form.confirmPassword}
               onChange={handleChange}
@@ -96,22 +96,23 @@ export default function ChangePass() {
               onToggle={() => setShow({ ...show, confirm: !show.confirm })}
               error={
                 form.confirmPassword && form.newPassword !== form.confirmPassword
-                  ? 'Passwords do not match'
+                  ? PROFILE_UI.CHANGE_PASSWORD.ERROR.MATCH
                   : ''
               }
             />
           </div>
 
-          <div className='pt-6 border-t flex justify-end items-center'>
+          <div className='border-border flex items-center justify-end border-t pt-6'>
             <button
               onClick={handleSubmit}
               disabled={!isValid}
-              className={`h-10 px-10 rounded-full font-semibold transition cursor-pointer
-  ${
-    isValid ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-red-200 text-white cursor-not-allowed'
-  }`}
+              className={`h-10 cursor-pointer rounded-full px-10 font-semibold transition ${
+                isValid
+                  ? 'bg-danger hover:bg-danger/90 text-white'
+                  : 'bg-danger/20 cursor-not-allowed text-white'
+              }`}
             >
-              Change Password
+              {PROFILE_UI.CHANGE_PASSWORD.SUBMIT}
             </button>
           </div>
         </div>
@@ -123,8 +124,8 @@ export default function ChangePass() {
 function PasswordField({ label, name, value, onChange, show, onToggle, hint, error }) {
   return (
     <div className='space-y-1'>
-      <label className='text-sm font-semibold text-slate-700 mb-4'>
-        {label} <span className='text-red-500'>*</span>
+      <label className='text-text mb-4 text-sm font-semibold'>
+        {label} <span className='text-danger'>*</span>
       </label>
 
       <div className='relative mt-2'>
@@ -133,28 +134,20 @@ function PasswordField({ label, name, value, onChange, show, onToggle, hint, err
           value={value}
           onChange={onChange}
           type={show ? 'text' : 'password'}
-          className={`
-            w-full h-11 pl-5 rounded-xl border
-            ${error ? 'border-red-400' : 'border-slate-300'}
-            focus:ring-2 focus:ring-primary
-            focus:border-primary
-            outline-none transition
-          `}
+          className={`border-border h-11 w-full rounded-xl border pl-5 ${error ? 'border-danger' : 'border-border'} focus:ring-primary focus:border-primary transition outline-none focus:ring-2`}
         />
 
         <button
           type='button'
           onClick={onToggle}
-          className='absolute right-4 top-1/2 -translate-y-1/2
-                     text-slate-400 hover:text-slate-600 transition'
+          className='text-muted hover:text-text absolute top-1/2 right-4 -translate-y-1/2 transition'
         >
           {show ? <EyeInvisibleOutlined /> : <EyeOutlined />}
         </button>
       </div>
 
-      {hint && <p className='text-xs text-slate-500'>{hint}</p>}
-      {error && <p className='text-xs text-red-500'>{error}</p>}
+      {hint && <p className='text-muted text-xs'>{hint}</p>}
+      {error && <p className='text-danger text-xs'>{error}</p>}
     </div>
   );
 }
-

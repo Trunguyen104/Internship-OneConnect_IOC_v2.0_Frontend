@@ -29,12 +29,12 @@ export default function StudentListPage() {
 
   if (!internshipId && !currentId && !loading && !groupDetail) {
     return (
-      <section className='m-6 flex h-[400px] items-center justify-center rounded-3xl border border-gray-200/50 bg-gray-50/50'>
+      <section className='border-border/50 bg-bg/50 m-6 flex h-[400px] items-center justify-center rounded-3xl border'>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           className='my-auto'
           description={
-            <span className='font-medium text-gray-500'>
+            <span className='text-muted font-medium'>
               {STUDENT_LIST_UI.EMPTY.NO_GROUP}
               <br />
               {STUDENT_LIST_UI.EMPTY.NOT_ASSIGNED}
@@ -47,19 +47,17 @@ export default function StudentListPage() {
 
   return (
     <section>
-      <StudentPageHeader title='Student List' />
+      <StudentPageHeader title={STUDENT_LIST_UI.PAGE_TITLE} />
 
       <Card>
-        <div className='mb-5 flex items-center justify-between border-b border-gray-100 pb-5'>
+        <div className='border-border/50 mb-5 flex items-center justify-between border-b pb-5'>
           <div className='flex items-center gap-4'>
-            <div className='flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 text-slate-500 shadow-sm'>
+            <div className='border-border bg-bg text-muted flex h-12 w-12 items-center justify-center rounded-2xl border shadow-sm'>
               <TeamOutlined className='text-xl' />
             </div>
             <div>
-              <h3 className='m-0 text-lg font-bold text-slate-900'>
-                {STUDENT_LIST_UI.GROUP.MEMBERS}
-              </h3>
-              <p className='m-0 mt-0.5 text-sm font-medium text-slate-500'>
+              <h3 className='text-text m-0 text-lg font-bold'>{STUDENT_LIST_UI.GROUP.MEMBERS}</h3>
+              <p className='text-muted m-0 mt-0.5 text-sm font-medium'>
                 {groupDetail?.members?.length || 0} {STUDENT_LIST_UI.GROUP.STUDENTS_TOTAL}
               </p>
             </div>
@@ -77,7 +75,7 @@ export default function StudentListPage() {
           </div>
         </div>
 
-        <div className='mb-3 flex-1 overflow-hidden rounded-xl border border-gray-50 bg-white shadow-sm'>
+        <div className='border-border/20 bg-surface mb-3 flex-1 overflow-hidden rounded-xl border shadow-sm'>
           <StudentTable data={paginatedMembers} loading={loading} onDelete={handleDeleteStudent} />
         </div>
       </Card>

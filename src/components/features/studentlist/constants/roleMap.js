@@ -1,10 +1,12 @@
+import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
+
 export const ROLE_MAP = {
   Member: {
-    label: 'Member',
+    label: STUDENT_LIST_UI.ROLE.MEMBER,
     color: 'default',
   },
   Leader: {
-    label: 'Leader',
-    color: 'gold',
+    label: STUDENT_LIST_UI.ROLE.LEADER,
+    color: 'warning',
   },
 };

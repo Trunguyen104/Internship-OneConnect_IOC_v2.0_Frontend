@@ -4,13 +4,24 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { useToast } from '@/providers/ToastProvider';
-import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY, SPRINT_STATUS } from '@/constants/enums';
+import {
+  WORK_ITEM_STATUS,
+  WORK_ITEM_TYPE,
+  WORK_ITEM_PRIORITY,
+  SPRINT_STATUS,
+} from '@/constants/enums';
+
+import { WORK_BOARD_UI } from '@/constants/work-board';
 
 export const COLUMNS = [
-  { id: WORK_ITEM_STATUS.TODO, title: 'To Do', underline: 'bg-gray-700' },
-  { id: WORK_ITEM_STATUS.IN_PROGRESS, title: 'In Progress', underline: 'bg-blue-600' },
-  { id: WORK_ITEM_STATUS.REVIEW, title: 'In Review', underline: 'bg-yellow-500' },
-  { id: WORK_ITEM_STATUS.DONE, title: 'Done', underline: 'bg-green-500' },
+  { id: WORK_ITEM_STATUS.TODO, title: WORK_BOARD_UI.COLUMN_TODO, underline: 'bg-muted' },
+  {
+    id: WORK_ITEM_STATUS.IN_PROGRESS,
+    title: WORK_BOARD_UI.COLUMN_IN_PROGRESS,
+    underline: 'bg-info',
+  },
+  { id: WORK_ITEM_STATUS.REVIEW, title: WORK_BOARD_UI.COLUMN_REVIEW, underline: 'bg-warning' },
+  { id: WORK_ITEM_STATUS.DONE, title: WORK_BOARD_UI.COLUMN_DONE, underline: 'bg-success' },
 ];
 
 /**
@@ -38,80 +49,83 @@ export function useBoardData() {
     fetchProjectId();
   }, [toast]);
 
-  const fetchBoardData = useCallback(async (showLoading = true) => {
-    if (!projectId) return;
-    try {
-      if (showLoading) setLoading(true);
-      const [sprintsRes, epicsRes] = await Promise.all([
-        productBacklogService.getWorkItemsBacklog(projectId),
-        productBacklogService.getEpics(projectId),
-      ]);
+  const fetchBoardData = useCallback(
+    async (showLoading = true) => {
+      if (!projectId) return;
+      try {
+        if (showLoading) setLoading(true);
+        const [sprintsRes, epicsRes] = await Promise.all([
+          productBacklogService.getWorkItemsBacklog(projectId),
+          productBacklogService.getEpics(projectId),
+        ]);
 
-      setEpics(epicsRes?.data?.items || epicsRes?.data || []);
-      const sprintsData = sprintsRes?.data?.sprints || [];
-      setSprints(sprintsData);
+        setEpics(epicsRes?.data?.items || epicsRes?.data || []);
+        const sprintsData = sprintsRes?.data?.sprints || [];
+        setSprints(sprintsData);
 
-      const activeSprint =
-        sprintsData.find((s) => {
-          const sStatus = s.status?.id || s.status;
-          return (
-            sStatus === SPRINT_STATUS.ACTIVE ||
-            String(sStatus).toUpperCase() === 'ACTIVE' ||
-            s.status?.name?.toUpperCase() === 'ACTIVE'
-          );
-        }) || sprintsData[0];
+        const activeSprint =
+          sprintsData.find((s) => {
+            const sStatus = s.status?.id || s.status;
+            return (
+              sStatus === SPRINT_STATUS.ACTIVE ||
+              String(sStatus).toUpperCase() === 'ACTIVE' ||
+              s.status?.name?.toUpperCase() === 'ACTIVE'
+            );
+          }) || sprintsData[0];
 
-      if (activeSprint) {
-        const itemsToMap = activeSprint.items || activeSprint.featureWorkItems || [];
+        if (activeSprint) {
+          const itemsToMap = activeSprint.items || activeSprint.featureWorkItems || [];
 
-        const mappedItems = itemsToMap.map((it, idx) => {
-          let s = it.status?.id || it.status;
-          if (typeof s === 'string') {
-            const upper = s.toUpperCase().replace(/\s|_/g, '');
-            if (upper === 'TODO') s = WORK_ITEM_STATUS.TODO;
-            else if (upper === 'INPROGRESS') s = WORK_ITEM_STATUS.IN_PROGRESS;
-            else if (upper === 'REVIEW') s = WORK_ITEM_STATUS.REVIEW;
-            else if (upper === 'DONE') s = WORK_ITEM_STATUS.DONE;
-            else s = WORK_ITEM_STATUS.TODO;
-          }
+          const mappedItems = itemsToMap.map((it, idx) => {
+            let s = it.status?.id || it.status;
+            if (typeof s === 'string') {
+              const upper = s.toUpperCase().replace(/\s|_/g, '');
+              if (upper === 'TODO') s = WORK_ITEM_STATUS.TODO;
+              else if (upper === 'INPROGRESS') s = WORK_ITEM_STATUS.IN_PROGRESS;
+              else if (upper === 'REVIEW') s = WORK_ITEM_STATUS.REVIEW;
+              else if (upper === 'DONE') s = WORK_ITEM_STATUS.DONE;
+              else s = WORK_ITEM_STATUS.TODO;
+            }
 
-          let t = it.type?.id || it.type;
-          if (typeof t === 'string') {
-            const upper = t.toUpperCase().replace(/\s|_/g, '');
-            if (upper === 'EPIC') t = WORK_ITEM_TYPE.EPIC;
-            else if (upper === 'USERSTORY') t = WORK_ITEM_TYPE.USER_STORY;
-            else if (upper === 'TASK') t = WORK_ITEM_TYPE.TASK;
-            else if (upper === 'SUBTASK') t = WORK_ITEM_TYPE.SUBTASK;
-            else t = WORK_ITEM_TYPE.USER_STORY;
-          }
+            let t = it.type?.id || it.type;
+            if (typeof t === 'string') {
+              const upper = t.toUpperCase().replace(/\s|_/g, '');
+              if (upper === 'EPIC') t = WORK_ITEM_TYPE.EPIC;
+              else if (upper === 'USERSTORY') t = WORK_ITEM_TYPE.USER_STORY;
+              else if (upper === 'TASK') t = WORK_ITEM_TYPE.TASK;
+              else if (upper === 'SUBTASK') t = WORK_ITEM_TYPE.SUBTASK;
+              else t = WORK_ITEM_TYPE.USER_STORY;
+            }
 
-          let p = it.priority?.id || it.priority;
-          if (typeof p === 'string') {
-            const upper = p.toUpperCase();
-            p = WORK_ITEM_PRIORITY[upper] || WORK_ITEM_PRIORITY.MEDIUM;
-          }
+            let p = it.priority?.id || it.priority;
+            if (typeof p === 'string') {
+              const upper = p.toUpperCase();
+              p = WORK_ITEM_PRIORITY[upper] || WORK_ITEM_PRIORITY.MEDIUM;
+            }
 
-          return {
-            id: it.workItemId || it.id,
-            displayId: it.key || `ISSUE-${idx + 1}`,
-            title: it.title || it.name,
-            type: t || WORK_ITEM_TYPE.USER_STORY,
-            priority: p || WORK_ITEM_PRIORITY.MEDIUM,
-            points: it.storyPoint || 0,
-            assignee: it.assigneeName || '—',
-            status: s || WORK_ITEM_STATUS.TODO,
-            sprintId: activeSprint.sprintId || activeSprint.id,
-            parentId: it.parentId,
-          };
-        });
-        setItems(mappedItems);
+            return {
+              id: it.workItemId || it.id,
+              displayId: it.key || `ISSUE-${idx + 1}`,
+              title: it.title || it.name,
+              type: t || WORK_ITEM_TYPE.USER_STORY,
+              priority: p || WORK_ITEM_PRIORITY.MEDIUM,
+              points: it.storyPoint || 0,
+              assignee: it.assigneeName || WORK_BOARD_UI.UNASSIGNED,
+              status: s || WORK_ITEM_STATUS.TODO,
+              sprintId: activeSprint.sprintId || activeSprint.id,
+              parentId: it.parentId,
+            };
+          });
+          setItems(mappedItems);
+        }
+      } catch {
+        toast.error(WORK_BOARD_UI.ERROR_FETCH_BOARD);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      toast.error('Lỗi khi tải dữ liệu');
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId, toast]);
+    },
+    [projectId, toast],
+  );
 
   useEffect(() => {
     fetchBoardData();
@@ -127,11 +141,12 @@ export function useBoardData() {
 
   return {
     projectId,
-    items, setItems,
+    items,
+    setItems,
     epics,
     sprints,
     loading,
     byColumn,
-    fetchBoardData
+    fetchBoardData,
   };
 }

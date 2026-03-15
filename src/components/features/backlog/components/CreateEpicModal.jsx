@@ -3,10 +3,11 @@
 import { useMemo, useState } from 'react';
 import TiptapEditor from '@/components/ui/TiptapEditor';
 import DateInput from '@/components/ui/DateInput';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 function FieldLabel({ required, children }) {
   return (
-    <div className='mb-2 text-sm font-semibold text-text'>
+    <div className='text-text mb-2 text-sm font-semibold'>
       {children}
       {required ? <span className='text-primary'> *</span> : null}
     </div>
@@ -19,7 +20,7 @@ function TextInput({ value, onChange, placeholder = '' }) {
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
-      className='h-11 w-full rounded-2xl border border-border bg-white px-4 text-sm outline-none focus:border-primary'
+      className='border-border focus:border-primary h-11 w-full rounded-2xl border bg-white px-4 text-sm outline-none'
     />
   );
 }
@@ -65,58 +66,62 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
       />
 
       {/* modal */}
-      <div className='relative w-full max-w-[720px] rounded-3xl bg-white shadow-2xl overflow-hidden flex flex-col'>
-        <div className='flex flex-col h-full max-h-[85vh]'>
+      <div className='relative flex w-full max-w-[720px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl'>
+        <div className='flex h-full max-h-[85vh] flex-col'>
           {/* Header */}
-          <div className='px-8 pt-8 pb-4 shrink-0'>
-            <div className='text-2xl font-bold text-text'>Create Epic</div>
+          <div className='shrink-0 px-8 pt-8 pb-4'>
+            <div className='text-text text-2xl font-bold'>{BACKLOG_UI.MODAL_CREATE_EPIC}</div>
           </div>
 
           {/* Body */}
-          <div className='flex-1 flex flex-col overflow-y-auto px-8 py-2 space-y-6'>
-            {/* Tên Epic */}
+          <div className='flex flex-1 flex-col space-y-6 overflow-y-auto px-8 py-2'>
+            {/* Epic name */}
             <div>
-              <FieldLabel required>Epic Name</FieldLabel>
+              <FieldLabel required>{BACKLOG_UI.FIELD_EPIC_NAME}</FieldLabel>
               <TextInput
                 value={epicName}
                 onChange={setEpicName}
-                placeholder='Enter epic summary...'
+                placeholder={BACKLOG_UI.PLACEHOLDER_EPIC_SUMMARY}
               />
             </div>
 
-            {/* Mô tả */}
-            <div className='flex flex-1 flex-col overflow-hidden min-h-[250px]'>
-              <FieldLabel>Description</FieldLabel>
+            {/* Description */}
+            <div className='flex min-h-[250px] flex-1 flex-col overflow-hidden'>
+              <FieldLabel>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
               <div className='flex-1 overflow-y-auto rounded-2xl'>
-                <TiptapEditor value={desc} onChange={setDesc} placeholder='Enter description...' />
+                <TiptapEditor
+                  value={desc}
+                  onChange={setDesc}
+                  placeholder={BACKLOG_UI.PLACEHOLDER_DESC}
+                />
               </div>
             </div>
 
-            {/* Ngày kết thúc */}
+            {/* End date */}
             <div>
-              <FieldLabel>End Date</FieldLabel>
+              <FieldLabel>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
               <div className='w-[200px]'>
                 <DateInput value={endDate} onChange={setEndDate} />
               </div>
             </div>
           </div>
 
-          <div className='flex items-center justify-end gap-3 px-8 py-6 shrink-0'>
+          <div className='flex shrink-0 items-center justify-end gap-3 px-8 py-6'>
             <button
               type='button'
               onClick={handleClose}
-              className='h-11 rounded-full bg-red-50/50 px-6 text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors'
+              className='bg-primary-50/50 text-primary hover:bg-primary-50 h-11 rounded-full px-6 text-sm font-semibold transition-colors'
             >
-              Cancel
+              {BACKLOG_UI.CANCEL}
             </button>
 
             <button
               type='button'
               disabled={!canSubmit}
               onClick={handleSubmit}
-              className='h-11 rounded-full px-8 text-sm font-semibold text-white bg-red-700 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'
+              className='bg-primary hover:bg-primary-hover h-11 rounded-full px-8 text-sm font-semibold text-white shadow-md transition-colors disabled:cursor-not-allowed disabled:opacity-50'
             >
-              Create
+              {BACKLOG_UI.CREATE}
             </button>
           </div>
         </div>
@@ -124,4 +129,3 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
     </div>
   );
 }
-

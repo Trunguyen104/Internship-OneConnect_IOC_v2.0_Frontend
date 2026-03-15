@@ -1,9 +1,4 @@
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 
 import { useBacklogBoard } from '../hooks/useBacklogBoard';
 import { EpicSidebar } from './EpicSidebar';
@@ -11,34 +6,58 @@ import { SprintSection } from './SprintSection';
 import { BacklogSection } from './BacklogSection';
 import { BoardHeader } from './BoardHeader';
 import { BacklogModals } from './BacklogModals';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 export default function BacklogBoard() {
   const {
     projectId,
-    epics, setEpics,
-    sprints, setSprints,
+    epics,
+    setEpics,
+    sprints,
+    setSprints,
     setBacklogItems,
     loading,
-    selectedEpicId, setSelectedEpicId,
-    isSidebarOpen, setIsSidebarOpen,
+    selectedEpicId,
+    setSelectedEpicId,
+    searchText,
+    setSearchText,
+    isSidebarOpen,
+    setIsSidebarOpen,
     filteredBacklogItems,
     filteredSprints,
     itemOrders,
-    activeSprintForTask, setActiveSprintForTask,
+    activeSprintForTask,
+    setActiveSprintForTask,
 
-    openCreateEpic, setOpenCreateEpic,
-    openCreateTask, setOpenCreateTask,
-    openUpdateTask, setOpenUpdateTask,
-    selectedTask, setSelectedTask,
-    openStartSprint, setOpenStartSprint,
-    openCompleteSprint, setOpenCompleteSprint,
-    selectedSprintAction, setSelectedSprintAction,
+    openCreateEpic,
+    setOpenCreateEpic,
+    openUpdateEpic,
+    setOpenUpdateEpic,
+    selectedEpic,
+    setSelectedEpic,
+    openCreateTask,
+    setOpenCreateTask,
+    openUpdateTask,
+    setOpenUpdateTask,
+    selectedTask,
+    setSelectedTask,
+    openStartSprint,
+    setOpenStartSprint,
+    openCompleteSprint,
+    setOpenCompleteSprint,
+    selectedSprintAction,
+    setSelectedSprintAction,
 
     handleQuickCreateSprint,
     handleDeleteSprint,
+    handleDeleteEpic,
+    handleDeleteWorkItem,
     handleSprintActionClick,
     fetchData,
-    openCreateSprint, setOpenCreateSprint,
+    openCreateSprint,
+    setOpenCreateSprint,
+    openUpdateSprint,
+    setOpenUpdateSprint,
     handleDragEnd,
   } = useBacklogBoard();
 
@@ -51,7 +70,7 @@ export default function BacklogBoard() {
   );
 
   return (
-    <div className='flex gap-6 w-full h-[calc(100vh-140px)] bg-slate-50 relative'>
+    <div className='bg-bg relative flex h-[calc(100vh-140px)] w-full gap-6'>
       {/* Sidebar Epics */}
       <EpicSidebar
         isSidebarOpen={isSidebarOpen}
@@ -60,15 +79,18 @@ export default function BacklogBoard() {
         selectedEpicId={selectedEpicId}
         setSelectedEpicId={setSelectedEpicId}
         setOpenCreateEpic={setOpenCreateEpic}
+        setOpenUpdateEpic={setOpenUpdateEpic}
+        setSelectedEpic={setSelectedEpic}
+        handleDeleteEpic={handleDeleteEpic}
       />
 
       {/* Main Board */}
-      <div className='flex-1 flex flex-col min-w-0 overflow-y-auto pr-2 pb-10'>
-        <BoardHeader />
+      <div className='flex min-w-0 flex-1 flex-col overflow-y-auto pr-2 pb-10'>
+        <BoardHeader searchText={searchText} setSearchText={setSearchText} />
 
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           {loading ? (
-            <div className='text-center py-10 text-slate-500'>Đang tải dữ liệu...</div>
+            <div className='text-muted py-10 text-center'>{BACKLOG_UI.LOADING}</div>
           ) : (
             <div className='overflow-x-auto pb-4'>
               <div className='min-w-[1000px] pr-2'>
@@ -84,8 +106,10 @@ export default function BacklogBoard() {
                     setSelectedSprintAction={setSelectedSprintAction}
                     setSelectedTask={setSelectedTask}
                     setOpenUpdateTask={setOpenUpdateTask}
+                    setOpenUpdateSprint={setOpenUpdateSprint}
                     setActiveSprintForTask={setActiveSprintForTask}
                     setOpenCreateTask={setOpenCreateTask}
+                    handleDeleteWorkItem={handleDeleteWorkItem}
                   />
                 ))}
 
@@ -99,6 +123,7 @@ export default function BacklogBoard() {
                   setOpenUpdateTask={setOpenUpdateTask}
                   setActiveSprintForTask={setActiveSprintForTask}
                   setOpenCreateTask={setOpenCreateTask}
+                  handleDeleteWorkItem={handleDeleteWorkItem}
                 />
               </div>
             </div>
@@ -116,6 +141,8 @@ export default function BacklogBoard() {
         fetchData={fetchData}
         openCreateEpic={openCreateEpic}
         setOpenCreateEpic={setOpenCreateEpic}
+        openUpdateEpic={openUpdateEpic}
+        setOpenUpdateEpic={setOpenUpdateEpic}
         openStartSprint={openStartSprint}
         setOpenStartSprint={setOpenStartSprint}
         openCompleteSprint={openCompleteSprint}
@@ -126,8 +153,12 @@ export default function BacklogBoard() {
         setOpenUpdateTask={setOpenUpdateTask}
         openCreateSprint={openCreateSprint}
         setOpenCreateSprint={setOpenCreateSprint}
+        openUpdateSprint={openUpdateSprint}
+        setOpenUpdateSprint={setOpenUpdateSprint}
         selectedTask={selectedTask}
         setSelectedTask={setSelectedTask}
+        selectedEpic={selectedEpic}
+        setSelectedEpic={setSelectedEpic}
         selectedSprintAction={selectedSprintAction}
         activeSprintForTask={activeSprintForTask}
         setActiveSprintForTask={setActiveSprintForTask}
@@ -135,4 +166,3 @@ export default function BacklogBoard() {
     </div>
   );
 }
-

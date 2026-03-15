@@ -1,25 +1,26 @@
 import { AlertCircle } from 'lucide-react';
 import { Card, CardHeader, EmptyState } from './atoms';
+import { DASHBOARD_UI } from '@/constants/dashboard';
 
 export function ViolationsList({ studentViolations }) {
   return (
     <Card>
-      <CardHeader title='Warnings & Violations' />
+      <CardHeader title={DASHBOARD_UI.WARNINGS_VIOLATIONS} />
       {studentViolations?.length ? (
-        <div className='p-5 h-[340px] overflow-y-auto'>
+        <div className='h-[340px] overflow-y-auto p-5'>
           <ul className='space-y-3'>
             {studentViolations.map((v) => (
               <li
                 key={v.type}
-                className='group flex items-center justify-between p-3.5 rounded-2xl bg-bg border border-border/50 hover:border-danger/30 hover:bg-danger/5 transition-all'
+                className='border-border/50 hover:border-danger/30 hover:bg-danger-surface bg-bg group flex items-center justify-between rounded-2xl border p-3.5 transition-all'
               >
                 <div className='flex items-center gap-3.5'>
-                  <div className='p-2 rounded-xl bg-danger/10 text-danger shadow-sm group-hover:scale-110 transition-transform'>
-                    <AlertCircle className='w-4 h-4' />
+                  <div className='bg-danger-surface text-danger rounded-xl p-2 shadow-sm transition-transform group-hover:scale-110'>
+                    <AlertCircle className='h-4 w-4' />
                   </div>
-                  <span className='text-sm font-medium text-text'>{v.type}</span>
+                  <span className='text-text text-sm font-medium'>{v.type}</span>
                 </div>
-                <span className='text-sm font-bold text-danger bg-danger/10 px-3 py-1.5 rounded-lg shadow-sm'>
+                <span className='bg-danger-surface text-danger rounded-lg px-3 py-1.5 text-sm font-bold shadow-sm'>
                   {v.count}
                 </span>
               </li>
@@ -27,9 +28,8 @@ export function ViolationsList({ studentViolations }) {
           </ul>
         </div>
       ) : (
-        <EmptyState text='No violation data' />
+        <EmptyState text={DASHBOARD_UI.NO_VIOLATION_DATA} />
       )}
     </Card>
   );
 }
-
