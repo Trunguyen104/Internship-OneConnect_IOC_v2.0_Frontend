@@ -4,7 +4,7 @@ import React from 'react';
 import { Input, Segmented, Row, Col } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 export function GroupFilters({ activeTab, onTabChange, search, onSearchChange, groupCount }) {
   const { ALL_GROUPS, ACTIVE, ARCHIVED, SEARCH_PLACEHOLDER } =

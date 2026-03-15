@@ -3,7 +3,7 @@
 import React, { memo } from 'react';
 import { Table, Avatar, Tooltip, Button, Dropdown, Tag } from 'antd';
 import { EyeOutlined, EditOutlined, MoreOutlined, UserDeleteOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const STATUS_STYLES = {
   placed: { color: 'success', label: 'Đã có chỗ' },

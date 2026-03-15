@@ -3,7 +3,7 @@
 import React, { memo } from 'react';
 import { Input, Select } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const TermFilterBar = memo(function TermFilterBar({
   searchValue,

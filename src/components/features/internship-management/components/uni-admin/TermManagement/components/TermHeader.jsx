@@ -3,7 +3,7 @@
 import React, { memo } from 'react';
 import { Button, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Title } = Typography;
 

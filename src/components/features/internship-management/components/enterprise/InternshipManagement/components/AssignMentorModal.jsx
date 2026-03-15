@@ -9,7 +9,7 @@ import { MOCK_MENTORS } from '../constants/internshipData';
 
 const { Title, Text } = Typography;
 
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
   const [form] = Form.useForm();

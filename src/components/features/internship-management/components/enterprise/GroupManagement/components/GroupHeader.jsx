@@ -4,7 +4,7 @@ import React from 'react';
 import { Row, Col, Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 export function GroupHeader({ onCreate }) {
   const { TITLE, CREATE_BTN } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;

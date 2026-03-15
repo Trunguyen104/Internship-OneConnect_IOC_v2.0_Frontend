@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Avatar, Tag, Tooltip } from 'antd';
 import { CodeOutlined, DeleteOutlined, UserOutlined, PlusOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { MOCK_MENTORS } from '../constants/groupData';
 
 export function GroupCard({ group, onAssign, onDelete, onView }) {

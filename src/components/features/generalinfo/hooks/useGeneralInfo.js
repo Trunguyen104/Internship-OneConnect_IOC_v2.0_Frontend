@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
-import { GENERAL_INFO_UI } from '@/constants/general-info';
+import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useGeneralInfo() {

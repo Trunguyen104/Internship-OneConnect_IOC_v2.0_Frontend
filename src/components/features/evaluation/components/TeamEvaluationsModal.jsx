@@ -5,7 +5,7 @@ import { Modal, Typography, Tag, Button, Tooltip, Space } from 'antd';
 import { TeamOutlined, LockOutlined, EyeOutlined, ClockCircleFilled } from '@ant-design/icons';
 import AppTable from '@/components/ui/AppTable';
 
-import { EVALUATION_UI } from '@/constants/evaluation';
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const { Text, Title } = Typography;
 

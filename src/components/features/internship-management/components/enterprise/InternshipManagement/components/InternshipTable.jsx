@@ -11,7 +11,7 @@ import {
   MoreOutlined,
 } from '@ant-design/icons';
 import { STATUS_CONFIG, MOCK_MENTORS } from '../constants/internshipData';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const InternshipTable = ({ data, loading, onAccept, onReject, onAssign, onGroup }) => {
   const { TABLE, ACTIONS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;

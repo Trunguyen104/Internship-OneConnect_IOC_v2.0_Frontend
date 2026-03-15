@@ -1,22 +1,22 @@
 export const JOB_BOARD_UI = {
   // Search Bar
-  CHOOSE_CATEGORY: 'Danh mục Nghề',
-  CHOOSE_LOCATION: 'Địa điểm',
-  LOCATION_HN: 'Hà Nội',
-  LOCATION_HCM: 'TP. Hồ Chí Minh',
-  SEARCH_PLACEHOLDER: 'Vị trí tuyển dụng, tên công ty',
-  SEARCH_BUTTON: 'Tìm kiếm',
+  CHOOSE_CATEGORY: 'Job Category',
+  CHOOSE_LOCATION: 'Location',
+  LOCATION_HN: 'Hanoi',
+  LOCATION_HCM: 'Ho Chi Minh City',
+  SEARCH_PLACEHOLDER: 'Job position, company name',
+  SEARCH_BUTTON: 'Search',
 
   // Filter Bar
-  FILTER_BY: 'Lọc theo:',
-  FILTER_LOCATION: 'Địa điểm',
-  FILTER_SALARY: 'Mức lương',
-  FILTER_EXPERIENCE: 'Kinh nghiệm',
-  FILTER_CATEGORY: 'Ngành nghề',
+  FILTER_BY: 'Filter by:',
+  FILTER_LOCATION: 'Location',
+  FILTER_SALARY: 'Salary',
+  FILTER_EXPERIENCE: 'Experience',
+  FILTER_CATEGORY: 'Category',
 
   // Job Card
-  DEFAULT_TITLE: 'Nhân Viên Kinh Doanh',
-  DEFAULT_COMPANY: 'CÔNG TY TNHH ABC',
-  DEFAULT_SALARY: '10 - 20 triệu',
-  DEFAULT_LOCATION: 'Hồ Chí Minh',
+  DEFAULT_TITLE: 'Sales Executive',
+  DEFAULT_COMPANY: 'ABC COMPANY LTD',
+  DEFAULT_SALARY: '10 - 20 million',
+  DEFAULT_LOCATION: 'Ho Chi Minh',
 };

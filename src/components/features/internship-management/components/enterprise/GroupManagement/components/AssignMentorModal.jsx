@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Select, Input, Button, Typography, Space, Divider } from 'antd';
 import { UserOutlined, ProjectOutlined, SearchOutlined, MessageOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { MOCK_MENTORS, MOCK_PROJECTS } from '../constants/groupData';
 
 const { Title, Text } = Typography;

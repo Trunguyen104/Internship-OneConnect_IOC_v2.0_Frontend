@@ -3,7 +3,7 @@
 import React from 'react';
 import { Row, Col, Input, Select, Button, Space, Tag } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { STATUS_CONFIG, MOCK_MENTORS } from '../constants/internshipData';
 
 const InternshipFilters = ({

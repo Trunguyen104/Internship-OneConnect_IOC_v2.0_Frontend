@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Modal, Input, Button, Typography, Space, Divider } from 'antd';
 import { ExclamationCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Title, Text } = Typography;
 

@@ -4,7 +4,7 @@ import React from 'react';
 import { Button } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
 
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const InternshipHeader = ({ onAddClick }) => {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Modal, Form, Input, Select, Button, Typography, Space } from 'antd';
 import { TeamOutlined, EditOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Title } = Typography;
 

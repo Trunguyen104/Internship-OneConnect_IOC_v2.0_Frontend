@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Skeleton, Empty, notification } from 'antd';
-import { INTERNSHIP_UI } from '@/constants/internship';
+import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
 import { InternshipGroupService } from './services/internshipGroup.service';
 import InternshipCard from './components/InternshipCard';
 import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';

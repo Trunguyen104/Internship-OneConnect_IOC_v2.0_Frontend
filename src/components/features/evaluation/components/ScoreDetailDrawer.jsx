@@ -14,7 +14,7 @@ import {
 import { MessageOutlined, StarFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
-import { EVALUATION_UI } from '@/constants/evaluation';
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const { Text, Paragraph, Title } = Typography;
 

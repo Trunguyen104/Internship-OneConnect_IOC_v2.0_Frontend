@@ -5,7 +5,7 @@ import { Button, Typography } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AppTable from '@/components/ui/AppTable';
-import { EVALUATION_UI } from '@/constants/evaluation';
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const { Text } = Typography;
 

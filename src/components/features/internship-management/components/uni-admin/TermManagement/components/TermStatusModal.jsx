@@ -3,7 +3,7 @@
 import React from 'react';
 import { Modal, Button, Typography, Space, Divider } from 'antd';
 import { WarningOutlined, InfoCircleOutlined, SyncOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Title, Text } = Typography;
 

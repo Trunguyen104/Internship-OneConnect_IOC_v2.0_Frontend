@@ -1,45 +1,45 @@
 export const ISSUE_UI = {
-  SEARCH_PLACEHOLDER: 'Tìm kiếm vấn đề...',
-  ADD_BUTTON: 'Thêm vấn đề',
+  SEARCH_PLACEHOLDER: 'Search issue...',
+  ADD_BUTTON: 'Add Issue',
 
   TABLE: {
-    NO: 'STT',
-    TITLE: 'Tiêu đề',
-    STAKEHOLDER: 'Người liên quan',
-    DESCRIPTION: 'Mô tả',
-    STATUS: 'Trạng thái',
-    CREATED_DATE: 'Ngày tạo',
-    ACTIONS: 'Thao tác',
+    NO: 'No.',
+    TITLE: 'Title',
+    STAKEHOLDER: 'Stakeholder',
+    DESCRIPTION: 'Description',
+    STATUS: 'Status',
+    CREATED_DATE: 'Created Date',
+    ACTIONS: 'Actions',
   },
 
   STATUS: {
-    PROCESSING: 'Đang xử lý',
-    RESOLVED: 'Đã giải quyết',
+    PROCESSING: 'Processing',
+    RESOLVED: 'Resolved',
   },
 
   BUTTON: {
-    REOPEN: 'Mở lại',
-    RESOLVE: 'Giải quyết',
-    DELETE: 'Xóa',
-    CANCEL: 'Hủy bỏ',
-    SAVE: 'Lưu vấn đề',
+    REOPEN: 'Reopen',
+    RESOLVE: 'Resolve',
+    DELETE: 'Delete',
+    CANCEL: 'Cancel',
+    SAVE: 'Save Issue',
   },
 
   FORM: {
-    ADD_TITLE: 'Thêm vấn đề mới',
-    TITLE_PLACEHOLDER: 'Nhập tiêu đề vấn đề',
-    STAKEHOLDER_PLACEHOLDER: 'Chọn người liên quan',
-    DESCRIPTION_PLACEHOLDER: 'Nhập mô tả vấn đề',
+    ADD_TITLE: 'Add New Issue',
+    TITLE_PLACEHOLDER: 'Enter issue title',
+    STAKEHOLDER_PLACEHOLDER: 'Select stakeholder',
+    DESCRIPTION_PLACEHOLDER: 'Enter issue description',
   },
 
   DETAIL: {
-    TITLE: 'Chi tiết vấn đề',
-    CREATED_AT: 'Ngày tạo',
-    RESOLVED_AT: 'Ngày giải quyết',
+    TITLE: 'Issue Details',
+    CREATED_AT: 'Created At',
+    RESOLVED_AT: 'Resolved At',
   },
 
   EMPTY: {
-    NO_DATA: 'Không tìm thấy vấn đề nào',
-    UNKNOWN: 'Không xác định',
+    NO_DATA: 'No issue found',
+    UNKNOWN: 'Unknown',
   },
 };

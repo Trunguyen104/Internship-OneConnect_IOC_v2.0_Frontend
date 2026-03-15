@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { MOCK_GROUPS } from '../constants/groupData';
 
 export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
