@@ -3,6 +3,7 @@
 import React from 'react';
 import { Row, Col, Input, Select, Button, Space, Tag } from 'antd';
 import { SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
 import { STATUS_CONFIG, MOCK_MENTORS } from '../constants/internshipData';
 
 const InternshipFilters = ({
@@ -14,87 +15,87 @@ const InternshipFilters = ({
   onMentorChange,
   onQuickStatusChange,
 }) => {
+  const { FILTERS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
+
   return (
-    <Space direction='vertical' size='middle' style={{ width: '100%', marginBottom: 24 }}>
-      {/* Search + Filters */}
-      <Row gutter={[16, 16]} align='middle'>
-        <Col xs={24} md={10}>
+    <div className='mb-6 flex w-full flex-col gap-6 p-6 pb-0'>
+      {/* Search + Filters row */}
+      <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
+        <div className='max-w-xl flex-1'>
           <Input
-            placeholder='Search students by name, email or major...'
-            prefix={<SearchOutlined />}
+            placeholder={FILTERS.SEARCH_PLACEHOLDER}
+            prefix={<SearchOutlined className='text-muted ml-1' />}
             allowClear
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
+            className='bg-surface border-border hover:border-primary focus:border-primary h-11 rounded-xl transition-all'
           />
-        </Col>
+        </div>
 
-        <Col xs={24} md={14}>
-          <Space style={{ width: '100%', justifyContent: 'flex-end' }} wrap>
-            <Select
-              style={{ minWidth: 160 }}
-              value={statusFilter}
-              onChange={onStatusChange}
-              options={[
-                { label: 'All Statuses', value: 'ALL' },
-                { label: 'Pending', value: 'PENDING' },
-                { label: 'Accepted', value: 'ACCEPTED' },
-                { label: 'Rejected', value: 'REJECTED' },
-                { label: 'Revoked', value: 'REVOKED' },
-              ]}
-            />
+        <div className='flex flex-wrap items-center gap-3'>
+          <Select
+            className='h-11 min-w-[160px]'
+            value={statusFilter}
+            onChange={onStatusChange}
+            options={[
+              { label: FILTERS.ALL_STATUSES, value: 'ALL' },
+              { label: 'Đang chờ duyệt', value: 'PENDING' },
+              { label: 'Đã chấp nhận', value: 'ACCEPTED' },
+              { label: 'Đã từ chối', value: 'REJECTED' },
+              { label: 'Bị thu hồi', value: 'REVOKED' },
+            ]}
+          />
 
-            <Select
-              style={{ minWidth: 160 }}
-              placeholder='Mentor'
-              value={mentorFilter}
-              allowClear
-              onChange={onMentorChange}
-              options={MOCK_MENTORS.map((m) => ({
-                label: m.name,
-                value: m.id,
-              }))}
-            />
+          <Select
+            className='h-11 min-w-[170px]'
+            placeholder={FILTERS.MENTOR_PLACEHOLDER}
+            value={mentorFilter}
+            allowClear
+            onChange={onMentorChange}
+            options={MOCK_MENTORS.map((m) => ({
+              label: m.name,
+              value: m.id,
+            }))}
+          />
 
-            <Button icon={<FilterOutlined />}>Filters</Button>
-          </Space>
-        </Col>
-      </Row>
+          <Button
+            icon={<FilterOutlined className='text-primary' />}
+            className='border-border h-11 rounded-xl font-semibold transition-all hover:bg-slate-50'
+          >
+            {FILTERS.FILTER_BTN}
+          </Button>
+        </div>
+      </div>
 
-      {/* Quick Status Filter */}
-      <Space wrap>
+      {/* Quick Status Tags */}
+      <div className='flex flex-wrap items-center gap-2'>
         <Tag
-          color={statusFilter === 'ALL' ? 'blue' : 'default'}
-          style={{
-            cursor: 'pointer',
-            padding: '4px 12px',
-            fontSize: '13px',
-            borderRadius: '16px',
-            transition: 'all 0.3s',
-          }}
+          className={`cursor-pointer rounded-full border-none px-6 py-1.5 text-xs font-black tracking-widest uppercase transition-all ${
+            statusFilter === 'ALL'
+              ? 'bg-primary shadow-primary/20 text-white shadow-md'
+              : 'bg-muted/10 text-muted hover:bg-muted/20'
+          }`}
           onClick={() => onQuickStatusChange('ALL')}
         >
-          All Students
+          {FILTERS.ALL_STUDENTS}
         </Tag>
 
         {Object.entries(STATUS_CONFIG).map(([key, config]) => (
           <Tag
             key={key}
-            color={statusFilter === key ? config.color : 'default'}
-            style={{
-              cursor: 'pointer',
-              padding: '4px 12px',
-              fontSize: '13px',
-              borderRadius: '16px',
-              transition: 'all 0.3s',
-              opacity: statusFilter === 'ALL' || statusFilter === key ? 1 : 0.6,
-            }}
+            className={`cursor-pointer rounded-full border-none px-6 py-1.5 text-xs font-black tracking-widest uppercase transition-all ${
+              statusFilter === key
+                ? `bg-${config.color} text-white shadow-md`
+                : 'bg-muted/10 text-muted hover:bg-muted/20'
+            }`}
+            style={statusFilter === key ? { backgroundColor: `var(--color-${config.color})` } : {}}
             onClick={() => onQuickStatusChange(key)}
           >
             {config.label}
           </Tag>
         ))}
-      </Space>
-    </Space>
+      </div>
+    </div>
   );
 };
 

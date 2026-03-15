@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@/constants/enums';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 export default function CompleteSprintModal({ open, sprint, sprints, onClose, onSubmit }) {
   const [moveOption, setMoveOption] = useState('backlog'); // Mặc định chọn Backlog cho an toàn
-  const [selectedNextSprintId, setSelectedNextSprintId] = useState('');
+  const [userSelectedNextSprintId, setUserSelectedNextSprintId] = useState(null);
   const [newSprintName, setNewSprintName] = useState('');
 
   const sprintItems = sprint?.items || [];
@@ -19,16 +20,13 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
     return (sprints || []).filter(
       (s) =>
         s.sprintId !== sprint?.sprintId &&
-        (!s.status || s.status === SPRINT_STATUS.PLANNED || (typeof s.status === 'string' && s.status.toUpperCase() === 'PLANNED')),
+        (!s.status ||
+          s.status === SPRINT_STATUS.PLANNED ||
+          (typeof s.status === 'string' && s.status.toUpperCase() === 'PLANNED')),
     );
   }, [sprints, sprint]);
 
-  // Tự động gán ID sprint kế tiếp nếu có
-  useEffect(() => {
-    if (futureSprints.length > 0) {
-      setSelectedNextSprintId(futureSprints[0].sprintId);
-    }
-  }, [futureSprints]);
+  const selectedNextSprintId = userSelectedNextSprintId ?? futureSprints[0]?.sprintId ?? '';
 
   if (!open) return null;
 
@@ -52,49 +50,57 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
   };
 
   return (
-    <div className='fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm bg-black/40'>
-      <div className='relative w-full max-w-[500px] rounded-3xl bg-white shadow-2xl p-8 flex flex-col'>
-        <h2 className='text-2xl font-bold text-gray-900 mb-2'>Hoàn thành {sprint?.name}</h2>
-        <p className='text-sm text-gray-500 mb-6 font-medium'>
-          Có {undoneItems.length} issue chưa xong sẽ được di chuyển:
+    <div className='fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm'>
+      <div className='relative flex w-full max-w-[500px] flex-col rounded-3xl bg-white p-8 shadow-2xl'>
+        <h2 className='mb-2 text-2xl font-bold text-gray-900'>
+          {BACKLOG_UI.COMPLETE_SPRINT_TITLE} {sprint?.name}
+        </h2>
+        <p className='mb-6 text-sm font-medium text-gray-500'>
+          Có {undoneItems.length} {BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT}
         </p>
 
-        <div className='space-y-4 mb-8'>
+        <div className='mb-8 space-y-4'>
           {/* 1. Quăng ra Backlog */}
-          <label className='flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-transparent hover:bg-gray-50 transition-colors'>
+          <label className='flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50'>
             <input
               type='radio'
               checked={moveOption === 'backlog'}
               onChange={() => setMoveOption('backlog')}
-              className='w-4 h-4 text-[#A32A2A] focus:ring-[#A32A2A]'
+              className='text-primary focus:ring-primary h-4 w-4'
             />
-            <span className='text-sm font-semibold text-gray-700'>Product Backlog</span>
+            <span className='text-sm font-semibold text-gray-700'>
+              {BACKLOG_UI.OPT_PRODUCT_BACKLOG}
+            </span>
           </label>
 
           {/* 2. Quăng sang Sprint kế tiếp */}
           <div className='space-y-2'>
-            <label className='flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-transparent hover:bg-gray-50 transition-colors'>
+            <label className='flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50'>
               <input
                 type='radio'
                 checked={moveOption === 'next'}
                 onChange={() => setMoveOption('next')}
-                className='w-4 h-4 text-[#A32A2A] focus:ring-[#A32A2A]'
+                className='text-primary focus:ring-primary h-4 w-4'
               />
-              <span className='text-sm font-semibold text-gray-700'>Sprint kế tiếp</span>
+              <span className='text-sm font-semibold text-gray-700'>
+                {BACKLOG_UI.OPT_NEXT_SPRINT}
+              </span>
             </label>
             {moveOption === 'next' && (
-              <div className='ml-9 animate-in slide-in-from-left-2'>
+              <div className='animate-in slide-in-from-left-2 ml-9'>
                 <select
                   value={selectedNextSprintId}
-                  onChange={(e) => setSelectedNextSprintId(e.target.value)}
-                  className='w-full h-10 px-3 rounded-xl border border-gray-200 text-sm font-medium outline-none focus:border-red-800 transition-all'
+                  onChange={(e) => setUserSelectedNextSprintId(e.target.value)}
+                  className='focus:border-primary h-10 w-full rounded-xl border border-gray-200 px-3 text-sm font-medium transition-all outline-none'
                 >
                   {futureSprints.map((s) => (
                     <option key={s.sprintId} value={s.sprintId}>
                       {s.name || s.title}
                     </option>
                   ))}
-                  {futureSprints.length === 0 && <option value=''>Không có sprint dự kiến</option>}
+                  {futureSprints.length === 0 && (
+                    <option value=''>{BACKLOG_UI.NO_PLANNED_SPRINT}</option>
+                  )}
                 </select>
               </div>
             )}
@@ -102,23 +108,25 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
           {/* 3. Quăng vô Sprint mới tạo */}
           {/* 3. Quăng vô Sprint mới tạo */}
           <div className='space-y-2'>
-            <label className='flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-transparent hover:bg-gray-50 transition-colors'>
+            <label className='flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50'>
               <input
                 type='radio'
                 checked={moveOption === 'new'}
                 onChange={() => setMoveOption('new')}
-                className='w-4 h-4 text-[#A32A2A] focus:ring-[#A32A2A]'
+                className='text-primary focus:ring-primary h-4 w-4'
               />
-              <span className='text-sm font-semibold text-gray-700'>Tạo Sprint mới</span>
+              <span className='text-sm font-semibold text-gray-700'>
+                {BACKLOG_UI.OPT_NEW_SPRINT}
+              </span>
             </label>
             {moveOption === 'new' && (
-              <div className='ml-9 animate-in slide-in-from-left-2'>
+              <div className='animate-in slide-in-from-left-2 ml-9'>
                 <input
                   type='text'
-                  placeholder='Nhập tên sprint mới...'
+                  placeholder={BACKLOG_UI.PLACEHOLDER_NEW_SPRINT}
                   value={newSprintName}
                   onChange={(e) => setNewSprintName(e.target.value)}
-                  className='w-full h-10 px-4 rounded-xl border border-red-100 bg-red-50/20 text-sm focus:ring-2 focus:ring-red-100 outline-none'
+                  className='border-primary/20 bg-primary-50/20 focus:ring-primary/20 h-10 w-full rounded-xl border px-4 text-sm outline-none focus:ring-2'
                   autoFocus
                 />
               </div>
@@ -126,23 +134,22 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
           </div>
         </div>
 
-        <div className='flex justify-end gap-3 pt-6 border-t border-gray-100'>
+        <div className='flex justify-end gap-3 border-t border-gray-100 pt-6'>
           <button
             onClick={onClose}
-            className='h-11 px-6 rounded-full font-bold text-gray-500 hover:bg-gray-100'
+            className='h-11 rounded-full px-6 font-bold text-gray-500 hover:bg-gray-100'
           >
-            Hủy
+            {BACKLOG_UI.CANCEL}
           </button>
           <button
             onClick={handleSubmit}
             disabled={moveOption === 'new' && !newSprintName.trim()}
-            className='h-11 px-8 rounded-full bg-[#A32A2A] font-bold text-white hover:bg-red-800 shadow-lg disabled:opacity-50'
+            className='bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white shadow-lg disabled:opacity-50'
           >
-            Hoàn thành Sprint
+            {BACKLOG_UI.COMPLETE_SPRINT}
           </button>
         </div>
       </div>
     </div>
   );
 }
-

@@ -1,20 +1,21 @@
 import React from 'react';
 import { Search, Filter } from 'lucide-react';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 export const BoardHeader = () => {
   return (
-    <div className='flex items-center gap-4 mb-6 sticky top-0 bg-slate-50 pt-1 z-10'>
-      <div className='flex items-center w-[360px] h-10 px-4 rounded-full border border-gray-200 bg-white shadow-sm'>
-        <Search className='w-4 h-4 text-gray-400 mr-2 shrink-0' />
+    <div className='bg-bg sticky top-0 z-10 mb-6 flex items-center gap-4 pt-1'>
+      <div className='flex h-10 w-[360px] items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm'>
+        <Search className='mr-2 h-4 w-4 shrink-0 text-gray-400' />
         <input
           type='text'
-          placeholder='Tìm kiếm'
-          className='flex-1 outline-none text-sm bg-transparent placeholder-gray-400 text-gray-800'
+          placeholder={BACKLOG_UI.SEARCH_PLACEHOLDER}
+          className='flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none'
         />
       </div>
-      <button className='flex items-center gap-2 h-10 px-5 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-700'>
-        <Filter className='w-4 h-4 text-gray-500' />
-        Bộ lọc
+      <button className='flex h-10 items-center gap-2 rounded-full border border-gray-200 bg-white px-5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50'>
+        <Filter className='h-4 w-4 text-gray-500' />
+        {BACKLOG_UI.FILTER}
       </button>
     </div>
   );

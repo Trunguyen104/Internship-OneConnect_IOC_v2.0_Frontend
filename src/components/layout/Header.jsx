@@ -37,9 +37,9 @@ export default function Header() {
     },
   };
   return (
-    <header className='sticky top-0 z-50 h-16 bg-gray-50 border-b border-slate-200 px-6 flex items-center justify-end'>
+    <header className='sticky top-0 z-50 flex h-16 items-center justify-end border-b border-slate-200 bg-gray-50 px-6'>
       <div className='flex items-center gap-4'>
-        <button className='w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300'>
+        <button className='flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300'>
           <BellOutlined className='text-lg text-gray-700' />
         </button>
 
@@ -54,4 +54,3 @@ export default function Header() {
     </header>
   );
 }
-

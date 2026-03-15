@@ -1,8 +1,11 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Button, Space } from 'antd';
+import { Button, Space, Typography } from 'antd';
 import { UserAddOutlined, UploadOutlined, UserDeleteOutlined } from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+
+const { Title } = Typography;
 
 const HeaderActions = memo(function HeaderActions({
   onImport,
@@ -10,45 +13,44 @@ const HeaderActions = memo(function HeaderActions({
   onWithdraw,
   canWithdraw = false,
 }) {
+  const { STUDENT_ENROLLMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+
   return (
-    <>
-      <div className='mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
-        <div>
-          <h1 className='text-2xl font-bold text-slate-900'>Term Students</h1>
-        </div>
-
-        <Space size='middle' wrap>
-          <Button
-            type='primary'
-            icon={<UserAddOutlined />}
-            size='middle'
-            className='bg-primary shadow-primary/20 hover:!bg-primary/90 rounded-full border-none font-bold shadow-md'
-            onClick={onAdd}
-          >
-            Thêm sinh viên
-          </Button>
-
-          <Button
-            icon={<UploadOutlined />}
-            size='middle'
-            className='border-primary/20 text-primary hover:!border-primary hover:!bg-primary/5 hover:!text-primary rounded-full font-bold'
-            onClick={onImport}
-          >
-            Nhập từ Excel
-          </Button>
-
-          <Button
-            icon={<UserDeleteOutlined />}
-            size='middle'
-            className='rounded-full border-slate-200 bg-slate-50 text-slate-400'
-            disabled={!canWithdraw}
-            onClick={onWithdraw}
-          >
-            Rút lui
-          </Button>
-        </Space>
+    <div className='mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
+      <div>
+        <Title level={2} className='text-text !mb-0 tracking-tight'>
+          {STUDENT_ENROLLMENT.TITLE}
+        </Title>
       </div>
-    </>
+
+      <Space size='middle' wrap>
+        <Button
+          type='primary'
+          icon={<UserAddOutlined />}
+          className='bg-primary h-11 rounded-xl border-none px-6 font-bold shadow-md transition-all hover:scale-105 active:scale-95'
+          onClick={onAdd}
+        >
+          {STUDENT_ENROLLMENT.ADD_BTN}
+        </Button>
+
+        <Button
+          icon={<UploadOutlined className='text-primary' />}
+          className='border-border h-11 rounded-xl px-6 font-bold transition-all hover:bg-slate-50'
+          onClick={onImport}
+        >
+          {STUDENT_ENROLLMENT.IMPORT_BTN}
+        </Button>
+
+        <Button
+          icon={<UserDeleteOutlined />}
+          className='h-11 rounded-xl px-6 font-bold disabled:opacity-50'
+          disabled={!canWithdraw}
+          onClick={onWithdraw}
+        >
+          {STUDENT_ENROLLMENT.WITHDRAW_BTN}
+        </Button>
+      </Space>
+    </div>
   );
 });
 

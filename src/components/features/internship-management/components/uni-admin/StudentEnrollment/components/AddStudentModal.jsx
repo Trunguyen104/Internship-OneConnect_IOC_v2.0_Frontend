@@ -1,126 +1,155 @@
 'use client';
-import React, { memo } from 'react';
-import { Modal, Button, Input, Form, DatePicker } from 'antd';
+
+import React, { memo, useEffect } from 'react';
+import { Modal, Button, Input, Form, Typography, Space, Divider, Row, Col, Select } from 'antd';
 import {
   UserOutlined,
   IdcardOutlined,
   MailOutlined,
   PhoneOutlined,
-  CheckCircleOutlined,
-  CloseOutlined,
+  PlusCircleOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
 
-const AddStudentModal = memo(function AddStudentModal({ visible, onClose }) {
+const { Title, Text } = Typography;
+
+const AddStudentModal = memo(function AddStudentModal({ visible, onClose, onSave }) {
   const [form] = Form.useForm();
+  const { ADD_EDIT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.STUDENT_ENROLLMENT.MODALS;
+
+  useEffect(() => {
+    if (!visible) form.resetFields();
+  }, [visible, form]);
 
   const handleSubmit = (values) => {
-    console.log(values);
-
+    onSave?.(values);
     form.resetFields();
     onClose();
   };
 
   return (
     <Modal
-      title={
-        <div className='flex items-center gap-3 text-slate-900'>
-          <span className='text-xl font-bold tracking-tight'>Add New Student</span>
-        </div>
-      }
       open={visible}
       onCancel={onClose}
-      width={560}
+      width={600}
       footer={null}
-      className='custom-add-student-modal'
-      closeIcon={<CloseOutlined className='hover:text-primary text-slate-500' />}
+      centered
+      destroyOnClose
+      className='modal-custom'
     >
-      <Form form={form} layout='vertical' onFinish={handleSubmit} className='pt-6 pb-2'>
-        <Form.Item
-          label='Full Name'
-          name='fullName'
-          rules={[{ required: true, message: 'Please enter full name' }]}
-        >
-          <Input
-            size='large'
-            prefix={<UserOutlined className='text-slate-400' />}
-            placeholder='e.g. John Doe'
-            className='rounded-xl'
-          />
-        </Form.Item>
+      <div className='mb-6 flex flex-col items-center gap-3 text-center'>
+        <div className='bg-primary/10 flex size-14 items-center justify-center rounded-2xl'>
+          <PlusCircleOutlined className='text-primary text-3xl' />
+        </div>
+        <div>
+          <Title level={4} className='text-text mb-1'>
+            {ADD_EDIT.TITLE_ADD}
+          </Title>
+          <Text className='text-muted text-xs'>
+            Thêm sinh viên mới vào danh sách quản lý của đợt thực tập
+          </Text>
+        </div>
+      </div>
+
+      <Divider className='border-border m-0' />
+
+      <Form form={form} layout='vertical' onFinish={handleSubmit} className='mt-8 space-y-4 px-2'>
+        <Row gutter={24}>
+          <Col span={14}>
+            <Form.Item
+              label={<span className='text-text font-semibold'>{ADD_EDIT.NAME_LABEL}</span>}
+              name='fullName'
+              rules={[{ required: true, message: 'Vui lòng nhập họ và tên' }]}
+            >
+              <Input
+                prefix={<UserOutlined className='text-muted ml-1' />}
+                placeholder='VD: Nguyễn Văn A'
+                className='bg-surface border-border h-11 rounded-xl'
+              />
+            </Form.Item>
+          </Col>
+
+          <Col span={10}>
+            <Form.Item
+              label={<span className='text-text font-semibold'>{ADD_EDIT.ID_LABEL}</span>}
+              name='studentCode'
+              rules={[{ required: true, message: 'Vui lòng nhập MSSV' }]}
+            >
+              <Input
+                prefix={<IdcardOutlined className='text-muted ml-1' />}
+                placeholder='VD: SV2024001'
+                className='bg-surface border-border h-11 rounded-xl'
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
         <Form.Item
-          label='Student Code'
-          name='studentCode'
-          rules={[{ required: true, message: 'Please enter student code' }]}
-        >
-          <Input
-            size='large'
-            prefix={<IdcardOutlined className='text-slate-400' />}
-            placeholder='e.g. STU-2024-001'
-            className='rounded-xl'
-          />
-        </Form.Item>
-
-        <Form.Item
-          label='Email Address'
+          label={<span className='text-text font-semibold'>{ADD_EDIT.EMAIL_LABEL}</span>}
           name='email'
           rules={[
-            { required: true, message: 'Please enter email' },
-            { type: 'email', message: 'Invalid email format' },
+            { required: true, message: 'Vui lòng nhập email' },
+            { type: 'email', message: 'Email không hợp lệ' },
           ]}
         >
           <Input
-            size='large'
-            prefix={<MailOutlined className='text-slate-400' />}
-            placeholder='e.g. john@university.edu'
-            className='rounded-xl'
+            prefix={<MailOutlined className='text-muted ml-1' />}
+            placeholder='VD: sinhvien@university.edu.vn'
+            className='bg-surface border-border h-11 rounded-xl'
           />
         </Form.Item>
 
-        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-          <Form.Item
-            label='Phone Number'
-            name='phone'
-            rules={[{ required: true, message: 'Please enter phone number' }]}
-          >
-            <Input
-              size='large'
-              prefix={<PhoneOutlined className='text-slate-400' />}
-              placeholder='+1 (555) 000-0000'
-              className='rounded-xl'
-            />
-          </Form.Item>
+        <Row gutter={24}>
+          <Col span={12}>
+            <Form.Item
+              label={<span className='text-text font-semibold'>{ADD_EDIT.MAJOR_LABEL}</span>}
+              name='major'
+              rules={[{ required: true, message: 'Vui lòng chọn ngành học' }]}
+            >
+              <Select
+                placeholder='Chọn ngành học'
+                prefix={<BookOutlined className='text-muted ml-1' />}
+                className='h-11 w-full rounded-xl'
+                options={[
+                  { label: 'Kỹ thuật phần mềm', value: 'Software Engineering' },
+                  { label: 'An toàn thông tin', value: 'Information Security' },
+                  { label: 'Thiết kế đồ họa', value: 'Graphic Design' },
+                ]}
+              />
+            </Form.Item>
+          </Col>
 
-          <Form.Item
-            label='Date of Birth'
-            name='dob'
-            rules={[{ required: true, message: 'Please select date of birth' }]}
-          >
-            <DatePicker size='large' style={{ width: '100%' }} className='rounded-xl' />
-          </Form.Item>
-        </div>
+          <Col span={12}>
+            <Form.Item
+              label={<span className='text-text font-semibold'>Số điện thoại</span>}
+              name='phone'
+            >
+              <Input
+                prefix={<PhoneOutlined className='text-muted ml-1' />}
+                placeholder='VD: 0901234567'
+                className='bg-surface border-border h-11 rounded-xl'
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-        <div className='mt-6 flex items-center justify-end gap-4 px-2 py-2'>
+        <Space className='mt-8 flex w-full justify-end gap-3 pb-2'>
           <Button
             onClick={onClose}
-            shape='round'
-            size='large'
-            className='border-none bg-slate-100 font-semibold text-slate-600 hover:!bg-slate-200'
+            className='border-border h-11 rounded-xl px-8 font-semibold transition-all hover:bg-slate-50'
           >
-            Cancel
+            {ADD_EDIT.CANCEL}
           </Button>
 
           <Button
-            htmlType='submit'
             type='primary'
-            shape='round'
-            size='large'
-            className='bg-primary shadow-primary/20 hover:!bg-primary/90 flex items-center gap-2 border-none font-bold shadow-md'
+            htmlType='submit'
+            className='bg-primary h-11 rounded-xl border-none px-8 font-semibold shadow-md transition-all hover:scale-105 active:scale-95'
           >
-            Save Student
-            <CheckCircleOutlined />
+            {ADD_EDIT.SUBMIT_ADD}
           </Button>
-        </div>
+        </Space>
       </Form>
     </Modal>
   );

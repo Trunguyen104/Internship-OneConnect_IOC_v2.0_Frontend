@@ -13,4 +13,3 @@ export default function ClientBoard() {
 
   return <Board />;
 }
-

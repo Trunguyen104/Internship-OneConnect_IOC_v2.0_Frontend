@@ -1,21 +1,23 @@
 'use client';
+
 import { Input, Select, Button } from 'antd';
 import { SearchOutlined, EnvironmentOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { JOB_BOARD_UI } from '@/constants/job-board';
 
-const categoryOptions = [{ value: 'all', label: 'Danh mục Nghề' }];
+const categoryOptions = [{ value: 'all', label: JOB_BOARD_UI.CHOOSE_CATEGORY }];
 const locationOptions = [
-  { value: 'all', label: 'Địa điểm' },
-  { value: 'hn', label: 'Hà Nội' },
-  { value: 'hcm', label: 'TP. Hồ Chí Minh' },
+  { value: 'all', label: JOB_BOARD_UI.CHOOSE_LOCATION },
+  { value: 'hn', label: JOB_BOARD_UI.LOCATION_HN },
+  { value: 'hcm', label: JOB_BOARD_UI.LOCATION_HCM },
 ];
 
 export default function SearchBar() {
   return (
-    <section className='bg-[#004d3d] pt-12 pb-8 px-4'>
-      <div className='max-w-6xl mx-auto'>
-        <div className='bg-white p-1.5 rounded-full flex items-center shadow-xl w-full mb-6'>
-          <div className='hidden lg:flex items-center flex-1 max-w-[200px] px-3'>
-            <UnorderedListOutlined className='text-gray-400 mr-2' />
+    <section className='bg-primary px-4 pt-12 pb-8'>
+      <div className='mx-auto max-w-6xl'>
+        <div className='mb-6 flex w-full items-center rounded-full bg-white p-1.5 shadow-xl'>
+          <div className='hidden max-w-[200px] flex-1 items-center px-3 lg:flex'>
+            <UnorderedListOutlined className='mr-2 text-gray-400' />
             <Select
               variant='borderless'
               defaultValue='all'
@@ -24,20 +26,20 @@ export default function SearchBar() {
             />
           </div>
 
-          <div className='hidden lg:block h-8 w-px bg-gray-200' />
+          <div className='hidden h-8 w-px bg-gray-200 lg:block' />
 
-          <div className='flex-[2] px-3'>
+          <div className='flex-2 px-3'>
             <Input
               variant='borderless'
-              placeholder='Vị trí tuyển dụng, tên công ty'
+              placeholder={JOB_BOARD_UI.SEARCH_PLACEHOLDER}
               className='py-2.5 text-[15px]'
             />
           </div>
 
           <div className='h-8 w-px bg-gray-200' />
 
-          <div className='flex items-center flex-1 min-w-[160px] px-3'>
-            <EnvironmentOutlined className='text-gray-400 mr-2' />
+          <div className='flex min-w-[160px] flex-1 items-center px-3'>
+            <EnvironmentOutlined className='mr-2 text-gray-400' />
             <Select
               variant='borderless'
               defaultValue='all'
@@ -49,13 +51,12 @@ export default function SearchBar() {
           <Button
             type='primary'
             icon={<SearchOutlined />}
-            className='bg-[#00b14f] hover:bg-[#009a44] border-none rounded-full h-[48px] px-10 font-bold'
+            className='bg-success hover:bg-success/80 h-[48px] rounded-full border-none px-10 font-bold'
           >
-            Tìm kiếm
+            {JOB_BOARD_UI.SEARCH_BUTTON}
           </Button>
         </div>
       </div>
     </section>
   );
 }
-

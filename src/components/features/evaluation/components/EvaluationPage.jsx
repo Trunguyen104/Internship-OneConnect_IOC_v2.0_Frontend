@@ -6,6 +6,7 @@ import CycleTable from './CycleTable';
 import TeamEvaluationsModal from './TeamEvaluationsModal';
 import ScoreDetailDrawer from './ScoreDetailDrawer';
 import { useEvaluation } from '../hooks/useEvaluation';
+import { EVALUATION_UI } from '@/constants/evaluation';
 import Pagination from '@/components/ui/Pagination';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
@@ -34,15 +35,14 @@ export default function EvaluationPage() {
   if (loading && paginated.length === 0) {
     return (
       <div className='flex h-64 items-center justify-center'>
-        <div className='h-8 w-8 animate-spin rounded-full border-4 border-[#d52020] border-t-transparent'></div>
+        <div className='border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent'></div>
       </div>
     );
   }
 
   return (
     <section className='flex flex-col space-y-6'>
-      {/* <h1 className='text-2xl font-bold text-slate-900'>Evaluation</h1> */}
-      <StudentPageHeader title='Evaluation' />
+      <StudentPageHeader title={EVALUATION_UI.TITLE} />
 
       <Card>
         <CycleTable data={paginated} page={page} pageSize={pageSize} onDetail={openTeamOverview} />

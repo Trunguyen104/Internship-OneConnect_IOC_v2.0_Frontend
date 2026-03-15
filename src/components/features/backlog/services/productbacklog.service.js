@@ -36,10 +36,10 @@ export const productBacklogService = {
 
   // FIX: API PATCH để chuyển vào Sprint theo đúng ảnh Swagger của bạn
   moveWorkItemToSprint(projectId, workItemId, sprintId) {
-    return httpPatch(`/workitems/${workItemId}/sprint`, { 
+    return httpPatch(`/workitems/${workItemId}/sprint`, {
       projectId,
       workItemId,
-      targetSprintId: sprintId 
+      targetSprintId: sprintId,
     });
   },
 
@@ -47,7 +47,7 @@ export const productBacklogService = {
   moveWorkItemToBacklog(projectId, workItemId) {
     return httpPatch(`/workitems/${workItemId}/backlog`, {
       projectId,
-      workItemId
+      workItemId,
     });
   },
 
@@ -56,7 +56,7 @@ export const productBacklogService = {
     return httpGet('/sprints', { projectId });
   },
   createSprint(projectId, payload) {
-    // Standardize to use params object if proxy expects it, 
+    // Standardize to use params object if proxy expects it,
     // but usually POST payload contains the data and projectId is in query.
     return httpPost(`/sprints?projectId=${projectId}`, payload);
   },
@@ -79,4 +79,3 @@ export const productBacklogService = {
     return httpPost(`/sprints/${sprintId}/complete?projectId=${projectId}`, payload);
   },
 };
-

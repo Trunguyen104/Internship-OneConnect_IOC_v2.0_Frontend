@@ -3,6 +3,7 @@
 import { useToast } from '@/providers/ToastProvider';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@/constants/enums';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 /**
  * Hook to manage actions triggered from Backlog Modals
@@ -11,11 +12,10 @@ export function useBacklogActions({
   projectId,
   epics,
   setEpics,
-  sprints,
   setSprints,
   setBacklogItems,
   fetchData,
-  ui // Should contain setters for closing modals
+  ui, // Should contain setters for closing modals
 }) {
   const toast = useToast();
 
@@ -39,10 +39,10 @@ export function useBacklogActions({
       };
       const res = await productBacklogService.createEpic(projectId, apiPayload);
       if (res && res.isSuccess === false) {
-        toast.error(res.message || 'Lỗi khi tạo epic');
+        toast.error(res.message || BACKLOG_UI.ERROR_CREATE_EPIC || 'Lỗi khi tạo epic');
         return;
       }
-      toast.success('Tạo Epic thành công');
+      toast.success(BACKLOG_UI.SUCCESS_CREATE_EPIC || 'Tạo Epic thành công');
       ui.setOpenCreateEpic(false);
 
       if (res?.data) {
@@ -55,8 +55,8 @@ export function useBacklogActions({
       } else {
         fetchData(projectId);
       }
-    } catch (error) {
-      toast.error('Lỗi mạng khi tạo Epic');
+    } catch {
+      toast.error(BACKLOG_UI.ERROR_CREATE_EPIC || 'Lỗi mạng khi tạo Epic');
     }
   };
 
@@ -74,7 +74,7 @@ export function useBacklogActions({
 
       const resStart = await productBacklogService.startSprint(projectId, targetId, startPayload);
       if (resStart && resStart.isSuccess !== false) {
-        toast.success('Bắt đầu Sprint thành công');
+        toast.success(BACKLOG_UI.SUCCESS_START_SPRINT || 'Bắt đầu Sprint thành công');
         setSprints((prevSprints) =>
           prevSprints.map((s) =>
             s.sprintId === selectedSprintAction.sprintId
@@ -86,7 +86,7 @@ export function useBacklogActions({
         fetchData(projectId);
       }
     } catch {
-      toast.error('Lỗi khi bắt đầu Sprint');
+      toast.error(BACKLOG_UI.ERROR_START_SPRINT || 'Lỗi khi bắt đầu Sprint');
     }
   };
 
@@ -107,10 +107,12 @@ export function useBacklogActions({
       );
 
       if (resComp && resComp.isSuccess === false) {
-        return toast.error(resComp.message || 'Lỗi khi hoàn thành Sprint');
+        return toast.error(
+          resComp.message || BACKLOG_UI.ERROR_COMPLETE_SPRINT || 'Lỗi khi hoàn thành Sprint',
+        );
       }
 
-      toast.success('Hoàn thành Sprint thành công');
+      toast.success(BACKLOG_UI.SUCCESS_COMPLETE_SPRINT || 'Hoàn thành Sprint thành công');
       ui.setOpenCompleteSprint(false);
 
       if (payload.incompleteItemsOption === MOVE_INCOMPLETE_ITEMS_OPTION.TO_BACKLOG) {
@@ -123,10 +125,10 @@ export function useBacklogActions({
 
       const sid = selectedSprintAction.sprintId || selectedSprintAction.id;
       setSprints((prev) => prev.filter((s) => (s.sprintId || s.id) !== sid));
-      
+
       setTimeout(() => fetchData(projectId, false), 500);
-    } catch (err) {
-      toast.error('Lỗi server khi hoàn thành Sprint');
+    } catch {
+      toast.error(BACKLOG_UI.ERROR_COMPLETE_SPRINT || 'Lỗi server khi hoàn thành Sprint');
     }
   };
 
@@ -153,7 +155,10 @@ export function useBacklogActions({
         throw new Error('Create failed');
       }
 
-      const newId = typeof resCreate.data === 'string' ? resCreate.data : resCreate.data.workItemId || resCreate.data.id;
+      const newId =
+        typeof resCreate.data === 'string'
+          ? resCreate.data
+          : resCreate.data.workItemId || resCreate.data.id;
       const epicName = epics.find((e) => e.id === payload.epic)?.title || '';
 
       const optimisticItem = {
@@ -168,7 +173,11 @@ export function useBacklogActions({
         setSprints((prev) =>
           prev.map((s) =>
             s.sprintId === targetSprintId
-              ? { ...s, items: [...(s.items || []), optimisticItem], itemCount: (s.itemCount || 0) + 1 }
+              ? {
+                  ...s,
+                  items: [...(s.items || []), optimisticItem],
+                  itemCount: (s.itemCount || 0) + 1,
+                }
               : s,
           ),
         );
@@ -176,13 +185,17 @@ export function useBacklogActions({
         setBacklogItems((prev) => [...prev, optimisticItem]);
       }
 
-      toast.success(targetSprintId ? 'Tạo và găm vào Sprint thành công!' : 'Tạo nhiệm vụ thành công!');
+      toast.success(
+        targetSprintId
+          ? BACKLOG_UI.SUCCESS_CREATE_TASK_SPRINT || 'Tạo và găm vào Sprint thành công!'
+          : BACKLOG_UI.SUCCESS_CREATE_TASK || 'Tạo nhiệm vụ thành công!',
+      );
       ui.setOpenCreateTask(false);
       ui.setActiveSprintForTask(null);
 
       setTimeout(() => fetchData(projectId, false), 800);
-    } catch (error) {
-      toast.error('Lỗi khi tạo nhiệm vụ');
+    } catch {
+      toast.error(BACKLOG_UI.ERROR_CREATE_TASK || 'Lỗi khi tạo nhiệm vụ');
     }
   };
 
@@ -206,7 +219,11 @@ export function useBacklogActions({
       const newSprintId = payload.sprintId;
       const workItemId = payload.id;
 
-      const resUpdate = await productBacklogService.updateWorkItem(projectId, workItemId, apiPayload);
+      const resUpdate = await productBacklogService.updateWorkItem(
+        projectId,
+        workItemId,
+        apiPayload,
+      );
       if (!resUpdate || resUpdate.isSuccess === false) throw new Error('Update failed');
 
       if (currentSprintId !== newSprintId) {
@@ -214,12 +231,12 @@ export function useBacklogActions({
         else await productBacklogService.moveWorkItemToSprint(projectId, workItemId, newSprintId);
       }
 
-      toast.success('Cập nhật nhiệm vụ thành công!');
+      toast.success(BACKLOG_UI.SUCCESS_UPDATE_TASK || 'Cập nhật nhiệm vụ thành công!');
       ui.setOpenUpdateTask(false);
       ui.setSelectedTask(null);
       fetchData(projectId, false);
-    } catch (error) {
-      toast.error('Lỗi khi cập nhật nhiệm vụ');
+    } catch {
+      toast.error(BACKLOG_UI.ERROR_UPDATE_TASK || 'Lỗi khi cập nhật nhiệm vụ');
     }
   };
 
@@ -227,14 +244,14 @@ export function useBacklogActions({
     try {
       const res = await productBacklogService.createSprint(projectId, { projectId, ...payload });
       if (res && res.isSuccess === false) {
-        toast.error(res.message || 'Lỗi khi tạo Sprint');
+        toast.error(res.message || BACKLOG_UI.ERROR_CREATE_SPRINT || 'Lỗi khi tạo Sprint');
         return;
       }
-      toast.success('Tạo Sprint thành công!');
+      toast.success(BACKLOG_UI.SUCCESS_CREATE_SPRINT || 'Tạo Sprint thành công!');
       ui.setOpenCreateSprint(false);
       fetchData(projectId, false);
-    } catch (err) {
-      toast.error('Lỗi server khi tạo Sprint');
+    } catch {
+      toast.error(BACKLOG_UI.ERROR_CREATE_SPRINT || 'Lỗi server khi tạo Sprint');
     }
   };
 
@@ -244,6 +261,6 @@ export function useBacklogActions({
     handleCompleteSprint,
     handleCreateTask,
     handleUpdateTask,
-    handleCreateSprint
+    handleCreateSprint,
   };
 }

@@ -1,8 +1,20 @@
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell, Legend
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
 } from 'recharts';
 import { Card, CardHeader } from './atoms';
+import { DASHBOARD_UI } from '@/constants/dashboard';
 
 function formatShortDate(iso) {
   if (!iso) return '';
@@ -21,7 +33,7 @@ function formatFullDate(iso) {
 export function BurndownChart({ burndown }) {
   return (
     <Card>
-      <CardHeader title='Burndown Chart' />
+      <CardHeader title={DASHBOARD_UI.BURNDOWN_CHART} />
       <div className='h-80 p-4'>
         <ResponsiveContainer width='100%' height='100%'>
           <AreaChart data={burndown} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -61,7 +73,7 @@ export function BurndownChart({ burndown }) {
             <Area
               type='monotone'
               dataKey='remaining'
-              name='Remaining'
+              name={DASHBOARD_UI.REMAINING}
               stroke='var(--color-primary)'
               fill='url(#burndownGrad)'
               strokeWidth={3}
@@ -82,7 +94,7 @@ export function BurndownChart({ burndown }) {
 export function TaskStatusDistributionChart({ taskStatusDistribution }) {
   return (
     <Card>
-      <CardHeader title='Task Status Distribution' />
+      <CardHeader title={DASHBOARD_UI.TASK_STATUS_DISTRIBUTION} />
       <div className='h-80 p-4'>
         <ResponsiveContainer width='100%' height='100%'>
           <BarChart
@@ -113,7 +125,12 @@ export function TaskStatusDistributionChart({ taskStatusDistribution }) {
               }}
               itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
             />
-            <Bar dataKey='count' name='Tasks' fill='var(--color-info)' radius={[6, 6, 0, 0]} />
+            <Bar
+              dataKey='count'
+              name={DASHBOARD_UI.TASKS}
+              fill='var(--color-info)'
+              radius={[6, 6, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -124,13 +141,10 @@ export function TaskStatusDistributionChart({ taskStatusDistribution }) {
 export function WorkloadDistributionChart({ workloadByPerson }) {
   return (
     <Card>
-      <CardHeader title='Workload Distribution' />
+      <CardHeader title={DASHBOARD_UI.WORKLOAD_DISTRIBUTION} />
       <div className='h-80 p-4'>
         <ResponsiveContainer width='100%' height='100%'>
-          <BarChart
-            data={workloadByPerson}
-            margin={{ top: 10, right: 10, left: -20, bottom: 40 }}
-          >
+          <BarChart data={workloadByPerson} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
             <CartesianGrid stroke='var(--color-border)' strokeDasharray='4 4' vertical={false} />
             <XAxis
               dataKey='name'
@@ -159,7 +173,7 @@ export function WorkloadDistributionChart({ workloadByPerson }) {
             />
             <Bar
               dataKey='count'
-              name='Tasks'
+              name={DASHBOARD_UI.TASKS}
               fill='var(--color-primary)'
               radius={[6, 6, 0, 0]}
             />
@@ -173,8 +187,8 @@ export function WorkloadDistributionChart({ workloadByPerson }) {
 export function CompletionPieChart({ completionPie }) {
   return (
     <Card>
-      <CardHeader title='Completed / Overdue' />
-      <div className='h-[340px] flex items-center justify-center p-4'>
+      <CardHeader title={DASHBOARD_UI.COMPLETED_OVERDUE} />
+      <div className='flex h-[340px] items-center justify-center p-4'>
         <ResponsiveContainer width='100%' height='100%'>
           <PieChart>
             <Tooltip
@@ -198,10 +212,7 @@ export function CompletionPieChart({ completionPie }) {
               paddingAngle={2}
             >
               {completionPie.map((_, idx) => (
-                <Cell
-                  key={idx}
-                  fill={idx === 0 ? 'var(--color-success)' : 'var(--color-danger)'}
-                />
+                <Cell key={idx} fill={idx === 0 ? 'var(--color-success)' : 'var(--color-danger)'} />
               ))}
             </Pie>
           </PieChart>
@@ -210,4 +221,3 @@ export function CompletionPieChart({ completionPie }) {
     </Card>
   );
 }
-

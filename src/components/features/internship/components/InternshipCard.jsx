@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext } from 'react';
 import { Button, Tag } from 'antd';
-import { ExternalLink, Building2, User, BookOpen, Check } from 'lucide-react';
+import { ExternalLink, Building2, User, BookOpen } from 'lucide-react';
+import { INTERNSHIP_UI } from '@/constants/internship';
 import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from '../constants/internshipStatus.js';
 import ProgressStepper from './ProgressStepper';
 
@@ -16,16 +17,6 @@ const useInternshipCard = () => {
   return context;
 };
 
-const TEXT = {
-  INTERNSHIP_CYCLE: 'Internship Cycle',
-  CURRENT: 'CURRENT',
-  STATUS: 'Status',
-  MENTOR: 'Mentor',
-  ENTERPRISE: 'Doanh nghiệp',
-  PROJECT: 'Dự án',
-  VIEW_DETAIL: 'View Detailed Training Plan',
-};
-
 /**
  * InternshipCard Root Component
  */
@@ -36,7 +27,9 @@ const InternshipCard = ({ data, children, className = '' }) => {
 
   return (
     <InternshipCardContext.Provider value={data}>
-      <div className={`overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md ${className}`}>
+      <div
+        className={`bg-surface border-border transition-all hover:shadow-md ${className} overflow-hidden rounded-3xl border p-6 shadow-sm`}
+      >
         {children}
       </div>
     </InternshipCardContext.Provider>
@@ -44,35 +37,38 @@ const InternshipCard = ({ data, children, className = '' }) => {
 };
 
 /**
- * InternshipCard.Header
+ * InternshipCard Sub-components
  */
-InternshipCard.Header = ({ title, isCurrent = false }) => {
+const Header = ({ title, isCurrent = false }) => {
   const { status } = useInternshipCard();
   const config = INTERNSHIP_STATUS_CONFIG[status];
 
   return (
-    <div className="mb-6 flex items-start justify-between">
-      <div className="space-y-1">
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] font-bold tracking-widest text-muted uppercase">
-            {TEXT.INTERNSHIP_CYCLE}
+    <div className='mb-6 flex items-start justify-between'>
+      <div className='space-y-1'>
+        <div className='flex items-center gap-3'>
+          <span className='text-muted text-[10px] font-bold tracking-widest uppercase'>
+            {INTERNSHIP_UI.LABELS.CYCLE}
           </span>
           {isCurrent && (
-            <Tag color="green" className="border-none bg-success/10 px-2 py-0.5 text-[10px] font-bold text-success font-sans">
-              {TEXT.CURRENT}
+            <Tag
+              color='green'
+              className='bg-success-surface text-success border-none px-2 py-0.5 font-sans text-[10px] font-bold'
+            >
+              {INTERNSHIP_UI.LABELS.CURRENT}
             </Tag>
           )}
         </div>
-        <h2 className="text-2xl font-bold text-text">{title}</h2>
+        <h2 className='text-text text-2xl font-bold'>{title}</h2>
       </div>
-      
-      <div className="flex flex-col items-end gap-2">
-        <span className="text-[10px] font-bold tracking-widest text-muted uppercase">
-          {TEXT.STATUS}
+
+      <div className='flex flex-col items-end gap-2'>
+        <span className='text-muted text-[10px] font-bold tracking-widest uppercase'>
+          {INTERNSHIP_UI.LABELS.STATUS}
         </span>
-        <Tag 
-          color={config.tagColor} 
-          className="m-0 border-none px-4 py-1 text-xs font-bold uppercase transition-all"
+        <Tag
+          color={config.tagColor}
+          className='m-0 border-none px-4 py-1 text-xs font-bold uppercase transition-all'
         >
           {config.label}
         </Tag>
@@ -81,106 +77,107 @@ InternshipCard.Header = ({ title, isCurrent = false }) => {
   );
 };
 
-/**
- * InternshipCard.Stepper
- */
-InternshipCard.Stepper = () => {
+const Stepper = () => {
   const { status } = useInternshipCard();
   if (status === INTERNSHIP_STATUS.CLOSED) return null;
 
   return <ProgressStepper currentStatus={status} />;
 };
 
-/**
- * InternshipCard.BodyTitle
- */
-InternshipCard.BodyTitle = ({ title }) => {
+const BodyTitle = ({ title }) => {
   const { status } = useInternshipCard();
   const config = INTERNSHIP_STATUS_CONFIG[status];
 
   return (
-    <div className="mt-8 mb-6 border-t border-border pt-8">
-      <div className="flex items-center gap-3">
-        <h3 className="text-xl font-bold text-text">{title}</h3>
-        <Tag color="purple" className="border-none bg-blue-50 px-3 py-0.5 text-[10px] font-bold text-info">
-           {config.label}
+    <div className='border-border mt-8 mb-6 border-t pt-8'>
+      <div className='flex items-center gap-3'>
+        <h3 className='text-text text-xl font-bold'>{title}</h3>
+        <Tag
+          color='purple'
+          className='bg-info-surface text-info border-none px-3 py-0.5 text-[10px] font-bold'
+        >
+          {config.label}
         </Tag>
       </div>
     </div>
   );
 };
 
-/**
- * InternshipCard.Info
- */
-InternshipCard.Info = ({ enterprise, mentor, project }) => {
+const Info = ({ enterprise, mentor, project }) => {
   const { status } = useInternshipCard();
 
   const isVisible = status === INTERNSHIP_STATUS.ACTIVE || status === INTERNSHIP_STATUS.ENDED;
   if (!isVisible) return null;
 
   return (
-    <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+    <div className='grid grid-cols-1 gap-8 md:grid-cols-3'>
       {/* Mentor Info */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success/10 text-success shadow-sm">
+      <div className='flex items-center gap-4'>
+        <div className='bg-success-surface text-success flex h-12 w-12 items-center justify-center rounded-full shadow-sm'>
           <User size={24} />
         </div>
-        <div className="flex flex-col">
-          <span className="text-xs font-medium text-muted">{TEXT.MENTOR}</span>
-          <span className="text-lg font-bold text-text">{mentor || 'N/A'}</span>
+        <div className='flex flex-col'>
+          <span className='text-muted text-xs font-medium'>{INTERNSHIP_UI.LABELS.MENTOR}</span>
+          <span className='text-text text-lg font-bold'>
+            {mentor || INTERNSHIP_UI.LABELS.FALLBACK_VALUE || 'N/A'}
+          </span>
         </div>
       </div>
 
       {/* Enterprise Info */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary shadow-sm">
+      <div className='flex items-center gap-4'>
+        <div className='bg-primary-surface text-primary flex h-12 w-12 items-center justify-center rounded-full shadow-sm'>
           <Building2 size={24} />
         </div>
-        <div className="flex flex-col">
-          <span className="text-xs font-medium text-muted">{TEXT.ENTERPRISE}</span>
-          <span className="text-lg font-bold text-text">{enterprise || 'N/A'}</span>
+        <div className='flex flex-col'>
+          <span className='text-muted text-xs font-medium'>{INTERNSHIP_UI.LABELS.ENTERPRISE}</span>
+          <span className='text-text text-lg font-bold'>
+            {enterprise || INTERNSHIP_UI.LABELS.FALLBACK_VALUE || 'N/A'}
+          </span>
         </div>
       </div>
 
       {/* Project Info */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-info shadow-sm">
+      <div className='flex items-center gap-4'>
+        <div className='bg-info-surface text-info flex h-12 w-12 items-center justify-center rounded-full shadow-sm'>
           <BookOpen size={24} />
         </div>
-        <div className="flex flex-col">
-          <span className="text-xs font-medium text-muted">{TEXT.PROJECT}</span>
-          <span className="text-lg font-bold text-text">{project || 'N/A'}</span>
+        <div className='flex flex-col'>
+          <span className='text-muted text-xs font-medium'>{INTERNSHIP_UI.LABELS.PROJECT}</span>
+          <span className='text-text text-lg font-bold'>
+            {project || INTERNSHIP_UI.LABELS.FALLBACK_VALUE || 'N/A'}
+          </span>
         </div>
       </div>
     </div>
   );
 };
 
-/**
- * InternshipCard.Action
- */
-InternshipCard.Action = ({ onDetailClick }) => {
+const Action = ({ onDetailClick }) => {
   const { status } = useInternshipCard();
   const showBtn = status === INTERNSHIP_STATUS.ACTIVE || status === INTERNSHIP_STATUS.ENDED;
 
   if (!showBtn) return null;
 
   return (
-    <div className="mt-10 flex justify-end">
-      <Button 
-        type="primary" 
-        size="large"
+    <div className='mt-10 flex justify-end'>
+      <Button
+        type='primary'
+        size='large'
         icon={<ExternalLink size={18} />}
-        className="group h-14! rounded-2xl bg-[#C55F33]! px-10 font-bold text-white shadow-xl shadow-orange-900/10 transition-all hover:scale-105 active:scale-95"
+        className='group bg-primary shadow-primary/10 h-14 rounded-2xl px-10 font-bold text-white shadow-xl transition-all hover:scale-105 active:scale-95'
         onClick={onDetailClick}
       >
-        <span className="flex items-center gap-2">
-          {TEXT.VIEW_DETAIL}
-        </span>
+        <span className='flex items-center gap-2'>{INTERNSHIP_UI.LABELS.VIEW_DETAIL}</span>
       </Button>
     </div>
   );
 };
+
+InternshipCard.Header = Header;
+InternshipCard.Stepper = Stepper;
+InternshipCard.BodyTitle = BodyTitle;
+InternshipCard.Info = Info;
+InternshipCard.Action = Action;
 
 export default InternshipCard;

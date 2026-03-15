@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 export function EpicSidebar({
   isSidebarOpen,
@@ -6,20 +7,20 @@ export function EpicSidebar({
   epics,
   selectedEpicId,
   setSelectedEpicId,
-  setOpenCreateEpic
+  setOpenCreateEpic,
 }) {
   if (!isSidebarOpen) {
     return (
-      <div className='w-12 shrink-0 bg-white border border-gray-200 shadow-sm rounded-3xl flex flex-col items-center py-6 h-full transition-all duration-300'>
+      <div className='flex h-full w-12 shrink-0 flex-col items-center rounded-3xl border border-gray-200 bg-white py-6 shadow-sm transition-all duration-300'>
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className='flex flex-col items-center justify-center text-gray-500 hover:text-gray-900 w-full h-full'
+          className='flex h-full w-full flex-col items-center justify-center text-gray-500 hover:text-gray-900'
         >
           <span
-            className='uppercase tracking-[0.3em] text-sm font-bold'
+            className='text-sm font-bold tracking-[0.3em] uppercase'
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
-            EPIC
+            {BACKLOG_UI.TYPE_EPIC}
           </span>
         </button>
       </div>
@@ -27,22 +28,22 @@ export function EpicSidebar({
   }
 
   return (
-    <div className='w-[260px] shrink-0 bg-white border border-gray-200 shadow-sm rounded-3xl p-5 flex flex-col h-full overflow-y-auto transition-all duration-300'>
-      <div className='flex justify-between items-center mb-6'>
-        <div className='text-[15px] font-bold text-gray-900'>Epic</div>
+    <div className='flex h-full w-[260px] shrink-0 flex-col overflow-y-auto rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300'>
+      <div className='mb-6 flex items-center justify-between'>
+        <div className='text-[15px] font-bold text-gray-900'>{BACKLOG_UI.TYPE_EPIC}</div>
         <div className='flex items-center gap-3'>
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className='text-xs text-[#A32A2A] font-bold hover:underline'
+            className='text-primary text-xs font-bold hover:underline'
           >
-            Ẩn
+            {BACKLOG_UI.HIDE}
           </button>
           <button
             onClick={() => setOpenCreateEpic(true)}
-            className='w-[22px] h-[22px] rounded-full bg-[#A32A2A] text-white flex items-center justify-center hover:bg-red-800 transition-colors'
-            title='Tạo Epic'
+            className='bg-primary hover:bg-primary-hover flex h-[22px] w-[22px] items-center justify-center rounded-full text-white transition-colors'
+            title={BACKLOG_UI.CREATE_EPIC}
           >
-            <Plus className='w-3.5 h-3.5' />
+            <Plus className='h-3.5 w-3.5' />
           </button>
         </div>
       </div>
@@ -50,22 +51,22 @@ export function EpicSidebar({
       <div className='flex flex-col gap-1'>
         <button
           onClick={() => setSelectedEpicId('ALL')}
-          className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${
+          className={`rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${
             selectedEpicId === 'ALL'
-              ? 'bg-[#F4F0FF] text-[#6333FF]'
+              ? 'bg-primary-50 text-primary'
               : 'text-gray-700 hover:bg-gray-50'
           }`}
         >
-          Tất cả
+          {BACKLOG_UI.ALL}
         </button>
 
         {epics.map((epic) => (
           <button
             key={epic.id}
             onClick={() => setSelectedEpicId(epic.id)}
-            className={`text-left px-4 py-2.5 rounded-2xl text-[14px] font-semibold transition-colors ${
+            className={`rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${
               selectedEpicId === epic.id
-                ? 'bg-[#F4F0FF] text-[#6333FF]'
+                ? 'bg-primary-50 text-primary'
                 : 'text-gray-700 hover:bg-gray-50'
             }`}
           >
@@ -76,4 +77,3 @@ export function EpicSidebar({
     </div>
   );
 }
-

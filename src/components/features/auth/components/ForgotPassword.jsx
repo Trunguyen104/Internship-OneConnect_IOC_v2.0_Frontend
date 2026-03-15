@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div
-      className='w-full h-screen flex items-center justify-center'
+      className='flex h-screen w-full items-center justify-center'
       style={{
         background:
           'radial-gradient(circle at top left, rgb(254, 202, 202) 0%, rgb(255, 255, 255) 65%)',
@@ -63,14 +63,14 @@ export default function ForgotPasswordPage() {
           className='mx-auto mb-6'
         />
 
-        <h1 className='text-center text-black font-bold text-4xl mb-4'>Quên mật khẩu</h1>
-        <p className='text-center text-gray-500 mb-6'>Nhập email xác thực của bạn</p>
+        <h1 className='mb-4 text-center text-4xl font-bold text-black'>Quên mật khẩu</h1>
+        <p className='mb-6 text-center text-gray-500'>Nhập email xác thực của bạn</p>
 
         {success ? (
           <div className='text-center'>
-            <p className='text-green-600 mb-4'>Đã gửi link đặt lại mật khẩu</p>
+            <p className='mb-4 text-green-600'>Đã gửi link đặt lại mật khẩu</p>
 
-            <Link href='/login' className='font-semibold hover:underline text-(--primary-700)'>
+            <Link href='/login' className='font-semibold text-(--primary-700) hover:underline'>
               Quay lại đăng nhập
             </Link>
           </div>
@@ -88,13 +88,13 @@ export default function ForgotPasswordPage() {
 
             <button
               type='submit'
-              className='w-full h-11 rounded-xl text-white font-semibold mt-2 bg-(--color-primary) hover:bg-(--color-primary-hover) cursor-pointer'
+              className='mt-2 h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)'
             >
               Gửi yêu cầu đặt lại
             </button>
 
-            <div className='text-center text-sm mt-4'>
-              <Link href='/login' className='hover:underline font-medium text-(--primary-700)'>
+            <div className='mt-4 text-center text-sm'>
+              <Link href='/login' className='font-medium text-(--primary-700) hover:underline'>
                 Quay lại đăng nhập
               </Link>
             </div>
@@ -104,4 +104,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-

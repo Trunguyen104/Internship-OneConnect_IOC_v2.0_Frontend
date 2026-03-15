@@ -1,22 +1,21 @@
-'use client';
-
 import { Select } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
+import { JOB_BOARD_UI } from '@/constants/job-board';
 
 const filterOptions = [
-  { value: 'location', label: 'Địa điểm' },
-  { value: 'salary', label: 'Mức lương' },
-  { value: 'experience', label: 'Kinh nghiệm' },
-  { value: 'category', label: 'Ngành nghề' },
+  { value: 'location', label: JOB_BOARD_UI.FILTER_LOCATION },
+  { value: 'salary', label: JOB_BOARD_UI.FILTER_SALARY },
+  { value: 'experience', label: JOB_BOARD_UI.FILTER_EXPERIENCE },
+  { value: 'category', label: JOB_BOARD_UI.FILTER_CATEGORY },
 ];
 
 export default function FilterBar() {
   return (
     <div className='flex items-center'>
-      <div className='flex items-center gap-2 h-10 px-4 rounded-full border border-slate-300 bg-white hover:border-emerald-500 transition'>
-        <FilterOutlined className='text-slate-500 text-sm' />
+      <div className='flex h-10 items-center gap-2 rounded-full border border-slate-300 bg-white px-4 transition hover:border-emerald-500'>
+        <FilterOutlined className='text-sm text-slate-500' />
 
-        <span className='text-sm text-slate-500 whitespace-nowrap'>Lọc theo:</span>
+        <span className='text-sm whitespace-nowrap text-slate-500'>{JOB_BOARD_UI.FILTER_BY}</span>
 
         <Select
           variant='borderless'
@@ -28,4 +27,3 @@ export default function FilterBar() {
     </div>
   );
 }
-

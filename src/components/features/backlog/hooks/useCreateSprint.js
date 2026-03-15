@@ -107,7 +107,9 @@ export function useCreateSprint(projectId, open) {
   }, [filteredItems, selectedItemIds]);
 
   const isAllFilteredSelected = useMemo(() => {
-    return filteredItems.length > 0 && filteredItems.every((it) => selectedItemIds.includes(it._id));
+    return (
+      filteredItems.length > 0 && filteredItems.every((it) => selectedItemIds.includes(it._id))
+    );
   }, [filteredItems, selectedItemIds]);
 
   const canSubmit = useMemo(() => sprintName.trim() !== '', [sprintName]);

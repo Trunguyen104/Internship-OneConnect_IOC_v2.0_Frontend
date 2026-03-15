@@ -5,7 +5,7 @@ import { useState } from 'react';
  */
 export function useBacklogUI() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  
+
   // Modal State
   const [openCreateEpic, setOpenCreateEpic] = useState(false);
   const [openCreateTask, setOpenCreateTask] = useState(false);
@@ -15,20 +15,30 @@ export function useBacklogUI() {
   const [openCompleteSprint, setOpenCompleteSprint] = useState(false);
   const [selectedSprintAction, setSelectedSprintAction] = useState(null);
   const [openCreateSprint, setOpenCreateSprint] = useState(false);
-  
+
   // Local state for specific actions
   const [activeSprintForTask, setActiveSprintForTask] = useState(null);
 
   return {
-    isSidebarOpen, setIsSidebarOpen,
-    openCreateEpic, setOpenCreateEpic,
-    openCreateTask, setOpenCreateTask,
-    openUpdateTask, setOpenUpdateTask,
-    selectedTask, setSelectedTask,
-    openStartSprint, setOpenStartSprint,
-    openCompleteSprint, setOpenCompleteSprint,
-    selectedSprintAction, setSelectedSprintAction,
-    openCreateSprint, setOpenCreateSprint,
-    activeSprintForTask, setActiveSprintForTask
+    isSidebarOpen,
+    setIsSidebarOpen,
+    openCreateEpic,
+    setOpenCreateEpic,
+    openCreateTask,
+    setOpenCreateTask,
+    openUpdateTask,
+    setOpenUpdateTask,
+    selectedTask,
+    setSelectedTask,
+    openStartSprint,
+    setOpenStartSprint,
+    openCompleteSprint,
+    setOpenCompleteSprint,
+    selectedSprintAction,
+    setSelectedSprintAction,
+    openCreateSprint,
+    setOpenCreateSprint,
+    activeSprintForTask,
+    setActiveSprintForTask,
   };
 }

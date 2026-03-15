@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import { Card, Descriptions, Typography, Spin } from 'antd';
 import { useGeneralInfo } from '../hooks/useGeneralInfo';
+import { GENERAL_INFO_UI } from '@/constants/general-info';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 const { Text } = Typography;
@@ -12,8 +12,8 @@ export default function GeneralInfo() {
 
   if (loading) {
     return (
-      <div className='flex min-h-[400px] items-center justify-center rounded-2xl bg-white/50 backdrop-blur-sm'>
-        <Spin size='large' tip='Loading information...'>
+      <div className='bg-surface/50 flex min-h-[400px] items-center justify-center rounded-2xl backdrop-blur-sm'>
+        <Spin size='large' tip={GENERAL_INFO_UI.LOADING}>
           <div className='px-12' />
         </Spin>
       </div>
@@ -22,25 +22,25 @@ export default function GeneralInfo() {
 
   return (
     <div className='animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-6 duration-700'>
-      <StudentPageHeader title='General Information' />
+      <StudentPageHeader title={GENERAL_INFO_UI.TITLE} />
 
       <Card
-        className='overflow-hidden rounded-2xl border-none shadow-[0_4px_20px_rgb(0,0,0,0.03)]'
+        className='border-border/10 overflow-hidden rounded-2xl border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
         bodyStyle={{ padding: '32px' }}
       >
         <Descriptions
           title={
             <div className='mb-6 flex items-center gap-3'>
-              <div className='bg-primary h-6 w-1.5 rounded-full shadow-[0_0_10px_rgba(213,32,32,0.3)]'></div>
-              <Text strong className='text-lg text-slate-800'>
-                Internship Group Details
+              <div className='bg-primary shadow-primary/20 h-6 w-1.5 rounded-full shadow-lg'></div>
+              <Text strong className='text-text text-lg'>
+                {GENERAL_INFO_UI.GROUP_DETAILS}
               </Text>
             </div>
           }
           column={{ xxl: 4, xl: 3, lg: 2, md: 2, sm: 1, xs: 1 }}
           bordered={false}
           labelStyle={{
-            color: '#64748b',
+            color: 'var(--color-muted)',
             fontWeight: 600,
             fontSize: '12px',
             textTransform: 'uppercase',
@@ -48,48 +48,54 @@ export default function GeneralInfo() {
             paddingBottom: '8px',
           }}
           contentStyle={{
-            color: '#1e293b',
+            color: 'var(--color-text)',
             fontWeight: 700,
             fontSize: '15px',
             paddingBottom: '20px',
           }}
           layout='vertical'
         >
-          <Descriptions.Item label='Group Code'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.GROUP_CODE}>
             <Text copyable={{ text: info.groupCode || info.internshipId }}>
-              {info.groupCode || info.internshipId || 'N/A'}
+              {info.groupCode || info.internshipId || GENERAL_INFO_UI.VALUES.NA}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label='Group Name'>{info.groupName || 'No name'}</Descriptions.Item>
-          <Descriptions.Item label='Internship Term'>
-            {info.internshipTermName || info.internshipTerm || 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.GROUP_NAME}>
+            {info.groupName || GENERAL_INFO_UI.VALUES.NO_NAME}
           </Descriptions.Item>
-          <Descriptions.Item label='Enterprise'>
-            {info.enterpriseName || info.company || 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.INTERNSHIP_TERM}>
+            {info.internshipTermName || info.internshipTerm || GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='University'>
-            {info.schoolName || info.school || 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.ENTERPRISE}>
+            {info.enterpriseName || info.company || GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='Mentor'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.UNIVERSITY}>
+            {info.schoolName || info.school || GENERAL_INFO_UI.VALUES.NA}
+          </Descriptions.Item>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR}>
             {info.mentorName || info.mentor || (
               <Text type='secondary' italic>
-                Unassigned
+                {GENERAL_INFO_UI.VALUES.UNASSIGNED}
               </Text>
             )}
           </Descriptions.Item>
-          <Descriptions.Item label='Start Date'>
-            {info.startDate ? new Date(info.startDate).toLocaleDateString('en-GB') : 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.START_DATE}>
+            {info.startDate
+              ? new Date(info.startDate).toLocaleDateString('vi-VN')
+              : GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='End Date'>
-            {info.endDate ? new Date(info.endDate).toLocaleDateString('en-GB') : 'N/A'}
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.END_DATE}>
+            {info.endDate
+              ? new Date(info.endDate).toLocaleDateString('vi-VN')
+              : GENERAL_INFO_UI.VALUES.NA}
           </Descriptions.Item>
-          <Descriptions.Item label='Student Count'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.STUDENT_COUNT}>
             <Text className='text-primary text-2xl font-black'>
               {info.totalStudents || info.members?.length || 0}
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label='Mentor Count'>
-            <Text className='text-2xl font-black text-slate-700'>
+          <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR_COUNT}>
+            <Text className='text-text text-2xl font-black'>
               {info.totalMentors || (info.mentorName ? 1 : 0)}
             </Text>
           </Descriptions.Item>

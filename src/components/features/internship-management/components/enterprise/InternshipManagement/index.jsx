@@ -4,6 +4,7 @@ import React from 'react';
 import { Pagination } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import Card from '@/components/ui/Card';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
 import { useInternshipManagement } from './hooks/useInternshipManagement';
 import { MOCK_STUDENTS } from './constants/internshipData';
 import InternshipHeader from './components/InternshipHeader';
@@ -15,6 +16,7 @@ import AssignMentorModal from './components/AssignMentorModal';
 import GroupActionModal from './components/GroupActionModal';
 
 export default function InternshipManagement() {
+  const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
   const {
     search,
     statusFilter,
@@ -47,7 +49,7 @@ export default function InternshipManagement() {
       <InternshipHeader onAddClick={() => setIsAddModalOpen(true)} />
 
       <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
-        <Card>
+        <Card className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
           <InternshipFilters
             search={search}
             onSearchChange={handleSearchChange}
@@ -74,8 +76,8 @@ export default function InternshipManagement() {
         </Card>
 
         <div className='mt-6 flex items-center justify-between px-2'>
-          <div className='text-xs font-semibold tracking-widest text-slate-400 uppercase'>
-            Total: {filteredData.length}
+          <div className='text-muted text-xs font-bold tracking-widest uppercase'>
+            {INTERNSHIP_LIST.TOTAL_LABEL}: {filteredData.length}
           </div>
           <Pagination
             {...pagination}
@@ -83,8 +85,8 @@ export default function InternshipManagement() {
             showSizeChanger={false}
             onChange={handleTableChange}
             itemRender={(page, type, originalElement) => {
-              if (type === 'prev') return <LeftOutlined />;
-              if (type === 'next') return <RightOutlined />;
+              if (type === 'prev') return <LeftOutlined className='text-primary' />;
+              if (type === 'next') return <RightOutlined className='text-primary' />;
               return originalElement;
             }}
           />

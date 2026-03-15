@@ -9,8 +9,11 @@ import { MOCK_MENTORS } from '../constants/internshipData';
 
 const { Title, Text } = Typography;
 
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+
 const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
   const [form] = Form.useForm();
+  const { ASSIGN } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
 
   useEffect(() => {
     if (!open) form.resetFields();
@@ -23,33 +26,42 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
   };
 
   return (
-    <Modal open={open} onCancel={onCancel} footer={null} width={560} destroyOnClose>
-      <Space direction='vertical' size='middle' style={{ width: '100%' }}>
+    <Modal
+      open={open}
+      onCancel={onCancel}
+      footer={null}
+      width={560}
+      destroyOnClose
+      className='modal-custom'
+    >
+      <Space direction='vertical' size='large' className='w-full'>
         {/* Header */}
-        <div>
-          <Title level={4} style={{ marginBottom: 4 }}>
-            Assign Mentor & Project
+        <div className='mb-2'>
+          <Title level={4} className='text-text mb-2'>
+            {ASSIGN.TITLE}
           </Title>
 
-          <Space>
-            <UserOutlined />
-            <Text type='secondary'>
-              Student: <Text strong>{student?.fullName}</Text>
+          <Space className='text-muted flex items-center gap-2'>
+            <UserOutlined className='text-primary' />
+            <Text className='text-muted'>
+              {ASSIGN.STUDENT_LABEL}{' '}
+              <Text className='text-text font-bold'>{student?.fullName}</Text>
             </Text>
           </Space>
         </div>
 
         {/* Form */}
-        <Form form={form} layout='vertical' onFinish={onFinish}>
+        <Form form={form} layout='vertical' onFinish={onFinish} className='space-y-4'>
           <Form.Item
-            label='Select Mentor'
+            label={<span className='text-text font-semibold'>{ASSIGN.MENTOR_LABEL}</span>}
             name='mentorId'
-            rules={[{ required: true, message: 'Please select a mentor' }]}
+            rules={[{ required: true, message: ASSIGN.MENTOR_REQUIRED }]}
           >
             <Select
               showSearch
-              placeholder='Search mentor'
-              prefix={<SearchOutlined />}
+              placeholder={ASSIGN.MENTOR_PLACEHOLDER}
+              prefix={<SearchOutlined className='text-muted' />}
+              className='h-11 w-full rounded-xl'
               options={MOCK_MENTORS.map((m) => ({
                 label: `${m.name} - ${m.role}`,
                 value: m.id,
@@ -61,18 +73,31 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
           </Form.Item>
 
           <Form.Item
-            label='Project Name / Position'
+            label={<span className='text-text font-semibold'>{ASSIGN.PROJECT_LABEL}</span>}
             name='project'
-            rules={[{ required: true, message: 'Please enter project name' }]}
+            rules={[{ required: true, message: ASSIGN.PROJECT_REQUIRED }]}
           >
-            <Input prefix={<ProjectOutlined />} placeholder='Enter project name or role' />
+            <Input
+              prefix={<ProjectOutlined className='text-muted' />}
+              placeholder={ASSIGN.PROJECT_PLACEHOLDER}
+              className='bg-surface border-border h-11 rounded-xl'
+            />
           </Form.Item>
 
-          <Space style={{ width: '100%', justifyContent: 'flex-end', marginTop: 16 }}>
-            <Button onClick={onCancel}>Cancel</Button>
+          <Space className='mt-8 flex w-full justify-end gap-3'>
+            <Button
+              onClick={onCancel}
+              className='border-border h-11 rounded-xl px-6 font-semibold transition-all hover:bg-slate-50'
+            >
+              {ASSIGN.CANCEL}
+            </Button>
 
-            <Button type='primary' htmlType='submit'>
-              Assign Mentor
+            <Button
+              type='primary'
+              htmlType='submit'
+              className='bg-primary h-11 rounded-xl border-none px-6 font-semibold shadow-md transition-all hover:scale-105 active:scale-95'
+            >
+              {ASSIGN.SUBMIT}
             </Button>
           </Space>
         </Form>

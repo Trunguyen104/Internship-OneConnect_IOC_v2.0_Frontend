@@ -10,7 +10,7 @@ export default function StudentAvatar({ name }) {
     <Avatar
       size='large'
       icon={!firstLetter && <UserOutlined />}
-      className='border border-[var(--primary-200)] bg-[var(--primary-100)] font-semibold text-[var(--primary-700)]'
+      className='border-primary/20 bg-primary-surface text-primary border font-semibold'
     >
       {firstLetter}
     </Avatar>

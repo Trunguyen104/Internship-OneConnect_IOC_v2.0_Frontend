@@ -1,8 +1,10 @@
 'use client';
+
 import React from 'react';
 import { Pagination } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import Card from '@/components/ui/Card';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
 import { useTermManagement } from './hooks/useTermManagement';
 import TermHeader from './components/TermHeader';
 import TermFilterBar from './components/TermFilterBar';
@@ -12,6 +14,8 @@ import TermStatusModal from './components/TermStatusModal';
 import { INITIAL_TERMS } from './constants/termData';
 
 export default function InternshipTermManagement() {
+  const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+
   const {
     loading,
     searchTerm,
@@ -39,15 +43,16 @@ export default function InternshipTermManagement() {
   return (
     <>
       <TermHeader onCreateNew={handleCreateNew} />
-      <Card>
-        <TermFilterBar
-          searchValue={searchTerm}
-          onSearchChange={handleSearchChange}
-          statusFilter={statusFilter}
-          onStatusChange={handleStatusChange}
-        />
 
-        <div className='flex-1 overflow-auto'>
+      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
+        <Card className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
+          <TermFilterBar
+            searchValue={searchTerm}
+            onSearchChange={handleSearchChange}
+            statusFilter={statusFilter}
+            onStatusChange={handleStatusChange}
+          />
+
           <TermTable
             data={paginatedData}
             loading={loading}
@@ -57,24 +62,26 @@ export default function InternshipTermManagement() {
             onRequestDelete={handleRequestDelete}
             onRequestChangeStatus={handleRequestChangeStatus}
           />
+        </Card>
+
+        <div className='mt-6 flex items-center justify-between px-2'>
+          <div className='text-muted text-xs font-bold tracking-widest uppercase'>
+            {TERM_MANAGEMENT.TOTAL_LABEL}: {filteredData.length}
+          </div>
+          <Pagination
+            {...pagination}
+            total={filteredData.length}
+            showSizeChanger={false}
+            onChange={(page) => handleTableChange({ current: page })}
+            itemRender={(page, type, originalElement) => {
+              if (type === 'prev') return <LeftOutlined className='text-primary' />;
+              if (type === 'next') return <RightOutlined className='text-primary' />;
+              return originalElement;
+            }}
+          />
         </div>
-      </Card>
-      <div className='mt-auto flex items-center justify-between border-t border-slate-100 px-2 pt-6'>
-        <div className='text-xs font-semibold tracking-widest text-slate-400 uppercase'>
-          Total: {filteredData.length}
-        </div>
-        <Pagination
-          {...pagination}
-          total={filteredData.length}
-          showSizeChanger={false}
-          onChange={(page) => handleTableChange({ current: page })}
-          itemRender={(page, type, originalElement) => {
-            if (type === 'prev') return <LeftOutlined />;
-            if (type === 'next') return <RightOutlined />;
-            return originalElement;
-          }}
-        />
       </div>
+
       <TermFormDrawer
         visible={modalVisible}
         onCancel={() => setModalVisible(false)}

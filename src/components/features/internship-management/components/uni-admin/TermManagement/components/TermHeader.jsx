@@ -1,22 +1,32 @@
 'use client';
+
 import React, { memo } from 'react';
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+
+const { Title } = Typography;
 
 const TermHeader = memo(function TermHeader({ onCreateNew }) {
+  const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+
   return (
-    <header className='mb-7 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
-      <h1 className='text-2xl font-bold text-slate-900'>Danh sách Kỳ thực tập</h1>
+    <div className='mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
+      <div>
+        <Title level={2} className='text-text !mb-0 tracking-tight'>
+          {TERM_MANAGEMENT.TITLE}
+        </Title>
+      </div>
 
       <Button
+        type='primary'
         icon={<PlusOutlined />}
         onClick={onCreateNew}
-        size='medium'
-        className='!bg-primary hover:!bg-primary-hover cursor-pointer !border-none font-medium !text-white shadow-sm'
+        className='bg-primary h-11 rounded-xl border-none px-6 font-bold shadow-md transition-all hover:scale-105 active:scale-95'
       >
-        Thêm Kỳ Mới
+        {TERM_MANAGEMENT.CREATE_BTN}
       </Button>
-    </header>
+    </div>
   );
 });
 

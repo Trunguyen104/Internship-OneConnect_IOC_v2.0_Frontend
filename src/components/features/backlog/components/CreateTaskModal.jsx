@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo, useState, useRef, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import TiptapEditor from '@/components/ui/TiptapEditor';
-import DateInput from '@/components/ui/DateInput';
 
 import { FieldLabel, TextInput } from './TaskFields';
 import { TaskModalSidebar } from './TaskModalSidebar';
 import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 export default function CreateTaskModal({
   open,
@@ -28,12 +28,6 @@ export default function CreateTaskModal({
   const [sprintId, setSprintId] = useState(initialSprintId || '');
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
-
-  useEffect(() => {
-    if (open) {
-      setSprintId(initialSprintId || '');
-    }
-  }, [open, initialSprintId]);
 
   const canSubmit = useMemo(
     () => summary.trim() && type && status && priority,
@@ -91,7 +85,7 @@ export default function CreateTaskModal({
       <div className='relative flex max-h-[90vh] w-full max-w-[1200px] flex-col rounded-4xl bg-white shadow-2xl'>
         {/* Header */}
         <div className='flex items-center justify-between px-8 pt-8 pb-5'>
-          <h2 className='text-[28px] font-bold text-slate-900'>Create Task</h2>
+          <h2 className='text-text text-[28px] font-bold'>{BACKLOG_UI.MODAL_CREATE_TASK}</h2>
         </div>
 
         {/* Content Body - 2 Columns */}
@@ -104,60 +98,71 @@ export default function CreateTaskModal({
             <div className='flex flex-1 flex-col space-y-6'>
               {/* Tóm tắt */}
               <div>
-                <FieldLabel required>Summary</FieldLabel>
-                <TextInput value={summary} onChange={setSummary} placeholder='Enter summary...' />
+                <FieldLabel required>{BACKLOG_UI.FIELD_SUMMARY}</FieldLabel>
+                <TextInput
+                  value={summary}
+                  onChange={setSummary}
+                  placeholder={BACKLOG_UI.PLACEHOLDER_SUMMARY}
+                />
               </div>
 
               {/* Mô tả */}
-              <div className='flex flex-1 flex-col overflow-hidden min-h-[200px]'>
-                <FieldLabel required>Description</FieldLabel>
+              <div className='flex min-h-[200px] flex-1 flex-col overflow-hidden'>
+                <FieldLabel required>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
                 <div className='flex-1 overflow-y-auto rounded-2xl'>
                   <TiptapEditor
                     value={desc}
                     onChange={setDesc}
-                    placeholder='Enter detailed description...'
+                    placeholder={BACKLOG_UI.PLACEHOLDER_DESC}
                   />
                 </div>
               </div>
             </div>
 
             {/* Cột phải (Sidebar Chi tiết) */}
-            <TaskModalSidebar 
-              status={status} setStatus={setStatus}
-              type={type} setType={setType}
-              epic={epic} setEpic={setEpic}
+            <TaskModalSidebar
+              status={status}
+              setStatus={setStatus}
+              type={type}
+              setType={setType}
+              epic={epic}
+              setEpic={setEpic}
               epics={epics}
-              sprintId={sprintId} setSprintId={setSprintId}
+              sprintId={sprintId}
+              setSprintId={setSprintId}
               sprints={sprints}
-              assignee={assignee} setAssignee={setAssignee}
-              priority={priority} setPriority={setPriority}
-              dueDate={dueDate} setDueDate={setDueDate}
-              points={points} setPoints={setPoints}
+              assignee={assignee}
+              setAssignee={setAssignee}
+              priority={priority}
+              setPriority={setPriority}
+              dueDate={dueDate}
+              setDueDate={setDueDate}
+              points={points}
+              setPoints={setPoints}
             />
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className='flex items-center justify-between px-8 py-5 gap-4 mt-1 border-t border-slate-100'>
+        <div className='border-border/50 mt-1 flex items-center justify-between gap-4 border-t px-8 py-5'>
           <button
             type='button'
             onClick={handleClose}
-            className='h-[50px] px-10 w-[140px] rounded-full text-[15px] font-bold text-red-600 bg-red-50 hover:bg-red-100 transition-colors'
+            className='text-primary bg-primary-50 hover:bg-primary-100 h-[50px] w-[140px] rounded-full px-10 text-[15px] font-bold transition-colors'
           >
-            Cancel
+            {BACKLOG_UI.CANCEL}
           </button>
 
           <button
             type='button'
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className='h-[50px] flex-1 flex items-center justify-center rounded-full bg-[#A32A2A] text-[15px] font-bold text-white transition-colors hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60'
+            className='bg-primary hover:bg-primary-hover flex h-[50px] flex-1 items-center justify-center rounded-full text-[15px] font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60'
           >
-            Create Task
+            {BACKLOG_UI.MODAL_CREATE_TASK}
           </button>
         </div>
       </div>
     </div>
   );
 }
-

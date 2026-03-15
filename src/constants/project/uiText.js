@@ -1,39 +1,39 @@
 export const PROJECT_UI = {
   TITLE: {
-    PROJECT_INFO: 'Project Information',
-    OVERVIEW: 'Overview',
-    PROJECT_RESOURCES: 'Project Resources',
-    RESOURCE_LIST: 'Resource List',
-    ADD_RESOURCE: 'Add New Resource',
-    EDIT_RESOURCE: 'Edit Resource',
+    PROJECT_INFO: 'Thông tin dự án',
+    OVERVIEW: 'Tổng quan',
+    PROJECT_RESOURCES: 'Tài liệu dự án',
+    RESOURCE_LIST: 'Danh sách tài liệu',
+    ADD_RESOURCE: 'Thêm tài liệu mới',
+    EDIT_RESOURCE: 'Chỉnh sửa tài liệu',
   },
 
   FORM: {
-    RESOURCE_NAME: 'Resource Name',
-    RESOURCE_TYPE: 'Resource Type',
-    ATTACH_FILE: 'Attach File',
+    RESOURCE_NAME: 'Tên tài liệu',
+    RESOURCE_TYPE: 'Loại tài liệu',
+    ATTACH_FILE: 'Đính kèm tệp',
   },
 
   BUTTON: {
-    UPLOAD: 'Upload',
-    SELECT_FILE: 'Select File',
-    VIEW: 'View',
-    DOWNLOAD: 'Download',
-    EDIT: 'Edit',
-    DELETE: 'Delete',
-    UPDATE: 'Update',
-    CANCEL: 'Cancel',
+    UPLOAD: 'Tải lên',
+    SELECT_FILE: 'Chọn tệp',
+    VIEW: 'Xem',
+    DOWNLOAD: 'Tải về',
+    EDIT: 'Sửa',
+    DELETE: 'Xóa',
+    UPDATE: 'Cập nhật',
+    CANCEL: 'Hủy bỏ',
   },
 
   PLACEHOLDER: {
-    RESOURCE_NAME: 'Enter resource name...',
+    RESOURCE_NAME: 'Nhập tên tài liệu...',
   },
 
   EMPTY: {
-    NO_RESOURCE: 'No resources attached.',
+    NO_RESOURCE: 'Chưa có tài liệu nào được đính kèm.',
   },
 
   CONFIRM: {
-    DELETE_RESOURCE: 'Are you sure you want to delete this resource?',
+    DELETE_RESOURCE: 'Bạn có chắc chắn muốn xóa tài liệu này không?',
   },
 };

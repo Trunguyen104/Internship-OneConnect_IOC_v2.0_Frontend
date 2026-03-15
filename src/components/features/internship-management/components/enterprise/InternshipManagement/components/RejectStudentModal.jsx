@@ -1,84 +1,102 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Modal, Input, Button } from 'antd';
-import { ExclamationCircleOutlined, TeamOutlined } from '@ant-design/icons';
+import { Modal, Input, Button, Typography, Space, Divider } from 'antd';
+import { ExclamationCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
+
+const { Title, Text } = Typography;
 
 const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
   const [reason, setReason] = useState('');
+  const { REJECT } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
 
-  // useEffect(() => {
-  //   if (!open && reason) {
-  //     setReason('');
-  //   }
-  // }, [open, reason]);
   const handleCancel = () => {
     setReason('');
     onCancel();
   };
+
+  const handleConfirm = () => {
+    if (student && reason.trim()) {
+      onConfirm(student.id, reason);
+      setReason('');
+    }
+  };
+
   return (
     <Modal
-      title={null}
       open={open}
       footer={null}
       closable={false}
       onCancel={handleCancel}
       width={520}
-      className='reject-modal'
+      centered
+      className='modal-custom overflow-hidden rounded-2xl'
     >
-      <div className='border-primary/10 relative flex flex-col overflow-hidden rounded-xl border bg-white shadow-2xl'>
-        <div className='flex flex-col items-center justify-center px-6 pt-8 pb-4 text-center'>
-          <ExclamationCircleOutlined className='text-4xl' />
-          <h3 className='text-xl font-bold text-slate-900'>Reject Student Application</h3>
+      <div className='flex flex-col'>
+        {/* Header Section */}
+        <div className='mb-6 flex flex-col items-center gap-3 text-center'>
+          <div className='bg-danger/10 flex size-14 items-center justify-center rounded-2xl'>
+            <ExclamationCircleOutlined className='text-danger text-3xl' />
+          </div>
+          <div>
+            <Title level={4} className='text-danger mb-1 tracking-tight uppercase'>
+              {REJECT.TITLE}
+            </Title>
+            <Text className='text-muted text-xs'>
+              {REJECT.WARNING_TEXT_1}{' '}
+              <span className='text-text font-bold'>{student?.fullName}</span>
+            </Text>
+          </div>
         </div>
 
-        <div className='px-8 py-2'>
-          <div className='bg-primary/5 border-primary mb-6 rounded-r-lg border-l-4 p-4'>
-            <p className='text-sm leading-relaxed text-slate-700'>
-              You are about to reject student{' '}
-              <span className='font-bold text-slate-900'>{student?.fullName}</span>. This action
-              cannot be undone and the student will be notified immediately.
-            </p>
+        <Divider className='border-border m-0' />
+
+        {/* Content Section */}
+        <div className='mt-6 px-2'>
+          <div className='bg-danger/5 border-danger mb-6 rounded-xl border-l-4 p-4'>
+            <Text className='text-muted text-xs leading-relaxed'>{REJECT.WARNING_TEXT_2}</Text>
           </div>
 
-          <div className='space-y-2'>
-            <label className='block text-sm font-semibold text-slate-700'>
-              Reason for Rejection <span className='text-primary'>*</span>
+          <div className='space-y-3'>
+            <label className='text-text block text-sm font-bold'>
+              {REJECT.REASON_LABEL} <span className='text-danger'>*</span>
             </label>
             <Input.TextArea
-              className='focus:ring-primary min-h-[140px] w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 transition-all outline-none placeholder:text-slate-400 focus:border-transparent focus:ring-2'
-              placeholder='Please provide a detailed reason for the rejection (e.g., missing qualifications, poor interview performance)...'
-              required
+              className='bg-surface border-border focus:ring-primary min-h-[140px] w-full rounded-xl px-4 py-3 text-sm transition-all focus:ring-2'
+              placeholder={REJECT.REASON_PLACEHOLDER}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
           </div>
         </div>
 
-        <div className='mt-8 flex flex-col gap-3 px-8 pb-8 sm:flex-row'>
+        {/* Footer Actions */}
+        <div className='mt-10 flex gap-3 px-2 pb-2'>
           <Button
-            className='order-2 h-12 flex-1 rounded-full border-2 border-slate-200 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100 sm:order-1'
+            className='border-border h-11 flex-1 rounded-xl font-semibold transition-all hover:bg-slate-50'
             onClick={handleCancel}
           >
-            Cancel
+            {REJECT.CANCEL}
           </Button>
           <Button
-            className='bg-primary shadow-primary/20 order-1 flex h-12 flex-1 items-center justify-center gap-2 rounded-full border-none text-sm font-bold text-white shadow-lg transition-all hover:bg-red-700 sm:order-2'
+            type='primary'
+            danger
+            className='bg-danger h-11 flex-1 rounded-xl border-none font-semibold shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-50'
             disabled={!reason.trim()}
-            onClick={() => student && onConfirm(student.id, reason)}
+            onClick={handleConfirm}
           >
-            <span className='truncate'>Confirm Reject</span>
+            {REJECT.SUBMIT}
           </Button>
         </div>
 
-        <div className='absolute top-4 right-4'>
-          <button
-            className='text-slate-400 transition-colors hover:text-slate-600'
-            onClick={onCancel}
-          >
-            <TeamOutlined />
-          </button>
-        </div>
+        {/* Close Button Shortcut */}
+        <button
+          className='text-muted hover:text-danger absolute top-6 right-6 transition-colors'
+          onClick={handleCancel}
+        >
+          <CloseCircleOutlined className='text-xl opacity-20 hover:opacity-100' />
+        </button>
       </div>
     </Modal>
   );

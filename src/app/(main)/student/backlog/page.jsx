@@ -7,8 +7,8 @@ import BacklogBoard from '@/components/features/backlog/components/BacklogBoard'
 export default function BacklogBoardPage() {
   return (
     <PageShell>
-      <div className='flex items-center gap-4 mb-4'>
-        <div className='flex-1 min-w-0'>
+      <div className='mb-4 flex items-center gap-4'>
+        <div className='min-w-0 flex-1'>
           <StudentTabs />
         </div>
       </div>
@@ -16,4 +16,3 @@ export default function BacklogBoardPage() {
     </PageShell>
   );
 }
-

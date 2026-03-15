@@ -22,11 +22,11 @@ export default function StudentTable({ data, loading, onDelete }) {
           <StudentAvatar name={text} />
 
           <div className='flex flex-col'>
-            <Text className='text-[15px] font-semibold text-gray-900'>
+            <Text className='text-text text-[15px] font-semibold'>
               {text || STUDENT_LIST_UI.DEFAULT.NA}
             </Text>
 
-            <Text className='text-[13px] text-gray-500'>{record.email}</Text>
+            <Text className='text-muted text-[13px]'>{record.email}</Text>
           </div>
         </div>
       ),
@@ -35,7 +35,7 @@ export default function StudentTable({ data, loading, onDelete }) {
       title: STUDENT_LIST_UI.TABLE.CODE,
       dataIndex: 'studentCode',
       key: 'studentCode',
-      render: (text) => <Text className='font-medium text-gray-600'>{text}</Text>,
+      render: (text) => <Text className='text-muted font-medium'>{text}</Text>,
     },
     {
       title: STUDENT_LIST_UI.TABLE.ROLE,
@@ -54,7 +54,7 @@ export default function StudentTable({ data, loading, onDelete }) {
       dataIndex: 'joinedAt',
       key: 'joinedAt',
       render: (date) => (
-        <span className='text-sm text-gray-500'>
+        <span className='text-muted text-sm'>
           {date ? new Date(date).toLocaleDateString('en-GB') : STUDENT_LIST_UI.DEFAULT.NA}
         </span>
       ),
@@ -69,7 +69,7 @@ export default function StudentTable({ data, loading, onDelete }) {
             danger
             type='text'
             icon={<DeleteOutlined />}
-            className='rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500'
+            className='text-muted hover:bg-danger-surface hover:text-danger rounded-lg transition-colors'
             onClick={() =>
               showDeleteConfirm({
                 title: STUDENT_LIST_UI.CONFIRM.REMOVE_TITLE,

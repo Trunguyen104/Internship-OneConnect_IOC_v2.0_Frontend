@@ -1,8 +1,8 @@
 'use client';
 
-import { Form } from 'antd';
+import React, { useState, useCallback } from 'react';
+import { Form, Select, Button } from 'antd';
 import { PlusOutlined, FilterOutlined } from '@ant-design/icons';
-import { Select, Button } from 'antd';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 import LogbookTable from './LogbookTable';
@@ -15,7 +15,6 @@ import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import dayjs from 'dayjs';
-import { useState } from 'react';
 
 export default function LogbookPage() {
   const {
@@ -34,14 +33,15 @@ export default function LogbookPage() {
     internshipId,
     userProfile,
   } = useLogbook();
+
   const toast = useToast();
+  const [form] = Form.useForm();
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [viewRecord, setViewRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form] = Form.useForm();
 
   const handleCreateOrUpdate = async (values) => {
     setSubmitting(true);
@@ -73,6 +73,7 @@ export default function LogbookPage() {
         };
         res = await LogBookService.create(createPayload);
       }
+
       if (res && (res.isSuccess !== false || res.success !== false)) {
         toast.success(
           editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
@@ -80,10 +81,8 @@ export default function LogbookPage() {
 
         if (!editingId) {
           setPageNumber(1);
-          fetchLogbooks();
-        } else {
-          fetchLogbooks();
         }
+        fetchLogbooks();
         closeFormModal();
       } else {
         toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
@@ -95,97 +94,110 @@ export default function LogbookPage() {
     }
   };
 
-  const openFormModal = (record = null) => {
-    if (record) {
-      setEditingId(record.logbookId);
-      form.setFieldsValue({
-        dateReport: record.dateReport ? dayjs(record.dateReport) : null,
-        summary: record.summary,
-        issue: record.issue,
-        plan: record.plan,
-      });
-    } else {
-      setEditingId(null);
-      form.resetFields();
-    }
-    setIsFormModalOpen(true);
-  };
+  const openFormModal = useCallback(
+    (record = null) => {
+      if (record) {
+        setEditingId(record.logbookId);
+        form.setFieldsValue({
+          dateReport: record.dateReport ? dayjs(record.dateReport) : null,
+          summary: record.summary,
+          issue: record.issue,
+          plan: record.plan,
+        });
+      } else {
+        setEditingId(null);
+        form.resetFields();
+      }
+      setIsFormModalOpen(true);
+    },
+    [form],
+  );
 
-  const closeFormModal = () => {
+  const closeFormModal = useCallback(() => {
     setIsFormModalOpen(false);
     setEditingId(null);
     form.resetFields();
-  };
+  }, [form]);
 
-  const openDetailModal = (record) => {
+  const openDetailModal = useCallback((record) => {
     setViewRecord(record);
     setIsDetailModalOpen(true);
-  };
+  }, []);
 
-  const closeDetailModal = () => {
+  const closeDetailModal = useCallback(() => {
     setIsDetailModalOpen(false);
     setViewRecord(null);
-  };
+  }, []);
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
-      <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
+      <StudentPageHeader title={DAILY_REPORT_UI.TITLE} description={DAILY_REPORT_UI.DESCRIPTION} />
 
-      <Card className='flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
-        <div className='flex flex-wrap items-center justify-between gap-4 border-b border-slate-50 bg-slate-50/20 py-4'>
-          <Select
-            allowClear
-            placeholder={DAILY_REPORT_UI.FILTER_STATUS}
-            value={statusFilter}
-            onChange={(val) => {
-              setStatusFilter(val);
+      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
+        <Card className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
+          <div className='flex flex-wrap items-center justify-between gap-4 p-4'>
+            <div className='min-w-[280px]'>
+              <Select
+                allowClear
+                placeholder={DAILY_REPORT_UI.FILTER_STATUS}
+                value={statusFilter}
+                onChange={(val) => {
+                  setStatusFilter(val);
+                  setPageNumber(1);
+                }}
+                className='h-11 w-full'
+                suffixIcon={<FilterOutlined className='text-muted' />}
+                options={[
+                  { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
+                  { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                  { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+                ]}
+              />
+            </div>
+
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              onClick={() => openFormModal()}
+              className='bg-primary h-11 rounded-xl border-none px-6 font-bold shadow-md transition-all hover:scale-105 active:scale-95'
+            >
+              {DAILY_REPORT_UI.CREATE_BUTTON}
+            </Button>
+          </div>
+
+          <LogbookTable
+            data={data}
+            loading={loading}
+            userProfile={userProfile}
+            onView={openDetailModal}
+            onEdit={openFormModal}
+            onDelete={handleDelete}
+            onTableChange={(pagination, filters, sorter) => {
+              if (sorter.field === 'dateReport' && sorter.order) {
+                setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
+              }
+            }}
+          />
+        </Card>
+
+        <div className='mt-6 flex items-center justify-between px-2'>
+          <div className='text-muted text-xs font-bold tracking-widest uppercase'>
+            Tổng cộng: {total} báo cáo
+          </div>
+          <Pagination
+            total={total}
+            page={pageNumber}
+            pageSize={pageSize}
+            totalPages={Math.ceil(total / pageSize)}
+            onPageChange={setPageNumber}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
               setPageNumber(1);
             }}
-            className='w-56 shadow-sm'
-            rootClassName='custom-select-premium'
-            suffixIcon={<FilterOutlined className='text-slate-400' />}
-            options={[
-              { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-              { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-              { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
-            ]}
           />
-
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => openFormModal()}
-            className='bg-primary! hover:bg-primary-hover! flex items-center gap-2 rounded-xl! border-none! px-6! py-2.5! text-sm! font-medium! text-white! shadow-sm transition-colors'
-          >
-            {DAILY_REPORT_UI.CREATE_BUTTON}
-          </Button>
         </div>
+      </div>
 
-        <LogbookTable
-          data={data}
-          loading={loading}
-          userProfile={userProfile}
-          onView={openDetailModal}
-          onEdit={openFormModal}
-          onDelete={handleDelete}
-          onTableChange={(pagination, filters, sorter) => {
-            if (sorter.field === 'dateReport' && sorter.order) {
-              setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
-            }
-          }}
-        />
-      </Card>
-
-      <Pagination
-        total={total}
-        page={pageNumber}
-        pageSize={pageSize}
-        totalPages={Math.ceil(total / pageSize)}
-        onPageChange={setPageNumber}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPageNumber(1);
-        }}
-      />
       <LogbookFormModal
         visible={isFormModalOpen}
         editingId={editingId}

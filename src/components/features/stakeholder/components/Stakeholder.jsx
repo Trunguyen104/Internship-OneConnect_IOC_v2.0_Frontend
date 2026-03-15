@@ -1,42 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import StakeholderTab from './StakeholderTab';
 import IssueTab from './IssueTab';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import { UserOutlined, WarningOutlined } from '@ant-design/icons';
 
 export default function StakeholderPage() {
   const [tab, setTab] = useState('stakeholder');
 
   return (
-    <section className='space-y-6'>
-      <StudentPageHeader hidden />
-      <div className='flex items-center gap-3'>
+    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
+      <StudentPageHeader
+        title='Người liên quan & Vấn đề'
+        description='Quản lý thông tin các bên liên quan và các vấn đề phát sinh trong dự án'
+      />
+
+      <div className='bg-muted/5 border-border flex w-fit items-center gap-2 rounded-2xl border p-1.5'>
         <button
           onClick={() => setTab('stakeholder')}
-          className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${
+          className={`flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-bold transition-all ${
             tab === 'stakeholder'
-              ? 'border-primary text-primary bg-red-50'
-              : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+              ? 'bg-surface text-primary shadow-sm'
+              : 'text-muted hover:text-text hover:bg-surface/50'
           }`}
         >
-          Stakeholder
+          <UserOutlined className={tab === 'stakeholder' ? 'text-primary' : ''} />
+          Người liên quan
         </button>
 
         <button
           onClick={() => setTab('issue')}
-          className={`rounded-full border px-4 py-1.5 text-sm font-semibold ${
+          className={`flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-bold transition-all ${
             tab === 'issue'
-              ? 'border-primary text-primary bg-red-50'
-              : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+              ? 'bg-surface text-primary shadow-sm'
+              : 'text-muted hover:text-text hover:bg-surface/50'
           }`}
         >
-          Issue
+          <WarningOutlined className={tab === 'issue' ? 'text-primary' : ''} />
+          Vấn đề
         </button>
       </div>
 
-      {tab === 'stakeholder' && <StakeholderTab />}
-      {tab === 'issue' && <IssueTab />}
+      <div className='flex-1'>
+        {tab === 'stakeholder' ? (
+          <div className='animate-in slide-in-from-left-4 duration-500'>
+            <StakeholderTab />
+          </div>
+        ) : (
+          <div className='animate-in slide-in-from-right-4 duration-500'>
+            <IssueTab />
+          </div>
+        )}
+      </div>
     </section>
   );
 }

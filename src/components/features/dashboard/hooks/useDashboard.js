@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getDashboardData } from '@/components/features/dashboard/services/dashboard.service';
+import { DASHBOARD_UI } from '@/constants/dashboard';
 
 export function useDashboard() {
   const [data, setData] = useState(null);
@@ -8,17 +9,16 @@ export function useDashboard() {
   useEffect(() => {
     getDashboardData()
       .then(setData)
-      .catch((e) => setErr(e?.message || 'Load failed'));
+      .catch((e) => setErr(e?.message || DASHBOARD_UI.ERROR));
   }, []);
 
   const completionPie = useMemo(() => {
     if (!data) return [];
     return [
-      { name: 'Completed', value: data.completionRatio.onTime },
-      { name: 'Overdue', value: data.completionRatio.overdue },
+      { name: DASHBOARD_UI.COMPLETED, value: data.completionRatio.onTime },
+      { name: DASHBOARD_UI.OVERDUE, value: data.completionRatio.overdue },
     ];
   }, [data]);
 
   return { data, err, completionPie };
 }
-

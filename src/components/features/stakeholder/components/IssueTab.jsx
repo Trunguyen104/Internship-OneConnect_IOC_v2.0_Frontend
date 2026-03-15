@@ -1,5 +1,6 @@
 'use client';
 
+import React, { memo } from 'react';
 import Card from '@/components/ui/Card';
 import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
@@ -9,7 +10,7 @@ import IssueTable from './IssueTable';
 import IssueFormModal from './IssueFormModal';
 import IssueDetailModal from './IssueDetailModal';
 
-export default function IssueTab() {
+const IssueTab = memo(function IssueTab() {
   const {
     issues,
     stakeholders,
@@ -35,8 +36,8 @@ export default function IssueTab() {
   } = useIssueTab();
 
   return (
-    <>
-      <Card>
+    <div className='flex flex-col gap-6'>
+      <Card className='bg-surface border-border overflow-hidden rounded-2xl border p-4 shadow-sm'>
         <SearchBar
           placeholder={ISSUE_UI.SEARCH_PLACEHOLDER}
           value={search}
@@ -47,7 +48,11 @@ export default function IssueTab() {
           showFilter
           showAction
           actionLabel={ISSUE_UI.ADD_BUTTON}
-          onActionClick={() => setOpenIssueForm(true)}
+          onActionClick={() => {
+            setIssueForm({ title: '', stakeholderId: '', description: '' });
+            setOpenIssueForm(true);
+          }}
+          className='mb-6'
         />
 
         <IssueTable
@@ -64,17 +69,22 @@ export default function IssueTab() {
         />
       </Card>
 
-      <Pagination
-        total={total}
-        page={page}
-        pageSize={pageSize}
-        totalPages={Math.ceil(total / pageSize)}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
+      <div className='flex items-center justify-between px-2'>
+        <div className='text-muted text-xs font-bold tracking-widest uppercase'>
+          Tổng cộng: {total} vấn đề
+        </div>
+        <Pagination
+          total={total}
+          page={page}
+          pageSize={pageSize}
+          totalPages={Math.ceil(total / pageSize)}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+        />
+      </div>
 
       <IssueFormModal
         isOpen={openIssueForm}
@@ -86,6 +96,8 @@ export default function IssueTab() {
       />
 
       <IssueDetailModal issue={issueDetail} onClose={() => setIssueDetail(null)} />
-    </>
+    </div>
   );
-}
+});
+
+export default IssueTab;

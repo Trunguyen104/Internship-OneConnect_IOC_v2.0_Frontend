@@ -11,4 +11,3 @@ export function getAccessToken() {
 export function clearAuth() {
   sessionStorage.removeItem(ACCESS_TOKEN_KEY);
 }
-

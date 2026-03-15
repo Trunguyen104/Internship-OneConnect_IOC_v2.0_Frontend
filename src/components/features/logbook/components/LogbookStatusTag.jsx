@@ -1,44 +1,52 @@
 'use client';
 
+import React, { memo } from 'react';
+import { Tag } from 'antd';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
-export default function LogbookStatusTag({ status }) {
+const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
   const config = {
     0: {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
-      style: 'bg-blue-50 text-blue-600 border-blue-200 border',
+      color: 'processing',
     },
     SUBMITTED: {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
-      style: 'bg-blue-50 text-blue-600 border-blue-200 border',
+      color: 'processing',
     },
     PUNCTUAL: {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-      style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      color: 'success',
     },
     3: {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-      style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+      color: 'success',
     },
     LATE: {
       label: DAILY_REPORT_UI.STATUS.LATE,
-      style: 'bg-red-50 text-red-600 border-red-200 border',
+      color: 'error',
     },
     4: {
       label: DAILY_REPORT_UI.STATUS.LATE,
-      style: 'bg-red-50 text-red-600 border-red-200 border',
+      color: 'error',
     },
     UNKNOWN: {
       label: DAILY_REPORT_UI.STATUS.UNKNOWN,
-      style: 'bg-gray-50 text-gray-600 border-gray-200 border',
+      color: 'default',
     },
   };
 
   const c = config[status] || config.UNKNOWN;
 
   return (
-    <div className={`inline-flex rounded-full px-3 py-1 text-[12px] font-bold ${c.style}`}>
+    <Tag
+      color={c.color}
+      variant='filled'
+      className='min-w-[100px] rounded-full py-0.5 text-center text-[10px] font-black tracking-widest uppercase'
+    >
       {c.label}
-    </div>
+    </Tag>
   );
-}
+});
+
+export default LogbookStatusTag;

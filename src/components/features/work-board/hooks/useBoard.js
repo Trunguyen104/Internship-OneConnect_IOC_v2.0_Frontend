@@ -21,12 +21,12 @@ export function useBoard() {
   const actions = useBoardActions({ projectId, ui, fetchBoardData });
 
   // 4. Drag and Drop
-  const dnd = useBoardDnd({ 
-    projectId, 
-    items, 
-    setItems, 
-    fetchBoardData, 
-    setActiveId: ui.setActiveId 
+  const dnd = useBoardDnd({
+    projectId,
+    items,
+    setItems,
+    fetchBoardData,
+    setActiveId: ui.setActiveId,
   });
 
   // Derived: Active task for overlay

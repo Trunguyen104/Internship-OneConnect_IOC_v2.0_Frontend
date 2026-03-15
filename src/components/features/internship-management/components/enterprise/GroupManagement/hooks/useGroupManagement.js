@@ -3,10 +3,12 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
 import { MOCK_GROUPS } from '../constants/groupData';
 
 export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
   const toast = useToast();
+  const { MESSAGES } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
   const [groups, setGroups] = useState(initialGroups);
   const [activeTab, setActiveTab] = useState('ALL');
   const [search, setSearch] = useState('');
@@ -45,32 +47,32 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
       setAssignModal({ open: false, group: null });
 
       if (isChangingMentor) {
-        toast.success(`Mentor changed successfully. Reason: ${values.reason}`);
+        toast.success(`${MESSAGES.MENTOR_CHANGED} ${values.reason}`);
       } else {
-        toast.success('Mentor & Project assigned successfully');
+        toast.success(MESSAGES.ASSIGN_SUCCESS);
       }
     },
-    [assignModal, toast],
+    [assignModal, toast, MESSAGES],
   );
 
   const handleDeleteGroup = useCallback(
     (group) => {
       if (group.memberCount > 0) {
-        toast.error('Cannot delete group with active students. Please reassign students first.');
+        toast.error(MESSAGES.DELETE_ERROR_STU);
         return;
       }
 
       showDeleteConfirm({
-        title: 'Delete Group',
-        content: `Are you sure you want to delete [${group.name}]?`,
-        okText: 'Delete',
+        title: MESSAGES.DELETE_CONFIRM_TITLE,
+        content: `${MESSAGES.DELETE_CONFIRM_TEXT} [${group.name}]?`,
+        okText: MESSAGES.DELETE_BTN,
         onOk() {
           setGroups((prev) => prev.filter((g) => g.id !== group.id));
-          toast.success('Group disbanded successfully');
+          toast.success(MESSAGES.DELETE_SUCCESS);
         },
       });
     },
-    [toast],
+    [toast, MESSAGES],
   );
 
   const handleCreateGroup = useCallback(
@@ -86,9 +88,9 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
       };
       setGroups((prev) => [newGroup, ...prev]);
       setCreateModal(false);
-      toast.success('Group created successfully');
+      toast.success(MESSAGES.CREATE_SUCCESS);
     },
-    [toast],
+    [toast, MESSAGES],
   );
 
   return {

@@ -14,54 +14,72 @@ import {
 import { MessageOutlined, StarFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
+import { EVALUATION_UI } from '@/constants/evaluation';
+
 const { Text, Paragraph, Title } = Typography;
 
 export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationDetail }) {
   if (!cycle) return null;
 
   return (
-    <Drawer title={cycle.name} placement='right' size='large' onClose={onClose} open={visible}>
+    <Drawer
+      title={<Text className='text-text text-lg font-bold'>{cycle.name}</Text>}
+      placement='right'
+      size='large'
+      onClose={onClose}
+      open={visible}
+    >
       {!evaluationDetail ? (
-        <Empty description='Scorecard not ready' />
+        <Empty description={EVALUATION_UI.LABELS.SCORECARD_NOT_READY} />
       ) : (
         <Space direction='vertical' size='large' style={{ width: '100%' }}>
-          <Card>
+          <Card className='border-border/60 shadow-sm'>
             <Descriptions column={1} size='small'>
-              <Descriptions.Item label='Evaluator'>
-                {evaluationDetail.evaluatorName}
+              <Descriptions.Item label={EVALUATION_UI.LABELS.EVALUATOR}>
+                <Text strong className='text-text'>
+                  {evaluationDetail.evaluatorName}
+                </Text>
               </Descriptions.Item>
 
-              <Descriptions.Item label='Time'>
-                {dayjs(evaluationDetail.gradedAt).format('DD/MM/YYYY HH:mm')}
+              <Descriptions.Item label={EVALUATION_UI.LABELS.TIME}>
+                <Text className='text-muted-foreground text-xs'>
+                  {dayjs(evaluationDetail.gradedAt).format('DD/MM/YYYY HH:mm')}
+                </Text>
               </Descriptions.Item>
 
-              <Descriptions.Item label='Total Score'>
-                <Title level={2} style={{ margin: 0 }}>
-                  {Number(evaluationDetail.totalScore).toFixed(1)}
-                  <Text type='secondary'> / 10</Text>
-                </Title>
+              <Descriptions.Item label={EVALUATION_UI.LABELS.TOTAL_SCORE}>
+                <div className='flex items-baseline gap-1'>
+                  <span className='text-primary text-3xl font-black'>
+                    {Number(evaluationDetail.totalScore).toFixed(1)}
+                  </span>
+                  <Text type='secondary' className='text-sm'>
+                    / 10
+                  </Text>
+                </div>
               </Descriptions.Item>
             </Descriptions>
           </Card>
 
           <Card
+            className='border-border/60 shadow-sm'
             title={
-              <Space>
+              <Space className='text-primary'>
                 <MessageOutlined />
-                Mentor Comments
+                {EVALUATION_UI.LABELS.MENTOR_COMMENTS}
               </Space>
             }
           >
-            <Paragraph italic>
-              {evaluationDetail.generalComment || 'No comments provided'}
+            <Paragraph italic className='text-text/80 mt-2'>
+              {evaluationDetail.generalComment || EVALUATION_UI.LABELS.NO_COMMENTS}
             </Paragraph>
           </Card>
 
           <Card
+            className='border-border/60 shadow-sm'
             title={
-              <Space>
+              <Space className='text-primary'>
                 <StarFilled />
-                Criteria Scores
+                {EVALUATION_UI.LABELS.CRITERIA_SCORES}
               </Space>
             }
           >
@@ -71,22 +89,30 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
                 const percent = (criteria.score / criteria.maxScore) * 100;
 
                 return (
-                  <List.Item>
+                  <List.Item className='border-none px-0'>
                     <Space direction='vertical' style={{ width: '100%' }}>
-                      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                        <Text strong>{criteria.criteriaName}</Text>
-                        <Text>
+                      <div className='flex items-center justify-between'>
+                        <Text strong className='text-text'>
+                          {criteria.criteriaName}
+                        </Text>
+                        <Text strong className='text-primary'>
                           {criteria.score} / {criteria.maxScore}
                         </Text>
-                      </Space>
+                      </div>
 
-                      <Progress percent={percent} showInfo={false} />
+                      <Progress
+                        percent={percent}
+                        showInfo={false}
+                        strokeColor='var(--color-primary)'
+                        trailColor='var(--color-primary-surface)'
+                        className='mb-2'
+                      />
 
-                      <Text type='secondary' italic>
-                        {criteria.comment || 'No detailed comments provided'}
+                      <Text type='secondary' italic className='text-[13px]'>
+                        {criteria.comment || EVALUATION_UI.LABELS.NO_DETAILED_COMMENTS}
                       </Text>
 
-                      <Divider style={{ margin: '8px 0' }} />
+                      <Divider className='my-3' />
                     </Space>
                   </List.Item>
                 );

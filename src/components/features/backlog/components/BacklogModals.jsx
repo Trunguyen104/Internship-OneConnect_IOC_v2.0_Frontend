@@ -50,8 +50,8 @@ export const BacklogModals = ({
       setOpenUpdateTask,
       setOpenCreateSprint,
       setSelectedTask,
-      setActiveSprintForTask
-    }
+      setActiveSprintForTask,
+    },
   });
 
   return (

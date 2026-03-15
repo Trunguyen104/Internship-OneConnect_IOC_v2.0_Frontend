@@ -1,17 +1,25 @@
 'use client';
 
 import React, { memo, useState } from 'react';
-import { Modal, Button, Upload, Table, Tooltip, message } from 'antd';
-import { UploadOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Modal, Button, Upload, Table, Tooltip, Typography, Space, Divider, Tag } from 'antd';
+import {
+  UploadOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  FileExcelOutlined,
+  DownloadOutlined,
+} from '@ant-design/icons';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management';
 
 const { Dragger } = Upload;
+const { Text, Title } = Typography;
 
 const ImportModal = memo(function ImportModal({ visible, onClose, onImport }) {
+  const { IMPORT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.STUDENT_ENROLLMENT.MODALS;
   const [previewData, setPreviewData] = useState([]);
 
   const uploadProps = {
     multiple: false,
-
     beforeUpload(file) {
       handlePreview(file);
       return false;
@@ -19,52 +27,54 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport }) {
   };
 
   const handlePreview = (file) => {
-    message.info(`Previewing ${file.name}`);
-
+    // Mock preview data
     setPreviewData([
       {
         id: '1',
-        name: 'Michael Jordan',
+        name: 'Nguyễn Văn A',
         studentId: 'ST010',
-        email: 'm.j@edu.com',
+        email: 'anvan@university.edu',
         valid: true,
       },
       {
         id: '2',
-        name: 'Sarah Connor',
+        name: 'Lê Thị B',
         studentId: '---',
-        email: 's.connor@edu.com',
+        email: 'btle@university.edu',
         valid: false,
-        error: 'Missing ID',
+        error: 'Thiếu MSSV',
       },
     ]);
   };
 
   const previewColumns = [
     {
-      title: 'Name',
+      title: 'Họ và tên',
       dataIndex: 'name',
-      render: (text) => <span className='font-medium text-slate-600'>{text}</span>,
+      render: (text) => <Text className='text-sm font-bold'>{text}</Text>,
     },
     {
-      title: 'ID',
+      title: 'MSSV',
       dataIndex: 'studentId',
+      render: (text) => <Text className='font-mono text-xs'>{text}</Text>,
     },
     {
       title: 'Email',
       dataIndex: 'email',
+      render: (text) => <Text className='text-muted text-xs'>{text}</Text>,
     },
     {
-      title: 'Status',
+      title: 'Hợp lệ',
       align: 'center',
+      width: 80,
       render: (_, record) =>
         record.valid ? (
-          <Tooltip title='Valid'>
-            <CheckCircleOutlined className='text-green-500' />
+          <Tooltip title='Hợp lệ'>
+            <CheckCircleOutlined className='text-success text-lg' />
           </Tooltip>
         ) : (
           <Tooltip title={record.error}>
-            <ExclamationCircleOutlined className='text-red-500' />
+            <ExclamationCircleOutlined className='text-danger text-lg' />
           </Tooltip>
         ),
     },
@@ -74,45 +84,97 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport }) {
   const invalidCount = previewData.length - validCount;
 
   return (
-    <Modal title='Import Students' open={visible} onCancel={onClose} width={720} footer={null}>
-      <Dragger {...uploadProps} className='mb-6 rounded-xl'>
-        <div className='bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full'>
-          <UploadOutlined className='text-primary text-3xl' />
+    <Modal
+      open={visible}
+      onCancel={onClose}
+      width={720}
+      footer={null}
+      centered
+      destroyOnClose
+      className='modal-custom'
+    >
+      <div className='flex flex-col items-center gap-3 text-center'>
+        <div className='bg-primary/10 flex size-14 items-center justify-center rounded-2xl'>
+          <FileExcelOutlined className='text-primary text-3xl' />
         </div>
+        <div>
+          <Title level={4} className='text-text mb-1'>
+            {IMPORT.TITLE}
+          </Title>
+          <Text className='text-muted text-xs'>
+            Tải lên danh sách sinh viên tham gia đợt thực tập này
+          </Text>
+        </div>
+      </div>
 
-        <p className='text-lg font-bold text-slate-900'>Drag & Drop Excel File</p>
+      <Divider className='border-border my-6' />
 
-        <p className='text-sm text-slate-500'>or click to browse from your computer</p>
+      <Dragger
+        {...uploadProps}
+        className='bg-muted/5 border-border hover:border-primary over:bg-muted/10 group mb-6 rounded-2xl border-2 border-dashed transition-all'
+      >
+        <div className='py-8'>
+          <div className='bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full transition-transform group-hover:scale-110'>
+            <UploadOutlined className='text-primary text-3xl' />
+          </div>
+          <p className='text-text text-lg font-bold'>{IMPORT.DRAG_TEXT}</p>
+          <p className='text-muted text-sm'>{IMPORT.HINT_TEXT}</p>
 
-        <Button className='mt-4'>Select File</Button>
+          <Button
+            icon={<DownloadOutlined />}
+            type='link'
+            className='text-primary mt-4 font-semibold'
+          >
+            {IMPORT.DOWNLOAD_TEMPLATE}
+          </Button>
+        </div>
       </Dragger>
 
       {previewData.length > 0 && (
-        <>
-          <div className='mb-3 text-sm text-slate-500'>
-            ✔ {validCount} valid — ✖ {invalidCount} invalid
+        <div className='animate-in fade-in slide-in-from-bottom-4 mt-8 duration-500'>
+          <div className='mb-4 flex items-center justify-between'>
+            <Text className='text-text text-sm font-bold tracking-wider uppercase'>
+              Xem trước dữ liệu
+            </Text>
+            <Space className='text-xs'>
+              <Tag color='success' className='border-none px-3 font-bold uppercase'>
+                {validCount} Hợp lệ
+              </Tag>
+              <Tag color='error' className='border-none px-3 font-bold uppercase'>
+                {invalidCount} Lỗi
+              </Tag>
+            </Space>
           </div>
 
-          <Table
-            dataSource={previewData}
-            columns={previewColumns}
-            pagination={false}
-            rowKey='id'
-            size='middle'
-          />
+          <div className='border-border overflow-hidden rounded-xl border'>
+            <Table
+              dataSource={previewData}
+              columns={previewColumns}
+              pagination={false}
+              rowKey='id'
+              size='middle'
+              className='custom-table'
+            />
+          </div>
 
-          <div className='mt-6 flex justify-end gap-3'>
-            <Button onClick={onClose}>Cancel</Button>
+          <div className='mt-8 flex justify-end gap-3'>
+            <Button
+              onClick={onClose}
+              className='border-border h-11 rounded-xl px-8 font-semibold transition-all hover:bg-slate-50'
+            >
+              {IMPORT.CANCEL}
+            </Button>
 
             <Button
               type='primary'
               disabled={validCount === 0}
               onClick={() => onImport?.(previewData)}
+              className='bg-primary h-11 rounded-xl border-none px-8 font-semibold shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-50'
             >
-              Confirm Import
+              {IMPORT.SUBMIT}
             </Button>
           </div>
-        </>
+        </div>
       )}
     </Modal>
   );

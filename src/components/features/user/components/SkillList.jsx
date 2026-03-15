@@ -7,6 +7,7 @@ import SkillEditModal from './SkillEditModal';
 import { Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import Card from '@/components/ui/Card';
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function SkillList({
   skills,
@@ -31,7 +32,7 @@ export default function SkillList({
 }) {
   return (
     <>
-      <h1 className='mt-7 text-2xl font-bold text-slate-900'>Skills</h1>
+      <h1 className='text-text mt-7 text-2xl font-bold'>{PROFILE_UI.SKILLS.TITLE}</h1>
 
       <Card>
         <div className='flex min-h-[400px] flex-col'>
@@ -46,13 +47,13 @@ export default function SkillList({
           )}
 
           <div className='flex items-center justify-between'>
-            <label className='text-xl font-medium italic'>Your Skills</label>
+            <label className='text-xl font-medium italic'>{PROFILE_UI.SKILLS.YOUR_SKILLS}</label>
 
             {skills.length > 0 && (
               <div className='flex items-center gap-4'>
                 {selectMode && selectedSkills.length > 0 && (
                   <Button danger type='primary' onClick={handleDeleteSelected}>
-                    Delete ({selectedSkills.length})
+                    {PROFILE_UI.BUTTONS.DELETE} ({selectedSkills.length})
                   </Button>
                 )}
               </div>
@@ -74,7 +75,7 @@ export default function SkillList({
 
             {!editMode && !showAddForm && (
               <Button icon={<PlusOutlined />} onClick={() => setShowAddForm(true)}>
-                Add
+                {PROFILE_UI.BUTTONS.ADD}
               </Button>
             )}
           </Space>
@@ -89,7 +90,7 @@ export default function SkillList({
                 setEditingSkill(null);
               }}
             >
-              {editMode ? 'Done' : 'Edit'}
+              {editMode ? PROFILE_UI.BUTTONS.DONE : PROFILE_UI.BUTTONS.EDIT}
             </Button>
           </div>
         </div>

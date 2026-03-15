@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+@import url('tailwindcss');
+
 html {
   scrollbar-gutter: stable;
 }
@@ -84,6 +85,18 @@ html {
   --green-800: #166534;
   --green-900: #14532d;
 
+  /* Yellow scale */
+  --yellow-50: #fefce8;
+  --yellow-100: #fef9c3;
+  --yellow-200: #fef08a;
+  --yellow-300: #fde047;
+  --yellow-400: #facc15;
+  --yellow-500: #eab308;
+  --yellow-600: #ca8a04;
+  --yellow-700: #a16207;
+  --yellow-800: #854d0e;
+  --yellow-900: #713f12;
+
   /* ✅ Semantic tokens (xài trong UI cho ổn định) */
   --color-bg: var(--gray-50);
   --color-surface: #ffffff;
@@ -92,9 +105,19 @@ html {
   --color-border: var(--gray-200);
   --color-primary: var(--primary-700);
   --color-primary-hover: var(--primary-600);
+  --color-primary-surface: var(--primary-50);
   --color-success: var(--green-500);
+  --color-success-surface: var(--green-50);
   --color-info: var(--blue-600);
+  --color-info-surface: var(--blue-50);
   --color-danger: var(--primary-600);
+  --color-danger-surface: var(--primary-50);
+
+  /* ✅ Semantic tokens cho trạng thái In Review */
+  --color-warning: var(--yellow-500);
+  --color-warning-surface: var(--yellow-100);
+  --color-warning-text: var(--yellow-800);
+  --color-warning-border: var(--yellow-200);
 }
 
 @theme inline {
@@ -107,35 +130,32 @@ html {
   --color-text: var(--color-text);
   --color-muted: var(--color-muted);
   --color-border: var(--color-border);
-
   --color-primary: var(--color-primary);
   --color-primary-hover: var(--color-primary-hover);
+  --color-primary-surface: var(--color-primary-surface);
   --color-success: var(--color-success);
+  --color-success-surface: var(--color-success-surface);
   --color-info: var(--color-info);
+  --color-info-surface: var(--color-info-surface);
   --color-danger: var(--color-danger);
-
-  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --color-danger-surface: var(--color-danger-surface);
+  --color-warning: var(--color-warning);
+  --color-warning-surface: var(--color-warning-surface);
+  --color-warning-text: var(--color-warning-text);
+  --color-warning-border: var(--color-warning-border);
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', roboto, arial, sans-serif;
   --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    ui-monospace, sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New',
     monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family:
-    'Be Vietnam Pro',
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    Arial,
-    sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   overflow-y: scroll;
 }
+
 /* Tiptap baseline */
 .ProseMirror {
   outline: none;
@@ -160,7 +180,7 @@ body {
 }
 
 .ProseMirror code {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgb(0 0 0 / 6%);
   padding: 0.1rem 0.3rem;
   border-radius: 0.35rem;
   font-family:
@@ -169,7 +189,7 @@ body {
 }
 
 .ProseMirror pre {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgb(0 0 0 / 6%);
   padding: 0.75rem;
   border-radius: 0.75rem;
   overflow: auto;
@@ -180,11 +200,13 @@ body {
   font-weight: 700;
   margin: 0.75rem 0;
 }
+
 .ProseMirror h2 {
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0.75rem 0;
 }
+
 .ProseMirror h3 {
   font-size: 1.1rem;
   font-weight: 700;
@@ -197,13 +219,15 @@ body {
   width: 100%;
   margin: 0.75rem 0;
 }
+
 .ProseMirror th,
 .ProseMirror td {
   border: 1px solid var(--color-border);
   padding: 0.5rem;
   vertical-align: top;
 }
+
 .ProseMirror th {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgb(0 0 0 / 3%);
   font-weight: 600;
 }

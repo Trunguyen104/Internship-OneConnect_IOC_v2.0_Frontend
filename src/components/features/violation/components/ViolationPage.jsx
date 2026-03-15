@@ -7,6 +7,8 @@ import ViolationTable from './ViolationTable';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { useViolation } from '../hooks/useViolation';
 
+import { VIOLATION_UI } from '@/constants/violation/uiText';
+
 export default function ViolationPage() {
   const {
     search,
@@ -24,12 +26,12 @@ export default function ViolationPage() {
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
-      <StudentPageHeader title='Violation' />
+      <StudentPageHeader title={VIOLATION_UI.PAGE_TITLE} />
 
-      <Card className='overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
+      <Card className='shadow-border/50 overflow-hidden rounded-2xl border-none shadow-xl'>
         <div className='mb-5'>
           <SearchBar
-            placeholder='Search'
+            placeholder={VIOLATION_UI.SEARCH.PLACEHOLDER}
             value={search}
             onChange={(val) => {
               setSearch(val);

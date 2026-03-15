@@ -18,4 +18,3 @@ export const enterpriseService = {
     return httpPut(`/Enterprises/${enterpriseId}`, payload);
   },
 };
-
