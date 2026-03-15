@@ -11,13 +11,13 @@ export const productBacklogService = {
     return httpPost('/epics', payload);
   },
   getEpicById(projectId, id) {
-    return httpGet(`/projects/${projectId}/epics/${id}`);
+    return httpGet(`/epics/${id}`, { projectId });
   },
   updateEpic(projectId, id, payload) {
-    return httpPut(`/projects/${projectId}/epics/${id}`, payload);
+    return httpPut(`/epics/${id}`, { ...payload, projectId });
   },
   deleteEpic(projectId, id) {
-    return httpDelete(`/projects/${projectId}/epics/${id}`);
+    return httpDelete(`/epics/${id}`, { projectId });
   },
 
   // WorkItems

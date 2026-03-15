@@ -5,6 +5,7 @@ import { WorkItem, ColumnHeaders } from './WorkItem';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { SPRINT_STATUS } from '@/constants/enums';
 import { BACKLOG_UI } from '@/constants/backlog';
+import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 export function SprintSection({
   sprint,
@@ -15,6 +16,7 @@ export function SprintSection({
   setSelectedSprintAction,
   setSelectedTask,
   setOpenUpdateTask,
+  setOpenUpdateSprint,
   setActiveSprintForTask,
   setOpenCreateTask,
 }) {
@@ -81,24 +83,30 @@ export function SprintSection({
               <button
                 onClick={() => {
                   setSelectedSprintAction(sprint);
-                  console.log('Mở modal sửa cho sprint:', sprint.sprintId);
+                  setOpenUpdateSprint(true);
                   setIsMenuOpen(false);
                 }}
                 className='flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold text-gray-700 transition-colors hover:bg-gray-50'
               >
                 <Pencil className='h-4 w-4 text-blue-600' />
-                {BACKLOG_UI.EDIT_SPRINT}
+                {BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
               </button>
 
               <button
                 onClick={() => {
-                  handleDeleteSprint(sprint.sprintId);
                   setIsMenuOpen(false);
+                  showDeleteConfirm({
+                    title: BACKLOG_UI.DELETE_SPRINT || 'Xóa Sprint',
+                    content: 'Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.',
+                    onOk: () => handleDeleteSprint(sprint.sprintId),
+                    okText: 'Xóa',
+                    cancelText: 'Hủy',
+                  });
                 }}
                 className='text-danger flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold transition-colors hover:bg-red-50'
               >
                 <Trash2 className='text-danger h-4 w-4' />
-                {BACKLOG_UI.DELETE_SPRINT}
+                {BACKLOG_UI.DELETE_SPRINT || 'Xóa Sprint'}
               </button>
             </div>
           )}

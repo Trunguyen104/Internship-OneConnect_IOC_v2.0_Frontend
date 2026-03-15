@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { BACKLOG_UI } from '@/constants/backlog';
 
 function FieldLabel({ required, children }) {
@@ -25,45 +25,18 @@ function TextInput({ value, onChange, placeholder = '', type = 'text', readOnly 
   );
 }
 
-export default function StartSprintModal({ open, sprint, issueCount, onClose, onSubmit }) {
-  const initialData = useMemo(() => {
-    if (!sprint) return { name: '', goal: '', startDate: '', endDate: '' };
-    const sName = sprint.name || sprint.title || '';
-    const sGoal = sprint.goal || '';
-    const sStart = sprint.startDate
-      ? new Date(sprint.startDate).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0];
+export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
+  const [name, setName] = useState('');
+  const [goal, setGoal] = useState('');
 
-    let sEnd = '';
-    if (sprint.endDate) {
-      sEnd = new Date(sprint.endDate).toISOString().split('T')[0];
-    } else {
-      const twoWeeks = new Date();
-      twoWeeks.setDate(twoWeeks.getDate() + 14);
-      sEnd = twoWeeks.toISOString().split('T')[0];
+  useEffect(() => {
+    if (sprint && open) {
+      setName(sprint.name || sprint.title || '');
+      setGoal(sprint.goal || '');
     }
+  }, [sprint, open]);
 
-    return { name: sName, goal: sGoal, startDate: sStart, endDate: sEnd };
-  }, [sprint]);
-
-  const [name, setName] = useState(initialData.name);
-  const [goal, setGoal] = useState(initialData.goal);
-  const [startDate, setStartDate] = useState(initialData.startDate);
-  const [endDate, setEndDate] = useState(initialData.endDate);
-
-  const [prevInitialData, setPrevInitialData] = useState(initialData);
-  if (initialData !== prevInitialData) {
-    setPrevInitialData(initialData);
-    setName(initialData.name);
-    setGoal(initialData.goal);
-    setStartDate(initialData.startDate);
-    setEndDate(initialData.endDate);
-  }
-
-  const canSubmit = useMemo(
-    () => name.trim() !== '' && startDate && endDate,
-    [name, startDate, endDate],
-  );
+  const canSubmit = useMemo(() => name.trim() !== '', [name]);
 
   if (!open) return null;
 
@@ -72,8 +45,6 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
     onSubmit?.({
       name: name.trim(),
       goal: goal.trim(),
-      startDate: startDate,
-      endDate: endDate,
     });
   };
 
@@ -83,10 +54,7 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
         <div className='flex h-full max-h-[85vh] flex-col'>
           {/* Header */}
           <div className='shrink-0 px-8 pt-8 pb-4'>
-            <div className='text-2xl font-bold text-gray-900'>{BACKLOG_UI.START_SPRINT}</div>
-            <div className='mt-2 text-sm font-medium text-gray-500'>
-              {issueCount} {BACKLOG_UI.ISSUE_COUNT_SPRINT || 'issue sẽ được gộp vào sprint này'}
-            </div>
+            <div className='text-2xl font-bold text-gray-900'>{BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}</div>
           </div>
 
           {/* Body */}
@@ -98,17 +66,6 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
                 onChange={setName}
                 placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'VD: Sprint 1'}
               />
-            </div>
-
-            <div className='flex gap-4'>
-              <div className='flex-1'>
-                <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE || 'Ngày bắt đầu'}</FieldLabel>
-                <TextInput type='date' value={startDate} onChange={setStartDate} />
-              </div>
-              <div className='flex-1'>
-                <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE || 'Ngày kết thúc'}</FieldLabel>
-                <TextInput type='date' value={endDate} onChange={setEndDate} />
-              </div>
             </div>
 
             <div className='flex flex-1 flex-col'>
@@ -137,7 +94,7 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
               disabled={!canSubmit}
               className='bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white transition-opacity disabled:opacity-50'
             >
-              {BACKLOG_UI.START_SPRINT}
+              {BACKLOG_UI.UPDATE || 'Cập nhật'}
             </button>
           </div>
         </div>

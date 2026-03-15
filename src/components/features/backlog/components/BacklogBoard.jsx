@@ -29,6 +29,10 @@ export default function BacklogBoard() {
 
     openCreateEpic,
     setOpenCreateEpic,
+    openUpdateEpic,
+    setOpenUpdateEpic,
+    selectedEpic,
+    setSelectedEpic,
     openCreateTask,
     setOpenCreateTask,
     openUpdateTask,
@@ -44,10 +48,13 @@ export default function BacklogBoard() {
 
     handleQuickCreateSprint,
     handleDeleteSprint,
+    handleDeleteEpic,
     handleSprintActionClick,
     fetchData,
     openCreateSprint,
     setOpenCreateSprint,
+    openUpdateSprint,
+    setOpenUpdateSprint,
     handleDragEnd,
   } = useBacklogBoard();
 
@@ -69,6 +76,9 @@ export default function BacklogBoard() {
         selectedEpicId={selectedEpicId}
         setSelectedEpicId={setSelectedEpicId}
         setOpenCreateEpic={setOpenCreateEpic}
+        setOpenUpdateEpic={setOpenUpdateEpic}
+        setSelectedEpic={setSelectedEpic}
+        handleDeleteEpic={handleDeleteEpic}
       />
 
       {/* Main Board */}
@@ -93,6 +103,7 @@ export default function BacklogBoard() {
                     setSelectedSprintAction={setSelectedSprintAction}
                     setSelectedTask={setSelectedTask}
                     setOpenUpdateTask={setOpenUpdateTask}
+                    setOpenUpdateSprint={setOpenUpdateSprint}
                     setActiveSprintForTask={setActiveSprintForTask}
                     setOpenCreateTask={setOpenCreateTask}
                   />
@@ -125,6 +136,8 @@ export default function BacklogBoard() {
         fetchData={fetchData}
         openCreateEpic={openCreateEpic}
         setOpenCreateEpic={setOpenCreateEpic}
+        openUpdateEpic={openUpdateEpic}
+        setOpenUpdateEpic={setOpenUpdateEpic}
         openStartSprint={openStartSprint}
         setOpenStartSprint={setOpenStartSprint}
         openCompleteSprint={openCompleteSprint}
@@ -135,8 +148,12 @@ export default function BacklogBoard() {
         setOpenUpdateTask={setOpenUpdateTask}
         openCreateSprint={openCreateSprint}
         setOpenCreateSprint={setOpenCreateSprint}
+        openUpdateSprint={openUpdateSprint}
+        setOpenUpdateSprint={setOpenUpdateSprint}
         selectedTask={selectedTask}
         setSelectedTask={setSelectedTask}
+        selectedEpic={selectedEpic}
+        setSelectedEpic={setSelectedEpic}
         selectedSprintAction={selectedSprintAction}
         activeSprintForTask={activeSprintForTask}
         setActiveSprintForTask={setActiveSprintForTask}

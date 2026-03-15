@@ -60,6 +60,43 @@ export function useBacklogActions({
     }
   };
 
+  const handleUpdateEpic = async (epicId, payload) => {
+    try {
+      const apiPayload = {
+        projectId,
+        name: payload.name,
+        title: payload.name,
+        description: payload.description,
+        endDate: payload.endDate,
+      };
+      const res = await productBacklogService.updateEpic(projectId, epicId, apiPayload);
+      if (res && res.isSuccess === false) {
+        toast.error(res.message || 'Lỗi khi cập nhật epic');
+        return;
+      }
+      toast.success('Cập nhật Epic thành công');
+      ui.setOpenUpdateEpic(false);
+      ui.setSelectedEpic(null);
+      fetchData(projectId);
+    } catch {
+      toast.error('Lỗi khi cập nhật Epic');
+    }
+  };
+
+  const handleDeleteEpic = async (epicId) => {
+    try {
+      const res = await productBacklogService.deleteEpic(projectId, epicId);
+      if (res && res.isSuccess === false) {
+        toast.error(res.message || 'Lỗi khi xóa epic');
+        return;
+      }
+      toast.success('Xóa Epic thành công');
+      fetchData(projectId);
+    } catch {
+      toast.error('Lỗi khi xóa Epic');
+    }
+  };
+
   const handleStartSprint = async (selectedSprintAction, payload) => {
     try {
       if (!selectedSprintAction) return;
@@ -255,12 +292,16 @@ export function useBacklogActions({
     }
   };
 
-  return {
+  const handleUpdateSprint = async (sprintId, payload) => {
+    try {
     handleCreateEpic,
+    handleUpdateEpic,
+    handleDeleteEpic,
     handleStartSprint,
     handleCompleteSprint,
     handleCreateTask,
     handleUpdateTask,
     handleCreateSprint,
+    handleUpdateSprint,
   };
 }

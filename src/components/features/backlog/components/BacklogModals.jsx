@@ -4,9 +4,11 @@ import { useBacklogActions } from '@/components/features/backlog/hooks/useBacklo
 import CreateTaskModal from '@/components/features/backlog/components/CreateTaskModal';
 import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
 import CreateEpicModal from '@/components/features/backlog/components/CreateEpicModal';
+import UpdateEpicModal from '@/components/features/backlog/components/UpdateEpicModal';
 import StartSprintModal from '@/components/features/backlog/components/StartSprintModal';
 import CompleteSprintModal from '@/components/features/backlog/components/CompleteSprintModal';
 import CreateSprintModal from '@/components/features/backlog/components/CreateSprintModal';
+import UpdateSprintModal from '@/components/features/backlog/components/UpdateSprintModal';
 
 export const BacklogModals = ({
   projectId,
@@ -18,6 +20,8 @@ export const BacklogModals = ({
   fetchData,
   openCreateEpic,
   setOpenCreateEpic,
+  openUpdateEpic,
+  setOpenUpdateEpic,
   openStartSprint,
   setOpenStartSprint,
   openCompleteSprint,
@@ -28,8 +32,12 @@ export const BacklogModals = ({
   setOpenUpdateTask,
   openCreateSprint,
   setOpenCreateSprint,
+  openUpdateSprint,
+  setOpenUpdateSprint,
   selectedTask,
   setSelectedTask,
+  selectedEpic,
+  setSelectedEpic,
   selectedSprintAction,
   activeSprintForTask,
   setActiveSprintForTask,
@@ -44,12 +52,15 @@ export const BacklogModals = ({
     fetchData,
     ui: {
       setOpenCreateEpic,
+      setOpenUpdateEpic,
       setOpenStartSprint,
       setOpenCompleteSprint,
       setOpenCreateTask,
       setOpenUpdateTask,
       setOpenCreateSprint,
+      setOpenUpdateSprint,
       setSelectedTask,
+      setSelectedEpic,
       setActiveSprintForTask,
     },
   });
@@ -60,6 +71,17 @@ export const BacklogModals = ({
         open={openCreateEpic}
         onClose={() => setOpenCreateEpic(false)}
         onSubmit={actions.handleCreateEpic}
+      />
+
+      <UpdateEpicModal
+        open={openUpdateEpic}
+        initialData={selectedEpic}
+        onClose={() => {
+          setOpenUpdateEpic(false);
+          setSelectedEpic(null);
+        }}
+        onSubmit={(payload) => actions.handleUpdateEpic(selectedEpic?.id, payload)}
+        onDelete={() => actions.handleDeleteEpic(selectedEpic?.id)}
       />
 
       <StartSprintModal
@@ -107,6 +129,13 @@ export const BacklogModals = ({
         projectId={projectId}
         onClose={() => setOpenCreateSprint(false)}
         onSubmit={actions.handleCreateSprint}
+      />
+
+      <UpdateSprintModal
+        open={openUpdateSprint}
+        sprint={selectedSprintAction}
+        onClose={() => setOpenUpdateSprint(false)}
+        onSubmit={(payload) => actions.handleUpdateSprint(selectedSprintAction?.sprintId, payload)}
       />
     </>
   );

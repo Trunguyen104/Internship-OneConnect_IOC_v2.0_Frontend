@@ -49,13 +49,6 @@ export function useBacklogBoard() {
 
   // Actions
   const handleDeleteSprint = async (sprintId) => {
-    if (
-      !window.confirm(
-        'Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.',
-      )
-    )
-      return;
-
     try {
       const res = await productBacklogService.deleteSprint(projectId, sprintId);
       if (res && res.isSuccess !== false) {
@@ -65,8 +58,22 @@ export function useBacklogBoard() {
       } else {
         toast.error(res.message || 'Không thể xóa Sprint');
       }
-    } catch (err) {
+    } catch {
       toast.error('Lỗi server khi xóa Sprint');
+    }
+  };
+
+  const handleDeleteEpic = async (epicId) => {
+    try {
+      const res = await productBacklogService.deleteEpic(projectId, epicId);
+      if (res && res.isSuccess !== false) {
+        toast.success('Xóa Epic thành công');
+        fetchData(projectId, false);
+      } else {
+        toast.error(res.message || 'Không thể xóa Epic');
+      }
+    } catch {
+      toast.error('Lỗi server khi xóa Epic');
     }
   };
 
@@ -193,6 +200,7 @@ export function useBacklogBoard() {
     ...ui,
     itemOrders,
     handleDeleteSprint,
+    handleDeleteEpic,
     handleSprintActionClick,
     handleQuickCreateSprint,
     handleDragEnd,
