@@ -35,7 +35,7 @@ const AddStudentModal = memo(function AddStudentModal({ visible, onClose, onSave
       width={600}
       footer={null}
       centered
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <div className='mb-6 flex flex-col items-center gap-3 text-center'>

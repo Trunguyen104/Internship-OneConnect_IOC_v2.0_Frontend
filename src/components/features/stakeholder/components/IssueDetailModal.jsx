@@ -1,11 +1,9 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Modal, Divider, Typography, Row, Col, Avatar, Button } from 'antd';
+import { Modal, Typography, Row, Col, Avatar, Divider, Button } from 'antd';
 import {
-  InfoCircleOutlined,
   FileTextOutlined,
-  SolutionOutlined,
   UserOutlined,
   ClockCircleOutlined,
   CheckCircleOutlined,
@@ -26,134 +24,60 @@ const IssueDetailModal = memo(function IssueDetailModal({ issue, onClose }) {
       open={!!issue}
       onCancel={onClose}
       footer={null}
-      width={560}
+      width={520}
       centered
-      destroyOnClose
-      className='modal-custom'
+      title={DETAIL.TITLE}
     >
-      <div className='mb-6 flex flex-col items-center gap-3 text-center'>
-        <div className='bg-primary/10 flex size-14 items-center justify-center rounded-2xl'>
-          <InfoCircleOutlined className='text-primary text-3xl' />
-        </div>
-        <div>
-          <Title level={4} className='text-text mb-1'>
-            {DETAIL.TITLE}
-          </Title>
-          <Text className='text-muted text-xs italic'>
-            Thông tin chi tiết về vấn đề đã được ghi nhận
-          </Text>
-        </div>
+      <div style={{ marginBottom: 16 }}>
+        <Text type='secondary'>{TABLE.TITLE}</Text>
+        <Title level={5}>{issue.title}</Title>
       </div>
 
-      <Divider className='border-border m-0' />
-
-      <div className='mt-8 space-y-8 px-2'>
-        {/* Basic Info */}
-        <div className='space-y-6'>
-          {/* Title Section */}
-          <div className='space-y-2'>
-            <div className='flex items-center gap-2'>
-              <FileTextOutlined className='text-primary' />
-              <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                {TABLE.TITLE}
-              </Text>
-            </div>
-            <Title level={5} className='text-text !m-0 leading-tight'>
-              {issue.title}
-            </Title>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={12}>
+          <Text type='secondary'>{TABLE.STAKEHOLDER}</Text>
+          <div style={{ marginTop: 4 }}>
+            <Text strong>{issue.stakeholderName || '—'}</Text>
           </div>
+        </Col>
 
-          {/* Stakeholder & Status */}
-          <Row gutter={24}>
-            <Col span={12}>
-              <div className='space-y-2'>
-                <div className='flex items-center gap-2'>
-                  <UserOutlined className='text-primary' />
-                  <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                    {TABLE.STAKEHOLDER}
-                  </Text>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <Avatar
-                    size='small'
-                    icon={<UserOutlined />}
-                    className='bg-primary/10 text-primary border-none'
-                  />
-                  <Text className='text-text text-sm font-bold'>
-                    {issue.stakeholderName || '—'}
-                  </Text>
-                </div>
-              </div>
-            </Col>
-            <Col span={12}>
-              <div className='space-y-2'>
-                <div className='flex items-center gap-2'>
-                  <InfoCircleOutlined className='text-primary' />
-                  <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                    {TABLE.STATUS}
-                  </Text>
-                </div>
-                <IssueStatusTag status={issue.status} />
-              </div>
-            </Col>
-          </Row>
-
-          {/* Timeline */}
-          <div className='bg-muted/5 border-border rounded-2xl border p-4'>
-            <Row gutter={24}>
-              <Col span={12}>
-                <div className='flex flex-col gap-1'>
-                  <div className='flex items-center gap-2'>
-                    <ClockCircleOutlined className='text-muted text-xs' />
-                    <Text className='text-muted text-[10px] font-bold uppercase'>
-                      {DETAIL.CREATED_AT}
-                    </Text>
-                  </div>
-                  <Text className='text-text text-sm font-bold'>
-                    {dayjs(issue.createdAt).format('DD/MM/YYYY')}
-                  </Text>
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className='border-border flex flex-col gap-1 border-l pl-6'>
-                  <div className='flex items-center gap-2'>
-                    <CheckCircleOutlined className='text-muted text-xs' />
-                    <Text className='text-muted text-[10px] font-bold uppercase'>
-                      {DETAIL.RESOLVED_AT}
-                    </Text>
-                  </div>
-                  <Text className='text-text text-sm font-bold'>
-                    {issue.resolvedAt ? dayjs(issue.resolvedAt).format('DD/MM/YYYY') : '—'}
-                  </Text>
-                </div>
-              </Col>
-            </Row>
+        <Col span={12}>
+          <Text type='secondary'>{TABLE.STATUS}</Text>
+          <div style={{ marginTop: 4 }}>
+            <IssueStatusTag status={issue.status} />
           </div>
+        </Col>
+      </Row>
 
-          {/* Description */}
-          <div className='space-y-2'>
-            <div className='flex items-center gap-2'>
-              <SolutionOutlined className='text-primary' />
-              <Text className='text-muted text-[10px] font-bold tracking-widest uppercase'>
-                {TABLE.DESCRIPTION}
-              </Text>
-            </div>
-            <div className='bg-muted/5 border-border relative rounded-xl border p-4'>
-              <Paragraph className='text-text mb-0 text-sm leading-relaxed'>
-                {issue.description || 'Không có mô tả chi tiết.'}
-              </Paragraph>
-            </div>
+      <Divider />
+
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={12}>
+          <Text type='secondary'>{DETAIL.CREATED_AT}</Text>
+          <div>
+            <Text strong>{dayjs(issue.createdAt).format('DD/MM/YYYY')}</Text>
           </div>
-        </div>
+        </Col>
 
-        <div className='flex justify-end pt-2 pb-2'>
-          <Button
-            onClick={onClose}
-            className='border-border h-11 rounded-xl px-10 font-bold shadow-sm transition-all hover:bg-slate-50'
-          >
-            Đóng
-          </Button>
-        </div>
+        <Col span={12}>
+          <Text type='secondary'>{DETAIL.RESOLVED_AT}</Text>
+          <div>
+            <Text strong>
+              {issue.resolvedAt ? dayjs(issue.resolvedAt).format('DD/MM/YYYY') : '—'}
+            </Text>
+          </div>
+        </Col>
+      </Row>
+
+      <div style={{ marginBottom: 20 }}>
+        <Text type='secondary'>{TABLE.DESCRIPTION}</Text>
+        <Paragraph style={{ marginTop: 4 }}>
+          {issue.description || 'No detailed description.'}
+        </Paragraph>
+      </div>
+
+      <div style={{ textAlign: 'right' }}>
+        <Button onClick={onClose}>{ISSUE_UI.BUTTON.CLOSE}</Button>
       </div>
     </Modal>
   );

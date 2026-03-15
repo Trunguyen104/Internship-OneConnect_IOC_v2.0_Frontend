@@ -36,7 +36,7 @@ const IssueTab = memo(function IssueTab() {
   } = useIssueTab();
 
   return (
-    <>
+    <div className='animate-in fade-in flex h-full flex-col space-y-6 duration-500'>
       <Card>
         <DataTableToolbar
           className='mb-6 !border-0 !p-0'
@@ -68,22 +68,17 @@ const IssueTab = memo(function IssueTab() {
         />
       </Card>
 
-      <div className='flex items-center justify-between px-2'>
-        <div className='text-muted text-xs font-bold tracking-widest uppercase'>
-          Tổng cộng: {total} vấn đề
-        </div>
-        <Pagination
-          total={total}
-          page={page}
-          pageSize={pageSize}
-          totalPages={Math.ceil(total / pageSize)}
-          onPageChange={setPage}
-          onPageSizeChange={(size) => {
-            setPageSize(size);
-            setPage(1);
-          }}
-        />
-      </div>
+      <Pagination
+        total={total}
+        page={page}
+        pageSize={pageSize}
+        totalPages={Math.ceil(total / pageSize)}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(1);
+        }}
+      />
 
       <IssueFormModal
         isOpen={openIssueForm}

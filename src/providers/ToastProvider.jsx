@@ -13,26 +13,26 @@ export function ToastProvider({ children }) {
   const toast = {
     success: (title, description) =>
       api.success({
-        message: title,
+        title: title,
         description,
         showProgress: true,
         duration: 5,
       }),
     error: (title, description) =>
       api.error({
-        message: title,
+        title: title,
         description,
         showProgress: true,
       }),
     info: (title, description) =>
       api.info({
-        message: title,
+        title: title,
         description,
         showProgress: true,
       }),
     warning: (title, description) =>
       api.warning({
-        message: title,
+        title: title,
         description,
         showProgress: true,
       }),

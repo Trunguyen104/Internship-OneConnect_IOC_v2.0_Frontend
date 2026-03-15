@@ -3,6 +3,7 @@
 import { Button } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const STATUS_CONFIG = {
   0: {
@@ -47,64 +48,56 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
     <div className='flex min-h-0 flex-1 flex-col'>
       {!data || data.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <p className='text-slate-400'>No evaluation data</p>
+          <p className='text-muted'>No evaluation data</p>
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>
           <div className='flex-1 overflow-auto'>
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
-              <thead className='sticky top-0 z-10 border-b border-slate-200 bg-slate-50'>
+              <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='w-[60px] px-6 py-4 text-xs font-semibold text-slate-500'>#</th>
-                  <th className='w-[280px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[60px] px-6 py-4 text-xs font-semibold'>#</th>
+                  <th className='text-muted w-[280px] px-6 py-4 text-xs font-semibold'>
                     Evaluation Cycle
                   </th>
-                  <th className='w-[140px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[140px] px-6 py-4 text-xs font-semibold'>
                     Start Date
                   </th>
-                  <th className='w-[140px] px-6 py-4 text-xs font-semibold text-slate-500'>
-                    End Date
-                  </th>
-                  <th className='w-[150px] px-6 py-4 text-xs font-semibold text-slate-500'>
-                    Status
-                  </th>
-                  <th className='w-[120px] px-6 py-4 text-xs font-semibold text-slate-500'>
-                    Scored
-                  </th>
-                  <th className='w-[120px] px-6 py-4 text-right text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[140px] px-6 py-4 text-xs font-semibold'>End Date</th>
+                  <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>Status</th>
+                  <th className='text-muted w-[120px] px-6 py-4 text-xs font-semibold'>Scored</th>
+                  <th className='text-muted w-[120px] px-6 py-4 text-right text-xs font-semibold'>
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-slate-100'>
+              <tbody className='divide-border/50 divide-y'>
                 {data.map((record, index) => {
                   const status = record.status;
                   const normalized = status ? String(status).toUpperCase() : '';
                   const cfg = STATUS_CONFIG[normalized] ||
                     STATUS_CONFIG[status] || {
                       label: status || 'Unknown',
-                      bg: 'bg-slate-50',
-                      text: 'text-slate-600',
+                      bg: 'bg-bg',
+                      text: 'text-muted',
                       icon: null,
                     };
 
                   return (
-                    <tr key={record.cycleId} className='transition-colors hover:bg-slate-50/80'>
-                      <td className='px-6 py-4 text-sm text-slate-600'>
+                    <tr key={record.cycleId} className='hover:bg-bg/80 transition-colors'>
+                      <td className='text-muted px-6 py-4 text-sm'>
                         {(page - 1) * pageSize + index + 1}
                       </td>
                       <td className='px-6 py-4'>
-                        <span className='font-bold tracking-tight text-slate-800'>
-                          {record.name}
-                        </span>
+                        <span className='text-text font-bold tracking-tight'>{record.name}</span>
                       </td>
                       <td className='px-6 py-4'>
-                        <span className='text-sm text-slate-600'>
+                        <span className='text-muted text-sm'>
                           {dayjs(record.startDate).format('DD/MM/YYYY')}
                         </span>
                       </td>
                       <td className='px-6 py-4'>
-                        <span className='text-sm text-slate-600'>
+                        <span className='text-muted text-sm'>
                           {dayjs(record.endDate).format('DD/MM/YYYY')}
                         </span>
                       </td>
@@ -117,9 +110,9 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
                         </span>
                       </td>
                       <td className='px-6 py-4'>
-                        <span className='font-bold text-slate-700'>
+                        <span className='text-text font-bold'>
                           {record.totalStudentsScored ?? 0}
-                          <span className='mx-0.5 font-normal text-slate-300'>/</span>
+                          <span className='text-border mx-0.5 font-normal'>/</span>
                           {record.totalTeamStudents ?? 0}
                         </span>
                       </td>
@@ -128,7 +121,7 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
                           size='small'
                           icon={<EyeOutlined />}
                           onClick={() => onDetail(record)}
-                          className='rounded-full border-none bg-[#d52020] font-bold shadow-sm shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
+                          className='bg-primary shadow-primary/20 hover:!bg-primary/90 rounded-full border-none font-bold shadow-sm'
                         />
                       </td>
                     </tr>

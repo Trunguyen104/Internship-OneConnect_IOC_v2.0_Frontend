@@ -16,6 +16,7 @@ import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import dayjs from 'dayjs';
+import { useCallback, useState } from 'react';
 
 export default function LogbookPage() {
   const {
@@ -172,11 +173,11 @@ export default function LogbookPage() {
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
-      <Card className='flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
+      <Card className='shadow-border/50 flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl'>
         <DataTableToolbar
           className='mb-5 !border-0 !p-0'
           searchProps={{
-            placeholder: 'Search by student name...',
+            placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
             value: search,
             onChange: (e) => setSearch(e.target.value),
           }}
@@ -191,7 +192,7 @@ export default function LogbookPage() {
               }}
               className='w-56 shadow-sm'
               rootClassName='custom-select-premium'
-              suffixIcon={<FilterOutlined className='text-slate-400' />}
+              suffixIcon={<FilterOutlined className='text-muted' />}
               options={[
                 { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
                 { value: 1, label: DAILY_REPORT_UI.STATUS.APPROVED },
@@ -206,6 +207,22 @@ export default function LogbookPage() {
             onClick: () => openFormModal(),
           }}
         />
+        <LogbookTable
+          data={data}
+          loading={loading}
+          userProfile={userProfile}
+          onView={openDetailModal}
+          onEdit={openFormModal}
+          onDelete={handleDelete}
+        />
+      </Card>
+
+      <Pagination
+        total={total}
+        page={pageNumber}
+        pageSize={pageSize}
+        onPageChange={setPageNumber}
+      />
 
       <LogbookFormModal
         visible={isFormModalOpen}

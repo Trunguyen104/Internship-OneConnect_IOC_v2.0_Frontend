@@ -10,11 +10,15 @@ export const ISSUE_UI = {
     STATUS: 'Status',
     CREATED_DATE: 'Created Date',
     ACTIONS: 'Actions',
+    VIEW_DETAIL: 'View Detail',
+    DELETE_CONFIRM: 'Are you sure you want to delete this issue?',
   },
 
   STATUS: {
+    OPEN: 'Open',
     PROCESSING: 'Processing',
     RESOLVED: 'Resolved',
+    CLOSED: 'Closed',
   },
 
   BUTTON: {
@@ -23,6 +27,7 @@ export const ISSUE_UI = {
     DELETE: 'Delete',
     CANCEL: 'Cancel',
     SAVE: 'Save Issue',
+    CLOSE: 'Close',
   },
 
   FORM: {
@@ -41,5 +46,7 @@ export const ISSUE_UI = {
   EMPTY: {
     NO_DATA: 'No issue found',
     UNKNOWN: 'Unknown',
+    TOTAL_PREFIX: 'Total:',
+    TOTAL_SUFFIX: 'issues',
   },
 };

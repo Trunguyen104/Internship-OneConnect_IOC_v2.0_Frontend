@@ -29,7 +29,7 @@ export default function ViolationPage() {
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={VIOLATION_UI.PAGE_TITLE} />
 
-      <Card className='overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
+      <Card className='shadow-border/50 overflow-hidden rounded-2xl border-none shadow-xl'>
         <DataTableToolbar
           className='mb-5 !border-0 !p-0'
           searchProps={{

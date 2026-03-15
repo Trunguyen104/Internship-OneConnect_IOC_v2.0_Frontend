@@ -22,7 +22,7 @@ export function ViewGroupModal({ open, group, onCancel }) {
       footer={null}
       width={560}
       centered
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <div className='bg-surface relative flex flex-col p-2'>

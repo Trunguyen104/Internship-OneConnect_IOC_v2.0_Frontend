@@ -27,7 +27,7 @@ export function CreateGroupModal({ open, onCancel, onFinish }) {
       onCancel={handleCancel}
       footer={null}
       width={520}
-      destroyOnClose
+      destroyOnHidden
       className='modal-custom'
     >
       <div className='mb-6 flex flex-col items-center gap-2 text-center'>

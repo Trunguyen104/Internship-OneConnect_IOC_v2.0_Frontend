@@ -7,12 +7,13 @@ export const DAILY_REPORT_UI = {
   FILTER_STATUS: 'Filter by status',
 
   TABLE: {
-    REPORT_DATE: 'REPORT DATE',
-    STUDENT: 'STUDENT',
-    SUMMARY: 'WORK SUMMARY',
-    ISSUE: 'ISSUES ENCOUNTERED',
-    STATUS: 'STATUS',
-    ACTION: 'ACTION',
+    REPORT_DATE: 'Report Date',
+    STUDENT: 'Student',
+    SUMMARY: 'Work Summary',
+    ISSUE: 'Issues Encountered',
+    STATUS: 'Status',
+    ACTION: 'Action',
+    SEARCH_PLACEHOLDER: 'Search by student name...',
   },
 
   STATUS: {
@@ -40,10 +41,21 @@ export const DAILY_REPORT_UI = {
     SUMMARY: 'Work Summary',
     ISSUE: 'Issues Encountered (Optional)',
     PLAN: 'Plan for Next Day',
+    LINKED_WORK_ITEMS: 'Linked Work Items',
 
     PLACEHOLDER_SUMMARY: 'Describe the tasks you have done today...',
     PLACEHOLDER_ISSUE: 'What difficulties or obstacles did you encounter?',
     PLACEHOLDER_PLAN: 'What are the planned tasks for tomorrow?',
+
+    VALIDATION: {
+      DATE_REQUIRED: 'Please select report date',
+      SUMMARY_REQUIRED: 'Please enter summary',
+      SUMMARY_MIN: 'Minimum 10 characters',
+      SUMMARY_MAX: 'Maximum 200 characters',
+      ISSUE_MAX: 'Maximum 200 characters',
+      PLAN_REQUIRED: 'Please enter next plan',
+      PLAN_MAX: 'Maximum 200 characters',
+    },
   },
 
   EMPTY: {
@@ -55,6 +67,9 @@ export const DAILY_REPORT_UI = {
     TITLE: 'Logbook Details',
     CLOSE: 'Close',
     NO_SUMMARY: 'No summary.',
+    NO_ISSUE: 'No issues reported.',
+    NO_PLAN: 'No plan recorded.',
+    NA: 'N/A',
   },
 
   DELETE_MODAL: {

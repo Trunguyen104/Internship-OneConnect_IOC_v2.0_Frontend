@@ -11,67 +11,65 @@ export default function ViolationTable({ data, page, pageSize, sortOrder, onSort
     <div className='flex min-h-0 flex-1 flex-col'>
       {!data || data.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <p className='text-slate-400'>No violations recorded</p>
+          <p className='text-muted'>No violations recorded</p>
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>
           <div className='flex-1 overflow-auto'>
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
-              <thead className='sticky top-0 z-10 border-b border-slate-200 bg-slate-50'>
+              <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='w-[60px] px-6 py-4 text-xs font-semibold text-slate-500'>#</th>
-                  <th className='w-[200px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[60px] px-6 py-4 text-xs font-semibold'>#</th>
+                  <th className='text-muted w-[200px] px-6 py-4 text-xs font-semibold'>
                     Violation Type
                   </th>
-                  <th className='w-[300px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[300px] px-6 py-4 text-xs font-semibold'>
                     Description
                   </th>
-                  <th className='w-[180px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[180px] px-6 py-4 text-xs font-semibold'>
                     Violation Time
                   </th>
-                  <th className='w-[150px] px-6 py-4 text-xs font-semibold text-slate-500'>
-                    Reporter
-                  </th>
-                  <th className='w-[150px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                  <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>Reporter</th>
+                  <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>
                     <div
-                      className='flex cursor-pointer items-center gap-1 transition-colors hover:text-blue-600'
+                      className='hover:text-info flex cursor-pointer items-center gap-1 transition-colors'
                       onClick={onSort}
                     >
                       Created Date
                       <div className='flex flex-col text-[10px]'>
                         <CaretUpOutlined
-                          className={sortOrder === 'asc' ? 'text-blue-600' : 'text-slate-300'}
+                          className={sortOrder === 'asc' ? 'text-info' : 'text-border'}
                         />
                         <CaretDownOutlined
-                          className={sortOrder === 'desc' ? 'text-blue-600' : 'text-slate-300'}
+                          className={sortOrder === 'desc' ? 'text-info' : 'text-border'}
                         />
                       </div>
                     </div>
                   </th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-slate-100'>
+              <tbody className='divide-border/50 divide-y'>
                 {data.map((record, index) => (
-                  <tr key={record.id} className='transition-colors hover:bg-slate-50/80'>
-                    <td className='px-6 py-4 text-sm text-slate-600'>
+                  <tr key={record.id} className='hover:bg-bg/80 transition-colors'>
+                    <td className='text-muted px-6 py-4 text-sm'>
                       {(page - 1) * pageSize + index + 1}
                     </td>
                     <td className='px-6 py-4 text-sm'>
-                      <span className='flex items-center gap-2 font-bold tracking-tight text-slate-800'>
-                        <WarningOutlined className='text-amber-500' />
+                      <span className='text-text flex items-center gap-2 font-bold tracking-tight'>
+                        <WarningOutlined className='text-warning' />
                         {record.type}
                       </span>
                     </td>
                     <td className='px-6 py-4 text-sm'>
                       <Text
-                        className='text-sm text-slate-600 italic'
+                        className='text-muted text-sm italic'
                         ellipsis={{ tooltip: record.description }}
                       >
                         {record.description}
                       </Text>
                     </td>
                     <td className='px-6 py-4'>
-                      <span className='text-xs font-medium text-slate-500'>
+                      <span className='text-muted text-xs font-medium'>
                         {dayjs(record.violationTime).format('DD/MM/YYYY HH:mm')}
                       </span>
                     </td>
@@ -84,7 +82,7 @@ export default function ViolationTable({ data, page, pageSize, sortOrder, onSort
                       </Tag>
                     </td>
                     <td className='px-6 py-4'>
-                      <span className='text-sm font-bold text-slate-800'>
+                      <span className='text-text text-sm font-bold'>
                         {dayjs(record.createdAt).format('DD/MM/YYYY')}
                       </span>
                     </td>
