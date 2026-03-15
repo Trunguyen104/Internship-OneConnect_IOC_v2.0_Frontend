@@ -21,7 +21,6 @@ export default function LogbookFormModal({
       footer={null}
       width={600}
       centered
-      destroyOnHidden
       title={
         <h2 className='text-xl font-semibold text-gray-800'>
           {editingId ? DAILY_REPORT_UI.MODAL.EDIT_TITLE : DAILY_REPORT_UI.MODAL.CREATE_TITLE}
@@ -42,26 +41,46 @@ export default function LogbookFormModal({
         </Form.Item>
 
         <Form.Item
-          label='Summary'
+          label={DAILY_REPORT_UI.FORM.SUMMARY}
           name='summary'
           rules={[
             { required: true, message: 'Please enter summary' },
             { min: 10, message: 'Minimum 10 characters' },
+            { max: 200, message: 'Maximum 200 characters' },
           ]}
         >
-          <TextArea rows={4} placeholder='Describe your work today...' className='rounded-md' />
-        </Form.Item>
-
-        <Form.Item label='Issue' name='issue'>
-          <TextArea rows={2} placeholder='Problems encountered (optional)' className='rounded-md' />
+          <TextArea
+            rows={4}
+            placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_SUMMARY}
+            className='rounded-md'
+          />
         </Form.Item>
 
         <Form.Item
-          label='Plan'
-          name='plan'
-          rules={[{ required: true, message: 'Please enter next plan' }]}
+          label={DAILY_REPORT_UI.FORM.ISSUE}
+          name='issue'
+          rules={[{ max: 200, message: 'Maximum 200 characters' }]}
         >
-          <TextArea rows={3} placeholder='Plan for next working day...' className='rounded-md' />
+          <TextArea
+            rows={2}
+            placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_ISSUE}
+            className='rounded-md'
+          />
+        </Form.Item>
+
+        <Form.Item
+          label={DAILY_REPORT_UI.FORM.PLAN}
+          name='plan'
+          rules={[
+            { required: true, message: 'Please enter next plan' },
+            { max: 200, message: 'Maximum 200 characters' },
+          ]}
+        >
+          <TextArea
+            rows={3}
+            placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_PLAN}
+            className='rounded-md'
+          />
         </Form.Item>
 
         <div className='flex justify-end gap-3 border-t pt-4'>

@@ -26,6 +26,12 @@ export function useStakeholderTab() {
   });
   const [errors, setErrors] = useState({});
 
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -87,41 +93,75 @@ export function useStakeholderTab() {
     };
 
     try {
+      let res;
       if (editingStakeholderId) {
-        await StakeholderService.update(editingStakeholderId, payload);
-        toast.success(STAKEHOLDER_MESSAGES.UPDATE_SUCCESS);
+        res = await StakeholderService.update(editingStakeholderId, payload);
       } else {
-        await StakeholderService.create(payload);
-        toast.success(STAKEHOLDER_MESSAGES.CREATE_SUCCESS);
+        res = await StakeholderService.create(payload);
       }
 
-      setOpenStakeholderForm(false);
-      setEditingStakeholderId(null);
-      setStakeholderForm({
-        name: '',
-        type: 0,
-        role: '',
-        description: '',
-        email: '',
-        phoneNumber: '',
-      });
-      setErrors({});
-      fetchStakeholders();
-    } catch (err) {
-      if (err.message?.includes('409')) {
-        toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
+      // httpClient returns { isSuccess: false, status, data } on error
+      if (res && res.isSuccess !== false && res.statusCode !== 403) {
+        toast.success(
+          editingStakeholderId
+            ? STAKEHOLDER_MESSAGES.UPDATE_SUCCESS
+            : STAKEHOLDER_MESSAGES.CREATE_SUCCESS,
+        );
+        setOpenStakeholderForm(false);
+        setEditingStakeholderId(null);
+        setStakeholderForm({
+          name: '',
+          type: 'Real',
+          role: '',
+          description: '',
+          email: '',
+          phoneNumber: '',
+        });
+        setErrors({});
+        fetchStakeholders();
       } else {
-        toast.error(STAKEHOLDER_MESSAGES.SAVE_FAILED);
+        // Handle specific error codes
+        const errorMsg =
+          res?.data?.errors?.[0] ||
+          res?.errors?.[0] ||
+          res?.message ||
+          STAKEHOLDER_MESSAGES.SAVE_FAILED;
+
+        if (res?.status === 403 || res?.statusCode === 403) {
+          toast.error(errorMsg || STAKEHOLDER_MESSAGES.FORBIDDEN);
+        } else if (res?.status === 409 || res?.statusCode === 409) {
+          toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
+        } else {
+          toast.error(errorMsg);
+        }
       }
+    } catch (err) {
+      console.error('Error saving stakeholder:', err);
+      toast.error(STAKEHOLDER_MESSAGES.SAVE_FAILED);
     }
   };
 
   const handleDeleteStakeholder = async (id) => {
     try {
-      await StakeholderService.remove(id, internshipId);
-      toast.success(STAKEHOLDER_MESSAGES.DELETE_SUCCESS);
-      fetchStakeholders();
-    } catch {
+      const res = await StakeholderService.remove(id, internshipId);
+      if (res && res.isSuccess !== false && res.statusCode !== 403) {
+        toast.success(STAKEHOLDER_MESSAGES.DELETE_SUCCESS);
+        fetchStakeholders();
+      } else {
+        const errorMsg =
+          res?.data?.errors?.[0] ||
+          res?.errors?.[0] ||
+          res?.message ||
+          STAKEHOLDER_MESSAGES.DELETE_FAILED;
+
+        if (res?.status === 403 || res?.statusCode === 403) {
+          toast.error(errorMsg || STAKEHOLDER_MESSAGES.FORBIDDEN);
+        } else {
+          toast.error(errorMsg);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting stakeholder:', error);
       toast.error(STAKEHOLDER_MESSAGES.DELETE_FAILED);
     }
   };
@@ -132,7 +172,11 @@ export function useStakeholderTab() {
     try {
       setStakeholderLoading(true);
 
-      const params = {};
+      const params = {
+        PageNumber: page,
+        PageSize: pageSize,
+      };
+
       if (debouncedSearch?.trim()) {
         params.SearchTerm = debouncedSearch.trim();
       }
@@ -141,16 +185,21 @@ export function useStakeholderTab() {
 
       if (res?.data?.items) {
         setStakeholders(res.data.items);
+        setTotal(res.data.totalCount || 0);
+        setTotalPages(res.data.totalPages || 1);
       }
     } catch {
       toast.error(STAKEHOLDER_MESSAGES.LOAD_FAILED);
     } finally {
       setStakeholderLoading(false);
     }
-  }, [internshipId, debouncedSearch, toast]);
+  }, [internshipId, debouncedSearch, page, pageSize, toast]);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 500);
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 on search
+    }, 500);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -198,6 +247,11 @@ export function useStakeholderTab() {
     handleSaveStakeholder,
     handleDeleteStakeholder,
     fetchStakeholders,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
   };
 }
-

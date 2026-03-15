@@ -18,20 +18,19 @@ import {
 
 const studentMenu = [
   { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
-  { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/general-info' },
-  { icon: <ProjectOutlined />, label: 'Dự án', href: '/student/project' },
-  { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
-  { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
-  { icon: <UploadOutlined />, label: 'Đánh giá', href: '/student/evaluate' },
-  { icon: <UserOutlined />, label: 'Bên liên quan', href: '/student/stakeholder' },
-  { icon: <ShopOutlined />, label: 'Vi phạm', href: '/student/violation' },
+  { icon: <BarChartOutlined />, label: 'General Information', href: '/student/general-info' },
+  { icon: <ProjectOutlined />, label: 'Project', href: '/student/project' },
+  { icon: <TeamOutlined />, label: 'Students', href: '/student/studentlist' },
+  { icon: <VideoCameraOutlined />, label: 'Daily Report', href: '/student/daily-report' },
+  { icon: <UploadOutlined />, label: 'Evaluation', href: '/student/evaluate' },
+  { icon: <UserOutlined />, label: 'Stakeholders', href: '/student/stakeholder' },
+  { icon: <ShopOutlined />, label: 'Violations', href: '/student/violation' },
 ];
 
 const profileMenu = [
-  { icon: <UserOutlined />, label: 'Thông tin cá nhân', href: '/student/profile' },
-  { icon: <LockOutlined />, label: 'Thay đổi mật khẩu', href: '/student/profile/change-password' },
+  { icon: <UserOutlined />, label: 'Profile', href: '/student/profile' },
+  { icon: <LockOutlined />, label: 'Change Password', href: '/student/profile/change-password' },
 ];
-
 export default function Sidebar() {
   const pathname = usePathname();
 
@@ -39,7 +38,7 @@ export default function Sidebar() {
   const menus = isProfile ? profileMenu : studentMenu;
 
   return (
-    <aside className='w-[15.1rem] h-screen bg-gray-50 border-r border-slate-200 sticky top-0 hidden md:flex flex-col'>
+    <aside className='sticky top-0 hidden h-screen w-[15.1rem] flex-col border-r border-slate-200 bg-gray-50 md:flex'>
       <div className='flex justify-center px-14 py-6'>
         <Image src='/assets/images/logo.svg' alt='IOC Logo' width={120} height={40} />
       </div>
@@ -47,16 +46,17 @@ export default function Sidebar() {
       {isProfile ? (
         <Link
           href='/student/space'
-          className='mx-4 mb-4 flex items-center gap-2 text-xs font-black text-red-800 cursor-pointer hover:underline'
+          className='mx-4 mb-4 flex cursor-pointer items-center gap-2 text-xs font-black text-red-800 hover:underline'
         >
           <ArrowLeftOutlined />
           Back
         </Link>
       ) : (
-        !isProfile && pathname !== '/internship-groups' && (
+        !isProfile &&
+        pathname !== '/internship-groups' && (
           <Link
             href='/student/space'
-            className='mx-5 mb-6 flex items-center gap-2 text-[14px] font-bold text-(--primary-700) hover:text-(--primary-800) cursor-pointer'
+            className='mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold text-(--primary-700) hover:text-(--primary-800)'
           >
             <ArrowLeftOutlined />
             Quay lại Dashboard
@@ -71,8 +71,7 @@ export default function Sidebar() {
           return (
             <Link key={item.href} href={item.href} className='block px-3'>
               <div
-                className={`flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold
-                ${isActive ? 'bg-[#FEF2F2] text-[#B91C1C]' : 'hover:bg-blue-50'}`}
+                className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm font-semibold ${isActive ? 'bg-[#FEF2F2] text-[#B91C1C]' : 'hover:bg-blue-50'}`}
               >
                 <span className='text-lg'>{item.icon}</span>
                 {item.label}
@@ -84,4 +83,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-

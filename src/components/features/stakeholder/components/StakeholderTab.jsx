@@ -1,11 +1,12 @@
 'use client';
 
-import SearchBar from '@/components/ui/SearchBar';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 import { useStakeholderTab } from '../hooks/useStakeholderTab';
 import StakeholderList from './StakeholderList';
 import StakeholderFormModal from './StakeholderFormModal';
 import Card from '@/components/ui/Card';
+import Pagination from '@/components/ui/Pagination';
 
 export default function StakeholderTab() {
   const {
@@ -23,36 +24,47 @@ export default function StakeholderTab() {
     setErrors,
     handleSaveStakeholder,
     handleDeleteStakeholder,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    total,
+    totalPages,
   } = useStakeholderTab();
 
   return (
     <>
       <section className='animate-in fade-in flex h-full flex-col space-y-6 duration-500'>
         <Card>
-          <SearchBar
-            placeholder={STAKEHOLDER_UI.SEARCH_PLACEHOLDER}
-            value={search}
-            onChange={setSearch}
-            showFilter
-            showAction
-            actionLabel={STAKEHOLDER_UI.ADD_BUTTON}
-            onActionClick={() => {
-              setStakeholderForm({
-                name: '',
-                type: 0,
-                role: '',
-                description: '',
-                email: '',
-                phoneNumber: '',
-              });
-              setErrors({});
-              setOpenStakeholderForm(true);
+          <DataTableToolbar
+            className='mb-6 !border-0 !p-0'
+            searchProps={{
+              placeholder: STAKEHOLDER_UI.SEARCH_PLACEHOLDER,
+              value: search,
+              onChange: (e) => setSearch(e.target.value),
+            }}
+            actionProps={{
+              label: STAKEHOLDER_UI.ADD_BUTTON,
+              onClick: () => {
+                setStakeholderForm({
+                  name: '',
+                  type: 0,
+                  role: '',
+                  description: '',
+                  email: '',
+                  phoneNumber: '',
+                });
+                setErrors({});
+                setOpenStakeholderForm(true);
+              },
             }}
           />
 
           <StakeholderList
             stakeholders={stakeholders}
             loading={stakeholderLoading}
+            page={page}
+            pageSize={pageSize}
             onEdit={(s) => {
               setEditingStakeholderId(s.id);
               setStakeholderForm({
@@ -69,7 +81,14 @@ export default function StakeholderTab() {
             onDelete={handleDeleteStakeholder}
           />
         </Card>
-
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
         <StakeholderFormModal
           isOpen={openStakeholderForm}
           onClose={() => {

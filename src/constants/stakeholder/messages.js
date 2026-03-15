@@ -8,7 +8,7 @@ export const STAKEHOLDER_MESSAGES = {
   LOAD_FAILED: 'Failed to load stakeholders',
 
   PROJECT_NOT_FOUND: 'Project not found',
-
+  FORBIDDEN: 'You do not have permission to perform this action',
   EMAIL_EXIST: 'Email already exists',
 
   REQUIRED_FIELDS: {
@@ -28,4 +28,3 @@ export const STAKEHOLDER_MESSAGES = {
     PHONE_MAX_LENGTH: 'Phone number cannot exceed 15 characters',
   },
 };
-

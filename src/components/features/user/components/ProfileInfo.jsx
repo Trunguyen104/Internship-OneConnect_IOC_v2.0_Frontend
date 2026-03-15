@@ -39,7 +39,7 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
         <div className='pt-6'>
           {loadingUser ? (
             <div className='flex w-full items-center justify-center py-12'>
-              <Spin tip='Loading profile...'>
+              <Spin description='Loading profile...'>
                 <div className='px-20' />
               </Spin>
             </div>

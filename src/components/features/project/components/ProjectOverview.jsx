@@ -33,12 +33,8 @@ export default function ProjectOverview({ project }) {
   return (
     <div className={'space-y-10'}>
       {/* Top Grid Info */}
-      <div className={'grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'}>
-        <div
-          className={
-            'col-span-1 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm md:col-span-2'
-          }
-        >
+      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
+        <div className='col-span-1 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:col-span-2'>
           <Text
             type={'secondary'}
             className={'mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'}
@@ -54,7 +50,7 @@ export default function ProjectOverview({ project }) {
           </Text>
         </div>
 
-        <div className={'rounded-2xl border border-slate-100 bg-white p-5 shadow-sm'}>
+        <div className='rounded-2xl border border-slate-100 bg-white p-6 shadow-sm'>
           <Text
             type={'secondary'}
             className={'mb-2 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'}
@@ -71,7 +67,7 @@ export default function ProjectOverview({ project }) {
           </Tag>
         </div>
 
-        <div className={'rounded-2xl border border-slate-100 bg-white p-5 shadow-sm'}>
+        <div className='rounded-2xl border border-slate-100 bg-white p-6 shadow-sm'>
           <Text
             type={'secondary'}
             className={'mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'}
@@ -88,15 +84,15 @@ export default function ProjectOverview({ project }) {
         </div>
       </div>
 
-      <div className={'space-y-6'}>
-        <section className={'rounded-3xl border border-slate-100 bg-slate-50/50 p-8'}>
-          <div className={'mb-6 flex items-center gap-4'}>
-            <div className={'bg-primary h-10 w-1.5 rounded-full'} />
-            <Title level={4} className={'!m-0 !font-black !text-slate-800'}>
-              {'Project Description'}
+      <div className='space-y-6'>
+        <section className='rounded-2xl border border-slate-100 bg-slate-50/50 p-6 sm:p-8'>
+          <div className='mb-6 flex items-center gap-4'>
+            <div className='bg-primary h-8 w-1.5 rounded-full' />
+            <Title level={4} className='!m-0 !text-xl !font-bold !text-slate-800'>
+              Project Description
             </Title>
           </div>
-          <Paragraph className={'text-[16px] leading-[1.8] font-medium text-slate-600'}>
+          <Paragraph className='text-[15px] leading-relaxed text-slate-600'>
             {project?.description || 'No detailed description available for this project.'}
           </Paragraph>
         </section>

@@ -2,7 +2,14 @@ import { EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
-export default function StakeholderList({ stakeholders, loading, onEdit, onDelete }) {
+export default function StakeholderList({
+  stakeholders,
+  loading,
+  page = 1,
+  pageSize = 10,
+  onEdit,
+  onDelete,
+}) {
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       {loading ? (
@@ -42,12 +49,11 @@ export default function StakeholderList({ stakeholders, loading, onEdit, onDelet
               <tbody className='divide-y divide-slate-100'>
                 {stakeholders.map((s, index) => (
                   <tr key={s.id} className='transition-colors hover:bg-slate-50/80'>
-                    <td className='px-6 py-4 text-sm text-slate-600'>{index + 1}</td>
+                    <td className='px-6 py-4 text-sm text-slate-600'>
+                      {(page - 1) * pageSize + index + 1}
+                    </td>
                     <td className='px-6 py-4'>
                       <div className='flex items-center gap-3'>
-                        <div className='bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg'>
-                          <UserOutlined />
-                        </div>
                         <div className='min-w-0'>
                           <div
                             className='truncate text-sm font-medium text-slate-800'
@@ -67,7 +73,7 @@ export default function StakeholderList({ stakeholders, loading, onEdit, onDelet
                       </div>
                     </td>
                     <td className='px-6 py-4'>
-                      <span className='inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-600'>
+                      <span className='inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-0.5 text-xs font-medium whitespace-nowrap text-blue-600'>
                         {s.role || STAKEHOLDER_UI.NO_ROLE}
                       </span>
                     </td>

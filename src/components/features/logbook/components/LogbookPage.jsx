@@ -1,10 +1,11 @@
 'use client';
 
 import { Form } from 'antd';
-import { PlusOutlined, FilterOutlined } from '@ant-design/icons';
-import { Select, Button } from 'antd';
+import { FilterOutlined } from '@ant-design/icons';
+import { Select } from 'antd';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import LogbookTable from './LogbookTable';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookDetailModal from './LogbookDetailModal';
@@ -28,7 +29,10 @@ export default function LogbookPage() {
     setPageSize,
     statusFilter,
     setStatusFilter,
+    sortOrder,
     setSortOrder,
+    search,
+    setSearch,
     fetchLogbooks,
     handleDelete,
     internshipId,
@@ -58,7 +62,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.toISOString(),
+          dateReport: values.dateReport.hour(12).toISOString(),
           status: PUNCTUAL_STATUS,
         };
         res = await LogBookService.update(editingId, updatePayload);
@@ -68,12 +72,12 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.toISOString(),
+          dateReport: values.dateReport.hour(12).toISOString(),
           status: SUBMITTED_STATUS,
         };
         res = await LogBookService.create(createPayload);
       }
-      if (res && (res.isSuccess !== false || res.success !== false)) {
+      if (res && res.isSuccess !== false) {
         toast.success(
           editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
         );
@@ -86,24 +90,53 @@ export default function LogbookPage() {
         }
         closeFormModal();
       } else {
-        toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
+        const errorMsg =
+          res?.data?.errors?.[0] ||
+          res?.errors?.[0] ||
+          res?.data?.message ||
+          res?.message ||
+          DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
+        toast.error(errorMsg);
       }
-    } catch {
-      toast.error(DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
+    } catch (error) {
+      console.error('Logbook submit error:', error);
+      const errorMsg =
+        error?.response?.data?.errors?.[0] ||
+        error?.response?.data?.message ||
+        error?.message ||
+        DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
+      toast.error(errorMsg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const openFormModal = (record = null) => {
+  const openFormModal = async (record = null) => {
     if (record) {
-      setEditingId(record.logbookId);
-      form.setFieldsValue({
-        dateReport: record.dateReport ? dayjs(record.dateReport) : null,
-        summary: record.summary,
-        issue: record.issue,
-        plan: record.plan,
-      });
+      try {
+        setSubmitting(true);
+        const res = await LogBookService.getById(record.logbookId);
+        const fullData = res?.data || record;
+
+        setEditingId(fullData.logbookId);
+        form.setFieldsValue({
+          dateReport: fullData.dateReport ? dayjs(fullData.dateReport) : null,
+          summary: fullData.summary,
+          issue: fullData.issue,
+          plan: fullData.plan,
+        });
+      } catch (err) {
+        console.error('Failed to load logbook details', err);
+        setEditingId(record.logbookId);
+        form.setFieldsValue({
+          dateReport: record.dateReport ? dayjs(record.dateReport) : null,
+          summary: record.summary,
+          issue: record.issue,
+          plan: record.plan,
+        });
+      } finally {
+        setSubmitting(false);
+      }
     } else {
       setEditingId(null);
       form.resetFields();
@@ -117,9 +150,19 @@ export default function LogbookPage() {
     form.resetFields();
   };
 
-  const openDetailModal = (record) => {
-    setViewRecord(record);
-    setIsDetailModalOpen(true);
+  const openDetailModal = async (record) => {
+    try {
+      setSubmitting(true);
+      const res = await LogBookService.getById(record.logbookId);
+      setViewRecord(res?.data || record);
+      setIsDetailModalOpen(true);
+    } catch (err) {
+      console.error('Failed to load logbook details', err);
+      setViewRecord(record);
+      setIsDetailModalOpen(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const closeDetailModal = () => {
@@ -132,33 +175,39 @@ export default function LogbookPage() {
       <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
       <Card className='flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
-        <div className='flex flex-wrap items-center justify-between gap-4 border-b border-slate-50 bg-slate-50/20 py-4'>
-          <Select
-            allowClear
-            placeholder={DAILY_REPORT_UI.FILTER_STATUS}
-            value={statusFilter}
-            onChange={(val) => {
-              setStatusFilter(val);
-              setPageNumber(1);
-            }}
-            className='w-56 shadow-sm'
-            rootClassName='custom-select-premium'
-            suffixIcon={<FilterOutlined className='text-slate-400' />}
-            options={[
-              { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-              { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-              { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
-            ]}
-          />
-
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => openFormModal()}
-            className='bg-primary! hover:bg-primary-hover! flex items-center gap-2 rounded-xl! border-none! px-6! py-2.5! text-sm! font-medium! text-white! shadow-sm transition-colors'
-          >
-            {DAILY_REPORT_UI.CREATE_BUTTON}
-          </Button>
-        </div>
+        <DataTableToolbar
+          className='mb-5 !border-0 !p-0'
+          searchProps={{
+            placeholder: 'Search by student name...',
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+          }}
+          filterContent={
+            <Select
+              allowClear
+              placeholder={DAILY_REPORT_UI.FILTER_STATUS}
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPageNumber(1);
+              }}
+              className='w-56 shadow-sm'
+              rootClassName='custom-select-premium'
+              suffixIcon={<FilterOutlined className='text-slate-400' />}
+              options={[
+                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
+                { value: 1, label: DAILY_REPORT_UI.STATUS.APPROVED },
+                { value: 2, label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION },
+                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+              ]}
+            />
+          }
+          actionProps={{
+            label: DAILY_REPORT_UI.CREATE_BUTTON,
+            onClick: () => openFormModal(),
+          }}
+        />
 
         <LogbookTable
           data={data}

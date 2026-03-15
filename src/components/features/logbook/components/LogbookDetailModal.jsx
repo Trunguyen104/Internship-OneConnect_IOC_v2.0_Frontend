@@ -66,6 +66,26 @@ export default function LogbookDetailModal({ visible, record, onClose }) {
               {record.plan || 'No plan outlined.'}
             </div>
           </section>
+
+          {record.workItems?.length > 0 && (
+            <section className='space-y-3'>
+              <h4 className='font-semibold text-gray-800'>Linked Work Items</h4>
+              <div className='space-y-2'>
+                {record.workItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className='flex items-center gap-3 rounded-lg border border-slate-100 p-3'
+                  >
+                    <div className='h-2 w-2 rounded-full bg-blue-500' />
+                    <div className='flex-1'>
+                      <p className='text-sm font-medium text-slate-800'>{item.title}</p>
+                      <p className='line-clamp-1 text-xs text-slate-500'>{item.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </Modal>

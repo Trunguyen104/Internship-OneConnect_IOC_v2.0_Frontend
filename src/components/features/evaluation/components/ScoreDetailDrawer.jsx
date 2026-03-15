@@ -1,16 +1,6 @@
 'use client';
 
-import {
-  Drawer,
-  Empty,
-  Typography,
-  Progress,
-  Card,
-  Descriptions,
-  List,
-  Space,
-  Divider,
-} from 'antd';
+import { Drawer, Empty, Typography, Progress, Card, Descriptions, Space, Divider } from 'antd';
 import { MessageOutlined, StarFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -65,33 +55,32 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
               </Space>
             }
           >
-            <List
-              dataSource={evaluationDetail.criteriaScores}
-              renderItem={(criteria) => {
+            <div className='flex flex-col gap-4'>
+              {evaluationDetail.criteriaScores?.map((criteria, index) => {
                 const percent = (criteria.score / criteria.maxScore) * 100;
 
                 return (
-                  <List.Item>
-                    <Space direction='vertical' style={{ width: '100%' }}>
-                      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                        <Text strong>{criteria.criteriaName}</Text>
-                        <Text>
-                          {criteria.score} / {criteria.maxScore}
-                        </Text>
-                      </Space>
-
-                      <Progress percent={percent} showInfo={false} />
-
-                      <Text type='secondary' italic>
-                        {criteria.comment || 'No detailed comments provided'}
+                  <div key={index} className='flex flex-col gap-2'>
+                    <div className='flex items-center justify-between'>
+                      <Text strong>{criteria.criteriaName}</Text>
+                      <Text>
+                        {criteria.score} / {criteria.maxScore}
                       </Text>
+                    </div>
 
+                    <Progress percent={percent} showInfo={false} />
+
+                    <Text type='secondary' italic>
+                      {criteria.comment || 'No detailed comments provided'}
+                    </Text>
+
+                    {index < evaluationDetail.criteriaScores.length - 1 && (
                       <Divider style={{ margin: '8px 0' }} />
-                    </Space>
-                  </List.Item>
+                    )}
+                  </div>
                 );
-              }}
-            />
+              })}
+            </div>
           </Card>
         </Space>
       )}

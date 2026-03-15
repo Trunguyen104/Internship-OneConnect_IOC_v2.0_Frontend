@@ -1,8 +1,8 @@
 'use client';
 
 import Card from '@/components/ui/Card';
-import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 import { useIssueTab } from '../hooks/useIssueTab';
 import IssueTable from './IssueTable';
@@ -37,17 +37,20 @@ export default function IssueTab() {
   return (
     <>
       <Card>
-        <SearchBar
-          placeholder={ISSUE_UI.SEARCH_PLACEHOLDER}
-          value={search}
-          onChange={(val) => {
-            setSearch(val);
-            setPage(1);
+        <DataTableToolbar
+          className='mb-6 !border-0 !p-0'
+          searchProps={{
+            placeholder: ISSUE_UI.SEARCH_PLACEHOLDER,
+            value: search,
+            onChange: (e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            },
           }}
-          showFilter
-          showAction
-          actionLabel={ISSUE_UI.ADD_BUTTON}
-          onActionClick={() => setOpenIssueForm(true)}
+          actionProps={{
+            label: ISSUE_UI.ADD_BUTTON,
+            onClick: () => setOpenIssueForm(true),
+          }}
         />
 
         <IssueTable

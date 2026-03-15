@@ -13,7 +13,7 @@ export default function GeneralInfo() {
   if (loading) {
     return (
       <div className='flex min-h-[400px] items-center justify-center rounded-2xl bg-white/50 backdrop-blur-sm'>
-        <Spin size='large' tip='Loading information...'>
+        <Spin size='large' description='Loading information...'>
           <div className='px-12' />
         </Spin>
       </div>
@@ -21,37 +21,31 @@ export default function GeneralInfo() {
   }
 
   return (
-    <div className='animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-7xl space-y-6 duration-700'>
+    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
       <StudentPageHeader title='General Information' />
 
       <Card
         className='overflow-hidden rounded-2xl border-none shadow-[0_4px_20px_rgb(0,0,0,0.03)]'
-        bodyStyle={{ padding: '32px' }}
+        styles={{ body: { padding: '32px' } }}
       >
         <Descriptions
-          title={
-            <div className='mb-6 flex items-center gap-3'>
-              <div className='bg-primary h-6 w-1.5 rounded-full shadow-[0_0_10px_rgba(213,32,32,0.3)]'></div>
-              <Text strong className='text-lg text-slate-800'>
-                Internship Group Details
-              </Text>
-            </div>
-          }
           column={{ xxl: 4, xl: 3, lg: 2, md: 2, sm: 1, xs: 1 }}
           bordered={false}
-          labelStyle={{
-            color: '#64748b',
-            fontWeight: 600,
-            fontSize: '12px',
-            textTransform: 'uppercase',
-            letterSpacing: '0.025em',
-            paddingBottom: '8px',
-          }}
-          contentStyle={{
-            color: '#1e293b',
-            fontWeight: 700,
-            fontSize: '15px',
-            paddingBottom: '20px',
+          styles={{
+            label: {
+              color: '#64748b',
+              fontWeight: 600,
+              fontSize: '12px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.025em',
+              paddingBottom: '8px',
+            },
+            content: {
+              color: '#1e293b',
+              fontWeight: 700,
+              fontSize: '15px',
+              paddingBottom: '20px',
+            },
           }}
           layout='vertical'
         >
@@ -95,6 +89,6 @@ export default function GeneralInfo() {
           </Descriptions.Item>
         </Descriptions>
       </Card>
-    </div>
+    </section>
   );
 }
