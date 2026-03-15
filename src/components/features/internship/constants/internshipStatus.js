@@ -14,25 +14,25 @@ export const INTERNSHIP_STATUS = {
 
 export const INTERNSHIP_STATUS_CONFIG = {
   [INTERNSHIP_STATUS.UPCOMING]: {
-    label: 'Upcoming',
+    label: 'Sắp diễn ra',
     color: 'default',
     badge: 'processing',
     tagColor: 'orange',
   },
   [INTERNSHIP_STATUS.ACTIVE]: {
-    label: 'Active',
+    label: 'Đang hoạt động',
     color: 'processing',
     badge: 'processing',
     tagColor: 'blue',
   },
   [INTERNSHIP_STATUS.ENDED]: {
-    label: 'Ended',
+    label: 'Đã kết thúc',
     color: 'success',
     badge: 'success',
     tagColor: 'green',
   },
   [INTERNSHIP_STATUS.CLOSED]: {
-    label: 'Closed',
+    label: 'Đã đóng',
     color: 'error',
     badge: 'default',
     tagColor: 'slate',
@@ -40,11 +40,11 @@ export const INTERNSHIP_STATUS_CONFIG = {
 };
 
 export const INTERNSHIP_STEPS = [
-  { key: 'registration', label: 'Registration' },
-  { key: 'interviewing', label: 'Interviewing' },
-  { key: 'offered', label: 'Offered' },
-  { key: 'placed', label: 'Placed' },
-  { key: 'finalizing', label: 'Finalizing' },
+  { key: 'registration', label: 'Đăng ký' },
+  { key: 'interviewing', label: 'Phỏng vấn' },
+  { key: 'offered', label: 'Lời mời' },
+  { key: 'placed', label: 'Tiếp nhận' },
+  { key: 'finalizing', label: 'Hoàn tất' },
 ];
 
 export const getStepStatus = (stepIndex, currentStatus) => {

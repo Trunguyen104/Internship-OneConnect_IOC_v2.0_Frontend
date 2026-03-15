@@ -35,13 +35,13 @@ export default function Modal({ open, title, onClose, children, footer }) {
 
       {/* dialog */}
       <div className='absolute inset-0 flex items-center justify-center p-4'>
-        <div className='w-full max-w-[520px] rounded-2xl border border-border/60 bg-surface shadow-xl'>
-          <div className='flex items-center justify-between border-b border-border/60 px-5 py-4'>
+        <div className='border-border/60 bg-surface w-full max-w-[520px] rounded-2xl border shadow-xl'>
+          <div className='border-border/60 flex items-center justify-between border-b px-5 py-4'>
             <div className='text-sm font-semibold'>{title}</div>
             <button
               type='button'
               onClick={onClose}
-              className='h-9 w-9 rounded-full border border-border/60 bg-bg text-muted hover:bg-surface'
+              className='border-border/60 bg-bg text-muted hover:bg-surface h-9 w-9 rounded-full border'
               title='Đóng'
             >
               ✕
@@ -51,7 +51,7 @@ export default function Modal({ open, title, onClose, children, footer }) {
           <div className='px-5 py-4'>{children}</div>
 
           {footer ? (
-            <div className='flex items-center justify-end gap-2 border-t border-border/60 px-5 py-4'>
+            <div className='border-border/60 flex items-center justify-end gap-2 border-t px-5 py-4'>
               {footer}
             </div>
           ) : null}
@@ -60,4 +60,3 @@ export default function Modal({ open, title, onClose, children, footer }) {
     </div>
   );
 }
-

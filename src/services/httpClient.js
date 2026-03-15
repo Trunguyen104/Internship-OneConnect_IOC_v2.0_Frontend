@@ -21,7 +21,7 @@ async function request(path, options = {}) {
     }
   }
 
-  const isFormData = options.body instanceof FormData;
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
     ...(options.headers || {}),
   };

@@ -30,12 +30,12 @@ export default function StudentListPage() {
 
   if (!internshipId && !currentId && !loading && !groupDetail) {
     return (
-      <section className='m-6 flex h-[400px] items-center justify-center rounded-3xl border border-gray-200/50 bg-gray-50/50'>
+      <section className='border-border/50 bg-bg/50 m-6 flex h-[400px] items-center justify-center rounded-3xl border'>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           className='my-auto'
           description={
-            <span className='font-medium text-gray-500'>
+            <span className='text-muted font-medium'>
               {STUDENT_LIST_UI.EMPTY.NO_GROUP}
               <br />
               {STUDENT_LIST_UI.EMPTY.NOT_ASSIGNED}
@@ -48,7 +48,7 @@ export default function StudentListPage() {
 
   return (
     <section>
-      <StudentPageHeader title='Student List' />
+      <StudentPageHeader title={STUDENT_LIST_UI.PAGE_TITLE} />
 
       <Card>
         <DataTableToolbar

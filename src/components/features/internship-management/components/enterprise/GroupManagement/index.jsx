@@ -33,8 +33,8 @@ function GroupManagementContent() {
   return (
     <>
       <GroupHeader onCreate={() => setCreateModal(true)} />
-      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
-        <Card>
+      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col p-6 pt-0'>
+        <Card className='bg-surface border-border overflow-hidden border'>
           <GroupFilters
             activeTab={activeTab}
             onTabChange={setActiveTab}

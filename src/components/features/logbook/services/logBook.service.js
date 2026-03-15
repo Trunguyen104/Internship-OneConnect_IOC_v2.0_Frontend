@@ -25,4 +25,3 @@ export const LogBookService = {
     return httpDelete(`/logbook/${id}`);
   },
 };
-

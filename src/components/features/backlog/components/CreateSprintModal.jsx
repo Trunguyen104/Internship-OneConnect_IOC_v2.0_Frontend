@@ -1,9 +1,10 @@
 import { useCreateSprint } from '../hooks/useCreateSprint';
 import { BacklogItemSelector } from './BacklogItemSelector';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 function FieldLabel({ required, children }) {
   return (
-    <div className='mb-2 text-sm font-semibold text-text'>
+    <div className='text-text mb-2 text-sm font-semibold'>
       {children}
       {required ? <span className='text-primary'> *</span> : null}
     </div>
@@ -16,7 +17,7 @@ function TextInput({ value, onChange, placeholder = '' }) {
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       placeholder={placeholder}
-      className='h-11 w-full rounded-2xl border border-border bg-white px-4 text-sm outline-none focus:border-primary'
+      className='border-border focus:border-primary h-11 w-full rounded-2xl border bg-white px-4 text-sm outline-none'
     />
   );
 }
@@ -63,32 +64,32 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
   if (!open) return null;
 
   return (
-    <div className='fixed inset-0 z-9999 flex items-center justify-center p-4 backdrop-blur-sm bg-black/40 transition-opacity'>
-      <div className='relative w-full max-w-[900px] rounded-3xl bg-white shadow-2xl overflow-hidden flex flex-col'>
-        <div className='flex flex-col h-full max-h-[85vh]'>
-          <div className='px-8 pt-8 pb-4 shrink-0 flex justify-center'>
-            <div className='text-3xl font-bold text-text'>Tạo Sprint mới</div>
+    <div className='fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity'>
+      <div className='relative flex w-full max-w-[900px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl'>
+        <div className='flex h-full max-h-[85vh] flex-col'>
+          <div className='flex shrink-0 justify-center px-8 pt-8 pb-4'>
+            <div className='text-text text-3xl font-bold'>{BACKLOG_UI.CREATE_SPRINT_NEW}</div>
           </div>
 
-          <div className='flex-1 flex flex-col overflow-y-auto px-8 py-2 space-y-6 pb-8'>
-            <div className='flex flex-col md:flex-row gap-8'>
-              <div className='w-[40%] flex flex-col space-y-6'>
+          <div className='flex flex-1 flex-col space-y-6 overflow-y-auto px-8 py-2 pb-8'>
+            <div className='flex flex-col gap-8 md:flex-row'>
+              <div className='flex w-[40%] flex-col space-y-6'>
                 <div>
-                  <FieldLabel required>Tên Sprint</FieldLabel>
+                  <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
                   <TextInput
                     value={sprintName}
                     onChange={setSprintName}
-                    placeholder='Nhập tên Sprint'
+                    placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME}
                   />
                 </div>
 
-                <div className='flex flex-col flex-1'>
-                  <FieldLabel>Mục tiêu Sprint</FieldLabel>
+                <div className='flex flex-1 flex-col'>
+                  <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
                   <textarea
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
-                    placeholder='Nhập mục tiêu Sprint (tùy chọn)'
-                    className='flex-1 min-h-[140px] w-full rounded-2xl border border-border bg-white p-4 text-sm outline-none focus:border-primary resize-none'
+                    placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
+                    className='border-border focus:border-primary min-h-[140px] w-full flex-1 resize-none rounded-2xl border bg-white p-4 text-sm outline-none'
                   />
                 </div>
               </div>
@@ -107,21 +108,21 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
             </div>
           </div>
 
-          <div className='flex items-center justify-between gap-4 border-t border-border/20 bg-white px-8 py-5 shrink-0'>
+          <div className='border-border/20 flex shrink-0 items-center justify-between gap-4 border-t bg-white px-8 py-5'>
             <button
               type='button'
               onClick={handleClose}
-              className='h-12 rounded-full px-10 font-bold text-[#b45656] bg-[#fdf5f5] hover:bg-[#faeae9] transition-colors'
+              className='text-primary bg-primary-50 hover:bg-primary-100 h-12 rounded-full px-10 font-bold transition-colors'
             >
-              Hủy
+              {BACKLOG_UI.CANCEL}
             </button>
             <button
               type='button'
               onClick={handleSubmit}
               disabled={!canSubmit}
-              className='h-12 flex-1 max-w-[400px] ml-auto rounded-full bg-[#c28686] px-8 font-bold text-white transition-opacity disabled:opacity-50 hover:bg-[#b07373]'
+              className='bg-primary hover:bg-primary-hover ml-auto h-12 max-w-[400px] flex-1 rounded-full px-8 font-bold text-white transition-opacity disabled:opacity-50'
             >
-              Tạo Sprint
+              {BACKLOG_UI.CREATE_SPRINT}
             </button>
           </div>
         </div>
@@ -129,4 +130,3 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
     </div>
   );
 }
-

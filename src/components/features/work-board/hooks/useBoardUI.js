@@ -12,9 +12,13 @@ export function useBoardUI() {
   const [selectedTask, setSelectedTask] = useState(null);
 
   return {
-    query, setQuery,
-    activeId, setActiveId,
-    openUpdateTask, setOpenUpdateTask,
-    selectedTask, setSelectedTask
+    query,
+    setQuery,
+    activeId,
+    setActiveId,
+    openUpdateTask,
+    setOpenUpdateTask,
+    selectedTask,
+    setSelectedTask,
   };
 }

@@ -7,14 +7,14 @@ export default function StudentTabs() {
   const pathname = usePathname();
 
   const items = [
-    { label: 'Tóm tắt', href: '/student/space' },
-    { label: 'Bảng công việc', href: '/student/job-board' },
+    { label: 'Summary', href: '/student/space' },
+    { label: 'Work Board', href: '/student/work-board' },
     { label: 'Backlog Board', href: '/student/backlog' },
   ];
 
   return (
     <div className='min-w-0'>
-      <div className='flex gap-3 whitespace-nowrap overflow-x-auto py-1'>
+      <div className='flex gap-3 overflow-x-auto py-1 whitespace-nowrap'>
         {items.map((t) => {
           const active = pathname === t.href || pathname.startsWith(t.href + '/');
 
@@ -24,8 +24,8 @@ export default function StudentTabs() {
               href={t.href}
               className={[
                 // base pill
-                'shrink-0 inline-flex items-center',
-                'px-5 py-3 rounded-2xl',
+                'inline-flex shrink-0 items-center',
+                'rounded-2xl px-5 py-3',
                 'text-sm font-semibold',
                 'border transition-colors duration-150',
                 'shadow-sm',
@@ -36,7 +36,7 @@ export default function StudentTabs() {
                     ' ',
                   ),
 
-                // active — giống "Thông tin chung"
+                // active — matches "General Info"
                 active &&
                   [
                     'bg-[var(--primary-50)]',
@@ -55,4 +55,3 @@ export default function StudentTabs() {
     </div>
   );
 }
-

@@ -64,7 +64,7 @@ export function useCreateSprint(projectId, open) {
           setBacklogItems(enhancedItems);
         } catch (error) {
           console.error('Failed to fetch backlog items', error);
-          toast.error('Lỗi khi tải danh sách Product Backlog');
+          toast.error('Failed to load product backlog list');
         } finally {
           setLoadingItems(false);
         }
@@ -107,7 +107,9 @@ export function useCreateSprint(projectId, open) {
   }, [filteredItems, selectedItemIds]);
 
   const isAllFilteredSelected = useMemo(() => {
-    return filteredItems.length > 0 && filteredItems.every((it) => selectedItemIds.includes(it._id));
+    return (
+      filteredItems.length > 0 && filteredItems.every((it) => selectedItemIds.includes(it._id))
+    );
   }, [filteredItems, selectedItemIds]);
 
   const canSubmit = useMemo(() => sprintName.trim() !== '', [sprintName]);

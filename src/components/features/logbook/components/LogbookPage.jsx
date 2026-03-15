@@ -16,7 +16,6 @@ import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import dayjs from 'dayjs';
-import { useState } from 'react';
 
 export default function LogbookPage() {
   const {
@@ -38,14 +37,15 @@ export default function LogbookPage() {
     internshipId,
     userProfile,
   } = useLogbook();
+
   const toast = useToast();
+  const [form] = Form.useForm();
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [viewRecord, setViewRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [form] = Form.useForm();
 
   const handleCreateOrUpdate = async (values) => {
     setSubmitting(true);
@@ -84,10 +84,8 @@ export default function LogbookPage() {
 
         if (!editingId) {
           setPageNumber(1);
-          fetchLogbooks();
-        } else {
-          fetchLogbooks();
         }
+        fetchLogbooks();
         closeFormModal();
       } else {
         const errorMsg =
@@ -144,11 +142,11 @@ export default function LogbookPage() {
     setIsFormModalOpen(true);
   };
 
-  const closeFormModal = () => {
+  const closeFormModal = useCallback(() => {
     setIsFormModalOpen(false);
     setEditingId(null);
     form.resetFields();
-  };
+  }, [form]);
 
   const openDetailModal = async (record) => {
     try {
@@ -165,10 +163,10 @@ export default function LogbookPage() {
     }
   };
 
-  const closeDetailModal = () => {
+  const closeDetailModal = useCallback(() => {
     setIsDetailModalOpen(false);
     setViewRecord(null);
-  };
+  }, []);
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
@@ -209,32 +207,6 @@ export default function LogbookPage() {
           }}
         />
 
-        <LogbookTable
-          data={data}
-          loading={loading}
-          userProfile={userProfile}
-          onView={openDetailModal}
-          onEdit={openFormModal}
-          onDelete={handleDelete}
-          onTableChange={(pagination, filters, sorter) => {
-            if (sorter.field === 'dateReport' && sorter.order) {
-              setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
-            }
-          }}
-        />
-      </Card>
-
-      <Pagination
-        total={total}
-        page={pageNumber}
-        pageSize={pageSize}
-        totalPages={Math.ceil(total / pageSize)}
-        onPageChange={setPageNumber}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPageNumber(1);
-        }}
-      />
       <LogbookFormModal
         visible={isFormModalOpen}
         editingId={editingId}

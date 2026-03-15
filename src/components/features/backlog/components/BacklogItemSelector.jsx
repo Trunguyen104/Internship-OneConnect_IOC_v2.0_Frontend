@@ -1,8 +1,9 @@
 import React from 'react';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 function FieldLabel({ required, children }) {
   return (
-    <div className='mb-2 text-sm font-semibold text-text'>
+    <div className='text-text mb-2 text-sm font-semibold'>
       {children}
       {required ? <span className='text-primary'> *</span> : null}
     </div>
@@ -21,54 +22,46 @@ export function BacklogItemSelector({
   isAllFilteredSelected,
 }) {
   return (
-    <div className='w-[60%] flex flex-col min-h-[400px] max-h-[500px]'>
-      <div className='flex items-center justify-between mb-2'>
-        <FieldLabel>Chọn Issue vào Sprint ({selectedItemIds.length})</FieldLabel>
+    <div className='flex max-h-[500px] min-h-[400px] w-[60%] flex-col'>
+      <div className='mb-2 flex items-center justify-between'>
+        <FieldLabel>
+          {BACKLOG_UI.SELECT_ISSUE_SPRINT} ({selectedItemIds.length})
+        </FieldLabel>
         <select
           value={selectedEpicId}
           onChange={(e) => setSelectedEpicId(e.target.value)}
-          className='h-9 rounded-[10px] border border-red-800/40 bg-white px-3 py-1 text-sm font-medium outline-none focus:border-red-800 focus:ring-1 focus:ring-red-800 cursor-pointer max-w-[300px] truncate shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all hover:border-red-800/60'
+          className='border-primary/40 focus:border-primary focus:ring-primary hover:border-primary/60 h-9 max-w-[300px] cursor-pointer truncate rounded-[10px] border bg-white px-3 py-1 text-sm font-medium shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all outline-none focus:ring-1'
         >
           <option value='' disabled hidden>
-            Chọn một Epic...
+            {BACKLOG_UI.SELECT_AN_EPIC}
           </option>
           {allEpics.map((epic) => (
-            <option
-              key={epic.id}
-              value={epic.id}
-              title={epic.name || epic.title || 'Unknown'}
-            >
+            <option key={epic.id} value={epic.id} title={epic.name || epic.title || 'Unknown'}>
               {epic.name || epic.title || 'Unknown Epic'}
             </option>
           ))}
         </select>
       </div>
 
-      <div className='flex-1 overflow-y-auto border border-border/60 rounded-xl bg-white shadow-sm'>
+      <div className='border-border/60 flex-1 overflow-y-auto rounded-xl border bg-white shadow-sm'>
         {loadingItems ? (
-          <div className='p-6 text-center text-sm text-slate-500'>
-            Đang tải danh sách...
-          </div>
+          <div className='text-muted p-6 text-center text-sm'>{BACKLOG_UI.LOADING_LIST}</div>
         ) : !selectedEpicId ? (
-          <div className='p-6 text-center text-sm text-slate-500'>
-            Vui lòng chọn một Epic để hiển thị danh sách Issue.
-          </div>
+          <div className='text-muted p-6 text-center text-sm'>{BACKLOG_UI.SELECT_EPIC_PROMPT}</div>
         ) : filteredItems.length === 0 ? (
-          <div className='p-6 text-center text-sm text-slate-500'>
-            Không có Issue nào trong Epic này.
-          </div>
+          <div className='text-muted p-6 text-center text-sm'>{BACKLOG_UI.EMPTY_ISSUES}</div>
         ) : (
-          <div className='divide-y divide-border/20'>
+          <div className='divide-border/20 divide-y'>
             {/* Select All Header */}
-            <label className='flex items-center px-4 py-3 hover:bg-gray-50/80 transition-colors sticky top-0 z-10 border-b border-border/40 cursor-pointer backdrop-blur-md bg-white/95'>
+            <label className='border-border/40 sticky top-0 z-10 flex cursor-pointer items-center border-b bg-white/95 px-4 py-3 backdrop-blur-md transition-colors hover:bg-gray-50/80'>
               <input
                 type='checkbox'
-                className='mr-4 rounded border-gray-300 w-4 h-4 cursor-pointer text-primary focus:ring-primary'
+                className='text-primary focus:ring-primary mr-4 h-4 w-4 cursor-pointer rounded border-gray-300'
                 checked={isAllFilteredSelected}
                 onChange={toggleAll}
               />
-              <span className='text-[14px] font-bold text-gray-800 tracking-wide'>
-                Chọn tất cả
+              <span className='text-[14px] font-bold tracking-wide text-gray-800'>
+                {BACKLOG_UI.SELECT_ALL}
               </span>
             </label>
 
@@ -76,29 +69,29 @@ export function BacklogItemSelector({
             {filteredItems.map((it, idx) => (
               <label
                 key={it._id}
-                className='flex items-start px-4 py-4 hover:bg-gray-50/50 cursor-pointer transition-colors group'
+                className='group flex cursor-pointer items-start px-4 py-4 transition-colors hover:bg-gray-50/50'
               >
                 <input
                   type='checkbox'
-                  className='mt-1 mr-4 rounded border-gray-300 w-4 h-4 cursor-pointer text-primary focus:ring-primary'
+                  className='text-primary focus:ring-primary mt-1 mr-4 h-4 w-4 cursor-pointer rounded border-gray-300'
                   checked={selectedItemIds.includes(it._id)}
                   onChange={() => toggleSelection(it._id)}
                 />
-                <div className='min-w-0 flex-1 flex flex-col gap-2'>
+                <div className='flex min-w-0 flex-1 flex-col gap-2'>
                   <div className='flex items-center gap-3'>
-                    <span className='text-[12px] font-bold text-gray-400 shrink-0 uppercase tracking-wider'>
+                    <span className='shrink-0 text-[12px] font-bold tracking-wider text-gray-400 uppercase'>
                       {it.key || `ISSUE-${idx + 1}`}
                     </span>
                     <span
-                      className='text-[14px] font-semibold text-text truncate transition-colors'
+                      className='text-text truncate text-[14px] font-semibold transition-colors'
                       dangerouslySetInnerHTML={{
                         __html: it.title || it.name || 'Untitled Issue',
                       }}
                     />
                   </div>
                   <div className='flex items-center gap-2'>
-                    <span className='inline-flex items-center justify-center px-2 py-0.5 rounded border border-purple-200 text-purple-600 bg-purple-50 text-[11px] font-semibold truncate'>
-                      {it.epicName || 'Epic'}
+                    <span className='inline-flex items-center justify-center truncate rounded border border-purple-200 bg-purple-50 px-2 py-0.5 text-[11px] font-semibold text-purple-600'>
+                      {it.epicName || BACKLOG_UI.TYPE_EPIC}
                     </span>
                   </div>
                 </div>

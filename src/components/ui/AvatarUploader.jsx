@@ -89,4 +89,3 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
     </ImgCrop>
   );
 }
-

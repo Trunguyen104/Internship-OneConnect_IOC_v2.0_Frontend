@@ -1,12 +1,6 @@
 import React from 'react';
 
-const Badge = ({
-  children,
-  variant = 'default',
-  size = 'md',
-  className = '',
-  icon,
-}) => {
+const Badge = ({ children, variant = 'default', size = 'md', className = '', icon }) => {
   const baseStyles = 'inline-flex items-center font-semibold rounded-full';
 
   const variants = {
@@ -32,12 +26,13 @@ const Badge = ({
   const sizeStyles = sizes[size] || sizes.md;
 
   return (
-    <span className={`${baseStyles} ${variantStyles} ${sizeStyles} uppercase tracking-wide ${className}`}>
-      {icon && <span className="mr-1.5">{icon}</span>}
+    <span
+      className={`${baseStyles} ${variantStyles} ${sizeStyles} tracking-wide uppercase ${className}`}
+    >
+      {icon && <span className='mr-1.5'>{icon}</span>}
       {children}
     </span>
   );
 };
 
 export default Badge;
-

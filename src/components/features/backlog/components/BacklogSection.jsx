@@ -2,49 +2,52 @@ import { useDroppable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { WorkItem, ColumnHeaders } from './WorkItem';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { BACKLOG_UI } from '@/constants/backlog';
 
 export function BacklogSection({
   filteredBacklogItems,
   projectId,
   itemOrders,
   handleQuickCreateSprint,
+  handleDeleteWorkItem,
   setSelectedTask,
   setOpenUpdateTask,
   setActiveSprintForTask,
-  setOpenCreateTask
+  setOpenCreateTask,
 }) {
   const { isOver, setNodeRef } = useDroppable({
     id: 'BACKLOG',
   });
 
   return (
-    <div 
+    <div
       ref={setNodeRef}
-      className={`rounded-3xl bg-white border shadow-sm p-6 mt-8 transition-colors ${
-        isOver ? 'bg-blue-50/50 border-primary border-dashed' : 'border-gray-100'
+      className={`mt-8 rounded-3xl border bg-white p-6 shadow-sm transition-colors ${
+        isOver ? 'border-primary border-dashed bg-blue-50/50' : 'border-gray-100'
       }`}
     >
-      <div className='flex items-center mb-6 pl-2 pr-1'>
-        <div className='w-4 h-4 rounded border border-gray-300 mr-4 flex-shrink-0' />
-        <h3 className='text-[16px] font-bold text-gray-900'>Backlog</h3>
+      <div className='mb-6 flex items-center pr-1 pl-2'>
+        <div className='mr-4 h-4 w-4 flex-shrink-0 rounded border border-gray-300' />
+        <h3 className='text-[16px] font-bold text-gray-900'>{BACKLOG_UI.BACKLOG_TITLE}</h3>
         <div className='flex-1' />
         <div className='flex items-center gap-3'>
           <button
             onClick={handleQuickCreateSprint}
-            className='h-[34px] px-5 border border-gray-200 bg-white rounded-full text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm'
+            className='h-[34px] rounded-full border border-gray-200 bg-white px-5 text-[13px] font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50'
           >
-            Tạo Sprint
+            {BACKLOG_UI.CREATE_SPRINT}
           </button>
         </div>
       </div>
 
       <ColumnHeaders />
-      <div className='min-h-[50px] mb-4'>
+      <div className='mb-4 min-h-[50px]'>
         {filteredBacklogItems.map((it) => (
           <WorkItem
             key={it.workItemId || it.id}
             it={it}
             itemOrder={itemOrders[it.workItemId || it.id]}
+            onDelete={() => handleDeleteWorkItem?.(it.workItemId || it.id)}
             onClick={async (task) => {
               try {
                 const res = await productBacklogService.getWorkItemById(
@@ -61,26 +64,24 @@ export function BacklogSection({
           />
         ))}
         {isOver && (
-          <div className='h-16 border-2 border-dashed border-primary/30 rounded-xl bg-primary/5 flex items-center justify-center text-primary text-sm font-medium'>
-            Thả vào đây để đưa về Backlog
+          <div className='border-primary/30 bg-primary/5 text-primary flex h-16 items-center justify-center rounded-xl border-2 border-dashed text-sm font-medium'>
+            {BACKLOG_UI.DROP_TO_BACKLOG}
           </div>
         )}
       </div>
 
-      <div className='flex items-center gap-6 mt-4 pl-2'>
+      <div className='mt-4 flex items-center gap-6 pl-2'>
         <button
           onClick={() => {
             setActiveSprintForTask(null); // Backlog implies null sprint
             setOpenCreateTask(true);
           }}
-          className='flex items-center gap-2 px-4 py-2 rounded-lg transition-colors font-medium
-bg-primary text-white hover:bg-primary-hover active:bg-primary-700'
+          className='bg-primary hover:bg-primary-hover active:bg-primary-700 flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-colors'
         >
-          <Plus className='w-4 h-4' />
-          Tạo nhiệm vụ
+          <Plus className='h-4 w-4' />
+          {BACKLOG_UI.CREATE_TASK}
         </button>
       </div>
     </div>
   );
 }
-

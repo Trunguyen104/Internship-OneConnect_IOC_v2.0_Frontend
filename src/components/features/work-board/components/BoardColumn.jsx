@@ -5,18 +5,18 @@ import { SortableIssueCard } from './IssueCard';
 export function BoardColumn({ column, tasks, onCardClick }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
   return (
-    <div className='flex flex-col w-full h-full'>
-      <div className='flex items-center gap-2 mb-3'>
-        <span className='text-sm font-bold text-gray-700'>{column.title}</span>
-        <span className='text-[11px] font-bold bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full'>
+    <div className='flex h-full w-full flex-col'>
+      <div className='mb-3 flex items-center gap-3'>
+        <span className='text-text text-[15px] leading-none font-bold'>{column.title}</span>
+        <div className='bg-surface border-border/60 text-muted flex h-6 min-w-[24px] items-center justify-center rounded-full border px-1.5 text-[11px] font-bold shadow-sm'>
           {tasks.length}
-        </span>
+        </div>
       </div>
-      <div className={`h-1 w-full ${column.underline} mb-4 rounded-full opacity-80`} />
+      <div className={`${column.underline} mb-5 h-[3px] w-full rounded-full opacity-80`} />
       <div
         ref={setNodeRef}
-        className={`flex flex-col gap-4 p-1 min-h-[calc(100vh-300px)] transition-colors rounded-xl ${
-          isOver ? 'bg-gray-50/50' : 'bg-transparent'
+        className={`flex min-h-[calc(100vh-320px)] flex-col gap-4 rounded-xl transition-colors ${
+          isOver ? 'bg-gray-100/30' : 'bg-transparent'
         }`}
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>

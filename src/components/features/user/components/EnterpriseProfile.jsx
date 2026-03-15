@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import {
   EnvironmentOutlined,
@@ -9,6 +9,8 @@ import {
   CloseOutlined,
   HistoryOutlined,
 } from '@ant-design/icons';
+
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave, isSaving }) {
   const [formData, setFormData] = useState({
@@ -21,7 +23,12 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
 
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
+  const [prevEditMode, setPrevEditMode] = useState(editMode);
+  const [prevProfile, setPrevProfile] = useState(profile);
+
+  if (editMode !== prevEditMode || profile !== prevProfile) {
+    setPrevEditMode(editMode);
+    setPrevProfile(profile);
     if (editMode) {
       setFormData({
         name: profile?.name || '',
@@ -32,7 +39,7 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
       });
       setErrors({});
     }
-  }, [editMode, profile]);
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,13 +53,13 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
   const validate = () => {
     const newErrors = {};
     if (formData.website && !/^https?:\/\/.*/.test(formData.website)) {
-      newErrors.website = 'Website must be a valid URL starting with http:// or https://';
+      newErrors.website = PROFILE_UI.ENTERPRISE.ERRORS.WEBSITE;
     }
     if (formData.description && formData.description.length > 2000) {
-      newErrors.description = 'Description cannot exceed 2000 characters';
+      newErrors.description = PROFILE_UI.ENTERPRISE.ERRORS.DESCRIPTION;
     }
     if (!formData.name.trim()) {
-      newErrors.name = 'Company Name is required';
+      newErrors.name = PROFILE_UI.ENTERPRISE.ERRORS.NAME;
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -66,9 +73,9 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
   };
 
   return (
-    <div className='w-full max-w-7xl mx-auto pb-12 animate-fade-in'>
+    <div className='animate-fade-in mx-auto w-full max-w-7xl pb-12'>
       {/* Banner Section */}
-      <div className='relative h-64 md:h-80 w-full bg-[var(--color-primary)]'>
+      <div className='bg-primary relative h-64 w-full md:h-80'>
         {profile?.backgroundUrl ? (
           <Image
             src={profile.backgroundUrl}
@@ -78,7 +85,7 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
             priority
           />
         ) : (
-          <div className='absolute inset-0 bg-gradient-to-r from-red-800 to-red-600 opacity-90' />
+          <div className='bg-primary/90 absolute inset-0' />
         )}
 
         {/* Banner Overlay Controls */}
@@ -86,40 +93,41 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
           {!editMode ? (
             <button
               onClick={onEdit}
-              className='flex items-center gap-2 px-4 py-2 bg-white text-[var(--color-primary)] rounded-lg font-bold shadow-md hover:bg-gray-50 transition-colors'
+              className='bg-bg text-primary hover:bg-surface flex items-center gap-2 rounded-lg px-4 py-2 font-bold shadow-md transition-colors'
             >
-              <EditOutlined /> Edit Profile
+              <EditOutlined /> {PROFILE_UI.ENTERPRISE.EDIT_PROFILE}
             </button>
           ) : (
             <>
               <button
                 onClick={onCancel}
                 disabled={isSaving}
-                className='flex items-center gap-2 px-4 py-2 bg-white text-gray-600 rounded-lg font-bold shadow-md hover:bg-gray-50 transition-colors disabled:opacity-50'
+                className='bg-bg text-muted hover:bg-surface flex items-center gap-2 rounded-lg px-4 py-2 font-bold shadow-md transition-colors disabled:opacity-50'
               >
-                <CloseOutlined /> Cancel
+                <CloseOutlined /> {PROFILE_UI.BUTTONS.CANCEL}
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isSaving}
-                className='flex items-center gap-2 px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg font-bold shadow-md hover:bg-[var(--color-primary-hover)] transition-colors disabled:opacity-50'
+                className='bg-primary hover:bg-primary/90 flex items-center gap-2 rounded-lg px-4 py-2 font-bold text-white shadow-md transition-colors disabled:opacity-50'
               >
-                <SaveOutlined /> {isSaving ? 'Saving...' : 'Save'}
+                <SaveOutlined />{' '}
+                {isSaving ? PROFILE_UI.ENTERPRISE.SAVING : PROFILE_UI.ENTERPRISE.SAVE}
               </button>
             </>
           )}
         </div>
       </div>
 
-      <div className='px-8 -mt-20 relative z-10'>
+      <div className='relative z-10 -mt-20 px-8'>
         {/* Profile Header (Logo & Title) */}
-        <div className='flex flex-col md:flex-row md:items-end gap-6 mb-8'>
-          <div className='w-40 h-40 rounded-2xl bg-white p-2 shadow-lg border-4 border-white flex-shrink-0'>
-            <div className='w-full h-full relative rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center'>
+        <div className='mb-8 flex flex-col gap-6 md:flex-row md:items-end'>
+          <div className='h-40 w-40 flex-shrink-0 rounded-2xl border-4 border-white bg-white p-2 shadow-lg'>
+            <div className='bg-surface relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl'>
               {profile?.logoUrl ? (
                 <Image src={profile.logoUrl} alt='Logo' fill className='object-contain p-2' />
               ) : (
-                <span className='text-4xl text-gray-300 font-bold'>LOGO</span>
+                <span className='text-muted text-4xl font-bold'>LOGO</span>
               )}
             </div>
           </div>
@@ -132,21 +140,21 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
                   name='name'
                   value={formData.name}
                   onChange={handleChange}
-                  className={`text-3xl font-black text-gray-900 bg-white border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 py-1 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-red-200`}
-                  placeholder='Company Name'
+                  className={`border-border bg-bg text-text focus:ring-primary/20 w-full max-w-md rounded-md border px-3 py-1 text-3xl font-black outline-none focus:ring-2 ${errors.name ? 'border-danger' : 'border-border'}`}
+                  placeholder={PROFILE_UI.ENTERPRISE.COMPANY_NAME_PLACEHOLDER}
                 />
-                {errors.name && <p className='text-red-500 text-sm mt-1'>{errors.name}</p>}
+                {errors.name && <p className='text-danger mt-1 text-sm'>{errors.name}</p>}
               </div>
             ) : (
-              <h1 className='text-3xl font-black text-gray-900 mb-2'>
-                {profile?.name || 'Unknown Company'}
+              <h1 className='text-text mb-2 text-3xl font-black'>
+                {profile?.name || PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
               </h1>
             )}
 
             <div className='flex flex-wrap gap-3'>
               {/* Badges */}
               {(editMode ? formData.industry : profile?.industry) && (
-                <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold border border-blue-100'>
+                <span className='bg-primary/10 text-primary border-primary/20 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold'>
                   <SolutionOutlined />
                   {editMode ? (
                     <input
@@ -154,8 +162,8 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
                       name='industry'
                       value={formData.industry}
                       onChange={handleChange}
-                      className='bg-transparent outline-none w-32'
-                      placeholder='Industry'
+                      className='w-32 bg-transparent outline-none'
+                      placeholder={PROFILE_UI.ENTERPRISE.INDUSTRY}
                     />
                   ) : (
                     profile.industry
@@ -164,7 +172,7 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
               )}
 
               {(editMode ? formData.headquater : profile?.headquater) && (
-                <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-semibold border border-gray-200'>
+                <span className='bg-muted/10 text-muted border-border inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold'>
                   <EnvironmentOutlined />
                   {editMode ? (
                     <input
@@ -172,8 +180,8 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
                       name='headquater'
                       value={formData.headquater}
                       onChange={handleChange}
-                      className='bg-transparent outline-none w-40'
-                      placeholder='Headquarters'
+                      className='w-40 bg-transparent outline-none'
+                      placeholder={PROFILE_UI.ENTERPRISE.HEADQUARTERS}
                     />
                   ) : (
                     profile.headquater
@@ -185,12 +193,12 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
         </div>
 
         {/* Content Rest */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
           {/* Main Column */}
-          <div className='lg:col-span-2 space-y-8'>
+          <div className='space-y-8 lg:col-span-2'>
             {/* Company Overview Card */}
-            <div className='bg-white rounded-2xl shadow-sm border border-[var(--color-border)] p-6'>
-              <h2 className='text-xl font-bold text-gray-800 mb-4'>Company Overview</h2>
+            <div className='border-border rounded-2xl border bg-white p-6 shadow-sm'>
+              <h2 className='text-text mb-4 text-xl font-bold'>{PROFILE_UI.ENTERPRISE.OVERVIEW}</h2>
               {editMode ? (
                 <div>
                   <textarea
@@ -198,36 +206,34 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
                     value={formData.description}
                     onChange={handleChange}
                     rows={6}
-                    className={`w-full border ${errors.description ? 'border-red-500' : 'border-gray-200'} rounded-lg p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-200`}
-                    placeholder='Describe your company (max 2000 characters)'
+                    className={`focus:ring-primary/20 text-text w-full rounded-lg border p-3 outline-none focus:ring-2 ${errors.description ? 'border-danger' : 'border-border'}`}
+                    placeholder={PROFILE_UI.ENTERPRISE.DESCRIPTION_PLACEHOLDER}
                   />
-                  <div className='flex justify-between mt-1'>
+                  <div className='mt-1 flex justify-between'>
                     {errors.description ? (
-                      <span className='text-red-500 text-sm'>{errors.description}</span>
+                      <span className='text-danger text-sm'>{errors.description}</span>
                     ) : (
                       <span></span>
                     )}
-                    <span className='text-gray-400 text-sm'>
-                      {formData.description.length}/2000
-                    </span>
+                    <span className='text-muted text-sm'>{formData.description.length}/2000</span>
                   </div>
                 </div>
               ) : (
-                <div className='text-gray-600 leading-relaxed whitespace-pre-wrap'>
-                  {profile?.description || 'No description provided.'}
+                <div className='text-text leading-relaxed whitespace-pre-wrap'>
+                  {profile?.description || PROFILE_UI.ENTERPRISE.NO_DESCRIPTION}
                 </div>
               )}
             </div>
 
             {/* Recent Activities Card */}
-            <div className='bg-white rounded-2xl shadow-sm border border-[var(--color-border)] p-6'>
-              <div className='flex items-center gap-2 mb-6'>
-                <HistoryOutlined className='text-xl text-[var(--color-primary)]' />
-                <h2 className='text-xl font-bold text-gray-800'>Recent Activities</h2>
+            <div className='border-border rounded-2xl border bg-white p-6 shadow-sm'>
+              <div className='mb-6 flex items-center gap-2'>
+                <HistoryOutlined className='text-primary text-xl' />
+                <h2 className='text-text text-xl font-bold'>{PROFILE_UI.ENTERPRISE.ACTIVITIES}</h2>
               </div>
 
-              <div className='flex flex-col items-center justify-center py-10 text-gray-400'>
-                <p>No recent activities found.</p>
+              <div className='text-muted flex flex-col items-center justify-center py-10'>
+                <p>{PROFILE_UI.ENTERPRISE.NO_ACTIVITIES}</p>
               </div>
             </div>
           </div>
@@ -235,34 +241,36 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
           {/* Right Sidebar Column */}
           <div className='space-y-8'>
             {/* Information Card */}
-            <div className='bg-white rounded-2xl shadow-sm border border-[var(--color-border)] p-6'>
-              <h2 className='text-xl font-bold text-gray-800 mb-4'>Information</h2>
+            <div className='border-border rounded-2xl border bg-white p-6 shadow-sm'>
+              <h2 className='text-text mb-4 text-xl font-bold'>{PROFILE_UI.ENTERPRISE.INFO}</h2>
 
               <div className='space-y-5'>
                 {/* Tax Code - Always Disabled */}
                 <div>
-                  <label className='block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1'>
-                    Tax Code
+                  <label className='text-muted mb-1 block text-xs font-bold tracking-wider uppercase'>
+                    {PROFILE_UI.ENTERPRISE.TAX_CODE}
                   </label>
-                  <div className='text-gray-900 font-medium px-3 py-2 bg-gray-50 rounded-lg border border-gray-100'>
+                  <div className='bg-surface border-border text-text rounded-lg border px-3 py-2 font-medium'>
                     {profile?.taxCode || 'N/A'}
                   </div>
                   {editMode && (
-                    <p className='text-xs text-gray-400 mt-1 italic'>Tax code cannot be changed.</p>
+                    <p className='text-muted mt-1 text-xs italic'>
+                      {PROFILE_UI.ENTERPRISE.TAX_CODE_HINT}
+                    </p>
                   )}
                 </div>
 
                 {/* Website */}
                 <div>
-                  <label className='block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1'>
-                    Website
+                  <label className='text-muted mb-1 block text-xs font-bold tracking-wider uppercase'>
+                    {PROFILE_UI.ENTERPRISE.WEBSITE}
                   </label>
                   {editMode ? (
                     <>
                       <div
-                        className={`flex items-center border ${errors.website ? 'border-red-500' : 'border-gray-300'} rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-red-200`}
+                        className={`focus-within:ring-primary/20 flex items-center overflow-hidden rounded-lg border transition-shadow focus-within:ring-2 ${errors.website ? 'border-danger' : 'border-border'}`}
                       >
-                        <span className='px-3 bg-gray-50 border-r border-gray-200 text-gray-400'>
+                        <span className='bg-surface border-border text-muted border-r px-3'>
                           <GlobalOutlined />
                         </span>
                         <input
@@ -270,28 +278,30 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
                           name='website'
                           value={formData.website}
                           onChange={handleChange}
-                          className='w-full px-3 py-2 focus:outline-none'
-                          placeholder='https://example.com'
+                          className='bg-bg text-text w-full px-3 py-2 outline-none'
+                          placeholder={PROFILE_UI.ENTERPRISE.WEBSITE_PLACEHOLDER}
                         />
                       </div>
                       {errors.website && (
-                        <p className='text-red-500 text-xs mt-1'>{errors.website}</p>
+                        <p className='text-danger mt-1 text-xs'>{errors.website}</p>
                       )}
                     </>
                   ) : (
-                    <div className='flex items-center gap-2 text-gray-900'>
-                      <GlobalOutlined className='text-gray-400' />
+                    <div className='text-text flex items-center gap-2'>
+                      <GlobalOutlined className='text-muted' />
                       {profile?.website ? (
                         <a
                           href={profile.website}
                           target='_blank'
                           rel='noopener noreferrer'
-                          className='font-medium text-[var(--color-info)] hover:underline'
+                          className='text-info font-medium hover:underline'
                         >
                           {profile.website}
                         </a>
                       ) : (
-                        <span className='text-gray-400 italic'>Not provided</span>
+                        <span className='text-muted italic'>
+                          {PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
+                        </span>
                       )}
                     </div>
                   )}
@@ -304,4 +314,3 @@ export function EnterpriseProfile({ profile, editMode, onEdit, onCancel, onSave,
     </div>
   );
 }
-

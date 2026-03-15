@@ -9,7 +9,7 @@ import { useBacklogUI } from './useBacklogUI';
  */
 export function useBacklogBoard() {
   const toast = useToast();
-  
+
   // 1. Data Logic
   const data = useBacklogData();
   const { projectId, sprints, setSprints, backlogItems, setBacklogItems, fetchData } = data;
@@ -49,20 +49,59 @@ export function useBacklogBoard() {
 
   // Actions
   const handleDeleteSprint = async (sprintId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa Sprint này không? Các nhiệm vụ bên trong sẽ quay về Backlog.'))
-      return;
-
     try {
       const res = await productBacklogService.deleteSprint(projectId, sprintId);
       if (res && res.isSuccess !== false) {
-        toast.success('Xóa Sprint thành công');
+        toast.success('Sprint deleted successfully');
         setSprints((prev) => prev.filter((s) => s.sprintId !== sprintId));
         fetchData(projectId, false);
       } else {
-        toast.error(res.message || 'Không thể xóa Sprint');
+        toast.error(res.message || 'Unable to delete sprint');
       }
-    } catch (err) {
-      toast.error('Lỗi server khi xóa Sprint');
+    } catch {
+      toast.error('Server error while deleting sprint');
+    }
+  };
+
+  const handleDeleteEpic = async (epicId) => {
+    try {
+      const res = await productBacklogService.deleteEpic(projectId, epicId);
+      if (res && res.isSuccess !== false) {
+        toast.success('Epic deleted successfully');
+        fetchData(projectId, false);
+      } else {
+        toast.error(res.message || 'Unable to delete epic');
+      }
+    } catch {
+      toast.error('Server error while deleting epic');
+    }
+  };
+
+  const handleDeleteWorkItem = async (workItemId) => {
+    if (!workItemId) return;
+
+    // Optimistic local update
+    setBacklogItems((prev) => prev.filter((it) => (it.workItemId || it.id) !== workItemId));
+    setSprints((prev) =>
+      prev.map((s) => ({
+        ...s,
+        items: (s.items || []).filter((it) => (it.workItemId || it.id) !== workItemId),
+      })),
+    );
+
+    try {
+      const res = await productBacklogService.deleteWorkItem(projectId, workItemId);
+      if (res?.isSuccess === false) {
+        toast.error(res?.message || 'Unable to delete work item');
+        fetchData(projectId, false);
+        return;
+      }
+
+      toast.success('Work item deleted successfully');
+      fetchData(projectId, false);
+    } catch {
+      toast.error('Server error while deleting work item');
+      fetchData(projectId, false);
     }
   };
 
@@ -77,102 +116,122 @@ export function useBacklogBoard() {
   };
 
   // Drag and Drop Handler
-  const handleDragEnd = useCallback(async (event) => {
-    const { active, over } = event;
-    if (!over) return;
+  const handleDragEnd = useCallback(
+    async (event) => {
+      const { active, over } = event;
+      if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
+      const activeId = active.id;
+      const overId = over.id;
 
-    let sourceSprintId = null;
-    let draggedItem = null;
+      let sourceSprintId = null;
+      let draggedItem = null;
 
-    // Find the source and the item
-    for (const s of sprints) {
-      const found = (s.items || []).find((it) => (it.workItemId || it.id) === activeId);
-      if (found) {
-        sourceSprintId = s.sprintId;
-        draggedItem = { ...found, workItemId: found.workItemId || found.id };
-        break;
-      }
-    }
-
-    if (!draggedItem) {
-      const found = backlogItems.find((it) => (it.workItemId || it.id) === activeId);
-      if (found) {
-        draggedItem = { ...found, workItemId: found.workItemId || found.id };
-      }
-    }
-
-    if (!draggedItem) return;
-    
-    const workItemId = draggedItem.workItemId;
-
-    // Destination logic
-    if (overId === 'BACKLOG') {
-      if (sourceSprintId === null) return;
-
-      try {
-        // Optimistic local update
-        setSprints(prev => prev.map(s => 
-          s.sprintId === sourceSprintId 
-            ? { ...s, items: s.items.filter(it => (it.workItemId || it.id) !== activeId) }
-            : s
-        ));
-        setBacklogItems(prev => [...prev, draggedItem]);
-
-        const res = await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
-        if (res?.isSuccess === false || res?.success === false) {
-          throw new Error(res.message || 'Không thể chuyển về Backlog');
+      // Find the source and the item
+      for (const s of sprints) {
+        const found = (s.items || []).find((it) => (it.workItemId || it.id) === activeId);
+        if (found) {
+          sourceSprintId = s.sprintId;
+          draggedItem = { ...found, workItemId: found.workItemId || found.id };
+          break;
         }
-        toast.success('Đã chuyển nhiệm vụ về Backlog');
-      } catch (err) {
-        toast.error(err.message || 'Lỗi khi chuyển về Backlog');
-        fetchData(projectId, false);
       }
-    } else {
-      const targetSprintId = overId;
-      if (sourceSprintId === targetSprintId) return;
 
-      try {
-        // Optimistic local update
-        if (sourceSprintId) {
-          setSprints(prev => prev.map(s => 
-            s.sprintId === sourceSprintId 
-              ? { ...s, items: s.items.filter(it => (it.workItemId || it.id) !== activeId) }
-              : s.sprintId === targetSprintId
-              ? { ...s, items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }] }
-              : s
-          ));
-        } else {
-          setBacklogItems(prev => prev.filter(it => (it.workItemId || it.id) !== activeId));
-          setSprints(prev => prev.map(s => 
-            s.sprintId === targetSprintId
-              ? { ...s, items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }] }
-              : s
-          ));
+      if (!draggedItem) {
+        const found = backlogItems.find((it) => (it.workItemId || it.id) === activeId);
+        if (found) {
+          draggedItem = { ...found, workItemId: found.workItemId || found.id };
         }
-
-        const res = await productBacklogService.moveWorkItemToSprint(projectId, workItemId, targetSprintId);
-        if (res?.isSuccess === false || res?.success === false) {
-          throw new Error(res.message || 'Không thể chuyển vào Sprint');
-        }
-        toast.success('Đã chuyển nhiệm vụ vào Sprint');
-      } catch (err) {
-        toast.error(err.message || 'Lỗi khi chuyển vào Sprint');
-        fetchData(projectId, false);
       }
-    }
-  }, [projectId, sprints, backlogItems, setSprints, setBacklogItems, fetchData, toast]);
+
+      if (!draggedItem) return;
+
+      const workItemId = draggedItem.workItemId;
+
+      // Destination logic
+      if (overId === 'BACKLOG') {
+        if (sourceSprintId === null) return;
+
+        try {
+          // Optimistic local update
+          setSprints((prev) =>
+            prev.map((s) =>
+              s.sprintId === sourceSprintId
+                ? { ...s, items: s.items.filter((it) => (it.workItemId || it.id) !== activeId) }
+                : s,
+            ),
+          );
+          setBacklogItems((prev) => [...prev, draggedItem]);
+
+          const res = await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
+          if (res?.isSuccess === false || res?.success === false) {
+            throw new Error(res.message || 'Unable to move to backlog');
+          }
+          toast.success('Moved item to backlog');
+        } catch (err) {
+          toast.error(err.message || 'Error moving to backlog');
+          fetchData(projectId, false);
+        }
+      } else {
+        const targetSprintId = overId;
+        if (sourceSprintId === targetSprintId) return;
+
+        try {
+          // Optimistic local update
+          if (sourceSprintId) {
+            setSprints((prev) =>
+              prev.map((s) =>
+                s.sprintId === sourceSprintId
+                  ? { ...s, items: s.items.filter((it) => (it.workItemId || it.id) !== activeId) }
+                  : s.sprintId === targetSprintId
+                    ? {
+                        ...s,
+                        items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }],
+                      }
+                    : s,
+              ),
+            );
+          } else {
+            setBacklogItems((prev) => prev.filter((it) => (it.workItemId || it.id) !== activeId));
+            setSprints((prev) =>
+              prev.map((s) =>
+                s.sprintId === targetSprintId
+                  ? {
+                      ...s,
+                      items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }],
+                    }
+                  : s,
+              ),
+            );
+          }
+
+          const res = await productBacklogService.moveWorkItemToSprint(
+            projectId,
+            workItemId,
+            targetSprintId,
+          );
+          if (res?.isSuccess === false || res?.success === false) {
+            throw new Error(res.message || 'Unable to move to sprint');
+          }
+          toast.success('Moved item to sprint');
+        } catch (err) {
+          toast.error(err.message || 'Error moving to sprint');
+          fetchData(projectId, false);
+        }
+      }
+    },
+    [projectId, sprints, backlogItems, setSprints, setBacklogItems, fetchData, toast],
+  );
 
   return {
     ...data,
     ...ui,
     itemOrders,
     handleDeleteSprint,
+    handleDeleteEpic,
+    handleDeleteWorkItem,
     handleSprintActionClick,
     handleQuickCreateSprint,
-    handleDragEnd
+    handleDragEnd,
   };
 }
-

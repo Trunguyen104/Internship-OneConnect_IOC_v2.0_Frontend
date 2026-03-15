@@ -1,13 +1,22 @@
 'use client';
 
-import { Modal } from 'antd';
+import React, { memo } from 'react';
+import { Modal, Typography, Divider, Avatar } from 'antd';
+import {
+  FileSearchOutlined,
+  SolutionOutlined,
+  InfoCircleOutlined,
+  RocketOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import LogbookStatusTag from './LogbookStatusTag';
 
-// const { Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
-export default function LogbookDetailModal({ visible, record, onClose }) {
+const LogbookDetailModal = memo(function LogbookDetailModal({ visible, record, onClose }) {
+  const { VIEW_MODAL, TABLE, FORM } = DAILY_REPORT_UI;
+
   return (
     <Modal
       open={visible}
@@ -15,41 +24,83 @@ export default function LogbookDetailModal({ visible, record, onClose }) {
       footer={null}
       width={720}
       centered
-      destroyOnHidden
-      title={
-        <div className='flex items-center gap-3 border-b border-gray-100 pb-3'>
-          <div>
-            <h3 className='text-lg font-semibold text-gray-900'>
-              {DAILY_REPORT_UI.VIEW_MODAL.TITLE}
-            </h3>
-            <p className='text-sm text-gray-500'>
-              {record ? dayjs(record.dateReport).format('DD/MM/YYYY') : ''}
-            </p>
-          </div>
-        </div>
-      }
+      destroyOnClose
+      className='modal-custom'
     >
+      <div className='mb-6 flex flex-col items-center gap-3 text-center'>
+        <div className='bg-primary/10 flex size-14 items-center justify-center rounded-2xl'>
+          <FileSearchOutlined className='text-primary text-3xl' />
+        </div>
+        <div>
+          <Title level={4} className='text-text mb-1'>
+            {VIEW_MODAL.TITLE}
+          </Title>
+          <Text className='text-muted text-xs italic'>
+            {record ? dayjs(record.dateReport).format('DD/MM/YYYY') : ''}
+          </Text>
+        </div>
+      </div>
+
       {record && (
-        <div className='mt-4 max-h-[60vh] space-y-6 overflow-y-auto pr-2'>
-          <div className='grid grid-cols-2 gap-6 border-b border-gray-100 pb-4'>
-            <div>
-              <p className='text-sm font-medium text-gray-500'>{DAILY_REPORT_UI.TABLE.STUDENT}</p>
-              <p className='text-base font-semibold text-gray-900'>{record.studentName || 'N/A'}</p>
+        <div className='space-y-8 px-2 pb-4'>
+          <Divider className='border-border m-0' />
+
+          <div className='bg-muted/5 border-border flex items-center justify-between gap-4 rounded-2xl border p-5'>
+            <div className='flex items-center gap-4'>
+              <Avatar
+                size={56}
+                className='bg-primary text-surface border-surface border-4 text-lg font-bold shadow-xl'
+              >
+                {record.studentName?.[0].toUpperCase()}
+              </Avatar>
+              <div>
+                <Text className='text-muted block text-xs font-bold tracking-wider uppercase'>
+                  {TABLE.STUDENT}
+                </Text>
+                <Title level={5} className='text-text !m-0'>
+                  {record.studentName || 'N/A'}
+                </Title>
+              </div>
             </div>
 
-            <div>
-              <p className='text-sm font-medium text-gray-500'>{DAILY_REPORT_UI.TABLE.STATUS}</p>
+            <div className='text-right'>
+              <Text className='text-muted mb-1 block text-xs font-bold tracking-wider uppercase'>
+                {TABLE.STATUS}
+              </Text>
               <LogbookStatusTag status={record.status} />
             </div>
           </div>
 
-          <section className='space-y-2'>
-            <h4 className='font-semibold text-gray-800'>{DAILY_REPORT_UI.FORM.SUMMARY}</h4>
+          <div className='grid gap-6'>
+            <section className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
+              <div className='bg-muted/5 border-border flex items-center gap-2 border-b px-5 py-3'>
+                <SolutionOutlined className='text-primary' />
+                <Text className='text-text text-sm font-bold tracking-tight uppercase'>
+                  {FORM.SUMMARY}
+                </Text>
+              </div>
+              <div className='p-5'>
+                <Paragraph className='text-text mb-0 text-[15px] leading-relaxed whitespace-pre-wrap'>
+                  {record.summary || VIEW_MODAL.NO_SUMMARY}
+                </Paragraph>
+              </div>
+            </section>
 
-            <div className='rounded-lg border border-gray-100 bg-gray-50 p-4 whitespace-pre-wrap text-gray-700'>
-              {record.summary || DAILY_REPORT_UI.VIEW_MODAL.NO_SUMMARY}
-            </div>
-          </section>
+            <section className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
+              <div className='bg-muted/5 border-border flex items-center gap-2 border-b px-5 py-3'>
+                <InfoCircleOutlined className='text-warning' />
+                <Text className='text-text text-sm font-bold tracking-tight uppercase'>
+                  {FORM.ISSUE}
+                </Text>
+              </div>
+              <div className='p-5'>
+                <Paragraph
+                  className={`mb-0 text-[15px] leading-relaxed whitespace-pre-wrap ${record.issue ? 'text-text' : 'text-muted italic'}`}
+                >
+                  {record.issue || 'Không có vấn đề nào báo cáo.'}
+                </Paragraph>
+              </div>
+            </section>
 
           <section className='space-y-2'>
             <h4 className='font-semibold text-gray-800'>{DAILY_REPORT_UI.FORM.ISSUE}</h4>
@@ -90,4 +141,6 @@ export default function LogbookDetailModal({ visible, record, onClose }) {
       )}
     </Modal>
   );
-}
+});
+
+export default LogbookDetailModal;
