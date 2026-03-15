@@ -14,19 +14,35 @@ const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
       color: 'processing',
     },
-    PUNCTUAL: {
-      label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-      color: 'success',
+    1: {
+      label: DAILY_REPORT_UI.STATUS.APPROVED,
+      style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+    },
+    APPROVED: {
+      label: DAILY_REPORT_UI.STATUS.APPROVED,
+      style: 'bg-emerald-50 text-emerald-600 border-emerald-200 border',
+    },
+    2: {
+      label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION,
+      style: 'bg-amber-50 text-amber-600 border-amber-200 border',
+    },
+    NEEDS_REVISION: {
+      label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION,
+      style: 'bg-amber-50 text-amber-600 border-amber-200 border',
     },
     3: {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
-      color: 'success',
+      style: 'bg-green-50 text-green-600 border-green-200 border',
     },
-    LATE: {
+    PUNCTUAL: {
+      label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
+      style: 'bg-green-50 text-green-600 border-green-200 border',
+    },
+    4: {
       label: DAILY_REPORT_UI.STATUS.LATE,
       color: 'error',
     },
-    4: {
+    LATE: {
       label: DAILY_REPORT_UI.STATUS.LATE,
       color: 'error',
     },

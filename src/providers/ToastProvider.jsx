@@ -30,6 +30,12 @@ export function ToastProvider({ children }) {
         description,
         showProgress: true,
       }),
+    warning: (title, description) =>
+      api.warning({
+        message: title,
+        description,
+        showProgress: true,
+      }),
   };
 
   return (

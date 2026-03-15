@@ -102,22 +102,41 @@ const LogbookDetailModal = memo(function LogbookDetailModal({ visible, record, o
               </div>
             </section>
 
-            <section className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
-              <div className='bg-muted/5 border-border flex items-center gap-2 border-b px-5 py-3'>
-                <RocketOutlined className='text-success' />
-                <Text className='text-text text-sm font-bold tracking-tight uppercase'>
-                  {FORM.PLAN}
-                </Text>
-              </div>
-              <div className='p-5'>
-                <Paragraph
-                  className={`mb-0 text-[15px] leading-relaxed whitespace-pre-wrap ${record.plan ? 'text-text' : 'text-muted italic'}`}
-                >
-                  {record.plan || 'Chưa có kế hoạch cụ thể.'}
-                </Paragraph>
+          <section className='space-y-2'>
+            <h4 className='font-semibold text-gray-800'>{DAILY_REPORT_UI.FORM.ISSUE}</h4>
+
+            <div className='rounded-lg border border-gray-100 bg-gray-50 p-4 whitespace-pre-wrap text-gray-700'>
+              {record.issue || 'No issues reported.'}
+            </div>
+          </section>
+
+          <section className='space-y-2'>
+            <h4 className='font-semibold text-gray-800'>{DAILY_REPORT_UI.FORM.PLAN}</h4>
+
+            <div className='rounded-lg border border-gray-100 bg-gray-50 p-4 whitespace-pre-wrap text-gray-700'>
+              {record.plan || 'No plan outlined.'}
+            </div>
+          </section>
+
+          {record.workItems?.length > 0 && (
+            <section className='space-y-3'>
+              <h4 className='font-semibold text-gray-800'>Linked Work Items</h4>
+              <div className='space-y-2'>
+                {record.workItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className='flex items-center gap-3 rounded-lg border border-slate-100 p-3'
+                  >
+                    <div className='h-2 w-2 rounded-full bg-blue-500' />
+                    <div className='flex-1'>
+                      <p className='text-sm font-medium text-slate-800'>{item.title}</p>
+                      <p className='line-clamp-1 text-xs text-slate-500'>{item.description}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
-          </div>
+          )}
         </div>
       )}
     </Modal>

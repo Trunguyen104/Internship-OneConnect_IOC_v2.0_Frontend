@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Input, Empty } from 'antd';
+import { Empty } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
 import { useStudentList } from '../hooks/useStudentList';
 import StudentTable from './StudentTable';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 export default function StudentListPage() {
@@ -50,34 +51,16 @@ export default function StudentListPage() {
       <StudentPageHeader title={STUDENT_LIST_UI.PAGE_TITLE} />
 
       <Card>
-        <div className='border-border/50 mb-5 flex items-center justify-between border-b pb-5'>
-          <div className='flex items-center gap-4'>
-            <div className='border-border bg-bg text-muted flex h-12 w-12 items-center justify-center rounded-2xl border shadow-sm'>
-              <TeamOutlined className='text-xl' />
-            </div>
-            <div>
-              <h3 className='text-text m-0 text-lg font-bold'>{STUDENT_LIST_UI.GROUP.MEMBERS}</h3>
-              <p className='text-muted m-0 mt-0.5 text-sm font-medium'>
-                {groupDetail?.members?.length || 0} {STUDENT_LIST_UI.GROUP.STUDENTS_TOTAL}
-              </p>
-            </div>
-          </div>
+        <DataTableToolbar
+          className='mb-5 !border-0 !p-0'
+          searchProps={{
+            placeholder: STUDENT_LIST_UI.SEARCH.PLACEHOLDER,
+            value: searchText,
+            onChange: (e) => setSearchText(e.target.value),
+          }}
+        />
 
-          <div className='flex items-center gap-3'>
-            <Input.Search
-              placeholder={STUDENT_LIST_UI.SEARCH.PLACEHOLDER}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className='w-full md:w-72'
-              variant='filled'
-              rootClassName='premium-search'
-            />
-          </div>
-        </div>
-
-        <div className='border-border/20 bg-surface mb-3 flex-1 overflow-hidden rounded-xl border shadow-sm'>
-          <StudentTable data={paginatedMembers} loading={loading} onDelete={handleDeleteStudent} />
-        </div>
+        <StudentTable data={paginatedMembers} loading={loading} onDelete={handleDeleteStudent} />
       </Card>
       <div className='mt-6 px-2'>
         <Pagination

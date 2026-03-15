@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { Form, Select, Button } from 'antd';
-import { PlusOutlined, FilterOutlined } from '@ant-design/icons';
+import { Form } from 'antd';
+import { FilterOutlined } from '@ant-design/icons';
+import { Select } from 'antd';
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import LogbookTable from './LogbookTable';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookDetailModal from './LogbookDetailModal';
@@ -27,7 +28,10 @@ export default function LogbookPage() {
     setPageSize,
     statusFilter,
     setStatusFilter,
+    sortOrder,
     setSortOrder,
+    search,
+    setSearch,
     fetchLogbooks,
     handleDelete,
     internshipId,
@@ -58,7 +62,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.toISOString(),
+          dateReport: values.dateReport.hour(12).toISOString(),
           status: PUNCTUAL_STATUS,
         };
         res = await LogBookService.update(editingId, updatePayload);
@@ -68,13 +72,12 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.toISOString(),
+          dateReport: values.dateReport.hour(12).toISOString(),
           status: SUBMITTED_STATUS,
         };
         res = await LogBookService.create(createPayload);
       }
-
-      if (res && (res.isSuccess !== false || res.success !== false)) {
+      if (res && res.isSuccess !== false) {
         toast.success(
           editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
         );
@@ -85,18 +88,43 @@ export default function LogbookPage() {
         fetchLogbooks();
         closeFormModal();
       } else {
-        toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
+        const errorMsg =
+          res?.data?.errors?.[0] ||
+          res?.errors?.[0] ||
+          res?.data?.message ||
+          res?.message ||
+          DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
+        toast.error(errorMsg);
       }
-    } catch {
-      toast.error(DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED);
+    } catch (error) {
+      console.error('Logbook submit error:', error);
+      const errorMsg =
+        error?.response?.data?.errors?.[0] ||
+        error?.response?.data?.message ||
+        error?.message ||
+        DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
+      toast.error(errorMsg);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const openFormModal = useCallback(
-    (record = null) => {
-      if (record) {
+  const openFormModal = async (record = null) => {
+    if (record) {
+      try {
+        setSubmitting(true);
+        const res = await LogBookService.getById(record.logbookId);
+        const fullData = res?.data || record;
+
+        setEditingId(fullData.logbookId);
+        form.setFieldsValue({
+          dateReport: fullData.dateReport ? dayjs(fullData.dateReport) : null,
+          summary: fullData.summary,
+          issue: fullData.issue,
+          plan: fullData.plan,
+        });
+      } catch (err) {
+        console.error('Failed to load logbook details', err);
         setEditingId(record.logbookId);
         form.setFieldsValue({
           dateReport: record.dateReport ? dayjs(record.dateReport) : null,
@@ -104,14 +132,15 @@ export default function LogbookPage() {
           issue: record.issue,
           plan: record.plan,
         });
-      } else {
-        setEditingId(null);
-        form.resetFields();
+      } finally {
+        setSubmitting(false);
       }
-      setIsFormModalOpen(true);
-    },
-    [form],
-  );
+    } else {
+      setEditingId(null);
+      form.resetFields();
+    }
+    setIsFormModalOpen(true);
+  };
 
   const closeFormModal = useCallback(() => {
     setIsFormModalOpen(false);
@@ -119,10 +148,20 @@ export default function LogbookPage() {
     form.resetFields();
   }, [form]);
 
-  const openDetailModal = useCallback((record) => {
-    setViewRecord(record);
-    setIsDetailModalOpen(true);
-  }, []);
+  const openDetailModal = async (record) => {
+    try {
+      setSubmitting(true);
+      const res = await LogBookService.getById(record.logbookId);
+      setViewRecord(res?.data || record);
+      setIsDetailModalOpen(true);
+    } catch (err) {
+      console.error('Failed to load logbook details', err);
+      setViewRecord(record);
+      setIsDetailModalOpen(true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const closeDetailModal = useCallback(() => {
     setIsDetailModalOpen(false);
@@ -131,72 +170,42 @@ export default function LogbookPage() {
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
-      <StudentPageHeader title={DAILY_REPORT_UI.TITLE} description={DAILY_REPORT_UI.DESCRIPTION} />
+      <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
-      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
-        <Card className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
-          <div className='flex flex-wrap items-center justify-between gap-4 p-4'>
-            <div className='min-w-[280px]'>
-              <Select
-                allowClear
-                placeholder={DAILY_REPORT_UI.FILTER_STATUS}
-                value={statusFilter}
-                onChange={(val) => {
-                  setStatusFilter(val);
-                  setPageNumber(1);
-                }}
-                className='h-11 w-full'
-                suffixIcon={<FilterOutlined className='text-muted' />}
-                options={[
-                  { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-                  { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-                  { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
-                ]}
-              />
-            </div>
-
-            <Button
-              type='primary'
-              icon={<PlusOutlined />}
-              onClick={() => openFormModal()}
-              className='bg-primary h-11 rounded-xl border-none px-6 font-bold shadow-md transition-all hover:scale-105 active:scale-95'
-            >
-              {DAILY_REPORT_UI.CREATE_BUTTON}
-            </Button>
-          </div>
-
-          <LogbookTable
-            data={data}
-            loading={loading}
-            userProfile={userProfile}
-            onView={openDetailModal}
-            onEdit={openFormModal}
-            onDelete={handleDelete}
-            onTableChange={(pagination, filters, sorter) => {
-              if (sorter.field === 'dateReport' && sorter.order) {
-                setSortOrder(sorter.order === 'ascend' ? 'asc' : 'desc');
-              }
-            }}
-          />
-        </Card>
-
-        <div className='mt-6 flex items-center justify-between px-2'>
-          <div className='text-muted text-xs font-bold tracking-widest uppercase'>
-            Tổng cộng: {total} báo cáo
-          </div>
-          <Pagination
-            total={total}
-            page={pageNumber}
-            pageSize={pageSize}
-            totalPages={Math.ceil(total / pageSize)}
-            onPageChange={setPageNumber}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
-              setPageNumber(1);
-            }}
-          />
-        </div>
-      </div>
+      <Card className='flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl shadow-slate-200/50'>
+        <DataTableToolbar
+          className='mb-5 !border-0 !p-0'
+          searchProps={{
+            placeholder: 'Search by student name...',
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+          }}
+          filterContent={
+            <Select
+              allowClear
+              placeholder={DAILY_REPORT_UI.FILTER_STATUS}
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPageNumber(1);
+              }}
+              className='w-56 shadow-sm'
+              rootClassName='custom-select-premium'
+              suffixIcon={<FilterOutlined className='text-slate-400' />}
+              options={[
+                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
+                { value: 1, label: DAILY_REPORT_UI.STATUS.APPROVED },
+                { value: 2, label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION },
+                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+              ]}
+            />
+          }
+          actionProps={{
+            label: DAILY_REPORT_UI.CREATE_BUTTON,
+            onClick: () => openFormModal(),
+          }}
+        />
 
       <LogbookFormModal
         visible={isFormModalOpen}

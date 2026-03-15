@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { userService } from '@/components/features/user/services/userService';
@@ -19,6 +19,26 @@ export function useLogbook() {
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState();
   const [sortOrder, setSortOrder] = useState('desc');
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPageNumber(1);
+    }, 500);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  const filteredData = useMemo(() => {
+    if (!debouncedSearch?.trim()) return data;
+    const term = debouncedSearch.toLowerCase().trim();
+    return data.filter((item) => {
+      const studentName = (item.studentName || '').toLowerCase();
+      const summary = (item.summary || '').toLowerCase();
+      return studentName.includes(term) || summary.includes(term);
+    });
+  }, [data, debouncedSearch]);
 
   useEffect(() => {
     const fetchInternship = async () => {
@@ -71,12 +91,15 @@ export function useLogbook() {
         params.Status = statusFilter;
       }
 
+      // We still send SearchTerm to the backend in case they implement it later
+      if (debouncedSearch?.trim()) {
+        params.SearchTerm = debouncedSearch.trim();
+      }
+
       const res = await LogBookService.getAll(internshipId, params);
 
       const items = res?.data?.items || [];
       const totalCount = res?.data?.totalCount || 0;
-
-      console.log('items:', items);
 
       setData(items);
       setTotal(totalCount);
@@ -85,7 +108,8 @@ export function useLogbook() {
     } finally {
       setLoading(false);
     }
-  }, [internshipId, pageNumber, pageSize, sortOrder, statusFilter]);
+  }, [internshipId, pageNumber, pageSize, sortOrder, statusFilter, debouncedSearch]);
+
   useEffect(() => {
     fetchLogbooks();
   }, [fetchLogbooks]);
@@ -114,7 +138,8 @@ export function useLogbook() {
   };
 
   return {
-    data,
+    data: filteredData, // Use filtered data for the UI
+    rawItems: data,
     loading,
     total,
     pageNumber,
@@ -125,6 +150,8 @@ export function useLogbook() {
     setStatusFilter,
     sortOrder,
     setSortOrder,
+    search,
+    setSearch,
     fetchLogbooks,
     handleDelete,
     internshipId,

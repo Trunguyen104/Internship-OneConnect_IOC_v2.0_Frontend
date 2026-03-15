@@ -18,20 +18,19 @@ import {
 
 const studentMenu = [
   { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
-  { icon: <BarChartOutlined />, label: 'Thông tin chung', href: '/student/general-info' },
-  { icon: <ProjectOutlined />, label: 'Dự án', href: '/student/project' },
-  { icon: <TeamOutlined />, label: 'Sinh viên', href: '/student/studentlist' },
-  { icon: <VideoCameraOutlined />, label: 'Báo cáo hàng ngày', href: '/student/daily-report' },
-  { icon: <UploadOutlined />, label: 'Đánh giá', href: '/student/evaluate' },
-  { icon: <UserOutlined />, label: 'Bên liên quan', href: '/student/stakeholder' },
-  { icon: <ShopOutlined />, label: 'Vi phạm', href: '/student/violation' },
+  { icon: <BarChartOutlined />, label: 'General Information', href: '/student/general-info' },
+  { icon: <ProjectOutlined />, label: 'Project', href: '/student/project' },
+  { icon: <TeamOutlined />, label: 'Students', href: '/student/studentlist' },
+  { icon: <VideoCameraOutlined />, label: 'Daily Report', href: '/student/daily-report' },
+  { icon: <UploadOutlined />, label: 'Evaluation', href: '/student/evaluate' },
+  { icon: <UserOutlined />, label: 'Stakeholders', href: '/student/stakeholder' },
+  { icon: <ShopOutlined />, label: 'Violations', href: '/student/violation' },
 ];
 
 const profileMenu = [
-  { icon: <UserOutlined />, label: 'Thông tin cá nhân', href: '/student/profile' },
-  { icon: <LockOutlined />, label: 'Thay đổi mật khẩu', href: '/student/profile/change-password' },
+  { icon: <UserOutlined />, label: 'Profile', href: '/student/profile' },
+  { icon: <LockOutlined />, label: 'Change Password', href: '/student/profile/change-password' },
 ];
-
 export default function Sidebar() {
   const pathname = usePathname();
 
@@ -56,7 +55,7 @@ export default function Sidebar() {
         !isProfile &&
         pathname !== '/internship-groups' && (
           <Link
-            href='/internship-groups'
+            href='/student/space'
             className='mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold text-(--primary-700) hover:text-(--primary-800)'
           >
             <ArrowLeftOutlined />

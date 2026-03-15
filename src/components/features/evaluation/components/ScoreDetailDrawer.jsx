@@ -1,16 +1,6 @@
 'use client';
 
-import {
-  Drawer,
-  Empty,
-  Typography,
-  Progress,
-  Card,
-  Descriptions,
-  List,
-  Space,
-  Divider,
-} from 'antd';
+import { Drawer, Empty, Typography, Progress, Card, Descriptions, Space, Divider } from 'antd';
 import { MessageOutlined, StarFilled } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -83,41 +73,32 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
               </Space>
             }
           >
-            <List
-              dataSource={evaluationDetail.criteriaScores}
-              renderItem={(criteria) => {
+            <div className='flex flex-col gap-4'>
+              {evaluationDetail.criteriaScores?.map((criteria, index) => {
                 const percent = (criteria.score / criteria.maxScore) * 100;
 
                 return (
-                  <List.Item className='border-none px-0'>
-                    <Space direction='vertical' style={{ width: '100%' }}>
-                      <div className='flex items-center justify-between'>
-                        <Text strong className='text-text'>
-                          {criteria.criteriaName}
-                        </Text>
-                        <Text strong className='text-primary'>
-                          {criteria.score} / {criteria.maxScore}
-                        </Text>
-                      </div>
-
-                      <Progress
-                        percent={percent}
-                        showInfo={false}
-                        strokeColor='var(--color-primary)'
-                        trailColor='var(--color-primary-surface)'
-                        className='mb-2'
-                      />
-
-                      <Text type='secondary' italic className='text-[13px]'>
-                        {criteria.comment || EVALUATION_UI.LABELS.NO_DETAILED_COMMENTS}
+                  <div key={index} className='flex flex-col gap-2'>
+                    <div className='flex items-center justify-between'>
+                      <Text strong>{criteria.criteriaName}</Text>
+                      <Text>
+                        {criteria.score} / {criteria.maxScore}
                       </Text>
+                    </div>
 
-                      <Divider className='my-3' />
-                    </Space>
-                  </List.Item>
+                    <Progress percent={percent} showInfo={false} />
+
+                    <Text type='secondary' italic>
+                      {criteria.comment || 'No detailed comments provided'}
+                    </Text>
+
+                    {index < evaluationDetail.criteriaScores.length - 1 && (
+                      <Divider style={{ margin: '8px 0' }} />
+                    )}
+                  </div>
                 );
-              }}
-            />
+              })}
+            </div>
           </Card>
         </Space>
       )}

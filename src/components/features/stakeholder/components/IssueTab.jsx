@@ -2,8 +2,8 @@
 
 import React, { memo } from 'react';
 import Card from '@/components/ui/Card';
-import SearchBar from '@/components/ui/SearchBar';
 import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 import { useIssueTab } from '../hooks/useIssueTab';
 import IssueTable from './IssueTable';
@@ -36,23 +36,22 @@ const IssueTab = memo(function IssueTab() {
   } = useIssueTab();
 
   return (
-    <div className='flex flex-col gap-6'>
-      <Card className='bg-surface border-border overflow-hidden rounded-2xl border p-4 shadow-sm'>
-        <SearchBar
-          placeholder={ISSUE_UI.SEARCH_PLACEHOLDER}
-          value={search}
-          onChange={(val) => {
-            setSearch(val);
-            setPage(1);
+    <>
+      <Card>
+        <DataTableToolbar
+          className='mb-6 !border-0 !p-0'
+          searchProps={{
+            placeholder: ISSUE_UI.SEARCH_PLACEHOLDER,
+            value: search,
+            onChange: (e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            },
           }}
-          showFilter
-          showAction
-          actionLabel={ISSUE_UI.ADD_BUTTON}
-          onActionClick={() => {
-            setIssueForm({ title: '', stakeholderId: '', description: '' });
-            setOpenIssueForm(true);
+          actionProps={{
+            label: ISSUE_UI.ADD_BUTTON,
+            onClick: () => setOpenIssueForm(true),
           }}
-          className='mb-6'
         />
 
         <IssueTable

@@ -1,13 +1,8 @@
 'use client';
 
-// import AppTable from '@/components/shared/AppTable';
-import { Button, Typography } from 'antd';
+import { Button } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import AppTable from '@/components/ui/AppTable';
-import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-
-const { Text } = Typography;
 
 const STATUS_CONFIG = {
   0: {
@@ -48,98 +43,102 @@ const STATUS_CONFIG = {
 };
 
 export default function CycleTable({ data, page, pageSize, onDetail }) {
-  const columns = [
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.STT,
-      width: 70,
-      align: 'center',
-      render: (_, __, index) => (
-        <Text type='secondary' className='text-xs font-medium'>
-          {(page - 1) * pageSize + index + 1}
-        </Text>
-      ),
-    },
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.CYCLE,
-      dataIndex: 'name',
-      width: 280,
-      render: (text) => <Text className='text-text font-bold tracking-tight'>{text}</Text>,
-    },
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.START_DATE,
-      dataIndex: 'startDate',
-      width: 140,
-      render: (date) => (
-        <Text className='text-muted-foreground text-sm'>{dayjs(date).format('DD/MM/YYYY')}</Text>
-      ),
-    },
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.END_DATE,
-      dataIndex: 'endDate',
-      width: 140,
-      render: (date) => (
-        <Text className='text-muted-foreground text-sm'>{dayjs(date).format('DD/MM/YYYY')}</Text>
-      ),
-    },
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.STATUS,
-      dataIndex: 'status',
-      width: 150,
-      render: (status) => {
-        const normalized = status ? String(status).toUpperCase() : '';
-        const cfg = STATUS_CONFIG[normalized] ||
-          STATUS_CONFIG[status] || {
-            label: status || EVALUATION_UI.STATUS.UNKNOWN,
-            bg: 'bg-muted',
-            text: 'text-muted-foreground',
-            icon: null,
-          };
-
-        return (
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${cfg.bg} ${cfg.text}`}
-          >
-            {cfg.icon}
-            {cfg.label}
-          </span>
-        );
-      },
-    },
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.SCORED,
-      width: 120,
-      render: (_, record) => (
-        <Text className='text-text font-bold'>
-          {record.totalStudentsScored ?? 0}
-          <span className='text-muted mx-0.5 font-normal'>/</span>
-          {record.totalTeamStudents ?? 0}
-        </Text>
-      ),
-    },
-    {
-      title: EVALUATION_UI.TABLE_COLUMNS.ACTIONS,
-      align: 'right',
-      width: 120,
-      render: (_, record) => (
-        <Button
-          size='small'
-          icon={<EyeOutlined />}
-          onClick={() => onDetail(record)}
-          className='bg-primary shadow-primary/20 hover:!bg-primary/90 rounded-full border-none font-bold shadow-sm'
-        />
-      ),
-    },
-  ];
-
   return (
-    <div className='border-border/60 bg-bg overflow-hidden rounded-xl border shadow-sm'>
-      <AppTable
-        columns={columns}
-        data={data}
-        rowKey='cycleId'
-        pagination={false}
-        emptyText={EVALUATION_UI.LABELS.NO_DATA}
-      />
+    <div className='flex min-h-0 flex-1 flex-col'>
+      {!data || data.length === 0 ? (
+        <div className='flex flex-1 items-center justify-center py-12'>
+          <p className='text-slate-400'>No evaluation data</p>
+        </div>
+      ) : (
+        <div className='mt-5 flex min-h-0 flex-1 flex-col'>
+          <div className='flex-1 overflow-auto'>
+            <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
+              <thead className='sticky top-0 z-10 border-b border-slate-200 bg-slate-50'>
+                <tr>
+                  <th className='w-[60px] px-6 py-4 text-xs font-semibold text-slate-500'>#</th>
+                  <th className='w-[280px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                    Evaluation Cycle
+                  </th>
+                  <th className='w-[140px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                    Start Date
+                  </th>
+                  <th className='w-[140px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                    End Date
+                  </th>
+                  <th className='w-[150px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                    Status
+                  </th>
+                  <th className='w-[120px] px-6 py-4 text-xs font-semibold text-slate-500'>
+                    Scored
+                  </th>
+                  <th className='w-[120px] px-6 py-4 text-right text-xs font-semibold text-slate-500'>
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className='divide-y divide-slate-100'>
+                {data.map((record, index) => {
+                  const status = record.status;
+                  const normalized = status ? String(status).toUpperCase() : '';
+                  const cfg = STATUS_CONFIG[normalized] ||
+                    STATUS_CONFIG[status] || {
+                      label: status || 'Unknown',
+                      bg: 'bg-slate-50',
+                      text: 'text-slate-600',
+                      icon: null,
+                    };
+
+                  return (
+                    <tr key={record.cycleId} className='transition-colors hover:bg-slate-50/80'>
+                      <td className='px-6 py-4 text-sm text-slate-600'>
+                        {(page - 1) * pageSize + index + 1}
+                      </td>
+                      <td className='px-6 py-4'>
+                        <span className='font-bold tracking-tight text-slate-800'>
+                          {record.name}
+                        </span>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <span className='text-sm text-slate-600'>
+                          {dayjs(record.startDate).format('DD/MM/YYYY')}
+                        </span>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <span className='text-sm text-slate-600'>
+                          {dayjs(record.endDate).format('DD/MM/YYYY')}
+                        </span>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${cfg.bg} ${cfg.text}`}
+                        >
+                          {cfg.icon}
+                          {cfg.label}
+                        </span>
+                      </td>
+                      <td className='px-6 py-4'>
+                        <span className='font-bold text-slate-700'>
+                          {record.totalStudentsScored ?? 0}
+                          <span className='mx-0.5 font-normal text-slate-300'>/</span>
+                          {record.totalTeamStudents ?? 0}
+                        </span>
+                      </td>
+                      <td className='px-6 py-4 text-right'>
+                        <Button
+                          size='small'
+                          icon={<EyeOutlined />}
+                          onClick={() => onDetail(record)}
+                          className='rounded-full border-none bg-[#d52020] font-bold shadow-sm shadow-[#d52020]/20 hover:!bg-[#d52020]/90'
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

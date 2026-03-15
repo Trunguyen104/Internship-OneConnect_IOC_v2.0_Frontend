@@ -65,35 +65,64 @@ export function useIssueTab() {
   }, [page, pageSize]);
 
   const handleSaveIssue = async () => {
-    if (!issueForm.title?.trim() || !issueForm.stakeholderId || !issueForm.description?.trim()) {
+    if (!issueForm.title?.trim() || !issueForm.stakeholderId) {
       toast.warning(ISSUE_MESSAGES.REQUIRED_FIELDS.GENERAL);
       return;
     }
 
     try {
-      await StakeholderIssueService.create({
+      const res = await StakeholderIssueService.create({
         title: issueForm.title,
         description: issueForm.description,
         stakeholderId: issueForm.stakeholderId,
         internshipId,
       });
 
-      toast.success(ISSUE_MESSAGES.CREATE_SUCCESS);
+      if (res && res.isSuccess !== false && res.statusCode !== 403) {
+        toast.success(ISSUE_MESSAGES.CREATE_SUCCESS);
+        setOpenIssueForm(false);
+        setIssueForm({ title: '', description: '', stakeholderId: '' });
+        fetchIssues();
+      } else {
+        const errorMsg =
+          res?.data?.errors?.[0] ||
+          res?.errors?.[0] ||
+          res?.message ||
+          ISSUE_MESSAGES.CREATE_FAILED;
 
-      setOpenIssueForm(false);
-      setIssueForm({ title: '', description: '', stakeholderId: '' });
-      fetchIssues();
-    } catch {
+        if (res?.status === 403 || res?.statusCode === 403) {
+          toast.error(errorMsg || 'You do not have permission to perform this action');
+        } else {
+          toast.error(errorMsg);
+        }
+      }
+    } catch (err) {
+      console.error('Error saving issue:', err);
       toast.error(ISSUE_MESSAGES.CREATE_FAILED);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await StakeholderIssueService.delete(id);
-      toast.success(ISSUE_MESSAGES.DELETE_SUCCESS);
-      fetchIssues();
-    } catch {
+      const res = await StakeholderIssueService.delete(id);
+      if (res && res.isSuccess !== false && res.statusCode !== 403) {
+        toast.success(ISSUE_MESSAGES.DELETE_SUCCESS);
+        fetchIssues();
+      } else {
+        const errorMsg =
+          res?.data?.errors?.[0] ||
+          res?.errors?.[0] ||
+          res?.message ||
+          ISSUE_MESSAGES.DELETE_FAILED;
+
+        if (res?.status === 403 || res?.statusCode === 403) {
+          toast.error(errorMsg || 'You do not have permission to perform this action');
+        } else {
+          toast.error(errorMsg);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting issue:', error);
       toast.error(ISSUE_MESSAGES.DELETE_FAILED);
     }
   };

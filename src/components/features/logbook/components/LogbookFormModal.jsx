@@ -31,8 +31,11 @@ const LogbookFormModal = memo(function LogbookFormModal({
       footer={null}
       width={600}
       centered
-      destroyOnClose
-      className='modal-custom'
+      title={
+        <h2 className='text-xl font-semibold text-gray-800'>
+          {editingId ? DAILY_REPORT_UI.MODAL.EDIT_TITLE : DAILY_REPORT_UI.MODAL.CREATE_TITLE}
+        </h2>
+      }
     >
       <div className='mb-6 flex flex-col items-center gap-3 text-center'>
         <div className='bg-primary/10 flex size-14 items-center justify-center rounded-2xl'>
@@ -70,40 +73,45 @@ const LogbookFormModal = memo(function LogbookFormModal({
         </Form.Item>
 
         <Form.Item
-          label={<span className='text-text font-semibold'>{FORM.SUMMARY}</span>}
+          label={DAILY_REPORT_UI.FORM.SUMMARY}
           name='summary'
           rules={[
-            { required: true, message: 'Vui lòng nhập tóm tắt công việc' },
-            { min: 10, message: 'Tóm tắt cần ít nhất 10 ký tự' },
+            { required: true, message: 'Please enter summary' },
+            { min: 10, message: 'Minimum 10 characters' },
+            { max: 200, message: 'Maximum 200 characters' },
           ]}
         >
           <TextArea
             rows={4}
-            placeholder={FORM.PLACEHOLDER_SUMMARY}
-            className='bg-surface border-border hover:border-primary rounded-xl transition-all'
+            placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_SUMMARY}
+            className='rounded-md'
           />
         </Form.Item>
 
         <Form.Item
-          label={<span className='text-text font-semibold'>{FORM.ISSUE}</span>}
+          label={DAILY_REPORT_UI.FORM.ISSUE}
           name='issue'
+          rules={[{ max: 200, message: 'Maximum 200 characters' }]}
         >
           <TextArea
             rows={2}
-            placeholder={FORM.PLACEHOLDER_ISSUE}
-            className='bg-surface border-border hover:border-primary rounded-xl border-dashed transition-all'
+            placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_ISSUE}
+            className='rounded-md'
           />
         </Form.Item>
 
         <Form.Item
-          label={<span className='text-text font-semibold'>{FORM.PLAN}</span>}
+          label={DAILY_REPORT_UI.FORM.PLAN}
           name='plan'
-          rules={[{ required: true, message: 'Vui lòng nhập kế hoạch' }]}
+          rules={[
+            { required: true, message: 'Please enter next plan' },
+            { max: 200, message: 'Maximum 200 characters' },
+          ]}
         >
           <TextArea
             rows={3}
-            placeholder={FORM.PLACEHOLDER_PLAN}
-            className='bg-surface border-border hover:border-primary rounded-xl transition-all'
+            placeholder={DAILY_REPORT_UI.FORM.PLACEHOLDER_PLAN}
+            className='rounded-md'
           />
         </Form.Item>
 
