@@ -71,6 +71,10 @@ export default function StudentListPage() {
                   pageSize={pageSize}
                   totalPages={totalPages}
                   onPageChange={setPage}
+                  onPageSizeChange={(size) => {
+                    setPageSize(size);
+                    setPage(1);
+                  }}
                 />
               </div>
             )}

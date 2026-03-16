@@ -2,18 +2,6 @@ import React from 'react';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { modalApi } from '@/providers/ToastProvider';
 
-/**
- * Standardized delete confirmation modal with a premium look and feel.
- * Located in UI components for better architectural consistency.
- *
- * @param {Object} options
- * @param {string} options.title - The title of the modal (default: 'Confirm Delete')
- * @param {React.ReactNode} options.content - The content/message of the modal
- * @param {Function} options.onOk - Callback when user confirms the delete
- * @param {string} options.okText - Text for the confirm button (default: 'Delete')
- * @param {string} options.cancelText - Text for the cancel button (default: 'Cancel')
- * @param {string} options.type - 'delete' (default) or 'warning'
- */
 export const showDeleteConfirm = ({
   title = 'Confirm Delete',
   content = 'Are you sure you want to delete this item? This action cannot be undone.',
@@ -30,7 +18,6 @@ export const showDeleteConfirm = ({
     ? 'bg-red-600 hover:bg-red-700 border-none'
     : 'bg-amber-600 hover:bg-amber-700 border-none';
 
-  // Fallback to static Modal.confirm if modalApi is not yet initialized
   const confirm = modalApi ? modalApi.confirm : require('antd').Modal.confirm;
 
   return confirm({

@@ -3,7 +3,7 @@ export const ISSUE_UI = {
   ADD_BUTTON: 'Add Issue',
 
   TABLE: {
-    NO: 'No.',
+    NO: '#',
     TITLE: 'Title',
     STAKEHOLDER: 'Stakeholder',
     DESCRIPTION: 'Description',

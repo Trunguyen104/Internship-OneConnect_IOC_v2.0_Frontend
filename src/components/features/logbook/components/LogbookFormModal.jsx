@@ -14,7 +14,6 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
 
   React.useEffect(() => {
     if (initialValues) {
-      console.log('LogbookFormModal initialValues:', initialValues);
       const reportDate =
         initialValues.dateReport ||
         initialValues.reportDate ||

@@ -64,7 +64,7 @@ export default function Pagination({
 
         <select
           value={pageSize}
-          onChange={(e) => onPageSizeChange(Number(e.target.value))}
+          onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
           className='ml-3 rounded-full border px-3 py-1 text-sm'
         >
           <option value={5}>5/page</option>
