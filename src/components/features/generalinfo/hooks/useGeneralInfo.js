@@ -113,10 +113,10 @@ export function useGeneralInfo(initialId = null) {
             data.description ||
             GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC,
           displayCreatedAt: data.createdAt
-            ? new Date(data.createdAt).toLocaleDateString('vi-VN')
+            ? new Date(data.createdAt).toLocaleDateString('en-GB')
             : GENERAL_INFO_UI.VALUES.NA,
           displayUpdatedAt: data.updatedAt
-            ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(data.updatedAt).toLocaleDateString('vi-VN')}`
+            ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(data.updatedAt).toLocaleDateString('en-GB')}`
             : data.updatedText || '',
         });
       } catch (error) {

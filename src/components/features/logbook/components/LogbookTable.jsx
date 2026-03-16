@@ -50,38 +50,32 @@ const LogbookTable = memo(function LogbookTable({ data, userProfile, onView, onE
 
               return (
                 <tr key={record.logbookId} className='hover:bg-bg h-[64px] transition-colors'>
-                  {/* DATE */}
                   <td className='text-text px-6 py-4 align-middle text-sm font-bold'>
                     {record.dateReport
                       ? dayjs(record.dateReport).format('DD/MM/YYYY')
                       : DAILY_REPORT_UI.VIEW_MODAL.NA}
                   </td>
 
-                  {/* STUDENT */}
                   <td className='text-text px-6 py-4 align-middle text-sm font-semibold whitespace-nowrap'>
                     {record.studentName || DAILY_REPORT_UI.VIEW_MODAL.NA}
                   </td>
 
-                  {/* SUMMARY */}
                   <td className='px-6 py-4 align-middle text-sm'>
                     <Tooltip placement='topLeft' title={record.summary}>
                       <div className='text-muted max-w-[260px] truncate'>{record.summary}</div>
                     </Tooltip>
                   </td>
 
-                  {/* ISSUE */}
                   <td className='px-6 py-4 align-middle text-sm'>
                     <Tooltip placement='topLeft' title={record.issue}>
                       <div className='text-muted max-w-[220px] truncate'>{record.issue || '-'}</div>
                     </Tooltip>
                   </td>
 
-                  {/* STATUS */}
                   <td className='px-6 py-4 text-center align-middle'>
                     <LogbookStatusTag status={record.status} />
                   </td>
 
-                  {/* ACTION */}
                   <td className='px-6 py-4 align-middle'>
                     <div className='flex items-center justify-center gap-2'>
                       <Tooltip title={DAILY_REPORT_UI.VIEW_MODAL.TITLE}>

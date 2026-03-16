@@ -89,7 +89,7 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
                     <Progress percent={percent} showInfo={false} />
 
                     <Text type='secondary' italic>
-                      {criteria.comment || 'No detailed comments provided'}
+                      {criteria.comment || EVALUATION_UI.LABELS.NO_DETAILED_COMMENTS}
                     </Text>
 
                     {index < evaluationDetail.criteriaScores.length - 1 && (

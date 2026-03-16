@@ -60,7 +60,7 @@ export default function ProjectResourceUpload({
   };
 
   return (
-    <div className={'rounded-2xl border border-slate-100 bg-slate-50/50 p-6'}>
+    <div className='border-border/50 bg-bg-surface rounded-2xl border p-6'>
       <div className={'mb-6'}>
         <Title
           level={5}

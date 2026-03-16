@@ -33,7 +33,7 @@ export default function ViolationPage() {
         <DataTableToolbar
           className='mb-5 !border-0 !p-0'
           searchProps={{
-            placeholder: 'Search',
+            placeholder: VIOLATION_UI.SEARCH.PLACEHOLDER,
             value: search,
             onChange: (e) => {
               setSearch(e.target.value);

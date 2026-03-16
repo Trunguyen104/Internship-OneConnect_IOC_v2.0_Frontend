@@ -33,7 +33,15 @@ export const PROJECT_UI = {
     NO_RESOURCE: 'No resources attached yet.',
   },
 
+  LOADING: 'Loading resources...',
+  LABEL_FILES: 'FILES',
+
+  VALUES: {
+    UNTITLED: 'Untitled Resource',
+  },
+
   CONFIRM: {
+    DELETE_TITLE: 'Delete Resource',
     DELETE_RESOURCE: 'Are you sure you want to delete this resource?',
   },
 };
