@@ -1,16 +1,9 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Button, Tooltip, Avatar, Empty } from 'antd';
+import { Button, Tooltip, Empty } from 'antd';
 import dayjs from 'dayjs';
-import {
-  DeleteOutlined,
-  UserOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  SyncOutlined,
-  EyeOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, CheckCircleOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import IssueStatusTag from './IssueStatusTag';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';

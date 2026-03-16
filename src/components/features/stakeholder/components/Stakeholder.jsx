@@ -5,7 +5,6 @@ import StakeholderTab from './StakeholderTab';
 import IssueTab from './IssueTab';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
 export default function StakeholderPage() {
   const [tab, setTab] = useState('stakeholder');

@@ -1,12 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import {
-  CheckCircleOutlined,
-  SyncOutlined,
-  ClockCircleOutlined,
-  CloseCircleOutlined,
-} from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { ISSUE_STATUS } from '../constants/issueStatus';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 

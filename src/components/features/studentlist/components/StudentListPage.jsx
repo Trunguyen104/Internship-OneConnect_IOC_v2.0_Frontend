@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Empty } from 'antd';
-import { TeamOutlined } from '@ant-design/icons';
 import { useStudentList } from '../hooks/useStudentList';
 import StudentTable from './StudentTable';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';

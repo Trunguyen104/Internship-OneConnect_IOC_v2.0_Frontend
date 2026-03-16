@@ -5,7 +5,6 @@ import { useGeneralInfo } from '../hooks/useGeneralInfo';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Card from '@/components/ui/Card';
-import { PROJECT_UI } from '@/constants/project/uiText';
 
 const { Text } = Typography;
 
