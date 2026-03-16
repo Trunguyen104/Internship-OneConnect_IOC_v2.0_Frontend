@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import Input from '@/components/ui/Input';
 
+import { AUTH_UI, AUTH_MESSAGES } from '@/constants/auth/uiText';
+
 export default function ForgotPasswordPage() {
   const [form, setForm] = useState({
     email: '',
@@ -21,7 +23,6 @@ export default function ForgotPasswordPage() {
       [name]: value,
     }));
 
-    // ✅ xoá TẤT CẢ lỗi khi nhập lại (giống Login / Register)
     setErrors({});
   };
 
@@ -29,9 +30,9 @@ export default function ForgotPasswordPage() {
     const newErrors = {};
 
     if (!form.email.trim()) {
-      newErrors.email = 'Email là bắt buộc';
+      newErrors.email = AUTH_MESSAGES.VALIDATION.EMAIL_REQUIRED;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Email không hợp lệ';
+      newErrors.email = AUTH_MESSAGES.VALIDATION.EMAIL_INVALID;
     }
 
     setErrors(newErrors);
@@ -51,38 +52,40 @@ export default function ForgotPasswordPage() {
       className='flex h-screen w-full items-center justify-center'
       style={{
         background:
-          'radial-gradient(circle at top left, rgb(254, 202, 202) 0%, rgb(255, 255, 255) 65%)',
+          'radial-gradient(circle at top left, var(--primary-100) 0%, var(--color-surface) 65%)',
       }}
     >
       <div className='w-full max-w-105 px-6'>
         <Image
-          src='https://iocv2.rikkei.edu.vn/logo.svg'
-          alt='IOC Logo'
+          src='/assets/images/logo.svg'
+          alt={AUTH_UI.LABELS.LOGO}
           width={180}
           height={45}
           className='mx-auto mb-6'
         />
 
-        <h1 className='mb-4 text-center text-4xl font-bold text-black'>Quên mật khẩu</h1>
-        <p className='mb-6 text-center text-gray-500'>Nhập email xác thực của bạn</p>
+        <h1 className='mb-4 text-center text-4xl font-bold text-black'>
+          {AUTH_UI.FORGOT_PASSWORD.TITLE}
+        </h1>
+        <p className='mb-6 text-center text-gray-500'>{AUTH_UI.FORGOT_PASSWORD.DESC}</p>
 
         {success ? (
           <div className='text-center'>
-            <p className='mb-4 text-green-600'>Đã gửi link đặt lại mật khẩu</p>
+            <p className='mb-4 text-green-600'>{AUTH_UI.FORGOT_PASSWORD.SUCCESS_TEXT}</p>
 
             <Link href='/login' className='font-semibold text-(--primary-700) hover:underline'>
-              Quay lại đăng nhập
+              {AUTH_UI.FORGOT_PASSWORD.BACK_TO_LOGIN}
             </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             <Input
-              label='Email'
+              label={AUTH_UI.LABELS.EMAIL}
               name='email'
               type='email'
               value={form.email}
               onChange={handleChange}
-              placeholder='name@university.edu'
+              placeholder={AUTH_UI.LABELS.EMAIL_PLACEHOLDER}
               error={errors.email}
             />
 
@@ -90,12 +93,12 @@ export default function ForgotPasswordPage() {
               type='submit'
               className='mt-2 h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)'
             >
-              Gửi yêu cầu đặt lại
+              {AUTH_UI.FORGOT_PASSWORD.BUTTON}
             </button>
 
             <div className='mt-4 text-center text-sm'>
               <Link href='/login' className='font-medium text-(--primary-700) hover:underline'>
-                Quay lại đăng nhập
+                {AUTH_UI.FORGOT_PASSWORD.BACK_TO_LOGIN}
               </Link>
             </div>
           </form>
