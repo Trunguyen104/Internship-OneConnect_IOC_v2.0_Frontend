@@ -54,7 +54,7 @@ export default function ProjectResources({
 
             <Col xs={24} lg={15} xl={16}>
               <div className='mb-6 flex items-center gap-3'>
-                <Title level={5} className='!m-0'>
+                <Title level={5} className='m-0!'>
                   {PROJECT_UI.TITLE.RESOURCE_LIST}
                 </Title>
                 <Tag className='bg-info-surface text-info rounded-full border-none px-3 text-[10px] font-bold'>

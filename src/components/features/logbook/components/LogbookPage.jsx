@@ -1,6 +1,6 @@
 'use client';
 
-import { Empty, Form, Spin } from 'antd';
+import { Empty, Spin } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import Card from '@/components/ui/Card';
@@ -15,7 +15,6 @@ import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
-import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 
 export default function LogbookPage() {
@@ -29,8 +28,6 @@ export default function LogbookPage() {
     setPageSize,
     statusFilter,
     setStatusFilter,
-    sortOrder,
-    setSortOrder,
     search,
     setSearch,
     fetchLogbooks,
@@ -167,9 +164,9 @@ export default function LogbookPage() {
     <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
-      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 2xl:h-auto'>
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto'>
         <DataTableToolbar
-          className='mb-5 !border-0 !p-0'
+          className='mb-5 border-0! p-0!'
           searchProps={{
             placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
             value: search,
@@ -200,7 +197,7 @@ export default function LogbookPage() {
         />
         {loading && data.length === 0 ? (
           <div className='flex h-full items-center justify-center py-20'>
-            <Spin size='large' tip={DAILY_REPORT_UI.LOADING} />
+            <Spin size='large' description={DAILY_REPORT_UI.LOADING} />
           </div>
         ) : data.length === 0 ? (
           <div className='flex flex-1 items-center justify-center py-12'>
