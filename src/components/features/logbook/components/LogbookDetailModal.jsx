@@ -23,7 +23,7 @@ const LogbookDetailModal = memo(function LogbookDetailModal({ visible, record, o
       centered
       title={VIEW_MODAL.TITLE}
     >
-      <Space direction='vertical' size={12} style={{ width: '100%' }}>
+      <Space orientation='vertical' size={12} style={{ width: '100%' }}>
         <div>
           <Text type='secondary'>{FORM.REPORT_DATE}</Text>
           <br />
