@@ -6,9 +6,7 @@ export const ProjectService = {
     return httpGet(`/projects${query ? `?${query}` : ''}`);
   },
 
-  getMy() {
-    return httpGet('/projects/my');
-  },
+  // getMy removed to standardize on paginated list endpoints.
 
   getById(projectId) {
     return httpGet(`/projects/${projectId}`);

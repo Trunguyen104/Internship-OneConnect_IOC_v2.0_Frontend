@@ -9,12 +9,14 @@ export default function DataTableToolbar({
   className = '',
 }) {
   return (
-    <div className={`flex w-full items-center gap-4 ${className}`}>
+    <div className={`flex w-full flex-wrap items-center gap-4 ${className}`}>
       {leftContent && <div className='flex min-w-0 shrink-0 items-center gap-4'>{leftContent}</div>}
 
-      <div className='flex min-w-0 flex-1 items-center gap-3'>
+      <div className='flex min-w-0 flex-1 flex-wrap items-center gap-3'>
         {searchProps && (
-          <div className={`relative shrink-0 ${searchProps.width || 'w-72'}`}>
+          <div
+            className={`relative min-w-[200px] flex-1 sm:flex-initial ${searchProps.width || 'sm:w-72'}`}
+          >
             <input
               value={searchProps.value}
               onChange={searchProps.onChange}

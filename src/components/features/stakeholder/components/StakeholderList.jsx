@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Button, Tooltip } from 'antd';
+import { Button, Tooltip, Empty } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
@@ -20,10 +20,7 @@ const StakeholderList = memo(function StakeholderList({
         </div>
       ) : !stakeholders || stakeholders.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <div className='flex flex-col items-center gap-1'>
-            <span className='text-text font-bold'>{STAKEHOLDER_UI.EMPTY_TITLE}</span>
-            <span className='text-muted text-xs'>{STAKEHOLDER_UI.EMPTY_DESC}</span>
-          </div>
+          <Empty description={STAKEHOLDER_UI.EMPTY_TITLE} />
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>
@@ -31,29 +28,29 @@ const StakeholderList = memo(function StakeholderList({
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
               <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='text-muted w-[60px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[60px] px-6 py-5 text-xs font-semibold'>
                     {STAKEHOLDER_UI.TABLE_NO}
                   </th>
-                  <th className='text-muted w-[300px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[300px] px-6 py-5 text-xs font-semibold'>
                     {STAKEHOLDER_UI.FIELD_NAME}
                   </th>
-                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted px-6 py-5 text-xs font-semibold'>
                     {STAKEHOLDER_UI.FIELD_ROLE}
                   </th>
-                  <th className='text-muted px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted px-6 py-5 text-xs font-semibold'>
                     {STAKEHOLDER_UI.FIELD_EMAIL}
                   </th>
-                  <th className='text-muted w-[180px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[180px] px-6 py-5 text-xs font-semibold'>
                     {STAKEHOLDER_UI.FIELD_PHONE}
                   </th>
-                  <th className='text-muted px-6 py-4 text-right text-xs font-semibold'>
+                  <th className='text-muted px-6 py-5 text-right text-xs font-semibold'>
                     {STAKEHOLDER_UI.ACTIONS}
                   </th>
                 </tr>
               </thead>
               <tbody className='divide-border/50 divide-y'>
                 {stakeholders.map((record, index) => (
-                  <tr key={record.id} className='hover:bg-bg/80 transition-colors'>
+                  <tr key={record.id} className='hover:bg-bg/80 h-[72px] transition-colors'>
                     <td className='px-6 py-4'>
                       <span className='text-muted text-xs text-[13px] font-semibold'>
                         {(page - 1) * pageSize + index + 1}
