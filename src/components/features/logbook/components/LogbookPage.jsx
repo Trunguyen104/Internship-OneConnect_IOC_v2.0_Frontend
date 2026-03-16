@@ -194,9 +194,6 @@ export default function LogbookPage() {
               rootClassName='custom-select-premium'
               suffixIcon={<FilterOutlined className='text-muted' />}
               options={[
-                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-                { value: 1, label: DAILY_REPORT_UI.STATUS.APPROVED },
-                { value: 2, label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION },
                 { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
                 { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
