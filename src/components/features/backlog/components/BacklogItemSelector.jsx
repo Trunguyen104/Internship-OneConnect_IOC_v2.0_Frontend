@@ -1,5 +1,7 @@
 import React from 'react';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { Dropdown } from 'antd';
+import { ChevronDown } from 'lucide-react';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 function FieldLabel({ required, children }) {
   return (
@@ -21,26 +23,46 @@ export function BacklogItemSelector({
   toggleAll,
   isAllFilteredSelected,
 }) {
+  const currentEpic = allEpics.find((e) => e.id === selectedEpicId);
+
+  const menuItems = allEpics.map((epic) => ({
+    key: epic.id,
+    label: (
+      <div className='max-w-[320px] truncate py-1 text-sm font-medium'>
+        {epic.name || epic.title || 'Unknown Epic'}
+      </div>
+    ),
+    onClick: () => setSelectedEpicId(epic.id),
+  }));
+
   return (
     <div className='flex max-h-[500px] min-h-[400px] w-[60%] flex-col'>
       <div className='mb-2 flex items-center justify-between'>
         <FieldLabel>
           {BACKLOG_UI.SELECT_ISSUE_SPRINT} ({selectedItemIds.length})
         </FieldLabel>
-        <select
-          value={selectedEpicId}
-          onChange={(e) => setSelectedEpicId(e.target.value)}
-          className='border-primary/40 focus:border-primary focus:ring-primary hover:border-primary/60 h-9 max-w-[300px] cursor-pointer truncate rounded-[10px] border bg-white px-3 py-1 text-sm font-medium shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all outline-none focus:ring-1'
+
+        <Dropdown
+          menu={{
+            items: menuItems,
+            selectable: true,
+            selectedKeys: [selectedEpicId],
+          }}
+          trigger={['click']}
+          placement='bottomRight'
+          getPopupContainer={(triggerNode) => triggerNode.parentNode}
         >
-          <option value='' disabled hidden>
-            {BACKLOG_UI.SELECT_AN_EPIC}
-          </option>
-          {allEpics.map((epic) => (
-            <option key={epic.id} value={epic.id} title={epic.name || epic.title || 'Unknown'}>
-              {epic.name || epic.title || 'Unknown Epic'}
-            </option>
-          ))}
-        </select>
+          <div className='border-border/60 hover:border-primary/60 flex h-10 w-full max-w-[280px] cursor-pointer items-center justify-between rounded-xl border bg-white px-4 transition-all hover:shadow-sm active:scale-[0.98]'>
+            <span
+              className={`truncate text-sm font-bold ${
+                selectedEpicId ? 'text-gray-900' : 'text-gray-400'
+              }`}
+            >
+              {currentEpic ? currentEpic.name || currentEpic.title : BACKLOG_UI.SELECT_AN_EPIC}
+            </span>
+            <ChevronDown className='ml-2 h-4 w-4 shrink-0 text-gray-400' />
+          </div>
+        </Dropdown>
       </div>
 
       <div className='border-border/60 flex-1 overflow-y-auto rounded-xl border bg-white shadow-sm'>

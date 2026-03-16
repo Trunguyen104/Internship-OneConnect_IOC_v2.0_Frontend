@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import TiptapEditor from '@/components/ui/TiptapEditor';
 import DateInput from '@/components/ui/DateInput';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 function FieldLabel({ required, children }) {
   return (

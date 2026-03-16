@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { WORK_ITEM_PRIORITY, PRIORITY_MAP, TYPE_MAP } from '@/constants/enums';
+import { WORK_ITEM_PRIORITY, PRIORITY_MAP, TYPE_MAP } from '@/constants/common/enums';
 
 export function IssueCard({ task, isOverlay }) {
   const getPriorityStyle = (priority) => {

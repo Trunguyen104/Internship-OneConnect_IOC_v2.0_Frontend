@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import {
   AppstoreOutlined,
   BarChartOutlined,
@@ -16,25 +16,36 @@ import {
   ProjectOutlined,
 } from '@ant-design/icons';
 
-const studentMenu = [
-  { icon: <AppstoreOutlined />, label: 'Space', href: '/student/space' },
-  { icon: <BarChartOutlined />, label: 'General Information', href: '/student/general-info' },
-  { icon: <ProjectOutlined />, label: 'Project', href: '/student/project' },
-  { icon: <TeamOutlined />, label: 'Students', href: '/student/studentlist' },
-  { icon: <VideoCameraOutlined />, label: 'Daily Report', href: '/student/daily-report' },
-  { icon: <UploadOutlined />, label: 'Evaluation', href: '/student/evaluate' },
-  { icon: <UserOutlined />, label: 'Stakeholders', href: '/student/stakeholder' },
-  { icon: <ShopOutlined />, label: 'Violations', href: '/student/violation' },
-];
-
-const profileMenu = [
-  { icon: <UserOutlined />, label: 'Profile', href: '/student/profile' },
-  { icon: <LockOutlined />, label: 'Change Password', href: '/student/profile/change-password' },
-];
 export default function Sidebar() {
   const pathname = usePathname();
+  const params = useParams();
+  const internshipGroupId = params?.internshipGroupId;
 
-  const isProfile = pathname.startsWith('/student/profile');
+  const basePath = internshipGroupId
+    ? `/internship-groups/${internshipGroupId}`
+    : '/internship-groups';
+
+  const studentMenu = [
+    { icon: <AppstoreOutlined />, label: 'Space', href: `${basePath}/space` },
+    { icon: <BarChartOutlined />, label: 'General Information', href: `${basePath}/general-info` },
+    { icon: <ProjectOutlined />, label: 'Project', href: `${basePath}/project` },
+    { icon: <TeamOutlined />, label: 'Students', href: `${basePath}/studentlist` },
+    { icon: <VideoCameraOutlined />, label: 'Daily Report', href: `${basePath}/daily-report` },
+    { icon: <UploadOutlined />, label: 'Evaluation', href: `${basePath}/evaluate` },
+    { icon: <UserOutlined />, label: 'Stakeholders', href: `${basePath}/stakeholder` },
+    { icon: <ShopOutlined />, label: 'Violations', href: `${basePath}/violation` },
+  ];
+
+  const profileMenu = [
+    { icon: <UserOutlined />, label: 'Profile', href: `${basePath}/profile` },
+    {
+      icon: <LockOutlined />,
+      label: 'Change Password',
+      href: `${basePath}/profile/change-password`,
+    },
+  ];
+
+  const isProfile = pathname.startsWith(`${basePath}/profile`);
   const menus = isProfile ? profileMenu : studentMenu;
 
   return (
@@ -45,7 +56,7 @@ export default function Sidebar() {
 
       {isProfile ? (
         <Link
-          href='/student/space'
+          href={`${basePath}/space`}
           className='mx-4 mb-4 flex cursor-pointer items-center gap-2 text-xs font-black text-red-800 hover:underline'
         >
           <ArrowLeftOutlined />
@@ -55,8 +66,8 @@ export default function Sidebar() {
         !isProfile &&
         pathname !== '/internship-groups' && (
           <Link
-            href='/student/space'
-            className='mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold text-red-700 hover:text-red-800'
+            href='/internship-groups'
+            className='mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold text-(--primary-700) hover:text-(--primary-800)'
           >
             <ArrowLeftOutlined />
             Back to previous page

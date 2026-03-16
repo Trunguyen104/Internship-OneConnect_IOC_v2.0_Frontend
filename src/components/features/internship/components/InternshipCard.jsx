@@ -85,7 +85,7 @@ const Stepper = () => {
   return <ProgressStepper currentStatus={status} />;
 };
 
-const BodyTitle = ({ title, href = '/student/space' }) => {
+const BodyTitle = ({ title, href = null }) => {
   const { status } = useInternshipCard();
   const config = INTERNSHIP_STATUS_CONFIG[status];
 

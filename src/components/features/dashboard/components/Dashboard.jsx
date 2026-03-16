@@ -14,7 +14,7 @@ import {
 import { ViolationsList } from './ViolationsList';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
-import { DASHBOARD_UI } from '@/constants/dashboard';
+import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 export default function DashboardPage() {
   const { data, err, completionPie } = useDashboard();

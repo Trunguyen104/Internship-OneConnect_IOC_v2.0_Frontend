@@ -2,7 +2,7 @@
 
 import { Input, Select, Button } from 'antd';
 import { SearchOutlined, EnvironmentOutlined, UnorderedListOutlined } from '@ant-design/icons';
-import { JOB_BOARD_UI } from '@/constants/job-board';
+import { JOB_BOARD_UI } from '@/constants/job-board/uiText';
 
 const categoryOptions = [{ value: 'all', label: JOB_BOARD_UI.CHOOSE_CATEGORY }];
 const locationOptions = [

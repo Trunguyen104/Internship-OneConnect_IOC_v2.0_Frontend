@@ -1,5 +1,5 @@
 import { getDashboardMock } from '@/mocks/mockServer';
-import { CONFIG } from '@/constants/config';
+import { CONFIG } from '@/constants/common/config';
 import { httpGet } from '@/services/httpClient';
 
 export async function getDashboardData() {

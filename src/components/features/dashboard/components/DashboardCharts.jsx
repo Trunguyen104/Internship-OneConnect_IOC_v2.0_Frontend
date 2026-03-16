@@ -14,7 +14,7 @@ import {
   Legend,
 } from 'recharts';
 import { Card, CardHeader } from './atoms';
-import { DASHBOARD_UI } from '@/constants/dashboard';
+import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 function formatShortDate(iso) {
   if (!iso) return '';

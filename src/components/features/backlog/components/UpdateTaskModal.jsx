@@ -5,8 +5,8 @@ import TiptapEditor from '@/components/ui/TiptapEditor';
 
 import { FieldLabel, TextInput } from './TaskFields';
 import { TaskModalSidebar } from './TaskModalSidebar';
-import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export default function UpdateTaskModal({
   open,
