@@ -1,6 +1,6 @@
 import { Plus, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 export function EpicSidebar({

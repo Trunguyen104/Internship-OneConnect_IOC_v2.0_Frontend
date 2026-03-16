@@ -3,8 +3,8 @@ import { useDroppable } from '@dnd-kit/core';
 import { MoreVertical, Plus, Pencil, Trash2 } from 'lucide-react';
 import { WorkItem, ColumnHeaders } from './WorkItem';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { SPRINT_STATUS } from '@/constants/enums';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { SPRINT_STATUS } from '@/constants/common/enums';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 export function SprintSection({

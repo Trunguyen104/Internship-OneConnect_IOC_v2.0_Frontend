@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { MoreVertical, GripVertical, Trash2 } from 'lucide-react';
-import { WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/enums';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 const statusToneText = {
@@ -89,32 +89,34 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
         {...listeners}
         onClick={(e) => e.stopPropagation()}
         style={{ touchAction: 'none' }}
-        className='mr-2 flex h-8 w-8 cursor-grab items-center justify-center text-gray-300 hover:text-gray-500 active:cursor-grabbing'
+        className='mr-2 flex h-8 w-8 shrink-0 cursor-grab items-center justify-center text-gray-300 hover:text-gray-500 active:cursor-grabbing'
       >
         <GripVertical className='h-4 w-4' />
       </div>
 
       <div className='flex flex-1 items-center'>
-        <div className='text-text w-32 shrink-0 pl-1 text-[13px] font-medium tracking-wide whitespace-nowrap'>
+        <div className='text-text w-20 shrink-0 pl-1 text-[13px] font-medium tracking-wide whitespace-nowrap'>
           {BACKLOG_UI.ISSUE || 'Issue'} {itemOrder || '-'}
         </div>
 
-        <div
-          className='text-text min-w-0 flex-1 truncate pr-4 text-[13.5px] font-medium'
-          title={it.title || it.name}
-        >
-          {it.title || it.name}
+        <div className='w-0 min-w-0 flex-1 pr-4'>
+          <div className='text-text truncate text-[13.5px] font-medium' title={it.title || it.name}>
+            {it.title || it.name}
+          </div>
         </div>
 
-        <div className='flex w-28 shrink-0 justify-start'>
-          <span className={`rounded-lg px-2.5 py-0.5 text-[12px] font-semibold ${statusConfig}`}>
+        <div className='flex w-32 shrink-0 justify-center'>
+          <span className={`${statusConfig} rounded-lg px-2.5 py-0.5 text-[12px] font-semibold`}>
             {getStatusLabel(currentStatus)}
           </span>
         </div>
 
-        <div className='flex w-44 shrink-0 justify-start px-2'>
+        <div className='flex w-32 min-w-0 shrink-0 justify-center px-2'>
           {it.epicName ? (
-            <span className='bg-primary-surface text-primary w-full truncate rounded-lg px-2.5 py-0.5 text-center text-xs font-semibold'>
+            <span
+              className='bg-primary-surface text-primary block w-full truncate rounded-lg px-2.5 py-0.5 text-center text-xs font-semibold'
+              title={it.epicName}
+            >
               {it.epicName}
             </span>
           ) : (
@@ -126,11 +128,11 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
           {it.dueDate ? new Date(it.dueDate).toLocaleDateString('vi-VN') : '-'}
         </div>
 
-        <div className='text-primary w-10 shrink-0 text-center text-[13px] font-bold'>
+        <div className='text-primary w-24 shrink-0 text-center text-[13px] font-bold'>
           {it.storyPoint || it.points || '-'}
         </div>
 
-        <div className='flex w-24 shrink-0 justify-center'>
+        <div className='flex w-20 shrink-0 justify-center'>
           <span
             className={`rounded-lg px-2.5 py-0.5 text-[12px] font-semibold ${isHigh ? 'bg-danger-surface text-danger' : isLow ? 'bg-success-surface text-success' : 'bg-info-surface text-info'}`}
           >
@@ -203,31 +205,35 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
 export function ColumnHeaders() {
   return (
     <div className='mb-2 flex items-center justify-between rounded-lg border-b border-gray-100/50 bg-gray-50/80 px-2 py-2'>
-      <div className='mr-4 w-4 shrink-0' />
-      <div className='text-muted w-32 shrink-0 pl-1 text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.ISSUE || 'Issue'}
+      <div className='mr-2 w-8 shrink-0' />
+
+      <div className='flex flex-1 items-center'>
+        <div className='text-muted w-20 shrink-0 pl-1 text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+          {BACKLOG_UI.ISSUE || 'Issue'}
+        </div>
+        <div className='text-muted min-w-0 flex-1 truncate text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+          {BACKLOG_UI.FIELD_SUMMARY || 'Summary'}
+        </div>
+        <div className='text-muted w-32 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+          {BACKLOG_UI.FIELD_STATUS || 'Status'}
+        </div>
+        <div className='text-muted w-32 shrink-0 px-2 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+          {BACKLOG_UI.TYPE_EPIC || 'Epic'}
+        </div>
+        <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+          {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
+        </div>
+        <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+          {BACKLOG_UI.FIELD_STORY_POINTS || 'Pts'}
+        </div>
+        <div className='text-muted w-20 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+          {BACKLOG_UI.FIELD_PRIORITY || 'Priority'}
+        </div>
+        <div className='text-muted w-12 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+          {BACKLOG_UI.FIELD_ASSIGNEE || 'User'}
+        </div>
       </div>
-      <div className='text-muted min-w-0 flex-1 text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.FIELD_SUMMARY || 'Summary'}
-      </div>
-      <div className='text-muted w-28 shrink-0 text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.FIELD_STATUS || 'Status'}
-      </div>
-      <div className='text-muted w-44 shrink-0 px-2 text-center text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.TYPE_EPIC || 'Epic'}
-      </div>
-      <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
-      </div>
-      <div className='text-muted w-10 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.FIELD_STORY_POINTS || 'Pts'}
-      </div>
-      <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.FIELD_PRIORITY || 'Priority'}
-      </div>
-      <div className='text-muted w-12 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
-        {BACKLOG_UI.FIELD_ASSIGNEE || 'User'}
-      </div>
+
       <div className='w-8 shrink-0' />
     </div>
   );

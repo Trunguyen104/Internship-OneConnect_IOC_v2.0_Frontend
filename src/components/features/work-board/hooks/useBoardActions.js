@@ -3,7 +3,8 @@
 import { useCallback } from 'react';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { useToast } from '@/providers/ToastProvider';
-import { WORK_ITEM_TYPE, WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/enums';
+import { WORK_ITEM_TYPE, WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
+import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 
 /**
  * Hook for Board actions (Task click, submission)
@@ -73,11 +74,11 @@ export function useBoardActions({ projectId, ui, fetchBoardData }) {
           }
         }
 
-        toast.success('Cập nhật nhiệm vụ thành công!');
+        toast.success(WORK_BOARD_UI.SUCCESS_UPDATE_TASK);
         ui.setOpenUpdateTask(false);
         fetchBoardData(false);
       } catch {
-        toast.error('Lỗi khi cập nhật nhiệm vụ');
+        toast.error(WORK_BOARD_UI.ERROR_UPDATE_TASK);
       }
     },
     [projectId, ui, fetchBoardData, toast],

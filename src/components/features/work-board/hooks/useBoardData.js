@@ -9,9 +9,9 @@ import {
   WORK_ITEM_TYPE,
   WORK_ITEM_PRIORITY,
   SPRINT_STATUS,
-} from '@/constants/enums';
+} from '@/constants/common/enums';
 
-import { WORK_BOARD_UI } from '@/constants/work-board';
+import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 
 export const COLUMNS = [
   { id: WORK_ITEM_STATUS.TODO, title: WORK_BOARD_UI.COLUMN_TODO, underline: 'bg-muted' },
@@ -43,7 +43,7 @@ export function useBoardData() {
           setProjectId(res.data.items[0].projectId);
         }
       } catch {
-        toast.error('Không lấy được project');
+        toast.error(WORK_BOARD_UI.ERROR_FETCH_PROJECT);
       }
     };
     fetchProjectId();

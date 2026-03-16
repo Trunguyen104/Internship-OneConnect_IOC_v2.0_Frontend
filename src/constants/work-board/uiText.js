@@ -13,6 +13,10 @@ export const WORK_BOARD_UI = {
   UNASSIGNED: '—',
 
   // Toasts
-  ERROR_FETCH_PROJECT: 'Failed to fetch project information',
+  ERROR_FETCH_PROJECT: 'Could not fetch project information',
   ERROR_FETCH_BOARD: 'Error loading work board data',
+  SUCCESS_UPDATE_TASK: 'Task updated successfully!',
+  ERROR_UPDATE_TASK: 'Error updating task',
+  ERROR_SAVE_STATUS: 'Could not save new status',
+  ERROR_SAVE_CHANGES: 'Error saving changes',
 };

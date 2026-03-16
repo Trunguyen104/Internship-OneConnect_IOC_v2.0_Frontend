@@ -2,8 +2,12 @@
 
 import { useToast } from '@/providers/ToastProvider';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@/constants/enums';
-import { BACKLOG_UI } from '@/constants/backlog';
+import {
+  SPRINT_STATUS,
+  WORK_ITEM_STATUS,
+  MOVE_INCOMPLETE_ITEMS_OPTION,
+} from '@/constants/common/enums';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 /**
  * Hook to manage actions triggered from Backlog Modals

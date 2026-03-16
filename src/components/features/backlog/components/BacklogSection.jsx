@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { WorkItem, ColumnHeaders } from './WorkItem';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export function BacklogSection({
   filteredBacklogItems,
