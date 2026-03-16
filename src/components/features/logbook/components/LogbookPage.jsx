@@ -1,6 +1,6 @@
 'use client';
 
-import { Form } from 'antd';
+import { Empty, Form, Spin } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import Card from '@/components/ui/Card';
@@ -40,12 +40,12 @@ export default function LogbookPage() {
   } = useLogbook();
 
   const toast = useToast();
-  const [form] = Form.useForm();
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [viewRecord, setViewRecord] = useState(null);
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   const handleCreateOrUpdate = async (values) => {
@@ -115,30 +115,24 @@ export default function LogbookPage() {
       try {
         setSubmitting(true);
         const res = await LogBookService.getById(record.logbookId);
-        const fullData = res?.data || record;
-
+        const detailData = res?.data || {};
+        const fullData = {
+          ...record,
+          ...detailData,
+          dateReport: detailData.dateReport || detailData.reportDate || record.dateReport,
+        };
         setEditingId(fullData.logbookId);
-        form.setFieldsValue({
-          dateReport: fullData.dateReport ? dayjs(fullData.dateReport) : null,
-          summary: fullData.summary,
-          issue: fullData.issue,
-          plan: fullData.plan,
-        });
+        setCurrentRecord(fullData);
       } catch (err) {
         console.error('Failed to load logbook details', err);
         setEditingId(record.logbookId);
-        form.setFieldsValue({
-          dateReport: record.dateReport ? dayjs(record.dateReport) : null,
-          summary: record.summary,
-          issue: record.issue,
-          plan: record.plan,
-        });
+        setCurrentRecord(record);
       } finally {
         setSubmitting(false);
       }
     } else {
       setEditingId(null);
-      form.resetFields();
+      setCurrentRecord(null);
     }
     setIsFormModalOpen(true);
   };
@@ -146,8 +140,8 @@ export default function LogbookPage() {
   const closeFormModal = useCallback(() => {
     setIsFormModalOpen(false);
     setEditingId(null);
-    form.resetFields();
-  }, [form]);
+    setCurrentRecord(null);
+  }, []);
 
   const openDetailModal = async (record) => {
     try {
@@ -170,10 +164,10 @@ export default function LogbookPage() {
   }, []);
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
+    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
-      <Card className='shadow-border/50 flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl'>
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 2xl:h-auto'>
         <DataTableToolbar
           className='mb-5 !border-0 !p-0'
           searchProps={{
@@ -194,9 +188,6 @@ export default function LogbookPage() {
               rootClassName='custom-select-premium'
               suffixIcon={<FilterOutlined className='text-muted' />}
               options={[
-                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-                { value: 1, label: DAILY_REPORT_UI.STATUS.APPROVED },
-                { value: 2, label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION },
                 { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
                 { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
@@ -207,28 +198,46 @@ export default function LogbookPage() {
             onClick: () => openFormModal(),
           }}
         />
-        <LogbookTable
-          data={data}
-          loading={loading}
-          userProfile={userProfile}
-          onView={openDetailModal}
-          onEdit={openFormModal}
-          onDelete={handleDelete}
-        />
-      </Card>
+        {loading && data.length === 0 ? (
+          <div className='flex h-full items-center justify-center py-20'>
+            <Spin size='large' tip={DAILY_REPORT_UI.LOADING} />
+          </div>
+        ) : data.length === 0 ? (
+          <div className='flex flex-1 items-center justify-center py-12'>
+            <Empty description={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'} />
+          </div>
+        ) : (
+          <LogbookTable
+            data={data}
+            loading={loading}
+            userProfile={userProfile}
+            onView={openDetailModal}
+            onEdit={openFormModal}
+            onDelete={handleDelete}
+          />
+        )}
 
-      <Pagination
-        total={total}
-        page={pageNumber}
-        pageSize={pageSize}
-        onPageChange={setPageNumber}
-      />
+        {total > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPageNumber(1);
+              }}
+            />
+          </div>
+        )}
+      </Card>
 
       <LogbookFormModal
         visible={isFormModalOpen}
         editingId={editingId}
         submitting={submitting}
-        form={form}
+        initialValues={currentRecord}
         onSubmit={handleCreateOrUpdate}
         onCancel={closeFormModal}
       />

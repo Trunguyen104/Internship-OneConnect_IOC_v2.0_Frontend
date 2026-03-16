@@ -3,6 +3,7 @@ export const DAILY_REPORT_UI = {
   DESCRIPTION: 'Manage and submit your daily internship logbook',
 
   CREATE_BUTTON: 'Create Report',
+  LOADING: 'Loading logbooks...',
 
   FILTER_STATUS: 'Filter by status',
 
@@ -39,10 +40,11 @@ export const DAILY_REPORT_UI = {
   FORM: {
     REPORT_DATE: 'Report Date',
     SUMMARY: 'Work Summary',
-    ISSUE: 'Issues Encountered (Optional)',
+    ISSUE: 'Issues Encountered',
     PLAN: 'Plan for Next Day',
     LINKED_WORK_ITEMS: 'Linked Work Items',
 
+    PLACEHOLDER_DATE: 'Select date',
     PLACEHOLDER_SUMMARY: 'Describe the tasks you have done today...',
     PLACEHOLDER_ISSUE: 'What difficulties or obstacles did you encounter?',
     PLACEHOLDER_PLAN: 'What are the planned tasks for tomorrow?',

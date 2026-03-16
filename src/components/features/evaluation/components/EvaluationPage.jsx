@@ -1,5 +1,6 @@
 'use client';
 
+import { Empty } from 'antd';
 import Card from '@/components/ui/Card';
 // import Footer from '@/components/layout/Footer';
 import CycleTable from './CycleTable';
@@ -32,32 +33,44 @@ export default function EvaluationPage() {
     closeDetail,
   } = useEvaluation();
 
-  if (loading && paginated.length === 0) {
-    return (
-      <div className='flex h-64 items-center justify-center'>
-        <div className='border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent'></div>
-      </div>
-    );
-  }
-
   return (
-    <section className='flex flex-col space-y-6'>
+    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={EVALUATION_UI.TITLE} />
 
-      <Card>
-        <CycleTable data={paginated} page={page} pageSize={pageSize} onDetail={openTeamOverview} />
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
+        {loading && paginated.length === 0 ? (
+          <div className='flex h-full items-center justify-center py-20'>
+            <div className='border-primary/30 border-t-primary h-8 w-8 animate-spin rounded-full border-4'></div>
+          </div>
+        ) : paginated.length === 0 ? (
+          <div className='flex flex-1 items-center justify-center py-12'>
+            <Empty description={EVALUATION_UI.LABELS.NO_DATA} />
+          </div>
+        ) : (
+          <CycleTable
+            data={paginated}
+            page={page}
+            pageSize={pageSize}
+            onDetail={openTeamOverview}
+          />
+        )}
+
+        {total > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={total}
+              page={page}
+              pageSize={pageSize}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          </div>
+        )}
       </Card>
-      <Pagination
-        total={total}
-        page={page}
-        pageSize={pageSize}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
 
       <TeamEvaluationsModal
         visible={teamVisible}

@@ -22,7 +22,7 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
       {!evaluationDetail ? (
         <Empty description={EVALUATION_UI.LABELS.SCORECARD_NOT_READY} />
       ) : (
-        <Space direction='vertical' size='large' style={{ width: '100%' }}>
+        <Space orientation='vertical' size='large' style={{ width: '100%' }}>
           <Card className='border-border/60 shadow-sm'>
             <Descriptions column={1} size='small'>
               <Descriptions.Item label={EVALUATION_UI.LABELS.EVALUATOR}>
@@ -89,7 +89,7 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
                     <Progress percent={percent} showInfo={false} />
 
                     <Text type='secondary' italic>
-                      {criteria.comment || 'No detailed comments provided'}
+                      {criteria.comment || EVALUATION_UI.LABELS.NO_DETAILED_COMMENTS}
                     </Text>
 
                     {index < evaluationDetail.criteriaScores.length - 1 && (

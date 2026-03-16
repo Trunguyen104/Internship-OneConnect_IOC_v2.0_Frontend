@@ -6,9 +6,7 @@ export const ProjectService = {
     return httpGet(`/projects${query ? `?${query}` : ''}`);
   },
 
-  getMy() {
-    return httpGet('/projects/my');
-  },
+  // getMy removed to standardize on paginated list endpoints.
 
   getById(projectId) {
     return httpGet(`/projects/${projectId}`);
@@ -29,7 +27,7 @@ export const ProjectService = {
   // getByInternshipGroup(internshipId) {
   //   return httpGet(`/projects/internship-group/${internshipId}`);
   // },
-  getByInternshipGroup(internshipGroupId) {
-    return httpGet(`/projects/internship-group?internshipGroupId=${internshipGroupId}`);
+  getByInternshipGroup(internshipId) {
+    return this.getAll({ InternshipId: internshipId, PageSize: 1 });
   },
 };

@@ -1,3 +1,7 @@
-export default function Card({ children }) {
-  return <div className='flex h-112.5 flex-col rounded-2xl bg-white p-5 shadow-sm'>{children}</div>;
+export default function Card({ children, className = '' }) {
+  return (
+    <div className={`flex min-h-[420px] flex-col rounded-2xl bg-white p-5 shadow-sm ${className}`}>
+      {children}
+    </div>
+  );
 }

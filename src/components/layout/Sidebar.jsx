@@ -82,7 +82,9 @@ export default function Sidebar() {
           return (
             <Link key={item.href} href={item.href} className='block px-3'>
               <div
-                className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm font-semibold ${isActive ? 'bg-[#FEF2F2] text-[#B91C1C]' : 'hover:bg-blue-50'}`}
+                className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm font-semibold ${
+                  isActive ? 'bg-[#FEF2F2] text-[#B91C1C]' : 'text-slate-600 hover:bg-blue-50'
+                }`}
               >
                 <span className='text-lg'>{item.icon}</span>
                 {item.label}

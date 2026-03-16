@@ -89,7 +89,7 @@ export default function TeamEvaluationsModal({
           );
         }
 
-        return <Tag color='red'>{Number(score).toFixed(1)}</Tag>;
+        return <Tag color='error'>{Number(score).toFixed(1)}</Tag>;
       },
     },
     {
@@ -118,7 +118,7 @@ export default function TeamEvaluationsModal({
             size='small'
             icon={<EyeOutlined />}
             onClick={() => onViewDetails(cycle)}
-            className='bg-primary'
+            className='bg-primary/95 hover:!bg-primary border-none shadow-sm transition-all'
           >
             {EVALUATION_UI.LABELS.VIEW_REPORT}
           </Button>
@@ -143,7 +143,7 @@ export default function TeamEvaluationsModal({
       width={850}
       centered
     >
-      <Space direction='vertical' size='large' style={{ width: '100%' }}>
+      <Space orientation='vertical' size='large' style={{ width: '100%' }}>
         <AppTable columns={columns} data={teamData} pagination={false} rowKey='studentId' />
       </Space>
     </Modal>

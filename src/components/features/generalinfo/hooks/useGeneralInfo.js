@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
-import { ProjectService } from '@/components/features/project/services/projectService';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
+import { ProjectService } from '@/components/features/project/services/projectService';
 import { useToast } from '@/providers/ToastProvider';
 
-export function useGeneralInfo() {
+export function useGeneralInfo(initialId = null) {
   const toast = useToast();
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,39 +62,62 @@ export function useGeneralInfo() {
     const fetchGeneralData = async () => {
       try {
         setLoading(true);
-        const groupsRes = await InternshipGroupService.getAll();
-        const groups = groupsRes?.data?.items || groupsRes?.items || [];
 
-        if (groups.length === 0) {
+        let data = null;
+        if (initialId) {
+          const res = await InternshipGroupService.getById(initialId);
+          data = res?.data || res;
+        } else {
+          const res = await InternshipGroupService.getAll({ PageSize: 1 });
+          // Get the first item from paginated items OR if the API returns a direct array
+          data = res?.data?.items?.[0] || res?.data?.[0] || res?.[0] || null;
+        }
+
+        if (!data) {
           setLoading(false);
           return;
         }
 
-        const groupId = groups[0].internshipId || groups[0].id;
+        const internshipId = data.internshipId || data.id;
+        const termId = data.termId || data.term?.termId;
 
-        const groupDetailRes = await InternshipGroupService.getById(groupId);
-        const groupDetail = groupDetailRes?.data || groupDetailRes;
+        // Supplemental fetches for missing DTO info
+        const [termRes, projectRes] = await Promise.all([
+          termId ? InternshipGroupService.getTermById(termId) : Promise.resolve(null),
+          internshipId ? ProjectService.getByInternshipGroup(internshipId) : Promise.resolve(null),
+        ]);
 
-        let projectInfo = null;
-        try {
-          const projectRes = await ProjectService.getByInternshipGroup(groupId);
-          projectInfo = projectRes?.data?.items?.[0] || projectRes?.data || projectRes;
-        } catch (err) {
-          console.warn('Could not fetch project info:', err);
-        }
+        const termData = termRes?.data || termRes;
+        const projectData =
+          projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
 
         setInfo({
-          ...groupDetail,
+          ...data,
+          groupName: data.groupName || data.name,
+          internshipTermName: termData?.name || data.internshipTermName || data.term?.name,
+          enterpriseName: data.enterpriseName || data.enterprise?.name || data.company,
+          schoolName: data.schoolName || data.school?.name || data.school,
+          mentorName: data.mentorName || data.mentors?.[0]?.fullName || data.mentor,
+          totalStudents: data.numberOfMembers || data.studentCount || data.members?.length,
+          totalMentors:
+            data.totalMentors || data.mentors?.length || (data.mentorName || data.mentor ? 1 : 0),
+          project: projectData
+            ? {
+                id: projectData.projectId || projectData.id,
+                name: projectData.projectName || projectData.name,
+              }
+            : data.project,
           projectDescription:
-            projectInfo?.description ||
-            groupDetail?.description ||
+            projectData?.description ||
+            data.project?.description ||
+            data.description ||
             GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC,
-          displayCreatedAt: groupDetail?.createdAt
-            ? new Date(groupDetail.createdAt).toLocaleDateString('vi-VN')
+          displayCreatedAt: data.createdAt
+            ? new Date(data.createdAt).toLocaleDateString('en-GB')
             : GENERAL_INFO_UI.VALUES.NA,
-          displayUpdatedAt: groupDetail?.updatedAt
-            ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(groupDetail.updatedAt).toLocaleDateString('vi-VN')}`
-            : groupDetail?.updatedText || '',
+          displayUpdatedAt: data.updatedAt
+            ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(data.updatedAt).toLocaleDateString('en-GB')}`
+            : data.updatedText || '',
         });
       } catch (error) {
         console.error('Error fetching general info:', error);
@@ -105,7 +128,7 @@ export function useGeneralInfo() {
     };
 
     fetchGeneralData();
-  }, [toast]);
+  }, [initialId, toast]);
 
   const getStatusConfig = (status) => {
     const normalizedStatus = status ? String(status).toUpperCase().replace(/_/g, '') : '';
