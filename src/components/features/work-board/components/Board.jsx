@@ -17,6 +17,7 @@ import { BoardColumn } from './BoardColumn';
 import { IssueCard } from './IssueCard';
 import SearchBar from '@/components/ui/SearchBar';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
+import { EmptySprintState } from './EmptySprintState';
 
 export default function Board() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
@@ -26,8 +27,10 @@ export default function Board() {
     setQuery,
     byColumn,
     activeTask,
+    activeSprint,
     epics,
     sprints,
+    loading,
     openUpdateTask,
     setOpenUpdateTask,
     selectedTask,
@@ -43,40 +46,46 @@ export default function Board() {
     <PageShell>
       <div className='mb-4 flex flex-col gap-4'>
         <StudentTabs />
-        <SearchBar
-          value={query}
-          onChange={setQuery}
-          placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
-          width='w-full max-w-sm'
-        />
+        {activeSprint && (
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
+            width='w-full max-w-sm'
+          />
+        )}
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        onDragEnd={onDragEnd}
-      >
-        <div className='grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
-          {COLUMNS.map((col) => (
-            <BoardColumn
-              key={col.id}
-              column={col}
-              tasks={byColumn[col.id].filter((t) =>
-                t.title.toLowerCase().includes(query.toLowerCase()),
-              )}
-              onCardClick={handleTaskClick}
-            />
-          ))}
-        </div>
-
-        <DragOverlay
-          dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}
+      {!activeSprint && !loading ? (
+        <EmptySprintState />
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
         >
-          {activeTask ? <IssueCard task={activeTask} isOverlay /> : null}
-        </DragOverlay>
-      </DndContext>
+          <div className='grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
+            {COLUMNS.map((col) => (
+              <BoardColumn
+                key={col.id}
+                column={col}
+                tasks={byColumn[col.id].filter((t) =>
+                  t.title.toLowerCase().includes(query.toLowerCase()),
+                )}
+                onCardClick={handleTaskClick}
+              />
+            ))}
+          </div>
+
+          <DragOverlay
+            dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}
+          >
+            {activeTask ? <IssueCard task={activeTask} isOverlay /> : null}
+          </DragOverlay>
+        </DndContext>
+      )}
 
       <UpdateTaskModal
         open={openUpdateTask}

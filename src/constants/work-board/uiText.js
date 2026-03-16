@@ -19,4 +19,9 @@ export const WORK_BOARD_UI = {
   ERROR_UPDATE_TASK: 'Error updating task',
   ERROR_SAVE_STATUS: 'Could not save new status',
   ERROR_SAVE_CHANGES: 'Error saving changes',
+
+  // Empty State
+  NO_ACTIVE_SPRINT: 'No active sprint found',
+  START_SPRINT_DESC: 'Start a sprint in the Backlog to see the work board.',
+  GO_TO_BACKLOG: 'Go to Backlog',
 };

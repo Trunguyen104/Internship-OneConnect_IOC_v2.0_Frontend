@@ -32,6 +32,7 @@ export function useBoardData() {
   const [projectId, setProjectId] = useState(null);
   const [epics, setEpics] = useState([]);
   const [sprints, setSprints] = useState([]);
+  const [activeSprint, setActiveSprint] = useState(null);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
 
@@ -63,18 +64,19 @@ export function useBoardData() {
         const sprintsData = sprintsRes?.data?.sprints || [];
         setSprints(sprintsData);
 
-        const activeSprint =
-          sprintsData.find((s) => {
-            const sStatus = s.status?.id || s.status;
-            return (
-              sStatus === SPRINT_STATUS.ACTIVE ||
-              String(sStatus).toUpperCase() === 'ACTIVE' ||
-              s.status?.name?.toUpperCase() === 'ACTIVE'
-            );
-          }) || sprintsData[0];
+        const foundActiveSprint = sprintsData.find((s) => {
+          const sStatus = s.status?.id || s.status;
+          return (
+            sStatus === SPRINT_STATUS.ACTIVE ||
+            String(sStatus).toUpperCase() === 'ACTIVE' ||
+            s.status?.name?.toUpperCase() === 'ACTIVE'
+          );
+        });
 
-        if (activeSprint) {
-          const itemsToMap = activeSprint.items || activeSprint.featureWorkItems || [];
+        setActiveSprint(foundActiveSprint);
+
+        if (foundActiveSprint) {
+          const itemsToMap = foundActiveSprint.items || foundActiveSprint.featureWorkItems || [];
 
           const mappedItems = itemsToMap.map((it, idx) => {
             let s = it.status?.id || it.status;
@@ -112,11 +114,13 @@ export function useBoardData() {
               points: it.storyPoint || 0,
               assignee: it.assigneeName || WORK_BOARD_UI.UNASSIGNED,
               status: s || WORK_ITEM_STATUS.TODO,
-              sprintId: activeSprint.sprintId || activeSprint.id,
+              sprintId: foundActiveSprint.sprintId || foundActiveSprint.id,
               parentId: it.parentId,
             };
           });
           setItems(mappedItems);
+        } else {
+          setItems([]);
         }
       } catch {
         toast.error(WORK_BOARD_UI.ERROR_FETCH_BOARD);
@@ -145,6 +149,7 @@ export function useBoardData() {
     setItems,
     epics,
     sprints,
+    activeSprint,
     loading,
     byColumn,
     fetchBoardData,
