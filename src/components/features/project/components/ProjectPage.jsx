@@ -10,7 +10,6 @@ import Card from '@/components/ui/Card';
 
 export default function ProjectPage({ projectId = null }) {
   const {
-    projectId: activeProjectId,
     projectInfo,
     resources,
     fileList,

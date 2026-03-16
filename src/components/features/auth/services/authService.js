@@ -12,9 +12,6 @@ export async function login(data) {
   }
 
   const { accessToken } = await res.json();
-
-  // lưu accessToken
-  sessionStorage.setItem('accessToken', accessToken);
   return accessToken;
 }
 
@@ -30,13 +27,11 @@ export async function logout() {
 export async function refreshToken() {
   const res = await fetch('/api/auth', {
     method: 'PUT',
-    //credentials: 'include',
+    credentials: 'include',
   });
 
   if (!res.ok) throw new Error('Refresh failed');
 
   const { accessToken } = await res.json();
-  sessionStorage.setItem('accessToken', accessToken);
-
   return accessToken;
 }
