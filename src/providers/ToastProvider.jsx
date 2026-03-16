@@ -1,37 +1,51 @@
 'use client';
 
-import { ConfigProvider, notification } from 'antd';
-import { createContext, useContext } from 'react';
+import { ConfigProvider, App } from 'antd';
+import { createContext, useContext, useLayoutEffect } from 'react';
 
 const ToastContext = createContext(null);
 
 const COLOR_BG = 'linear-gradient(135deg,#6253e1, #04befe)';
 
-export function ToastProvider({ children }) {
-  const [api, contextHolder] = notification.useNotification();
+export let notificationApi = null;
+export let messageApi = null;
+export let modalApi = null;
 
+function AntdAppHookHelper() {
+  const { notification: nApi, message: mApi, modal: modApi } = App.useApp();
+
+  useLayoutEffect(() => {
+    notificationApi = nApi;
+    messageApi = mApi;
+    modalApi = modApi;
+  }, [nApi, mApi, modApi]);
+
+  return null;
+}
+
+export function ToastProvider({ children }) {
   const toast = {
     success: (title, description) =>
-      api.success({
+      notificationApi?.success({
         title: title,
         description,
         showProgress: true,
         duration: 5,
       }),
     error: (title, description) =>
-      api.error({
+      notificationApi?.error({
         title: title,
         description,
         showProgress: true,
       }),
     info: (title, description) =>
-      api.info({
+      notificationApi?.info({
         title: title,
         description,
         showProgress: true,
       }),
     warning: (title, description) =>
-      api.warning({
+      notificationApi?.warning({
         title: title,
         description,
         showProgress: true,
@@ -41,6 +55,11 @@ export function ToastProvider({ children }) {
   return (
     <ConfigProvider
       theme={{
+        token: {
+          colorPrimary: '#b91c1c',
+          colorLink: '#b91c1c',
+          fontFamily: 'var(--font-sans)',
+        },
         components: {
           Notification: {
             progressBg: COLOR_BG,
@@ -48,10 +67,10 @@ export function ToastProvider({ children }) {
         },
       }}
     >
-      <ToastContext.Provider value={toast}>
-        {contextHolder}
-        {children}
-      </ToastContext.Provider>
+      <App component='div'>
+        <AntdAppHookHelper />
+        <ToastContext.Provider value={toast}>{children}</ToastContext.Provider>
+      </App>
     </ConfigProvider>
   );
 }

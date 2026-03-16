@@ -88,7 +88,8 @@ export function useGeneralInfo(initialId = null) {
         ]);
 
         const termData = termRes?.data || termRes;
-        const projectData = projectRes?.data?.[0] || projectRes?.data || projectRes?.[0];
+        const projectData =
+          projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
 
         setInfo({
           ...data,
