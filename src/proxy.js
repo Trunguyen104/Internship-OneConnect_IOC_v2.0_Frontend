@@ -4,7 +4,7 @@ export function proxy(request) {
   const refreshToken = request.cookies.get('refreshToken')?.value;
   const pathname = request.nextUrl.pathname;
 
-  // REMOVE the forced redirect to /student/space when hitting /login with a token
+  // REMOVE the forced redirect to /internship-groups when hitting /login with a token
   // because we handle role-based redirection on the client side in LoginPage.jsx.
   // We can just redirect to a neutral route or let the client decide.
   if (pathname === '/login' && refreshToken) {
@@ -18,7 +18,7 @@ export function proxy(request) {
     // will have the cookie, and pass the `isProtected` check.
     // So if they visit `/login` while ALREADY logged in, where do they go?
     // Let's redirect them to '/' which can then redirect them appropriately, OR
-    // simply turn off this forced `/student/space` redirect!
+    // simply turn off this forced redirect!
     // Let's redirect to `/internship-groups` for now as a default fallback,
     // but the client-side router.push('/dashboard') for HR will take precedence since it happens directly
     // on the client without a full page reload hitting middleware for /login.
@@ -27,7 +27,7 @@ export function proxy(request) {
   }
 
   const isProtected =
-    pathname.startsWith('/student') ||
+    pathname.startsWith('/internship-groups') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/profile');
 
@@ -39,5 +39,5 @@ export function proxy(request) {
 }
 
 export const config = {
-  matcher: ['/student/:path*', '/dashboard/:path*', '/profile/:path*', '/login'],
+  matcher: ['/internship-groups/:path*', '/dashboard/:path*', '/profile/:path*', '/login'],
 };

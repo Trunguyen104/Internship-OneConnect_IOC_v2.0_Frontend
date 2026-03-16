@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Skeleton, Empty, notification } from 'antd';
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
 import { InternshipGroupService } from './services/internshipGroup.service';
@@ -8,6 +9,7 @@ import InternshipCard from './components/InternshipCard';
 import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
 
 const InternshipDashboard = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [internships, setInternships] = useState([]);
 
@@ -113,7 +115,10 @@ const InternshipDashboard = () => {
             />
             <InternshipCard.Stepper />
 
-            <InternshipCard.BodyTitle title={item.groupName} />
+            <InternshipCard.BodyTitle
+              title={item.groupName}
+              href={`/internship-groups/${item.id}/space`}
+            />
 
             <InternshipCard.Info
               enterprise={item.enterpriseName}
@@ -122,10 +127,7 @@ const InternshipDashboard = () => {
             />
             <InternshipCard.Action
               onDetailClick={() => {
-                notification.info({
-                  message: INTERNSHIP_UI.LABELS.COMING_SOON,
-                  description: INTERNSHIP_UI.LABELS.COMING_SOON_DESC,
-                });
+                router.push(`/internship-groups/${item.id}/space`);
               }}
             />
           </InternshipCard>

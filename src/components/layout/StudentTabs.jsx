@@ -1,15 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 export default function StudentTabs() {
   const pathname = usePathname();
+  const params = useParams();
+  const internshipGroupId = params?.internshipGroupId;
+
+  const basePath = internshipGroupId
+    ? `/internship-groups/${internshipGroupId}`
+    : '/internship-groups';
 
   const items = [
-    { label: 'Summary', href: '/student/space' },
-    { label: 'Work Board', href: '/student/work-board' },
-    { label: 'Backlog Board', href: '/student/backlog' },
+    { label: 'Summary', href: `${basePath}/space` },
+    { label: 'Work Board', href: `${basePath}/work-board` },
+    { label: 'Backlog Board', href: `${basePath}/backlog` },
   ];
 
   return (
