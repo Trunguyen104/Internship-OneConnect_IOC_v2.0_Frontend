@@ -1,6 +1,6 @@
 import React from 'react';
-import { Modal } from 'antd';
 import { Trash2, AlertCircle } from 'lucide-react';
+import { modalApi } from '@/providers/ToastProvider';
 
 /**
  * Standardized delete confirmation modal with a premium look and feel.
@@ -30,7 +30,10 @@ export const showDeleteConfirm = ({
     ? 'bg-red-600 hover:bg-red-700 border-none'
     : 'bg-amber-600 hover:bg-amber-700 border-none';
 
-  return Modal.confirm({
+  // Fallback to static Modal.confirm if modalApi is not yet initialized
+  const confirm = modalApi ? modalApi.confirm : require('antd').Modal.confirm;
+
+  return confirm({
     icon: null,
     title: (
       <div className='flex items-center gap-3'>
