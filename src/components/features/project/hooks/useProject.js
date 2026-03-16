@@ -344,13 +344,11 @@ export function useProject(initialProjectId = null) {
       const result = await readProjectResource(resource.projectResourceId);
       if (result.success && result.data?.resourceUrl) {
         const fullUrl = resolveResourceUrl(result.data.resourceUrl);
-        console.log('👀 Opening direct link:', fullUrl);
         window.open(fullUrl, '_blank');
       } else {
         throw new Error(result.message || 'Failed to get file URL');
       }
     } catch (err) {
-      console.error('View error:', err);
       toast.error(err.message || 'Could not open file.');
     }
   };

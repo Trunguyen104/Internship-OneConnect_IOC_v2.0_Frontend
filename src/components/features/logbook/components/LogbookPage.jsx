@@ -95,7 +95,6 @@ export default function LogbookPage() {
         toast.error(errorMsg);
       }
     } catch (error) {
-      console.error('Logbook submit error:', error);
       const errorMsg =
         error?.response?.data?.errors?.[0] ||
         error?.response?.data?.message ||
@@ -121,7 +120,6 @@ export default function LogbookPage() {
         setEditingId(fullData.logbookId);
         setCurrentRecord(fullData);
       } catch (err) {
-        console.error('Failed to load logbook details', err);
         setEditingId(record.logbookId);
         setCurrentRecord(record);
       } finally {
@@ -147,7 +145,6 @@ export default function LogbookPage() {
       setViewRecord(res?.data || record);
       setIsDetailModalOpen(true);
     } catch (err) {
-      console.error('Failed to load logbook details', err);
       setViewRecord(record);
       setIsDetailModalOpen(true);
     } finally {

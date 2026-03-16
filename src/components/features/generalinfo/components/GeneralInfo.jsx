@@ -75,9 +75,9 @@ export default function GeneralInfo({ internshipGroupId = null }) {
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.ENTERPRISE}>
                     {info.enterpriseName || info.company || GENERAL_INFO_UI.VALUES.NA}
                   </Descriptions.Item>
-                  <Descriptions.Item label={GENERAL_INFO_UI.LABELS.UNIVERSITY}>
+                  {/* <Descriptions.Item label={GENERAL_INFO_UI.LABELS.UNIVERSITY}>
                     {info.schoolName || info.school || GENERAL_INFO_UI.VALUES.NA}
-                  </Descriptions.Item>
+                  </Descriptions.Item> */}
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR}>
                     {info.mentorName || info.mentor || (
                       <Text type='secondary' italic>

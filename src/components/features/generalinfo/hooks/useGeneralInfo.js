@@ -69,7 +69,6 @@ export function useGeneralInfo(initialId = null) {
           data = res?.data || res;
         } else {
           const res = await InternshipGroupService.getAll({ PageSize: 1 });
-          // Get the first item from paginated items OR if the API returns a direct array
           data = res?.data?.items?.[0] || res?.data?.[0] || res?.[0] || null;
         }
 
@@ -81,7 +80,6 @@ export function useGeneralInfo(initialId = null) {
         const internshipId = data.internshipId || data.id;
         const termId = data.termId || data.term?.termId;
 
-        // Supplemental fetches for missing DTO info
         const [termRes, projectRes] = await Promise.all([
           termId ? InternshipGroupService.getTermById(termId) : Promise.resolve(null),
           internshipId ? ProjectService.getByInternshipGroup(internshipId) : Promise.resolve(null),
@@ -120,7 +118,6 @@ export function useGeneralInfo(initialId = null) {
             : data.updatedText || '',
         });
       } catch (error) {
-        console.error('Error fetching general info:', error);
         toast.error(GENERAL_INFO_UI.MESSAGES.FETCH_ERROR);
       } finally {
         setLoading(false);
