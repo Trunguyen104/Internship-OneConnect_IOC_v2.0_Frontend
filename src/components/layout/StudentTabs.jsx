@@ -28,30 +28,11 @@ export default function StudentTabs() {
             <Link
               key={t.href}
               href={t.href}
-              className={[
-                // base pill
-                'inline-flex shrink-0 items-center',
-                'rounded-2xl px-5 py-3',
-                'text-sm font-semibold',
-                'border transition-colors duration-150',
-                'shadow-sm',
-
-                // inactive
-                !active &&
-                  ['bg-surface', 'text-text', 'border-border', 'hover:bg-[var(--gray-100)]'].join(
-                    ' ',
-                  ),
-
-                // active — matches "General Info"
-                active &&
-                  [
-                    'bg-[var(--primary-50)]',
-                    'text-[var(--primary-700)]',
-                    'border-[var(--primary-100)]',
-                  ].join(' '),
-              ]
-                .filter(Boolean)
-                .join(' ')}
+              className={`inline-flex shrink-0 items-center rounded-2xl border px-5 py-3 text-sm font-semibold shadow-sm transition-all duration-150 ${
+                active
+                  ? 'text-text! border-slate-900! bg-white'
+                  : 'text-text! border-border hover:bg-bg bg-white'
+              }`}
             >
               {t.label}
             </Link>
