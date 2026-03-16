@@ -86,7 +86,7 @@ const StakeholderList = memo(function StakeholderList({
                             type='text'
                             icon={<EditOutlined />}
                             onClick={() => onEdit(record)}
-                            className='text-muted hover:bg-primary/10 hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                            className='text-muted hover:bg-primary-surface hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                           />
                         </Tooltip>
                         <Tooltip title={STAKEHOLDER_UI.DELETE_BUTTON}>
@@ -101,7 +101,7 @@ const StakeholderList = memo(function StakeholderList({
                                 onOk: () => onDelete(record.id),
                               })
                             }
-                            className='hover:bg-danger/10 flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                            className='hover:bg-danger-surface flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                           />
                         </Tooltip>
                       </div>

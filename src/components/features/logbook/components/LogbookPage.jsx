@@ -200,7 +200,7 @@ export default function LogbookPage() {
         />
         {loading && data.length === 0 ? (
           <div className='flex h-full items-center justify-center py-20'>
-            <Spin size='large' description='Loading logbooks…' />
+            <Spin size='large' tip={DAILY_REPORT_UI.LOADING} />
           </div>
         ) : data.length === 0 ? (
           <div className='flex flex-1 items-center justify-center py-12'>

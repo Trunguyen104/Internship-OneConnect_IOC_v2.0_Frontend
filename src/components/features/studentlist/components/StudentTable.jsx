@@ -26,7 +26,9 @@ export default function StudentTable({ data, loading, onDelete }) {
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
               <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='text-muted w-[60px] px-6 py-5 text-xs font-semibold'>#</th>
+                  <th className='text-muted w-[60px] px-6 py-5 text-xs font-semibold'>
+                    {STUDENT_LIST_UI.TABLE.INDEX}
+                  </th>
                   <th className='text-muted w-[300px] px-6 py-5 text-xs font-semibold'>
                     {STUDENT_LIST_UI.TABLE.STUDENT}
                   </th>

@@ -88,12 +88,12 @@ export default function GeneralInfo({ internshipGroupId = null }) {
                   </Descriptions.Item>
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.START_DATE}>
                     {info.startDate
-                      ? new Date(info.startDate).toLocaleDateString('vi-VN')
+                      ? new Date(info.startDate).toLocaleDateString('en-GB')
                       : GENERAL_INFO_UI.VALUES.NA}
                   </Descriptions.Item>
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.END_DATE}>
                     {info.endDate
-                      ? new Date(info.endDate).toLocaleDateString('vi-VN')
+                      ? new Date(info.endDate).toLocaleDateString('en-GB')
                       : GENERAL_INFO_UI.VALUES.NA}
                   </Descriptions.Item>
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.STUDENT_COUNT}>

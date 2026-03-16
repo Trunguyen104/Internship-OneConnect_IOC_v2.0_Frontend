@@ -40,5 +40,6 @@ export const EVALUATION_UI = {
     NOT_PUBLISHED: 'Scorecard not published yet',
     AWAITING_RESULTS: 'Awaiting results',
     VIEW_REPORT: 'View Report',
+    NO_DETAILED_COMMENTS: 'No detailed comments provided',
   },
 };

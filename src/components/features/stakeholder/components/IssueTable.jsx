@@ -113,7 +113,7 @@ const IssueTable = memo(function IssueTable({
                                 record.status === 2 ? <SyncOutlined /> : <CheckCircleOutlined />
                               }
                               onClick={() => onToggleStatus(record)}
-                              className='text-muted hover:bg-primary/10 hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                              className='text-muted hover:bg-primary-surface hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                             />
                           </Tooltip>
                           <Tooltip title={ISSUE_UI.TABLE.VIEW_DETAIL}>
@@ -121,7 +121,7 @@ const IssueTable = memo(function IssueTable({
                               type='text'
                               icon={<EyeOutlined />}
                               onClick={() => onView(record.id)}
-                              className='text-muted hover:bg-primary/10 hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                              className='text-muted hover:bg-primary-surface hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                             />
                           </Tooltip>
                           <Tooltip title={ISSUE_UI.BUTTON.DELETE}>
@@ -136,7 +136,7 @@ const IssueTable = memo(function IssueTable({
                                   onOk: () => onDelete(record.id),
                                 })
                               }
-                              className='hover:bg-danger/10 flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                              className='hover:bg-danger-surface flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                             />
                           </Tooltip>
                         </div>

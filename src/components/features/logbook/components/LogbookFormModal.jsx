@@ -46,7 +46,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
         rules={[{ required: true, message: FORM.VALIDATION.DATE_REQUIRED }]}
       >
         <DatePicker
-          placeholder='Chọn ngày'
+          placeholder={FORM.PLACEHOLDER_DATE}
           className='w-full !cursor-default'
           format='DD/MM/YYYY'
           disabledDate={(current) => current && current > dayjs().endOf('day')}
