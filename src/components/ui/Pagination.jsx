@@ -6,11 +6,13 @@ export default function Pagination({
   total = 0,
   page = 1,
   pageSize = 10,
-  totalPages = 1,
+  totalPages,
   onPageChange,
   onPageSizeChange,
 }) {
-  const pages = getVisiblePages(page, totalPages);
+  const calculatedTotalPages =
+    totalPages !== undefined ? totalPages : Math.max(0, Math.ceil(total / pageSize));
+  const pages = getVisiblePages(page, calculatedTotalPages);
 
   return (
     <div className='flex items-center justify-between text-sm text-slate-600'>
@@ -23,7 +25,7 @@ export default function Pagination({
       <div className='flex items-center gap-2'>
         {/* PREV */}
         <button
-          disabled={page === 1}
+          disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
           className='h-9 w-9 rounded-full border text-slate-500 hover:bg-slate-100 disabled:opacity-40'
         >
@@ -53,7 +55,7 @@ export default function Pagination({
 
         {/* NEXT */}
         <button
-          disabled={page === totalPages}
+          disabled={page >= calculatedTotalPages}
           onClick={() => onPageChange(page + 1)}
           className='h-9 w-9 rounded-full border text-slate-500 hover:bg-slate-100 disabled:opacity-40'
         >
@@ -75,10 +77,14 @@ export default function Pagination({
 }
 
 function getVisiblePages(page, totalPages) {
+  if (totalPages <= 0) return [];
+
   const pages = new Set();
 
   pages.add(1);
-  pages.add(totalPages);
+  if (totalPages > 1) {
+    pages.add(totalPages);
+  }
 
   for (let i = page - 2; i <= page + 2; i++) {
     if (i > 1 && i < totalPages) {

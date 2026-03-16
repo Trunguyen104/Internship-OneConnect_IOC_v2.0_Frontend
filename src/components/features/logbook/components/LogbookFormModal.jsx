@@ -20,14 +20,33 @@ const LogbookFormModal = memo(function LogbookFormModal({
   onSubmit,
   onCancel,
   submitting,
-  form,
+  initialValues,
 }) {
   const { MODAL, FORM } = DAILY_REPORT_UI;
+  const [form] = Form.useForm();
+
+  React.useEffect(() => {
+    if (visible) {
+      if (initialValues) {
+        form.setFieldsValue({
+          dateReport: initialValues.dateReport ? dayjs(initialValues.dateReport) : null,
+          summary: initialValues.summary,
+          issue: initialValues.issue,
+          plan: initialValues.plan,
+        });
+      } else {
+        form.resetFields();
+      }
+    }
+  }, [visible, initialValues, form]);
 
   return (
     <Modal
       open={visible}
-      onCancel={onCancel}
+      onCancel={() => {
+        form.resetFields();
+        onCancel();
+      }}
       footer={null}
       width={520}
       centered
@@ -95,7 +114,14 @@ const LogbookFormModal = memo(function LogbookFormModal({
         </Form.Item>
 
         <div className='mt-6 flex justify-end gap-3'>
-          <Button onClick={onCancel}>{MODAL.CANCEL}</Button>
+          <Button
+            onClick={() => {
+              form.resetFields();
+              onCancel();
+            }}
+          >
+            {MODAL.CANCEL}
+          </Button>
           <Button type='primary' htmlType='submit' loading={submitting} icon={<SendOutlined />}>
             {editingId ? MODAL.SAVE : MODAL.SUBMIT}
           </Button>

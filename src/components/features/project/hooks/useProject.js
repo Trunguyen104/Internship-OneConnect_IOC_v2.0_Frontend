@@ -24,11 +24,9 @@ export function useProject() {
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [form] = Form.useForm();
 
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
-  const [editForm] = Form.useForm();
 
   const loadResources = useCallback(
     async (id) => {
@@ -134,13 +132,13 @@ export function useProject() {
     if (isDuplicateName) {
       toast.error(`A resource with name "${values.resourceName || file.name}" already exists.`);
       setUploading(false);
-      return;
+      return false;
     }
 
     if (isDuplicateFile) {
       toast.error(`This file (${file.name}) has already been uploaded.`);
       setUploading(false);
-      return;
+      return false;
     }
     // ------------------------
 
@@ -157,14 +155,16 @@ export function useProject() {
       if (result && (result.success || result.isSuccess)) {
         await loadResources(projectId);
         setFileList([]);
-        form.resetFields();
         toast.success(PROJECT_MESSAGES.SUCCESS.UPLOAD);
+        return true;
       } else {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
       }
     } catch (err) {
       console.error('Upload error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
+      return false;
+      return false;
     } finally {
       setUploading(false);
     }
@@ -187,10 +187,6 @@ export function useProject() {
 
   const openEditModal = (resource) => {
     setEditingResource(resource);
-    editForm.setFieldsValue({
-      resourceName: resource.resourceName,
-      resourceType: resource.resourceType,
-    });
     setIsEditModalVisible(true);
   };
 
@@ -341,11 +337,9 @@ export function useProject() {
     setFileList,
     loading,
     uploading,
-    form,
     isEditModalVisible,
     setIsEditModalVisible,
     editingResource,
-    editForm,
     handleUpload,
     handleDelete,
     openEditModal,

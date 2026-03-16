@@ -40,12 +40,12 @@ export default function LogbookPage() {
   } = useLogbook();
 
   const toast = useToast();
-  const [form] = Form.useForm();
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [viewRecord, setViewRecord] = useState(null);
+  const [currentRecord, setCurrentRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   const handleCreateOrUpdate = async (values) => {
@@ -116,29 +116,18 @@ export default function LogbookPage() {
         setSubmitting(true);
         const res = await LogBookService.getById(record.logbookId);
         const fullData = res?.data || record;
-
         setEditingId(fullData.logbookId);
-        form.setFieldsValue({
-          dateReport: fullData.dateReport ? dayjs(fullData.dateReport) : null,
-          summary: fullData.summary,
-          issue: fullData.issue,
-          plan: fullData.plan,
-        });
+        setCurrentRecord(fullData);
       } catch (err) {
         console.error('Failed to load logbook details', err);
         setEditingId(record.logbookId);
-        form.setFieldsValue({
-          dateReport: record.dateReport ? dayjs(record.dateReport) : null,
-          summary: record.summary,
-          issue: record.issue,
-          plan: record.plan,
-        });
+        setCurrentRecord(record);
       } finally {
         setSubmitting(false);
       }
     } else {
       setEditingId(null);
-      form.resetFields();
+      setCurrentRecord(null);
     }
     setIsFormModalOpen(true);
   };
@@ -146,8 +135,8 @@ export default function LogbookPage() {
   const closeFormModal = useCallback(() => {
     setIsFormModalOpen(false);
     setEditingId(null);
-    form.resetFields();
-  }, [form]);
+    setCurrentRecord(null);
+  }, []);
 
   const openDetailModal = async (record) => {
     try {
@@ -225,7 +214,7 @@ export default function LogbookPage() {
         visible={isFormModalOpen}
         editingId={editingId}
         submitting={submitting}
-        form={form}
+        initialValues={currentRecord}
         onSubmit={handleCreateOrUpdate}
         onCancel={closeFormModal}
       />
