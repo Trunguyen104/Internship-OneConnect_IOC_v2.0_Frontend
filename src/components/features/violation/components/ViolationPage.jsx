@@ -3,7 +3,6 @@
 import Card from '@/components/ui/Card';
 import Pagination from '@/components/ui/Pagination';
 import DataTableToolbar from '@/components/ui/DataTableToolbar';
-import { FilterOutlined } from '@ant-design/icons';
 import ViolationTable from './ViolationTable';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { useViolation } from '../hooks/useViolation';

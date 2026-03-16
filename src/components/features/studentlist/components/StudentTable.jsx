@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Typography, Tooltip, Button, Empty } from 'antd';
+import { Tooltip, Button, Empty } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import StudentStatusTag from './StudentStatusTag';
 import StudentRoleTag from './StudentRoleTag';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
-const { Text } = Typography;
 
 export default function StudentTable({ data, loading, onDelete }) {
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Modal, Form, Input, Select, Button, Typography, Space } from 'antd';
+import { Modal, Input, Select, Button, Typography, Space } from 'antd';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 import { PlusCircleOutlined, SaveOutlined } from '@ant-design/icons';
 

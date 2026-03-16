@@ -2,7 +2,6 @@
 
 import React, { memo } from 'react';
 import { Modal, Typography, Space, Divider } from 'antd';
-import { FileSearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import LogbookStatusTag from './LogbookStatusTag';

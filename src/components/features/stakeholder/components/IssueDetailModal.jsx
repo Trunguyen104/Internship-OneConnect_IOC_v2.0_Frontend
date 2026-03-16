@@ -1,13 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Modal, Typography, Row, Col, Avatar, Divider, Button } from 'antd';
-import {
-  FileTextOutlined,
-  UserOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
+import { Modal, Typography, Row, Col, Divider, Button } from 'antd';
 import dayjs from 'dayjs';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 import IssueStatusTag from './IssueStatusTag';

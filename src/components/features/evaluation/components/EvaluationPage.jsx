@@ -2,7 +2,6 @@
 
 import { Empty } from 'antd';
 import Card from '@/components/ui/Card';
-// import Footer from '@/components/layout/Footer';
 import CycleTable from './CycleTable';
 import TeamEvaluationsModal from './TeamEvaluationsModal';
 import ScoreDetailDrawer from './ScoreDetailDrawer';
