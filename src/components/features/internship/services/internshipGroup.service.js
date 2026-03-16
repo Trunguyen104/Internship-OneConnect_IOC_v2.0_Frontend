@@ -6,8 +6,10 @@ export const InternshipGroupService = {
     return httpGet(`/internshipgroups${query ? `?${query}` : ''}`);
   },
 
-  // getMine has been removed as per backend refactor.
-  // Students should use getAll() which is filtered by the backend or pass specific filters.
+  getMine(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return httpGet(`/mine${query ? `?${query}` : ''}`);
+  },
 
   getTermById(id) {
     return httpGet(`/terms/${id}`);

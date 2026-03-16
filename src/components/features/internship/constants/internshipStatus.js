@@ -1,9 +1,9 @@
 /**
  * Internship Status Enum (TermDisplayStatus)
- * 0: Upcoming - Kỳ thực tập sắp diễn ra.
- * 1: Active - Kỳ thực tập đang hoạt động.
- * 2: Ended - Kỳ thực tập đã kết thúc.
- * 3: Closed - Kỳ thực tập đã đóng.
+ * 0: Upcoming - Internship cycle has not started yet.
+ * 1: Active - Internship cycle is in progress.
+ * 2: Ended - Internship cycle has ended.
+ * 3: Closed - Internship cycle is closed.
  */
 export const INTERNSHIP_STATUS = {
   UPCOMING: 0,
@@ -14,25 +14,25 @@ export const INTERNSHIP_STATUS = {
 
 export const INTERNSHIP_STATUS_CONFIG = {
   [INTERNSHIP_STATUS.UPCOMING]: {
-    label: 'Sắp diễn ra',
+    label: 'Upcoming',
     color: 'default',
     badge: 'processing',
     tagColor: 'orange',
   },
   [INTERNSHIP_STATUS.ACTIVE]: {
-    label: 'Đang hoạt động',
+    label: 'In progress',
     color: 'processing',
     badge: 'processing',
     tagColor: 'blue',
   },
   [INTERNSHIP_STATUS.ENDED]: {
-    label: 'Đã kết thúc',
+    label: 'Ended',
     color: 'success',
     badge: 'success',
     tagColor: 'green',
   },
   [INTERNSHIP_STATUS.CLOSED]: {
-    label: 'Đã đóng',
+    label: 'Closed',
     color: 'error',
     badge: 'default',
     tagColor: 'slate',
@@ -40,11 +40,11 @@ export const INTERNSHIP_STATUS_CONFIG = {
 };
 
 export const INTERNSHIP_STEPS = [
-  { key: 'registration', label: 'Đăng ký' },
-  { key: 'interviewing', label: 'Phỏng vấn' },
-  { key: 'offered', label: 'Lời mời' },
-  { key: 'placed', label: 'Tiếp nhận' },
-  { key: 'finalizing', label: 'Hoàn tất' },
+  { key: 'registration', label: 'Registration' },
+  { key: 'interviewing', label: 'Interview' },
+  { key: 'offered', label: 'Offer' },
+  { key: 'placed', label: 'Placement' },
+  { key: 'finalizing', label: 'Finalize' },
 ];
 
 export const getStepStatus = (stepIndex, currentStatus) => {
