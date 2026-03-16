@@ -41,7 +41,7 @@ export function AssignMentorModal({ open, group, onCancel, onFinish }) {
       destroyOnHidden
       className='modal-custom'
     >
-      <Space direction='vertical' size='large' className='w-full'>
+      <Space orientation='vertical' size='large' className='w-full'>
         {/* Header */}
         <div className='flex flex-col items-center gap-3 text-center'>
           <div

@@ -143,7 +143,7 @@ export default function TeamEvaluationsModal({
       width={850}
       centered
     >
-      <Space direction='vertical' size='large' style={{ width: '100%' }}>
+      <Space orientation='vertical' size='large' style={{ width: '100%' }}>
         <AppTable columns={columns} data={teamData} pagination={false} rowKey='studentId' />
       </Space>
     </Modal>

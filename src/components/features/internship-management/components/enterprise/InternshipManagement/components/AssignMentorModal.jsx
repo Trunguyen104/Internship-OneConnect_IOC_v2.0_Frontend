@@ -34,7 +34,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
       destroyOnHidden
       className='modal-custom'
     >
-      <Space direction='vertical' size='large' className='w-full'>
+      <Space orientation='vertical' size='large' className='w-full'>
         {/* Header */}
         <div className='mb-2'>
           <Title level={4} className='text-text mb-2'>

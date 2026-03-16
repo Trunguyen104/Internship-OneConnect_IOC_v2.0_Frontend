@@ -22,7 +22,7 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
       {!evaluationDetail ? (
         <Empty description={EVALUATION_UI.LABELS.SCORECARD_NOT_READY} />
       ) : (
-        <Space direction='vertical' size='large' style={{ width: '100%' }}>
+        <Space orientation='vertical' size='large' style={{ width: '100%' }}>
           <Card className='border-border/60 shadow-sm'>
             <Descriptions column={1} size='small'>
               <Descriptions.Item label={EVALUATION_UI.LABELS.EVALUATOR}>
