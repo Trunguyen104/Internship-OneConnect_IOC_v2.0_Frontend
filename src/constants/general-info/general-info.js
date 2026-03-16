@@ -14,6 +14,7 @@ export const GENERAL_INFO_UI = {
     END_DATE: 'End Date',
     STUDENT_COUNT: 'Student Count',
     MENTOR_COUNT: 'Mentor Count',
+    PROJECT: 'Project',
   },
 
   STATUS: {

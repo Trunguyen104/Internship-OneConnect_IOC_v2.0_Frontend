@@ -36,8 +36,8 @@ const IssueTab = memo(function IssueTab() {
   } = useIssueTab();
 
   return (
-    <div className='animate-in fade-in flex h-full flex-col space-y-6 duration-500'>
-      <Card>
+    <div className='animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500'>
+      <Card className='flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto'>
         <DataTableToolbar
           className='mb-6 !border-0 !p-0'
           searchProps={{
@@ -66,19 +66,23 @@ const IssueTab = memo(function IssueTab() {
           onView={handleViewDetail}
           tableBodyRef={tableBodyRef}
         />
-      </Card>
 
-      <Pagination
-        total={total}
-        page={page}
-        pageSize={pageSize}
-        totalPages={Math.ceil(total / pageSize)}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setPage(1);
-        }}
-      />
+        {total > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={total}
+              page={page}
+              pageSize={pageSize}
+              totalPages={Math.ceil(total / pageSize)}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          </div>
+        )}
+      </Card>
 
       <IssueFormModal
         isOpen={openIssueForm}

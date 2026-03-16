@@ -28,8 +28,15 @@ const LogbookFormModal = memo(function LogbookFormModal({
   React.useEffect(() => {
     if (visible) {
       if (initialValues) {
+        console.log('LogbookFormModal initialValues:', initialValues);
+        const reportDate =
+          initialValues.dateReport ||
+          initialValues.reportDate ||
+          initialValues.createdAt ||
+          initialValues.date;
+
         form.setFieldsValue({
-          dateReport: initialValues.dateReport ? dayjs(initialValues.dateReport) : null,
+          dateReport: reportDate ? dayjs(reportDate) : null,
           summary: initialValues.summary,
           issue: initialValues.issue,
           plan: initialValues.plan,
@@ -76,9 +83,11 @@ const LogbookFormModal = memo(function LogbookFormModal({
         >
           <DatePicker
             placeholder='Chọn ngày'
-            className='w-full'
+            className='w-full !cursor-default'
             format='DD/MM/YYYY'
             disabledDate={(current) => current && current > dayjs().endOf('day')}
+            disabled={!!editingId}
+            inputReadOnly={!!editingId}
           />
         </Form.Item>
 

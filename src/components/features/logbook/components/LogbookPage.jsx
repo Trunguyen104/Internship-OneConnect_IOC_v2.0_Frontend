@@ -1,6 +1,6 @@
 'use client';
 
-import { Form } from 'antd';
+import { Empty, Form, Spin } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import Card from '@/components/ui/Card';
@@ -115,7 +115,12 @@ export default function LogbookPage() {
       try {
         setSubmitting(true);
         const res = await LogBookService.getById(record.logbookId);
-        const fullData = res?.data || record;
+        const detailData = res?.data || {};
+        const fullData = {
+          ...record,
+          ...detailData,
+          dateReport: detailData.dateReport || detailData.reportDate || record.dateReport,
+        };
         setEditingId(fullData.logbookId);
         setCurrentRecord(fullData);
       } catch (err) {
@@ -159,10 +164,10 @@ export default function LogbookPage() {
   }, []);
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
+    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
-      <Card className='shadow-border/50 flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl'>
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 2xl:h-auto'>
         <DataTableToolbar
           className='mb-5 !border-0 !p-0'
           searchProps={{
@@ -193,22 +198,40 @@ export default function LogbookPage() {
             onClick: () => openFormModal(),
           }}
         />
-        <LogbookTable
-          data={data}
-          loading={loading}
-          userProfile={userProfile}
-          onView={openDetailModal}
-          onEdit={openFormModal}
-          onDelete={handleDelete}
-        />
-      </Card>
+        {loading && data.length === 0 ? (
+          <div className='flex h-full items-center justify-center py-20'>
+            <Spin size='large' description='Loading logbooks…' />
+          </div>
+        ) : data.length === 0 ? (
+          <div className='flex flex-1 items-center justify-center py-12'>
+            <Empty description={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'} />
+          </div>
+        ) : (
+          <LogbookTable
+            data={data}
+            loading={loading}
+            userProfile={userProfile}
+            onView={openDetailModal}
+            onEdit={openFormModal}
+            onDelete={handleDelete}
+          />
+        )}
 
-      <Pagination
-        total={total}
-        page={pageNumber}
-        pageSize={pageSize}
-        onPageChange={setPageNumber}
-      />
+        {total > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPageNumber(1);
+              }}
+            />
+          </div>
+        )}
+      </Card>
 
       <LogbookFormModal
         visible={isFormModalOpen}

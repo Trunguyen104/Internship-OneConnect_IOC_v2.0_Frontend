@@ -19,18 +19,18 @@ export default function ViolationTable({ data, page, pageSize, sortOrder, onSort
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
               <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='text-muted w-[60px] px-6 py-4 text-xs font-semibold'>#</th>
-                  <th className='text-muted w-[200px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[60px] px-6 py-5 text-xs font-semibold'>#</th>
+                  <th className='text-muted w-[200px] px-6 py-5 text-xs font-semibold'>
                     Violation Type
                   </th>
-                  <th className='text-muted w-[300px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[300px] px-6 py-5 text-xs font-semibold'>
                     Description
                   </th>
-                  <th className='text-muted w-[180px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[180px] px-6 py-5 text-xs font-semibold'>
                     Violation Time
                   </th>
-                  <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>Reporter</th>
-                  <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[150px] px-6 py-5 text-xs font-semibold'>Reporter</th>
+                  <th className='text-muted w-[150px] px-6 py-5 text-xs font-semibold'>
                     <div
                       className='hover:text-info flex cursor-pointer items-center gap-1 transition-colors'
                       onClick={onSort}
@@ -50,12 +50,12 @@ export default function ViolationTable({ data, page, pageSize, sortOrder, onSort
               </thead>
               <tbody className='divide-border/50 divide-y'>
                 {data.map((record, index) => (
-                  <tr key={record.id} className='hover:bg-bg/80 transition-colors'>
-                    <td className='text-muted px-6 py-4 text-sm'>
+                  <tr key={record.id} className='hover:bg-bg/80 h-[72px] transition-colors'>
+                    <td className='text-muted px-6 py-4 text-sm font-semibold'>
                       {(page - 1) * pageSize + index + 1}
                     </td>
                     <td className='px-6 py-4 text-sm'>
-                      <span className='text-text flex items-center gap-2 font-bold tracking-tight'>
+                      <span className='text-text flex items-center gap-2 text-[15px] font-bold tracking-tight'>
                         <WarningOutlined className='text-warning' />
                         {record.type}
                       </span>

@@ -6,9 +6,8 @@ export const InternshipGroupService = {
     return httpGet(`/internshipgroups${query ? `?${query}` : ''}`);
   },
 
-  getMine() {
-    return httpGet('/mine');
-  },
+  // getMine has been removed as per backend refactor.
+  // Students should use getAll() which is filtered by the backend or pass specific filters.
 
   getTermById(id) {
     return httpGet(`/terms/${id}`);
@@ -30,12 +29,12 @@ export const InternshipGroupService = {
     return httpDelete(`/internshipgroups/${id}`);
   },
 
-  addStudents(id, data) {
-    return httpPost(`/internshipgroups/${id}/students`, data);
+  addStudents(data) {
+    return httpPost('/internshipgroups/students', data);
   },
 
-  removeStudents(id, data) {
-    return httpDelete(`/internshipgroups/${id}/students`, {
+  removeStudents(data) {
+    return httpDelete('/internshipgroups/students', {
       body: JSON.stringify(data),
     });
   },
