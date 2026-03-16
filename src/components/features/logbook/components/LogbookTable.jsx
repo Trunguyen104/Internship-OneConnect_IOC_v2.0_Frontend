@@ -18,27 +18,27 @@ const LogbookTable = memo(function LogbookTable({ data, userProfile, onView, onE
         <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
           <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
             <tr>
-              <th className='text-muted w-[140px] px-6 py-4 text-xs font-semibold'>
+              <th className='text-muted w-[140px] px-6 py-5 text-xs font-semibold'>
                 {DAILY_REPORT_UI.TABLE.REPORT_DATE}
               </th>
 
-              <th className='text-muted w-[200px] px-6 py-4 text-xs font-semibold'>
+              <th className='text-muted w-[200px] px-6 py-5 text-xs font-semibold'>
                 {DAILY_REPORT_UI.TABLE.STUDENT}
               </th>
 
-              <th className='text-muted px-6 py-4 text-xs font-semibold'>
+              <th className='text-muted px-6 py-5 text-xs font-semibold'>
                 {DAILY_REPORT_UI.TABLE.SUMMARY}
               </th>
 
-              <th className='text-muted px-6 py-4 text-xs font-semibold'>
+              <th className='text-muted px-6 py-5 text-xs font-semibold'>
                 {DAILY_REPORT_UI.TABLE.ISSUE}
               </th>
 
-              <th className='text-muted w-[120px] px-6 py-4 text-center text-xs font-semibold'>
+              <th className='text-muted w-[120px] px-6 py-5 text-center text-xs font-semibold'>
                 {DAILY_REPORT_UI.TABLE.STATUS}
               </th>
 
-              <th className='text-muted w-[140px] px-6 py-4 text-center text-xs font-semibold'>
+              <th className='text-muted w-[140px] px-6 py-5 text-center text-xs font-semibold'>
                 {DAILY_REPORT_UI.TABLE.ACTION}
               </th>
             </tr>
@@ -49,14 +49,14 @@ const LogbookTable = memo(function LogbookTable({ data, userProfile, onView, onE
               const isOwner = record.studentId === currentStudentId;
 
               return (
-                <tr key={record.logbookId} className='hover:bg-bg h-[64px] transition-colors'>
-                  <td className='text-text px-6 py-4 align-middle text-sm font-bold'>
+                <tr key={record.logbookId} className='hover:bg-bg h-[72px] transition-colors'>
+                  <td className='text-text px-6 py-4 align-middle text-[15px] font-bold'>
                     {record.dateReport
                       ? dayjs(record.dateReport).format('DD/MM/YYYY')
                       : DAILY_REPORT_UI.VIEW_MODAL.NA}
                   </td>
 
-                  <td className='text-text px-6 py-4 align-middle text-sm font-semibold whitespace-nowrap'>
+                  <td className='text-text px-6 py-4 align-middle text-[15px] font-bold whitespace-nowrap'>
                     {record.studentName || DAILY_REPORT_UI.VIEW_MODAL.NA}
                   </td>
 
