@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Skeleton, Empty, notification } from 'antd';
+import { Skeleton, Empty } from 'antd';
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
+import { useToast } from '@/providers/ToastProvider';
 import { InternshipGroupService } from './services/internshipGroup.service';
 import InternshipCard from './components/InternshipCard';
 import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
@@ -13,6 +14,8 @@ const InternshipDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [internships, setInternships] = useState([]);
 
+  const toast = useToast();
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -21,20 +24,27 @@ const InternshipDashboard = () => {
 
         const mineResponse = await InternshipGroupService.getMine();
 
-        if (!mineResponse || mineResponse.success !== true || !mineResponse.data) {
+        const isSuccess = mineResponse?.success === true || mineResponse?.isSuccess === true;
+        if (!mineResponse || !isSuccess || !mineResponse.data) {
           setInternships([]);
           return;
         }
 
-        const mineDataList = mineResponse.data;
+        const mineDataList = mineResponse.data?.items || mineResponse.data || [];
         const enrichedInternships = await Promise.all(
-          mineDataList.map(async (mineItem) => {
+          mineDataList.map(async (mineItem, index) => {
             let termStatus = 1; // Default to Active (1)
 
             let termName = mineItem.term?.name || INTERNSHIP_UI.LABELS.FALLBACK_CYCLE;
             let groupName = mineItem.name;
 
             const targetTermId = mineItem.termId || mineItem.term?.id;
+            const clientKey =
+              mineItem.id ??
+              targetTermId ??
+              mineItem.code ??
+              mineItem.name ??
+              `internship-${index}`;
 
             if (targetTermId) {
               try {
@@ -47,15 +57,18 @@ const InternshipDashboard = () => {
               } catch (err) {
                 console.warn('Failed to fetch term status:', err);
               }
+            } else if (typeof mineItem.term?.status === 'number') {
+              termStatus = mineItem.term.status;
             }
 
             return {
               id: mineItem.id,
+              clientKey,
               displayName: termName,
               groupName: groupName,
               status: termStatus,
               enterpriseName: mineItem.enterprise?.name,
-              mentorName: mineItem.mentors?.[0]?.fullName,
+              mentorName: mineItem.mentor?.fullName || mineItem.mentors?.[0]?.fullName,
               projectName: mineItem.project?.name || mineItem.name,
             };
           }),
@@ -64,17 +77,14 @@ const InternshipDashboard = () => {
         setInternships(enrichedInternships);
       } catch (error) {
         console.error('Dashboard Fetch Error:', error);
-        notification.error({
-          message: 'Lỗi',
-          description: INTERNSHIP_UI.MESSAGES.ERROR_FETCH,
-        });
+        toast.error('Lỗi', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [toast]);
 
   if (loading) {
     return (
@@ -108,7 +118,7 @@ const InternshipDashboard = () => {
 
       <div className='flex flex-col gap-8'>
         {internships.map((item) => (
-          <InternshipCard key={item.id} data={item}>
+          <InternshipCard key={item.clientKey ?? item.id} data={item}>
             <InternshipCard.Header
               title={item.displayName}
               isCurrent={item.status === INTERNSHIP_STATUS.ACTIVE}
