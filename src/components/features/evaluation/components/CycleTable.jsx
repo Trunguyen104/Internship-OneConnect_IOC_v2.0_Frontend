@@ -72,9 +72,6 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
               <th className='text-muted w-[150px] px-6 py-4 text-xs font-semibold'>
                 {EVALUATION_UI.TABLE_COLUMNS.STATUS}
               </th>
-              <th className='text-muted w-[120px] px-6 py-4 text-xs font-semibold'>
-                {EVALUATION_UI.TABLE_COLUMNS.SCORED}
-              </th>
               <th className='text-muted w-[120px] px-6 py-4 text-right text-xs font-semibold'>
                 {EVALUATION_UI.TABLE_COLUMNS.ACTIONS}
               </th>
@@ -116,13 +113,6 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
                     >
                       {cfg.icon}
                       {cfg.label}
-                    </span>
-                  </td>
-                  <td className='px-6 py-4'>
-                    <span className='text-text font-bold'>
-                      {record.totalStudentsScored ?? 0}
-                      <span className='text-border mx-0.5 font-normal'>/</span>
-                      {record.totalTeamStudents ?? 0}
                     </span>
                   </td>
                   <td className='px-6 py-4 text-right'>

@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Input from '@/components/ui/Input';
 import { login } from '@/components/features/auth/services/authService';
 import { useRouter } from 'next/navigation';
@@ -17,12 +17,11 @@ export default function LoginPage() {
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
-      const savedPassword = localStorage.getItem('rememberPassword');
 
       if (savedEmail) {
         return {
           email: savedEmail,
-          password: savedPassword || '',
+          password: '',
           rememberMe: true,
         };
       }
@@ -63,10 +62,8 @@ export default function LoginPage() {
 
       if (form.rememberMe) {
         localStorage.setItem('rememberEmail', form.email);
-        localStorage.setItem('rememberPassword', form.password);
       } else {
         localStorage.removeItem('rememberEmail');
-        localStorage.removeItem('rememberPassword');
       }
 
       toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);

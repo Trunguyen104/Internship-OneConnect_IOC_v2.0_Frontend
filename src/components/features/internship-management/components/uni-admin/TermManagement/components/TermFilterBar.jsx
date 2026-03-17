@@ -34,9 +34,10 @@ const TermFilterBar = memo(function TermFilterBar({
           onChange={onStatusChange}
           className='h-11 min-w-[200px]'
           options={[
-            { value: 1, label: 'Đang hoạt động' },
-            { value: 0, label: 'Bản nháp' },
-            { value: 2, label: 'Đã hoàn thành' },
+            { value: 0, label: 'Upcoming' },
+            { value: 1, label: 'Active' },
+            { value: 2, label: 'Ended' },
+            { value: 3, label: 'Closed' },
           ]}
           suffixIcon={<FilterOutlined className='text-muted' />}
         />
