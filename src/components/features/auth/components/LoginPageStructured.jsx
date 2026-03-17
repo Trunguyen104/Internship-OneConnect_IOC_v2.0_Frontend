@@ -14,7 +14,7 @@ export default function LoginPage() {
       className='h-screen w-full overflow-hidden'
       style={{
         background:
-          'radial-gradient(circle at top left, rgb(254, 202, 202) 0%, rgb(255, 255, 255) 65%)',
+          'radial-gradient(circle at top left, var(--primary-100) 0%, var(--color-surface) 65%)',
       }}
     >
       <div className='grid h-full w-full grid-cols-1 lg:grid-cols-2'>

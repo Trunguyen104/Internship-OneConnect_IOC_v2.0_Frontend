@@ -50,6 +50,13 @@ export default function ProjectResourceUpload({
           label={PROJECT_UI.FORM.RESOURCE_NAME}
           name={'resourceName'}
           tooltip={{ title: PROJECT_UI.TOOLTIP.RESOURCE_NAME }}
+          rules={[
+            {
+              required: true,
+              message: PROJECT_MESSAGES.ERROR.RESOURCE_NAME_REQUIRED || 'Resource name is required',
+            },
+            { max: 100, message: PROJECT_MESSAGES.ERROR.MAX_LENGTH || 'Max length exceeded' },
+          ]}
         >
           <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
         </Form.Item>
@@ -59,6 +66,12 @@ export default function ProjectResourceUpload({
           name={'resourceType'}
           initialValue={1}
           required
+          rules={[
+            {
+              required: true,
+              message: PROJECT_MESSAGES.ERROR.RESOURCE_TYPE_REQUIRED || 'Resource type is required',
+            },
+          ]}
         >
           <Select options={RESOURCE_TYPES} />
         </Form.Item>
