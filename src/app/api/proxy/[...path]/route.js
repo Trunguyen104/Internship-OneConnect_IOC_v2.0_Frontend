@@ -39,9 +39,18 @@ async function handler(req, { params }) {
     if (contentType) {
       headers.set('Content-Type', contentType);
     }
-    const authorization = req.headers.get('authorization');
-    if (authorization) {
-      headers.set('Authorization', authorization);
+
+    // Extract accessToken from HttpOnly cookies securely on the server
+    const accessToken = req.cookies.get('accessToken')?.value;
+    if (accessToken) {
+      headers.set('Authorization', `Bearer ${accessToken}`);
+    } else {
+      // Fallback to client-provided header if absolutely necessary,
+      // but ideally we rely on the cookie we just set.
+      const authorization = req.headers.get('authorization');
+      if (authorization) {
+        headers.set('Authorization', authorization);
+      }
     }
 
     const requestOptions = {
