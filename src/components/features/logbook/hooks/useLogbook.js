@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { userService } from '@/components/features/user/services/userService';
@@ -8,8 +9,12 @@ import { useToast } from '@/providers/ToastProvider';
 
 export function useLogbook() {
   const toast = useToast();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const [internshipId, setInternshipId] = useState(null);
+  const urlInternshipId = searchParams.get('internshipId');
+  const [internshipId, setInternshipIdState] = useState(urlInternshipId);
   const [userProfile, setUserProfile] = useState(null);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -41,15 +46,34 @@ export function useLogbook() {
   }, [data, debouncedSearch]);
 
   useEffect(() => {
+    if (urlInternshipId && urlInternshipId !== internshipId) {
+      setInternshipIdState(urlInternshipId);
+    }
+  }, [urlInternshipId]);
+
+  const setInternshipId = useCallback(
+    (id) => {
+      setInternshipIdState(id);
+      const params = new URLSearchParams(searchParams);
+      if (id) {
+        params.set('internshipId', id);
+      } else {
+        params.delete('internshipId');
+      }
+      router.replace(`${pathname}?${params.toString()}`);
+    },
+    [searchParams, router, pathname],
+  );
+
+  useEffect(() => {
     const fetchInternship = async () => {
       try {
         const res = await InternshipGroupService.getAll();
         const items = res?.data?.items || res?.data || [];
 
-        // TODO: Move internship selection to a global context or URL param
-        // This is a temporary fallback to pre-select the first available group
-        if (items.length > 0 && !internshipId) {
-          setInternshipId(items[0].internshipId || items[0].id);
+        if (items.length > 0 && !urlInternshipId) {
+          const firstId = items[0].internshipId || items[0].id;
+          setInternshipId(firstId);
         }
       } catch (err) {
         console.error('Fetch internshipgroups failed', err);
@@ -57,7 +81,7 @@ export function useLogbook() {
     };
 
     fetchInternship();
-  }, []);
+  }, [urlInternshipId, setInternshipId]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -93,7 +117,6 @@ export function useLogbook() {
         params.Status = statusFilter;
       }
 
-      // We still send SearchTerm to the backend in case they implement it later
       if (debouncedSearch?.trim()) {
         params.SearchTerm = debouncedSearch.trim();
       }
@@ -140,7 +163,7 @@ export function useLogbook() {
   };
 
   return {
-    data: filteredData, // Use filtered data for the UI
+    data: filteredData,
     rawItems: data,
     loading,
     total,

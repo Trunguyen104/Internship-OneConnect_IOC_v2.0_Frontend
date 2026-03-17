@@ -23,21 +23,7 @@ export default function ProjectResourceUpload({
       setFileList([]);
     },
     beforeUpload: (file) => {
-      const allowedExtensions = [
-        'pdf',
-        'doc',
-        'docx',
-        'xls',
-        'xlsx',
-        'ppt',
-        'pptx',
-        'png',
-        'jpg',
-        'jpeg',
-        'zip',
-        'rar',
-        'mp4',
-      ];
+      const allowedExtensions = ['pdf', 'docx', 'pptx', 'png', 'jpg', 'jpeg', 'zip', 'rar'];
       const currentExt = file.name.split('.').pop().toLowerCase();
       const isAllowed = allowedExtensions.includes(currentExt);
       if (!isAllowed) {
@@ -56,7 +42,7 @@ export default function ProjectResourceUpload({
     },
     fileList,
     maxCount: 1,
-    accept: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.zip,.rar,.mp4',
+    accept: '.pdf,.docx,.pptx,.png,.jpg,.jpeg,.zip,.rar',
   };
 
   return (

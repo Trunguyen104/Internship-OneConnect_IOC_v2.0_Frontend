@@ -17,7 +17,6 @@ export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, 
       confirmLoading={loading}
       okText={PROJECT_UI.BUTTON.UPDATE}
       cancelText={PROJECT_UI.BUTTON.CANCEL}
-      forceRender
     >
       <Form form={form} layout='vertical' onFinish={onUpdate}>
         <Form.Item
