@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Pagination } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import Card from '@/components/ui/Card';
+import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import { Select } from 'antd';
+import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useTermManagement } from './hooks/useTermManagement';
-import TermHeader from './components/TermHeader';
-import TermFilterBar from './components/TermFilterBar';
 import TermTable from './components/TermTable';
 import TermFormDrawer from './components/TermFormDrawer';
 import TermStatusModal from './components/TermStatusModal';
@@ -41,46 +42,59 @@ export default function InternshipTermManagement() {
   } = useTermManagement(INITIAL_TERMS);
 
   return (
-    <>
-      <TermHeader onCreateNew={handleCreateNew} />
+    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
+      <StudentPageHeader title={TERM_MANAGEMENT.TITLE} />
 
-      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
-        <Card className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
-          <TermFilterBar
-            searchValue={searchTerm}
-            onSearchChange={handleSearchChange}
-            statusFilter={statusFilter}
-            onStatusChange={handleStatusChange}
-          />
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
+        <DataTableToolbar
+          className='mb-5 !border-0 !p-0'
+          searchProps={{
+            placeholder: TERM_MANAGEMENT.SEARCH_PLACEHOLDER,
+            value: searchTerm,
+            onChange: (e) => handleSearchChange(e.target.value),
+          }}
+          filterContent={
+            <Select
+              allowClear
+              placeholder={TERM_MANAGEMENT.STATUS_FILTER}
+              value={statusFilter ?? undefined}
+              onChange={handleStatusChange}
+              className='h-9 min-w-[180px]'
+              options={[
+                { value: 1, label: 'Đang hoạt động' },
+                { value: 0, label: 'Bản nháp' },
+                { value: 2, label: 'Đã hoàn thành' },
+              ]}
+              suffixIcon={<FilterOutlined className='text-muted' />}
+            />
+          }
+          actionProps={{
+            label: TERM_MANAGEMENT.CREATE_BTN,
+            onClick: handleCreateNew,
+            icon: <PlusOutlined />,
+          }}
+        />
 
-          <TermTable
-            data={paginatedData}
-            loading={loading}
-            pagination={false}
-            onTableChange={handleTableChange}
-            onEdit={handleEdit}
-            onRequestDelete={handleRequestDelete}
-            onRequestChangeStatus={handleRequestChangeStatus}
-          />
-        </Card>
+        <TermTable
+          data={paginatedData}
+          loading={loading}
+          onTableChange={handleTableChange}
+          onEdit={handleEdit}
+          onRequestDelete={handleRequestDelete}
+          onRequestChangeStatus={handleRequestChangeStatus}
+        />
 
-        <div className='mt-6 flex items-center justify-between px-2'>
-          <div className='text-muted text-xs font-bold tracking-widest uppercase'>
-            {TERM_MANAGEMENT.TOTAL_LABEL}: {filteredData.length}
+        {filteredData.length > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={filteredData.length}
+              page={pagination.current}
+              pageSize={pagination.pageSize}
+              onPageChange={(page) => handleTableChange({ current: page })}
+            />
           </div>
-          <Pagination
-            {...pagination}
-            total={filteredData.length}
-            showSizeChanger={false}
-            onChange={(page) => handleTableChange({ current: page })}
-            itemRender={(page, type, originalElement) => {
-              if (type === 'prev') return <LeftOutlined className='text-primary' />;
-              if (type === 'next') return <RightOutlined className='text-primary' />;
-              return originalElement;
-            }}
-          />
-        </div>
-      </div>
+        )}
+      </Card>
 
       <TermFormDrawer
         visible={modalVisible}
@@ -97,6 +111,6 @@ export default function InternshipTermManagement() {
         onCancel={() => setStatusModalState({ open: false, record: null, newStatus: null })}
         onConfirm={handleChangeStatus}
       />
-    </>
+    </section>
   );
 }

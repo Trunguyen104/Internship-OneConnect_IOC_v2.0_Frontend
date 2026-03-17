@@ -46,7 +46,9 @@ export function useLogbook() {
         const res = await InternshipGroupService.getAll();
         const items = res?.data?.items || res?.data || [];
 
-        if (items.length > 0) {
+        // TODO: Move internship selection to a global context or URL param
+        // This is a temporary fallback to pre-select the first available group
+        if (items.length > 0 && !internshipId) {
           setInternshipId(items[0].internshipId || items[0].id);
         }
       } catch (err) {

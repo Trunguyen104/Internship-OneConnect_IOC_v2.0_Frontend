@@ -16,6 +16,7 @@ import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import { useCallback, useState } from 'react';
+import dayjs from 'dayjs';
 
 export default function LogbookPage() {
   const {
@@ -53,6 +54,11 @@ export default function LogbookPage() {
       const PUNCTUAL_STATUS = 3;
       const effectiveInternshipId = internshipId;
 
+      const now = dayjs();
+      const getFormattedDate = (date) => {
+        return date.hour(now.hour()).minute(now.minute()).second(now.second()).toISOString();
+      };
+
       if (editingId) {
         const updatePayload = {
           internshipId: effectiveInternshipId,
@@ -60,7 +66,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.startOf('day').toISOString(),
+          dateReport: getFormattedDate(values.dateReport),
           status: PUNCTUAL_STATUS,
         };
         res = await LogBookService.update(editingId, updatePayload);
@@ -70,7 +76,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.startOf('day').toISOString(),
+          dateReport: getFormattedDate(values.dateReport),
           status: SUBMITTED_STATUS,
         };
         res = await LogBookService.create(createPayload);
@@ -86,12 +92,18 @@ export default function LogbookPage() {
         fetchLogbooks();
         closeFormModal();
       } else {
-        const errorMsg =
+        let errorMsg =
           res?.data?.errors?.[0] ||
           res?.errors?.[0] ||
           res?.data?.message ||
           res?.message ||
           DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
+
+        if (res?.statusCode === 409 || res?.status === 409) {
+          errorMsg =
+            'Ngày này đã có báo cáo hoặc bị trùng lặp. Vui lòng kiểm tra lại hoặc xóa báo cáo cũ.';
+        }
+
         toast.error(errorMsg);
       }
     } catch (error) {

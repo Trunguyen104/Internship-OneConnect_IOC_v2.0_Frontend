@@ -17,11 +17,6 @@ const FiltersAndSearch = memo(function FiltersAndSearch({
     { label: 'Hoàn thành', value: 'COMPLETED' },
     { label: 'Đã rút lui', value: 'WITHDRAWN' },
   ],
-  majorOptions = [
-    { label: 'Kỹ thuật phần mềm', value: 'Software Engineering' },
-    { label: 'An toàn thông tin', value: 'Information Security' },
-    { label: 'Thiết kế đồ họa', value: 'Graphic Design' },
-  ],
 }) {
   const { STUDENT_ENROLLMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
 
@@ -67,16 +62,6 @@ const FiltersAndSearch = memo(function FiltersAndSearch({
           onChange={handleStatusChange}
           className='h-11 min-w-[200px]'
           options={statusOptions}
-          suffixIcon={<FilterOutlined className='text-muted' />}
-        />
-
-        <Select
-          allowClear
-          placeholder={STUDENT_ENROLLMENT.MAJOR_FILTER}
-          value={majorFilter || undefined}
-          onChange={handleMajorChange}
-          className='h-11 min-w-[220px]'
-          options={majorOptions}
           suffixIcon={<FilterOutlined className='text-muted' />}
         />
       </div>

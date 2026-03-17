@@ -3,9 +3,17 @@
 import React, { memo } from 'react';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
+const LOGBOOK_STATUS = {
+  SUBMITTED: 0,
+  APPROVED: 1,
+  NEEDS_REVISION: 2,
+  PUNCTUAL: 3,
+  LATE: 4,
+};
+
 const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
   const config = {
-    0: {
+    [LOGBOOK_STATUS.SUBMITTED]: {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
       color: 'text-info',
     },
@@ -13,7 +21,7 @@ const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
       label: DAILY_REPORT_UI.STATUS.SUBMITTED,
       color: 'text-info',
     },
-    1: {
+    [LOGBOOK_STATUS.APPROVED]: {
       label: DAILY_REPORT_UI.STATUS.APPROVED,
       color: 'text-success',
     },
@@ -21,7 +29,7 @@ const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
       label: DAILY_REPORT_UI.STATUS.APPROVED,
       color: 'text-success',
     },
-    2: {
+    [LOGBOOK_STATUS.NEEDS_REVISION]: {
       label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION,
       color: 'text-warning',
     },
@@ -29,7 +37,7 @@ const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
       label: DAILY_REPORT_UI.STATUS.NEEDS_REVISION,
       color: 'text-warning',
     },
-    3: {
+    [LOGBOOK_STATUS.PUNCTUAL]: {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
       color: 'text-success',
     },
@@ -37,7 +45,7 @@ const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
       label: DAILY_REPORT_UI.STATUS.PUNCTUAL,
       color: 'text-success',
     },
-    4: {
+    [LOGBOOK_STATUS.LATE]: {
       label: DAILY_REPORT_UI.STATUS.LATE,
       color: 'text-danger',
     },

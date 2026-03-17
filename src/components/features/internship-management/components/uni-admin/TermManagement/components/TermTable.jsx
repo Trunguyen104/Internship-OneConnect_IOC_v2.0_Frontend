@@ -1,7 +1,5 @@
-'use client';
-
 import React, { useMemo, memo } from 'react';
-import { Table, Tag, Button, Dropdown, Typography, Tooltip } from 'antd';
+import { Tag, Button, Dropdown, Typography, Tooltip } from 'antd';
 import {
   EyeOutlined,
   EditOutlined,
@@ -10,6 +8,7 @@ import {
   SolutionOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import DataTable from '@/components/ui/DataTable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Text } = Typography;
@@ -23,7 +22,6 @@ const STATUS_CONFIG = {
 const TermTable = memo(function TermTable({
   data,
   loading,
-  pagination,
   onEdit,
   onRequestDelete,
   onRequestChangeStatus,
@@ -34,22 +32,21 @@ const TermTable = memo(function TermTable({
     () => [
       {
         title: <span className='tracking-wider'>{TABLE.COLUMNS.NAME}</span>,
-        dataIndex: 'name',
         key: 'name',
-        width: 250,
-        render: (text) => (
+        width: '250px',
+        render: (_, record) => (
           <div className='flex items-center gap-3'>
             <div className='bg-primary/10 flex size-9 items-center justify-center rounded-xl'>
               <CalendarOutlined className='text-primary text-lg' />
             </div>
-            <span className='text-text text-sm font-bold'>{text}</span>
+            <span className='text-text text-sm font-bold'>{record.name}</span>
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.DURATION,
         key: 'duration',
-        width: 250,
+        width: '250px',
         render: (_, record) => (
           <div className='flex items-center gap-2'>
             <Text className='bg-surface border-border text-muted rounded-lg border px-2 py-0.5 font-mono text-xs font-semibold'>
@@ -64,30 +61,27 @@ const TermTable = memo(function TermTable({
       },
       {
         title: TABLE.COLUMNS.STUDENT_COUNT,
-        dataIndex: 'studentCount',
         key: 'studentCount',
-        width: 150,
+        width: '150px',
         align: 'center',
-        render: (count) => (
+        render: (_, record) => (
           <div className='flex items-center justify-center gap-2'>
             <SolutionOutlined className='text-muted text-xs' />
-            <span className='text-text text-sm font-bold'>{count || 0}</span>
+            <span className='text-text text-sm font-bold'>{record.studentCount || 0}</span>
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.STATUS,
-        dataIndex: 'status',
         key: 'status',
-        width: 160,
+        width: '160px',
         align: 'center',
-        render: (status) => {
-          const config = STATUS_CONFIG[status] || STATUS_CONFIG[0];
+        render: (_, record) => {
+          const config = STATUS_CONFIG[record.status] || STATUS_CONFIG[0];
           return (
             <Tag
               color={config.color}
-              variant='filled'
-              className='min-w-[110px] rounded-full py-0.5 text-[10px] font-black tracking-widest uppercase'
+              className='min-w-[110px] rounded-full border-none px-3 text-[10px] font-bold uppercase'
             >
               {config.label}
             </Tag>
@@ -95,9 +89,9 @@ const TermTable = memo(function TermTable({
         },
       },
       {
-        title: <span className='pr-4'>{TABLE.COLUMNS.ACTIONS}</span>,
+        title: TABLE.COLUMNS.ACTIONS,
         key: 'action',
-        width: 120,
+        width: '120px',
         align: 'right',
         render: (_, record) => {
           const isClosed = record.status === 2;
@@ -161,18 +155,7 @@ const TermTable = memo(function TermTable({
   );
 
   return (
-    <div className='flex-1 overflow-hidden px-2'>
-      <Table
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-        rowKey='termId'
-        pagination={false}
-        className='premium-table'
-        rowClassName='group hover:bg-muted/5 transition-all duration-200 cursor-default'
-        scroll={{ x: 'max-content' }}
-      />
-    </div>
+    <DataTable columns={columns} data={data} loading={loading} rowKey='termId' minWidth='900px' />
   );
 });
 

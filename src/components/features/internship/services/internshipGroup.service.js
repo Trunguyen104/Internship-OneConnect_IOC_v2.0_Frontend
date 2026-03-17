@@ -36,8 +36,6 @@ export const InternshipGroupService = {
   },
 
   removeStudents(data) {
-    return httpDelete('/internshipgroups/students', {
-      body: JSON.stringify(data),
-    });
+    return httpDelete('/internshipgroups/students', data);
   },
 };
