@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useEffect } from 'react';
-import { Form, Input, DatePicker, Select, Drawer, Button, Space, Typography, Divider } from 'antd';
+import { Form, Input, DatePicker, Select, Drawer, Button, Typography, Divider } from 'antd';
 import {
   CalendarOutlined,
   PlusCircleOutlined,
@@ -79,8 +79,8 @@ const TermFormDrawer = memo(function TermFormDrawer({
             </Title>
             <Text className='text-muted text-xs italic'>
               {initialValues
-                ? 'Cập nhật thông tin chi tiết đợt thực tập'
-                : 'Vui lòng cung cấp thông tin để tạo đợt mới'}
+                ? 'Update internship term details and configuration'
+                : 'Please provide required information to create a new internship term'}
             </Text>
           </div>
         </div>
@@ -107,25 +107,26 @@ const TermFormDrawer = memo(function TermFormDrawer({
 
             <div className='grid grid-cols-2 gap-4'>
               <Form.Item
-                label={<span className='text-text font-semibold'>Ngày bắt đầu</span>}
+                label={<span className='text-text font-semibold'>Start Date</span>}
                 name='startDate'
-                rules={[{ required: true, message: 'Vui lòng chọn ngày bắt đầu' }]}
+                rules={[{ required: true, message: 'Please select start date' }]}
               >
                 <DatePicker
-                  placeholder='Chọn ngày'
+                  placeholder='Select date'
                   suffixIcon={<CalendarOutlined className='text-muted' />}
                   style={{ width: '100%' }}
                   format='DD/MM/YYYY'
+                  disabled={!!initialValues}
                   className='bg-surface border-border h-11 rounded-xl'
                 />
               </Form.Item>
 
               <Form.Item
-                label={<span className='text-text font-semibold'>Ngày kết thúc</span>}
+                label={<span className='text-text font-semibold'>End Date</span>}
                 name='endDate'
                 dependencies={['startDate']}
                 rules={[
-                  { required: true, message: 'Vui lòng chọn ngày kết thúc' },
+                  { required: true, message: 'Please select end date' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
                       if (
@@ -135,13 +136,13 @@ const TermFormDrawer = memo(function TermFormDrawer({
                       ) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(new Error('Ngày kết thúc phải sau ngày bắt đầu'));
+                      return Promise.reject(new Error('End date must be after start date'));
                     },
                   }),
                 ]}
               >
                 <DatePicker
-                  placeholder='Chọn ngày'
+                  placeholder='Select date'
                   suffixIcon={<CalendarOutlined className='text-muted' />}
                   style={{ width: '100%' }}
                   format='DD/MM/YYYY'
@@ -152,15 +153,15 @@ const TermFormDrawer = memo(function TermFormDrawer({
 
             {!initialValues && (
               <Form.Item
-                label={<span className='text-text font-semibold'>Trạng thái khởi tạo</span>}
+                label={<span className='text-text font-semibold'>Initial Status</span>}
                 name='status'
                 rules={[{ required: true }]}
               >
                 <Select
                   className='h-11'
                   options={[
-                    { value: 0, label: 'Lưu dưới dạng Bản nháp' },
-                    { value: 1, label: 'Kích hoạt ngay lập tức' },
+                    { value: 0, label: 'Save as Draft' },
+                    { value: 1, label: 'Activate Immediately' },
                   ]}
                 />
               </Form.Item>

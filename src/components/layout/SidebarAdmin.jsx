@@ -3,9 +3,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarOutlined, TeamOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import {
+  CalendarOutlined,
+  TeamOutlined,
+  ArrowLeftOutlined,
+  DashboardOutlined,
+} from '@ant-design/icons';
 
 const adminMenu = [
+  { icon: <DashboardOutlined />, label: 'Trang chủ', href: '/admin-dashboard' },
   { icon: <CalendarOutlined />, label: 'Kỳ thực tập', href: '/internship-terms' },
   { icon: <TeamOutlined />, label: 'Quản lí Sinh viên', href: '/enrollments' },
 ];

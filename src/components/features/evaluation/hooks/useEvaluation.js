@@ -24,30 +24,32 @@ export function useEvaluation() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // 1. Fetch Internship ID first
   useEffect(() => {
     const fetchInternship = async () => {
       try {
+        setLoading(true);
         const res = await InternshipGroupService.getAll();
-        const items = res?.data?.items || res?.items || [];
+        const items = res?.data?.items || res?.data || [];
+
         if (items.length > 0) {
-          const id = items[0].internshipId || items[0].id;
-          const sId = items[0].studentId;
+          const activeItem = items.find((it) => it.status !== 'Failed') || items[0];
+          const id = activeItem.internshipId || activeItem.id;
+          const sId = activeItem.studentId;
+
           setInternshipId(id);
           setMyStudentId(sId);
         } else {
-          setLoading(false);
           toast.warning('You are not currently enrolled in any internship.');
         }
       } catch (error) {
         console.error('Error fetching internship:', error);
+      } finally {
         setLoading(false);
       }
     };
     fetchInternship();
-  }, []);
+  }, [toast]);
 
-  // 2. Fetch Cycles when internshipId is available
   useEffect(() => {
     if (!internshipId) return;
 
@@ -66,37 +68,43 @@ export function useEvaluation() {
     };
 
     fetchCycles();
-  }, [internshipId]);
+  }, [internshipId, toast]);
 
   // 3. Fetch Team Evaluations when a cycle is selected
-  const fetchTeamData = useCallback(async (cycleId) => {
-    try {
-      setLoadingTeam(true);
-      const res = await EvaluationService.getStudentTeamEvaluations(cycleId);
-      const data = res?.data || res || [];
-      setTeamData(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error('Error fetching team evaluations:', error);
-      toast.error('Failed to load team evaluations.');
-    } finally {
-      setLoadingTeam(false);
-    }
-  }, []);
+  const fetchTeamData = useCallback(
+    async (cycleId) => {
+      try {
+        setLoadingTeam(true);
+        const res = await EvaluationService.getStudentTeamEvaluations(cycleId);
+        const data = res?.data || res || [];
+        setTeamData(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching team evaluations:', error);
+        toast.error('Failed to load team evaluations.');
+      } finally {
+        setLoadingTeam(false);
+      }
+    },
+    [toast],
+  );
 
   // 4. Fetch My Evaluation details
-  const fetchMyEvalData = useCallback(async (cycleId) => {
-    try {
-      setLoadingMyEval(true);
-      const res = await EvaluationService.getStudentMyEvaluation(cycleId);
-      const data = res?.data || res || null;
-      setMyEvaluation(data);
-    } catch (error) {
-      console.error('Error fetching my evaluation:', error);
-      toast.error('Failed to load individual evaluation details.');
-    } finally {
-      setLoadingMyEval(false);
-    }
-  }, []);
+  const fetchMyEvalData = useCallback(
+    async (cycleId) => {
+      try {
+        setLoadingMyEval(true);
+        const res = await EvaluationService.getStudentMyEvaluation(cycleId);
+        const data = res?.data || res || null;
+        setMyEvaluation(data);
+      } catch (error) {
+        console.error('Error fetching my evaluation:', error);
+        toast.error('Failed to load individual evaluation details.');
+      } finally {
+        setLoadingMyEval(false);
+      }
+    },
+    [toast],
+  );
 
   const total = cycles.length;
   const totalPages = Math.ceil(total / pageSize);
