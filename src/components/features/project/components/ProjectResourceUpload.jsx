@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Form, Input, Select, Button, Upload, Typography } from 'antd';
+import { Form, Input, Select, Button, Upload } from 'antd';
 import { useToast } from '@/providers/ToastProvider';
 import { UploadOutlined } from '@ant-design/icons';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
-
-const { Title, Text } = Typography;
 
 export default function ProjectResourceUpload({
   form,
@@ -31,7 +29,7 @@ export default function ProjectResourceUpload({
         return Upload.LIST_IGNORE;
       }
 
-      const isLt10M = file.size / 1024 / 1024 <= 10;
+      const isLt10M = file.size / 1024 / 1024 <= 30;
       if (!isLt10M) {
         toast.error(PROJECT_MESSAGES.ERROR.FILE_TOO_LARGE);
         return Upload.LIST_IGNORE;

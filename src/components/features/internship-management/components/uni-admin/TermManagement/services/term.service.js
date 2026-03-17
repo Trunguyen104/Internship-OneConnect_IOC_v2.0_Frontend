@@ -17,12 +17,12 @@ export const TermService = {
     return httpPut(`/terms/${id}`, data);
   },
 
-  delete(id) {
-    return httpDelete(`/terms/${id}`);
+  delete(id, reason) {
+    const url = reason ? `/terms/${id}?reason=${encodeURIComponent(reason)}` : `/terms/${id}`;
+    return httpDelete(url);
   },
 
-  close(id, data) {
-    // Backend expects CloseTermCommand: { reason: string, version: number }
-    return httpPatch(`/terms/${id}/close`, data);
+  updateStatus(id, data) {
+    return httpPatch(`/terms/${id}/status`, data);
   },
 };
