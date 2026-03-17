@@ -52,11 +52,6 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({
     >
       <div className='space-y-8 p-6'>
         <div className='flex items-start gap-6'>
-          <div
-            className='h-24 w-24 rounded-xl bg-cover bg-center'
-            style={{ backgroundImage: `url(${avatar})` }}
-          />
-
           <div>
             <h3 className='text-xl font-bold'>{student.name}</h3>
 
@@ -88,7 +83,6 @@ const StudentDetailsDrawer = memo(function StudentDetailsDrawer({
           </div>
         </section>
 
-        {/* Placement */}
         <section>
           <div className='mb-4 flex items-center gap-2'>
             <SettingOutlined />

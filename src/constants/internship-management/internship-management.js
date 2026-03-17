@@ -170,7 +170,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
   },
   UNI_ADMIN: {
     STUDENT_ENROLLMENT: {
-      TITLE: 'Student List by Term',
+      TITLE: 'Student List',
       ADD_BTN: 'Add Student',
       IMPORT_BTN: 'Import from Excel',
       WITHDRAW_BTN: 'Withdraw',

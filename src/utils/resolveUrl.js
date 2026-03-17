@@ -4,8 +4,8 @@ export const resolveResourceUrl = (url) => {
   // external URL
   if (url.startsWith('http')) return url;
 
-  // Determine the target backend root (port 5050)
-  const backendRoot = 'http://localhost:5050';
+  // Determine the target backend root
+  const backendRoot = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5050';
 
   let cleanPath = url.replace(/\\/g, '/').trim();
 
@@ -25,7 +25,7 @@ export const resolveResourceUrl = (url) => {
 
   // Special handling for Uploads to ensure they use backendRoot
   const resolved = backendRoot + (cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath);
-  console.log('🔗 URL RECONSTRUCTION:', { original: url, resolved });
+  console.log('URL RECONSTRUCTION:', { original: url, resolved });
 
   return resolved;
 };
