@@ -21,24 +21,24 @@ export const productBacklogService = {
 
   // Work items
   getWorkItemsBacklog(projectId) {
-    return httpGet('/workitems/backlog', { projectId });
+    return httpGet('/work-items/backlog', { projectId });
   },
   getWorkItemById(projectId, workItemId) {
-    return httpGet(`/workitems/${workItemId}`, { projectId });
+    return httpGet(`/work-items/${workItemId}`, { projectId });
   },
   createWorkItem(projectId, payload) {
-    return httpPost(`/workitems?projectId=${projectId}`, payload);
+    return httpPost(`/work-items?projectId=${projectId}`, payload);
   },
   updateWorkItem(projectId, workItemId, payload) {
-    return httpPut(`/workitems/${workItemId}`, { ...payload, projectId });
+    return httpPut(`/work-items/${workItemId}`, { ...payload, projectId });
   },
   deleteWorkItem(projectId, workItemId) {
-    return httpDelete(`/workitems/${workItemId}`, { projectId });
+    return httpDelete(`/work-items/${workItemId}`, { projectId });
   },
 
   // PATCH endpoint: move a work item into a sprint
   moveWorkItemToSprint(projectId, workItemId, sprintId) {
-    return httpPatch(`/workitems/${workItemId}/sprint`, {
+    return httpPatch(`/work-items/${workItemId}/sprint`, {
       projectId,
       workItemId,
       targetSprintId: sprintId,
@@ -47,7 +47,7 @@ export const productBacklogService = {
 
   // PATCH endpoint: move a work item back to the backlog
   moveWorkItemToBacklog(projectId, workItemId) {
-    return httpPatch(`/workitems/${workItemId}/backlog`, {
+    return httpPatch(`/work-items/${workItemId}/backlog`, {
       projectId,
       workItemId,
     });
