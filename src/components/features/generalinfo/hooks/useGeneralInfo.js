@@ -11,51 +11,19 @@ export function useGeneralInfo(initialId = null) {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const GROUP_STATUS_MAP = {
-    1: {
-      label: GENERAL_INFO_UI.STATUS.REGISTERED,
-      style: 'bg-muted text-muted-foreground border-border',
-    },
-    2: {
-      label: GENERAL_INFO_UI.STATUS.ONBOARDED,
-      style: 'bg-info-surface text-info border-info/20',
-    },
-    3: {
-      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
-      style: 'bg-primary-surface text-primary border-primary/20',
-    },
-    4: {
-      label: GENERAL_INFO_UI.STATUS.COMPLETED,
-      style: 'bg-success-surface text-success border-success/20',
-    },
-    5: {
-      label: GENERAL_INFO_UI.STATUS.FAILED,
-      style: 'bg-danger-surface text-danger border-danger/20',
-    },
-    ACTIVE: {
-      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
-      style: 'bg-primary-surface text-primary border-primary/20',
-    },
-    INPROGRESS: {
-      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
-      style: 'bg-primary-surface text-primary border-primary/20',
-    },
-    IN_PROGRESS: {
-      label: GENERAL_INFO_UI.STATUS.IN_PROGRESS,
-      style: 'bg-primary-surface text-primary border-primary/20',
-    },
-    COMPLETED: {
-      label: GENERAL_INFO_UI.STATUS.COMPLETED,
-      style: 'bg-success-surface text-success border-success/20',
-    },
-    REGISTERED: {
-      label: GENERAL_INFO_UI.STATUS.REGISTERED,
-      style: 'bg-muted text-muted-foreground border-border',
-    },
-    ONBOARDED: {
-      label: GENERAL_INFO_UI.STATUS.ONBOARDED,
-      style: 'bg-info-surface text-info border-info/20',
-    },
+  const GROUP_STATUS_COLORS = {
+    1: 'info',
+    2: 'info',
+    3: 'warning',
+    4: 'success',
+    5: 'danger',
+    ACTIVE: 'warning',
+    INPROGRESS: 'warning',
+    IN_PROGRESS: 'warning',
+    COMPLETED: 'success',
+    REGISTERED: 'info',
+    ONBOARDED: 'info',
+    FAILED: 'danger',
   };
 
   useEffect(() => {
@@ -129,13 +97,18 @@ export function useGeneralInfo(initialId = null) {
 
   const getStatusConfig = (status) => {
     const normalizedStatus = status ? String(status).toUpperCase().replace(/_/g, '') : '';
-    return (
-      GROUP_STATUS_MAP[status] ||
-      GROUP_STATUS_MAP[normalizedStatus] || {
-        label: status || GENERAL_INFO_UI.STATUS.UNKNOWN,
-        style: 'bg-muted text-muted-foreground border-border',
-      }
-    );
+    const color = GROUP_STATUS_COLORS[status] || GROUP_STATUS_COLORS[normalizedStatus] || 'default';
+
+    // Map label
+    let label = status || GENERAL_INFO_UI.STATUS.UNKNOWN;
+    if (color === 'muted') label = GENERAL_INFO_UI.STATUS.REGISTERED;
+    if (color === 'info') label = GENERAL_INFO_UI.STATUS.ONBOARDED;
+    if (color === 'primary') label = GENERAL_INFO_UI.STATUS.IN_PROGRESS;
+    if (color === 'warning') label = GENERAL_INFO_UI.STATUS.IN_PROGRESS;
+    if (color === 'success') label = GENERAL_INFO_UI.STATUS.COMPLETED;
+    if (color === 'danger') label = GENERAL_INFO_UI.STATUS.FAILED;
+
+    return { label, color };
   };
 
   return {

@@ -58,7 +58,7 @@ const StakeholderList = memo(function StakeholderList({
                     </td>
                     <td className='px-6 py-4'>
                       <div className='flex flex-col'>
-                        <span className='text-text text-[15px] font-semibold'>{record.name}</span>
+                        <span className='text-text text-[15px] font-bold'>{record.name}</span>
                         {record.description && (
                           <span className='text-muted mt-0.5 line-clamp-1 text-[13px]'>
                             {record.description}
@@ -67,7 +67,7 @@ const StakeholderList = memo(function StakeholderList({
                       </div>
                     </td>
                     <td className='px-6 py-4'>
-                      <span className='text-primary text-[10px] font-bold tracking-widest uppercase'>
+                      <span className='text-primary text-[11px] font-bold'>
                         {record.role || STAKEHOLDER_UI.NO_ROLE}
                       </span>
                     </td>

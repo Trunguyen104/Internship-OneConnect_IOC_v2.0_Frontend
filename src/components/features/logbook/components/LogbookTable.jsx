@@ -49,8 +49,8 @@ const LogbookTable = memo(function LogbookTable({ data, userProfile, onView, onE
               const isOwner = record.studentId === currentStudentId;
 
               return (
-                <tr key={record.logbookId} className='hover:bg-bg h-[72px] transition-colors'>
-                  <td className='text-text px-6 py-4 align-middle text-[15px] font-bold'>
+                <tr key={record.logbookId} className='hover:bg-bg/80 h-[72px] transition-colors'>
+                  <td className='text-text px-6 py-4 align-middle text-[15px]'>
                     {record.dateReport
                       ? dayjs(record.dateReport).format('DD/MM/YYYY')
                       : DAILY_REPORT_UI.VIEW_MODAL.NA}

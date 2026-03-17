@@ -87,7 +87,6 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
           <Input
             placeholder={PLACEHOLDER_EMAIL}
             value={form.email}
-            disabled={!!editingId}
             onChange={(e) => {
               setForm((prev) => ({ ...prev, email: e.target.value }));
               if (errors.email) setErrors((prev) => ({ ...prev, email: null }));
