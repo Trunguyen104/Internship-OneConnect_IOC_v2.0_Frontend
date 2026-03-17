@@ -60,7 +60,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.hour(12).toISOString(),
+          dateReport: values.dateReport.startOf('day').toISOString(),
           status: PUNCTUAL_STATUS,
         };
         res = await LogBookService.update(editingId, updatePayload);
@@ -70,7 +70,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.hour(12).toISOString(),
+          dateReport: values.dateReport.startOf('day').toISOString(),
           status: SUBMITTED_STATUS,
         };
         res = await LogBookService.create(createPayload);

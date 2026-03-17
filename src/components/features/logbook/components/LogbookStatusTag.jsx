@@ -53,9 +53,7 @@ const LogbookStatusTag = memo(function LogbookStatusTag({ status }) {
 
   const c = config[status] || config.UNKNOWN;
 
-  return (
-    <span className={`${c.color} text-xs font-semibold tracking-wide uppercase`}>{c.label}</span>
-  );
+  return <span className={`${c.color} text-xs font-semibold`}>{c.label}</span>;
 });
 
 export default LogbookStatusTag;

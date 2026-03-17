@@ -1,6 +1,6 @@
 'use client';
 
-import { Typography, Tag } from 'antd';
+import { Typography, Tag, Empty } from 'antd';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { VIOLATION_UI } from '@/constants/violation/uiText';
@@ -12,7 +12,7 @@ export default function ViolationTable({ data, page, pageSize, sortOrder, onSort
     <div className='flex min-h-0 flex-1 flex-col'>
       {!data || data.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <p className='text-muted'>{VIOLATION_UI.TABLE.EMPTY}</p>
+          <Empty description={VIOLATION_UI.TABLE.EMPTY} />
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>

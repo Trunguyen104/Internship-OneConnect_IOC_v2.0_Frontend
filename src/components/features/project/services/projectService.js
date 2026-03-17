@@ -2,8 +2,7 @@ import { httpGet, httpPost, httpPut, httpDelete } from '@/services/httpClient';
 
 export const ProjectService = {
   getAll(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/projects${query ? `?${query}` : ''}`);
+    return httpGet('/projects', params);
   },
 
   // getMy removed to standardize on paginated list endpoints.

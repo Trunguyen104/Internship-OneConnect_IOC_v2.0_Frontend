@@ -30,9 +30,7 @@ const IssueStatusTag = memo(function IssueStatusTag({ status }) {
   const config = ISSUE_STATUS_MAP[status] || ISSUE_STATUS_MAP[ISSUE_STATUS.IN_PROGRESS];
 
   return (
-    <span
-      className={`flex w-fit items-center gap-1.5 text-xs font-semibold tracking-wide uppercase ${config.color}`}
-    >
+    <span className={`flex w-fit items-center gap-1.5 text-xs font-semibold ${config.color}`}>
       {config.icon}
       {config.label}
     </span>

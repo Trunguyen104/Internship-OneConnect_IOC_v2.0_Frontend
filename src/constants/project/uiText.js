@@ -14,6 +14,21 @@ export const PROJECT_UI = {
     ATTACH_FILE: 'Attach File',
   },
 
+  LABELS: {
+    NAME: 'Project Name',
+    STATUS: 'Status',
+    TIMELINE: 'Timeline',
+    DESCRIPTION: 'Project Description',
+    TO: 'to',
+  },
+
+  STATUS_LABELS: {
+    PLANNING: 'Planning',
+    IN_PROGRESS: 'In Progress',
+    DONE: 'Done',
+    CANCELLED: 'Cancelled',
+  },
+
   BUTTON: {
     UPLOAD: 'Upload',
     SELECT_FILE: 'Select File',
@@ -29,8 +44,14 @@ export const PROJECT_UI = {
     RESOURCE_NAME: 'Enter resource name...',
   },
 
+  TOOLTIP: {
+    RESOURCE_NAME: 'If left blank, the attached filename will be used',
+  },
+
   EMPTY: {
     NO_RESOURCE: 'No resources attached yet.',
+    NO_PROJECT: 'Project information not found',
+    NO_DESCRIPTION: 'No detailed description available for this project.',
   },
 
   LOADING: 'Loading resources...',
@@ -38,6 +59,7 @@ export const PROJECT_UI = {
 
   VALUES: {
     UNTITLED: 'Untitled Resource',
+    OTHER: 'Other',
   },
 
   CONFIRM: {

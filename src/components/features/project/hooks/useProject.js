@@ -64,7 +64,6 @@ export function useProject(initialProjectId = null) {
       let targetProjectId = initialProjectId;
       let internshipId = null;
 
-      // If no project ID provided, find the group first
       if (!targetProjectId) {
         const mineRes = await InternshipGroupService.getAll({ PageSize: 1 });
         const mineData = mineRes?.data?.items?.[0] || mineRes?.data?.[0] || null;
@@ -72,7 +71,6 @@ export function useProject(initialProjectId = null) {
         targetProjectId =
           mineData?.projectId || mineData?.project?.projectId || mineData?.project?.id;
 
-        // If still no project ID, try to find it by group ID
         if (!targetProjectId && internshipId) {
           const projectRes = await ProjectService.getAll({
             InternshipId: internshipId,
@@ -133,7 +131,6 @@ export function useProject(initialProjectId = null) {
       7: ['png'],
     };
 
-    // If it's not "Other" (0), validate the extension
     if (selectedType !== 0 && typeExtensionMap[selectedType]) {
       if (!typeExtensionMap[selectedType].includes(currentExt)) {
         const typeLabel =
@@ -144,7 +141,6 @@ export function useProject(initialProjectId = null) {
       }
     }
 
-    // --- Duplicate Checks ---
     const proposedName = (values.resourceName || file.name).trim().toLowerCase();
     const proposedFileName = file.name.toLowerCase();
 

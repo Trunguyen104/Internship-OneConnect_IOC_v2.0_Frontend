@@ -8,7 +8,7 @@ import { PROJECT_UI } from '@/constants/project/uiText';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 export default function ProjectResourceUpload({
   form,
@@ -60,20 +60,12 @@ export default function ProjectResourceUpload({
   };
 
   return (
-    <div className='border-border/50 bg-bg-surface rounded-2xl border p-6'>
-      <div className={'mb-6'}>
-        <Title
-          level={5}
-          className={'!m-0 !text-sm !font-bold tracking-wider !text-slate-800 uppercase'}
-        >
-          {PROJECT_UI.TITLE.ADD_RESOURCE}
-        </Title>
-      </div>
+    <div className='pt-2'>
       <Form form={form} layout={'vertical'} onFinish={onUpload} className={'space-y-4'}>
         <Form.Item
           label={PROJECT_UI.FORM.RESOURCE_NAME}
           name={'resourceName'}
-          tooltip={{ title: 'If left blank, the attached filename will be used' }}
+          tooltip={{ title: PROJECT_UI.TOOLTIP.RESOURCE_NAME }}
         >
           <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
         </Form.Item>

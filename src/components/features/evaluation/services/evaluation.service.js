@@ -3,8 +3,7 @@ import { httpGet, httpPost, httpPut, httpDelete, httpPatch } from '@/services/ht
 export const EvaluationService = {
   // --- Cycle Endpoints ---
   getCycles(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/evaluations/cycles${query ? `?${query}` : ''}`);
+    return httpGet('/evaluations/cycles', params);
   },
 
   createCycle(data) {
@@ -25,8 +24,7 @@ export const EvaluationService = {
 
   // --- Criteria Endpoints ---
   getCriteria(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/evaluations/criteria${query ? `?${query}` : ''}`);
+    return httpGet('/evaluations/criteria', params);
   },
 
   createCriteria(data) {

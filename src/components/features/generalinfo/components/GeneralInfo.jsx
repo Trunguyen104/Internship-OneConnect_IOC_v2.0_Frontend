@@ -1,6 +1,6 @@
 'use client';
 
-import { Descriptions, Typography, Spin, Empty } from 'antd';
+import { Descriptions, Typography, Spin, Empty, Tag } from 'antd';
 import { useGeneralInfo } from '../hooks/useGeneralInfo';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
@@ -9,29 +9,29 @@ import Card from '@/components/ui/Card';
 const { Text } = Typography;
 
 export default function GeneralInfo({ internshipGroupId = null }) {
-  const { info, loading } = useGeneralInfo(internshipGroupId);
+  const { info, loading, getStatusConfig } = useGeneralInfo(internshipGroupId);
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 overflow-y-auto duration-500'>
-      <StudentPageHeader title='General Information' />
+      <StudentPageHeader title={GENERAL_INFO_UI.TITLE} />
 
       <div className='flex min-h-0 flex-1 flex-col gap-6 lg:flex-row'>
         <div className='flex min-h-0 flex-1 flex-col lg:w-2/3'>
           <Card className='flex min-h-0 flex-1 flex-col'>
             {loading ? (
               <div className='flex flex-1 items-center justify-center py-20'>
-                <Spin size='large' description='Loading information…' />
+                <Spin size='large' description={GENERAL_INFO_UI.LOADING} />
               </div>
             ) : !info ? (
               <div className='flex flex-1 items-center justify-center py-12'>
                 <Empty
-                  description={GENERAL_INFO_UI.MESSAGES.FETCH_ERROR || 'No information available'}
+                  description={GENERAL_INFO_UI.MESSAGES.FETCH_ERROR || GENERAL_INFO_UI.VALUES.NA}
                 />
               </div>
             ) : (
               <div className='w-full overflow-x-auto'>
                 <Descriptions
-                  column={{ xxl: 4, xl: 3, lg: 2, md: 1, sm: 1, xs: 1 }}
+                  column={{ xxl: 4, xl: 4, lg: 4, md: 2, sm: 2, xs: 1 }}
                   bordered={false}
                   styles={{
                     label: {
@@ -69,21 +69,46 @@ export default function GeneralInfo({ internshipGroupId = null }) {
                       {info.project?.name || GENERAL_INFO_UI.VALUES.NA}
                     </Text>
                   </Descriptions.Item>
+
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.INTERNSHIP_TERM}>
                     {info.internshipTermName || info.internshipTerm || GENERAL_INFO_UI.VALUES.NA}
+                  </Descriptions.Item>
+                  <Descriptions.Item label={GENERAL_INFO_UI.LABELS.STATUS}>
+                    {(() => {
+                      const config = getStatusConfig(info.status);
+                      return (
+                        <Tag
+                          style={{
+                            backgroundColor: `var(--color-${config.color}-surface, var(--color-bg))`,
+                            color: `var(--color-${config.color})`,
+                          }}
+                          className='min-w-[100px] rounded-full border-none py-1 text-center text-[10px] font-black tracking-widest uppercase shadow-sm'
+                        >
+                          {config.label}
+                        </Tag>
+                      );
+                    })()}
                   </Descriptions.Item>
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.ENTERPRISE}>
                     {info.enterpriseName || info.company || GENERAL_INFO_UI.VALUES.NA}
                   </Descriptions.Item>
-                  {/* <Descriptions.Item label={GENERAL_INFO_UI.LABELS.UNIVERSITY}>
-                    {info.schoolName || info.school || GENERAL_INFO_UI.VALUES.NA}
-                  </Descriptions.Item> */}
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR}>
                     {info.mentorName || info.mentor || (
                       <Text type='secondary' italic>
                         {GENERAL_INFO_UI.VALUES.UNASSIGNED}
                       </Text>
                     )}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label={GENERAL_INFO_UI.LABELS.STUDENT_COUNT}>
+                    <Text className='text-primary text-3xl font-black'>
+                      {info.totalStudents || info.members?.length || 0}
+                    </Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR_COUNT}>
+                    <Text className='text-text text-3xl font-black'>
+                      {info.totalMentors || (info.mentorName ? 1 : 0)}
+                    </Text>
                   </Descriptions.Item>
                   <Descriptions.Item label={GENERAL_INFO_UI.LABELS.START_DATE}>
                     {info.startDate
@@ -94,16 +119,6 @@ export default function GeneralInfo({ internshipGroupId = null }) {
                     {info.endDate
                       ? new Date(info.endDate).toLocaleDateString('en-GB')
                       : GENERAL_INFO_UI.VALUES.NA}
-                  </Descriptions.Item>
-                  <Descriptions.Item label={GENERAL_INFO_UI.LABELS.STUDENT_COUNT}>
-                    <Text className='text-primary text-2xl font-black'>
-                      {info.totalStudents || info.members?.length || 0}
-                    </Text>
-                  </Descriptions.Item>
-                  <Descriptions.Item label={GENERAL_INFO_UI.LABELS.MENTOR_COUNT}>
-                    <Text className='text-text text-2xl font-black'>
-                      {info.totalMentors || (info.mentorName ? 1 : 0)}
-                    </Text>
                   </Descriptions.Item>
                 </Descriptions>
               </div>
