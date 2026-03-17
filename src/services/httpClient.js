@@ -2,44 +2,27 @@
 const API_BASE = '/api/proxy';
 
 async function request(path, options = {}) {
-  let token = null;
-
-  if (typeof window !== 'undefined') {
-    const raw = sessionStorage.getItem('accessToken');
-
-    if (raw) {
-      try {
-        if (raw.startsWith('ey')) {
-          token = raw;
-        } else {
-          const parsed = JSON.parse(raw);
-          token = parsed?.accessToken || parsed?.data?.accessToken || null;
-        }
-      } catch {
-        token = null;
-      }
-    }
-  }
-
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
     ...(options.headers || {}),
   };
+
   if (!isFormData && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+
+  // Token is now handled server-side in the proxy route via HttpOnly cookies.
+  // We do NOT attach it here to prevent XSS/Token Leakage.
+
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
   });
+
   const contentType = res.headers.get('content-type');
   let data = null;
 
   if (options.responseType === 'blob') {
-    // DO NOT read as text or JSON if blob is requested
     data = await res.blob();
   } else if (contentType && contentType.includes('application/json')) {
     const text = await res.text();
@@ -52,38 +35,24 @@ async function request(path, options = {}) {
     if (res.status === 401 && typeof window !== 'undefined') {
       console.log('HTTP: 401 Detected, attempting refresh...');
       try {
-        // thử refresh token
         const refreshRes = await fetch('/api/auth', {
           method: 'PUT',
           credentials: 'include',
         });
 
-        console.log('HTTP: Refresh response status:', refreshRes.status);
         if (refreshRes.ok) {
-          const { accessToken } = await refreshRes.json();
-          sessionStorage.setItem('accessToken', accessToken);
-
-          // retry request ban đầu
+          // Retry logic without client-side token attachment
           const retryRes = await fetch(`${API_BASE}${path}`, {
             ...options,
-            headers: {
-              ...headers,
-              Authorization: `Bearer ${accessToken}`,
-            },
+            headers,
           });
 
           if (!retryRes.ok) {
-            return {
-              isSuccess: false,
-              status: retryRes.status,
-              data: await retryRes.text(),
-            };
+            const errorData = await retryRes.text();
+            throw new Error(errorData || 'Request failed after refresh');
           }
 
-          // Process retry response using the same logic as the original
-          if (options.responseType === 'blob') {
-            return await retryRes.blob();
-          }
+          if (options.responseType === 'blob') return await retryRes.blob();
           const retryContentType = retryRes.headers.get('content-type');
           if (retryContentType && retryContentType.includes('application/json')) {
             return await retryRes.json();
@@ -95,11 +64,13 @@ async function request(path, options = {}) {
       }
     }
 
-    return {
-      isSuccess: false,
-      status: res.status,
-      data,
-    };
+    // Standardize error shape by throwing
+    const error = new Error(
+      typeof data === 'string' ? data : data?.message || `Request failed with status ${res.status}`,
+    );
+    error.status = res.status;
+    error.data = data;
+    throw error;
   }
 
   return data;

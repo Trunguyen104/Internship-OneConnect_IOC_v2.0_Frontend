@@ -49,7 +49,6 @@ export async function POST(req) {
       email: data.data?.email,
       role: data.data?.role,
       expiresIn: data.data?.expiresIn,
-      accessToken: accessToken || data.data?.accessToken,
     });
 
     const isProd = process.env.NODE_ENV === 'production';
@@ -146,7 +145,6 @@ export async function PUT(req) {
     const response = NextResponse.json({
       success: true,
       role: data.data?.role,
-      accessToken: accessToken || data.data?.accessToken,
     });
 
     const isProd = process.env.NODE_ENV === 'production';
