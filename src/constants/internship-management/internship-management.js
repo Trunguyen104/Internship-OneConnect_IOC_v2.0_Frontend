@@ -227,7 +227,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       TABLE: {
         COLUMNS: {
           NAME: 'TERM NAME',
-          DURATION: 'DURATION',
+          START_DATE: 'START DATE',
+          END_DATE: 'END DATE',
           STUDENT_COUNT: 'STUDENT COUNT',
           STATUS: 'STATUS',
           ACTIONS: 'ACTIONS',

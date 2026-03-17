@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
 import DataTableToolbar from '@/components/ui/DataTableToolbar';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { Select } from 'antd';
@@ -12,12 +11,12 @@ import { useTermManagement } from './hooks/useTermManagement';
 import TermTable from './components/TermTable';
 import TermFormDrawer from './components/TermFormDrawer';
 import TermStatusModal from './components/TermStatusModal';
-import { INITIAL_TERMS } from './constants/termData';
 
 export default function InternshipTermManagement() {
   const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
 
   const {
+    data,
     loading,
     searchTerm,
     statusFilter,
@@ -26,20 +25,17 @@ export default function InternshipTermManagement() {
     submitLoading,
     editingRecord,
     statusModalState,
-    filteredData,
-    paginatedData,
     setModalVisible,
     setStatusModalState,
     handleSearchChange,
     handleStatusChange,
-    handleTableChange,
     handleCreateNew,
     handleEdit,
     handleRequestDelete,
     handleRequestChangeStatus,
     handleChangeStatus,
     handleSaveModal,
-  } = useTermManagement(INITIAL_TERMS);
+  } = useTermManagement();
 
   return (
     <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
@@ -61,9 +57,10 @@ export default function InternshipTermManagement() {
               onChange={handleStatusChange}
               className='h-9 min-w-[180px]'
               options={[
-                { value: 1, label: 'Đang hoạt động' },
-                { value: 0, label: 'Bản nháp' },
-                { value: 2, label: 'Đã hoàn thành' },
+                { value: 0, label: 'Upcoming' },
+                { value: 1, label: 'Active' },
+                { value: 2, label: 'Ended' },
+                { value: 3, label: 'Closed' },
               ]}
               suffixIcon={<FilterOutlined className='text-muted' />}
             />
@@ -75,25 +72,32 @@ export default function InternshipTermManagement() {
           }}
         />
 
-        <TermTable
-          data={paginatedData}
-          loading={loading}
-          onTableChange={handleTableChange}
-          onEdit={handleEdit}
-          onRequestDelete={handleRequestDelete}
-          onRequestChangeStatus={handleRequestChangeStatus}
-        />
+        {loading && data.length === 0 ? (
+          <div className='flex h-full items-center justify-center py-20'>
+            <div className='border-primary/30 border-t-primary h-8 w-8 animate-spin rounded-full border-4'></div>
+          </div>
+        ) : (
+          <TermTable
+            data={data}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            onEdit={handleEdit}
+            onRequestDelete={handleRequestDelete}
+            onRequestChangeStatus={handleRequestChangeStatus}
+          />
+        )}
 
-        {filteredData.length > 0 && (
+        {/* {data.length > 0 && (
           <div className='border-border/50 mt-6 border-t pt-6'>
             <Pagination
-              total={filteredData.length}
+              total={pagination.total}
               page={pagination.current}
               pageSize={pagination.pageSize}
+              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
               onPageChange={(page) => handleTableChange({ current: page })}
             />
           </div>
-        )}
+        )} */}
       </Card>
 
       <TermFormDrawer

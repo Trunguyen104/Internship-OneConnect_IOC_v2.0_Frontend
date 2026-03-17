@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Modal, Button, Typography, Space, Divider } from 'antd';
+import { Modal, Button, Typography, Divider } from 'antd';
 import { WarningOutlined, InfoCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -41,7 +41,7 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
           <Text className='text-muted text-sm'>
             {STATUS.CONTENT}{' '}
             <Text className={`font-bold ${isOpening ? 'text-primary' : 'text-danger'}`}>
-              {isOpening ? 'Đang hoạt động' : 'Đã hoàn thành'}
+              {isOpening ? 'Active' : 'Closed'}
             </Text>
             ?
           </Text>
@@ -53,7 +53,7 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
 
         {!isOpening && (
           <Text className='text-danger text-xs italic'>
-            * Lưu ý: Khi chuyển sang Đã hoàn thành, các cấu hình của đợt này sẽ bị khóa.
+            * Note: When changing to Closed, all configurations for this term will be locked.
           </Text>
         )}
 
