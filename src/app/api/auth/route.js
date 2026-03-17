@@ -5,6 +5,24 @@ const BE_URL = GENERIC_BE_URL.includes('/api/v1/auth')
   ? GENERIC_BE_URL
   : `${GENERIC_BE_URL}/api/v1/auth`;
 
+function parseTokensFromHeaders(headers) {
+  const setCookies = headers.getSetCookie();
+  const tokens = {};
+
+  setCookies.forEach((cookieStr) => {
+    const parts = cookieStr.split(';')[0].split('=');
+    if (parts.length >= 2) {
+      const name = parts[0].trim().toLowerCase();
+      const value = parts[1].trim();
+
+      if (name === 'accesstoken') tokens.accessToken = value;
+      if (name === 'refreshtoken') tokens.refreshToken = value;
+    }
+  });
+
+  return tokens;
+}
+
 /**
  * LOGIN
  * POST /api/auth
@@ -18,52 +36,40 @@ export async function POST(req) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
-      credentials: 'include',
     });
 
     const data = await res.json();
+    if (!res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    }
 
-    // Use getSetCookie() to handle multiple Set-Cookie headers correctly (Node.js 18+)
-    const setCookies = res.headers.getSetCookie();
-
-    let accessToken = null;
-    let refreshToken = null;
-
-    setCookies.forEach((cookieStr) => {
-      const lower = cookieStr.toLowerCase();
-      if (lower.startsWith('accesstoken=')) {
-        accessToken = cookieStr.split(';')[0].split('=')[1];
-      } else if (lower.startsWith('refreshtoken=')) {
-        refreshToken = cookieStr.split(';')[0].split('=')[1];
-      }
-    });
+    const { accessToken, refreshToken } = parseTokensFromHeaders(res.headers);
 
     const response = NextResponse.json({
       email: data.data?.email,
       role: data.data?.role,
       expiresIn: data.data?.expiresIn,
-      accessToken, // Crucial for client-side sessionStorage
     });
 
     const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+    };
 
     if (accessToken) {
       response.cookies.set('accessToken', accessToken, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: data.data?.expiresIn || 3600,
+        ...cookieOptions,
+        maxAge: 60 * 60 * 24,
       });
     }
 
     if (refreshToken) {
       response.cookies.set('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: isProd,
-        sameSite: 'lax',
-        path: '/',
-        maxAge: Math.floor(data.data?.refreshTokenExpiresIn) || 60 * 60 * 24 * 30,
+        ...cookieOptions,
+        maxAge: 60 * 60 * 24 * 7,
       });
     }
 
@@ -92,14 +98,14 @@ export async function DELETE(req) {
 
     const response = NextResponse.json({ message: 'Logged out' });
 
-    const cookieOptions = {
+    const clearOptions = {
       httpOnly: true,
       path: '/',
       maxAge: 0,
     };
 
-    response.cookies.set('accessToken', '', cookieOptions);
-    response.cookies.set('refreshToken', '', cookieOptions);
+    response.cookies.set('accessToken', '', clearOptions);
+    response.cookies.set('refreshToken', '', clearOptions);
 
     return response;
   } catch (err) {
@@ -114,9 +120,9 @@ export async function DELETE(req) {
  */
 export async function PUT(req) {
   try {
-    const refreshToken = req.cookies.get('refreshToken')?.value;
+    const oldRefreshToken = req.cookies.get('refreshToken')?.value;
 
-    if (!refreshToken) {
+    if (!oldRefreshToken) {
       return NextResponse.json({ message: 'No refresh token' }, { status: 401 });
     }
 
@@ -124,46 +130,42 @@ export async function PUT(req) {
     const res = await fetch(refreshUrl, {
       method: 'POST',
       headers: {
-        Cookie: `refreshToken=${refreshToken}`,
+        'Content-Type': 'application/json',
+        Cookie: `refreshToken=${oldRefreshToken}`,
       },
-      credentials: 'include',
     });
 
+    const data = await res.json();
     if (!res.ok) {
-      return NextResponse.json({ message: 'Refresh failed' }, { status: 401 });
+      return NextResponse.json(data, { status: res.status });
     }
 
-    // const data = await res.json();
-    let data = null;
-
-    try {
-      data = await res.json();
-    } catch {
-      data = null;
-    }
-    const setCookies = res.headers.getSetCookie();
-    let newAccessToken = null;
-
-    setCookies.forEach((cookieStr) => {
-      const lower = cookieStr.toLowerCase();
-      if (lower.startsWith('accesstoken=')) {
-        newAccessToken = cookieStr.split(';')[0].split('=')[1];
-      }
-    });
+    const { accessToken, refreshToken } = parseTokensFromHeaders(res.headers);
 
     const response = NextResponse.json({
       success: true,
       role: data.data?.role,
-      accessToken: newAccessToken, // Crucial for client-side retry
     });
 
-    if (newAccessToken) {
-      response.cookies.set('accessToken', newAccessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: data.data?.expiresIn || 3600,
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      path: '/',
+    };
+
+    if (accessToken) {
+      response.cookies.set('accessToken', accessToken, {
+        ...cookieOptions,
+        maxAge: 60 * 60 * 24,
+      });
+    }
+
+    if (refreshToken) {
+      response.cookies.set('refreshToken', refreshToken, {
+        ...cookieOptions,
+        maxAge: 60 * 60 * 24 * 7,
       });
     }
 

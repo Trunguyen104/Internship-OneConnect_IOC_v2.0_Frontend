@@ -1,13 +1,14 @@
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 export function setAccessToken(token) {
-  sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
+  // REMOVED: Tokens are now handled via HttpOnly cookies for security
 }
 
 export function getAccessToken() {
-  return sessionStorage.getItem(ACCESS_TOKEN_KEY);
+  // REMOVED: Accessing tokens from JS is disabled to prevent XSS
+  return null;
 }
 
 export function clearAuth() {
-  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+  // REMOVED: Auth state is managed via cookies
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 function FieldLabel({ required, children }) {
   return (

@@ -17,12 +17,6 @@ const HeaderActions = memo(function HeaderActions({
 
   return (
     <div className='mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center'>
-      <div>
-        <Title level={2} className='text-text !mb-0 tracking-tight'>
-          {STUDENT_ENROLLMENT.TITLE}
-        </Title>
-      </div>
-
       <Space size='middle' wrap>
         <Button
           type='primary'
@@ -34,20 +28,19 @@ const HeaderActions = memo(function HeaderActions({
         </Button>
 
         <Button
-          icon={<UploadOutlined className='text-primary' />}
-          className='border-border h-11 rounded-xl px-6 font-bold transition-all hover:bg-slate-50'
-          onClick={onImport}
-        >
-          {STUDENT_ENROLLMENT.IMPORT_BTN}
-        </Button>
-
-        <Button
           icon={<UserDeleteOutlined />}
           className='h-11 rounded-xl px-6 font-bold disabled:opacity-50'
           disabled={!canWithdraw}
           onClick={onWithdraw}
         >
           {STUDENT_ENROLLMENT.WITHDRAW_BTN}
+        </Button>
+        <Button
+          icon={<UploadOutlined className='text-primary' />}
+          className='border-border h-11 rounded-xl px-6 font-bold transition-all hover:bg-slate-50'
+          onClick={onImport}
+        >
+          {STUDENT_ENROLLMENT.IMPORT_BTN}
         </Button>
       </Space>
     </div>

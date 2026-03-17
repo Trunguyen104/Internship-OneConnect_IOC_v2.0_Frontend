@@ -1,16 +1,9 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Button, Tooltip, Avatar } from 'antd';
+import { Button, Tooltip, Empty } from 'antd';
 import dayjs from 'dayjs';
-import {
-  DeleteOutlined,
-  UserOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  SyncOutlined,
-  EyeOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, CheckCircleOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import IssueStatusTag from './IssueStatusTag';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
@@ -33,9 +26,7 @@ const IssueTable = memo(function IssueTable({
         </div>
       ) : !issues || issues.length === 0 ? (
         <div className='flex flex-1 items-center justify-center py-12'>
-          <div className='flex flex-col items-center gap-1'>
-            <span className='text-text font-bold'>{ISSUE_UI.EMPTY.NO_DATA}</span>
-          </div>
+          <Empty description={ISSUE_UI.EMPTY.NO_DATA} />
         </div>
       ) : (
         <div className='mt-5 flex min-h-0 flex-1 flex-col'>
@@ -43,22 +34,22 @@ const IssueTable = memo(function IssueTable({
             <table className='w-full min-w-[1000px] table-fixed border-collapse text-left'>
               <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
                 <tr>
-                  <th className='text-muted w-[70px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[70px] px-6 py-5 text-xs font-semibold'>
                     {ISSUE_UI.TABLE.NO}
                   </th>
-                  <th className='text-muted w-[300px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[300px] px-6 py-5 text-xs font-semibold'>
                     {ISSUE_UI.TABLE.TITLE}
                   </th>
-                  <th className='text-muted w-[200px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[200px] px-6 py-5 text-xs font-semibold'>
                     {ISSUE_UI.TABLE.STAKEHOLDER}
                   </th>
-                  <th className='text-muted w-[140px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[140px] px-6 py-5 text-xs font-semibold'>
                     {ISSUE_UI.TABLE.STATUS}
                   </th>
-                  <th className='text-muted w-[160px] px-6 py-4 text-xs font-semibold'>
+                  <th className='text-muted w-[160px] px-6 py-5 text-xs font-semibold'>
                     {ISSUE_UI.TABLE.CREATED_DATE}
                   </th>
-                  <th className='text-muted px-6 py-4 text-right text-xs font-semibold'>
+                  <th className='text-muted px-6 py-5 text-right text-xs font-semibold'>
                     {ISSUE_UI.TABLE.ACTIONS}
                   </th>
                 </tr>
@@ -67,7 +58,7 @@ const IssueTable = memo(function IssueTable({
                 {issues.map((record, index) => {
                   const stakeholder = stakeholders.find((s) => s.id === record.stakeholderId);
                   return (
-                    <tr key={record.id} className='hover:bg-bg/80 transition-colors'>
+                    <tr key={record.id} className='hover:bg-bg/80 h-[72px] transition-colors'>
                       <td className='px-6 py-4'>
                         <span className='text-muted text-[13px] font-medium'>
                           {(page - 1) * pageSize + index + 1}
@@ -115,7 +106,7 @@ const IssueTable = memo(function IssueTable({
                                 record.status === 2 ? <SyncOutlined /> : <CheckCircleOutlined />
                               }
                               onClick={() => onToggleStatus(record)}
-                              className='text-muted hover:bg-primary/10 hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                              className='text-muted hover:bg-primary-surface hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                             />
                           </Tooltip>
                           <Tooltip title={ISSUE_UI.TABLE.VIEW_DETAIL}>
@@ -123,7 +114,7 @@ const IssueTable = memo(function IssueTable({
                               type='text'
                               icon={<EyeOutlined />}
                               onClick={() => onView(record.id)}
-                              className='text-muted hover:bg-primary/10 hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                              className='text-muted hover:bg-primary-surface hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                             />
                           </Tooltip>
                           <Tooltip title={ISSUE_UI.BUTTON.DELETE}>
@@ -138,7 +129,7 @@ const IssueTable = memo(function IssueTable({
                                   onOk: () => onDelete(record.id),
                                 })
                               }
-                              className='hover:bg-danger/10 flex size-9 items-center justify-center rounded-xl p-0 transition-all'
+                              className='hover:bg-danger-surface flex size-9 items-center justify-center rounded-xl p-0 transition-all'
                             />
                           </Tooltip>
                         </div>

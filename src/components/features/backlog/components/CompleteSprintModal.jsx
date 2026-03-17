@@ -1,8 +1,12 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { SPRINT_STATUS, WORK_ITEM_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION } from '@/constants/enums';
-import { BACKLOG_UI } from '@/constants/backlog';
+import {
+  SPRINT_STATUS,
+  WORK_ITEM_STATUS,
+  MOVE_INCOMPLETE_ITEMS_OPTION,
+} from '@/constants/common/enums';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export default function CompleteSprintModal({ open, sprint, sprints, onClose, onSubmit }) {
   const [moveOption, setMoveOption] = useState('backlog'); // Default to Backlog for safety

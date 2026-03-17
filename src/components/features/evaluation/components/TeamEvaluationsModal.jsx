@@ -1,6 +1,5 @@
 'use client';
 
-// import AppTable from '@/components/shared/AppTable';
 import { Modal, Typography, Tag, Button, Tooltip, Space } from 'antd';
 import { TeamOutlined, LockOutlined, EyeOutlined, ClockCircleFilled } from '@ant-design/icons';
 import AppTable from '@/components/ui/AppTable';
@@ -89,7 +88,7 @@ export default function TeamEvaluationsModal({
           );
         }
 
-        return <Tag color='red'>{Number(score).toFixed(1)}</Tag>;
+        return <Tag color='error'>{Number(score).toFixed(1)}</Tag>;
       },
     },
     {
@@ -118,7 +117,7 @@ export default function TeamEvaluationsModal({
             size='small'
             icon={<EyeOutlined />}
             onClick={() => onViewDetails(cycle)}
-            className='bg-primary'
+            className='bg-primary/95 hover:!bg-primary border-none shadow-sm transition-all'
           >
             {EVALUATION_UI.LABELS.VIEW_REPORT}
           </Button>

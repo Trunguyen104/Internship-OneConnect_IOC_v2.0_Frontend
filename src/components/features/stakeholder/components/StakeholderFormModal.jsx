@@ -1,16 +1,8 @@
 'use client';
 
 import React, { memo } from 'react';
-import { Modal, Form, Input, Select, Divider, Space, Button, Typography } from 'antd';
-import {
-  UserOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  SolutionOutlined,
-  TagOutlined,
-  SaveOutlined,
-  EditOutlined,
-} from '@ant-design/icons';
+import { Modal, Input, Select, Space, Button, Typography } from 'antd';
+import { UserOutlined, SaveOutlined, EditOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 
 const { Text, Title } = Typography;
@@ -95,7 +87,6 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
           <Input
             placeholder={PLACEHOLDER_EMAIL}
             value={form.email}
-            disabled={!!editingId}
             onChange={(e) => {
               setForm((prev) => ({ ...prev, email: e.target.value }));
               if (errors.email) setErrors((prev) => ({ ...prev, email: null }));

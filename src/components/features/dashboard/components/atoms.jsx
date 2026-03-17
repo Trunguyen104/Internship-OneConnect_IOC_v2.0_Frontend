@@ -1,6 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 
-import { DASHBOARD_UI } from '@/constants/dashboard';
+import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 export function StatCard({ label, value, icon, color, colorClass }) {
   return (

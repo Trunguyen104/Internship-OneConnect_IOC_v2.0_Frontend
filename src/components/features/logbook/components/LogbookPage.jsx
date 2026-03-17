@@ -1,6 +1,6 @@
 'use client';
 
-import { Form } from 'antd';
+import { Empty, Spin } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import Card from '@/components/ui/Card';
@@ -15,8 +15,8 @@ import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
-import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
+import dayjs from 'dayjs';
 
 export default function LogbookPage() {
   const {
@@ -29,8 +29,6 @@ export default function LogbookPage() {
     setPageSize,
     statusFilter,
     setStatusFilter,
-    sortOrder,
-    setSortOrder,
     search,
     setSearch,
     fetchLogbooks,
@@ -56,6 +54,11 @@ export default function LogbookPage() {
       const PUNCTUAL_STATUS = 3;
       const effectiveInternshipId = internshipId;
 
+      const now = dayjs();
+      const getFormattedDate = (date) => {
+        return date.hour(now.hour()).minute(now.minute()).second(now.second()).toISOString();
+      };
+
       if (editingId) {
         const updatePayload = {
           internshipId: effectiveInternshipId,
@@ -63,7 +66,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.hour(12).toISOString(),
+          dateReport: getFormattedDate(values.dateReport),
           status: PUNCTUAL_STATUS,
         };
         res = await LogBookService.update(editingId, updatePayload);
@@ -73,7 +76,7 @@ export default function LogbookPage() {
           summary: values.summary,
           issue: values.issue || '',
           plan: values.plan,
-          dateReport: values.dateReport.hour(12).toISOString(),
+          dateReport: getFormattedDate(values.dateReport),
           status: SUBMITTED_STATUS,
         };
         res = await LogBookService.create(createPayload);
@@ -89,16 +92,21 @@ export default function LogbookPage() {
         fetchLogbooks();
         closeFormModal();
       } else {
-        const errorMsg =
+        let errorMsg =
           res?.data?.errors?.[0] ||
           res?.errors?.[0] ||
           res?.data?.message ||
           res?.message ||
           DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
+
+        if (res?.statusCode === 409 || res?.status === 409) {
+          errorMsg =
+            'Ngày này đã có báo cáo hoặc bị trùng lặp. Vui lòng kiểm tra lại hoặc xóa báo cáo cũ.';
+        }
+
         toast.error(errorMsg);
       }
     } catch (error) {
-      console.error('Logbook submit error:', error);
       const errorMsg =
         error?.response?.data?.errors?.[0] ||
         error?.response?.data?.message ||
@@ -115,11 +123,15 @@ export default function LogbookPage() {
       try {
         setSubmitting(true);
         const res = await LogBookService.getById(record.logbookId);
-        const fullData = res?.data || record;
+        const detailData = res?.data || {};
+        const fullData = {
+          ...record,
+          ...detailData,
+          dateReport: detailData.dateReport || detailData.reportDate || record.dateReport,
+        };
         setEditingId(fullData.logbookId);
         setCurrentRecord(fullData);
       } catch (err) {
-        console.error('Failed to load logbook details', err);
         setEditingId(record.logbookId);
         setCurrentRecord(record);
       } finally {
@@ -145,7 +157,6 @@ export default function LogbookPage() {
       setViewRecord(res?.data || record);
       setIsDetailModalOpen(true);
     } catch (err) {
-      console.error('Failed to load logbook details', err);
       setViewRecord(record);
       setIsDetailModalOpen(true);
     } finally {
@@ -159,12 +170,12 @@ export default function LogbookPage() {
   }, []);
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-col space-y-6 duration-500'>
+    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
       <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
 
-      <Card className='shadow-border/50 flex flex-1 flex-col overflow-hidden rounded-2xl border-none shadow-xl'>
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto'>
         <DataTableToolbar
-          className='mb-5 !border-0 !p-0'
+          className='mb-5 border-0! p-0!'
           searchProps={{
             placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
             value: search,
@@ -193,22 +204,40 @@ export default function LogbookPage() {
             onClick: () => openFormModal(),
           }}
         />
-        <LogbookTable
-          data={data}
-          loading={loading}
-          userProfile={userProfile}
-          onView={openDetailModal}
-          onEdit={openFormModal}
-          onDelete={handleDelete}
-        />
-      </Card>
+        {loading && data.length === 0 ? (
+          <div className='flex h-full items-center justify-center py-20'>
+            <Spin size='large' description={DAILY_REPORT_UI.LOADING} />
+          </div>
+        ) : data.length === 0 ? (
+          <div className='flex flex-1 items-center justify-center py-12'>
+            <Empty description={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'} />
+          </div>
+        ) : (
+          <LogbookTable
+            data={data}
+            loading={loading}
+            userProfile={userProfile}
+            onView={openDetailModal}
+            onEdit={openFormModal}
+            onDelete={handleDelete}
+          />
+        )}
 
-      <Pagination
-        total={total}
-        page={pageNumber}
-        pageSize={pageSize}
-        onPageChange={setPageNumber}
-      />
+        {total > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPageNumber(1);
+              }}
+            />
+          </div>
+        )}
+      </Card>
 
       <LogbookFormModal
         visible={isFormModalOpen}

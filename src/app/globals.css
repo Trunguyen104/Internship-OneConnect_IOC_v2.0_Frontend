@@ -149,11 +149,15 @@ html {
     monospace;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  overflow-y: scroll;
 }
 
 /* Tiptap baseline */

@@ -2,13 +2,10 @@ import { httpGet, httpPost, httpPut, httpDelete } from '@/services/httpClient';
 
 export const ProjectService = {
   getAll(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/projects${query ? `?${query}` : ''}`);
+    return httpGet('/projects', params);
   },
 
-  getMy() {
-    return httpGet('/projects/my');
-  },
+  // getMy removed to standardize on paginated list endpoints.
 
   getById(projectId) {
     return httpGet(`/projects/${projectId}`);
@@ -29,7 +26,7 @@ export const ProjectService = {
   // getByInternshipGroup(internshipId) {
   //   return httpGet(`/projects/internship-group/${internshipId}`);
   // },
-  getByInternshipGroup(internshipGroupId) {
-    return httpGet(`/projects/internship-group?internshipGroupId=${internshipGroupId}`);
+  getByInternshipGroup(internshipId) {
+    return this.getAll({ InternshipId: internshipId, PageSize: 1 });
   },
 };

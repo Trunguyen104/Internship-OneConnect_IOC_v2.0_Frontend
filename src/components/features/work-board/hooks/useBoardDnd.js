@@ -3,7 +3,8 @@
 import { useCallback } from 'react';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { useToast } from '@/providers/ToastProvider';
-import { WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
+import { WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
+import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 import { COLUMNS } from './useBoardData';
 
 /**
@@ -92,12 +93,12 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
           if (updateRes?.isSuccess || updateRes?.status === 200 || updateRes?.data) {
             fetchBoardData(false);
           } else {
-            toast.error('Không thể lưu trạng thái mới');
+            toast.error(WORK_BOARD_UI.ERROR_SAVE_STATUS);
             fetchBoardData(false);
           }
         }
       } catch {
-        toast.error('Lỗi khi lưu thay đổi');
+        toast.error(WORK_BOARD_UI.ERROR_SAVE_CHANGES);
         fetchBoardData(false);
       }
     },

@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Pagination } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import Card from '@/components/ui/Card';
+import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import { Select } from 'antd';
+import { FilterOutlined, UserAddOutlined, UploadOutlined } from '@ant-design/icons';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useStudentEnrollment } from './hooks/useStudentEnrollment';
-import HeaderActions from './components/HeaderActions';
-import FiltersAndSearch from './components/FiltersAndSearch';
 import DataGrid from './components/DataGrid';
 import ImportModal from './components/ImportModal';
 import AddStudentModal from './components/AddStudentModal';
@@ -47,47 +48,84 @@ export default function StudentEnrollment() {
     handleImportStudents,
   } = useStudentEnrollment(MOCK_STUDENTS);
 
+  const pageSize = 10;
+  const total = filteredStudents.length;
+  const totalPages = Math.ceil(total / pageSize);
+  const paginatedData = filteredStudents.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
   return (
-    <>
-      <HeaderActions onImport={() => setImportVisible(true)} onAdd={() => setAddVisible(true)} />
+    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
+      <StudentPageHeader title={STUDENT_ENROLLMENT.TITLE} />
 
-      <div className='mx-auto flex w-full max-w-[1440px] flex-1 flex-col'>
-        <Card className='bg-surface border-border overflow-hidden rounded-2xl border shadow-sm'>
-          <FiltersAndSearch
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            majorFilter={majorFilter}
-            onMajorFilterChange={setMajorFilter}
-          />
+      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
+        <DataTableToolbar
+          className='mb-5 !border-0 !p-0'
+          searchProps={{
+            placeholder: STUDENT_ENROLLMENT.SEARCH_PLACEHOLDER,
+            value: searchTerm,
+            onChange: (e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            },
+          }}
+          filterContent={
+            <div className='flex flex-wrap items-center gap-3'>
+              <Select
+                allowClear
+                placeholder={STUDENT_ENROLLMENT.STATUS_FILTER}
+                value={statusFilter || undefined}
+                onChange={(val) => {
+                  setStatusFilter(val || '');
+                  setCurrentPage(1);
+                }}
+                className='h-9 min-w-[160px]'
+                options={[
+                  { label: 'Đang thực tập', value: 'INTERNSHIP' },
+                  { label: 'Hoàn thành', value: 'COMPLETED' },
+                  { label: 'Đã rút lui', value: 'WITHDRAWN' },
+                ]}
+                suffixIcon={<FilterOutlined className='text-muted' />}
+              />
+            </div>
+          }
+          leftContent={
+            <button
+              onClick={() => setImportVisible(true)}
+              className='border-border hover:bg-bg/50 flex h-9 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-all active:scale-95'
+            >
+              <UploadOutlined className='text-primary' />
+              <span>{STUDENT_ENROLLMENT.IMPORT_BTN}</span>
+            </button>
+          }
+          actionProps={{
+            label: STUDENT_ENROLLMENT.ADD_BTN,
+            onClick: () => setAddVisible(true),
+            icon: <UserAddOutlined />,
+          }}
+        />
 
-          <DataGrid
-            students={filteredStudents}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        </Card>
+        <DataGrid
+          students={paginatedData}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
-        <div className='mt-6 flex items-center justify-between px-2'>
-          <div className='text-muted text-xs font-bold tracking-widest uppercase'>
-            {STUDENT_ENROLLMENT.TOTAL_LABEL}: {filteredStudents.length}
+        {total > 0 && (
+          <div className='border-border/50 mt-6 border-t pt-6'>
+            <Pagination
+              total={total}
+              page={currentPage}
+              pageSize={pageSize}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
-          <Pagination
-            current={currentPage}
-            total={filteredStudents.length}
-            pageSize={10}
-            onChange={setCurrentPage}
-            showSizeChanger={false}
-            itemRender={(page, type, originalElement) => {
-              if (type === 'prev') return <LeftOutlined className='text-primary' />;
-              if (type === 'next') return <RightOutlined className='text-primary' />;
-              return originalElement;
-            }}
-          />
-        </div>
-      </div>
+        )}
+      </Card>
 
       <ImportModal
         visible={importVisible}
@@ -114,6 +152,6 @@ export default function StudentEnrollment() {
         student={selectedStudent}
         onUpdate={handleView}
       />
-    </>
+    </section>
   );
 }

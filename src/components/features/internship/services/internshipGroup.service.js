@@ -6,8 +6,9 @@ export const InternshipGroupService = {
     return httpGet(`/internshipgroups${query ? `?${query}` : ''}`);
   },
 
-  getMine() {
-    return httpGet('/mine');
+  getMine(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return httpGet(`/mine${query ? `?${query}` : ''}`);
   },
 
   getTermById(id) {
@@ -30,13 +31,11 @@ export const InternshipGroupService = {
     return httpDelete(`/internshipgroups/${id}`);
   },
 
-  addStudents(id, data) {
-    return httpPost(`/internshipgroups/${id}/students`, data);
+  addStudents(data) {
+    return httpPost('/internshipgroups/students', data);
   },
 
-  removeStudents(id, data) {
-    return httpDelete(`/internshipgroups/${id}/students`, {
-      body: JSON.stringify(data),
-    });
+  removeStudents(data) {
+    return httpDelete('/internshipgroups/students', data);
   },
 };

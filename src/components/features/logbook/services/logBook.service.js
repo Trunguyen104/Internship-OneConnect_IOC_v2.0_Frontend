@@ -1,12 +1,10 @@
 import { httpGet, httpPost, httpPut, httpDelete } from '@/services/httpClient';
 export const LogBookService = {
   getAll(internshipId, params = {}) {
-    const query = new URLSearchParams({
+    return httpGet('/logbook', {
       InternshipId: internshipId,
       ...params,
-    }).toString();
-
-    return httpGet(`/logbook?${query}`);
+    });
   },
 
   getById: (id) => {

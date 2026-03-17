@@ -1,6 +1,6 @@
 import { Select } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
-import { JOB_BOARD_UI } from '@/constants/job-board';
+import { JOB_BOARD_UI } from '@/constants/job-board/uiText';
 
 const filterOptions = [
   { value: 'location', label: JOB_BOARD_UI.FILTER_LOCATION },

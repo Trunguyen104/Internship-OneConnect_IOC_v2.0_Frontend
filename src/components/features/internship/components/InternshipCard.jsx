@@ -85,7 +85,7 @@ const Stepper = () => {
   return <ProgressStepper currentStatus={status} />;
 };
 
-const BodyTitle = ({ title, href = '/student/space' }) => {
+const BodyTitle = ({ title, href = null }) => {
   const { status } = useInternshipCard();
   const config = INTERNSHIP_STATUS_CONFIG[status];
 
@@ -95,7 +95,7 @@ const BodyTitle = ({ title, href = '/student/space' }) => {
         {href ? (
           <Link
             href={href}
-            className='text-text text-xl font-bold hover:underline'
+            className='!visited:text-black text-xl font-bold !text-black !no-underline underline-offset-4 transition-colors hover:!text-black hover:!underline hover:decoration-black'
             title='Go to Space'
           >
             {title}

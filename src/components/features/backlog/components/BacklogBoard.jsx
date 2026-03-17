@@ -6,7 +6,7 @@ import { SprintSection } from './SprintSection';
 import { BacklogSection } from './BacklogSection';
 import { BoardHeader } from './BoardHeader';
 import { BacklogModals } from './BacklogModals';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export default function BacklogBoard() {
   const {
@@ -70,7 +70,7 @@ export default function BacklogBoard() {
   );
 
   return (
-    <div className='bg-bg relative flex h-[calc(100vh-140px)] w-full gap-6'>
+    <div className='relative flex h-[calc(100vh-140px)] w-full gap-6'>
       {/* Sidebar Epics */}
       <EpicSidebar
         isSidebarOpen={isSidebarOpen}
@@ -93,7 +93,7 @@ export default function BacklogBoard() {
             <div className='text-muted py-10 text-center'>{BACKLOG_UI.LOADING}</div>
           ) : (
             <div className='overflow-x-auto pb-4'>
-              <div className='min-w-[1000px] pr-2'>
+              <div className='min-w-[850px] pr-2'>
                 {/* SPRINTS */}
                 {filteredSprints.map((sprint) => (
                   <SprintSection

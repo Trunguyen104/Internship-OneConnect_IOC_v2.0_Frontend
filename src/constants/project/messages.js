@@ -7,6 +7,8 @@ export const PROJECT_MESSAGES = {
     INVALID_FILE_TYPE: 'Unsupported file type!',
     FILE_TOO_LARGE: 'File size exceeds 10MB limit!',
     LOAD_PROJECT_FAILED: 'Failed to load project information.',
+    RESOURCE_NAME_REQUIRED: 'Please enter the resource name!',
+    RESOURCE_TYPE_REQUIRED: 'Please select the resource type!',
   },
 
   SUCCESS: {

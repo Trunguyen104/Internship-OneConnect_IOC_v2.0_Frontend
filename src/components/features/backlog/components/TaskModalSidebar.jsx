@@ -1,9 +1,9 @@
 'use client';
 
-import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/enums';
+import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
 import { Select, TextInput } from './TaskFields';
 import DateInput from '@/components/ui/DateInput';
-import { BACKLOG_UI } from '@/constants/backlog';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 /**
  * Shared Sidebar for Create and Update Task Modals

@@ -12,13 +12,14 @@ import {
   readProjectResource,
 } from '@/components/features/project/services/projectResources';
 import { ProjectService } from '@/components/features/project/services/projectService';
+import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
 
-export function useProject() {
+export function useProject(initialProjectId = null) {
   const toast = useToast();
-  const [projectId, setProjectId] = useState(null);
+  const [projectId, setProjectId] = useState(initialProjectId);
   const [projectInfo, setProjectInfo] = useState(null);
   const [resources, setResources] = useState([]);
   const [fileList, setFileList] = useState([]);
@@ -28,6 +29,9 @@ export function useProject() {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
 
+  const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
+
   const loadResources = useCallback(
     async (id) => {
       if (!id) return;
@@ -35,7 +39,6 @@ export function useProject() {
       try {
         const res = await getProjectResources(id);
         const items = (res?.data?.items || []).map((item) => {
-          // Handle string resourceType from backend
           let type = item.resourceType;
           if (typeof type === 'string') {
             const matched = RESOURCE_TYPES.find((t) => t.key === type);
@@ -57,20 +60,43 @@ export function useProject() {
   const initProject = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await ProjectService.getAll();
-      if (res && res.data && res.data.items && res.data.items.length > 0) {
-        const id = res.data.items[0].projectId;
-        setProjectId(id);
 
-        // Fetch full project details
-        const detailRes = await ProjectService.getById(id);
-        if (detailRes && detailRes.data) {
-          setProjectInfo(detailRes.data);
-        } else {
-          setProjectInfo(res.data.items[0]); // Fallback to list info
+      let targetProjectId = initialProjectId;
+      let internshipId = null;
+
+      if (!targetProjectId) {
+        const mineRes = await InternshipGroupService.getAll({ PageSize: 1 });
+        const mineData = mineRes?.data?.items?.[0] || mineRes?.data?.[0] || null;
+        internshipId = mineData?.internshipId || mineData?.id;
+        targetProjectId =
+          mineData?.projectId || mineData?.project?.projectId || mineData?.project?.id;
+
+        if (!targetProjectId && internshipId) {
+          const projectRes = await ProjectService.getAll({
+            InternshipId: internshipId,
+            PageSize: 1,
+          });
+          const projectData =
+            projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
+          targetProjectId = projectData?.projectId || projectData?.id;
         }
 
-        await loadResources(id);
+        if (!targetProjectId) {
+          toast.warning('No project assigned to your internship group.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      setProjectId(targetProjectId);
+
+      const [detailRes, _] = await Promise.all([
+        ProjectService.getById(targetProjectId),
+        loadResources(targetProjectId),
+      ]);
+
+      if (detailRes && detailRes.data) {
+        setProjectInfo(detailRes.data);
       }
     } catch (error) {
       console.error('Failed to init project', error);
@@ -78,7 +104,7 @@ export function useProject() {
     } finally {
       setLoading(false);
     }
-  }, [loadResources, toast]);
+  }, [initialProjectId, loadResources, toast]);
 
   useEffect(() => {
     initProject();
@@ -95,7 +121,6 @@ export function useProject() {
     const selectedType = values.resourceType || 1;
     const currentExt = file.name.split('.').pop().toLowerCase();
 
-    // Mapping of resource type to allowed extensions
     const typeExtensionMap = {
       1: ['pdf'],
       2: ['docx', 'doc'],
@@ -106,7 +131,6 @@ export function useProject() {
       7: ['png'],
     };
 
-    // If it's not "Other" (0), validate the extension
     if (selectedType !== 0 && typeExtensionMap[selectedType]) {
       if (!typeExtensionMap[selectedType].includes(currentExt)) {
         const typeLabel =
@@ -117,7 +141,6 @@ export function useProject() {
       }
     }
 
-    // --- Duplicate Checks ---
     const proposedName = (values.resourceName || file.name).trim().toLowerCase();
     const proposedFileName = file.name.toLowerCase();
 
@@ -151,7 +174,6 @@ export function useProject() {
     try {
       const result = await createProjectResource(formData);
 
-      // Specifically check for result success to avoid false positives
       if (result && (result.success || result.isSuccess)) {
         await loadResources(projectId);
         setFileList([]);
@@ -187,12 +209,15 @@ export function useProject() {
 
   const openEditModal = (resource) => {
     setEditingResource(resource);
+    editForm.setFieldsValue({
+      resourceName: resource.resourceName,
+      resourceType: resource.resourceType,
+    });
     setIsEditModalVisible(true);
   };
 
   const handleUpdate = async (values) => {
     try {
-      // --- Duplicate Name Check for Update ---
       const newName = (values.resourceName || '').trim().toLowerCase();
       const isDuplicateName = resources.some(
         (r) =>
@@ -204,7 +229,6 @@ export function useProject() {
         toast.error(`A resource with name "${values.resourceName}" already exists.`);
         return;
       }
-      // --------------------------------------------
       const result = await updateProjectResource(editingResource.projectResourceId, {
         projectId: projectId,
         resourceName: values.resourceName,
@@ -271,14 +295,12 @@ export function useProject() {
     try {
       console.log('🚀 Authenticated Proxy Download:', resource.projectResourceId);
 
-      // Call the authorized download endpoint via the proxy
       const rawBlob = await downloadProjectResource(resource.projectResourceId);
 
       if (!rawBlob || rawBlob.size === 0) {
         throw new Error('Server returned an empty file');
       }
 
-      // Sanity check: if it's very small and starts with '{', it's likely an error message
       if (rawBlob.size < 500) {
         const text = await rawBlob.text();
         if (text.startsWith('{')) {
@@ -318,13 +340,11 @@ export function useProject() {
       const result = await readProjectResource(resource.projectResourceId);
       if (result.success && result.data?.resourceUrl) {
         const fullUrl = resolveResourceUrl(result.data.resourceUrl);
-        console.log('👀 Opening direct link:', fullUrl);
         window.open(fullUrl, '_blank');
       } else {
         throw new Error(result.message || 'Failed to get file URL');
       }
     } catch (err) {
-      console.error('View error:', err);
       toast.error(err.message || 'Could not open file.');
     }
   };
@@ -337,6 +357,8 @@ export function useProject() {
     setFileList,
     loading,
     uploading,
+    form,
+    editForm,
     isEditModalVisible,
     setIsEditModalVisible,
     editingResource,

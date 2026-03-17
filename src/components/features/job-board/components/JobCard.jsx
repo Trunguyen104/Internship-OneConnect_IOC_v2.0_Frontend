@@ -2,7 +2,7 @@
 import { Card, Typography, Tag } from 'antd';
 import { HeartOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
-import { JOB_BOARD_UI } from '@/constants/job-board';
+import { JOB_BOARD_UI } from '@/constants/job-board/uiText';
 
 const { Text } = Typography;
 

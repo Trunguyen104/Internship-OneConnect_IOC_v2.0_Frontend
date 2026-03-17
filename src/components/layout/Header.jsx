@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Dropdown, Avatar } from 'antd';
 import { logout } from '@/components/features/auth/services/authService';
@@ -9,6 +9,8 @@ import { useToast } from '@/providers/ToastProvider';
 
 export default function Header() {
   const router = useRouter();
+  const params = useParams();
+  const internshipGroupId = params?.internshipGroupId;
 
   const toast = useToast();
 
@@ -30,7 +32,11 @@ export default function Header() {
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: async ({ key }) => {
-      if (key === 'profile') router.push('/student/profile');
+      if (key === 'profile') {
+        router.push(
+          internshipGroupId ? `/internship-groups/${internshipGroupId}/profile` : '/profile',
+        );
+      }
       if (key === 'settings') router.push('/settings');
 
       if (key === 'logout') handleLogout();

@@ -10,11 +10,6 @@ export function useLogin() {
   const toast = useToast();
   const router = useRouter();
 
-  // const [form, setForm] = useState({
-  //   email: '',
-  //   password: '',
-  //   rememberMe: false,
-  // });
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
@@ -37,19 +32,6 @@ export function useLogin() {
   });
 
   const [errors, setErrors] = useState({});
-
-  // useEffect(() => {
-  //   const savedEmail = localStorage.getItem('rememberEmail');
-  //   const savedPassword = localStorage.getItem('rememberPassword');
-
-  //   if (savedEmail && savedPassword) {
-  //     setForm({
-  //       email: savedEmail,
-  //       password: savedPassword,
-  //       rememberMe: true,
-  //     });
-  //   }
-  // }, []);
 
   const validate = useCallback(() => {
     const newErrors = {};
@@ -83,7 +65,7 @@ export function useLogin() {
         localStorage.removeItem('rememberPassword');
       }
 
-      setAccessToken(token, form.rememberMe);
+      setAccessToken(token);
 
       toast.success('Đăng nhập thành công');
       router.push('/internship-groups');

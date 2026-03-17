@@ -1,6 +1,7 @@
 export const STUDENT_LIST_UI = {
   PAGE_TITLE: 'Student List',
   TABLE: {
+    INDEX: '#',
     STUDENT: 'Student',
     CODE: 'Code',
     ROLE: 'Role',

@@ -3,33 +3,33 @@
 import { useState, useMemo } from 'react';
 
 const MOCK_VIOLATIONS = [
-  {
-    id: 'V001',
-    type: 'Late Arrival',
-    description: 'Arrived 20 minutes late for the morning shift.',
-    violationTime: '2024-03-01T08:20:00',
-    reporter: 'Admin',
-    createdAt: '2024-03-01',
-    severity: 'MEDIUM',
-  },
-  {
-    id: 'V002',
-    type: 'Missed Meeting',
-    description: 'Did not attend the weekly progress review.',
-    violationTime: '2024-03-05T14:00:00',
-    reporter: 'Mentor',
-    createdAt: '2024-03-05',
-    severity: 'HIGH',
-  },
-  {
-    id: 'V003',
-    type: 'Dress Code',
-    description: 'Wore non-business casual attire on a Friday.',
-    violationTime: '2024-03-08T09:00:00',
-    reporter: 'HR',
-    createdAt: '2024-03-08',
-    severity: 'LOW',
-  },
+  // {
+  //   id: 'V001',
+  //   type: 'Late Arrival',
+  //   description: 'Arrived 20 minutes late for the morning shift.',
+  //   violationTime: '2024-03-01T08:20:00',
+  //   reporter: 'Admin',
+  //   createdAt: '2024-03-01',
+  //   severity: 'MEDIUM',
+  // },
+  // {
+  //   id: 'V002',
+  //   type: 'Missed Meeting',
+  //   description: 'Did not attend the weekly progress review.',
+  //   violationTime: '2024-03-05T14:00:00',
+  //   reporter: 'Mentor',
+  //   createdAt: '2024-03-05',
+  //   severity: 'HIGH',
+  // },
+  // {
+  //   id: 'V003',
+  //   type: 'Dress Code',
+  //   description: 'Wore non-business casual attire on a Friday.',
+  //   violationTime: '2024-03-08T09:00:00',
+  //   reporter: 'HR',
+  //   createdAt: '2024-03-08',
+  //   severity: 'LOW',
+  // },
 ];
 
 export function useViolation() {

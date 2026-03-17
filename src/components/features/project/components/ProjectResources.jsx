@@ -1,19 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Typography, Row, Col, Button, Tag } from 'antd';
+import { Typography, Row, Col, Button, Tag, Empty } from 'antd';
 import {
   FileTextOutlined,
   DownloadOutlined,
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
+  PlusCircleOutlined,
 } from '@ant-design/icons';
+import { Modal } from 'antd';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
 import ProjectResourceEditModal from './ProjectResourceEditModal';
-import { resolveResourceUrl } from '@/utils/resolveUrl';
 import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 
 const { Title, Text } = Typography;
@@ -35,121 +36,151 @@ export default function ProjectResources({
   onDownload,
   onView,
 }) {
+  const [isUploadModalVisible, setIsUploadModalVisible] = React.useState(false);
+
+  const handleOpenUpload = () => {
+    form.resetFields();
+    setFileList([]);
+    setIsUploadModalVisible(true);
+  };
+
+  const handleCloseUpload = () => {
+    setIsUploadModalVisible(false);
+  };
+
+  const handleUploadFinish = async (values) => {
+    const success = await onUpload(values);
+    if (success) {
+      handleCloseUpload();
+    }
+  };
+
   return (
-    <>
-      <div className='custom-scrollbar h-[380px] overflow-x-hidden overflow-y-auto pr-2'>
-        <div className='space-y-6'>
-          <Row gutter={[24, 16]}>
-            <Col xs={24} lg={9} xl={8}>
-              <div className='lg:sticky lg:top-0'>
-                <ProjectResourceUpload
-                  form={form}
-                  onUpload={onUpload}
-                  uploading={uploading}
-                  fileList={fileList}
-                  setFileList={setFileList}
-                />
-              </div>
-            </Col>
+    <div className='flex min-h-0 flex-1 flex-col'>
+      <div className='space-y-6'>
+        <div className='flex items-center justify-between gap-3'>
+          <div className='flex items-center gap-3'>
+            <Title level={5} className='m-0 font-bold!'>
+              {PROJECT_UI.TITLE.RESOURCE_LIST}
+            </Title>
+            <Tag className='bg-info-surface text-info rounded-full border-none px-3 text-[10px] font-bold'>
+              {resources.length} {PROJECT_UI.LABEL_FILES || 'FILES'}
+            </Tag>
+          </div>
+          <Button
+            type='primary'
+            onClick={handleOpenUpload}
+            className='flex items-center gap-2 rounded-full'
+          >
+            <span>{PROJECT_UI.BUTTON.ADD_RESOURCE || 'Add Resource'}</span>
+            <PlusCircleOutlined className='text-base' />
+          </Button>
+        </div>
 
-            <Col xs={24} lg={15} xl={16}>
-              <div className='mb-6 flex items-center gap-3'>
-                <Title level={5} className='!m-0'>
-                  {PROJECT_UI.TITLE.RESOURCE_LIST}
-                </Title>
-                <Tag
-                  color='geekblue'
-                  className='rounded-full border-none bg-blue-50 px-3 text-[10px] font-bold text-blue-600'
+        <div className='custom-scrollbar max-h-[350px] w-full overflow-x-hidden overflow-y-auto pr-2 pb-4'>
+          <div className='flex min-w-[500px] flex-col gap-2'>
+            {loading && resources.length === 0 ? (
+              <div className='text-muted py-8 text-center'>{PROJECT_UI.LOADING || 'Loading…'}</div>
+            ) : resources.length === 0 ? (
+              <div className='flex flex-1 items-center justify-center py-8'>
+                <Empty description={PROJECT_UI.EMPTY.NO_RESOURCE} />
+              </div>
+            ) : (
+              resources.map((item) => (
+                <div
+                  key={item.projectResourceId || item.id}
+                  className='group border-border/50 hover:bg-bg-surface flex items-center justify-between rounded-xl border px-4 py-3 transition-all'
                 >
-                  {resources.length} {'FILES'}
-                </Tag>
-              </div>
-
-              <div className='flex flex-col gap-2'>
-                {loading && resources.length === 0 ? (
-                  <div className='py-8 text-center text-slate-400'>Loading...</div>
-                ) : resources.length === 0 ? (
-                  <div className='py-8 text-center text-slate-400'>
-                    {PROJECT_UI.EMPTY.NO_RESOURCE}
-                  </div>
-                ) : (
-                  resources.map((item) => (
-                    <div
-                      key={item.projectResourceId || item.id}
-                      className='group flex items-center justify-between rounded-xl border border-transparent px-4 py-3 transition-all hover:border-slate-100 hover:bg-slate-50/80'
-                    >
-                      <div className='flex min-w-0 flex-1 items-center gap-3'>
-                        <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-transform group-hover:scale-110'>
-                          <FileTextOutlined className='text-xl' />
-                        </div>
-                        <div className='flex min-w-0 flex-1 flex-col'>
-                          <Text
-                            strong
-                            className='block truncate text-sm text-slate-800'
-                            title={item.resourceName}
-                          >
-                            {item.resourceName || 'Untitled Resource'}
-                          </Text>
-                          <Text
-                            type='secondary'
-                            className='mt-1 text-[11px] leading-none font-medium'
-                          >
-                            {RESOURCE_TYPES.find(
-                              (t) => t.value === item.resourceType || t.key === item.resourceType,
-                            )?.label || 'Other'}
-                          </Text>
-                        </div>
-                      </div>
-
-                      <div className='flex shrink-0 items-center gap-1'>
-                        <Button
-                          type='text'
-                          size='small'
-                          icon={<EyeOutlined />}
-                          onClick={() => onView(item)}
-                          className='text-slate-400 transition-colors hover:text-blue-600'
-                          title={PROJECT_UI.BUTTON.VIEW}
-                        />
-                        <Button
-                          type='text'
-                          size='small'
-                          icon={<DownloadOutlined />}
-                          onClick={() => onDownload(item)}
-                          className='text-slate-400 transition-colors hover:text-blue-600'
-                          title={PROJECT_UI.BUTTON.DOWNLOAD}
-                        />
-                        <Button
-                          type='text'
-                          size='small'
-                          icon={<EditOutlined />}
-                          onClick={() => openEditModal(item)}
-                          className='text-slate-400 transition-colors hover:text-slate-800'
-                          title={PROJECT_UI.BUTTON.EDIT}
-                        />
-                        <Button
-                          type='text'
-                          size='small'
-                          danger
-                          icon={<DeleteOutlined />}
-                          onClick={() =>
-                            showDeleteConfirm({
-                              title: 'Delete Resource',
-                              content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
-                              onOk: () => onDelete(item.projectResourceId),
-                            })
-                          }
-                          className='text-slate-300 transition-colors hover:text-red-500'
-                          title={PROJECT_UI.BUTTON.DELETE}
-                        />
-                      </div>
+                  <div className='flex min-w-0 flex-1 items-center gap-3'>
+                    <div className='bg-info-surface text-info flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110'>
+                      <FileTextOutlined className='text-xl' />
                     </div>
-                  ))
-                )}
-              </div>
-            </Col>
-          </Row>
+                    <div className='flex min-w-0 flex-1 flex-col'>
+                      <Text
+                        strong
+                        className='text-text block truncate text-sm'
+                        title={item.resourceName}
+                      >
+                        {item.resourceName || PROJECT_UI.VALUES.UNTITLED || 'Untitled Resource'}
+                      </Text>
+                      <Text type='secondary' className='mt-1 text-[11px] leading-none font-medium'>
+                        {RESOURCE_TYPES.find(
+                          (t) => t.value === item.resourceType || t.key === item.resourceType,
+                        )?.label || PROJECT_UI.VALUES.OTHER}
+                      </Text>
+                    </div>
+                  </div>
+
+                  <div className='flex shrink-0 items-center gap-1'>
+                    <Button
+                      type='text'
+                      size='small'
+                      icon={<EyeOutlined />}
+                      onClick={() => onView(item)}
+                      className='text-muted hover:text-info transition-colors'
+                      title={PROJECT_UI.BUTTON.VIEW}
+                      aria-label={PROJECT_UI.BUTTON.VIEW}
+                    />
+                    <Button
+                      type='text'
+                      size='small'
+                      icon={<DownloadOutlined />}
+                      onClick={() => onDownload(item)}
+                      className='text-muted hover:text-info transition-colors'
+                      title={PROJECT_UI.BUTTON.DOWNLOAD}
+                      aria-label={PROJECT_UI.BUTTON.DOWNLOAD}
+                    />
+                    <Button
+                      type='text'
+                      size='small'
+                      icon={<EditOutlined />}
+                      onClick={() => openEditModal(item)}
+                      className='text-muted hover:text-text transition-colors'
+                      title={PROJECT_UI.BUTTON.EDIT}
+                      aria-label={PROJECT_UI.BUTTON.EDIT}
+                    />
+                    <Button
+                      type='text'
+                      size='small'
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() =>
+                        showDeleteConfirm({
+                          title: PROJECT_UI.CONFIRM.DELETE_TITLE || 'Delete Resource',
+                          content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
+                          onOk: () => onDelete(item.projectResourceId),
+                        })
+                      }
+                      className='text-muted/50 hover:text-danger transition-colors'
+                      title={PROJECT_UI.BUTTON.DELETE}
+                      aria-label={PROJECT_UI.BUTTON.DELETE}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
+
+      <Modal
+        title={PROJECT_UI.TITLE.ADD_RESOURCE}
+        open={isUploadModalVisible}
+        onCancel={handleCloseUpload}
+        footer={null}
+        destroyOnHidden
+        width={480}
+        centered
+        forceRender
+      >
+        <ProjectResourceUpload
+          form={form}
+          onUpload={handleUploadFinish}
+          uploading={uploading}
+          fileList={fileList}
+          setFileList={setFileList}
+        />
+      </Modal>
 
       <ProjectResourceEditModal
         visible={isEditModalVisible}
@@ -158,6 +189,6 @@ export default function ProjectResources({
         form={editForm}
         loading={loading}
       />
-    </>
+    </div>
   );
 }

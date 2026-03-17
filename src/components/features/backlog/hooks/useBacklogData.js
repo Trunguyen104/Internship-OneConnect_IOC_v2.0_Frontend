@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo, useDeferredValue } from 'rea
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { useToast } from '@/providers/ToastProvider';
-import { SPRINT_STATUS } from '@/constants/enums';
+import { SPRINT_STATUS } from '@/constants/common/enums';
 
 /**
  * Hook for core backlog data (Epics, Sprints, Items)
