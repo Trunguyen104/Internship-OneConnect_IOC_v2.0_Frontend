@@ -37,6 +37,11 @@ export default function ProjectResources({
   onView,
 }) {
   const [isUploadModalVisible, setIsUploadModalVisible] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleOpenUpload = () => {
     form.resetFields();
@@ -163,32 +168,35 @@ export default function ProjectResources({
         </div>
       </div>
 
-      <Modal
-        title={PROJECT_UI.TITLE.ADD_RESOURCE}
-        open={isUploadModalVisible}
-        onCancel={handleCloseUpload}
-        footer={null}
-        destroyOnHidden
-        width={480}
-        centered
-        forceRender
-      >
-        <ProjectResourceUpload
-          form={form}
-          onUpload={handleUploadFinish}
-          uploading={uploading}
-          fileList={fileList}
-          setFileList={setFileList}
-        />
-      </Modal>
+      {!mounted ? null : (
+        <>
+          <Modal
+            title={PROJECT_UI.TITLE.ADD_RESOURCE}
+            open={isUploadModalVisible}
+            onCancel={handleCloseUpload}
+            footer={null}
+            destroyOnHidden
+            width={480}
+            centered
+          >
+            <ProjectResourceUpload
+              form={form}
+              onUpload={handleUploadFinish}
+              uploading={uploading}
+              fileList={fileList}
+              setFileList={setFileList}
+            />
+          </Modal>
 
-      <ProjectResourceEditModal
-        visible={isEditModalVisible}
-        onCancel={() => setIsEditModalVisible(false)}
-        onUpdate={onUpdate}
-        form={editForm}
-        loading={loading}
-      />
+          <ProjectResourceEditModal
+            visible={isEditModalVisible}
+            onCancel={() => setIsEditModalVisible(false)}
+            onUpdate={onUpdate}
+            form={editForm}
+            loading={loading}
+          />
+        </>
+      )}
     </div>
   );
 }
