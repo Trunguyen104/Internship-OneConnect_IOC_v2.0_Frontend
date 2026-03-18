@@ -6,13 +6,12 @@ export async function login(data) {
     credentials: 'include',
   });
 
+  const result = await res.json();
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Login failed');
+    throw new Error(result.message || 'Login failed');
   }
 
-  const { accessToken } = await res.json();
-  return accessToken;
+  return result;
 }
 
 export async function logout() {

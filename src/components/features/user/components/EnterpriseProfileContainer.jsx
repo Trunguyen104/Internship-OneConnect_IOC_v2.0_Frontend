@@ -1,63 +1,79 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { Button, Empty, Spin, message } from 'antd';
+import { HistoryOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { enterpriseService } from '@/components/features/dashboard/services/enterprise.service';
 import { EnterpriseProfile } from './EnterpriseProfile';
 import { PROFILE_UI } from '@/constants/user/uiText';
 
+function toEllipsis(value) {
+  if (!value) return value;
+  return value.replace('...', '…');
+}
+
+/**
+ * EnterpriseProfileContainer
+ * Handles data fetching and business logic for the Enterprise Profile feature.
+ * Follows Vercel React Best Practices for data fetching and state management.
+ */
 export default function EnterpriseProfileContainer() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(null);
   const [editMode, setEditMode] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  // Fetch profile data with error handling and normalization
+  const fetchProfile = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
-      const data = await enterpriseService.getEnterpriseHRProfile();
-      // Handle wrapped API responses
-      // It might be { isSuccess: true, data: { ... } }
-      // OR { isSuccess: true, data: { items: [ { ... } ] } }
+      if (showLoading) setLoading(true);
+
+      const response = await enterpriseService.getEnterpriseHRProfile();
+
+      // Normalize response according to API structure
       let profileData = null;
-      if (data?.data?.items && Array.isArray(data.data.items)) {
-        profileData = data.data.items[0];
+      if (response?.data?.items && Array.isArray(response.data.items)) {
+        profileData = response.data.items[0];
       } else {
-        profileData = data?.data || data;
+        profileData = response?.data || response;
       }
 
-      console.log('Extracted Profile Data:', profileData);
+      if (!profileData) {
+        throw new Error('Profile data format is invalid');
+      }
+
       setProfile(profileData);
     } catch (error) {
       console.error('Failed to fetch profile:', error);
       message.error(error.message || PROFILE_UI.LOADING_ERROR);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleSave = async (updatedData) => {
     try {
       setSaving(true);
-      // Construct payload taking care of optimistic locking
+
       const payload = {
-        name: updatedData.name,
-        description: updatedData.description,
-        website: updatedData.website,
-        headquater: updatedData.headquater, // as per typical namings, check backend API specifics, assume same from GET
-        industry: updatedData.industry,
-        // taxCode is disabled/read-only usually not updated or ignored
-        rowVersion: profile.rowVersion,
+        ...updatedData,
+        // rowVersion is critical for optimistic concurrency control if backend requires it
+        rowVersion: profile?.rowVersion,
       };
 
-      await enterpriseService.updateEnterpriseProfile(profile.id, payload);
+      await enterpriseService.updateEnterpriseProfile(
+        profile?.enterpriseId || profile?.id,
+        payload,
+      );
+
       message.success(PROFILE_UI.UPDATE_SUCCESS);
       setEditMode(false);
-      fetchProfile(); // refresh data to get latest rowVersion
+      // Refresh data to get latest updates and rowVersion
+      await fetchProfile(false);
     } catch (error) {
       console.error('Failed to update profile:', error);
       message.error(error.message || PROFILE_UI.UPDATE_ERROR);
@@ -68,15 +84,20 @@ export default function EnterpriseProfileContainer() {
 
   if (loading) {
     return (
-      <div className='p-8 text-center'>
-        <div className='border-primary/20 border-t-primary inline-block h-8 w-8 animate-spin rounded-full border-4'></div>
-        <p className='text-muted mt-2 text-sm'>{PROFILE_UI.LOADING}</p>
+      <div className='flex min-h-[400px] items-center justify-center p-12'>
+        <Spin size='large' tip={toEllipsis(PROFILE_UI.LOADING)} />
       </div>
     );
   }
 
   if (!profile) {
-    return <div className='text-muted p-8 text-center'>{PROFILE_UI.EMPTY.NO_DATA}</div>;
+    return (
+      <div className='m-8 rounded-3xl border border-dashed border-gray-200 bg-white p-10'>
+        <Empty description={PROFILE_UI.EMPTY.NO_DATA}>
+          <Button onClick={() => fetchProfile()}>Try Again</Button>
+        </Empty>
+      </div>
+    );
   }
 
   return (
@@ -87,6 +108,32 @@ export default function EnterpriseProfileContainer() {
       onCancel={() => setEditMode(false)}
       onSave={handleSave}
       isSaving={saving}
-    />
+    >
+      <EnterpriseProfile.Banner />
+      <EnterpriseProfile.Identity />
+
+      <EnterpriseProfile.Content>
+        <EnterpriseProfile.Main>
+          <EnterpriseProfile.Card
+            title={PROFILE_UI.ENTERPRISE.OVERVIEW}
+            icon={<InfoCircleOutlined />}
+          >
+            <EnterpriseProfile.Description />
+          </EnterpriseProfile.Card>
+          <EnterpriseProfile.Card
+            title={PROFILE_UI.ENTERPRISE.ACTIVITIES}
+            icon={<HistoryOutlined />}
+          >
+            <EnterpriseProfile.Activities />
+          </EnterpriseProfile.Card>
+        </EnterpriseProfile.Main>
+
+        <EnterpriseProfile.Sidebar>
+          <EnterpriseProfile.Card title={PROFILE_UI.ENTERPRISE.INFO} icon={<InfoCircleOutlined />}>
+            <EnterpriseProfile.InfoPanel />
+          </EnterpriseProfile.Card>
+        </EnterpriseProfile.Sidebar>
+      </EnterpriseProfile.Content>
+    </EnterpriseProfile>
   );
 }

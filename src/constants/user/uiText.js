@@ -67,6 +67,7 @@ export const PROFILE_UI = {
     WEBSITE: 'Website',
     INDUSTRY: 'Industry',
     HEADQUARTERS: 'Headquarters',
+    ADDRESS: 'Address',
     NO_DESCRIPTION: 'No description provided.',
     NO_ACTIVITIES: 'No recent activities found.',
     TAX_CODE_HINT: 'Tax code cannot be changed.',
