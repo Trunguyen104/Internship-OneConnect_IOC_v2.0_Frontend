@@ -16,8 +16,10 @@ COPY . .
 # Use NEXT_PUBLIC_API_URL if needed at build time
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NEXT_DISABLE_WORKER_THREADS=1
 
-RUN npm run build
+RUN npm run build:docker
+RUN npm prune --omit=dev
 
 # Production Stage
 FROM node:20-alpine AS runner
@@ -30,9 +32,10 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy standalone build artifacts
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Copy Next.js build artifacts and runtime deps
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/public ./public
 
 USER nextjs
@@ -43,4 +46,4 @@ ENV PORT=3000
 # set hostname to localhost
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
