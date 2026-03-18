@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { Button, Drawer, Form, Input, Space, Typography } from 'antd';
 
-import AvatarUploader from '@/components/ui/AvatarUploader';
+import AvatarUploader from '@/components/ui/avataruploader';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
 function isHttpUrl(value) {
