@@ -11,15 +11,14 @@ export async function login(data) {
     credentials: 'include',
   });
 
+  const result = await res.json();
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Login failed');
+    throw new Error(result.message || 'Login failed');
   }
 
   // /api/auth sets HttpOnly cookies and returns basic auth context for routing decisions.
   // Do not return tokens to the client (XSS risk).
-  const auth = await res.json();
-  return auth;
+  return result;
 }
 
 export async function logout() {

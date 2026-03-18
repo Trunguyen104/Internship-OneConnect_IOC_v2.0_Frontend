@@ -1,0 +1,43 @@
+export const ENTERPRISE_PROFILE_UI = {
+  LOADING: 'Loading profile...',
+  LOADING_ERROR: 'Failed to load profile data',
+  UPDATE_SUCCESS: 'Profile updated successfully',
+  UPDATE_ERROR: 'Failed to update profile',
+  EDIT_DRAWER: {
+    TITLE: 'Edit Organization Profile',
+    SUBTITLE: 'Update your organization details. Changes will be visible immediately after saving.',
+    SAVE_CHANGES: 'Save Changes',
+  },
+  EMPTY: {
+    NO_DATA: 'No profile data found.',
+  },
+  BUTTONS: {
+    CANCEL: 'Cancel',
+  },
+  ENTERPRISE: {
+    SUMMARY: 'Organization',
+    OVERVIEW: 'Company Overview',
+    ACTIVITIES: 'Recent Activities',
+    INFO: 'Information',
+    TAX_CODE: 'Tax Code',
+    WEBSITE: 'Website',
+    INDUSTRY: 'Industry',
+    HEADQUARTERS: 'Headquarters',
+    ADDRESS: 'Address',
+    NO_DESCRIPTION: 'No description provided.',
+    NO_ACTIVITIES: 'No recent activities found.',
+    TAX_CODE_HINT: 'Tax code cannot be changed.',
+    NOT_PROVIDED: 'Not provided',
+    SAVING: 'Saving...',
+    SAVE: 'Save',
+    EDIT_PROFILE: 'Edit Profile',
+    COMPANY_NAME_PLACEHOLDER: 'Company Name',
+    WEBSITE_PLACEHOLDER: 'https://example.com',
+    DESCRIPTION_PLACEHOLDER: 'Describe your company (max 2000 characters)',
+    ERRORS: {
+      WEBSITE: 'Website must be a valid URL starting with http:// or https://',
+      DESCRIPTION: 'Description cannot exceed 2000 characters',
+      NAME: 'Company Name is required',
+    },
+  },
+};

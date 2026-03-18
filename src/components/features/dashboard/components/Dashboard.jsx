@@ -4,7 +4,7 @@ import StudentTabs from '@/components/layout/StudentTabs';
 import PageShell from '@/components/layout/PageShell';
 
 import { useDashboard } from '../hooks/useDashboard';
-import { StatCard, Loading, ErrorBox } from './atoms';
+import { StatCard, Loading, ErrorBox } from '@/components/ui/atoms';
 import {
   BurndownChart,
   TaskStatusDistributionChart,
