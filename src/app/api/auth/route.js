@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
+import { resolveAuthBaseUrl } from '@/lib/server/backend-url';
 
-const GENERIC_BE_URL = process.env.BE_URL || 'http://localhost:5050';
-const BE_URL = GENERIC_BE_URL.includes('/api/v1/auth')
-  ? GENERIC_BE_URL
-  : `${GENERIC_BE_URL}/api/v1/auth`;
+const BE_URL = resolveAuthBaseUrl();
 
 function parseTokensFromHeaders(headers) {
   let setCookies = [];
@@ -39,14 +37,26 @@ function parseTokensFromHeaders(headers) {
  */
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const loginUrl = `${BE_URL}/login`;
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ message: 'Invalid request payload' }, { status: 400 });
+    }
 
-    const res = await fetch(loginUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const loginUrl = `${BE_URL}/login`;
+    let res;
+
+    try {
+      res = await fetch(loginUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch (upstreamError) {
+      console.error('LOGIN UPSTREAM ERROR:', upstreamError);
+      return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
+    }
 
     const rawBody = await res.text();
     let data = {};
@@ -144,13 +154,20 @@ export async function PUT(req) {
     }
 
     const refreshUrl = `${BE_URL}/tokens/refresh`;
-    const res = await fetch(refreshUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: `refreshToken=${oldRefreshToken}`,
-      },
-    });
+    let res;
+
+    try {
+      res = await fetch(refreshUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: `refreshToken=${oldRefreshToken}`,
+        },
+      });
+    } catch (upstreamError) {
+      console.error('REFRESH UPSTREAM ERROR:', upstreamError);
+      return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
+    }
 
     const rawBody = await res.text();
     let data = {};

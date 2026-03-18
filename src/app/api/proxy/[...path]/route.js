@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { CONFIG } from '@/constants/common/config';
+import { resolveApiRoot } from '@/lib/server/backend-url';
 
-const BE_URL = process.env.BE_URL || 'http://localhost:5050';
+const API_ROOT = resolveApiRoot();
 
 async function handler(req, { params }) {
   try {
@@ -14,23 +15,14 @@ async function handler(req, { params }) {
       throw new Error(`Path is missing or invalid. Details: ${JSON.stringify(resolvedParams)}`);
     }
 
-    // Construct target URL carefully
-    const baseUrl = BE_URL.endsWith('/') ? BE_URL.slice(0, -1) : BE_URL;
     const pathStr = path.join('/');
 
     // Bypass v1 for specific routes (like student evaluations)
     const isV1Bypass = CONFIG.V1_BYPASS_ROUTES.some((route) => pathStr.startsWith(route));
 
-    // Construct target URL robustly
-    const targetRoot = baseUrl.toLowerCase().endsWith('/api')
-      ? baseUrl.slice(0, -4)
-      : baseUrl.endsWith('/')
-        ? baseUrl.slice(0, -1)
-        : baseUrl;
-
     const url = isV1Bypass
-      ? `${targetRoot}/api/${pathStr}${searchString}`
-      : `${targetRoot}/api/v1/${pathStr}${searchString}`;
+      ? `${API_ROOT}/${pathStr}${searchString}`
+      : `${API_ROOT}/v1/${pathStr}${searchString}`;
 
     console.log(`PROXY TARGET: ${req.method} ${url}`);
 

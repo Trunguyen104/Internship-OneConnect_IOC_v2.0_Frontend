@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Environment setup
+
+Create a local env file from the template:
+
+```bash
+cp .env.example .env.local
+```
+
+Required variables:
+
+- `NEXT_PUBLIC_API_URL`: backend public URL for browser requests.
+- `BE_URL`: backend internal URL for Next.js server routes (`/api/auth`, `/api/proxy`, `/uploads`).
+
 ## Getting Started
 
 First, run the development server:
