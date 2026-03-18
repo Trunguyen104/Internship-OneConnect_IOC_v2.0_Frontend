@@ -7,6 +7,8 @@ import { useToast } from '@/providers/ToastProvider';
 import { AUTH_MESSAGES } from '@/constants/auth/uiText';
 import { validateLogin } from '@/validators/auth';
 
+import { USER_ROLE } from '@/constants/common/enums';
+
 export function useLogin() {
   const toast = useToast();
   const router = useRouter();
