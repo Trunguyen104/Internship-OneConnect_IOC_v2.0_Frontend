@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/components/features/auth/services/authService';
-import { setAccessToken } from '@/components/features/auth/services/authStorage';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useLogin() {
@@ -13,22 +12,12 @@ export function useLogin() {
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
-      const savedPassword = localStorage.getItem('rememberPassword');
-
-      if (savedEmail && savedPassword) {
-        return {
-          email: savedEmail,
-          password: savedPassword,
-          rememberMe: true,
-        };
+      if (savedEmail) {
+        return { email: savedEmail, password: '', rememberMe: true };
       }
     }
 
-    return {
-      email: '',
-      password: '',
-      rememberMe: false,
-    };
+    return { email: '', password: '', rememberMe: false };
   });
 
   const [errors, setErrors] = useState({});
@@ -37,13 +26,13 @@ export function useLogin() {
     const newErrors = {};
 
     if (!form.email.trim()) {
-      newErrors.email = 'Email là bắt buộc';
+      newErrors.email = 'Email lÃ  báº¯t buá»™c';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Email không hợp lệ';
+      newErrors.email = 'Email khÃ´ng há»£p lá»‡';
     }
 
     if (!form.password.trim()) {
-      newErrors.password = 'Mật khẩu là bắt buộc';
+      newErrors.password = 'Máº­t kháº©u lÃ  báº¯t buá»™c';
     }
 
     setErrors(newErrors);
@@ -55,23 +44,45 @@ export function useLogin() {
     if (!validate()) return;
 
     try {
-      const token = await login(form);
+      const auth = await login(form);
 
       if (form.rememberMe) {
         localStorage.setItem('rememberEmail', form.email);
-        localStorage.setItem('rememberPassword', form.password);
       } else {
         localStorage.removeItem('rememberEmail');
-        localStorage.removeItem('rememberPassword');
       }
 
-      setAccessToken(token);
+      toast.success('ÄÄƒng nháº­p thÃ nh cÃ´ng');
 
-      toast.success('Đăng nhập thành công');
+      const rawRole = auth?.role;
+      const role =
+        typeof rawRole === 'number'
+          ? rawRole
+          : typeof rawRole === 'string'
+            ? rawRole.trim().toLowerCase()
+            : undefined;
+
+      if (role === 1 || role === 'superadmin' || role === 'super_admin') {
+        router.push('/admin-users');
+        return;
+      }
+      if (role === 2 || role === 'moderator') {
+        router.push('/admin-users');
+        return;
+      }
+      if (role === 3 || role === 'schooladmin') {
+        router.push('/admin-dashboard');
+        return;
+      }
+      if (role === 4 || role === 'enterpriseadmin') {
+        router.push('/dashboard');
+        return;
+      }
+
       router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
-      toast.error('Đăng nhập thất bại');
+      toast.error('ÄÄƒng nháº­p tháº¥t báº¡i');
     }
   };
 
@@ -89,10 +100,6 @@ export function useLogin() {
     }));
   };
 
-  return {
-    form,
-    errors,
-    handleChange,
-    handleSubmit,
-  };
+  return { form, errors, handleChange, handleSubmit };
 }
+

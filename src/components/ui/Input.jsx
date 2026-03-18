@@ -1,37 +1,41 @@
 'use client';
 
-import { useState } from 'react';
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import React from 'react';
+import { cn } from '@/lib/cn';
 
-export default function Input({ label, error, className = '', type, showToggle = true, ...props }) {
-  const [showPassword, setShowPassword] = useState(false);
-  const isPassword = type === 'password' && showToggle;
-
+const Input = React.forwardRef(({ className, type, label, error, ...props }, ref) => {
   return (
-    <div className='mb-4'>
-      <label className='mb-2 block text-sm font-medium text-gray-900'>
-        {label} <span className='text-red-500'>*</span>
-      </label>
-
-      <div className='relative'>
-        <input
-          {...props}
-          type={isPassword && showPassword ? 'text' : type}
-          className={`w-full rounded-2xl border bg-white px-4 py-2 text-gray-900 ${error ? 'border-red-500' : 'border-gray-300'} ${isPassword ? 'pr-10' : ''} ${className}`}
-        />
-
-        {isPassword && (
-          <button
-            type='button'
-            onClick={() => setShowPassword(!showPassword)}
-            className='absolute top-1/2 right-3 -translate-y-1/2 text-gray-500'
-          >
-            {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-          </button>
+    <div className='flex w-full flex-col gap-1.5'>
+      {label && (
+        <label className='text-sm font-medium text-slate-700'>
+          {label}
+        </label>
+      )}
+      <input
+        type={type}
+        data-slot='input'
+        ref={ref}
+        className={cn(
+          'flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900',
+          'file:border-0 file:bg-transparent file:text-sm file:font-medium',
+          'placeholder:text-slate-400',
+          'focus-visible:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-600)]/20',
+          'disabled:cursor-not-allowed disabled:opacity-50',
+          error && 'border-red-500 focus-visible:ring-red-500/20',
+          className,
         )}
-
-        {error && <span className='mt-1 block text-xs text-red-600'>{error}</span>}
-      </div>
+        {...props}
+      />
+      {error && (
+        <p className='text-xs font-medium text-red-500'>
+          {error}
+        </p>
+      )}
     </div>
   );
-}
+});
+
+Input.displayName = 'Input';
+
+export { Input };
+export default Input;

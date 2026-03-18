@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import { login } from '@/components/features/auth/services/authService';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/providers/ToastProvider';
@@ -58,7 +58,7 @@ export default function LoginPage() {
     if (!validate()) return;
 
     try {
-      await login(form);
+      const auth = await login(form);
 
       if (form.rememberMe) {
         localStorage.setItem('rememberEmail', form.email);
@@ -67,6 +67,33 @@ export default function LoginPage() {
       }
 
       toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
+
+      const rawRole = auth?.role;
+      const role =
+        typeof rawRole === 'number'
+          ? rawRole
+          : typeof rawRole === 'string'
+            ? rawRole.trim().toLowerCase()
+            : undefined;
+
+      // Role-based entry routes
+      if (role === 1 || role === 'superadmin' || role === 'super_admin') {
+        router.push('/admin-users');
+        return;
+      }
+      if (role === 2 || role === 'moderator') {
+        router.push('/admin-users');
+        return;
+      }
+      if (role === 3 || role === 'schooladmin') {
+        router.push('/admin-dashboard');
+        return;
+      }
+      if (role === 4 || role === 'enterpriseadmin') {
+        router.push('/dashboard');
+        return;
+      }
+
       router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
