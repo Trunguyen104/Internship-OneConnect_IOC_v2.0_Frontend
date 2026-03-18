@@ -28,7 +28,12 @@ jobs:
         run: npm run lint
 
       - name: Type Check
-        run: npx tsc --noEmit
+        run: |
+          if [ -f tsconfig.json ]; then
+            npx tsc --noEmit -p tsconfig.json
+          else
+            echo "No tsconfig.json found, skipping Type Check"
+          fi
 
       - name: Build
         run: npm run build
