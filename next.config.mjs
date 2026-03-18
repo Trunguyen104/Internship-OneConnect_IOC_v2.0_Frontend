@@ -1,16 +1,35 @@
 /** @type {import('next').NextConfig} */
-const enableWorkerThreads =
-  process.platform === 'win32' && process.env.NEXT_DISABLE_WORKER_THREADS !== '1';
 
 const nextConfig = {
-  /* config options here */
+  // Bắt buộc để Dockerfile standalone hoạt động đúng
   output: 'standalone',
-  // Disabled to avoid Windows EPERM spawn failures in `next build` for this repo.
+
+  // Tắt React Compiler (tránh lỗi EPERM spawn trên Windows)
   reactCompiler: false,
-  // Use worker_threads only on Windows local builds when explicitly allowed.
-  experimental: enableWorkerThreads ? { workerThreads: true } : {},
-  // CI/Windows environments can hit EPERM when Next spawns the typecheck worker.
-  // Local dev still gets editor/tsserver type safety.
+
+  // Cho phép Next.js load ảnh từ domain ngoài
+  // Thêm domain BE nếu serve ảnh trực tiếp từ BE (không qua Cloudinary)
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        // Cho phép ảnh từ domain production
+        protocol: 'https',
+        hostname: 'iocv2.duckdns.org',
+      },
+      {
+        // Fallback local dev
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
+  },
+
+  // Bỏ qua lỗi TypeScript lúc build (project dùng JS, không TS)
+  // TODO: Xóa dòng này khi migrate sang TypeScript
   typescript: { ignoreBuildErrors: true },
 };
 

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+const BE_URL = process.env.BE_URL || 'http://localhost:5050';
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -10,7 +12,7 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Missing access token' }, { status: 401 });
     }
 
-    const res = await fetch('http://localhost:8080/api/Auth/change-password', {
+    const res = await fetch(`${BE_URL}/api/Auth/change-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
