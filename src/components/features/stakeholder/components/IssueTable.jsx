@@ -4,7 +4,7 @@ import React, { memo } from 'react';
 import { Button, Tooltip, Empty } from 'antd';
 import dayjs from 'dayjs';
 import { DeleteOutlined, CheckCircleOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import IssueStatusTag from './IssueStatusTag';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 

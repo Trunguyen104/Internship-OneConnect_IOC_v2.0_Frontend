@@ -3,8 +3,8 @@ import { UI_TEXT } from '@/lib/UI_Text';
 import { USER_ROLE_LABEL, USER_STATUS, USER_STATUS_LABEL } from '@/constants/admin-users/enums';
 import AdminUsersAction from './AdminUsersAction';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/emptystate';
 
 export default function AdminUsersTable({ users = [], loading = false, error = '', refresh }) {
   const getRoleLabel = (role) => {

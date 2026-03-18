@@ -15,7 +15,7 @@ import UpdateTaskModal from '@/components/features/backlog/components/UpdateTask
 import { useBoard, COLUMNS } from '../hooks/useBoard';
 import { BoardColumn } from './BoardColumn';
 import { IssueCard } from './IssueCard';
-import SearchBar from '@/components/ui/SearchBar';
+import SearchBar from '@/components/ui/searchbar';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 import { EmptySprintState } from './EmptySprintState';
 

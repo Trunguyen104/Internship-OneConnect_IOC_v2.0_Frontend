@@ -1,10 +1,10 @@
 'use client';
 
-import PageLayout from '@/components/ui/PageLayout';
+import PageLayout from '@/components/ui/pagelayout';
 import { Select } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/emptystate';
 import LogbookTable from './LogbookTable';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookDetailModal from './LogbookDetailModal';

@@ -2,7 +2,7 @@ import React, { memo, useMemo } from 'react';
 import { Tag, Button, Dropdown, Tooltip } from 'antd';
 import { EyeOutlined, EditOutlined, EllipsisOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import DataTable from '@/components/ui/DataTable';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const STATUS_CONFIG = {

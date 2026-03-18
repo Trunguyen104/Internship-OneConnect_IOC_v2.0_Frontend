@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import PageLayout from '@/components/ui/PageLayout';
+import PageLayout from '@/components/ui/pagelayout';
 import AdminUsersDialog from '@/components/features/admin-users/AdminUsersDialog';
 import AdminUsersTable from '@/components/features/admin-users/AdminUsersTable';
 import { UI_TEXT } from '@/lib/UI_Text';

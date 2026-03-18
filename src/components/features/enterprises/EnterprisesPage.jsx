@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import PageLayout from '@/components/ui/PageLayout';
+import PageLayout from '@/components/ui/pagelayout';
 import { useEnterprises } from './useEnterprises';
 import EnterprisesTable from './EnterprisesTable';
 import EnterprisesDialog from './EnterprisesDialog';

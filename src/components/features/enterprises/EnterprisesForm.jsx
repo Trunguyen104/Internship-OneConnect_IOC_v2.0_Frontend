@@ -10,7 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useToast } from '@/providers/ToastProvider';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
 import { enterpriseService } from '@/services/enterprise.service';
-import LogoUploader from '@/components/ui/LogoUploader';
+import LogoUploader from '@/components/ui/logouploader';
 
 export default function EnterprisesForm({ enterprise, onSuccess }) {
   const toast = useToast();

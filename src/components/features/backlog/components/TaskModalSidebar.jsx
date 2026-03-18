@@ -2,7 +2,7 @@
 
 import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
 import { Select, TextInput } from './TaskFields';
-import DateInput from '@/components/ui/DateInput';
+import DateInput from '@/components/ui/dateinput';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 /**

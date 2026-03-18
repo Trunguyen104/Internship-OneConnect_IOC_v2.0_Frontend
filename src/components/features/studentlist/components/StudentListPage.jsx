@@ -5,9 +5,9 @@ import { Empty } from 'antd';
 import { useStudentList } from '../hooks/useStudentList';
 import StudentTable from './StudentTable';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
-import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import Card from '@/components/ui/card';
+import Pagination from '@/components/ui/pagination';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 export default function StudentListPage() {

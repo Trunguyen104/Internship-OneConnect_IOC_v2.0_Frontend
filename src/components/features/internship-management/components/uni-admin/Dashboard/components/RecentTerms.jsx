@@ -3,7 +3,7 @@
 import React, { memo, useMemo } from 'react';
 import { Tag } from 'antd';
 import dayjs from 'dayjs';
-import DataTable from '@/components/ui/DataTable';
+import DataTable from '@/components/ui/datatable';
 
 const STATUS_MAP = {
   0: { label: 'Upcoming', color: 'processing' },

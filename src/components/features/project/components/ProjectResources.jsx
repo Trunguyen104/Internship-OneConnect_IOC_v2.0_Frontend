@@ -15,7 +15,7 @@ import { PROJECT_UI } from '@/constants/project/uiText';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
 import ProjectResourceEditModal from './ProjectResourceEditModal';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 const { Title, Text } = Typography;
 

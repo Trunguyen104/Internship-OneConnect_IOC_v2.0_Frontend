@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/emptystate';
 import UniversitiesAction from './UniversitiesAction';
 
 export default function UniversitiesTable({ universities = [], loading = false }) {

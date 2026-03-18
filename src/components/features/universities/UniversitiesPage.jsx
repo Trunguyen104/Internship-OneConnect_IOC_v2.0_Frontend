@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import PageLayout from '@/components/ui/PageLayout';
+import PageLayout from '@/components/ui/pagelayout';
 import { useUniversities } from './useUniversities';
 import UniversitiesTable from './UniversitiesTable';
 import UniversitiesDialog from './UniversitiesDialog';

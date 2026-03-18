@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { cn } from '@/lib/cn';
-import Card from './Card';
-import DataTableToolbar from './DataTableToolbar';
-import Pagination from './Pagination';
+import Card from './card';
+import DataTableToolbar from './datatabletoolbar';
+import Pagination from './pagination';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 /**

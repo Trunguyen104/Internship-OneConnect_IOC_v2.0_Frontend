@@ -10,7 +10,7 @@ import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useUniversitiesStore } from '@/store/useUniversitiesStore';
 import { universityService } from '@/services/university.service';
-import LogoUploader from '@/components/ui/LogoUploader';
+import LogoUploader from '@/components/ui/logouploader';
 
 export default function UniversitiesForm({ university, onSuccess }) {
   const toast = useToast();

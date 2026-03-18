@@ -11,7 +11,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { CardDescription } from '@/components/ui/Card';
+import { CardDescription } from '@/components/ui/card';
 import EnterprisesForm from './EnterprisesForm';
 
 export default function EnterprisesDialog({
