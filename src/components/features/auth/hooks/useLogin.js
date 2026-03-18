@@ -65,20 +65,36 @@ export function useLogin() {
             ? rawRole.trim().toLowerCase()
             : undefined;
 
-      if (role === 1 || role === 'superadmin' || role === 'super_admin') {
+      if (
+        role === USER_ROLE.SUPER_ADMIN ||
+        role === 'superadmin' ||
+        role === 'super_admin' ||
+        role === USER_ROLE.MODERATOR ||
+        role === 'moderator'
+      ) {
         router.push('/admin-users');
         return;
       }
-      if (role === 2 || role === 'moderator') {
-        router.push('/admin-users');
-        return;
-      }
-      if (role === 3 || role === 'schooladmin') {
+
+      if (role === USER_ROLE.SCHOOL_ADMIN || role === 'schooladmin') {
         router.push('/admin-dashboard');
         return;
       }
-      if (role === 4 || role === 'enterpriseadmin') {
+
+      if (
+        role === USER_ROLE.ENTERPRISE_ADMIN ||
+        role === 'enterpriseadmin' ||
+        role === USER_ROLE.HR ||
+        role === 'hr' ||
+        role === USER_ROLE.MENTOR ||
+        role === 'mentor'
+      ) {
         router.push('/dashboard');
+        return;
+      }
+
+      if (role === USER_ROLE.STUDENT || role === 'student') {
+        router.push('/internship-groups');
         return;
       }
 
