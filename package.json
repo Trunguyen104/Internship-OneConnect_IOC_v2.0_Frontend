@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
-    "build": "next build --experimental-build-mode compile",
+    "build": "next build --webpack",
     "build:generate": "next build --experimental-build-mode generate-env",
+    "build:compile": "next build --experimental-build-mode compile",
     "build:docker": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
