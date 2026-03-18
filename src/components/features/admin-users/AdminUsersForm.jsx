@@ -95,7 +95,7 @@ export default function AdminUsersForm({ onSuccess, onCancel }) {
     const nextErrors = {};
     if (!payload.fullName) nextErrors.fullName = 'Full name is required';
     if (!payload.email) nextErrors.email = 'Email is required';
-    if (payload.email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(payload.email))
+    if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email))
       nextErrors.email = 'Invalid email';
     if (unitRequired(payload.role) && !payload.unitId)
       nextErrors.unitId = `Please select a ${unitLabel}`;
