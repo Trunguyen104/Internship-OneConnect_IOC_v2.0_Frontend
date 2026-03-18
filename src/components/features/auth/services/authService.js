@@ -18,8 +18,7 @@ export async function login(data) {
 
   // /api/auth sets HttpOnly cookies and returns basic auth context for routing decisions.
   // Do not return tokens to the client (XSS risk).
-  const auth = await res.json();
-  return auth;
+  return result;
 }
 
 export async function logout() {
