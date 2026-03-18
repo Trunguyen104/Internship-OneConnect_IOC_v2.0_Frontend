@@ -7,15 +7,18 @@ export default function Input({ label, error, className = '', type, showToggle =
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password' && showToggle;
 
+  const inputId = props.id || props.name || label;
+
   return (
     <div className='mb-4'>
-      <label className='mb-2 block text-sm font-medium text-gray-900'>
+      <label htmlFor={inputId} className='mb-2 block text-sm font-medium text-gray-900'>
         {label} <span className='text-red-500'>*</span>
       </label>
 
       <div className='relative'>
         <input
           {...props}
+          id={inputId}
           type={isPassword && showPassword ? 'text' : type}
           className={`w-full rounded-2xl border bg-white px-4 py-2 text-gray-900 ${error ? 'border-red-500' : 'border-gray-300'} ${isPassword ? 'pr-10' : ''} ${className}`}
         />
