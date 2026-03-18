@@ -1,4 +1,4 @@
-internship - oneconnect_ioc_v2.0_frontend\src\components\features\logbook'use client';
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';

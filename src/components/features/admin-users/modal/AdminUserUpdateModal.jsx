@@ -3,18 +3,22 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
@@ -39,6 +43,7 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
   const [busy, setBusy] = useState(false);
   const [detail, setDetail] = useState(null);
   const [editForm, setEditForm] = useState(initialEditForm);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!open) return;
@@ -64,7 +69,9 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
           studentClass: data?.studentClass || '',
           studentMajor: data?.studentMajor || '',
           studentGpa:
-            data?.studentGpa !== null && data?.studentGpa !== undefined ? String(data.studentGpa) : '',
+            data?.studentGpa !== null && data?.studentGpa !== undefined
+              ? String(data.studentGpa)
+              : '',
         });
       })
       .catch((e) => {
@@ -84,6 +91,17 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
     e.preventDefault();
     if (!userId) return;
 
+    const nextErrors = {};
+    if (!editForm.fullName.trim()) nextErrors.fullName = 'Full name is required';
+    if (editForm.dateOfBirth && !/^\d{4}-\d{2}-\d{2}$/.test(editForm.dateOfBirth.trim())) {
+      nextErrors.dateOfBirth = 'Date of birth must be in YYYY-MM-DD format';
+    }
+    if (editForm.studentGpa !== '' && Number.isNaN(Number(editForm.studentGpa))) {
+      nextErrors.studentGpa = 'Student GPA must be a number';
+    }
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+
     const payload = {
       fullName: editForm.fullName.trim(),
       phoneNumber: editForm.phoneNumber?.trim() || undefined,
@@ -95,11 +113,6 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
       studentMajor: editForm.studentMajor?.trim() || undefined,
       studentGpa: editForm.studentGpa !== '' ? Number(editForm.studentGpa) : undefined,
     };
-
-    if (!payload.fullName) {
-      toast.error('Full name is required');
-      return;
-    }
 
     setBusy(true);
     try {
@@ -115,21 +128,22 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onToggle}>
-      <DialogContent aria-describedby={undefined}>
-        <form onSubmit={doUpdate}>
-          <DialogHeader>
-            <DialogTitle>{UI_TEXT.ADMIN_USERS.UPDATE_PROFILE}</DialogTitle>
-            <DialogDescription>Update admin user information.</DialogDescription>
-          </DialogHeader>
+    <Sheet open={open} onOpenChange={onToggle}>
+      <SheetContent className='flex flex-col p-4 sm:max-w-[560px]'>
+        <form onSubmit={doUpdate} className='flex min-h-0 flex-1 flex-col'>
+          <SheetHeader className='mt-2 text-center'>
+            <SheetTitle className='text-3xl'>{UI_TEXT.ADMIN_USERS.UPDATE_PROFILE}</SheetTitle>
+            <SheetDescription>{UI_TEXT.ADMIN_USERS.UPDATE_INFO}</SheetDescription>
+          </SheetHeader>
 
-          <FieldGroup className='mt-4 gap-4'>
+          <FieldGroup className='mt-4 min-h-0 flex-1 gap-4 overflow-y-auto pb-8'>
             <Field>
               <FieldLabel htmlFor='fullName'>Full name</FieldLabel>
               <Input
                 id='fullName'
                 value={editForm.fullName}
                 onChange={(e) => setEditForm((p) => ({ ...p, fullName: e.target.value }))}
+                error={errors.fullName}
               />
             </Field>
 
@@ -165,7 +179,10 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
 
               <Field>
                 <FieldLabel>Gender</FieldLabel>
-                <Select value={editForm.gender} onValueChange={(v) => setEditForm((p) => ({ ...p, gender: v }))}>
+                <Select
+                  value={editForm.gender}
+                  onValueChange={(v) => setEditForm((p) => ({ ...p, gender: v }))}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder='Gender' />
                   </SelectTrigger>
@@ -185,6 +202,7 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
                 id='dateOfBirth'
                 value={editForm.dateOfBirth}
                 onChange={(e) => setEditForm((p) => ({ ...p, dateOfBirth: e.target.value }))}
+                error={errors.dateOfBirth}
               />
             </Field>
 
@@ -221,25 +239,25 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
                     id='studentGpa'
                     value={editForm.studentGpa}
                     onChange={(e) => setEditForm((p) => ({ ...p, studentGpa: e.target.value }))}
+                    error={errors.studentGpa}
                   />
                 </Field>
               </>
             ) : null}
           </FieldGroup>
 
-          <DialogFooter className='mt-4'>
-            <DialogClose asChild>
-              <Button type='button' variant='outline'>
+          <div className='mt-auto border-t border-slate-100 pt-4'>
+            <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+              <Button type='button' variant='outline' onClick={() => onToggle?.(false)}>
                 {UI_TEXT.BUTTON.CLOSE}
               </Button>
-            </DialogClose>
-            <Button type='submit' disabled={busy}>
-              {UI_TEXT.BUTTON.SAVE_CHANGES}
-            </Button>
-          </DialogFooter>
+              <Button type='submit' disabled={busy}>
+                {UI_TEXT.BUTTON.SAVE_CHANGES}
+              </Button>
+            </div>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
-

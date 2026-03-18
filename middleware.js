@@ -3,6 +3,13 @@ import { NextResponse } from 'next/server';
 export function middleware(request) {
   const pathname = request.nextUrl.pathname;
 
+  // Normalize legacy /Uploads/* to /uploads/* (case mismatches from BE/static links).
+  if (pathname.startsWith('/Uploads/')) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/^\/Uploads\//, '/uploads/');
+    return NextResponse.rewrite(url);
+  }
+
   // Cookie-based auth (HttpOnly). Treat having a refresh token as "logged in".
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
@@ -27,6 +34,6 @@ export const config = {
     '/dashboard/:path*',
     '/profile/:path*',
     '/admin-users/:path*',
+    '/Uploads/:path*',
   ],
 };
-
