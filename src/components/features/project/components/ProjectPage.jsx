@@ -6,7 +6,7 @@ import { useProject } from '../hooks/useProject';
 import ProjectOverview from './ProjectOverview';
 import ProjectResources from './ProjectResources';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 
 export default function ProjectPage({ projectId = null }) {
   const {

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 
 import { AUTH_UI, AUTH_MESSAGES } from '@/constants/auth/uiText';
 

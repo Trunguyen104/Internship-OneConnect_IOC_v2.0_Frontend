@@ -6,7 +6,17 @@ const BE_URL = GENERIC_BE_URL.includes('/api/v1/auth')
   : `${GENERIC_BE_URL}/api/v1/auth`;
 
 function parseTokensFromHeaders(headers) {
-  const setCookies = headers.getSetCookie();
+  let setCookies = [];
+
+  if (typeof headers.getSetCookie === 'function') {
+    setCookies = headers.getSetCookie();
+  } else {
+    const combinedSetCookie = headers.get('set-cookie');
+    if (combinedSetCookie) {
+      setCookies = combinedSetCookie.split(/,(?=\s*[A-Za-z0-9_-]+=)/);
+    }
+  }
+
   const tokens = {};
 
   setCookies.forEach((cookieStr) => {
@@ -38,7 +48,14 @@ export async function POST(req) {
       body: JSON.stringify(body),
     });
 
-    const data = await res.json();
+    const rawBody = await res.text();
+    let data = {};
+    try {
+      data = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      data = { message: rawBody || 'Unexpected upstream response' };
+    }
+
     if (!res.ok) {
       return NextResponse.json(data, { status: res.status });
     }
@@ -135,7 +152,14 @@ export async function PUT(req) {
       },
     });
 
-    const data = await res.json();
+    const rawBody = await res.text();
+    let data = {};
+    try {
+      data = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      data = { message: rawBody || 'Unexpected upstream response' };
+    }
+
     if (!res.ok) {
       return NextResponse.json(data, { status: res.status });
     }

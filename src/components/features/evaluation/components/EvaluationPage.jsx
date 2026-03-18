@@ -1,7 +1,7 @@
 'use client';
 
 import { Empty } from 'antd';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import CycleTable from './CycleTable';
 import TeamEvaluationsModal from './TeamEvaluationsModal';
 import ScoreDetailDrawer from './ScoreDetailDrawer';

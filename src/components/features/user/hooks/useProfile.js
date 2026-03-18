@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
 import { userService } from '@/components/features/user/services/userService';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 export function useProfile() {
   const toast = useToast();

@@ -4,7 +4,7 @@ import { Descriptions, Typography, Spin, Empty, Tag } from 'antd';
 import { useGeneralInfo } from '../hooks/useGeneralInfo';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 
 const { Text } = Typography;
 

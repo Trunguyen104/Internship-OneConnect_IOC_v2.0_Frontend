@@ -1,8 +1,13 @@
 export async function login(data) {
+  const payload = {
+    email: data?.email,
+    password: data?.password,
+  };
+
   const res = await fetch('/api/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
     credentials: 'include',
   });
 
@@ -11,7 +16,10 @@ export async function login(data) {
     throw new Error(result.message || 'Login failed');
   }
 
-  return result;
+  // /api/auth sets HttpOnly cookies and returns basic auth context for routing decisions.
+  // Do not return tokens to the client (XSS risk).
+  const auth = await res.json();
+  return auth;
 }
 
 export async function logout() {
@@ -31,6 +39,6 @@ export async function refreshToken() {
 
   if (!res.ok) throw new Error('Refresh failed');
 
-  const { accessToken } = await res.json();
-  return accessToken;
+  // /api/auth refresh returns basic auth context; tokens remain in HttpOnly cookies.
+  return await res.json();
 }

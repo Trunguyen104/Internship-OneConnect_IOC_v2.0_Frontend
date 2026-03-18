@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import Card from '@/components/ui/Card';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import Card from '@/components/ui/card';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { Select } from 'antd';
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
@@ -12,7 +12,7 @@ import TermTable from './components/TermTable';
 import TermFormModal from './components/TermFormModal';
 import TermStatusModal from './components/TermStatusModal';
 import TermDeleteModal from './components/TermDeleteModal';
-import Pagination from '@/components/ui/Pagination';
+import Pagination from '@/components/ui/pagination';
 
 export default function InternshipTermManagement() {
   const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;

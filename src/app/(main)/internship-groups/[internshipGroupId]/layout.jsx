@@ -2,7 +2,7 @@
 
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
-import PageTitle from '@/components/ui/PageTitle';
+import PageTitle from '@/components/ui/pagetitle';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 
 export default function Space({ children }) {
@@ -36,7 +36,7 @@ export default function Space({ children }) {
 
 // import Header from '@/components/layout/Header';
 // import Sidebar from '@/components/layout/Sidebar';
-// import PageTitle from '@/components/ui/PageTitle';
+// import PageTitle from '@/components/ui/pagetitle';
 // import { usePageHeader } from '@/providers/PageHeaderProvider';
 
 // export default function Space({ children }) {

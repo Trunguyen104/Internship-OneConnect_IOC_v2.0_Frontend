@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import TiptapEditor from '@/components/ui/TiptapEditor';
+import TiptapEditor from '@/components/ui/tiptapeditor';
 
 import { FieldLabel, TextInput } from './TaskFields';
 import { TaskModalSidebar } from './TaskModalSidebar';

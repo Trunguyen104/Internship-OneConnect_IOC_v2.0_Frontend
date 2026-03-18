@@ -4,8 +4,8 @@
 // import Card from '@/components/shared/Card';
 import InfoItem from './InfoItem';
 import { Button, Space, Spin } from 'antd';
-import AvatarUploader from '@/components/ui/AvatarUploader';
-import Card from '@/components/ui/Card';
+import AvatarUploader from '@/components/ui/avataruploader';
+import Card from '@/components/ui/card';
 import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatarChange }) {

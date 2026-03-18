@@ -1,6 +1,6 @@
 'use client';
 import { useState, useMemo, useCallback } from 'react';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 export const useStudentEnrollment = (initialStudents) => {
   const [students, setStudents] = useState(initialStudents);

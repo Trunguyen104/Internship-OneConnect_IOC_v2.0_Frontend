@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/components/features/auth/services/authService';
-import { setAccessToken } from '@/components/features/auth/services/authStorage';
 import { useToast } from '@/providers/ToastProvider';
 import { AUTH_MESSAGES } from '@/constants/auth/uiText';
 import { validateLogin } from '@/validators/auth';
@@ -13,7 +12,6 @@ import { USER_ROLE } from '@/constants/common/enums';
 export function useLogin() {
   const toast = useToast();
   const router = useRouter();
-
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
@@ -27,11 +25,7 @@ export function useLogin() {
       }
     }
 
-    return {
-      email: '',
-      password: '',
-      rememberMe: false,
-    };
+    return { email: '', password: '', rememberMe: false };
   });
 
   const [errors, setErrors] = useState({});
@@ -53,7 +47,7 @@ export function useLogin() {
     if (!validate()) return;
 
     try {
-      const data = await login(form);
+      const auth = await login(form);
 
       if (form.rememberMe) {
         localStorage.setItem('rememberEmail', form.email);
@@ -61,27 +55,34 @@ export function useLogin() {
         localStorage.removeItem('rememberEmail');
       }
 
-      setAccessToken(data.accessToken);
-
       toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
 
-      // REDIRECT BASED ON ROLE
-      switch (data.role) {
-        case USER_ROLE.SUPER_ADMIN:
-        case USER_ROLE.MODERATOR:
-        case USER_ROLE.SCHOOL_ADMIN:
-          router.push('/admin-dashboard');
-          break;
-        case USER_ROLE.ENTERPRISE_ADMIN:
-        case USER_ROLE.HR:
-          router.push('/dashboard');
-          break;
-        case USER_ROLE.MENTOR:
-        case USER_ROLE.STUDENT:
-        default:
-          router.push('/internship-groups');
-          break;
+      const rawRole = auth?.role;
+      const role =
+        typeof rawRole === 'number'
+          ? rawRole
+          : typeof rawRole === 'string'
+            ? rawRole.trim().toLowerCase()
+            : undefined;
+
+      if (role === 1 || role === 'superadmin' || role === 'super_admin') {
+        router.push('/admin-users');
+        return;
       }
+      if (role === 2 || role === 'moderator') {
+        router.push('/admin-users');
+        return;
+      }
+      if (role === 3 || role === 'schooladmin') {
+        router.push('/admin-dashboard');
+        return;
+      }
+      if (role === 4 || role === 'enterpriseadmin') {
+        router.push('/dashboard');
+        return;
+      }
+
+      router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
       toast.error(AUTH_MESSAGES.TOAST.LOGIN_FAILED);
@@ -102,10 +103,6 @@ export function useLogin() {
     }));
   };
 
-  return {
-    form,
-    errors,
-    handleChange,
-    handleSubmit,
-  };
+  return { form, errors, handleChange, handleSubmit };
 }
+

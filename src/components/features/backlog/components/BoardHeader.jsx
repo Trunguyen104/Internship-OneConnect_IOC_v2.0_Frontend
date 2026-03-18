@@ -1,4 +1,4 @@
-import SearchBar from '@/components/ui/SearchBar';
+import SearchBar from '@/components/ui/searchbar';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export const BoardHeader = ({ searchText, setSearchText }) => {
