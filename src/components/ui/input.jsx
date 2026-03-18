@@ -26,11 +26,11 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, ...pro
           className={cn(
             'flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900',
             'placeholder:text-slate-400',
-            'focus-visible:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-600)]/20',
+            'focus-visible:border-slate-300 focus-visible:ring-2 focus-visible:ring-[var(--primary-600)]/20 focus-visible:outline-none',
             'disabled:cursor-not-allowed disabled:opacity-50',
             isPassword && 'pr-10',
             error && 'border-red-500 focus-visible:ring-red-500/20',
-            className
+            className,
           )}
         />
         {isPassword && (
@@ -43,11 +43,7 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, ...pro
           </button>
         )}
       </div>
-      {error && (
-        <p className='text-xs font-medium text-red-500'>
-          {error}
-        </p>
-      )}
+      {error && <p className='text-xs font-medium text-red-500'>{error}</p>}
     </div>
   );
 });

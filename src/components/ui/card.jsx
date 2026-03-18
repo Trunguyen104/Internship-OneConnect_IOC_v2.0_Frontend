@@ -14,7 +14,11 @@ function CardRoot({ children, className = '', ...props }) {
 
 function CardHeader({ children, className = '', ...props }) {
   return (
-    <div data-slot='card-header' className={cn('flex items-start justify-between gap-4', className)} {...props}>
+    <div
+      data-slot='card-header'
+      className={cn('flex items-start justify-between gap-4', className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -22,7 +26,11 @@ function CardHeader({ children, className = '', ...props }) {
 
 function CardTitle({ children, className = '', ...props }) {
   return (
-    <div data-slot='card-title' className={cn('text-lg font-semibold leading-snug text-slate-900', className)} {...props}>
+    <div
+      data-slot='card-title'
+      className={cn('text-lg leading-snug font-semibold text-slate-900', className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -30,7 +38,11 @@ function CardTitle({ children, className = '', ...props }) {
 
 function CardDescription({ children, className = '', ...props }) {
   return (
-    <div data-slot='card-description' className={cn('text-sm text-slate-500', className)} {...props}>
+    <div
+      data-slot='card-description'
+      className={cn('text-sm text-slate-500', className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -54,7 +66,11 @@ function CardContent({ children, className = '', ...props }) {
 
 function CardFooter({ children, className = '', ...props }) {
   return (
-    <div data-slot='card-footer' className={cn('mt-auto flex items-center justify-end gap-2', className)} {...props}>
+    <div
+      data-slot='card-footer'
+      className={cn('mt-auto flex items-center justify-end gap-2', className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -70,4 +86,13 @@ const Card = Object.assign(CardRoot, {
 });
 
 export default Card;
-export { Card, CardRoot, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter };
+export {
+  Card,
+  CardRoot,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardAction,
+  CardContent,
+  CardFooter,
+};

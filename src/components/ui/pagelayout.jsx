@@ -13,23 +13,21 @@ import StudentPageHeader from '@/components/layout/StudentPageHeader';
 const PageLayout = ({ children, className }) => (
   <section
     className={cn(
-      "animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500 py-4",
-      className
+      'animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 py-4 duration-500',
+      className,
     )}
   >
     {children}
   </section>
 );
 
-const PageHeader = (props) => (
-  <StudentPageHeader {...props} />
-);
+const PageHeader = (props) => <StudentPageHeader {...props} />;
 
 const PageCard = ({ children, className }) => (
   <Card
     className={cn(
-      "flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto",
-      className
+      'flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto',
+      className,
     )}
   >
     {children}
@@ -37,16 +35,11 @@ const PageCard = ({ children, className }) => (
 );
 
 const PageToolbar = (props) => (
-  <DataTableToolbar
-    {...props}
-    className={cn('mb-5 border-0! p-0!', props.className)}
-  />
+  <DataTableToolbar {...props} className={cn('mb-5 border-0! p-0!', props.className)} />
 );
 
 const PageContent = ({ children, className }) => (
-  <div className={cn("min-h-0 flex-1 overflow-hidden", className)}>
-    {children}
-  </div>
+  <div className={cn('min-h-0 flex-1 overflow-hidden', className)}>{children}</div>
 );
 
 const PagePagination = (props) => (
