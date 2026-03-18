@@ -47,6 +47,18 @@ export const PRIORITY_MAP = Object.fromEntries(
 export const SPRINT_STATUS_MAP = Object.fromEntries(
   Object.entries(SPRINT_STATUS).map(([k, v]) => [v, k]),
 );
-export const MOVE_INCOMPLETE_ITEMS_OPTION_MAP = Object.fromEntries(
+export const MOVING_INCOMPLETE_ITEMS_OPTION_MAP = Object.fromEntries(
   Object.entries(MOVE_INCOMPLETE_ITEMS_OPTION).map(([k, v]) => [v, k]),
 );
+
+export const USER_ROLE = {
+  SUPER_ADMIN: 1,
+  MODERATOR: 2,
+  SCHOOL_ADMIN: 3,
+  ENTERPRISE_ADMIN: 4,
+  HR: 5,
+  MENTOR: 6,
+  STUDENT: 7,
+};
+
+export const USER_ROLE_MAP = Object.fromEntries(Object.entries(USER_ROLE).map(([k, v]) => [v, k]));

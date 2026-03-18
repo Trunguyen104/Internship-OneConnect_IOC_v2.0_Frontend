@@ -11,9 +11,9 @@ export async function login(data) {
     credentials: 'include',
   });
 
+  const result = await res.json();
   if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.message || 'Login failed');
+    throw new Error(result.message || 'Login failed');
   }
 
   // /api/auth sets HttpOnly cookies and returns basic auth context for routing decisions.
