@@ -5,11 +5,7 @@
 import InfoItem from './InfoItem';
 import { Button, Space, Spin } from 'antd';
 import AvatarUploader from '@/components/ui/avataruploader';
-<<<<<<< HEAD
 import Card from '@/components/ui/card';
-=======
-import Card from '@/components/ui/Card';
->>>>>>> dcccf7b (fix: rename AvatarUploader file with correct casing)
 import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatarChange }) {
