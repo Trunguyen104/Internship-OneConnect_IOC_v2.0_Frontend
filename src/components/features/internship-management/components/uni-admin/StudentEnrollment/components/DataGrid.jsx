@@ -12,13 +12,29 @@ const STATUS_STYLES = {
   withdrawn: { color: 'error', label: 'Đã rút lui' },
 };
 
-const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) {
+const DataGrid = memo(function DataGrid({
+  students,
+  loading,
+  page = 1,
+  pageSize = 10,
+  onView,
+  onEdit,
+  onDelete,
+}) {
   const { TABLE } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.STUDENT_ENROLLMENT;
 
   const columns = useMemo(
     () => [
       {
-        title: <span className='tracking-wider'>{TABLE.COLUMNS.FULL_NAME}</span>,
+        title: '#',
+        key: 'index',
+        width: '60px',
+        align: 'center',
+        render: (_, __, index) => (page - 1) * pageSize + index + 1,
+        className: 'text-muted font-semibold text-xs',
+      },
+      {
+        title: TABLE.COLUMNS.FULL_NAME,
         key: 'name',
         width: '220px',
         render: (_, record) => (
@@ -123,11 +139,18 @@ const DataGrid = memo(function DataGrid({ students, onView, onEdit, onDelete }) 
         ),
       },
     ],
-    [onView, onEdit, onDelete, TABLE],
+    [onView, onEdit, onDelete, TABLE, page, pageSize],
   );
 
   return (
-    <DataTable columns={columns} data={students} rowKey='id' minWidth='800px' className='mt-2' />
+    <DataTable
+      columns={columns}
+      data={students}
+      loading={loading}
+      rowKey='id'
+      minWidth='800px'
+      className='no-scrollbar mt-2 min-h-0 flex-1'
+    />
   );
 });
 

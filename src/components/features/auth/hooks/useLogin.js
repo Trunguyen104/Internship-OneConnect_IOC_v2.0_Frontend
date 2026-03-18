@@ -4,16 +4,22 @@ import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/components/features/auth/services/authService';
 import { useToast } from '@/providers/ToastProvider';
+import { AUTH_MESSAGES } from '@/constants/auth/uiText';
+import { validateLogin } from '@/validators/auth';
 
 export function useLogin() {
   const toast = useToast();
   const router = useRouter();
-
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
+
       if (savedEmail) {
-        return { email: savedEmail, password: '', rememberMe: true };
+        return {
+          email: savedEmail,
+          password: '',
+          rememberMe: true,
+        };
       }
     }
 
@@ -23,21 +29,16 @@ export function useLogin() {
   const [errors, setErrors] = useState({});
 
   const validate = useCallback(() => {
-    const newErrors = {};
+    const validationErrors = validateLogin(form);
+    const mappedErrors = {};
 
-    if (!form.email.trim()) {
-      newErrors.email = 'Email lÃ  báº¯t buá»™c';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Email khÃ´ng há»£p lá»‡';
-    }
+    Object.keys(validationErrors).forEach((key) => {
+      mappedErrors[key] = AUTH_MESSAGES.VALIDATION[validationErrors[key]];
+    });
 
-    if (!form.password.trim()) {
-      newErrors.password = 'Máº­t kháº©u lÃ  báº¯t buá»™c';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [form.email, form.password]);
+    setErrors(mappedErrors);
+    return Object.keys(mappedErrors).length === 0;
+  }, [form]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,7 +53,7 @@ export function useLogin() {
         localStorage.removeItem('rememberEmail');
       }
 
-      toast.success('ÄÄƒng nháº­p thÃ nh cÃ´ng');
+      toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
 
       const rawRole = auth?.role;
       const role =
@@ -82,7 +83,7 @@ export function useLogin() {
       router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
-      toast.error('ÄÄƒng nháº­p tháº¥t báº¡i');
+      toast.error(AUTH_MESSAGES.TOAST.LOGIN_FAILED);
     }
   };
 

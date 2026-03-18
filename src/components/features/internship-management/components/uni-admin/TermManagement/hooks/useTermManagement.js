@@ -1,7 +1,6 @@
 'use client';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/providers/ToastProvider';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
 import { TermService } from '../services/term.service';
 
 export const useTermManagement = () => {
@@ -10,6 +9,9 @@ export const useTermManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState(undefined);
+  const [yearFilter, setYearFilter] = useState(undefined);
+  const [sortConfig, setSortConfig] = useState({ column: 'createdat', order: 'desc' });
+  const knownVersions = useRef({}); // Track versions to avoid losing them on refetch
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -34,10 +36,18 @@ export const useTermManagement = () => {
         pageSize: pagination.pageSize,
         searchTerm: searchTerm || undefined,
         status: statusFilter ?? undefined,
+        year: yearFilter || undefined,
+        sortColumn: sortConfig.column,
+        sortOrder: sortConfig.order,
       };
       const response = await TermService.getAll(params);
       if (response?.data) {
-        setData(response.data.items || []);
+        // Merge known versions into fetched data because the list API lacks 'version'
+        const mergedItems = (response.data.items || []).map((item) => ({
+          ...item,
+          version: item.version || knownVersions.current[item.termId] || 1,
+        }));
+        setData(mergedItems);
         setPagination((prev) => ({
           ...prev,
           total: response.data.totalCount || 0,
@@ -49,7 +59,15 @@ export const useTermManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [pagination, searchTerm, statusFilter, toast]);
+  }, [
+    pagination,
+    searchTerm,
+    statusFilter,
+    yearFilter,
+    sortConfig.column,
+    sortConfig.order,
+    toast,
+  ]);
 
   useEffect(() => {
     fetchData();
@@ -65,8 +83,19 @@ export const useTermManagement = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
-  const handleTableChange = useCallback((newPagination) => {
+  const handleTableChange = useCallback((newPagination, filters, sorter) => {
+    if (sorter && sorter.field) {
+      setSortConfig({
+        column: sorter.field.toLowerCase(),
+        order: sorter.order === 'ascend' ? 'asc' : 'desc',
+      });
+    }
     setPagination((prev) => ({ ...prev, current: newPagination.current }));
+  }, []);
+
+  const handleYearChange = useCallback((value) => {
+    setYearFilter(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
   const handleCreateNew = useCallback(() => {
@@ -94,61 +123,79 @@ export const useTermManagement = () => {
           setModalVisible(true);
         }
       } catch (error) {
-        console.error(
-          'Failed to fetch term details. This is likely a 403 Forbidden on GetTermById. Error:',
-          error,
-        );
-        toast.error('Failed to fetch term details');
+        console.error('GetTermById failed:', error);
+        toast.error('Failed to load term details');
       }
     },
     [toast],
   );
 
-  const handleRequestDelete = useCallback(
-    (record) => {
-      showDeleteConfirm({
-        title: 'Delete Internship Term',
-        content: `Are you sure you want to delete the term "${record.name}"? This action cannot be undone.`,
-        onOk: async () => {
-          try {
-            await TermService.delete(record.termId);
-            toast.success('Term deleted successfully');
-            fetchData();
-          } catch (error) {
-            toast.error(error.message || 'Failed to delete term');
-          }
-        },
-      });
+  const [deleteModalState, setDeleteModalState] = useState({
+    open: false,
+    record: null,
+  });
+
+  const handleRequestDelete = useCallback((record) => {
+    setDeleteModalState({
+      open: true,
+      record,
+    });
+  }, []);
+
+  const handleDelete = useCallback(
+    async (reason) => {
+      const { record } = deleteModalState;
+      if (!record || !reason) return;
+
+      setSubmitLoading(true);
+      try {
+        await TermService.delete(record.termId, reason);
+        toast.success('Term deleted successfully');
+        setDeleteModalState({ open: false, record: null });
+        fetchData();
+      } catch (error) {
+        toast.error(error.message || 'Failed to delete term');
+      } finally {
+        setSubmitLoading(false);
+      }
     },
-    [fetchData, toast],
+    [deleteModalState, fetchData, toast],
   );
 
-  const handleChangeStatus = useCallback(async () => {
-    const { record, newStatus } = statusModalState;
-    if (!record || newStatus === null) return;
+  const handleChangeStatus = useCallback(
+    async (reason) => {
+      const { record, newStatus } = statusModalState;
+      if (!record || newStatus === null) return;
 
-    setSubmitLoading(true);
-    try {
-      if (newStatus === 2) {
-        // Closing term
-        await TermService.close(record.termId, {
-          reason: 'Closed by Admin',
-          version: record.version,
+      setSubmitLoading(true);
+      try {
+        // Backend expects CloseTermCommand (generic status update): { Status: int, Reason: string, Version: number }
+        const response = await TermService.updateStatus(record.termId, {
+          Status: newStatus,
+          Reason: reason || 'Status updated by Admin',
+          Version: record.version || record.Version || knownVersions.current[record.termId] || 1,
         });
-      } else {
-        // Potentially other status changes if the backend supports it via update
-        // Current backend seems to only have explicit 'close' patch
-        // For now, assume other changes are not standard or handled by Update
+
+        // Proactively update local state and known versions
+        if (response?.data) {
+          knownVersions.current[record.termId] = response.data.version;
+          setData((prev) =>
+            prev.map((item) =>
+              item.termId === record.termId ? { ...item, ...response.data } : item,
+            ),
+          );
+        }
+        toast.success('Status updated successfully');
+        setStatusModalState({ open: false, record: null, newStatus: null });
+        fetchData();
+      } catch (error) {
+        toast.error(error.message || 'Failed to update status');
+      } finally {
+        setSubmitLoading(false);
       }
-      toast.success('Status updated successfully');
-      setStatusModalState({ open: false, record: null, newStatus: null });
-      fetchData();
-    } catch (error) {
-      toast.error(error.message || 'Failed to update status');
-    } finally {
-      setSubmitLoading(false);
-    }
-  }, [statusModalState, fetchData, toast]);
+    },
+    [statusModalState, fetchData, toast],
+  );
 
   const handleRequestChangeStatus = useCallback((record, newStatus) => {
     setStatusModalState({
@@ -164,20 +211,44 @@ export const useTermManagement = () => {
       try {
         const id = editingRecord?.termId || editingRecord?.termID || editingRecord?.id;
         if (id) {
-          // Strictly follow PUT schema: termId, name, startDate, endDate, version
+          // Strictly follow PUT schema: TermId, Name, StartDate, EndDate, Version
           const updatePayload = {
-            termId: id,
-            name: payload.name,
-            startDate: payload.startDate,
-            endDate: payload.endDate,
-            version: editingRecord.version ?? 0,
+            TermId: id,
+            Name: payload.name,
+            StartDate: payload.startDate,
+            EndDate: payload.endDate,
+            Version:
+              editingRecord.version || editingRecord.Version || knownVersions.current[id] || 1,
           };
 
-          await TermService.update(id, updatePayload);
+          const response = await TermService.update(id, updatePayload);
+
+          // Proactively update local state and known versions
+          if (response?.data) {
+            const newVersion = response.data.version || response.data.Version;
+            knownVersions.current[id] = newVersion;
+            setData((prev) =>
+              prev.map((item) =>
+                item.termId === id || item.TermId === id ? { ...item, ...response.data } : item,
+              ),
+            );
+          }
+
           toast.success('Term updated successfully!');
         } else {
-          // POST /create payload can include status
-          await TermService.create(payload);
+          // Strictly follow POST schema: Name, StartDate, EndDate, UniversityId (if any)
+          const createPayload = {
+            Name: payload.name,
+            StartDate: payload.startDate,
+            EndDate: payload.endDate,
+          };
+          const response = await TermService.create(createPayload);
+
+          if (response?.data) {
+            const newId = response.data.termId || response.data.TermId;
+            const newVersion = response.data.version || response.data.Version;
+            if (newId) knownVersions.current[newId] = newVersion;
+          }
           toast.success('New term created successfully!');
         }
         setModalVisible(false);
@@ -197,23 +268,29 @@ export const useTermManagement = () => {
     loading,
     searchTerm,
     statusFilter,
+    yearFilter,
+    sortConfig,
     pagination,
     modalVisible,
     submitLoading,
     editingRecord,
     statusModalState,
+    deleteModalState,
 
     // Setters
     setModalVisible,
     setStatusModalState,
+    setYearFilter,
 
     // Actions
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handleYearChange,
     handleCreateNew,
     handleEdit,
     handleRequestDelete,
+    handleDelete,
     handleRequestChangeStatus,
     handleChangeStatus,
     handleSaveModal,

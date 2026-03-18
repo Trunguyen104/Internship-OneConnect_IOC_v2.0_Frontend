@@ -24,7 +24,6 @@ export default function StudentEnrollment() {
   const {
     searchTerm,
     statusFilter,
-    majorFilter,
     currentPage,
     importVisible,
     addVisible,
@@ -34,7 +33,6 @@ export default function StudentEnrollment() {
     filteredStudents,
     setSearchTerm,
     setStatusFilter,
-    setMajorFilter,
     setCurrentPage,
     setImportVisible,
     setAddVisible,
@@ -62,7 +60,7 @@ export default function StudentEnrollment() {
 
       <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
         <DataTableToolbar
-          className='mb-5 !border-0 !p-0'
+          className='mb-5 flex-shrink-0 !border-0 !p-0'
           searchProps={{
             placeholder: STUDENT_ENROLLMENT.SEARCH_PLACEHOLDER,
             value: searchTerm,
@@ -94,7 +92,7 @@ export default function StudentEnrollment() {
           leftContent={
             <button
               onClick={() => setImportVisible(true)}
-              className='border-border hover:bg-bg/50 flex h-9 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-all active:scale-95'
+              className='border-border hover:bg-bg/50 flex h-9 flex-shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-all active:scale-95'
             >
               <UploadOutlined className='text-primary' />
               <span>{STUDENT_ENROLLMENT.IMPORT_BTN}</span>
@@ -109,13 +107,16 @@ export default function StudentEnrollment() {
 
         <DataGrid
           students={paginatedData}
+          loading={false} // Mock data is always fast
+          page={currentPage}
+          pageSize={pageSize}
           onView={handleView}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
 
         {total > 0 && (
-          <div className='border-border/50 mt-6 border-t pt-6'>
+          <div className='border-border/50 mt-6 flex-shrink-0 border-t pt-6'>
             <Pagination
               total={total}
               page={currentPage}

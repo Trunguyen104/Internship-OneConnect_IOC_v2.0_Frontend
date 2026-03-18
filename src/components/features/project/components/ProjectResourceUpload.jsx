@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Form, Input, Select, Button, Upload, Typography } from 'antd';
+import { Form, Input, Select, Button, Upload } from 'antd';
 import { useToast } from '@/providers/ToastProvider';
 import { UploadOutlined } from '@ant-design/icons';
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
-
-const { Title, Text } = Typography;
 
 export default function ProjectResourceUpload({
   form,
@@ -31,7 +29,7 @@ export default function ProjectResourceUpload({
         return Upload.LIST_IGNORE;
       }
 
-      const isLt10M = file.size / 1024 / 1024 <= 10;
+      const isLt10M = file.size / 1024 / 1024 <= 30;
       if (!isLt10M) {
         toast.error(PROJECT_MESSAGES.ERROR.FILE_TOO_LARGE);
         return Upload.LIST_IGNORE;
@@ -52,6 +50,13 @@ export default function ProjectResourceUpload({
           label={PROJECT_UI.FORM.RESOURCE_NAME}
           name={'resourceName'}
           tooltip={{ title: PROJECT_UI.TOOLTIP.RESOURCE_NAME }}
+          rules={[
+            {
+              required: true,
+              message: PROJECT_MESSAGES.ERROR.RESOURCE_NAME_REQUIRED || 'Resource name is required',
+            },
+            { max: 100, message: PROJECT_MESSAGES.ERROR.MAX_LENGTH || 'Max length exceeded' },
+          ]}
         >
           <Input placeholder={PROJECT_UI.PLACEHOLDER.RESOURCE_NAME} />
         </Form.Item>
@@ -61,6 +66,12 @@ export default function ProjectResourceUpload({
           name={'resourceType'}
           initialValue={1}
           required
+          rules={[
+            {
+              required: true,
+              message: PROJECT_MESSAGES.ERROR.RESOURCE_TYPE_REQUIRED || 'Resource type is required',
+            },
+          ]}
         >
           <Select options={RESOURCE_TYPES} />
         </Form.Item>

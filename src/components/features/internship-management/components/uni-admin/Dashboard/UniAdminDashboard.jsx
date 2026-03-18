@@ -1,74 +1,62 @@
 'use client';
 
 import React from 'react';
-import { Row, Col, Typography } from 'antd';
+import { Row, Col } from 'antd';
 import { TeamOutlined, CalendarOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useUniAdminDashboard } from './hooks/useUniAdminDashboard';
 import MetricCard from './components/MetricCard';
 import RecentTerms from './components/RecentTerms';
-
 import Card from '@/components/ui/Card';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
-
-const { Text } = Typography;
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 export default function UniAdminDashboard() {
-  const { loading, profile, stats, recentTerms } = useUniAdminDashboard();
+  const { DASHBOARD } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { loading, stats, recentTerms } = useUniAdminDashboard();
 
   return (
-    <div className='animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-700'>
-      <StudentPageHeader title='Dashboard' />
+    <div className='animate-in fade-in slide-in-from-bottom-4 flex h-full flex-col space-y-6 duration-700'>
+      <StudentPageHeader title={DASHBOARD.TITLE} />
 
-      <Row gutter={[20, 20]}>
+      {/* Metrics Row */}
+      <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={8}>
           <MetricCard
-            title='Total Students'
+            title={DASHBOARD.METRICS.TOTAL_STUDENTS}
             value={stats.totalStudents}
             icon={<TeamOutlined />}
-            color='#3B82F6'
+            color='var(--color-info)'
             loading={loading}
-            suffix='Enrolled'
+            suffix={DASHBOARD.METRICS.ENROLLED}
           />
         </Col>
         <Col xs={24} sm={12} lg={8}>
           <MetricCard
-            title='Active Terms'
+            title={DASHBOARD.METRICS.ACTIVE_TERMS}
             value={stats.activeTerms}
             icon={<CalendarOutlined />}
-            color='#10B981'
+            color='var(--color-success)'
             loading={loading}
-            suffix='In Progress'
+            suffix={DASHBOARD.METRICS.IN_PROGRESS}
           />
         </Col>
         <Col xs={24} sm={12} lg={8}>
           <MetricCard
-            title='Internship Groups'
+            title={DASHBOARD.METRICS.INTERNSHIP_GROUPS}
             value={stats.totalGroups}
             icon={<AppstoreOutlined />}
-            color='#F59E0B'
+            color='var(--color-warning)'
             loading={loading}
-            suffix='Coordinated'
+            suffix={DASHBOARD.METRICS.COORDINATED}
           />
         </Col>
       </Row>
 
-      {/* Main Content Card */}
-      <Card className='flex-1 !p-6 sm:!p-8'>
-        <div className='mb-8 flex items-center justify-between'>
-          <div className='space-y-1'>
-            <Text className='text-sm font-medium text-slate-500'>
-              Here&apos;s a summary of the latest internship terms at{' '}
-              <span className='text-primary font-bold'>
-                {profile?.universityName || profile?.university?.name || 'your university'}
-              </span>
-            </Text>
-          </div>
-        </div>
-
-        <div className='rounded-2xl border border-slate-100 bg-slate-50/30 p-4'>
+      <div className='flex-1 pb-4'>
+        <Card className='flex flex-col overflow-hidden !p-4 sm:!p-8'>
           <RecentTerms data={recentTerms} loading={loading} />
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ export const PROJECT_MESSAGES = {
     DELETE_FAILED: 'Error deleting resource!',
     UPDATE_FAILED: 'Error updating resource!',
     INVALID_FILE_TYPE: 'Unsupported file type!',
-    FILE_TOO_LARGE: 'File size exceeds 10MB limit!',
+    FILE_TOO_LARGE: 'File size exceeds 30MB limit!',
     LOAD_PROJECT_FAILED: 'Failed to load project information.',
     RESOURCE_NAME_REQUIRED: 'Please enter the resource name!',
     RESOURCE_TYPE_REQUIRED: 'Please select the resource type!',

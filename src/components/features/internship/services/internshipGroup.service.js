@@ -31,11 +31,11 @@ export const InternshipGroupService = {
     return httpDelete(`/internship-groups/${id}`);
   },
 
-  addStudents(data) {
-    return httpPost('/internship-groups/students', data);
+  addStudents(id, data) {
+    return httpPost(`/internship-groups/${id}/students`, data);
   },
 
-  removeStudents(data) {
-    return httpDelete('/internship-groups/students', data);
+  removeStudents(id, data) {
+    return httpDelete(`/internship-groups/${id}/students`, data);
   },
 };

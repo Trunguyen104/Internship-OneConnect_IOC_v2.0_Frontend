@@ -2,8 +2,8 @@ import ForgotPasswordPage from '@/components/features/auth/components/ForgotPass
 import React from 'react';
 
 export const metadata = {
-  title: 'Quên mật khẩu',
-  description: 'Trang đăng nhập hệ thống',
+  title: 'Forgot Password',
+  description: 'System login page',
 };
 
 export default function page() {

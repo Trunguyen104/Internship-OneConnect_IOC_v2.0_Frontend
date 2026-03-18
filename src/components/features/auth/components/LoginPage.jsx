@@ -1,116 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import Input from '@/components/ui/input';
-import { login } from '@/components/features/auth/services/authService';
-import { useRouter } from 'next/navigation';
-import { useToast } from '@/providers/ToastProvider';
 import Link from 'next/link';
-
-import { AUTH_UI, AUTH_MESSAGES } from '@/constants/auth/uiText';
+import Input from '@/components/ui/Input';
+import { AUTH_UI } from '@/constants/auth/uiText';
+import { useLogin } from '@/components/features/auth/hooks/useLogin';
 
 export default function LoginPage() {
-  const toast = useToast();
-  const router = useRouter();
-
-  const [form, setForm] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const savedEmail = localStorage.getItem('rememberEmail');
-
-      if (savedEmail) {
-        return {
-          email: savedEmail,
-          password: '',
-          rememberMe: true,
-        };
-      }
-    }
-
-    return {
-      email: '',
-      password: '',
-      rememberMe: false,
-    };
-  });
-
-  const [errors, setErrors] = useState({});
-
-  const validate = () => {
-    const newErrors = {};
-
-    if (!form.email.trim()) {
-      newErrors.email = AUTH_MESSAGES.VALIDATION.EMAIL_REQUIRED;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = AUTH_MESSAGES.VALIDATION.EMAIL_INVALID;
-    }
-
-    if (!form.password.trim()) {
-      newErrors.password = AUTH_MESSAGES.VALIDATION.PASSWORD_REQUIRED;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    try {
-      const auth = await login(form);
-
-      if (form.rememberMe) {
-        localStorage.setItem('rememberEmail', form.email);
-      } else {
-        localStorage.removeItem('rememberEmail');
-      }
-
-      toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
-
-      const rawRole = auth?.role;
-      const role =
-        typeof rawRole === 'number'
-          ? rawRole
-          : typeof rawRole === 'string'
-            ? rawRole.trim().toLowerCase()
-            : undefined;
-
-      // Role-based entry routes
-      if (role === 1 || role === 'superadmin' || role === 'super_admin') {
-        router.push('/admin-users');
-        return;
-      }
-      if (role === 2 || role === 'moderator') {
-        router.push('/admin-users');
-        return;
-      }
-      if (role === 3 || role === 'schooladmin') {
-        router.push('/admin-dashboard');
-        return;
-      }
-      if (role === 4 || role === 'enterpriseadmin') {
-        router.push('/dashboard');
-        return;
-      }
-
-      router.push('/internship-groups');
-    } catch (err) {
-      setErrors({ password: err.message });
-      toast.error(AUTH_MESSAGES.TOAST.LOGIN_FAILED);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    setErrors({});
-  };
+  const { form, errors, handleChange, handleSubmit } = useLogin();
 
   return (
     <div
@@ -162,18 +59,13 @@ export default function LoginPage() {
                     type='checkbox'
                     name='rememberMe'
                     checked={form.rememberMe}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        rememberMe: e.target.checked,
-                      }))
-                    }
+                    onChange={handleChange}
                   />
-                  {AUTH_UI.LOGIN.REMEMBER_EMAIL}
+                  {AUTH_UI.LOGIN.REMEMBER_LOGIN}
                 </label>
 
                 <Link
-                  href='forgot-password'
+                  href='/forgot-password'
                   className='text-sm text-(--primary-700) hover:underline'
                 >
                   {AUTH_UI.LOGIN.FORGOT_PASSWORD_LINK}
