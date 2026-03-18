@@ -60,10 +60,10 @@ jobs:
           context: .
           push: true
           build-args: |
-            NEXT_PUBLIC_API_URL=https://foodhub-v1.duckdns.org
+            NEXT_PUBLIC_API_URL=https://ioc-v1.duckdns.org
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/foodhub-fe:latest
-            ${{ secrets.DOCKER_USERNAME }}/foodhub-fe:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/iocv2-frontend:latest
+            ${{ secrets.DOCKER_USERNAME }}/iocv2-frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -79,6 +79,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/foodhub
+            cd ~/iocv2
             docker compose pull frontend
             docker compose up -d frontend
