@@ -33,7 +33,6 @@ async function request(path, options = {}) {
 
   if (!res.ok) {
     if (res.status === 401 && typeof window !== 'undefined') {
-      console.log('HTTP: 401 Detected, attempting refresh...');
       try {
         const refreshRes = await fetch('/api/auth', {
           method: 'PUT',
@@ -60,7 +59,7 @@ async function request(path, options = {}) {
           return await retryRes.text();
         }
       } catch (e) {
-        console.error('Refresh token failed', e);
+        // Silent: caller will handle the 401/refresh failure via thrown error below.
       }
     }
 

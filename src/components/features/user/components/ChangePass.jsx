@@ -1,6 +1,6 @@
 'use client';
 
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import { useState } from 'react';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useToast } from '@/providers/ToastProvider';

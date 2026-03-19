@@ -2,22 +2,34 @@ node_modules
 .next
 out
 build
+
+# Git
 .git
+.gitignore
 .github
+
+# Dev tools
 .husky
 .vscode
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+
+# Env files (KHÔNG copy vào image — inject qua docker run)
+.env
+.env.*
+
+# Docker
 Dockerfile
 .dockerignore
+docker-compose*.yml
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.prettierrc.json
-.prettierignore
-eslint.config.mjs
-tailwind.config.js
-postcss.config.mjs
+
+# CI/AI tools
+.agent/
+.agents/
+.gitnexus
+
+# Docs
 README.md

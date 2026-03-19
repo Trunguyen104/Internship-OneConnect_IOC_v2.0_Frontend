@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 
 import { AUTH_UI, AUTH_MESSAGES } from '@/constants/auth/uiText';
 
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
 
         {success ? (
           <div className='text-center'>
-            <p className='mb-4 text-green-600'>{AUTH_UI.FORGOT_PASSWORD.SUCCESS_TEXT}</p>
+            <p className='text-success mb-4'>{AUTH_UI.FORGOT_PASSWORD.SUCCESS_TEXT}</p>
 
             <Link href='/login' className='font-semibold text-(--primary-700) hover:underline'>
               {AUTH_UI.FORGOT_PASSWORD.BACK_TO_LOGIN}

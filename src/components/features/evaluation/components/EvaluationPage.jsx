@@ -1,13 +1,12 @@
 'use client';
 
 import { Empty } from 'antd';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import CycleTable from './CycleTable';
 import TeamEvaluationsModal from './TeamEvaluationsModal';
 import ScoreDetailDrawer from './ScoreDetailDrawer';
 import { useEvaluation } from '../hooks/useEvaluation';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-import Pagination from '@/components/ui/Pagination';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 export default function EvaluationPage() {
@@ -17,10 +16,6 @@ export default function EvaluationPage() {
     page,
     pageSize,
     paginated,
-    total,
-    totalPages,
-    setPage,
-    setPageSize,
     selectedCycle,
     teamData,
     myEvaluation,
@@ -52,22 +47,6 @@ export default function EvaluationPage() {
             pageSize={pageSize}
             onDetail={openTeamOverview}
           />
-        )}
-
-        {total > 0 && (
-          <div className='border-border/50 mt-6 border-t pt-6'>
-            <Pagination
-              total={total}
-              page={page}
-              pageSize={pageSize}
-              totalPages={totalPages}
-              onPageChange={setPage}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPage(1);
-              }}
-            />
-          </div>
         )}
       </Card>
 

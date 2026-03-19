@@ -15,7 +15,8 @@ import { PROJECT_UI } from '@/constants/project/uiText';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
 import ProjectResourceEditModal from './ProjectResourceEditModal';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 
 const { Title, Text } = Typography;
 
@@ -37,6 +38,11 @@ export default function ProjectResources({
   onView,
 }) {
   const [isUploadModalVisible, setIsUploadModalVisible] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleOpenUpload = () => {
     form.resetFields();
@@ -80,7 +86,7 @@ export default function ProjectResources({
         <div className='custom-scrollbar max-h-[350px] w-full overflow-x-hidden overflow-y-auto pr-2 pb-4'>
           <div className='flex min-w-[500px] flex-col gap-2'>
             {loading && resources.length === 0 ? (
-              <div className='text-muted py-8 text-center'>{PROJECT_UI.LOADING || 'Loading…'}</div>
+              <SkeletonTable rows={4} columns={2} />
             ) : resources.length === 0 ? (
               <div className='flex flex-1 items-center justify-center py-8'>
                 <Empty description={PROJECT_UI.EMPTY.NO_RESOURCE} />
@@ -163,32 +169,35 @@ export default function ProjectResources({
         </div>
       </div>
 
-      <Modal
-        title={PROJECT_UI.TITLE.ADD_RESOURCE}
-        open={isUploadModalVisible}
-        onCancel={handleCloseUpload}
-        footer={null}
-        destroyOnHidden
-        width={480}
-        centered
-        forceRender
-      >
-        <ProjectResourceUpload
-          form={form}
-          onUpload={handleUploadFinish}
-          uploading={uploading}
-          fileList={fileList}
-          setFileList={setFileList}
-        />
-      </Modal>
+      {!mounted ? null : (
+        <>
+          <Modal
+            title={PROJECT_UI.TITLE.ADD_RESOURCE}
+            open={isUploadModalVisible}
+            onCancel={handleCloseUpload}
+            footer={null}
+            destroyOnHidden
+            width={480}
+            centered
+          >
+            <ProjectResourceUpload
+              form={form}
+              onUpload={handleUploadFinish}
+              uploading={uploading}
+              fileList={fileList}
+              setFileList={setFileList}
+            />
+          </Modal>
 
-      <ProjectResourceEditModal
-        visible={isEditModalVisible}
-        onCancel={() => setIsEditModalVisible(false)}
-        onUpdate={onUpdate}
-        form={editForm}
-        loading={loading}
-      />
+          <ProjectResourceEditModal
+            visible={isEditModalVisible}
+            onCancel={() => setIsEditModalVisible(false)}
+            onUpdate={onUpdate}
+            form={editForm}
+            loading={loading}
+          />
+        </>
+      )}
     </div>
   );
 }

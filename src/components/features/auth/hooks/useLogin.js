@@ -1,77 +1,107 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/components/features/auth/services/authService';
-import { setAccessToken } from '@/components/features/auth/services/authStorage';
 import { useToast } from '@/providers/ToastProvider';
+import { AUTH_MESSAGES } from '@/constants/auth/uiText';
+import { validateLogin } from '@/validators/auth';
+
+import { USER_ROLE } from '@/constants/common/enums';
 
 export function useLogin() {
   const toast = useToast();
   const router = useRouter();
-
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
-      const savedPassword = localStorage.getItem('rememberPassword');
 
-      if (savedEmail && savedPassword) {
+      if (savedEmail) {
         return {
           email: savedEmail,
-          password: savedPassword,
+          password: '',
           rememberMe: true,
         };
       }
     }
 
-    return {
-      email: '',
-      password: '',
-      rememberMe: false,
-    };
+    return { email: '', password: '', rememberMe: false };
   });
 
   const [errors, setErrors] = useState({});
 
   const validate = useCallback(() => {
-    const newErrors = {};
+    const validationErrors = validateLogin(form);
+    const mappedErrors = {};
 
-    if (!form.email.trim()) {
-      newErrors.email = 'Email là bắt buộc';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = 'Email không hợp lệ';
-    }
+    Object.keys(validationErrors).forEach((key) => {
+      mappedErrors[key] = AUTH_MESSAGES.VALIDATION[validationErrors[key]];
+    });
 
-    if (!form.password.trim()) {
-      newErrors.password = 'Mật khẩu là bắt buộc';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [form.email, form.password]);
+    setErrors(mappedErrors);
+    return Object.keys(mappedErrors).length === 0;
+  }, [form]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     try {
-      const token = await login(form);
+      const auth = await login(form);
 
       if (form.rememberMe) {
         localStorage.setItem('rememberEmail', form.email);
-        localStorage.setItem('rememberPassword', form.password);
       } else {
         localStorage.removeItem('rememberEmail');
-        localStorage.removeItem('rememberPassword');
       }
 
-      setAccessToken(token);
+      toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
 
-      toast.success('Đăng nhập thành công');
+      const rawRole = auth?.role;
+      const role =
+        typeof rawRole === 'number'
+          ? rawRole
+          : typeof rawRole === 'string'
+            ? rawRole.trim().toLowerCase()
+            : undefined;
+
+      if (
+        role === USER_ROLE.SUPER_ADMIN ||
+        role === 'superadmin' ||
+        role === 'super_admin' ||
+        role === USER_ROLE.MODERATOR ||
+        role === 'moderator'
+      ) {
+        router.push('/admin-users');
+        return;
+      }
+
+      if (role === USER_ROLE.SCHOOL_ADMIN || role === 'schooladmin') {
+        router.push('/admin-dashboard');
+        return;
+      }
+
+      if (
+        role === USER_ROLE.ENTERPRISE_ADMIN ||
+        role === 'enterpriseadmin' ||
+        role === USER_ROLE.HR ||
+        role === 'hr' ||
+        role === USER_ROLE.MENTOR ||
+        role === 'mentor'
+      ) {
+        router.push('/dashboard');
+        return;
+      }
+
+      if (role === USER_ROLE.STUDENT || role === 'student') {
+        router.push('/internship-groups');
+        return;
+      }
+
       router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
-      toast.error('Đăng nhập thất bại');
+      toast.error(AUTH_MESSAGES.TOAST.LOGIN_FAILED);
     }
   };
 
@@ -89,10 +119,5 @@ export function useLogin() {
     }));
   };
 
-  return {
-    form,
-    errors,
-    handleChange,
-    handleSubmit,
-  };
+  return { form, errors, handleChange, handleSubmit };
 }

@@ -123,15 +123,15 @@ export function useProject(initialProjectId = null) {
 
     const typeExtensionMap = {
       1: ['pdf'],
-      2: ['docx', 'doc'],
-      3: ['pptx', 'ppt'],
+      2: ['docx'],
+      3: ['pptx'],
       4: ['zip'],
       5: ['rar'],
       6: ['jpg', 'jpeg'],
       7: ['png'],
     };
 
-    if (selectedType !== 0 && typeExtensionMap[selectedType]) {
+    if (typeExtensionMap[selectedType]) {
       if (!typeExtensionMap[selectedType].includes(currentExt)) {
         const typeLabel =
           RESOURCE_TYPES.find((t) => t.value === selectedType)?.label || 'selected type';

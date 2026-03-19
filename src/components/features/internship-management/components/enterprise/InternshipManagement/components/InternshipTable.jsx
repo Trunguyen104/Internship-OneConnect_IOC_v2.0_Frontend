@@ -1,51 +1,79 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { Table, Avatar, Dropdown, Button, Tag } from 'antd';
-import {
-  CheckOutlined,
-  CloseOutlined,
-  UserOutlined,
-  TeamOutlined,
-  EyeOutlined,
-  MoreOutlined,
-} from '@ant-design/icons';
-import { STATUS_CONFIG, MOCK_MENTORS } from '../constants/internshipData';
+import React, { memo, useMemo } from 'react';
+import { Tooltip, Button } from 'antd';
+import { CheckOutlined, CloseOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { MOCK_MENTORS } from '../constants/internshipData';
 
-const InternshipTable = ({ data, loading, onAccept, onReject, onAssign, onGroup }) => {
-  const { TABLE, ACTIONS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
+const STATUS_CONFIG = {
+  ACCEPTED: {
+    bgClass: '!bg-success-surface',
+    textClass: '!text-success',
+  },
+  PENDING: {
+    bgClass: '!bg-info-surface',
+    textClass: '!text-info',
+  },
+  REJECTED: {
+    bgClass: '!bg-danger-surface',
+    textClass: '!text-danger',
+  },
+  REVOKED: {
+    bgClass: '!bg-gray-100',
+    textClass: '!text-gray-500',
+  },
+  default: {
+    bgClass: '!bg-gray-100',
+    textClass: '!text-gray-500',
+  },
+};
+
+const InternshipTable = memo(function InternshipTable({
+  data,
+  loading,
+  page,
+  pageSize,
+  onAccept,
+  onReject,
+  onAssign,
+  onGroup,
+}) {
+  const { TABLE, ACTIONS, STATUS_LABELS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
 
   const columns = useMemo(
     () => [
       {
-        title: <span className='tracking-wider'>{TABLE.COLUMNS.FULL_NAME}</span>,
+        title: '#',
+        key: 'index',
+        width: '60px',
+        align: 'center',
+        render: (_, __, index) => (page - 1) * pageSize + index + 1,
+        className: 'text-muted font-semibold text-xs',
+      },
+      {
+        title: TABLE.COLUMNS.FULL_NAME,
         dataIndex: 'fullName',
         key: 'fullName',
-        width: 220,
+        width: 250,
         render: (text, record) => {
-          const initials = text
-            ?.split(' ')
+          const initials = (text || '')
+            .split(' ')
             .map((n) => n[0])
             .join('')
             .toUpperCase()
             .slice(0, 2);
           return (
             <div className='flex items-center gap-3'>
-              <Avatar
-                size={36}
-                src={record.avatar?.startsWith('http') ? record.avatar : null}
-                className={`border-surface border-2 shadow-sm ${
-                  !record.avatar?.startsWith('http')
-                    ? 'bg-primary/10 text-primary text-[10px] font-bold'
-                    : ''
-                }`}
-              >
-                {!record.avatar?.startsWith('http') ? initials : null}
-              </Avatar>
+              <div className='bg-primary/10 text-primary flex size-9 items-center justify-center rounded-full border-2 border-white text-[10px] font-bold shadow-sm'>
+                {initials}
+              </div>
               <div className='flex flex-col'>
-                <span className='text-text truncate text-sm font-bold'>{text}</span>
-                <span className='text-muted text-[10px] font-medium'>{record.major}</span>
+                <span className='text-text truncate text-sm font-bold'>{text || 'N/A'}</span>
+                <span className='text-muted text-[10px] font-medium tracking-wider uppercase opacity-60'>
+                  {record.major || 'None'}
+                </span>
               </div>
             </div>
           );
@@ -55,32 +83,35 @@ const InternshipTable = ({ data, loading, onAccept, onReject, onAssign, onGroup 
         title: TABLE.COLUMNS.STUDENT_ID,
         dataIndex: 'studentId',
         key: 'studentId',
-        width: 100,
-        className: 'text-muted font-mono text-xs',
+        width: 120,
+        render: (id) => (
+          <span className='text-muted font-mono text-xs font-semibold uppercase'>{id}</span>
+        ),
       },
       {
         title: TABLE.COLUMNS.EMAIL,
         dataIndex: 'email',
         key: 'email',
         width: 200,
-        className: 'text-muted truncate text-xs font-medium',
+        render: (email) => (
+          <span className='text-text block truncate text-xs opacity-70'>{email}</span>
+        ),
       },
       {
         title: TABLE.COLUMNS.STATUS,
         dataIndex: 'status',
         key: 'status',
-        width: 140,
+        width: 160,
         align: 'center',
         render: (status) => {
-          const config = STATUS_CONFIG[status];
+          const config = STATUS_CONFIG[status] || STATUS_CONFIG.default;
+          const label = (STATUS_LABELS && STATUS_LABELS[status]) || status;
           return (
-            <Tag
-              color={config?.color || 'default'}
-              variant='filled'
-              className='min-w-[90px] rounded-full py-0.5 text-[10px] font-black tracking-widest uppercase'
+            <span
+              className={`${config.bgClass} ${config.textClass} m-0 inline-flex h-6 w-fit items-center justify-center rounded-full px-2.5 text-[10px] font-bold uppercase transition-all`}
             >
-              {config?.label || status}
-            </Tag>
+              {label}
+            </span>
           );
         },
       },
@@ -93,108 +124,93 @@ const InternshipTable = ({ data, loading, onAccept, onReject, onAssign, onGroup 
           const mentor = MOCK_MENTORS.find((m) => m.id === id);
           return mentor ? (
             <div className='flex items-center gap-2'>
-              <div className='bg-primary/10 h-1.5 w-1.5 rounded-full' />
+              <div className='bg-primary-hover h-1.5 w-1.5 rounded-full' />
               <span className='text-text text-xs font-bold'>{mentor.name}</span>
             </div>
           ) : (
-            <span className='text-muted text-xs italic opacity-50'>{TABLE.NOT_ASSIGNED}</span>
+            <span className='text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40'>
+              {TABLE.NOT_ASSIGNED}
+            </span>
           );
         },
       },
       {
-        title: <span className='pr-4'>{TABLE.COLUMNS.ACTIONS}</span>,
+        title: TABLE.COLUMNS.ACTION,
         key: 'actions',
-        width: 80,
+        width: 150,
         align: 'right',
-        render: (_, record) => {
-          const items = [];
-
-          if (record.status === 'PENDING') {
-            items.push(
-              {
-                key: 'accept',
-                label: <span className='font-semibold'>{ACTIONS.ACCEPT}</span>,
-                icon: <CheckOutlined className='text-success' />,
-                onClick: () => onAccept(record),
-              },
-              {
-                key: 'reject',
-                label: <span className='font-semibold'>{ACTIONS.REJECT}</span>,
-                icon: <CloseOutlined className='text-danger' />,
-                onClick: () => onReject(record),
-              },
-            );
-          }
-
-          if (record.status === 'ACCEPTED') {
-            items.push(
-              {
-                key: 'assign',
-                label: <span className='font-semibold'>{ACTIONS.ASSIGN}</span>,
-                icon: <UserOutlined className='text-primary' />,
-                onClick: () => onAssign(record),
-              },
-              {
-                key: 'group',
-                icon: <TeamOutlined className='text-primary' />,
-                label: (
-                  <span className='font-semibold'>
-                    {record.groupId ? ACTIONS.CHANGE_GROUP : ACTIONS.ADD_TO_GROUP}
-                  </span>
-                ),
-                onClick: () => onGroup(record),
-              },
-            );
-          }
-
-          items.push(
-            { type: 'divider' },
-            {
-              key: 'details',
-              label: <span className='font-semibold'>{ACTIONS.VIEW_BIO}</span>,
-              icon: <EyeOutlined className='text-muted' />,
-            },
-          );
-
-          return (
-            <Dropdown
-              menu={{ items }}
-              trigger={['click']}
-              placement='bottomRight'
-              overlayClassName='min-w-[200px] rounded-xl overflow-hidden shadow-xl border border-border'
-            >
+        render: (_, record) => (
+          <div className='flex items-center justify-end gap-1'>
+            {record.status === 'PENDING' && (
+              <>
+                <Tooltip title={ACTIONS.ACCEPT}>
+                  <Button
+                    type='text'
+                    size='small'
+                    icon={<CheckOutlined />}
+                    className='hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAccept(record);
+                    }}
+                  />
+                </Tooltip>
+                <Tooltip title={ACTIONS.REJECT}>
+                  <Button
+                    type='text'
+                    size='small'
+                    danger
+                    icon={<CloseOutlined />}
+                    className='hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onReject(record);
+                    }}
+                  />
+                </Tooltip>
+              </>
+            )}
+            <Tooltip title={ACTIONS.ASSIGN || 'Assign Mentor'}>
               <Button
                 type='text'
-                className='hover:bg-primary/10 hover:text-primary text-muted flex size-9 items-center justify-center rounded-xl p-0 transition-all'
-                icon={<MoreOutlined className='text-xl' />}
+                size='small'
+                icon={<UserOutlined />}
+                className='hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAssign(record);
+                }}
               />
-            </Dropdown>
-          );
-        },
+            </Tooltip>
+            <Tooltip title={ACTIONS.GROUP_ACTION || ACTIONS.GROUP || 'Group Management'}>
+              <Button
+                type='text'
+                size='small'
+                icon={<TeamOutlined />}
+                className='hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onGroup(record);
+                }}
+              />
+            </Tooltip>
+          </div>
+        ),
       },
     ],
-    [onAccept, onReject, onAssign, onGroup, TABLE, ACTIONS],
+    [page, pageSize, onAccept, onReject, onAssign, onGroup, TABLE, ACTIONS, STATUS_LABELS],
   );
 
   return (
-    <div className='flex-1 overflow-hidden px-2'>
-      <Table
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-        scroll={{ y: 'calc(100vh - 460px)' }}
-        pagination={false}
-        className='premium-table'
-        rowClassName={(record) =>
-          `group transition-all duration-200 hover:bg-muted/5 cursor-default ${
-            record.status === 'REJECTED' ? 'opacity-60' : ''
-          }`
-        }
-        locale={{ emptyText: TABLE.EMPTY_TEXT }}
-        rowKey='id'
-      />
-    </div>
+    <DataTable
+      columns={columns}
+      data={data}
+      loading={loading}
+      rowKey='id'
+      minWidth='1000px'
+      className='no-scrollbar mt-2 min-h-0 flex-1'
+    />
   );
-};
+});
 
 export default InternshipTable;

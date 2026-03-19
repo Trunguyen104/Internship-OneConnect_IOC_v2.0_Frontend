@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { App } from 'antd';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import { useGroupManagement } from './hooks/useGroupManagement';
 import { GroupHeader } from './components/GroupHeader';
 import { GroupFilters } from './components/GroupFilters';

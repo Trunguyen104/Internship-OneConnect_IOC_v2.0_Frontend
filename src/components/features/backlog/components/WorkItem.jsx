@@ -3,7 +3,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { MoreVertical, GripVertical, Trash2 } from 'lucide-react';
 import { WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 const statusToneText = {
   [WORK_ITEM_STATUS.TODO]: 'bg-gray-100 text-muted',

@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import TiptapEditor from '@/components/ui/TiptapEditor';
-import DateInput from '@/components/ui/DateInput';
+import TiptapEditor from '@/components/ui/tiptapeditor';
+import DateInput from '@/components/ui/dateinput';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 function FieldLabel({ required, children }) {

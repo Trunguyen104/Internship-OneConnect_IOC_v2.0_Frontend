@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
+import { resolveAuthBaseUrl } from '@/lib/server/backend-url';
 
-const GENERIC_BE_URL = process.env.BE_URL || 'http://localhost:5050';
-const BE_URL = GENERIC_BE_URL.includes('/api/v1/auth')
-  ? GENERIC_BE_URL
-  : `${GENERIC_BE_URL}/api/v1/auth`;
+const BE_URL = resolveAuthBaseUrl();
 
 function parseTokensFromHeaders(headers) {
-  const setCookies = headers.getSetCookie();
+  let setCookies = [];
+
+  if (typeof headers.getSetCookie === 'function') {
+    setCookies = headers.getSetCookie();
+  } else {
+    const combinedSetCookie = headers.get('set-cookie');
+    if (combinedSetCookie) {
+      setCookies = combinedSetCookie.split(/,(?=\s*[A-Za-z0-9_-]+=)/);
+    }
+  }
+
   const tokens = {};
 
   setCookies.forEach((cookieStr) => {
@@ -29,16 +37,35 @@ function parseTokensFromHeaders(headers) {
  */
 export async function POST(req) {
   try {
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ message: 'Invalid request payload' }, { status: 400 });
+    }
+
     const loginUrl = `${BE_URL}/login`;
+    let res;
 
-    const res = await fetch(loginUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    try {
+      res = await fetch(loginUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    } catch (upstreamError) {
+      console.error('LOGIN UPSTREAM ERROR:', upstreamError);
+      return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
+    }
 
-    const data = await res.json();
+    const rawBody = await res.text();
+    let data = {};
+    try {
+      data = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      data = { message: rawBody || 'Unexpected upstream response' };
+    }
+
     if (!res.ok) {
       return NextResponse.json(data, { status: res.status });
     }
@@ -127,15 +154,29 @@ export async function PUT(req) {
     }
 
     const refreshUrl = `${BE_URL}/tokens/refresh`;
-    const res = await fetch(refreshUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: `refreshToken=${oldRefreshToken}`,
-      },
-    });
+    let res;
 
-    const data = await res.json();
+    try {
+      res = await fetch(refreshUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: `refreshToken=${oldRefreshToken}`,
+        },
+      });
+    } catch (upstreamError) {
+      console.error('REFRESH UPSTREAM ERROR:', upstreamError);
+      return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
+    }
+
+    const rawBody = await res.text();
+    let data = {};
+    try {
+      data = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      data = { message: rawBody || 'Unexpected upstream response' };
+    }
+
     if (!res.ok) {
       return NextResponse.json(data, { status: res.status });
     }

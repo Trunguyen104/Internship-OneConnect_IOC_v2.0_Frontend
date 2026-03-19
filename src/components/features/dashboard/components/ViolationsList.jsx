@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react';
-import { Card, CardHeader, EmptyState } from './atoms';
+import { Card, CardHeader, EmptyState } from '@/components/ui/atoms';
 import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 export function ViolationsList({ studentViolations }) {

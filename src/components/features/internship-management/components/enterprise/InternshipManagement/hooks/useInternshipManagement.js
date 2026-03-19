@@ -1,13 +1,13 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useToast } from '@/providers/ToastProvider';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { MOCK_MENTORS, MOCK_GROUPS } from '../constants/internshipData';
 
 export const useInternshipManagement = (initialStudents) => {
   const toast = useToast();
   const { MESSAGES } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
-  const [students, setStudents] = useState(initialStudents);
+  const [students, setStudents] = useState(initialStudents || []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [mentorFilter, setMentorFilter] = useState(undefined);
@@ -27,9 +27,9 @@ export const useInternshipManagement = (initialStudents) => {
       const s = search.toLowerCase();
       data = data.filter(
         (item) =>
-          item.fullName.toLowerCase().includes(s) ||
-          item.email.toLowerCase().includes(s) ||
-          item.major.toLowerCase().includes(s),
+          (item.fullName || '').toLowerCase().includes(s) ||
+          (item.email || '').toLowerCase().includes(s) ||
+          (item.major || '').toLowerCase().includes(s),
       );
     }
     if (statusFilter !== 'ALL') data = data.filter((item) => item.status === statusFilter);
@@ -64,6 +64,7 @@ export const useInternshipManagement = (initialStudents) => {
 
   const handleAcceptStudent = useCallback(
     (student) => {
+      if (!student) return;
       showDeleteConfirm({
         title: MESSAGES.ACCEPT_CONFIRM_TITLE,
         content: `${MESSAGES.ACCEPT_CONFIRM_CONTENT} ${student.fullName}?`,
@@ -91,7 +92,7 @@ export const useInternshipManagement = (initialStudents) => {
         major: values.major,
         status: 'PENDING',
         mentorId: null,
-        avatar: values.fullName
+        avatar: (values.fullName || '')
           .split(' ')
           .map((n) => n[0])
           .join('')
@@ -105,7 +106,7 @@ export const useInternshipManagement = (initialStudents) => {
   );
 
   const handleRejectStudent = useCallback(
-    (studentId) => {
+    (studentId, reason) => {
       setStudents((prev) =>
         prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s)),
       );
@@ -127,6 +128,8 @@ export const useInternshipManagement = (initialStudents) => {
   const handleGroupSubmit = useCallback(
     (values) => {
       const { student, type } = groupModal;
+      if (!student) return;
+
       const selectedGroup = MOCK_GROUPS.find((g) => g.id === values.groupId);
 
       setStudents((prev) =>
@@ -135,7 +138,9 @@ export const useInternshipManagement = (initialStudents) => {
             ? {
                 ...s,
                 groupId: values.groupId,
-                mentorId: MOCK_MENTORS.find((m) => m.name === selectedGroup.mentor)?.id || null,
+                mentorId: selectedGroup
+                  ? MOCK_MENTORS.find((m) => m.name === selectedGroup.mentor)?.id || null
+                  : null,
               }
             : s,
         ),
