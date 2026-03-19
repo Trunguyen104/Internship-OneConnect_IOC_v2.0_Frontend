@@ -1,8 +1,8 @@
 'use client';
 
-import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import Card from '@/components/ui/card';
+import Pagination from '@/components/ui/pagination';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import ViolationTable from './ViolationTable';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { useViolation } from '../hooks/useViolation';

@@ -1,17 +1,17 @@
 'use client';
 
 import React from 'react';
-import Card from '@/components/ui/Card';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import Card from '@/components/ui/card';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { Select } from 'antd';
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { useTermManagement } from '../hooks/useTermManagement';
-import TermTable from './TermTable';
-import TermFormModal from './TermFormModal';
-import TermStatusModal from './TermStatusModal';
-import TermDeleteModal from './TermDeleteModal';
+import { useTermManagement } from './hooks/useTermManagement';
+import TermTable from './components/TermTable';
+import TermFormModal from './components/TermFormModal';
+import TermStatusModal from './components/TermStatusModal';
+import TermDeleteModal from './components/TermDeleteModal';
 import Pagination from '@/components/ui/Pagination';
 
 export default function InternshipTermManagement() {

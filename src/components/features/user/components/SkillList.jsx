@@ -6,7 +6,7 @@ import SkillAddForm from './SkillAddForm';
 import SkillEditModal from './SkillEditModal';
 import { Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function SkillList({

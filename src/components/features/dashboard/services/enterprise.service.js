@@ -5,7 +5,7 @@ export const enterpriseService = {
    * Get the HR/Enterprise profile data
    */
   getEnterpriseHRProfile() {
-    return httpGet('/Enterprises/HR');
+    return httpGet('/enterprises/mine');
   },
 
   /**
@@ -15,6 +15,6 @@ export const enterpriseService = {
    * @returns
    */
   updateEnterpriseProfile(enterpriseId, payload) {
-    return httpPut(`/Enterprises/${enterpriseId}`, payload);
+    return httpPut(`/enterprises/${enterpriseId}`, payload);
   },
 };

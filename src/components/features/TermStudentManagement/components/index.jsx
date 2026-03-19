@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import Card from '@/components/ui/card';
+import Pagination from '@/components/ui/pagination';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { Select } from 'antd';
 import { FilterOutlined, UserAddOutlined, UploadOutlined, BookOutlined } from '@ant-design/icons';

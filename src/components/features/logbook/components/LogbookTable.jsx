@@ -6,7 +6,7 @@ import { FileTextOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icon
 import dayjs from 'dayjs';
 
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import LogbookStatusTag from './LogbookStatusTag';
 
 const LogbookTable = memo(function LogbookTable({ data, userProfile, onView, onEdit, onDelete }) {

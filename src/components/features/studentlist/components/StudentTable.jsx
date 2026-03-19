@@ -7,7 +7,7 @@ import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import DataTable from '@/components/ui/DataTable';
 import StudentStatusTag from './StudentStatusTag';
 import StudentRoleTag from './StudentRoleTag';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 export default function StudentTable({ data, loading, onDelete }) {
   const columns = useMemo(

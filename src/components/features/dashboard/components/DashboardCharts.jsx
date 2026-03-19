@@ -13,7 +13,7 @@ import {
   Cell,
   Legend,
 } from 'recharts';
-import { Card, CardHeader } from './atoms';
+import { Card, CardHeader } from '@/components/ui/atoms';
 import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 function formatShortDate(iso) {

@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { login } from '@/components/features/auth/services/authService';
-import { setAccessToken } from '@/components/features/auth/services/authStorage';
 import { useToast } from '@/providers/ToastProvider';
 import { AUTH_MESSAGES } from '@/constants/auth/uiText';
 import { validateLogin } from '@/validators/auth';
 
+import { USER_ROLE } from '@/constants/common/enums';
+
 export function useLogin() {
   const toast = useToast();
   const router = useRouter();
-
   const [form, setForm] = useState(() => {
     if (typeof window !== 'undefined') {
       const savedEmail = localStorage.getItem('rememberEmail');
@@ -25,11 +25,7 @@ export function useLogin() {
       }
     }
 
-    return {
-      email: '',
-      password: '',
-      rememberMe: false,
-    };
+    return { email: '', password: '', rememberMe: false };
   });
 
   const [errors, setErrors] = useState({});
@@ -51,7 +47,7 @@ export function useLogin() {
     if (!validate()) return;
 
     try {
-      const token = await login(form);
+      const auth = await login(form);
 
       if (form.rememberMe) {
         localStorage.setItem('rememberEmail', form.email);
@@ -59,9 +55,49 @@ export function useLogin() {
         localStorage.removeItem('rememberEmail');
       }
 
-      setAccessToken(token);
-
       toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
+
+      const rawRole = auth?.role;
+      const role =
+        typeof rawRole === 'number'
+          ? rawRole
+          : typeof rawRole === 'string'
+            ? rawRole.trim().toLowerCase()
+            : undefined;
+
+      if (
+        role === USER_ROLE.SUPER_ADMIN ||
+        role === 'superadmin' ||
+        role === 'super_admin' ||
+        role === USER_ROLE.MODERATOR ||
+        role === 'moderator'
+      ) {
+        router.push('/admin-users');
+        return;
+      }
+
+      if (role === USER_ROLE.SCHOOL_ADMIN || role === 'schooladmin') {
+        router.push('/admin-dashboard');
+        return;
+      }
+
+      if (
+        role === USER_ROLE.ENTERPRISE_ADMIN ||
+        role === 'enterpriseadmin' ||
+        role === USER_ROLE.HR ||
+        role === 'hr' ||
+        role === USER_ROLE.MENTOR ||
+        role === 'mentor'
+      ) {
+        router.push('/dashboard');
+        return;
+      }
+
+      if (role === USER_ROLE.STUDENT || role === 'student') {
+        router.push('/internship-groups');
+        return;
+      }
+
       router.push('/internship-groups');
     } catch (err) {
       setErrors({ password: err.message });
@@ -83,10 +119,5 @@ export function useLogin() {
     }));
   };
 
-  return {
-    form,
-    errors,
-    handleChange,
-    handleSubmit,
-  };
+  return { form, errors, handleChange, handleSubmit };
 }

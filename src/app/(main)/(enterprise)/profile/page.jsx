@@ -1,4 +1,4 @@
-import EnterpriseProfileContainer from '@/components/features/user/components/EnterpriseProfileContainer';
+import EnterpriseProfileContainer from '@/components/features/company-profile/components/EnterpriseProfileContainer';
 
 export default function EnterpriseProfilePage() {
   return (

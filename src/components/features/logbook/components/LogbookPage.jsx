@@ -1,15 +1,13 @@
 'use client';
 
-import { Empty, Spin } from 'antd';
-import { FilterOutlined } from '@ant-design/icons';
+import PageLayout from '@/components/ui/pagelayout';
 import { Select } from 'antd';
-import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import { FilterOutlined } from '@ant-design/icons';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/emptystate';
 import LogbookTable from './LogbookTable';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookDetailModal from './LogbookDetailModal';
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { useLogbook } from '../hooks/useLogbook';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
@@ -170,12 +168,11 @@ export default function LogbookPage() {
   }, []);
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
-      <StudentPageHeader title={DAILY_REPORT_UI.TITLE} />
+    <PageLayout>
+      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} />
 
-      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto'>
-        <DataTableToolbar
-          className='mb-5 border-0! p-0!'
+      <PageLayout.Card>
+        <PageLayout.Toolbar
           searchProps={{
             placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
             value: search,
@@ -204,40 +201,50 @@ export default function LogbookPage() {
             onClick: () => openFormModal(),
           }}
         />
-        {loading && data.length === 0 ? (
-          <div className='flex h-full items-center justify-center py-20'>
-            <Spin size='large' description={DAILY_REPORT_UI.LOADING} />
-          </div>
-        ) : data.length === 0 ? (
-          <div className='flex flex-1 items-center justify-center py-12'>
-            <Empty description={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'} />
-          </div>
-        ) : (
-          <LogbookTable
-            data={data}
-            loading={loading}
-            userProfile={userProfile}
-            onView={openDetailModal}
-            onEdit={openFormModal}
-            onDelete={handleDelete}
-          />
-        )}
+
+        <PageLayout.Content>
+          {loading && data.length === 0 ? (
+            <div className='space-y-4 px-6 py-4'>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className='flex h-[72px] items-center gap-4 border-b border-slate-50'>
+                  <Skeleton className='h-4 w-24' />
+                  <Skeleton className='h-4 w-32' />
+                  <Skeleton className='h-4 flex-1' />
+                  <Skeleton className='h-6 w-16 rounded-full' />
+                  <Skeleton className='h-8 w-16 rounded-lg' />
+                </div>
+              ))}
+            </div>
+          ) : data.length === 0 ? (
+            <EmptyState
+              title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
+              description='Keep track of your learning journey! Start by adding your first daily report.'
+            />
+          ) : (
+            <LogbookTable
+              data={data}
+              loading={loading}
+              userProfile={userProfile}
+              onView={openDetailModal}
+              onEdit={openFormModal}
+              onDelete={handleDelete}
+            />
+          )}
+        </PageLayout.Content>
 
         {total > 0 && (
-          <div className='border-border/50 mt-6 border-t pt-6'>
-            <Pagination
-              total={total}
-              page={pageNumber}
-              pageSize={pageSize}
-              onPageChange={setPageNumber}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPageNumber(1);
-              }}
-            />
-          </div>
+          <PageLayout.Pagination
+            total={total}
+            page={pageNumber}
+            pageSize={pageSize}
+            onPageChange={setPageNumber}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPageNumber(1);
+            }}
+          />
         )}
-      </Card>
+      </PageLayout.Card>
 
       <LogbookFormModal
         visible={isFormModalOpen}
@@ -253,6 +260,6 @@ export default function LogbookPage() {
         record={viewRecord}
         onClose={closeDetailModal}
       />
-    </section>
+    </PageLayout>
   );
 }
