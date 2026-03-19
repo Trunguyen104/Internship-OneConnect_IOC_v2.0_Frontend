@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Skeleton, Empty } from 'antd';
+
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
 import { useToast } from '@/providers/ToastProvider';
 import { InternshipGroupService } from './services/internshipGroup.service';
@@ -10,7 +10,6 @@ import InternshipCard from './components/InternshipCard';
 import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
 
 const InternshipDashboard = () => {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [internships, setInternships] = useState([]);
 
@@ -134,11 +133,6 @@ const InternshipDashboard = () => {
               enterprise={item.enterpriseName}
               mentor={item.mentorName}
               project={item.projectName}
-            />
-            <InternshipCard.Action
-              onDetailClick={() => {
-                router.push(`/internship-groups/${item.id}/space`);
-              }}
             />
           </InternshipCard>
         ))}

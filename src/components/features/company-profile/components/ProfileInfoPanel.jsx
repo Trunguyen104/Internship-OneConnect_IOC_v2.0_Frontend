@@ -105,7 +105,7 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
         <Divider style={{ marginBlock: 0 }} />
 
         <Text type='secondary' style={{ display: 'block' }}>
-          Keep your company information up to date to build trust with candidates.
+          {ENTERPRISE_PROFILE_UI.ENTERPRISE.TRUST_HINT}
         </Text>
       </Space>
     </ProfileSectionCard>

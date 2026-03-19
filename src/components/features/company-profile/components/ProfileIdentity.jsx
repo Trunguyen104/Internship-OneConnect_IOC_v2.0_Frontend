@@ -83,7 +83,7 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
                     fontWeight: 700,
                   }}
                 >
-                  Verified
+                  {ENTERPRISE_PROFILE_UI.ENTERPRISE.VERIFIED}
                 </Tag>
               ) : null}
             </Space>

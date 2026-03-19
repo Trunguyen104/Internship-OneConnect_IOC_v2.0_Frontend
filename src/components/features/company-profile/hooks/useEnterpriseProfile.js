@@ -5,6 +5,7 @@ import {
   getMyEnterpriseProfile,
   updateEnterpriseProfile,
 } from '../services/enterpriseProfile.service';
+import { mediaService } from '@/services/media.service';
 import { userService } from '@/components/features/user/services/userService';
 import { USER_ROLE } from '@/constants/common/enums';
 
@@ -47,6 +48,15 @@ function toUpdatablePayload(values, profile) {
   const nextLogoUrl = values?.logoUrl;
   if (nextLogoUrl && nextLogoUrl !== profile?.logoUrl && !String(nextLogoUrl).startsWith('data:')) {
     payload.logoUrl = nextLogoUrl;
+  }
+
+  const nextBackgroundUrl = values?.backgroundUrl;
+  if (
+    nextBackgroundUrl &&
+    nextBackgroundUrl !== profile?.backgroundUrl &&
+    !String(nextBackgroundUrl).startsWith('data:')
+  ) {
+    payload.backgroundUrl = nextBackgroundUrl;
   }
 
   if (profile?.rowVersion !== undefined && profile?.rowVersion !== null) {
@@ -106,7 +116,30 @@ export function useEnterpriseProfile() {
         const enterpriseId = profile?.enterpriseId || profile?.id;
         if (!enterpriseId) throw new Error('Missing enterpriseId');
 
-        const payload = toUpdatablePayload(values, profile);
+        let logoUrl = values?.logoUrl;
+        let backgroundUrl = values?.backgroundUrl;
+
+        // Upload logo if it's a File
+        if (logoUrl instanceof File) {
+          const uploadRes = await mediaService.uploadImage(logoUrl, 'Enterprises');
+          if (uploadRes?.success && uploadRes?.data) {
+            logoUrl = uploadRes.data;
+          } else {
+            throw new Error('Failed to upload logo');
+          }
+        }
+
+        // Upload background if it's a File
+        if (backgroundUrl instanceof File) {
+          const uploadRes = await mediaService.uploadImage(backgroundUrl, 'Enterprises');
+          if (uploadRes?.success && uploadRes?.data) {
+            backgroundUrl = uploadRes.data;
+          } else {
+            throw new Error('Failed to upload background');
+          }
+        }
+
+        const payload = toUpdatablePayload({ ...values, logoUrl, backgroundUrl }, profile);
         const updateResponse = await updateEnterpriseProfile(enterpriseId, payload);
 
         const updatedFromResponse = normalizeEnterpriseProfile(

@@ -22,7 +22,7 @@ export function ProfileEmpty({ onRetry }) {
     <div className='border-border/60 bg-surface rounded-3xl border p-12 shadow-sm'>
       <EmptyState
         title={ENTERPRISE_PROFILE_UI.EMPTY.NO_DATA}
-        description='We couldn’t load your company profile right now. Please try again.'
+        description={ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.LOAD_FAILED_DESCRIPTION}
         minHeightClassName='min-h-[280px]'
         action={
           <button
@@ -31,7 +31,7 @@ export function ProfileEmpty({ onRetry }) {
             className='border-border/60 bg-surface hover:bg-bg text-text inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-[13px] font-semibold transition-colors'
           >
             <RefreshCcw className='h-4 w-4' />
-            Try Again
+            {ENTERPRISE_PROFILE_UI.BUTTONS.RETRY}
           </button>
         }
       />
