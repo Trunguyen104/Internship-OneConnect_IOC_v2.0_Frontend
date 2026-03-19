@@ -43,4 +43,3 @@ function Button({ className, variant = 'default', size = 'default', type = 'butt
 }
 
 export { Button };
-

@@ -56,11 +56,7 @@ export default function AdminUsersPage() {
         )}
       </PageLayout.Card>
 
-      <AdminUsersDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        controlled
-      />
+      <AdminUsersDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} controlled />
     </PageLayout>
   );
 }

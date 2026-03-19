@@ -29,7 +29,13 @@ function DialogTrigger({ asChild = false, children }) {
     },
   };
 
-  return asChild ? React.cloneElement(child, props) : <button type='button' {...props}>{children}</button>;
+  return asChild ? (
+    React.cloneElement(child, props)
+  ) : (
+    <button type='button' {...props}>
+      {children}
+    </button>
+  );
 }
 
 function DialogClose({ asChild = false, children }) {
@@ -43,7 +49,13 @@ function DialogClose({ asChild = false, children }) {
     },
   };
 
-  return asChild ? React.cloneElement(child, props) : <button type='button' {...props}>{children}</button>;
+  return asChild ? (
+    React.cloneElement(child, props)
+  ) : (
+    <button type='button' {...props}>
+      {children}
+    </button>
+  );
 }
 
 function DialogOverlay({ className = '', ...props }) {
@@ -68,7 +80,7 @@ function DialogContent({ className = '', children, showCloseButton = true, ...pr
         role='dialog'
         aria-modal='true'
         className={cn(
-          'fixed left-1/2 top-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2',
+          'fixed top-1/2 left-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2',
           'rounded-lg border border-slate-200 bg-white p-6 shadow-xl outline-none sm:max-w-lg',
           className,
         )}
@@ -80,7 +92,7 @@ function DialogContent({ className = '', children, showCloseButton = true, ...pr
             type='button'
             aria-label='Close'
             onClick={() => onOpenChange?.(false)}
-            className='absolute right-4 top-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+            className='absolute top-4 right-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
           >
             <X className='size-4' />
           </button>
@@ -92,19 +104,43 @@ function DialogContent({ className = '', children, showCloseButton = true, ...pr
 }
 
 function DialogHeader({ className = '', ...props }) {
-  return <div data-slot='dialog-header' className={cn('flex flex-col gap-2 text-center sm:text-left', className)} {...props} />;
+  return (
+    <div
+      data-slot='dialog-header'
+      className={cn('flex flex-col gap-2 text-center sm:text-left', className)}
+      {...props}
+    />
+  );
 }
 
 function DialogFooter({ className = '', ...props }) {
-  return <div data-slot='dialog-footer' className={cn('mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)} {...props} />;
+  return (
+    <div
+      data-slot='dialog-footer'
+      className={cn('mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
+      {...props}
+    />
+  );
 }
 
 function DialogTitle({ className = '', ...props }) {
-  return <div data-slot='dialog-title' className={cn('text-lg font-semibold leading-none text-slate-900', className)} {...props} />;
+  return (
+    <div
+      data-slot='dialog-title'
+      className={cn('text-lg leading-none font-semibold text-slate-900', className)}
+      {...props}
+    />
+  );
 }
 
 function DialogDescription({ className = '', ...props }) {
-  return <div data-slot='dialog-description' className={cn('text-sm text-slate-500', className)} {...props} />;
+  return (
+    <div
+      data-slot='dialog-description'
+      className={cn('text-sm text-slate-500', className)}
+      {...props}
+    />
+  );
 }
 
 export {
@@ -117,4 +153,3 @@ export {
   DialogTitle,
   DialogDescription,
 };
-

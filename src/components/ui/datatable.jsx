@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Empty, Skeleton } from 'antd';
+import { Empty } from 'antd';
+import SkeletonTable from './SkeletonTable';
 
 export default function DataTable({
   columns = [],
@@ -13,15 +13,15 @@ export default function DataTable({
   onRowClick,
   className = '',
 }) {
-  if (loading && (!data || data.length === 0)) {
+  if (loading && (!Array.isArray(data) || data.length === 0)) {
     return (
-      <div className='flex flex-1 items-center justify-center py-20'>
-        <Skeleton active paragraph={{ rows: 8 }} />
+      <div className='flex flex-1 flex-col py-6'>
+        <SkeletonTable rows={10} columns={columns.length || 4} />
       </div>
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className='flex flex-1 items-center justify-center py-12'>
         <Empty description={<span className='text-muted font-medium'>{emptyText}</span>} />
@@ -47,9 +47,9 @@ export default function DataTable({
             </tr>
           </thead>
           <tbody className='divide-border/50 divide-y'>
-            {data.map((record, index) => (
+            {data.filter(Boolean).map((record, index) => (
               <tr
-                key={record[rowKey] || index}
+                key={record?.[rowKey] || record?.id || record?.key || index}
                 onClick={() => onRowClick?.(record)}
                 className={`hover:bg-bg/80 h-[72px] transition-colors ${onRowClick ? 'cursor-pointer' : ''} `}
               >

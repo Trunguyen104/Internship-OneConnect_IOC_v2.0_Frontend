@@ -24,9 +24,14 @@ function subscribe(listener) {
 }
 
 export function useUniversitiesStore(selector = (s) => s) {
-  return useSyncExternalStore(subscribe, () => selector(store.state), () => selector(store.state));
+  return useSyncExternalStore(
+    subscribe,
+    () => selector(store.state),
+    () => selector(store.state),
+  );
 }
 
 useUniversitiesStore.setUniversities = (universities, totalCount = 0) =>
   setState((s) => ({ ...s, universities, totalCount }));
-useUniversitiesStore.increment = () => setState((s) => ({ ...s, refreshCount: s.refreshCount + 1 }));
+useUniversitiesStore.increment = () =>
+  setState((s) => ({ ...s, refreshCount: s.refreshCount + 1 }));

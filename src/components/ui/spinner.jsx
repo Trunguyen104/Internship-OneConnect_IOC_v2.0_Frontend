@@ -16,4 +16,3 @@ function Spinner({ className, ...props }) {
 }
 
 export { Spinner };
-

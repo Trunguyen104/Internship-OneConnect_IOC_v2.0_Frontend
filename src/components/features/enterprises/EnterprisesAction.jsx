@@ -34,8 +34,9 @@ export default function EnterprisesAction({ enterprise }) {
       {enterprise.website && (
         <Tooltip title='Mở trang web'>
           <Button
-            variant='ghost' size='icon'
-            className='h-10 w-10 rounded-full text-slate-400 hover:bg-slate-100 hover:text-primary transition-all'
+            variant='ghost'
+            size='icon'
+            className='hover:text-primary h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-slate-100'
             onClick={() => window.open(enterprise.website, '_blank')}
           >
             <ExternalLink className='h-4 w-4' />
@@ -45,8 +46,9 @@ export default function EnterprisesAction({ enterprise }) {
 
       <Tooltip title='Chỉnh sửa hồ sơ'>
         <Button
-          variant='ghost' size='icon'
-          className='h-10 w-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-primary transition-all'
+          variant='ghost'
+          size='icon'
+          className='hover:text-primary h-10 w-10 rounded-full text-slate-500 transition-all hover:bg-slate-100'
           onClick={() => setOpenEdit(true)}
         >
           <Edit3 className='h-4 w-4' />
@@ -55,8 +57,9 @@ export default function EnterprisesAction({ enterprise }) {
 
       <Tooltip title='Xóa doanh nghiệp'>
         <Button
-          variant='ghost' size='icon'
-          className='h-10 w-10 rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all active:scale-95'
+          variant='ghost'
+          size='icon'
+          className='h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95'
           onClick={handleDelete}
           disabled={loading}
         >

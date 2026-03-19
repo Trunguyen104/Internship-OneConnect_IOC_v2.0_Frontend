@@ -24,7 +24,11 @@ function subscribe(listener) {
 }
 
 export function useEnterprisesStore(selector = (s) => s) {
-  return useSyncExternalStore(subscribe, () => selector(store.state), () => selector(store.state));
+  return useSyncExternalStore(
+    subscribe,
+    () => selector(store.state),
+    () => selector(store.state),
+  );
 }
 
 useEnterprisesStore.setEnterprises = (enterprises, totalCount = 0) =>

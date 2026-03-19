@@ -41,7 +41,11 @@ export default function AdminUsersAction({ user }) {
             <List className='size-4' />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-56 rounded-2xl border-slate-100 p-1.5 shadow-2xl' align='end' sideOffset={8}>
+        <DropdownMenuContent
+          className='w-56 rounded-2xl border-slate-100 p-1.5 shadow-2xl'
+          align='end'
+          sideOffset={8}
+        >
           <DropdownMenuItem onClick={() => handleEdit('edit')} className='rounded-xl p-2.5'>
             <div className='rounded-lg bg-blue-50 p-2'>
               <UserPen className='size-4 text-blue-600' />
@@ -58,19 +62,27 @@ export default function AdminUsersAction({ user }) {
             </div>
             <div className='flex flex-col'>
               <span className='text-sm font-semibold'>{UI_TEXT.ADMIN_USERS.RESET_PASSWORD}</span>
-              <span className='text-[10px] uppercase tracking-tight text-slate-400'>{UI_TEXT.ADMIN_USERS.ACCOUNT_SECURITY}</span>
+              <span className='text-[10px] tracking-tight text-slate-400 uppercase'>
+                {UI_TEXT.ADMIN_USERS.ACCOUNT_SECURITY}
+              </span>
             </div>
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator className='my-1.5 mx-2' />
+          <DropdownMenuSeparator className='mx-2 my-1.5' />
 
-          <DropdownMenuItem variant='destructive' onClick={() => handleEdit('delete')} className='rounded-xl p-2.5'>
+          <DropdownMenuItem
+            variant='destructive'
+            onClick={() => handleEdit('delete')}
+            className='rounded-xl p-2.5'
+          >
             <div className='rounded-lg bg-rose-50 p-2'>
               <Trash2 className='size-4 text-rose-600' />
             </div>
             <div className='flex flex-col'>
               <span className='text-sm font-semibold'>{UI_TEXT.ADMIN_USERS.DELETE}</span>
-              <span className='text-[10px] uppercase tracking-tight text-rose-400'>{UI_TEXT.ADMIN_USERS.REMOVE_FROM_SYSTEM}</span>
+              <span className='text-[10px] tracking-tight text-rose-400 uppercase'>
+                {UI_TEXT.ADMIN_USERS.REMOVE_FROM_SYSTEM}
+              </span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -98,4 +110,3 @@ export default function AdminUsersAction({ user }) {
     </>
   );
 }
-

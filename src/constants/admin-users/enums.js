@@ -31,4 +31,3 @@ export const USER_STATUS_LABEL = {
   [USER_STATUS.ACTIVE]: 'Active',
   [USER_STATUS.SUSPENDED]: 'Suspended',
 };
-

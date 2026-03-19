@@ -28,4 +28,3 @@ function Checkbox({ className, checked, onCheckedChange, disabled, ...props }) {
 }
 
 export { Checkbox };
-

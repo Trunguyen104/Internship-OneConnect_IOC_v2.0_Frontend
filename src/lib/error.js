@@ -9,4 +9,3 @@ export function getErrorMessage(err) {
     return 'Unknown error';
   }
 }
-

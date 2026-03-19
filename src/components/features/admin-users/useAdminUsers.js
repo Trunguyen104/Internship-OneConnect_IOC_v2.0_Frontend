@@ -9,7 +9,7 @@ export function useAdminUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { refreshCount, totalCount, users } = useAdminUsersStore();
-  
+
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -34,10 +34,10 @@ export function useAdminUsers() {
       };
       const res = await adminUsersService.getList(params);
       const data = res?.data ?? res;
-      
+
       const items = data?.items ?? data?.Items ?? [];
       const total = data?.totalCount ?? data?.TotalCount ?? items.length;
-      
+
       useAdminUsersStore.setUsers(items, total);
       setError(null);
     } catch (err) {

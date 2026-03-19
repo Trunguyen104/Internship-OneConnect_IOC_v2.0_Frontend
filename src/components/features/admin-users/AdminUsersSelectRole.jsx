@@ -1,7 +1,13 @@
 'use client';
 
 import { Field, FieldLabel } from '@/components/ui/field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/admin-users/enums';
 

@@ -204,9 +204,9 @@ export default function LogbookPage() {
 
         <PageLayout.Content>
           {loading && data.length === 0 ? (
-            <div className='space-y-4 py-4 px-6'>
+            <div className='space-y-4 px-6 py-4'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className='flex gap-4 items-center h-[72px] border-b border-slate-50'>
+                <div key={i} className='flex h-[72px] items-center gap-4 border-b border-slate-50'>
                   <Skeleton className='h-4 w-24' />
                   <Skeleton className='h-4 w-32' />
                   <Skeleton className='h-4 flex-1' />
@@ -216,9 +216,9 @@ export default function LogbookPage() {
               ))}
             </div>
           ) : data.length === 0 ? (
-            <EmptyState 
+            <EmptyState
               title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
-              description="Keep track of your learning journey! Start by adding your first daily report."
+              description='Keep track of your learning journey! Start by adding your first daily report.'
             />
           ) : (
             <LogbookTable

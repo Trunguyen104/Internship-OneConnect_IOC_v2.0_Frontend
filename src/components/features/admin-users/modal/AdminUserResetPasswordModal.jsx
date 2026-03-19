@@ -98,4 +98,3 @@ export default function AdminUserResetPasswordModal({ open, userId, email, onTog
     </Dialog>
   );
 }
-

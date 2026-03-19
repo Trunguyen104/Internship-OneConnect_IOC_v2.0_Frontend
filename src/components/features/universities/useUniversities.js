@@ -8,7 +8,7 @@ export function useUniversities() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { universities, totalCount, refreshCount } = useUniversitiesStore();
-  
+
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -31,10 +31,10 @@ export function useUniversities() {
         SearchTerm: debouncedSearch || undefined,
       };
       const res = await universityService.getAll(params);
-      
+
       const items = res?.data?.items ?? res?.items ?? [];
       const total = res?.data?.totalCount ?? res?.totalCount ?? items.length;
-      
+
       useUniversitiesStore.setUniversities(items, total);
       setError(null);
     } catch (err) {

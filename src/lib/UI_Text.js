@@ -33,4 +33,3 @@ export const UI_TEXT = {
     TITLE: 'Role',
   },
 };
-

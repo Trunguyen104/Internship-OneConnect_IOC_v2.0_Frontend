@@ -24,8 +24,13 @@ function subscribe(listener) {
 }
 
 export function useAdminUsersStore(selector = (s) => s) {
-  return useSyncExternalStore(subscribe, () => selector(store.state), () => selector(store.state));
+  return useSyncExternalStore(
+    subscribe,
+    () => selector(store.state),
+    () => selector(store.state),
+  );
 }
 
-useAdminUsersStore.setUsers = (users, totalCount = 0) => setState((s) => ({ ...s, users, totalCount }));
+useAdminUsersStore.setUsers = (users, totalCount = 0) =>
+  setState((s) => ({ ...s, users, totalCount }));
 useAdminUsersStore.increment = () => setState((s) => ({ ...s, refreshCount: s.refreshCount + 1 }));

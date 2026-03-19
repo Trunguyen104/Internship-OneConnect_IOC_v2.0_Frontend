@@ -8,7 +8,7 @@ export function useEnterprises() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { enterprises, totalCount, refreshCount } = useEnterprisesStore();
-  
+
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -31,10 +31,10 @@ export function useEnterprises() {
         SearchTerm: debouncedSearch || undefined,
       };
       const res = await enterpriseService.getAll(params);
-      
+
       const items = res?.data?.items ?? res?.items ?? [];
       const total = res?.data?.totalCount ?? res?.totalCount ?? items.length;
-      
+
       useEnterprisesStore.setEnterprises(items, total);
       setError(null);
     } catch (err) {

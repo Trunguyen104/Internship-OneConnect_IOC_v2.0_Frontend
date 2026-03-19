@@ -95,4 +95,3 @@ export default function AdminUserDeleteModal({ open, userId, label, onToggle }) 
     </Dialog>
   );
 }
-

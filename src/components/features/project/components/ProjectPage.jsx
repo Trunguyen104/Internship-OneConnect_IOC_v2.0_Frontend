@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Spin as AntdSpin } from 'antd';
+import { Skeleton } from 'antd';
 import { useProject } from '../hooks/useProject';
 import ProjectOverview from './ProjectOverview';
 import ProjectResources from './ProjectResources';
@@ -35,8 +34,8 @@ export default function ProjectPage({ projectId = null }) {
       <div className='flex flex-1 flex-col gap-6'>
         <Card className='shrink-0 !p-4 sm:!p-8'>
           {loading && !projectInfo ? (
-            <div className='flex min-h-[200px] items-center justify-center py-10'>
-              <AntdSpin size='large' description='Loading project details…' />
+            <div className='py-4'>
+              <Skeleton active paragraph={{ rows: 4 }} />
             </div>
           ) : (
             <ProjectOverview project={projectInfo} />

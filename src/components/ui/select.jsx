@@ -35,7 +35,9 @@ function Select({ value, defaultValue, onValueChange, name, required, children }
 
   return (
     <SelectCtx.Provider value={ctx}>
-      {name ? <input type='hidden' name={name} value={currentValue} required={required} readOnly /> : null}
+      {name ? (
+        <input type='hidden' name={name} value={currentValue} required={required} readOnly />
+      ) : null}
       {children}
     </SelectCtx.Provider>
   );
@@ -56,7 +58,7 @@ function SelectTrigger({ className = '', children, ...props }) {
       onClick={() => setOpen(!open)}
       className={cn(
         'flex h-11 w-full items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 text-sm font-medium text-slate-600',
-        'hover:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--primary-600)]/20',
+        'hover:bg-white focus:ring-2 focus:ring-[var(--primary-600)]/20 focus:outline-none',
         className,
       )}
       {...props}

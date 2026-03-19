@@ -46,7 +46,13 @@ function DropdownMenuItem({ className, variant = 'default', ...props }) {
 }
 
 function DropdownMenuSeparator({ className, ...props }) {
-  return <DropdownMenuPrimitive.Separator data-slot='dropdown-menu-separator' className={cn('my-1.5 mx-2 h-px bg-slate-100', className)} {...props} />;
+  return (
+    <DropdownMenuPrimitive.Separator
+      data-slot='dropdown-menu-separator'
+      className={cn('mx-2 my-1.5 h-px bg-slate-100', className)}
+      {...props}
+    />
+  );
 }
 
 export {
@@ -56,4 +62,3 @@ export {
   DropdownMenuItem,
   DropdownMenuSeparator,
 };
-

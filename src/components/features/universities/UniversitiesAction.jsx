@@ -31,28 +31,28 @@ export default function UniversitiesAction({ university }) {
 
   return (
     <div className='flex items-center justify-end gap-1'>
-        <Tooltip title='Chỉnh sửa trường'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-9 w-9 rounded-full text-slate-500 hover:bg-slate-100/80 hover:text-primary transition-all'
-            onClick={() => setOpenEdit(true)}
-          >
-            <Edit2 className='h-4 w-4' />
-          </Button>
-        </Tooltip>
+      <Tooltip title='Chỉnh sửa trường'>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='hover:text-primary h-9 w-9 rounded-full text-slate-500 transition-all hover:bg-slate-100/80'
+          onClick={() => setOpenEdit(true)}
+        >
+          <Edit2 className='h-4 w-4' />
+        </Button>
+      </Tooltip>
 
-        <Tooltip title='Xóa trường'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-9 w-9 rounded-full text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-all active:scale-95'
-            onClick={handleDelete}
-            disabled={loading}
-          >
-            <Trash2 className='h-4 w-4' />
-          </Button>
-        </Tooltip>
+      <Tooltip title='Xóa trường'>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='h-9 w-9 rounded-full text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95'
+          onClick={handleDelete}
+          disabled={loading}
+        >
+          <Trash2 className='h-4 w-4' />
+        </Button>
+      </Tooltip>
 
       {openEdit && (
         <UniversitiesDialog
