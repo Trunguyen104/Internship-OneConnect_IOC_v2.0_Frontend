@@ -10,7 +10,7 @@ import {
   MinusCircleFilled,
   CloseCircleFilled,
 } from '@ant-design/icons';
-import DataTable from '@/components/ui/DataTable';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const STATUS_CONFIG = {

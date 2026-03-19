@@ -6,7 +6,7 @@ import { TeamOutlined, CalendarOutlined, AppstoreOutlined } from '@ant-design/ic
 import { useUniAdminDashboard } from '../services/useUniAdminDashboard.service';
 import MetricCard from './MetricCard';
 import RecentTerms from './RecentTerms';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 

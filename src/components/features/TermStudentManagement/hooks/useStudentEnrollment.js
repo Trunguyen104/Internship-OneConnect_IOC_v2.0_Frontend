@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useToast } from '@/providers/ToastProvider';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { StudentService } from '../services/student.service';
 import { useStudentFilters } from './useStudentFilters';
 import { useStudentModals } from './useStudentModals';

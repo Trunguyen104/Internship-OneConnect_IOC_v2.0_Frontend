@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { Tooltip, Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
-import DataTable from '@/components/ui/DataTable';
+import DataTable from '@/components/ui/datatable';
 import StudentStatusTag from './StudentStatusTag';
 import StudentRoleTag from './StudentRoleTag';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';

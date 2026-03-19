@@ -7,12 +7,12 @@ import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { Select } from 'antd';
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { useTermManagement } from './hooks/useTermManagement';
-import TermTable from './components/TermTable';
-import TermFormModal from './components/TermFormModal';
-import TermStatusModal from './components/TermStatusModal';
-import TermDeleteModal from './components/TermDeleteModal';
-import Pagination from '@/components/ui/Pagination';
+import { useTermManagement } from '../hooks/useTermManagement';
+import TermTable from './TermTable';
+import TermFormModal from './TermFormModal';
+import TermStatusModal from './TermStatusModal';
+import TermDeleteModal from './TermDeleteModal';
+import Pagination from '@/components/ui/pagination';
 
 export default function InternshipTermManagement() {
   const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;

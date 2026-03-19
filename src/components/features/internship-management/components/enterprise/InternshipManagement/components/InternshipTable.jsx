@@ -3,7 +3,7 @@
 import React, { memo, useMemo } from 'react';
 import { Tooltip, Button } from 'antd';
 import { CheckOutlined, CloseOutlined, UserOutlined, TeamOutlined } from '@ant-design/icons';
-import DataTable from '@/components/ui/DataTable';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { MOCK_MENTORS } from '../constants/internshipData';
 

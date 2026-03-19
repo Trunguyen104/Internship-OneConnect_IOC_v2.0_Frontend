@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
-import Pagination from '@/components/ui/Pagination';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import Pagination from '@/components/ui/pagination';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { FilterOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
@@ -14,7 +14,7 @@ import AddStudentModal from './AddStudentModal';
 import RejectStudentModal from './RejectStudentModal';
 import AssignMentorModal from './AssignMentorModal';
 import GroupActionModal from './GroupActionModal';
-import Card from '@/components/ui/Card';
+import Card from '@/components/ui/card';
 
 export default function InternshipManagement() {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;

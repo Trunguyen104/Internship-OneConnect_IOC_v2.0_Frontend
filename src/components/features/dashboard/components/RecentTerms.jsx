@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import dayjs from 'dayjs';
-import DataTable from '@/components/ui/DataTable';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { DASHBOARD, TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
