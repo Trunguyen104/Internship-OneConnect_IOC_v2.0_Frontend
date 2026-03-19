@@ -85,5 +85,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/ioc
-            sudo docker compose pull frontend
-            sudo docker compose up -d frontend
+            sudo docker compose pull iocv2_frontend
+            sudo docker compose up -d iocv2_frontend
