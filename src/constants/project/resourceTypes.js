@@ -6,4 +6,5 @@ export const RESOURCE_TYPES = [
   { value: 5, label: 'Compressed files (RAR)', key: 'RAR' },
   { value: 6, label: 'Images (JPG)', key: 'JPG' },
   { value: 7, label: 'Images (PNG)', key: 'PNG' },
+  { value: 8, label: 'External link (Docs/Figma)', key: 'LINK' },
 ];

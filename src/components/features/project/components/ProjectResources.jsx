@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Typography, Row, Col, Button, Tag, Empty } from 'antd';
+import { Typography, Modal, Button, Tag, Empty } from 'antd';
 import {
   FileTextOutlined,
   DownloadOutlined,
@@ -10,7 +10,7 @@ import {
   EyeOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';
-import { Modal } from 'antd';
+
 import { PROJECT_UI } from '@/constants/project/uiText';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import ProjectResourceUpload from './ProjectResourceUpload';
@@ -127,15 +127,17 @@ export default function ProjectResources({
                       title={PROJECT_UI.BUTTON.VIEW}
                       aria-label={PROJECT_UI.BUTTON.VIEW}
                     />
-                    <Button
-                      type='text'
-                      size='small'
-                      icon={<DownloadOutlined />}
-                      onClick={() => onDownload(item)}
-                      className='text-muted hover:text-info transition-colors'
-                      title={PROJECT_UI.BUTTON.DOWNLOAD}
-                      aria-label={PROJECT_UI.BUTTON.DOWNLOAD}
-                    />
+                    {Number(item.resourceType) !== 8 ? (
+                      <Button
+                        type='text'
+                        size='small'
+                        icon={<DownloadOutlined />}
+                        onClick={() => onDownload(item)}
+                        className='text-muted hover:text-info transition-colors'
+                        title={PROJECT_UI.BUTTON.DOWNLOAD}
+                        aria-label={PROJECT_UI.BUTTON.DOWNLOAD}
+                      />
+                    ) : null}
                     <Button
                       type='text'
                       size='small'
