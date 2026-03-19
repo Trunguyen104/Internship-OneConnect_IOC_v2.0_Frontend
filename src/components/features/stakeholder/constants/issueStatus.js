@@ -1,6 +1,6 @@
 export const ISSUE_STATUS = {
-  OPEN: 0,
-  IN_PROGRESS: 1,
-  RESOLVED: 2,
-  CLOSED: 3,
+  OPEN: 1,
+  IN_PROGRESS: 2,
+  RESOLVED: 3,
+  CLOSED: 4,
 };

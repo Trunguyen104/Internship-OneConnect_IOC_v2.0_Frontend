@@ -1,4 +1,4 @@
-import UniAdminDashboard from '@/components/features/internship-management/components/uni-admin/Dashboard/UniAdminDashboard';
+import UniAdminDashboard from '@/components/features/dashboard/components/UniAdminDashboard';
 
 export const metadata = {
   title: 'Dashboard | Internship Management',

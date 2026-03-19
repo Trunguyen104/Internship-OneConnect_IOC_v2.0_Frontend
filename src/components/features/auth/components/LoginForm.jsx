@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 
 import { AUTH_UI } from '@/constants/auth/uiText';
 

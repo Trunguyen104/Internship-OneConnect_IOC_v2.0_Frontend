@@ -5,7 +5,7 @@ import { WorkItem, ColumnHeaders } from './WorkItem';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { SPRINT_STATUS } from '@/constants/common/enums';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 export function SprintSection({
   sprint,

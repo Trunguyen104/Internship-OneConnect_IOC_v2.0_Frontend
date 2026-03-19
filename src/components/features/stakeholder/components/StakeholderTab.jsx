@@ -1,11 +1,11 @@
 import React, { memo } from 'react';
-import DataTableToolbar from '@/components/ui/DataTableToolbar';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 import { useStakeholderTab } from '../hooks/useStakeholderTab';
 import StakeholderList from './StakeholderList';
 import StakeholderFormModal from './StakeholderFormModal';
-import Card from '@/components/ui/Card';
-import Pagination from '@/components/ui/Pagination';
+import Card from '@/components/ui/card';
+import Pagination from '@/components/ui/pagination';
 
 const StakeholderTab = memo(function StakeholderTab() {
   const {

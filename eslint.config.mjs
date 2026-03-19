@@ -14,15 +14,15 @@ export default defineConfig([
     },
     rules: {
       'prettier/prettier': 'warn', // Chuyển sang warn để không làm đỏ lòm cả màn hình khi đang code
-      
+
       // TẮT QUY TẮC NÀY ĐỂ HẾT 2000 LỖI
-      'react/jsx-no-literals': 'off', 
-      
+      'react/jsx-no-literals': 'off',
+
       // Các quy tắc bổ sung để code "dễ thở" hơn trong lúc OJT
       'react/display-name': 'off',
       'react/prop-types': 'off',
       'no-unused-vars': 'warn',
-      'react-hooks/exhaustive-deps': 'warn'
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 ]);

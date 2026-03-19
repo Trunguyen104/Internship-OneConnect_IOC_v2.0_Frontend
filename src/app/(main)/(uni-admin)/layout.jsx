@@ -2,7 +2,7 @@
 
 import Header from '@/components/layout/Header';
 import SidebarAdmin from '@/components/layout/SidebarAdmin';
-import PageTitle from '@/components/ui/PageTitle';
+import PageTitle from '@/components/ui/pagetitle';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 
 export default function Admin({ children }) {

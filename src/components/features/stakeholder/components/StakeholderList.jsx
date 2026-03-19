@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { Button, Tooltip, Empty } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-import { showDeleteConfirm } from '@/components/ui/DeleteConfirm';
+import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 
 const StakeholderList = memo(function StakeholderList({
   stakeholders,

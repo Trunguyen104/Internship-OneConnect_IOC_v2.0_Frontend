@@ -2,7 +2,7 @@
 
 import { Modal, Typography, Tag, Button, Tooltip, Space } from 'antd';
 import { TeamOutlined, LockOutlined, EyeOutlined, ClockCircleFilled } from '@ant-design/icons';
-import AppTable from '@/components/ui/AppTable';
+import AppTable from '@/components/ui/apptable';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
