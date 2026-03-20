@@ -1,18 +1,20 @@
 'use client';
 
+import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
+import { Select } from 'antd';
 import React from 'react';
+
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import { Select } from 'antd';
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
+import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
 import { useTermManagement } from '../hooks/useTermManagement';
-import TermTable from './TermTable';
+import TermDeleteModal from './TermDeleteModal';
 import TermFormModal from './TermFormModal';
 import TermStatusModal from './TermStatusModal';
-import TermDeleteModal from './TermDeleteModal';
-import Pagination from '@/components/ui/pagination';
+import TermTable from './TermTable';
 
 export default function InternshipTermManagement() {
   const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
@@ -44,12 +46,12 @@ export default function InternshipTermManagement() {
   } = useTermManagement();
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
+    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={TERM_MANAGEMENT.TITLE} />
 
-      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
         <DataTableToolbar
-          className='mb-5 flex-shrink-0 !border-0 !p-0'
+          className="mb-5 flex-shrink-0 !border-0 !p-0"
           searchProps={{
             placeholder: TERM_MANAGEMENT.SEARCH_PLACEHOLDER,
             value: searchTerm,
@@ -61,9 +63,9 @@ export default function InternshipTermManagement() {
               placeholder={TERM_MANAGEMENT.STATUS_FILTER}
               value={statusFilter ?? undefined}
               onChange={handleStatusChange}
-              className='h-9 min-w-[180px]'
+              className="h-9 min-w-[180px]"
               options={TERM_MANAGEMENT.STATUS_OPTIONS}
-              suffixIcon={<FilterOutlined className='text-muted' />}
+              suffixIcon={<FilterOutlined className="text-muted" />}
             />
           }
           actionProps={{
@@ -85,7 +87,7 @@ export default function InternshipTermManagement() {
         />
 
         {data.length > 0 && (
-          <div className='border-border/50 mt-6 flex-shrink-0 border-t pt-6'>
+          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
             <Pagination
               total={pagination.total}
               page={pagination.current}

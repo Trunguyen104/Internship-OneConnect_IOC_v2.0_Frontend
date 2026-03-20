@@ -1,10 +1,12 @@
 'use client';
 
+import { SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Input, Select } from 'antd';
 import React, { useEffect } from 'react';
-import { Form, Select, Input } from 'antd';
-import { UserOutlined, SearchOutlined } from '@ant-design/icons';
+
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
 import { MOCK_GROUPS } from '../constants/internshipData';
 
 const GroupActionModal = ({ open, student, type, onCancel, onConfirm }) => {
@@ -21,34 +23,34 @@ const GroupActionModal = ({ open, student, type, onCancel, onConfirm }) => {
         icon={<UserOutlined />}
         title={type === 'ADD' ? GROUP_ACTION.TITLE_ADD : GROUP_ACTION.TITLE_CHANGE}
         subtitle={
-          <div className='flex items-center gap-2'>
-            <span className='opacity-70'>{GROUP_ACTION.STUDENT_LABEL}</span>
-            <span className='text-text font-bold'>{student?.fullName}</span>
+          <div className="flex items-center gap-2">
+            <span className="opacity-70">{GROUP_ACTION.STUDENT_LABEL}</span>
+            <span className="text-text font-bold">{student?.fullName}</span>
           </div>
         }
       />
 
       <Form
         form={form}
-        layout='vertical'
+        layout="vertical"
         onFinish={onConfirm}
-        className='p-6 pt-8'
+        className="p-6 pt-8"
         requiredMark={false}
       >
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {GROUP_ACTION.GROUP_LABEL}
             </span>
           }
-          name='groupId'
+          name="groupId"
           rules={[{ required: true, message: GROUP_ACTION.GROUP_REQUIRED }]}
         >
           <Select
             showSearch
             placeholder={GROUP_ACTION.GROUP_PLACEHOLDER}
-            className='h-11 w-full rounded-xl'
-            suffixIcon={<SearchOutlined className='text-muted' />}
+            className="h-11 w-full rounded-xl"
+            suffixIcon={<SearchOutlined className="text-muted" />}
             options={MOCK_GROUPS.map((g) => ({
               label: `${g.name} — ${g.mentor} — ${g.project} — ${g.memberCount} ${GROUP_ACTION.STUDENTS_SUFFIX}`,
               value: g.id,
@@ -62,17 +64,17 @@ const GroupActionModal = ({ open, student, type, onCancel, onConfirm }) => {
         {type === 'CHANGE' && (
           <Form.Item
             label={
-              <span className='text-text text-xs font-bold tracking-wider uppercase'>
+              <span className="text-text text-xs font-bold tracking-wider uppercase">
                 {GROUP_ACTION.REASON_LABEL}
               </span>
             }
-            name='reason'
+            name="reason"
             rules={[{ required: true, message: GROUP_ACTION.REASON_REQUIRED }]}
           >
             <Input.TextArea
               rows={4}
               placeholder={GROUP_ACTION.REASON_PLACEHOLDER}
-              className='bg-surface border-border rounded-xl px-4 py-3'
+              className="bg-surface border-border rounded-xl px-4 py-3"
             />
           </Form.Item>
         )}
@@ -82,7 +84,7 @@ const GroupActionModal = ({ open, student, type, onCancel, onConfirm }) => {
           submitText={type === 'ADD' ? GROUP_ACTION.SUBMIT_ADD : GROUP_ACTION.SUBMIT_CHANGE}
           onCancel={onCancel}
           onSubmit={() => form.submit()}
-          className='mt-8 pt-6'
+          className="mt-8 pt-6"
         />
       </Form>
     </CompoundModal>

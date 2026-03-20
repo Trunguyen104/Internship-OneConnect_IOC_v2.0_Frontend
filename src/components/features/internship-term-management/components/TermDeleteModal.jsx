@@ -1,7 +1,8 @@
-import React from 'react';
 import { DeleteOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import React from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const TermDeleteModal = ({ open, onCancel, onConfirm, record, loading }) => {
   const { DELETE } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
@@ -11,16 +12,16 @@ const TermDeleteModal = ({ open, onCancel, onConfirm, record, loading }) => {
       <CompoundModal.Header title={DELETE.TITLE} />
 
       <CompoundModal.Content>
-        <div className='flex flex-col gap-4'>
-          <div className='text-muted text-sm'>
-            {DELETE.CONTENT_PREFIX} <span className='text-text font-bold'>{record?.name}</span>
+        <div className="flex flex-col gap-4">
+          <div className="text-muted text-sm">
+            {DELETE.CONTENT_PREFIX} <span className="text-text font-bold">{record?.name}</span>
             {DELETE.CONTENT_SUFFIX}
           </div>
 
           <CompoundModal.InfoBox
             label={INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.TABLE.COLUMNS.NAME}
             value={record?.name}
-            color='danger'
+            color="danger"
           />
         </div>
       </CompoundModal.Content>

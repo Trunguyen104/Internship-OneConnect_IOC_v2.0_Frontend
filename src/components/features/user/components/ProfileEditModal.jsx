@@ -1,9 +1,10 @@
 'use client';
 
-import { Modal, Form, Input, Select, Button, Space, DatePicker } from 'antd';
-import { PROFILE_UI } from '@/constants/user/uiText';
+import { Button, DatePicker, Form, Input, Modal, Select } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
+
+import { PROFILE_UI } from '@/constants/user/uiText';
 
 export default function ProfileEditModal({ open, onCancel, userInfo, onSave, loading }) {
   const [form] = Form.useForm();
@@ -37,8 +38,8 @@ export default function ProfileEditModal({ open, onCancel, userInfo, onSave, loa
     switch (userInfo.role) {
       case 'Student':
         return (
-          <Form.Item label={PROFILE_UI.LABELS.PORTFOLIO} name='portfolioUrl'>
-            <Input placeholder='https://github.com/your-portfolio' />
+          <Form.Item label={PROFILE_UI.LABELS.PORTFOLIO} name="portfolioUrl">
+            <Input placeholder="https://github.com/your-portfolio" />
           </Form.Item>
         );
       case 'Mentor':
@@ -46,13 +47,13 @@ export default function ProfileEditModal({ open, onCancel, userInfo, onSave, loa
       case 'EnterpriseAdmin':
         return (
           <>
-            <Form.Item label={PROFILE_UI.LABELS.POSITION} name='position'>
+            <Form.Item label={PROFILE_UI.LABELS.POSITION} name="position">
               <Input />
             </Form.Item>
-            <Form.Item label={PROFILE_UI.LABELS.EXPERTISE} name='expertise'>
-              <Input placeholder='e.g. Software Engineering, Recruitment' />
+            <Form.Item label={PROFILE_UI.LABELS.EXPERTISE} name="expertise">
+              <Input placeholder="e.g. Software Engineering, Recruitment" />
             </Form.Item>
-            <Form.Item label={PROFILE_UI.LABELS.BIO} name='bio'>
+            <Form.Item label={PROFILE_UI.LABELS.BIO} name="bio">
               <Input.TextArea rows={4} maxLength={1000} showCount />
             </Form.Item>
           </>
@@ -60,13 +61,13 @@ export default function ProfileEditModal({ open, onCancel, userInfo, onSave, loa
       case 'SchoolAdmin':
         return (
           <>
-            <Form.Item label={PROFILE_UI.LABELS.POSITION} name='position'>
+            <Form.Item label={PROFILE_UI.LABELS.POSITION} name="position">
               <Input />
             </Form.Item>
-            <Form.Item label={PROFILE_UI.LABELS.DEPARTMENT} name='department'>
+            <Form.Item label={PROFILE_UI.LABELS.DEPARTMENT} name="department">
               <Input />
             </Form.Item>
-            <Form.Item label={PROFILE_UI.LABELS.BIO} name='bio'>
+            <Form.Item label={PROFILE_UI.LABELS.BIO} name="bio">
               <Input.TextArea rows={4} maxLength={1000} showCount />
             </Form.Item>
           </>
@@ -82,21 +83,21 @@ export default function ProfileEditModal({ open, onCancel, userInfo, onSave, loa
       title={PROFILE_UI.BUTTONS.EDIT + ' ' + PROFILE_UI.PERSONAL_INFO}
       onCancel={onCancel}
       footer={[
-        <Button key='cancel' onClick={onCancel}>
+        <Button key="cancel" onClick={onCancel}>
           {PROFILE_UI.BUTTONS.CANCEL}
         </Button>,
-        <Button key='save' type='primary' danger loading={loading} onClick={handleSubmit}>
+        <Button key="save" type="primary" danger loading={loading} onClick={handleSubmit}>
           {PROFILE_UI.BUTTONS.SAVE_CHANGES}
         </Button>,
       ]}
       width={600}
       centered
     >
-      <Form form={form} layout='vertical' className='mt-4'>
-        <div className='grid grid-cols-1 gap-x-4 md:grid-cols-2'>
+      <Form form={form} layout="vertical" className="mt-4">
+        <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
           <Form.Item
             label={PROFILE_UI.LABELS.FULL_NAME}
-            name='fullName'
+            name="fullName"
             rules={[{ required: true, message: 'Full name is required' }]}
           >
             <Input maxLength={150} />
@@ -104,20 +105,20 @@ export default function ProfileEditModal({ open, onCancel, userInfo, onSave, loa
 
           <Form.Item
             label={PROFILE_UI.LABELS.PHONE}
-            name='phoneNumber'
+            name="phoneNumber"
             rules={[
               { pattern: /^\d+$/, message: 'Phone number must contain only digits' },
               { max: 15, message: 'Max 15 characters' },
             ]}
           >
-            <Input placeholder='09xxxxxxxx' />
+            <Input placeholder="09xxxxxxxx" />
           </Form.Item>
 
-          <Form.Item label={PROFILE_UI.LABELS.DATE_OF_BIRTH} name='dateOfBirth'>
-            <DatePicker className='w-full' format='DD/MM/YYYY' />
+          <Form.Item label={PROFILE_UI.LABELS.DATE_OF_BIRTH} name="dateOfBirth">
+            <DatePicker className="w-full" format="DD/MM/YYYY" />
           </Form.Item>
 
-          <Form.Item label={PROFILE_UI.LABELS.GENDER} name='gender'>
+          <Form.Item label={PROFILE_UI.LABELS.GENDER} name="gender">
             <Select
               options={[
                 { value: 'Male', label: 'Male' },

@@ -1,7 +1,7 @@
 'use client';
 
+import { Empty, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
-import { Typography, Tag, Empty } from 'antd';
 
 import { PROJECT_UI } from '@/constants/project/uiText';
 
@@ -17,7 +17,7 @@ const STATUS_PROJECT_CONFIG = {
 export default function ProjectOverview({ project }) {
   if (!project) {
     return (
-      <div className='flex min-h-[400px] flex-1 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-20'>
+      <div className="flex min-h-[400px] flex-1 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-20">
         <Empty description={PROJECT_UI.EMPTY.NO_PROJECT} />
       </div>
     );
@@ -30,9 +30,9 @@ export default function ProjectOverview({ project }) {
 
   return (
     <div className={'space-y-10'}>
-      <div className='w-full overflow-x-auto pb-4'>
-        <div className='grid min-w-[600px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
-          <div className='col-span-1 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:col-span-2'>
+      <div className="w-full overflow-x-auto pb-4">
+        <div className="grid min-w-[600px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="col-span-1 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:col-span-2">
             <Text
               type={'secondary'}
               className={
@@ -50,7 +50,7 @@ export default function ProjectOverview({ project }) {
             </Text>
           </div>
 
-          <div className='rounded-2xl border border-slate-100 bg-white p-6 shadow-sm'>
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <Text
               type={'secondary'}
               className={
@@ -72,7 +72,7 @@ export default function ProjectOverview({ project }) {
             </Tag>
           </div>
 
-          <div className='rounded-2xl border border-slate-100 bg-white p-6 shadow-sm'>
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
             <Text
               type={'secondary'}
               className={
@@ -92,14 +92,14 @@ export default function ProjectOverview({ project }) {
         </div>
       </div>
 
-      <div className='space-y-6'>
-        <section className='rounded-2xl border border-slate-100 bg-slate-50/50 p-6 sm:p-8'>
-          <div className='mb-6 flex items-center gap-4'>
-            <Title level={4} className='!m-0 !text-xl !font-bold !text-slate-800'>
+      <div className="space-y-6">
+        <section className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6 sm:p-8">
+          <div className="mb-6 flex items-center gap-4">
+            <Title level={4} className="!m-0 !text-xl !font-bold !text-slate-800">
               {PROJECT_UI.LABELS.DESCRIPTION}
             </Title>
           </div>
-          <Paragraph className='text-[15px] leading-relaxed text-slate-600'>
+          <Paragraph className="text-[15px] leading-relaxed text-slate-600">
             {project?.description || PROJECT_UI.EMPTY.NO_DESCRIPTION}
           </Paragraph>
         </section>

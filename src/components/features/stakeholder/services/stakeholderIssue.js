@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpDelete, httpPatch } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPatch, httpPost } from '@/services/httpClient';
 
 const StakeholderIssueService = {
   getAll: (params) => {

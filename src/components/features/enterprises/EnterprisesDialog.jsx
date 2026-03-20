@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -10,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+
 import EnterprisesForm from './EnterprisesForm';
 
 export default function EnterprisesDialog({
@@ -28,19 +30,19 @@ export default function EnterprisesDialog({
       {!controlled ? (
         <Button
           onClick={() => setOpen(true)}
-          className='group flex h-12 items-center justify-center gap-2 rounded-full border-none bg-slate-900 px-8 font-bold text-white shadow-xl shadow-slate-200/50 transition-all outline-none hover:bg-slate-800 hover:shadow-slate-300/60 active:scale-95'
+          className="group flex h-12 items-center justify-center gap-2 rounded-full border-none bg-slate-900 px-8 font-bold text-white shadow-xl shadow-slate-200/50 transition-all outline-none hover:bg-slate-800 hover:shadow-slate-300/60 active:scale-95"
         >
-          <div className='rounded-full bg-white/10 p-1.5 transition-transform duration-500 group-hover:rotate-180'>
-            <Plus className='h-4 w-4 text-white' />
+          <div className="rounded-full bg-white/10 p-1.5 transition-transform duration-500 group-hover:rotate-180">
+            <Plus className="h-4 w-4 text-white" />
           </div>
           Onboard Enterprise
         </Button>
       ) : null}
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className='flex flex-col p-4 sm:max-w-[640px]'>
-          <SheetHeader className='mt-2 text-center'>
-            <SheetTitle className='text-3xl'>
+        <SheetContent className="flex flex-col p-4 sm:max-w-[640px]">
+          <SheetHeader className="mt-2 text-center">
+            <SheetTitle className="text-3xl">
               {isEdit ? 'Update Enterprise' : 'Create Enterprise'}
             </SheetTitle>
             <SheetDescription>
@@ -50,7 +52,7 @@ export default function EnterprisesDialog({
             </SheetDescription>
           </SheetHeader>
 
-          <div className='mt-4 min-h-0 flex-1 overflow-y-auto pb-8'>
+          <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-8">
             <EnterprisesForm
               enterprise={enterprise}
               onSuccess={() => setOpen(false)}

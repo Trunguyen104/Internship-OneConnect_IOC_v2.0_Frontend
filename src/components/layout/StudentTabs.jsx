@@ -19,8 +19,8 @@ export default function StudentTabs() {
   ];
 
   return (
-    <div className='min-w-0'>
-      <div className='flex gap-3 overflow-x-auto py-1 whitespace-nowrap'>
+    <div className="min-w-0">
+      <div className="flex gap-3 overflow-x-auto py-1 whitespace-nowrap">
         {items.map((t) => {
           const active = pathname === t.href || pathname.startsWith(t.href + '/');
 

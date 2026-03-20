@@ -1,0 +1,228 @@
+
+> ioc@0.1.0 lint
+> eslint .
+
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\admin-users\AdminUsersTable.jsx
+  22:25  warning  '_role' is defined but never used         @typescript-eslint/no-unused-vars
+  36:39  error    Strings not allowed in JSX files: "Code"  react/jsx-no-literals
+  37:22  error    Strings not allowed in JSX files: "User"  react/jsx-no-literals
+  38:55  error    Strings not allowed in JSX files: "Unit"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\admin-users\components\AdminUsersFilters.jsx
+  29:23  error  Strings not allowed in JSX files: "Admin users"                                       react/jsx-no-literals
+  30:29  error  Strings not allowed in JSX files: "Manage administrative accounts across the system"  react/jsx-no-literals
+  37:12  error  Strings not allowed in JSX files: "Create"                                            react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\admin-users\modal\AdminUserUpdateModal.jsx
+  141:46  error  Strings not allowed in JSX files: "Full name"                   react/jsx-no-literals
+  151:49  error  Strings not allowed in JSX files: "Phone (optional)"            react/jsx-no-literals
+  181:29  error  Strings not allowed in JSX files: "Gender"                      react/jsx-no-literals
+  191:43  error  Strings not allowed in JSX files: "Male"                        react/jsx-no-literals
+  192:43  error  Strings not allowed in JSX files: "Female"                      react/jsx-no-literals
+  193:43  error  Strings not allowed in JSX files: "Other"                       react/jsx-no-literals
+  200:49  error  Strings not allowed in JSX files: "Date of birth (YYYY-MM-DD)"  react/jsx-no-literals
+  210:47  error  Strings not allowed in JSX files: "Avatar URL (optional)"       react/jsx-no-literals
+  221:54  error  Strings not allowed in JSX files: "Student class (optional)"    react/jsx-no-literals
+  229:54  error  Strings not allowed in JSX files: "Student major (optional)"    react/jsx-no-literals
+  237:52  error  Strings not allowed in JSX files: "Student GPA (optional)"      react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\auth\services\authStorage.js
+  1:7   warning  'ACCESS_TOKEN_KEY' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  1:7   warning  'ACCESS_TOKEN_KEY' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+  3:32  warning  'token' is defined but never used                                                            @typescript-eslint/no-unused-vars
+  3:32  warning  'token' is defined but never used. Allowed unused args must match /^_/u                      unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\backlog\components\StartSprintModal.jsx
+  89:67  error  Strings not allowed in JSX files: "will be included in this sprint"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\backlog\hooks\useBacklogData.js
+  78:16  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  78:16  warning  'err' is defined but never used  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\company-profile\components\ProfileDescription.jsx
+  11:79  warning  'onEdit' is defined but never used                                        @typescript-eslint/no-unused-vars
+  11:79  warning  'onEdit' is defined but never used. Allowed unused args must match /^_/u  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\company-profile\components\ProfileInfoPanel.jsx
+  57:70  error  Strings not allowed in JSX files: "(i)"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\dashboard\components\UniAdminDashboard.jsx
+   9:10  warning  'message' is defined but never used    @typescript-eslint/no-unused-vars
+   9:10  error    'message' is defined but never used    unused-imports/no-unused-imports
+  10:10  warning  'useRouter' is defined but never used  @typescript-eslint/no-unused-vars
+  10:10  error    'useRouter' is defined but never used  unused-imports/no-unused-imports
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\enterprises\EnterprisesDialog.jsx
+  37:17  error  Strings not allowed in JSX files: "Onboard Enterprise"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\enterprises\EnterprisesPage.jsx
+  50:45  error  Strings not allowed in JSX files: "Communication Error"  react/jsx-no-literals
+  55:16  error  Strings not allowed in JSX files: "Try Again"            react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\enterprises\EnterprisesTable.jsx
+  19:39  error  Strings not allowed in JSX files: "Tax ID"      react/jsx-no-literals
+  20:22  error  Strings not allowed in JSX files: "Enterprise"  react/jsx-no-literals
+  21:55  error  Strings not allowed in JSX files: "Industry"    react/jsx-no-literals
+  22:50  error  Strings not allowed in JSX files: "Action"      react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\evaluation\components\ScoreDetailDrawer.jsx
+  45:62  error  Strings not allowed in JSX files: "/ 10"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\evaluation\components\TeamEvaluationsModal.jsx
+  80:41  error  Strings not allowed in JSX files: "--"   react/jsx-no-literals
+  86:44  error  Strings not allowed in JSX files: "***"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\generalinfo\hooks\useGeneralInfo.js
+  89:16  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  89:16  warning  'error' is defined but never used  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\components\ImportModal.jsx
+  30:26  warning  'file' is defined but never used                                        @typescript-eslint/no-unused-vars
+  30:26  warning  'file' is defined but never used. Allowed unused args must match /^_/u  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\components\StudentFormModal.jsx
+  209:61  error  Strings not allowed in JSX files: "This student is currently in the"                                                                    react/jsx-no-literals
+  210:86  error  Strings not allowed in JSX files: "phase.
+            Business details and evaluations will be updated as the internship progresses."  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\hooks\useStudentEnrollment.js
+   70:20  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+   70:20  warning  '_error' is defined but never used  unused-imports/no-unused-vars
+   91:16  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+   91:16  warning  '_error' is defined but never used  unused-imports/no-unused-vars
+  113:16  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  113:16  warning  '_error' is defined but never used  unused-imports/no-unused-vars
+  133:16  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  133:16  warning  '_error' is defined but never used  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\services\student.service.js
+  11:16  warning  'params' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  11:16  warning  'params' is assigned a value but never used. Allowed unused args must match /^_/u  unused-imports/no-unused-vars
+  16:17  warning  'id' is defined but never used                                                     @typescript-eslint/no-unused-vars
+  16:17  warning  'id' is defined but never used. Allowed unused args must match /^_/u               unused-imports/no-unused-vars
+  31:16  warning  'id' is defined but never used                                                     @typescript-eslint/no-unused-vars
+  31:16  warning  'id' is defined but never used. Allowed unused args must match /^_/u               unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-group-management\components\AssignMentorModal.jsx
+  10:9   warning  'Text' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  10:9   warning  'Text' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+  12:34  error    Component definition is missing display name                                     react/display-name
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-group-management\components\CreateGroupModal.jsx
+  8:33  error  Component definition is missing display name  react/display-name
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-group-management\components\GroupCard.jsx
+  55:19  error  Component definition is missing display name  react/display-name
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-group-management\components\ViewGroupModal.jsx
+  21:31  error  Component definition is missing display name  react/display-name
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-group-management\components\index.jsx
+  40:5  warning  'paginatedGroups' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  40:5  warning  'paginatedGroups' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-management\components\InternshipTable.jsx
+  183:5  warning  React Hook useMemo has an unnecessary dependency: 'STATUS_LABELS'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-management\hooks\useInternshipManagement.js
+   30:10  warning  'createModal' is assigned a value but never used                                               @typescript-eslint/no-unused-vars
+   30:10  warning  'createModal' is assigned a value but never used. Allowed unused vars must match /^_/u         unused-imports/no-unused-vars
+   30:23  warning  'setCreateModal' is assigned a value but never used                                            @typescript-eslint/no-unused-vars
+   30:23  warning  'setCreateModal' is assigned a value but never used. Allowed unused vars must match /^_/u      unused-imports/no-unused-vars
+   80:9   warning  'handleMentorChange' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+   80:9   warning  'handleMentorChange' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+  133:17  warning  'reason' is defined but never used                                                             @typescript-eslint/no-unused-vars
+  133:17  warning  'reason' is defined but never used. Allowed unused args must match /^_/u                       unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-term-management\components\TermStatusModal.jsx
+  27:68  error  Strings not allowed in JSX files: "&quot;"  react/jsx-no-literals
+  27:87  error  Strings not allowed in JSX files: "&quot;"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-term-management\hooks\useTermManagement.js
+  71:14  warning  '_error' is defined but never used                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  71:14  warning  '_error' is defined but never used                                                                                                                                                                                                         unused-imports/no-unused-vars
+  76:6   warning  React Hook useCallback has a missing dependency: 'pagination'. Either include it or remove the dependency array. Mutable values like 'pagination.current' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\job-board\components\JobCard.jsx
+  18:159  error  Strings not allowed in JSX files: "LOGO"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\logbook\components\LogbookPage.jsx
+  134:16  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  134:16  warning  'err' is defined but never used  unused-imports/no-unused-vars
+  159:14  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  159:14  warning  'err' is defined but never used  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\logbook\hooks\useLogbook.js
+  53:6  warning  React Hook useEffect has a missing dependency: 'internshipId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\stakeholder\components\StakeholderFormModal.jsx
+  9:15  warning  'Title' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  9:15  warning  'Title' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\universities\UniversitiesPage.jsx
+  50:45  error  Strings not allowed in JSX files: "Communication Error"  react/jsx-no-literals
+  55:16  error  Strings not allowed in JSX files: "Try Again"            react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\universities\UniversitiesTable.jsx
+  19:39  error  Strings not allowed in JSX files: "Code"        react/jsx-no-literals
+  20:22  error  Strings not allowed in JSX files: "University"  react/jsx-no-literals
+  21:55  error  Strings not allowed in JSX files: "Address"     react/jsx-no-literals
+  22:50  error  Strings not allowed in JSX files: "Action"      react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\user\components\ProfileInfo.jsx
+  93:24  error  Strings not allowed in JSX files: "View Link"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\user\components\SkillEditModal.jsx
+  29:44  error  Strings not allowed in JSX files: "Name"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\user\hooks\useProfile.js
+   28:10  warning  'selectMode' is assigned a value but never used                                         @typescript-eslint/no-unused-vars
+   28:10  warning  'selectMode' is assigned a value but never used. Allowed unused vars must match /^_/u   unused-imports/no-unused-vars
+   94:9   warning  'updateSkill' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+   94:9   warning  'updateSkill' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+  101:9   warning  'deleteSkill' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  101:9   warning  'deleteSkill' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\ui\searchbar.jsx
+  35:29  error  Strings not allowed in JSX files: "Filter"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\ui\tiptapeditor.jsx
+  440:30  error  Strings not allowed in JSX files: "`
+            .ProseMirror {
+              flex: 1;
+              min-height: 100%;
+              outline: none;
+            }
+
+            .ProseMirror.is-editor-empty:first-child::before {
+              content: attr(data-placeholder);
+              float: left;
+              color: #9aa4b2;
+              pointer-events: none;
+              height: 0;
+            }
+
+            .ProseMirror ul {
+              list-style: disc;
+              padding-left: 1.25rem;
+            }
+
+            .ProseMirror ol {
+              list-style: decimal;
+              padding-left: 1.25rem;
+            }
+
+            .ProseMirror li {
+              margin: 0.25rem 0;
+            }
+          `"  react/jsx-no-literals
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\services\httpClient.js
+  61:16  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  61:16  warning  'e' is defined but never used  unused-imports/no-unused-vars
+  82:37  warning  '_' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 111 problems (50 errors, 61 warnings)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+

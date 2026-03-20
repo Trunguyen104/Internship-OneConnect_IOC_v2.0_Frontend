@@ -1,20 +1,21 @@
-import React, { memo, useEffect, useState } from 'react';
-import { Form, Input, Row, Col, Select, Tabs, Empty } from 'antd';
 import {
-  UserOutlined,
+  BookOutlined,
+  EditOutlined,
   IdcardOutlined,
+  InfoCircleOutlined,
   MailOutlined,
   PhoneOutlined,
   PlusCircleOutlined,
-  EditOutlined,
-  BookOutlined,
-  InfoCircleOutlined,
-  SettingOutlined,
   SearchOutlined,
+  SettingOutlined,
   StarOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { Col, Empty, Form, Input, Row, Select, Tabs } from 'antd';
+import React, { memo, useEffect, useState } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const StudentFormBody = memo(function StudentFormBody({
   initialValues,
@@ -73,39 +74,39 @@ const StudentFormBody = memo(function StudentFormBody({
       : ADD_EDIT.SUBTITLE_ADD;
 
   const renderPersonalTab = () => (
-    <div className='animate-in fade-in slide-in-from-bottom-2 min-h-[300px] duration-300'>
+    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[300px] duration-300">
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             label={
-              <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
                 {ADD_EDIT.NAME_LABEL}
               </span>
             }
-            name='fullName'
+            name="fullName"
             rules={[{ required: true, message: ADD_EDIT.NAME_REQUIRED }]}
           >
             <Input
-              prefix={<UserOutlined className='text-muted ml-0.5' />}
+              prefix={<UserOutlined className="text-muted ml-0.5" />}
               placeholder={ADD_EDIT.NAME_PLACEHOLDER}
-              className='h-10 rounded-lg'
+              className="h-10 rounded-lg"
             />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item
             label={
-              <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
                 {ADD_EDIT.ID_LABEL}
               </span>
             }
-            name='studentCode'
+            name="studentCode"
             rules={[{ required: true, message: ADD_EDIT.ID_REQUIRED }]}
           >
             <Input
-              prefix={<IdcardOutlined className='text-muted ml-0.5' />}
+              prefix={<IdcardOutlined className="text-muted ml-0.5" />}
               placeholder={ADD_EDIT.ID_PLACEHOLDER}
-              className='h-10 rounded-lg'
+              className="h-10 rounded-lg"
             />
           </Form.Item>
         </Col>
@@ -113,20 +114,20 @@ const StudentFormBody = memo(function StudentFormBody({
 
       <Form.Item
         label={
-          <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+          <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
             {ADD_EDIT.EMAIL_LABEL}
           </span>
         }
-        name='email'
+        name="email"
         rules={[
           { required: true, message: ADD_EDIT.EMAIL_REQUIRED },
           { type: 'email', message: ADD_EDIT.EMAIL_INVALID },
         ]}
       >
         <Input
-          prefix={<MailOutlined className='text-muted ml-0.5' />}
+          prefix={<MailOutlined className="text-muted ml-0.5" />}
           placeholder={ADD_EDIT.EMAIL_PLACEHOLDER}
-          className='h-10 rounded-lg'
+          className="h-10 rounded-lg"
         />
       </Form.Item>
 
@@ -134,16 +135,16 @@ const StudentFormBody = memo(function StudentFormBody({
         <Col span={12}>
           <Form.Item
             label={
-              <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
                 {ADD_EDIT.MAJOR_LABEL}
               </span>
             }
-            name='major'
+            name="major"
             rules={[{ required: true, message: ADD_EDIT.MAJOR_REQUIRED }]}
           >
             <Select
               placeholder={ADD_EDIT.MAJOR_PLACEHOLDER}
-              className='h-10 w-full rounded-lg'
+              className="h-10 w-full rounded-lg"
               options={MAJOR_OPTIONS}
               suffixIcon={<BookOutlined />}
             />
@@ -152,16 +153,16 @@ const StudentFormBody = memo(function StudentFormBody({
         <Col span={12}>
           <Form.Item
             label={
-              <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
                 {ADD_EDIT.PHONE_LABEL}
               </span>
             }
-            name='phone'
+            name="phone"
           >
             <Input
-              prefix={<PhoneOutlined className='text-muted ml-0.5' />}
+              prefix={<PhoneOutlined className="text-muted ml-0.5" />}
               placeholder={ADD_EDIT.PHONE_PLACEHOLDER}
-              className='h-10 rounded-lg'
+              className="h-10 rounded-lg"
             />
           </Form.Item>
         </Col>
@@ -170,42 +171,42 @@ const StudentFormBody = memo(function StudentFormBody({
   );
 
   const renderPlacementTab = () => (
-    <div className='animate-in fade-in slide-in-from-bottom-2 min-h-[300px] space-y-4 duration-300'>
+    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[300px] space-y-4 duration-300">
       <Form.Item
         label={
-          <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+          <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
             {ADD_EDIT.STATUS_LABEL}
           </span>
         }
-        name='status'
+        name="status"
       >
-        <Select className='h-10 w-full rounded-lg' options={STATUS_OPTIONS} />
+        <Select className="h-10 w-full rounded-lg" options={STATUS_OPTIONS} />
       </Form.Item>
 
       <Form.Item
         label={
-          <span className='mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase'>
+          <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
             {ADD_EDIT.ENTERPRISE_LABEL}
           </span>
         }
       >
         <Input
           disabled
-          prefix={<SearchOutlined className='text-muted ml-0.5' />}
+          prefix={<SearchOutlined className="text-muted ml-0.5" />}
           placeholder={ADD_EDIT.ENTERPRISE_PLACEHOLDER}
-          className='h-10 rounded-lg'
+          className="h-10 rounded-lg"
         />
       </Form.Item>
 
       {initialValues?.status && (
-        <div className='bg-muted/5 border-border mt-6 rounded-xl border p-4'>
-          <div className='mb-2 flex items-center gap-2'>
-            <SettingOutlined className='text-primary' />
-            <span className='text-muted text-[10px] font-black tracking-wider uppercase'>
+        <div className="bg-muted/5 border-border mt-6 rounded-xl border p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <SettingOutlined className="text-primary" />
+            <span className="text-muted text-[10px] font-black tracking-wider uppercase">
               {ADD_EDIT.SECTION_PLACEMENT}
             </span>
           </div>
-          <p className='text-muted text-xs leading-relaxed'>
+          <p className="text-muted text-xs leading-relaxed">
             This student is currently in the <strong>{initialValues?.status}</strong> phase.
             Business details and evaluations will be updated as the internship progresses.
           </p>
@@ -215,13 +216,13 @@ const StudentFormBody = memo(function StudentFormBody({
   );
 
   const renderFeedbackTab = () => (
-    <div className='animate-in fade-in slide-in-from-bottom-2 border-border/50 bg-bg flex min-h-[300px] flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 duration-300'>
+    <div className="animate-in fade-in slide-in-from-bottom-2 border-border/50 bg-bg flex min-h-[300px] flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 duration-300">
       <Empty
         image={Empty.PRESENTED_IMAGE_SIMPLE}
         description={
-          <div className='flex flex-col gap-1'>
-            <span className='text-text/40 text-sm font-bold'>{ADD_EDIT.FEEDBACK_EMPTY.TITLE}</span>
-            <span className='text-muted text-[10px] font-medium uppercase'>
+          <div className="flex flex-col gap-1">
+            <span className="text-text/40 text-sm font-bold">{ADD_EDIT.FEEDBACK_EMPTY.TITLE}</span>
+            <span className="text-muted text-[10px] font-medium uppercase">
               {ADD_EDIT.FEEDBACK_EMPTY.SUBTITLE}
             </span>
           </div>
@@ -234,7 +235,7 @@ const StudentFormBody = memo(function StudentFormBody({
     {
       key: '1',
       label: (
-        <span className='flex items-center gap-2 px-1'>
+        <span className="flex items-center gap-2 px-1">
           <InfoCircleOutlined /> {ADD_EDIT.TABS.GENERAL}
         </span>
       ),
@@ -243,7 +244,7 @@ const StudentFormBody = memo(function StudentFormBody({
     {
       key: '2',
       label: (
-        <span className='flex items-center gap-2 px-1'>
+        <span className="flex items-center gap-2 px-1">
           <SettingOutlined /> {ADD_EDIT.TABS.PLACEMENT}
         </span>
       ),
@@ -252,7 +253,7 @@ const StudentFormBody = memo(function StudentFormBody({
     {
       key: '3',
       label: (
-        <span className='flex items-center gap-2 px-1'>
+        <span className="flex items-center gap-2 px-1">
           <StarOutlined /> {ADD_EDIT.TABS.FEEDBACK}
         </span>
       ),
@@ -263,11 +264,11 @@ const StudentFormBody = memo(function StudentFormBody({
   return (
     <>
       <CompoundModal.Header title={title} subtitle={subtitle} />
-      <CompoundModal.Content className='!pb-2'>
+      <CompoundModal.Content className="!pb-2">
         <Form
           form={form}
-          layout='vertical'
-          className='space-y-4'
+          layout="vertical"
+          className="space-y-4"
           disabled={loading || viewOnly}
           requiredMark={!viewOnly}
         >
@@ -275,7 +276,7 @@ const StudentFormBody = memo(function StudentFormBody({
             activeKey={activeTab}
             onChange={setActiveTab}
             items={tabItems}
-            className='student-enrollment-tabs'
+            className="student-enrollment-tabs"
           />
         </Form>
       </CompoundModal.Content>

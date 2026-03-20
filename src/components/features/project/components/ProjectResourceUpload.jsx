@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
-import { Form, Input, Select, Button, Upload } from 'antd';
-import { useToast } from '@/providers/ToastProvider';
 import { UploadOutlined } from '@ant-design/icons';
-import { PROJECT_UI } from '@/constants/project/uiText';
+import { Button, Form, Input, Select, Upload } from 'antd';
+import React from 'react';
+
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
+import { PROJECT_UI } from '@/constants/project/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function ProjectResourceUpload({
   form,
@@ -47,7 +48,7 @@ export default function ProjectResourceUpload({
   };
 
   return (
-    <div className='pt-2'>
+    <div className="pt-2">
       <Form form={form} layout={'vertical'} onFinish={onUpload} className={'space-y-4'}>
         <Form.Item
           label={PROJECT_UI.FORM.RESOURCE_NAME}
@@ -81,14 +82,14 @@ export default function ProjectResourceUpload({
 
         {isLinkType ? (
           <Form.Item
-            label='External URL'
-            name='externalUrl'
+            label="External URL"
+            name="externalUrl"
             rules={[
               { required: true, message: 'Please enter link URL' },
               { type: 'url', message: 'Please enter a valid URL' },
             ]}
           >
-            <Input placeholder='https://docs.google.com/... or https://figma.com/...' />
+            <Input placeholder="https://docs.google.com/... or https://figma.com/..." />
           </Form.Item>
         ) : null}
 

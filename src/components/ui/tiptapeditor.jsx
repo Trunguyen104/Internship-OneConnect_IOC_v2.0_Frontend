@@ -1,47 +1,45 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import { Underline } from '@tiptap/extension-underline';
-import { Link } from '@tiptap/extension-link';
-import { Image } from '@tiptap/extension-image';
-import { TextAlign } from '@tiptap/extension-text-align';
 import { HorizontalRule } from '@tiptap/extension-horizontal-rule';
+import { Image } from '@tiptap/extension-image';
+import { Link } from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-
 import { Table } from '@tiptap/extension-table';
-import { TableRow } from '@tiptap/extension-table-row';
-import { TableHeader } from '@tiptap/extension-table-header';
 import { TableCell } from '@tiptap/extension-table-cell';
-
+import { TableHeader } from '@tiptap/extension-table-header';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { Underline } from '@tiptap/extension-underline';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
   Bold,
-  Italic,
-  Underline as UnderlineIcon,
-  Strikethrough,
+  Code2,
+  Eraser,
   Heading1,
   Heading2,
   Heading3,
+  Image as ImageIcon,
+  Italic,
+  Link2,
   List,
   ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  Quote,
-  Code2,
   Minus,
-  Link2,
-  Image as ImageIcon,
+  Quote,
+  Strikethrough,
   Table2,
-  Eraser,
+  Underline as UnderlineIcon,
 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function ToolbarButton({ title, active, disabled, onClick, children }) {
   return (
     <button
-      type='button'
+      type="button"
       title={title}
       disabled={disabled}
       onClick={onClick}
@@ -266,7 +264,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
           {/* Row 1 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <ToolbarButton
-              title='Bold'
+              title="Bold"
               active={editor.isActive('bold')}
               disabled={!editor.can().toggleBold()}
               onClick={() => editor.chain().focus().toggleBold().run()}
@@ -275,7 +273,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Italic'
+              title="Italic"
               active={editor.isActive('italic')}
               disabled={!editor.can().toggleItalic()}
               onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -284,7 +282,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Underline'
+              title="Underline"
               active={editor.isActive('underline')}
               disabled={!editor.can().toggleUnderline()}
               onClick={() => editor.chain().focus().toggleUnderline().run()}
@@ -293,7 +291,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Strikethrough'
+              title="Strikethrough"
               active={editor.isActive('strike')}
               disabled={!editor.can().toggleStrike()}
               onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -304,7 +302,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             <Divider />
 
             <ToolbarButton
-              title='H1'
+              title="H1"
               active={editor.isActive('heading', { level: 1 })}
               onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             >
@@ -312,7 +310,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='H2'
+              title="H2"
               active={editor.isActive('heading', { level: 2 })}
               onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
             >
@@ -320,7 +318,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='H3'
+              title="H3"
               active={editor.isActive('heading', { level: 3 })}
               onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
             >
@@ -330,7 +328,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             <Divider />
 
             <ToolbarButton
-              title='Bullet list'
+              title="Bullet list"
               active={editor.isActive('bulletList')}
               onClick={() => editor.chain().focus().toggleBulletList().run()}
             >
@@ -338,7 +336,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Numbered list'
+              title="Numbered list"
               active={editor.isActive('orderedList')}
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
             >
@@ -348,7 +346,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             <Divider />
 
             <ToolbarButton
-              title='Align left'
+              title="Align left"
               active={isAlign('left')}
               onClick={() => editor.chain().focus().setTextAlign('left').run()}
             >
@@ -356,7 +354,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Align center'
+              title="Align center"
               active={isAlign('center')}
               onClick={() => editor.chain().focus().setTextAlign('center').run()}
             >
@@ -364,7 +362,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Align right'
+              title="Align right"
               active={isAlign('right')}
               onClick={() => editor.chain().focus().setTextAlign('right').run()}
             >
@@ -372,7 +370,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Justify'
+              title="Justify"
               active={isAlign('justify')}
               onClick={() => editor.chain().focus().setTextAlign('justify').run()}
             >
@@ -382,7 +380,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             <Divider />
 
             <ToolbarButton
-              title='Quote'
+              title="Quote"
               active={editor.isActive('blockquote')}
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
             >
@@ -393,7 +391,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
           {/* Row 2 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
             <ToolbarButton
-              title='Code block'
+              title="Code block"
               active={editor.isActive('codeBlock')}
               onClick={() => editor.chain().focus().toggleCodeBlock().run()}
             >
@@ -401,7 +399,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
             </ToolbarButton>
 
             <ToolbarButton
-              title='Horizontal rule'
+              title="Horizontal rule"
               onClick={() => editor.chain().focus().setHorizontalRule().run()}
             >
               <Minus size={20} />
@@ -409,19 +407,19 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
 
             <Divider />
 
-            <ToolbarButton title='Link' active={editor.isActive('link')} onClick={setLink}>
+            <ToolbarButton title="Link" active={editor.isActive('link')} onClick={setLink}>
               <Link2 size={20} />
             </ToolbarButton>
 
-            <ToolbarButton title='Image' onClick={insertImage}>
+            <ToolbarButton title="Image" onClick={insertImage}>
               <ImageIcon size={20} />
             </ToolbarButton>
 
-            <ToolbarButton title='Table' active={editor.isActive('table')} onClick={insertTable}>
+            <ToolbarButton title="Table" active={editor.isActive('table')} onClick={insertTable}>
               <Table2 size={20} />
             </ToolbarButton>
 
-            <ToolbarButton title='Clear formatting' onClick={clearFormatting}>
+            <ToolbarButton title="Clear formatting" onClick={clearFormatting}>
               <Eraser size={20} />
             </ToolbarButton>
 
@@ -471,8 +469,8 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nh·∫≠p m√
 
           <input
             ref={fileInputRef}
-            type='file'
-            accept='image/*'
+            type="file"
+            accept="image/*"
             style={{ display: 'none' }}
             onChange={onPickImage}
           />

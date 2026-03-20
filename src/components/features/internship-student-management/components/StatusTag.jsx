@@ -1,11 +1,11 @@
-import React from 'react';
-import { Tag } from 'antd';
 import {
   CheckCircleOutlined,
-  ExclamationCircleOutlined,
   CloseCircleOutlined,
+  ExclamationCircleOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
+import { Tag } from 'antd';
+import React from 'react';
 
 const StatusTag = ({ status }) => {
   const configs = {
@@ -40,7 +40,7 @@ const StatusTag = ({ status }) => {
     <Tag
       color={config.color}
       icon={config.icon}
-      className='rounded-full px-3 py-0.5 text-[10px] font-bold uppercase'
+      className="rounded-full px-3 py-0.5 text-[10px] font-bold uppercase"
     >
       {status}
     </Tag>

@@ -1,15 +1,16 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Form, Input, Select, Row, Col, DatePicker } from 'antd';
 import {
-  UserOutlined,
+  CalendarOutlined,
   IdcardOutlined,
   MailOutlined,
-  PlusCircleOutlined,
   PhoneOutlined,
-  CalendarOutlined,
+  PlusCircleOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import { Col, DatePicker, Form, Input, Row, Select } from 'antd';
+import React, { useEffect } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -36,26 +37,26 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
 
       <Form
         form={form}
-        layout='vertical'
+        layout="vertical"
         onFinish={handleFinish}
-        className='p-6 pt-8'
+        className="p-6 pt-8"
         requiredMark={false}
       >
         <Row gutter={24}>
           <Col span={14}>
             <Form.Item
               label={
-                <span className='text-text text-xs font-bold tracking-wider uppercase'>
+                <span className="text-text text-xs font-bold tracking-wider uppercase">
                   {ADD.NAME_LABEL}
                 </span>
               }
-              name='fullName'
+              name="fullName"
               rules={[{ required: true, message: ADD.NAME_REQUIRED }]}
             >
               <Input
-                prefix={<UserOutlined className='text-muted' />}
+                prefix={<UserOutlined className="text-muted" />}
                 placeholder={ADD.NAME_PLACEHOLDER}
-                className='bg-surface border-border h-11 rounded-xl'
+                className="bg-surface border-border h-11 rounded-xl"
               />
             </Form.Item>
           </Col>
@@ -63,17 +64,17 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
           <Col span={10}>
             <Form.Item
               label={
-                <span className='text-text text-xs font-bold tracking-wider uppercase'>
+                <span className="text-text text-xs font-bold tracking-wider uppercase">
                   {ADD.ID_LABEL}
                 </span>
               }
-              name='studentId'
+              name="studentId"
               rules={[{ required: true, message: ADD.ID_REQUIRED }]}
             >
               <Input
-                prefix={<IdcardOutlined className='text-muted' />}
+                prefix={<IdcardOutlined className="text-muted" />}
                 placeholder={ADD.ID_PLACEHOLDER}
-                className='bg-surface border-border h-11 rounded-xl'
+                className="bg-surface border-border h-11 rounded-xl"
               />
             </Form.Item>
           </Col>
@@ -81,20 +82,20 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
 
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {ADD.EMAIL_LABEL}
             </span>
           }
-          name='email'
+          name="email"
           rules={[
             { required: true, message: ADD.EMAIL_REQUIRED },
             { type: 'email', message: ADD.EMAIL_INVALID },
           ]}
         >
           <Input
-            prefix={<MailOutlined className='text-muted' />}
+            prefix={<MailOutlined className="text-muted" />}
             placeholder={ADD.EMAIL_PLACEHOLDER}
-            className='bg-surface border-border h-11 rounded-xl'
+            className="bg-surface border-border h-11 rounded-xl"
           />
         </Form.Item>
 
@@ -102,38 +103,38 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
           <Col span={12}>
             <Form.Item
               label={
-                <span className='text-text text-xs font-bold tracking-wider uppercase'>
+                <span className="text-text text-xs font-bold tracking-wider uppercase">
                   {ADD.PHONE_LABEL}
                 </span>
               }
-              name='phone'
+              name="phone"
               rules={[
                 { required: true, message: ADD.PHONE_REQUIRED },
                 { pattern: /^[0-9]{10,11}$/, message: ADD.PHONE_INVALID },
               ]}
             >
               <Input
-                prefix={<PhoneOutlined className='text-muted' />}
+                prefix={<PhoneOutlined className="text-muted" />}
                 placeholder={ADD.PHONE_PLACEHOLDER}
-                className='bg-surface border-border h-11 rounded-xl'
+                className="bg-surface border-border h-11 rounded-xl"
               />
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               label={
-                <span className='text-text text-xs font-bold tracking-wider uppercase'>
+                <span className="text-text text-xs font-bold tracking-wider uppercase">
                   {ADD.DOB_LABEL}
                 </span>
               }
-              name='dob'
+              name="dob"
               rules={[{ required: true, message: ADD.DOB_REQUIRED }]}
             >
               <DatePicker
                 placeholder={ADD.DATE_FORMAT_PLACEHOLDER}
-                format='DD/MM/YYYY'
-                className='bg-surface border-border h-11 w-full rounded-xl'
-                suffixIcon={<CalendarOutlined className='text-muted' />}
+                format="DD/MM/YYYY"
+                className="bg-surface border-border h-11 w-full rounded-xl"
+                suffixIcon={<CalendarOutlined className="text-muted" />}
               />
             </Form.Item>
           </Col>
@@ -141,16 +142,16 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
 
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {ADD.MAJOR_LABEL}
             </span>
           }
-          name='major'
+          name="major"
           rules={[{ required: true, message: ADD.MAJOR_REQUIRED }]}
         >
           <Select
             placeholder={ADD.MAJOR_PLACEHOLDER}
-            className='h-11 w-full rounded-xl'
+            className="h-11 w-full rounded-xl"
             options={ADD.MAJOR_OPTIONS}
           />
         </Form.Item>
@@ -160,7 +161,7 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
           submitText={ADD.SUBMIT}
           onCancel={onCancel}
           onSubmit={() => form.submit()}
-          className='mt-8 pt-6'
+          className="mt-8 pt-6"
         />
       </Form>
     </CompoundModal>

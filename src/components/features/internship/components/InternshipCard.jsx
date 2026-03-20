@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button, Tag } from "antd";
-import { BookOpen, Building2, ExternalLink, User } from "lucide-react";
-import Link from "next/link";
-import React, { createContext, useContext } from "react";
+import { Button, Tag } from 'antd';
+import { BookOpen, Building2, ExternalLink, User } from 'lucide-react';
+import Link from 'next/link';
+import React, { createContext, useContext } from 'react';
 
-import { INTERNSHIP_UI } from "@/constants/internship-management/internship.js";
+import { INTERNSHIP_UI } from '@/constants/internship-management/internship.js';
 
-import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from "../constants/internshipStatus.js";
-import ProgressStepper from "./ProgressStepper";
+import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from '../constants/internshipStatus.js';
+import ProgressStepper from './ProgressStepper';
 
 const InternshipCardContext = createContext(null);
 
 const useInternshipCard = () => {
   const context = useContext(InternshipCardContext);
   if (!context) {
-    throw new Error("InternshipCard sub-components must be rendered within InternshipCard");
+    throw new Error('InternshipCard sub-components must be rendered within InternshipCard');
   }
   return context;
 };
@@ -23,7 +23,7 @@ const useInternshipCard = () => {
 /**
  * InternshipCard Root Component
  */
-const InternshipCard = ({ data, children, className = "" }) => {
+const InternshipCard = ({ data, children, className = '' }) => {
   return (
     <InternshipCardContext.Provider value={data}>
       <div

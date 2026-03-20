@@ -1,9 +1,10 @@
 'use client';
 
-import React, { memo } from 'react';
-import { Modal, Form, DatePicker, Input, Button, Space } from 'antd';
-import { PlusCircleOutlined, EditOutlined, SendOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusCircleOutlined, SendOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Form, Input, Modal, Space } from 'antd';
 import dayjs from 'dayjs';
+import React, { memo } from 'react';
+
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
 const { TextArea } = Input;
@@ -34,20 +35,20 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
   return (
     <Form
       form={form}
-      layout='vertical'
+      layout="vertical"
       onFinish={onSubmit}
-      className='mt-4'
-      requiredMark='optional'
+      className="mt-4"
+      requiredMark="optional"
     >
       <Form.Item
         label={FORM.REPORT_DATE}
-        name='dateReport'
+        name="dateReport"
         rules={[{ required: true, message: FORM.VALIDATION.DATE_REQUIRED }]}
       >
         <DatePicker
           placeholder={FORM.PLACEHOLDER_DATE}
-          className='w-full !cursor-default'
-          format='DD/MM/YYYY'
+          className="w-full !cursor-default"
+          format="DD/MM/YYYY"
           disabledDate={(current) => current && current > dayjs().endOf('day')}
           disabled={!!editingId}
           inputReadOnly={!!editingId}
@@ -56,7 +57,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
 
       <Form.Item
         label={FORM.SUMMARY}
-        name='summary'
+        name="summary"
         rules={[
           { required: true, message: FORM.VALIDATION.SUMMARY_REQUIRED },
           { min: 10, message: FORM.VALIDATION.SUMMARY_MIN },
@@ -68,7 +69,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
 
       <Form.Item
         label={FORM.ISSUE}
-        name='issue'
+        name="issue"
         rules={[{ max: 200, message: FORM.VALIDATION.ISSUE_MAX }]}
       >
         <TextArea rows={2} placeholder={FORM.PLACEHOLDER_ISSUE} />
@@ -76,7 +77,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
 
       <Form.Item
         label={FORM.PLAN}
-        name='plan'
+        name="plan"
         rules={[
           { required: true, message: FORM.VALIDATION.PLAN_REQUIRED },
           { max: 200, message: FORM.VALIDATION.PLAN_MAX },
@@ -85,7 +86,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
         <TextArea rows={3} placeholder={FORM.PLACEHOLDER_PLAN} />
       </Form.Item>
 
-      <div className='mt-6 flex justify-end gap-3'>
+      <div className="mt-6 flex justify-end gap-3">
         <Button
           onClick={() => {
             form.resetFields();
@@ -94,7 +95,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
         >
           {DAILY_REPORT_UI.MODAL.CANCEL}
         </Button>
-        <Button type='primary' htmlType='submit' loading={submitting} icon={<SendOutlined />}>
+        <Button type="primary" htmlType="submit" loading={submitting} icon={<SendOutlined />}>
           {editingId ? DAILY_REPORT_UI.MODAL.SAVE : DAILY_REPORT_UI.MODAL.SUBMIT}
         </Button>
       </div>
@@ -121,11 +122,11 @@ const LogbookFormModal = memo(function LogbookFormModal({
       centered
       destroyOnHidden
       title={
-        <Space className='mb-2'>
+        <Space className="mb-2">
           {editingId ? (
-            <EditOutlined className='text-primary' />
+            <EditOutlined className="text-primary" />
           ) : (
-            <PlusCircleOutlined className='text-primary' />
+            <PlusCircleOutlined className="text-primary" />
           )}
           <span>{editingId ? MODAL.EDIT_TITLE : MODAL.CREATE_TITLE}</span>
         </Space>

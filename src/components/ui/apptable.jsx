@@ -1,6 +1,6 @@
 'use client';
 
-import { Table, Empty, Skeleton } from 'antd';
+import { Empty, Skeleton, Table } from 'antd';
 
 export default function AppTable({
   columns,
@@ -14,7 +14,7 @@ export default function AppTable({
 }) {
   if (loading) {
     return (
-      <div className='p-6'>
+      <div className="p-6">
         <Skeleton active paragraph={{ rows: 6 }} />
       </div>
     );
@@ -28,13 +28,13 @@ export default function AppTable({
       pagination={pagination}
       onChange={onChange}
       scroll={scroll}
-      rowClassName='hover:bg-gray-50/50 transition-colors'
+      rowClassName="hover:bg-gray-50/50 transition-colors"
       locale={{
         emptyText: (
-          <div className='py-10'>
+          <div className="py-10">
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<span className='font-medium text-gray-400'>{emptyText}</span>}
+              description={<span className="font-medium text-gray-400">{emptyText}</span>}
             />
           </div>
         ),

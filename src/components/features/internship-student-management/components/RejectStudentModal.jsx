@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { Form, Input, Typography } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Form, Input, Typography } from 'antd';
+import React, { useEffect } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -23,36 +24,36 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
   return (
     <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden>
       <CompoundModal.Header
-        icon={<ExclamationCircleOutlined className='text-danger' />}
+        icon={<ExclamationCircleOutlined className="text-danger" />}
         title={REJECT.TITLE}
         subtitle={`${REJECT.WARNING_TEXT_1} ${student?.fullName || ''}`}
-        type='danger'
+        type="danger"
       />
 
       <Form
         form={form}
-        layout='vertical'
+        layout="vertical"
         onFinish={handleFinish}
-        className='p-6 pt-8'
+        className="p-6 pt-8"
         requiredMark={false}
       >
-        <div className='bg-danger-surface border-danger mb-6 rounded-xl border-l-4 p-4'>
-          <Text className='text-muted text-xs leading-relaxed'>{REJECT.WARNING_TEXT_2}</Text>
+        <div className="bg-danger-surface border-danger mb-6 rounded-xl border-l-4 p-4">
+          <Text className="text-muted text-xs leading-relaxed">{REJECT.WARNING_TEXT_2}</Text>
         </div>
 
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {REJECT.REASON_LABEL}
             </span>
           }
-          name='reason'
+          name="reason"
           rules={[{ required: true, message: REJECT.REASON_REQUIRED }]}
         >
           <Input.TextArea
             rows={4}
             placeholder={REJECT.REASON_PLACEHOLDER}
-            className='bg-surface border-border rounded-xl px-4 py-3'
+            className="bg-surface border-border rounded-xl px-4 py-3"
           />
         </Form.Item>
 
@@ -62,7 +63,7 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
           onCancel={onCancel}
           onSubmit={() => form.submit()}
           submitDanger
-          className='mt-8 pt-6'
+          className="mt-8 pt-6"
         />
       </Form>
     </CompoundModal>

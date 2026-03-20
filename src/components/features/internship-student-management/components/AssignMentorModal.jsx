@@ -1,11 +1,13 @@
 'use client';
 
+import { ProjectOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Input, Select } from 'antd';
 import React, { useEffect } from 'react';
-import { Form, Select, Input } from 'antd';
-import { UserOutlined, SearchOutlined, ProjectOutlined } from '@ant-design/icons';
+
 import CompoundModal from '@/components/ui/CompoundModal';
-import { MOCK_MENTORS } from '../constants/internshipData';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
+import { MOCK_MENTORS } from '../constants/internshipData';
 
 const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
   const [form] = Form.useForm();
@@ -27,34 +29,34 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
         icon={<UserOutlined />}
         title={ASSIGN.TITLE}
         subtitle={
-          <div className='flex items-center gap-2'>
-            <span className='opacity-70'>{ASSIGN.STUDENT_LABEL}</span>
-            <span className='text-text font-bold'>{student?.fullName}</span>
+          <div className="flex items-center gap-2">
+            <span className="opacity-70">{ASSIGN.STUDENT_LABEL}</span>
+            <span className="text-text font-bold">{student?.fullName}</span>
           </div>
         }
       />
 
       <Form
         form={form}
-        layout='vertical'
+        layout="vertical"
         onFinish={onFinish}
-        className='p-6 pt-8'
+        className="p-6 pt-8"
         requiredMark={false}
       >
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {ASSIGN.MENTOR_LABEL}
             </span>
           }
-          name='mentorId'
+          name="mentorId"
           rules={[{ required: true, message: ASSIGN.MENTOR_REQUIRED }]}
         >
           <Select
             showSearch
             placeholder={ASSIGN.MENTOR_PLACEHOLDER}
-            className='h-11 w-full rounded-xl'
-            suffixIcon={<SearchOutlined className='text-muted' />}
+            className="h-11 w-full rounded-xl"
+            suffixIcon={<SearchOutlined className="text-muted" />}
             options={MOCK_MENTORS.map((m) => ({
               label: `${m.name} - ${m.role}`,
               value: m.id,
@@ -67,17 +69,17 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
 
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {ASSIGN.PROJECT_LABEL}
             </span>
           }
-          name='project'
+          name="project"
           rules={[{ required: true, message: ASSIGN.PROJECT_REQUIRED }]}
         >
           <Input
-            prefix={<ProjectOutlined className='text-muted' />}
+            prefix={<ProjectOutlined className="text-muted" />}
             placeholder={ASSIGN.PROJECT_PLACEHOLDER}
-            className='bg-surface border-border h-11 rounded-xl'
+            className="bg-surface border-border h-11 rounded-xl"
           />
         </Form.Item>
 
@@ -86,7 +88,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
           submitText={ASSIGN.SUBMIT}
           onCancel={onCancel}
           onSubmit={() => form.submit()}
-          className='mt-8 pt-6'
+          className="mt-8 pt-6"
         />
       </Form>
     </CompoundModal>

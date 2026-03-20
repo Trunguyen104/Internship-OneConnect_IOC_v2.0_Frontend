@@ -1,10 +1,12 @@
 'use client';
 
 import { useCallback } from 'react';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { useToast } from '@/providers/ToastProvider';
-import { WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
+import { WORK_ITEM_PRIORITY, WORK_ITEM_TYPE } from '@/constants/common/enums';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
+import { useToast } from '@/providers/ToastProvider';
+
 import { COLUMNS } from './useBoardData';
 
 /**
@@ -17,7 +19,7 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
     (event) => {
       setActiveId(event.active.id);
     },
-    [setActiveId],
+    [setActiveId]
   );
 
   const onDragOver = useCallback(
@@ -37,10 +39,10 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
       if (!overColumnId || overColumnId === activeTask.status) return;
 
       setItems((prev) =>
-        prev.map((item) => (item.id === activeId ? { ...item, status: overColumnId } : item)),
+        prev.map((item) => (item.id === activeId ? { ...item, status: overColumnId } : item))
       );
     },
-    [items, setItems],
+    [items, setItems]
   );
 
   const onDragEnd = useCallback(
@@ -87,7 +89,7 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
           const updateRes = await productBacklogService.updateWorkItem(
             projectId,
             activeId,
-            payload,
+            payload
           );
 
           if (updateRes?.isSuccess || updateRes?.status === 200 || updateRes?.data) {
@@ -102,7 +104,7 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
         fetchBoardData(false);
       }
     },
-    [projectId, items, fetchBoardData, setActiveId, toast],
+    [projectId, items, fetchBoardData, setActiveId, toast]
   );
 
   return { onDragStart, onDragOver, onDragEnd };

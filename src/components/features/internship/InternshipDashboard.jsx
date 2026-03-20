@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Empty, Skeleton } from "antd";
-import React, { useEffect, useState } from "react";
+import { Empty, Skeleton } from 'antd';
+import React, { useEffect, useState } from 'react';
 
-import { INTERNSHIP_UI } from "@/constants/internship-management/internship";
-import { useToast } from "@/providers/ToastProvider";
+import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
+import { useToast } from '@/providers/ToastProvider';
 
-import InternshipCard from "./components/InternshipCard";
-import { INTERNSHIP_STATUS } from "./constants/internshipStatus.js";
-import { InternshipGroupService } from "./services/internshipGroup.service";
+import InternshipCard from './components/InternshipCard';
+import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
+import { InternshipGroupService } from './services/internshipGroup.service';
 
 const InternshipDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -55,8 +55,8 @@ const InternshipDashboard = () => {
 
         setInternships(enrichedInternships);
       } catch (error) {
-        console.error("Dashboard Fetch Error:", error);
-        toast.error("Lỗi", INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
+        console.error('Dashboard Fetch Error:', error);
+        toast.error('Lỗi', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
       } finally {
         setLoading(false);
       }
@@ -89,7 +89,7 @@ const InternshipDashboard = () => {
     <div className="mx-auto max-w-5xl space-y-8 px-6 py-12">
       <header className="mb-10">
         <h1 className="text-text text-3xl font-black tracking-tight">
-          {INTERNSHIP_UI.TITLE.replace(INTERNSHIP_UI.JOURNEY_HIGHLIGHT, "")}
+          {INTERNSHIP_UI.TITLE.replace(INTERNSHIP_UI.JOURNEY_HIGHLIGHT, '')}
           <span className="text-primary italic">{INTERNSHIP_UI.JOURNEY_HIGHLIGHT}</span>
         </h1>
         <p className="text-muted mt-2 font-medium">{INTERNSHIP_UI.SUBTITLE}</p>

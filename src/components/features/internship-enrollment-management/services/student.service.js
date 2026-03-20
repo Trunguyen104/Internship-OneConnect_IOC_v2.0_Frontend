@@ -1,5 +1,3 @@
-import { httpGet, httpPost, httpPut, httpDelete } from '@/services/httpClient';
-
 const mapStudent = (student) => ({
   ...student,
   id: student.id || student.studentId || student.studentCode,

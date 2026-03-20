@@ -1,5 +1,6 @@
+import { AlertCircle, Trash2 } from 'lucide-react';
 import React from 'react';
-import { Trash2, AlertCircle } from 'lucide-react';
+
 import { modalApi } from '@/providers/ToastProvider';
 
 export const showDeleteConfirm = ({
@@ -23,14 +24,14 @@ export const showDeleteConfirm = ({
   return confirm({
     icon: null,
     title: (
-      <div className='flex items-center gap-3'>
+      <div className="flex items-center gap-3">
         <div className={`p-2 ${iconBgClass} rounded-xl`}>
           <Icon className={`h-5 w-5 ${iconColorClass}`} />
         </div>
-        <span className='text-lg font-bold text-slate-800'>{title}</span>
+        <span className="text-lg font-bold text-slate-800">{title}</span>
       </div>
     ),
-    content: <div className='mt-2 leading-relaxed text-slate-600'>{content}</div>,
+    content: <div className="mt-2 leading-relaxed text-slate-600">{content}</div>,
     okText,
     okType: isDelete ? 'danger' : 'primary',
     cancelText,

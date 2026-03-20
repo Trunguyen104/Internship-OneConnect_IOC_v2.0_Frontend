@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback } from 'react';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { useToast } from '@/providers/ToastProvider';
-import { WORK_ITEM_TYPE, WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
+import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 /**
  * Hook for Board actions (Task click, submission)
@@ -23,7 +24,7 @@ export function useBoardActions({ projectId, ui, fetchBoardData }) {
         ui.setOpenUpdateTask(true);
       }
     },
-    [projectId, ui],
+    [projectId, ui]
   );
 
   const handleUpdateSubmit = useCallback(
@@ -61,7 +62,7 @@ export function useBoardActions({ projectId, ui, fetchBoardData }) {
         const resUpdate = await productBacklogService.updateWorkItem(
           projectId,
           workItemId,
-          apiPayload,
+          apiPayload
         );
         if (!resUpdate || (resUpdate.isSuccess === false && !resUpdate.data))
           throw new Error('Update failed');
@@ -81,7 +82,7 @@ export function useBoardActions({ projectId, ui, fetchBoardData }) {
         toast.error(WORK_BOARD_UI.ERROR_UPDATE_TASK);
       }
     },
-    [projectId, ui, fetchBoardData, toast],
+    [projectId, ui, fetchBoardData, toast]
   );
 
   return { handleTaskClick, handleUpdateSubmit };

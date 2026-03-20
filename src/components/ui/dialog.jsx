@@ -1,8 +1,9 @@
 'use client';
 
+import { X } from 'lucide-react';
 import React, { createContext, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+
 import { cn } from '@/lib/cn';
 
 const DialogCtx = createContext(null);
@@ -32,7 +33,7 @@ function DialogTrigger({ asChild = false, children }) {
   return asChild ? (
     React.cloneElement(child, props)
   ) : (
-    <button type='button' {...props}>
+    <button type="button" {...props}>
       {children}
     </button>
   );
@@ -52,7 +53,7 @@ function DialogClose({ asChild = false, children }) {
   return asChild ? (
     React.cloneElement(child, props)
   ) : (
-    <button type='button' {...props}>
+    <button type="button" {...props}>
       {children}
     </button>
   );
@@ -61,7 +62,7 @@ function DialogClose({ asChild = false, children }) {
 function DialogOverlay({ className = '', ...props }) {
   return (
     <div
-      data-slot='dialog-overlay'
+      data-slot="dialog-overlay"
       className={cn('fixed inset-0 z-50 bg-black/50', className)}
       {...props}
     />
@@ -76,37 +77,37 @@ function DialogContent({ className = '', children, showCloseButton = true, ...pr
     <>
       <DialogOverlay onMouseDown={() => onOpenChange?.(false)} />
       <div
-        data-slot='dialog-content'
-        role='dialog'
-        aria-modal='true'
+        data-slot="dialog-content"
+        role="dialog"
+        aria-modal="true"
         className={cn(
           'fixed top-1/2 left-1/2 z-50 w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2',
           'rounded-lg border border-slate-200 bg-white p-6 shadow-xl outline-none sm:max-w-lg',
-          className,
+          className
         )}
         {...props}
       >
         {children}
         {showCloseButton ? (
           <button
-            type='button'
-            aria-label='Close'
+            type="button"
+            aria-label="Close"
             onClick={() => onOpenChange?.(false)}
-            className='absolute top-4 right-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+            className="absolute top-4 right-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
-            <X className='size-4' />
+            <X className="size-4" />
           </button>
         ) : null}
       </div>
     </>,
-    document.body,
+    document.body
   );
 }
 
 function DialogHeader({ className = '', ...props }) {
   return (
     <div
-      data-slot='dialog-header'
+      data-slot="dialog-header"
       className={cn('flex flex-col gap-2 text-center sm:text-left', className)}
       {...props}
     />
@@ -116,7 +117,7 @@ function DialogHeader({ className = '', ...props }) {
 function DialogFooter({ className = '', ...props }) {
   return (
     <div
-      data-slot='dialog-footer'
+      data-slot="dialog-footer"
       className={cn('mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
       {...props}
     />
@@ -126,7 +127,7 @@ function DialogFooter({ className = '', ...props }) {
 function DialogTitle({ className = '', ...props }) {
   return (
     <div
-      data-slot='dialog-title'
+      data-slot="dialog-title"
       className={cn('text-lg leading-none font-semibold text-slate-900', className)}
       {...props}
     />
@@ -136,7 +137,7 @@ function DialogTitle({ className = '', ...props }) {
 function DialogDescription({ className = '', ...props }) {
   return (
     <div
-      data-slot='dialog-description'
+      data-slot="dialog-description"
       className={cn('text-sm text-slate-500', className)}
       {...props}
     />
@@ -145,11 +146,11 @@ function DialogDescription({ className = '', ...props }) {
 
 export {
   Dialog,
-  DialogTrigger,
   DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 };

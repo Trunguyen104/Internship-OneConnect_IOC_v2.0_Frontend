@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DashboardPage from './Dashboard';
-import { useDashboard } from '../hooks/useDashboard';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
+
+import { useDashboard } from '../hooks/useDashboard';
+import DashboardPage from './Dashboard';
 
 // Mock the hook
 vi.mock('../hooks/useDashboard', () => ({
@@ -12,38 +13,38 @@ vi.mock('../hooks/useDashboard', () => ({
 
 // Mock layout components
 vi.mock('@/components/layout/PageShell', () => ({
-  default: ({ children }) => <div data-testid='page-shell'>{children}</div>,
+  default: ({ children }) => <div data-testid="page-shell">{children}</div>,
 }));
 vi.mock('@/components/layout/StudentTabs', () => ({
-  default: () => <div data-testid='student-tabs' />,
+  default: () => <div data-testid="student-tabs" />,
 }));
 vi.mock('@/components/layout/StudentPageHeader', () => ({
-  default: () => <div data-testid='student-header' />,
+  default: () => <div data-testid="student-header" />,
 }));
 
 // Mock feature atoms
 vi.mock('./atoms', () => ({
   StatCard: ({ label, value }) => (
-    <div data-testid='stat-card'>
+    <div data-testid="stat-card">
       <span>{label}</span>
       <span>{value}</span>
     </div>
   ),
-  Loading: () => <div data-testid='loading' />,
-  ErrorBox: ({ message }) => <div data-testid='error-box'>{message}</div>,
+  Loading: () => <div data-testid="loading" />,
+  ErrorBox: ({ message }) => <div data-testid="error-box">{message}</div>,
 }));
 
 // Mock charts
 vi.mock('./DashboardCharts', () => ({
-  BurndownChart: () => <div data-testid='burndown-chart' />,
-  TaskStatusDistributionChart: () => <div data-testid='task-status-chart' />,
-  WorkloadDistributionChart: () => <div data-testid='workload-chart' />,
-  CompletionPieChart: () => <div data-testid='completion-pie-chart' />,
+  BurndownChart: () => <div data-testid="burndown-chart" />,
+  TaskStatusDistributionChart: () => <div data-testid="task-status-chart" />,
+  WorkloadDistributionChart: () => <div data-testid="workload-chart" />,
+  CompletionPieChart: () => <div data-testid="completion-pie-chart" />,
 }));
 
 // Mock violations list
 vi.mock('./ViolationsList', () => ({
-  ViolationsList: () => <div data-testid='violations-list' />,
+  ViolationsList: () => <div data-testid="violations-list" />,
 }));
 
 describe('DashboardPage Component', () => {
@@ -124,7 +125,7 @@ describe('DashboardPage Component', () => {
       render(<DashboardPage />);
       expect(screen.getByTestId('student-tabs')).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: new RegExp(DASHBOARD_UI.EXPORT_CSV, 'i') }),
+        screen.getByRole('button', { name: new RegExp(DASHBOARD_UI.EXPORT_CSV, 'i') })
       ).toBeInTheDocument();
     });
   });
