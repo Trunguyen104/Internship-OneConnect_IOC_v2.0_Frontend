@@ -1,12 +1,13 @@
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
+
 import { useBacklogBoard } from '../hooks/useBacklogBoard';
-import { EpicSidebar } from './EpicSidebar';
-import { SprintSection } from './SprintSection';
+import { BacklogModals } from './BacklogModals';
 import { BacklogSection } from './BacklogSection';
 import { BoardHeader } from './BoardHeader';
-import { BacklogModals } from './BacklogModals';
-import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { EpicSidebar } from './EpicSidebar';
+import { SprintSection } from './SprintSection';
 
 export default function BacklogBoard() {
   const {
@@ -66,11 +67,11 @@ export default function BacklogBoard() {
       activationConstraint: {
         distance: 3,
       },
-    }),
+    })
   );
 
   return (
-    <div className='relative flex h-[calc(100vh-140px)] w-full gap-6'>
+    <div className="relative flex h-[calc(100vh-140px)] w-full gap-6">
       {/* Sidebar Epics */}
       <EpicSidebar
         isSidebarOpen={isSidebarOpen}
@@ -85,15 +86,15 @@ export default function BacklogBoard() {
       />
 
       {/* Main Board */}
-      <div className='flex min-w-0 flex-1 flex-col overflow-y-auto pr-2 pb-10'>
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto pr-2 pb-10">
         <BoardHeader searchText={searchText} setSearchText={setSearchText} />
 
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           {loading ? (
-            <div className='text-muted py-10 text-center'>{BACKLOG_UI.LOADING}</div>
+            <div className="text-muted py-10 text-center">{BACKLOG_UI.LOADING}</div>
           ) : (
-            <div className='overflow-x-auto pb-4'>
-              <div className='min-w-[850px] pr-2'>
+            <div className="overflow-x-auto pb-4">
+              <div className="min-w-[850px] pr-2">
                 {/* SPRINTS */}
                 {filteredSprints.map((sprint) => (
                   <SprintSection

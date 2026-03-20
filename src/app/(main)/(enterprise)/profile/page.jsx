@@ -1,10 +1,11 @@
 'use client';
 
+import { Spin } from 'antd';
+import { useEffect, useState } from 'react';
+
 import EnterpriseProfileContainer from '@/components/features/company-profile/components/EnterpriseProfileContainer';
 import ProfilePage from '@/components/features/user/components/ProfilePage';
 import { userService } from '@/components/features/user/services/userService';
-import { useEffect, useState } from 'react';
-import { Spin } from 'antd';
 
 export default function GeneralProfilePage() {
   const [role, setRole] = useState(null);
@@ -27,8 +28,8 @@ export default function GeneralProfilePage() {
 
   if (loading) {
     return (
-      <div className='flex h-64 items-center justify-center'>
-        <Spin size='large' />
+      <div className="flex h-64 items-center justify-center">
+        <Spin size="large" />
       </div>
     );
   }
@@ -38,7 +39,7 @@ export default function GeneralProfilePage() {
   const isEnterpriseRole = role === 'EnterpriseAdmin' || role === 4 || role === 'HR' || role === 5;
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       {isEnterpriseRole ? <EnterpriseProfileContainer /> : <ProfilePage />}
     </div>
   );

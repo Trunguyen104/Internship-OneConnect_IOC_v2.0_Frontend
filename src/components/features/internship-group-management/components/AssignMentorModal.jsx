@@ -1,11 +1,11 @@
-import { ProjectOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { Form, Input, Select } from "antd";
-import React, { memo, useEffect } from "react";
+import { ProjectOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Input, Select } from 'antd';
+import React, { memo, useEffect } from 'react';
 
-import CompoundModal from "@/components/ui/CompoundModal";
-import { INTERNSHIP_MANAGEMENT_UI } from "@/constants/internship-management/internship-management";
+import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { MOCK_MENTORS, MOCK_PROJECTS } from "../constants/groupData";
+import { MOCK_MENTORS, MOCK_PROJECTS } from '../constants/groupData';
 
 export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
   const [form] = Form.useForm();
@@ -72,7 +72,7 @@ export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
               value: m.id,
             }))}
             filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
           />
         </Form.Item>
@@ -96,7 +96,7 @@ export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
               value: p.id,
             }))}
             filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
           />
         </Form.Item>
@@ -131,4 +131,4 @@ export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
   );
 });
 
-AssignMentorModal.displayName = "AssignMentorModal";
+AssignMentorModal.displayName = 'AssignMentorModal';

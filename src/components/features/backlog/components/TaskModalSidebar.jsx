@@ -1,9 +1,10 @@
 'use client';
 
-import { WORK_ITEM_STATUS, WORK_ITEM_TYPE, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
-import { Select, TextInput } from './TaskFields';
 import DateInput from '@/components/ui/dateinput';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
+
+import { Select, TextInput } from './TaskFields';
 
 /**
  * Shared Sidebar for Create and Update Task Modals
@@ -29,20 +30,20 @@ export function TaskModalSidebar({
   setPoints,
 }) {
   return (
-    <div className='flex w-full shrink-0 flex-col lg:w-[360px]'>
+    <div className="flex w-full shrink-0 flex-col lg:w-[360px]">
       <div
-        className='border-border/50 h-full overflow-y-auto rounded-3xl border bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]'
+        className="border-border/50 h-full overflow-y-auto rounded-3xl border bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
         style={{ scrollbarWidth: 'none' }}
       >
-        <h3 className='text-text mb-5 text-[17px] font-bold'>{BACKLOG_UI.DETAILS || 'Details'}</h3>
+        <h3 className="text-text mb-5 text-[17px] font-bold">{BACKLOG_UI.DETAILS || 'Details'}</h3>
 
-        <div className='space-y-5'>
+        <div className="space-y-5">
           {/* Status */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[130px] text-[13.5px] font-semibold'>
-              {BACKLOG_UI.FIELD_STATUS || 'Status'} <span className='text-danger'>*</span>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[130px] text-[13.5px] font-semibold">
+              {BACKLOG_UI.FIELD_STATUS || 'Status'} <span className="text-danger">*</span>
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <Select
                 value={status}
                 onChange={setStatus}
@@ -58,11 +59,11 @@ export function TaskModalSidebar({
           </div>
 
           {/* Type */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
-              {BACKLOG_UI.FIELD_TYPE || 'Type'} <span className='text-danger'>*</span>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
+              {BACKLOG_UI.FIELD_TYPE || 'Type'} <span className="text-danger">*</span>
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <Select
                 value={type}
                 onChange={setType}
@@ -77,11 +78,11 @@ export function TaskModalSidebar({
           </div>
 
           {/* Epic */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
               {BACKLOG_UI.TYPE_EPIC || 'Epic'}
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <Select
                 value={epic}
                 onChange={setEpic}
@@ -95,11 +96,11 @@ export function TaskModalSidebar({
           </div>
 
           {/* Sprint */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
               {BACKLOG_UI.FIELD_SPRINT || 'Sprint'}
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <Select
                 value={sprintId}
                 onChange={setSprintId}
@@ -113,11 +114,11 @@ export function TaskModalSidebar({
           </div>
 
           {/* Assignee */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
               {BACKLOG_UI.FIELD_ASSIGNEE || 'Assignee'}
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <Select
                 value={assignee}
                 onChange={setAssignee}
@@ -131,11 +132,11 @@ export function TaskModalSidebar({
           </div>
 
           {/* Priority */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
-              {BACKLOG_UI.FIELD_PRIORITY || 'Priority'} <span className='text-danger'>*</span>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
+              {BACKLOG_UI.FIELD_PRIORITY || 'Priority'} <span className="text-danger">*</span>
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <Select
                 value={priority}
                 onChange={setPriority}
@@ -150,22 +151,22 @@ export function TaskModalSidebar({
           </div>
 
           {/* Due Date */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
               {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
             </span>
-            <div className='flex-1'>
+            <div className="flex-1">
               <DateInput value={dueDate} onChange={setDueDate} />
             </div>
           </div>
 
           {/* Story Points */}
-          <div className='flex items-center justify-between gap-4'>
-            <span className='text-muted min-w-[120px] text-sm font-medium'>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted min-w-[120px] text-sm font-medium">
               {BACKLOG_UI.FIELD_STORY_POINTS || 'Story Points'}
             </span>
-            <div className='flex-1'>
-              <TextInput value={points} onChange={setPoints} placeholder='' />
+            <div className="flex-1">
+              <TextInput value={points} onChange={setPoints} placeholder="" />
             </div>
           </div>
         </div>

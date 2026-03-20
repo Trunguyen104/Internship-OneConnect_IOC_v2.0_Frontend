@@ -1,5 +1,6 @@
-import ProfilePage from '@/components/features/user/components/ProfilePage';
 import React from 'react';
+
+import ProfilePage from '@/components/features/user/components/ProfilePage';
 
 function page() {
   return (

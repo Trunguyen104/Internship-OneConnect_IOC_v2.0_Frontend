@@ -1,8 +1,10 @@
 'use client';
 
+import { Select } from 'antd';
+
 import Card from '@/components/ui/card';
 import SearchBar from '@/components/ui/searchbar';
-import { Select } from 'antd';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useAdminUsersContext } from '../context/AdminUsersContext';
 
@@ -22,26 +24,26 @@ export default function AdminUsersFilters() {
   } = useAdminUsersContext();
 
   return (
-    <Card className='min-h-0'>
-      <Card.Header className='border-b border-slate-100 pb-4'>
+    <Card className="min-h-0">
+      <Card.Header className="border-b border-slate-100 pb-4">
         <div>
-          <Card.Title>Admin users</Card.Title>
-          <Card.Description>Manage administrative accounts across the system</Card.Description>
+          <Card.Title>{UI_TEXT.ADMIN_USERS.ADMIN_USERS_CAP}</Card.Title>
+          <Card.Description>{UI_TEXT.ADMIN_USERS.MANAGE_ADMIN_ACCOUNTS}</Card.Description>
         </div>
         <Card.Action>
           <button
-            type='button'
+            type="button"
             onClick={() => setCreateOpen(true)}
-            className='bg-primary hover:bg-primary-hover flex cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white'
+            className="bg-primary hover:bg-primary-hover flex cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white"
           >
-            Create
+            {UI_TEXT.ADMIN_USERS.CREATE_CAP}
           </button>
         </Card.Action>
       </Card.Header>
 
-      <Card.Content className='space-y-3 pt-4'>
+      <Card.Content className="space-y-3 pt-4">
         <SearchBar
-          placeholder='Search name/email/code'
+          placeholder={UI_TEXT.ADMIN_USERS.SEARCH_PLACEHOLDER}
           value={search}
           onChange={setSearch}
           showAction={false}
@@ -49,36 +51,36 @@ export default function AdminUsersFilters() {
           onFilterClick={() => {}}
         />
 
-        <div className='flex flex-wrap items-center gap-3'>
-          <div className='w-56'>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-56">
             <Select
               allowClear
-              placeholder='Filter role'
+              placeholder={UI_TEXT.ADMIN_USERS.FILTER_ROLE}
               value={role}
               onChange={(v) => {
                 setRole(v);
                 setPageNumber(1);
               }}
               options={roleOptions}
-              className='w-full'
+              className="w-full"
             />
           </div>
 
-          <div className='w-56'>
+          <div className="w-56">
             <Select
               allowClear
-              placeholder='Filter status'
+              placeholder={UI_TEXT.ADMIN_USERS.FILTER_STATUS}
               value={status}
               onChange={(v) => {
                 setStatus(v);
                 setPageNumber(1);
               }}
               options={statusOptions}
-              className='w-full'
+              className="w-full"
             />
           </div>
 
-          {!!err && <span className='text-sm font-medium text-red-600'>{String(err)}</span>}
+          {!!err && <span className="text-sm font-medium text-red-600">{String(err)}</span>}
         </div>
       </Card.Content>
     </Card>

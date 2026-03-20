@@ -36,6 +36,38 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
+import { UI_TEXT } from '@/lib/UI_Text';
+
+const EDITOR_STYLE = `
+.ProseMirror {
+  flex: 1;
+  min-height: 100%;
+  outline: none;
+}
+
+.ProseMirror.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #9aa4b2;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+
+.ProseMirror ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+`;
+
 function ToolbarButton({ title, active, disabled, onClick, children }) {
   return (
     <button
@@ -81,7 +113,11 @@ function Divider() {
   );
 }
 
-export default function TiptapEditor({ value, onChange, placeholder = 'Nhập mô tả...' }) {
+export default function TiptapEditor({
+  value,
+  onChange,
+  placeholder = UI_TEXT.TIPTAP.PLACEHOLDER,
+}) {
   const lastHtmlRef = useRef('');
   const applyingExternalValueRef = useRef(false);
   const fileInputRef = useRef(null);
@@ -197,7 +233,7 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nhập m�
 
   const setLink = () => {
     const prev = editor.getAttributes('link').href || '';
-    const url = window.prompt('Nhập URL', prev);
+    const url = window.prompt(UI_TEXT.TIPTAP.PROMPT_URL, prev);
     if (url === null) return;
 
     if (url.trim() === '') {
@@ -217,14 +253,14 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nhập m�
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Vui lòng chọn file ảnh');
+      alert(UI_TEXT.TIPTAP.IMAGE_ONLY);
       e.target.value = '';
       return;
     }
 
     const MAX_MB = 3;
     if (file.size > MAX_MB * 1024 * 1024) {
-      alert(`Ảnh quá lớn. Vui lòng chọn ảnh <= ${MAX_MB}MB`);
+      alert(UI_TEXT.TIPTAP.IMAGE_TOO_LARGE);
       e.target.value = '';
       return;
     }
@@ -437,35 +473,9 @@ export default function TiptapEditor({ value, onChange, placeholder = 'Nhập m�
             flexDirection: 'column',
           }}
         >
-          <style jsx global>{`
-            .ProseMirror {
-              flex: 1;
-              min-height: 100%;
-              outline: none;
-            }
-
-            .ProseMirror.is-editor-empty:first-child::before {
-              content: attr(data-placeholder);
-              float: left;
-              color: #9aa4b2;
-              pointer-events: none;
-              height: 0;
-            }
-
-            .ProseMirror ul {
-              list-style: disc;
-              padding-left: 1.25rem;
-            }
-
-            .ProseMirror ol {
-              list-style: decimal;
-              padding-left: 1.25rem;
-            }
-
-            .ProseMirror li {
-              margin: 0.25rem 0;
-            }
-          `}</style>
+          <style jsx global>
+            {EDITOR_STYLE}
+          </style>
 
           <input
             ref={fileInputRef}

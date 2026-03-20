@@ -19,10 +19,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/admin-users/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
-import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/admin-users/enums';
 
 import { adminUsersService } from '../adminUsers.service';
 
@@ -129,18 +129,18 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
 
   return (
     <Sheet open={open} onOpenChange={onToggle}>
-      <SheetContent className='flex flex-col p-4 sm:max-w-[560px]'>
-        <form onSubmit={doUpdate} className='flex min-h-0 flex-1 flex-col'>
-          <SheetHeader className='mt-2 text-center'>
-            <SheetTitle className='text-3xl'>{UI_TEXT.ADMIN_USERS.UPDATE_PROFILE}</SheetTitle>
+      <SheetContent className="flex flex-col p-4 sm:max-w-[560px]">
+        <form onSubmit={doUpdate} className="flex min-h-0 flex-1 flex-col">
+          <SheetHeader className="mt-2 text-center">
+            <SheetTitle className="text-3xl">{UI_TEXT.ADMIN_USERS.UPDATE_PROFILE}</SheetTitle>
             <SheetDescription>{UI_TEXT.ADMIN_USERS.UPDATE_INFO}</SheetDescription>
           </SheetHeader>
 
-          <FieldGroup className='mt-4 min-h-0 flex-1 gap-4 overflow-y-auto pb-8'>
+          <FieldGroup className="mt-4 min-h-0 flex-1 gap-4 overflow-y-auto pb-8">
             <Field>
-              <FieldLabel htmlFor='fullName'>Full name</FieldLabel>
+              <FieldLabel htmlFor="fullName">{UI_TEXT.ADMIN_USERS.FULL_NAME_LABEL}</FieldLabel>
               <Input
-                id='fullName'
+                id="fullName"
                 value={editForm.fullName}
                 onChange={(e) => setEditForm((p) => ({ ...p, fullName: e.target.value }))}
                 error={errors.fullName}
@@ -148,15 +148,15 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor='phoneNumber'>Phone (optional)</FieldLabel>
+              <FieldLabel htmlFor="phoneNumber">{UI_TEXT.ADMIN_USERS.PHONE_OPTIONAL}</FieldLabel>
               <Input
-                id='phoneNumber'
+                id="phoneNumber"
                 value={editForm.phoneNumber}
                 onChange={(e) => setEditForm((p) => ({ ...p, phoneNumber: e.target.value }))}
               />
             </Field>
 
-            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field>
                 <FieldLabel>{UI_TEXT.ADMIN_USERS.STATUS}</FieldLabel>
                 <Select
@@ -166,8 +166,8 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
                   <SelectTrigger>
                     <SelectValue placeholder={UI_TEXT.ADMIN_USERS.STATUS} />
                   </SelectTrigger>
-                  <SelectContent position='popper'>
-                    <SelectItem value=''>-</SelectItem>
+                  <SelectContent position="popper">
+                    <SelectItem value="">{UI_TEXT.COMMON.MINUS}</SelectItem>
                     {Object.values(USER_STATUS).map((v) => (
                       <SelectItem key={String(v)} value={String(v)}>
                         {USER_STATUS_LABEL[v] || String(v)}
@@ -178,28 +178,28 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
               </Field>
 
               <Field>
-                <FieldLabel>Gender</FieldLabel>
+                <FieldLabel>{UI_TEXT.ADMIN_USERS.GENDER}</FieldLabel>
                 <Select
                   value={editForm.gender}
                   onValueChange={(v) => setEditForm((p) => ({ ...p, gender: v }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder='Gender' />
+                    <SelectValue placeholder={UI_TEXT.ADMIN_USERS.GENDER} />
                   </SelectTrigger>
-                  <SelectContent position='popper'>
-                    <SelectItem value=''>-</SelectItem>
-                    <SelectItem value='1'>Male</SelectItem>
-                    <SelectItem value='2'>Female</SelectItem>
-                    <SelectItem value='3'>Other</SelectItem>
+                  <SelectContent position="popper">
+                    <SelectItem value="">{UI_TEXT.COMMON.MINUS}</SelectItem>
+                    <SelectItem value="1">{UI_TEXT.ADMIN_USERS.MALE}</SelectItem>
+                    <SelectItem value="2">{UI_TEXT.ADMIN_USERS.FEMALE}</SelectItem>
+                    <SelectItem value="3">{UI_TEXT.ADMIN_USERS.OTHER}</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
             </div>
 
             <Field>
-              <FieldLabel htmlFor='dateOfBirth'>Date of birth (YYYY-MM-DD)</FieldLabel>
+              <FieldLabel htmlFor="dateOfBirth">{UI_TEXT.ADMIN_USERS.DOB_LABEL}</FieldLabel>
               <Input
-                id='dateOfBirth'
+                id="dateOfBirth"
                 value={editForm.dateOfBirth}
                 onChange={(e) => setEditForm((p) => ({ ...p, dateOfBirth: e.target.value }))}
                 error={errors.dateOfBirth}
@@ -207,9 +207,9 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor='avatarUrl'>Avatar URL (optional)</FieldLabel>
+              <FieldLabel htmlFor="avatarUrl">{UI_TEXT.ADMIN_USERS.AVATAR_LABEL}</FieldLabel>
               <Input
-                id='avatarUrl'
+                id="avatarUrl"
                 value={editForm.avatarUrl}
                 onChange={(e) => setEditForm((p) => ({ ...p, avatarUrl: e.target.value }))}
               />
@@ -218,25 +218,25 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
             {detail?.role === USER_ROLE.STUDENT ? (
               <>
                 <Field>
-                  <FieldLabel htmlFor='studentClass'>Student class (optional)</FieldLabel>
+                  <FieldLabel htmlFor="studentClass">{UI_TEXT.ADMIN_USERS.CLASS_LABEL}</FieldLabel>
                   <Input
-                    id='studentClass'
+                    id="studentClass"
                     value={editForm.studentClass}
                     onChange={(e) => setEditForm((p) => ({ ...p, studentClass: e.target.value }))}
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor='studentMajor'>Student major (optional)</FieldLabel>
+                  <FieldLabel htmlFor="studentMajor">{UI_TEXT.ADMIN_USERS.MAJOR_LABEL}</FieldLabel>
                   <Input
-                    id='studentMajor'
+                    id="studentMajor"
                     value={editForm.studentMajor}
                     onChange={(e) => setEditForm((p) => ({ ...p, studentMajor: e.target.value }))}
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor='studentGpa'>Student GPA (optional)</FieldLabel>
+                  <FieldLabel htmlFor="studentGpa">{UI_TEXT.ADMIN_USERS.GPA_LABEL}</FieldLabel>
                   <Input
-                    id='studentGpa'
+                    id="studentGpa"
                     value={editForm.studentGpa}
                     onChange={(e) => setEditForm((p) => ({ ...p, studentGpa: e.target.value }))}
                     error={errors.studentGpa}
@@ -246,12 +246,12 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
             ) : null}
           </FieldGroup>
 
-          <div className='mt-auto border-t border-slate-100 pt-4'>
-            <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
-              <Button type='button' variant='outline' onClick={() => onToggle?.(false)}>
+          <div className="mt-auto border-t border-slate-100 pt-4">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <Button type="button" variant="outline" onClick={() => onToggle?.(false)}>
                 {UI_TEXT.BUTTON.CLOSE}
               </Button>
-              <Button type='submit' disabled={busy}>
+              <Button type="submit" disabled={busy}>
                 {UI_TEXT.BUTTON.SAVE_CHANGES}
               </Button>
             </div>

@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/components/features/auth/services/authService';
-import { useToast } from '@/providers/ToastProvider';
-import { AUTH_MESSAGES } from '@/constants/auth/uiText';
-import { validateLogin } from '@/validators/auth';
+import { useCallback, useState } from 'react';
 
+import { login } from '@/components/features/auth/services/authService';
+import { AUTH_MESSAGES } from '@/constants/auth/uiText';
 import { USER_ROLE } from '@/constants/common/enums';
+import { useToast } from '@/providers/ToastProvider';
+import { validateLogin } from '@/validators/auth';
 
 export function useLogin() {
   const toast = useToast();

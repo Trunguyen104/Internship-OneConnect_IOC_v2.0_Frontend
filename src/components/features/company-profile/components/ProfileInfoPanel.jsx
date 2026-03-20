@@ -1,14 +1,17 @@
 'use client';
 
-import { memo } from 'react';
 import {
   EnvironmentOutlined,
   GlobalOutlined,
   InfoCircleOutlined,
   SolutionOutlined,
 } from '@ant-design/icons';
-import { Descriptions, Divider, Space, Tooltip, Typography, theme } from 'antd';
+import { Descriptions, Divider, Space, theme, Tooltip, Typography } from 'antd';
+import { memo } from 'react';
+
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
+
 import { ProfileSectionCard } from './ProfileSectionCard';
 
 const { Text, Link } = Typography;
@@ -24,11 +27,11 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
 
   return (
     <ProfileSectionCard title={ENTERPRISE_PROFILE_UI.ENTERPRISE.INFO} icon={<InfoCircleOutlined />}>
-      <Space orientation='vertical' size='middle' style={{ width: '100%' }}>
+      <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
         <Descriptions
           column={1}
           bordered={false}
-          layout='vertical'
+          layout="vertical"
           styles={{
             label: {
               color: token.colorTextTertiary,
@@ -49,11 +52,11 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
           <Descriptions.Item
             label={
               <Space size={6}>
-                <InfoCircleOutlined aria-hidden='true' />
+                <InfoCircleOutlined aria-hidden="true" />
                 {ENTERPRISE_PROFILE_UI.ENTERPRISE.TAX_CODE}
                 <Tooltip title={ENTERPRISE_PROFILE_UI.ENTERPRISE.TAX_CODE_HINT}>
-                  <Text type='secondary' style={{ fontWeight: 700 }}>
-                    (i)
+                  <Text type="secondary" style={{ fontWeight: 700 }}>
+                    {UI_TEXT.COMMON.INFO_ICON}
                   </Text>
                 </Tooltip>
               </Space>
@@ -65,7 +68,7 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
           <Descriptions.Item
             label={
               <Space size={6}>
-                <SolutionOutlined aria-hidden='true' />
+                <SolutionOutlined aria-hidden="true" />
                 {ENTERPRISE_PROFILE_UI.ENTERPRISE.INDUSTRY}
               </Space>
             }
@@ -76,7 +79,7 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
           <Descriptions.Item
             label={
               <Space size={6}>
-                <EnvironmentOutlined aria-hidden='true' />
+                <EnvironmentOutlined aria-hidden="true" />
                 {ENTERPRISE_PROFILE_UI.ENTERPRISE.ADDRESS}
               </Space>
             }
@@ -87,13 +90,13 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
           <Descriptions.Item
             label={
               <Space size={6}>
-                <GlobalOutlined aria-hidden='true' />
+                <GlobalOutlined aria-hidden="true" />
                 {ENTERPRISE_PROFILE_UI.ENTERPRISE.WEBSITE}
               </Space>
             }
           >
             {profile?.website ? (
-              <Link href={profile.website} target='_blank' rel='noopener noreferrer'>
+              <Link href={profile.website} target="_blank" rel="noopener noreferrer">
                 {profile.website}
               </Link>
             ) : (
@@ -104,7 +107,7 @@ export const ProfileInfoPanel = memo(function ProfileInfoPanel({ profile }) {
 
         <Divider style={{ marginBlock: 0 }} />
 
-        <Text type='secondary' style={{ display: 'block' }}>
+        <Text type="secondary" style={{ display: 'block' }}>
           {ENTERPRISE_PROFILE_UI.ENTERPRISE.TRUST_HINT}
         </Text>
       </Space>

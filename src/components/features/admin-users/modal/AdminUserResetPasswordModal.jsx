@@ -57,39 +57,39 @@ export default function AdminUserResetPasswordModal({ open, userId, email, onTog
 
   return (
     <Dialog open={open} onOpenChange={onToggle}>
-      <DialogContent aria-describedby={undefined} className='sm:max-w-sm'>
+      <DialogContent aria-describedby={undefined} className="sm:max-w-sm">
         <form onSubmit={doReset}>
           <DialogHeader>
             <DialogTitle>{UI_TEXT.ADMIN_USERS.RESET_PASSWORD}</DialogTitle>
             <DialogDescription>{UI_TEXT.ADMIN_USERS.ACCOUNT_SECURITY}</DialogDescription>
           </DialogHeader>
 
-          <FieldGroup className='mt-4 gap-4'>
+          <FieldGroup className="mt-4 gap-4">
             <Field>
-              <FieldLabel>Target</FieldLabel>
-              <div className='rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-sm text-slate-700'>
-                {email || '-'}
+              <FieldLabel>{UI_TEXT.ADMIN_USERS.TARGET}</FieldLabel>
+              <div className="rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                {email || UI_TEXT.COMMON.MINUS}
               </div>
             </Field>
 
             <Field>
-              <FieldLabel htmlFor='reason'>Reason</FieldLabel>
+              <FieldLabel htmlFor="reason">{UI_TEXT.ADMIN_USERS.REASON}</FieldLabel>
               <Textarea
-                id='reason'
+                id="reason"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder='Reason (10..500 chars)'
+                placeholder="Reason (10..500 chars)"
               />
             </Field>
           </FieldGroup>
 
-          <DialogFooter className='mt-4'>
+          <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button type='button' variant='outline'>
+              <Button type="button" variant="outline">
                 {UI_TEXT.BUTTON.CLOSE}
               </Button>
             </DialogClose>
-            <Button type='submit' disabled={busy}>
+            <Button type="submit" disabled={busy}>
               {UI_TEXT.ADMIN_USERS.RESET_PASSWORD}
             </Button>
           </DialogFooter>

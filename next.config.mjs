@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Bắt buộc để Dockerfile standalone hoạt động đúng
-  output: "standalone",
+  output: 'standalone',
 
   // Tắt React Compiler (tránh lỗi EPERM spawn trên Windows)
   reactCompiler: false,
@@ -9,24 +9,24 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
       {
-        protocol: "https",
-        hostname: "placehold.co",
+        protocol: 'https',
+        hostname: 'placehold.co',
       },
       {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       },
       {
-        protocol: "https",
-        hostname: "iocv2.duckdns.org",
+        protocol: 'https',
+        hostname: 'iocv2.duckdns.org',
       },
       {
-        protocol: "http",
-        hostname: "localhost",
+        protocol: 'http',
+        hostname: 'localhost',
       },
     ],
   },
