@@ -6,35 +6,29 @@ import dayjs from 'dayjs';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const STATUS_CONFIG = {
-  0: {
+  1: {
     label: EVALUATION_UI.STATUS.PENDING,
     bg: 'bg-warning-surface',
     text: 'text-warning-text',
     border: 'border-warning-border',
   },
-  1: {
-    label: EVALUATION_UI.STATUS.ONGOING,
+  2: {
+    label: EVALUATION_UI.STATUS.DRAFT,
     bg: 'bg-info-surface',
     text: 'text-info',
     border: 'border-info/20',
   },
-  2: {
-    label: EVALUATION_UI.STATUS.COMPLETED,
+  3: {
+    label: EVALUATION_UI.STATUS.SUBMITTED,
+    bg: 'bg-info-surface',
+    text: 'text-info',
+    border: 'border-info/20',
+  },
+  4: {
+    label: EVALUATION_UI.STATUS.PUBLISHED,
     bg: 'bg-success-surface',
     text: 'text-success',
     border: 'border-success/20',
-  },
-  ONGOING: {
-    label: EVALUATION_UI.STATUS.ONGOING,
-    bg: 'bg-info-surface',
-    text: 'text-info',
-    border: 'border-info/20',
-  },
-  UPCOMING: {
-    label: EVALUATION_UI.STATUS.PENDING,
-    bg: 'bg-warning-surface',
-    text: 'text-warning-text',
-    border: 'border-warning-border',
   },
   PENDING: {
     label: EVALUATION_UI.STATUS.PENDING,
@@ -42,8 +36,26 @@ const STATUS_CONFIG = {
     text: 'text-warning-text',
     border: 'border-warning-border',
   },
+  DRAFT: {
+    label: EVALUATION_UI.STATUS.DRAFT,
+    bg: 'bg-info-surface',
+    text: 'text-info',
+    border: 'border-info/20',
+  },
+  SUBMITTED: {
+    label: EVALUATION_UI.STATUS.SUBMITTED,
+    bg: 'bg-info-surface',
+    text: 'text-info',
+    border: 'border-info/20',
+  },
+  PUBLISHED: {
+    label: EVALUATION_UI.STATUS.PUBLISHED,
+    bg: 'bg-success-surface',
+    text: 'text-success',
+    border: 'border-success/20',
+  },
   COMPLETED: {
-    label: EVALUATION_UI.STATUS.COMPLETED,
+    label: EVALUATION_UI.STATUS.PUBLISHED,
     bg: 'bg-success-surface',
     text: 'text-success',
     border: 'border-success/20',

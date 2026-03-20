@@ -11,10 +11,5 @@ const adminMenu = [
 ];
 
 export default function SidebarAdmin() {
-  const backButton = {
-    href: '/internship-groups',
-    label: 'Back to previous page',
-  };
-
-  return <BaseSidebar menus={adminMenu} backButton={backButton} activeStrategy='prefix' />;
+  return <BaseSidebar menus={adminMenu} activeStrategy='prefix' />;
 }

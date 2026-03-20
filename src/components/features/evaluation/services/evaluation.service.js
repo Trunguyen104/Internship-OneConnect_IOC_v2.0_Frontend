@@ -64,7 +64,7 @@ export const EvaluationService = {
     );
   },
 
-  // --- Student Endpoints ---
+  // --- Student Endpoints (api/students/me prefixed) ---
   getStudentEvaluationCycles(internshipId) {
     return httpGet(`/students/me/internships/${internshipId}/evaluation-cycles`);
   },
