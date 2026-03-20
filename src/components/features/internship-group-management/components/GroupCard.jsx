@@ -142,6 +142,8 @@ const GroupCard = memo(({ group, onAssign, onDelete, onView }) => {
   );
 });
 
+GroupCard.displayName = 'GroupCard';
+
 Object.assign(GroupCard, {
   Root: GroupCardRoot,
   Header: GroupCardHeader,
