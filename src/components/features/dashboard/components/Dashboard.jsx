@@ -1,7 +1,7 @@
 'use client';
+import React from 'react';
 import { Download, LayoutList, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import StudentTabs from '@/components/layout/StudentTabs';
-import PageShell from '@/components/layout/PageShell';
 
 import { useDashboard } from '../hooks/useDashboard';
 import { StatCard, Loading, ErrorBox } from '@/components/ui/atoms';
@@ -19,22 +19,11 @@ import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 export default function DashboardPage() {
   const { data, err, completionPie } = useDashboard();
 
-  if (err)
-    return (
-      <PageShell>
-        <ErrorBox message={err} />
-      </PageShell>
-    );
-
-  if (!data)
-    return (
-      <PageShell>
-        <Loading />
-      </PageShell>
-    );
+  if (err) return <ErrorBox message={err} />;
+  if (!data) return <Loading />;
 
   return (
-    <PageShell>
+    <div className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
       <StudentPageHeader hidden />
       {/* Top actions */}
       <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
@@ -93,6 +82,6 @@ export default function DashboardPage() {
         <CompletionPieChart completionPie={completionPie} />
         <ViolationsList studentViolations={data.studentViolations} />
       </div>
-    </PageShell>
+    </div>
   );
 }

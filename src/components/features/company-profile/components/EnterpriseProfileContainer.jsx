@@ -46,12 +46,41 @@ export default function EnterpriseProfileContainer() {
     if (!result.ok) message.error(result.error?.message || ENTERPRISE_PROFILE_UI.LOADING_ERROR);
   }, [message, refetch]);
 
+  const handleLogoChange = useCallback(
+    async (file) => {
+      const result = await saveProfile({ ...profile, logoUrl: file });
+      if (result.ok) {
+        message.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
+      } else {
+        message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
+      }
+    },
+    [message, profile, saveProfile],
+  );
+
+  const handleBannerChange = useCallback(
+    async (file) => {
+      const result = await saveProfile({ ...profile, backgroundUrl: file });
+      if (result.ok) {
+        message.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
+      } else {
+        message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
+      }
+    },
+    [message, profile, saveProfile],
+  );
+
   if (loading) return <ProfileLoading />;
   if (!profile) return <ProfileEmpty onRetry={handleRetry} />;
 
   return (
     <>
-      <EnterpriseProfile profile={profile} onEdit={canEdit ? openEdit : null} />
+      <EnterpriseProfile
+        profile={profile}
+        onEdit={canEdit ? openEdit : null}
+        onLogoChange={canEdit ? handleLogoChange : null}
+        onBannerChange={canEdit ? handleBannerChange : null}
+      />
       <EnterpriseProfileEditDrawer
         open={isEditOpen}
         saving={saving}

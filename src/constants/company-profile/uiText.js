@@ -7,12 +7,17 @@ export const ENTERPRISE_PROFILE_UI = {
     TITLE: 'Edit Organization Profile',
     SUBTITLE: 'Update your organization details. Changes will be visible immediately after saving.',
     SAVE_CHANGES: 'Save Changes',
+    COMPANY_LOGO: 'Company Logo',
+    COVER_BANNER: 'Cover Banner',
+    LOGO_OVERLAP_HINT:
+      'The logo will elegantly overlap the cover banner on your public profile page.',
   },
   EMPTY: {
     NO_DATA: 'No profile data found.',
   },
   BUTTONS: {
     CANCEL: 'Cancel',
+    RETRY: 'Try Again',
   },
   ENTERPRISE: {
     SUMMARY: 'Organization',
@@ -38,6 +43,11 @@ export const ENTERPRISE_PROFILE_UI = {
       WEBSITE: 'Website must be a valid URL starting with http:// or https://',
       DESCRIPTION: 'Description cannot exceed 2000 characters',
       NAME: 'Company Name is required',
+      LOAD_FAILED_DESCRIPTION: 'We couldn’t load your company profile right now. Please try again.',
     },
+    CHANGE_COVER: 'Change Cover',
+    VERIFIED: 'Verified',
+    ADD_OVERVIEW_HINT: 'Add a short overview to make your company profile more complete.',
+    TRUST_HINT: 'Keep your company information up to date to build trust with candidates.',
   },
 };
