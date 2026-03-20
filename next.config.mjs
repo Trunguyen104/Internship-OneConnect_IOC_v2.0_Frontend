@@ -1,36 +1,39 @@
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
   // Bắt buộc để Dockerfile standalone hoạt động đúng
-  output: 'standalone',
+  output: "standalone",
 
   // Tắt React Compiler (tránh lỗi EPERM spawn trên Windows)
   reactCompiler: false,
 
-  // Cho phép Next.js load ảnh từ domain ngoài
-  // Thêm domain BE nếu serve ảnh trực tiếp từ BE (không qua Cloudinary)
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
       {
-        // Cho phép ảnh từ domain production
-        protocol: 'https',
-        hostname: 'iocv2.duckdns.org',
+        protocol: "https",
+        hostname: "placehold.co",
       },
       {
-        // Fallback local dev
-        protocol: 'http',
-        hostname: 'localhost',
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "iocv2.duckdns.org",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
   },
 
-  // Bỏ qua lỗi TypeScript lúc build (project dùng JS, không TS)
-  // TODO: Xóa dòng này khi migrate sang TypeScript
-  typescript: { ignoreBuildErrors: true },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
