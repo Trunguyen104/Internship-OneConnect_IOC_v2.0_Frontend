@@ -1,3 +1,4 @@
+import { Modal } from 'antd';
 import { AlertCircle, Trash2 } from 'lucide-react';
 import React from 'react';
 
@@ -19,7 +20,7 @@ export const showDeleteConfirm = ({
     ? 'bg-red-600 hover:bg-red-700 border-none'
     : 'bg-amber-600 hover:bg-amber-700 border-none';
 
-  const confirm = modalApi ? modalApi.confirm : require('antd').Modal.confirm;
+  const confirm = modalApi ? modalApi.confirm : Modal.confirm;
 
   return confirm({
     icon: null,

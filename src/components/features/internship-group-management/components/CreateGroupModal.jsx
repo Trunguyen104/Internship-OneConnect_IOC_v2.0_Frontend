@@ -85,5 +85,6 @@ export const CreateGroupModal = memo(({ open, onCancel, onFinish }) => {
     </CompoundModal>
   );
 });
+CreateGroupModal.displayName = 'CreateGroupModal';
 
 export default CreateGroupModal;

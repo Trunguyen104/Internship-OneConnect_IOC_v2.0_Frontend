@@ -6,7 +6,7 @@ import {
   RocketOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { message, Progress } from 'antd';
+import { Progress } from 'antd';
 import React from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
@@ -20,15 +20,6 @@ const { DASHBOARD } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
 
 export default function UniAdminDashboard() {
   const { loading, stats, recentTerms } = useUniAdminDashboard();
-  const router = useRouter();
-
-  const handleGenerateAnalytics = () => {
-    const hide = message.loading(DASHBOARD.MESSAGES.GENERATING_STATS, 0);
-    setTimeout(() => {
-      hide();
-      message.success(DASHBOARD.MESSAGES.GENERATE_SUCCESS);
-    }, 1500);
-  };
 
   const endedPercent =
     stats?.totalTerms > 0 ? Math.round((stats?.statusCounts?.ended / stats.totalTerms) * 100) : 0;

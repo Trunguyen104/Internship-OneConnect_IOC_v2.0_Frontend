@@ -101,3 +101,4 @@ export const ViewGroupModal = memo(({ open, group, onCancel }) => {
     </CompoundModal>
   );
 });
+ViewGroupModal.displayName = 'ViewGroupModal';
