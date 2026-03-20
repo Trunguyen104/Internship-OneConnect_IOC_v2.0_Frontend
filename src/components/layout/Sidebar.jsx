@@ -22,35 +22,37 @@ export default function Sidebar() {
   const internshipGroupId = params?.internshipGroupId;
 
   const basePath = useMemo(
-    () => (internshipGroupId ? `/internship-groups/${internshipGroupId}` : '/internship-groups'),
+    () => (internshipGroupId ? `/internship-groups/${internshipGroupId}` : ''),
     [internshipGroupId]
   );
 
-  const studentMenu = useMemo(
-    () => [
-      { icon: <AppstoreOutlined />, label: 'Space', href: `${basePath}/space` },
+  const studentMenu = useMemo(() => {
+    const prefix = internshipGroupId
+      ? `/internship-groups/${internshipGroupId}`
+      : '/internship-groups';
+    return [
+      { icon: <AppstoreOutlined />, label: 'Space', href: `${prefix}/space` },
       {
         icon: <BarChartOutlined />,
         label: 'General Information',
-        href: `${basePath}/general-info`,
+        href: `${prefix}/general-info`,
       },
-      { icon: <ProjectOutlined />, label: 'Project', href: `${basePath}/project` },
-      { icon: <TeamOutlined />, label: 'Students', href: `${basePath}/studentlist` },
-      { icon: <VideoCameraOutlined />, label: 'Daily Report', href: `${basePath}/daily-report` },
-      { icon: <UploadOutlined />, label: 'Evaluation', href: `${basePath}/evaluate` },
-      { icon: <UserOutlined />, label: 'Stakeholders', href: `${basePath}/stakeholder` },
-      { icon: <ShopOutlined />, label: 'Violations', href: `${basePath}/violation` },
-    ],
-    [basePath]
-  );
+      { icon: <ProjectOutlined />, label: 'Project', href: `${prefix}/project` },
+      { icon: <TeamOutlined />, label: 'Students', href: `${prefix}/studentlist` },
+      { icon: <VideoCameraOutlined />, label: 'Daily Report', href: `${prefix}/daily-report` },
+      { icon: <UploadOutlined />, label: 'Evaluation', href: `${prefix}/evaluate` },
+      { icon: <UserOutlined />, label: 'Stakeholders', href: `${prefix}/stakeholder` },
+      { icon: <ShopOutlined />, label: 'Violations', href: `${prefix}/violation` },
+    ];
+  }, [internshipGroupId]);
 
   const profileMenu = useMemo(
     () => [
-      { icon: <UserOutlined />, label: 'Profile', href: `${basePath}/profile` },
+      { icon: <UserOutlined />, label: 'Profile', href: `${basePath || ''}/profile` },
       {
         icon: <LockOutlined />,
         label: 'Change Password',
-        href: `${basePath}/profile/change-password`,
+        href: `${basePath || ''}/profile/change-password`,
       },
     ],
     [basePath]
