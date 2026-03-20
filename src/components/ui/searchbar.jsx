@@ -2,6 +2,8 @@
 
 import { FilterOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 
+import { UI_TEXT } from '@/lib/UI_Text';
+
 export default function SearchBar({
   placeholder = 'Search',
   value,
@@ -33,7 +35,7 @@ export default function SearchBar({
           className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
         >
           <FilterOutlined />
-          Filter
+          {UI_TEXT.COMMON.FILTER}
         </button>
       )}
 

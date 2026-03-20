@@ -4,6 +4,7 @@ import { PictureOutlined, PlusOutlined } from '@ant-design/icons';
 import { Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
 
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function BannerUploader({ value, onChange }) {
@@ -52,7 +53,7 @@ export default function BannerUploader({ value, onChange }) {
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20 text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <PlusOutlined className="text-3xl" />
                 <span className="mt-2 text-sm font-bold tracking-wide uppercase">
-                  Update Cover Photo
+                  {UI_TEXT.UPLOADER.UPDATE_COVER}
                 </span>
               </div>
             </div>
@@ -60,9 +61,9 @@ export default function BannerUploader({ value, onChange }) {
             <div className="group-hover:text-primary flex h-full w-full flex-col items-center justify-center px-4 text-slate-400 transition-colors">
               <PictureOutlined className="mb-3 text-4xl opacity-40 transition-transform group-hover:scale-110" />
               <div className="text-center">
-                <span className="block text-base font-bold">Upload Cover Banner</span>
+                <span className="block text-base font-bold">{UI_TEXT.UPLOADER.UPLOAD_BANNER}</span>
                 <span className="mt-1 block text-[11px] font-medium tracking-tighter uppercase opacity-60">
-                  Recommended ratio 4.5:1
+                  {UI_TEXT.UPLOADER.RATIO_NOTE}
                 </span>
               </div>
             </div>

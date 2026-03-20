@@ -11,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import EnterprisesForm from './EnterprisesForm';
 
@@ -35,7 +36,7 @@ export default function EnterprisesDialog({
           <div className="rounded-full bg-white/10 p-1.5 transition-transform duration-500 group-hover:rotate-180">
             <Plus className="h-4 w-4 text-white" />
           </div>
-          Onboard Enterprise
+          {UI_TEXT.ENTERPRISES.ONBOARD}
         </Button>
       ) : null}
 
@@ -43,7 +44,7 @@ export default function EnterprisesDialog({
         <SheetContent className="flex flex-col p-4 sm:max-w-[640px]">
           <SheetHeader className="mt-2 text-center">
             <SheetTitle className="text-3xl">
-              {isEdit ? 'Update Enterprise' : 'Create Enterprise'}
+              {isEdit ? UI_TEXT.ADMIN_USERS.UPDATE_PROFILE : UI_TEXT.ADMIN_USERS.CREATE_TITLE}
             </SheetTitle>
             <SheetDescription>
               {isEdit

@@ -4,6 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
 
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function AvatarUploader({ value, onChange, size = 116, fullName }) {
@@ -52,7 +53,7 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100">
                 <PlusOutlined className="text-xl" />
-                <span className="mt-1 text-xs font-semibold">Edit avatar</span>
+                <span className="mt-1 text-xs font-semibold">{UI_TEXT.UPLOADER.EDIT_AVATAR}</span>
               </div>
             </>
           ) : (
@@ -62,13 +63,13 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
                   <span className="text-4xl font-bold text-slate-700">{getInitials(fullName)}</span>
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100">
                     <PlusOutlined className="text-xl" />
-                    <span className="mt-1 text-xs font-semibold">Upload</span>
+                    <span className="mt-1 text-xs font-semibold">{UI_TEXT.COMMON.UPLOAD}</span>
                   </div>
                 </>
               ) : (
                 <>
                   <PlusOutlined className="mb-1 text-2xl" />
-                  <span className="text-xs font-medium">Upload</span>
+                  <span className="text-xs font-medium">{UI_TEXT.COMMON.UPLOAD}</span>
                 </>
               )}
             </div>

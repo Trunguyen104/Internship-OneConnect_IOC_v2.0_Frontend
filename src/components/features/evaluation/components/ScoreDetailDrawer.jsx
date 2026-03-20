@@ -5,6 +5,7 @@ import { Card, Descriptions, Divider, Drawer, Empty, Progress, Space, Typography
 import dayjs from 'dayjs';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const { Text, Paragraph } = Typography;
 
@@ -43,7 +44,7 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
                     {Number(evaluationDetail.totalScore).toFixed(1)}
                   </span>
                   <Text type="secondary" className="text-sm">
-                    / 10
+                    {UI_TEXT.COMMON.SCORE_DENOMINATOR}
                   </Text>
                 </div>
               </Descriptions.Item>

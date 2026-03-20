@@ -16,6 +16,7 @@ import React, { memo, useEffect, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const StudentFormBody = memo(function StudentFormBody({
   initialValues,
@@ -207,8 +208,9 @@ const StudentFormBody = memo(function StudentFormBody({
             </span>
           </div>
           <p className="text-muted text-xs leading-relaxed">
-            This student is currently in the <strong>{initialValues?.status}</strong> phase.
-            Business details and evaluations will be updated as the internship progresses.
+            {UI_TEXT.ENROLLMENT.STUDENT_IN_PHASE} <strong>{initialValues?.status}</strong>{' '}
+            {UI_TEXT.BACKLOG.ISSUE} {UI_TEXT.COMMON.PHASE_VAL}
+            {UI_TEXT.ENROLLMENT.PHASE_HINT}
           </p>
         </div>
       )}

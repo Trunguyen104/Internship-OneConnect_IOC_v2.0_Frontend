@@ -3,6 +3,7 @@ import { Upload } from 'antd';
 import { useState } from 'react';
 
 import { cn } from '@/lib/cn';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { mediaService } from '@/services/media.service';
 
@@ -65,7 +66,9 @@ export default function LogoUploader({
           {loading ? (
             <div className="flex flex-col items-center gap-2 text-slate-400">
               <LoadingOutlined className="text-2xl" />
-              <span className="text-[10px] font-bold tracking-widest uppercase">Loading</span>
+              <span className="text-[10px] font-bold tracking-widest uppercase">
+                {UI_TEXT.COMMON.LOADING}
+              </span>
             </div>
           ) : value ? (
             <>
@@ -95,7 +98,7 @@ export default function LogoUploader({
                 <PlusOutlined className="text-lg" />
               </div>
               <span className="text-[10px] font-bold tracking-widest uppercase">
-                Upload {label}
+                {UI_TEXT.COMMON.UPLOAD} {label}
               </span>
             </div>
           )}

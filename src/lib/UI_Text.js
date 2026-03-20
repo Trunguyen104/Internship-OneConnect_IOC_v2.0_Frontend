@@ -34,7 +34,10 @@ export const UI_TEXT = {
     UNIT_ID_OPTIONAL: 'UnitId (optional)',
     RETRY: 'Retry',
     MINUS: '-',
+    DOUBLE_MINUS: '--',
+    TRIPLE_ASTERISK: '***',
     ACTION: 'Action',
+    PHASE_VAL: 'phase.',
   },
   ADMIN_USERS: {
     TITLE: 'Admin Users',
@@ -96,11 +99,43 @@ export const UI_TEXT = {
     EMAIL_PLACEHOLDER: 'Email',
     PHONE_PLACEHOLDER: 'Phone number (optional)',
   },
+  ENTERPRISES: {
+    ONBOARD: 'Onboard Enterprise',
+    BRAND_LOGO: 'Brand Logo',
+    COVER_IMAGE: 'Cover Image',
+    NAME: 'Enterprise Name',
+    TAX_ID_LONG: 'Tax Identification Number',
+    TAX_ID_SHORT: 'Tax ID',
+    INDUSTRY: 'Industry Section',
+    DESC: 'Company Description',
+    ADDRESS: 'Headquarters Address',
+    WEBSITE: 'Corporate Website',
+    ENTERPRISE: 'Enterprise',
+    INDUSTRY_COLUMN: 'Industry',
+  },
+  UNIVERSITIES: {
+    CREATE: 'Create University',
+    NAME: 'University Name',
+    CODE: 'University Code',
+    ADDRESS: 'Address',
+    UNIVERSITY: 'University',
+  },
+  ENROLLMENT: {
+    STUDENT_IN_PHASE: 'This student is currently in the',
+    PHASE_HINT:
+      'phase. Business details and evaluations will be updated as the internship progresses.',
+  },
+  USER_PROFILE: {
+    VIEW_LINK: 'View Link',
+    SKILL_NAME: 'Name',
+  },
   BUTTON: {
     CLOSE: 'Close',
     SAVE_CHANGES: 'Save Changes',
     CREATE: 'Create',
     CANCEL: 'Cancel',
+    TRY_AGAIN: 'Try Again',
+    APPLY: 'Apply',
   },
   TIPTAP: {
     PLACEHOLDER: 'Nhập mô tả...',
@@ -118,6 +153,7 @@ export const UI_TEXT = {
     UPDATE_COVER: 'Update Cover Photo',
     UPLOAD_BANNER: 'Upload Cover Banner',
     RATIO_NOTE: 'Recommended ratio 4.5:1',
+    LOGO: 'LOGO',
   },
   PAGINATION: {
     TOTAL: 'Total records:',
@@ -131,9 +167,13 @@ export const UI_TEXT = {
     ISSUE: 'issue',
     ISSUES: 'issues',
     ASTERISK_SPACE: ' *',
+    UNKNOWN_EPIC: 'Unknown Epic',
   },
   ENTERPRISE: {
     DASHBOARD_TITLE: 'Enterprise Dashboard',
     DASHBOARD_WELCOME: 'Welcome to the Enterprise Dashboard. Select an option from the sidebar.',
+  },
+  ERROR: {
+    COMMUNICATION: 'Communication Error',
   },
 };

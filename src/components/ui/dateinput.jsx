@@ -6,6 +6,8 @@ import { CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { UI_TEXT } from '@/lib/UI_Text';
+
 dayjs.extend(customParseFormat);
 
 export default function DateInput({ value, onChange }) {
@@ -147,7 +149,7 @@ export default function DateInput({ value, onChange }) {
                   onClick={setToday}
                   className="h-10 shrink-0 rounded-full bg-red-50 px-[14px] text-[13px] font-bold text-[#A32A2A] transition-colors hover:bg-red-100"
                 >
-                  Today
+                  {UI_TEXT.COMMON.TODAY}
                 </button>
               </div>
 
@@ -200,14 +202,14 @@ export default function DateInput({ value, onChange }) {
                   onClick={() => setOpen(false)}
                   className="h-11 flex-1 rounded-full bg-red-50 text-[14px] font-bold text-[#A32A2A] transition-colors hover:bg-red-100"
                 >
-                  Cancel
+                  {UI_TEXT.BUTTON.CANCEL}
                 </button>
                 <button
                   type="button"
                   onClick={handleApply}
                   className="h-11 flex-1 rounded-full bg-[#A32A2A] text-[14px] font-bold text-white transition-colors hover:bg-red-800"
                 >
-                  Apply
+                  {UI_TEXT.BUTTON.APPLY}
                 </button>
               </div>
             </div>

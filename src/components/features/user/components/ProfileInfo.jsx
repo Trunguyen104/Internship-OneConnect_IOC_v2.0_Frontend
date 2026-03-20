@@ -7,6 +7,7 @@ import { Button, Space, Spin } from 'antd';
 import AvatarUploader from '@/components/ui/avataruploader';
 import Card from '@/components/ui/card';
 import { PROFILE_UI } from '@/constants/user/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import InfoItem from './InfoItem';
 import ProfileEditModal from './ProfileEditModal';
@@ -82,7 +83,10 @@ export default function ProfileInfo({
                     label={PROFILE_UI.LABELS.UNIVERSITY}
                     value={userInfo?.universityName || '—'}
                   />
-                  <InfoItem label="Major" value={userInfo?.major || '—'} />
+                  <InfoItem
+                    label={UI_TEXT.ENTERPRISES.INDUSTRY_COLUMN}
+                    value={userInfo?.major || '—'}
+                  />
                   <InfoItem label={PROFILE_UI.LABELS.PORTFOLIO}>
                     {userInfo?.portfolioUrl ? (
                       <a
@@ -91,7 +95,7 @@ export default function ProfileInfo({
                         rel="noreferrer"
                         className="text-primary hover:underline"
                       >
-                        View Link
+                        {UI_TEXT.USER_PROFILE.VIEW_LINK}
                       </a>
                     ) : (
                       '—'
@@ -104,7 +108,10 @@ export default function ProfileInfo({
                 userInfo?.role === 'HR' ||
                 userInfo?.role === 'EnterpriseAdmin') && (
                 <>
-                  <InfoItem label="Enterprise" value={userInfo?.enterpriseName || '—'} />
+                  <InfoItem
+                    label={UI_TEXT.ENTERPRISES.ENTERPRISE}
+                    value={userInfo?.enterpriseName || '—'}
+                  />
                   <InfoItem label={PROFILE_UI.LABELS.POSITION} value={userInfo?.position || '—'} />
                   <InfoItem
                     label={PROFILE_UI.LABELS.EXPERTISE}

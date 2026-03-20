@@ -2,6 +2,8 @@
 
 import { Fragment } from 'react';
 
+import { UI_TEXT } from '@/lib/UI_Text';
+
 export default function Pagination({
   total = 0,
   page = 1,
@@ -18,7 +20,7 @@ export default function Pagination({
     <div className="flex items-center justify-between text-sm text-slate-600">
       {/* LEFT */}
       <span>
-        Total records: <b className="text-slate-800">{total}</b>
+        {UI_TEXT.PAGINATION.TOTAL} <b className="text-slate-800">{total}</b>
       </span>
 
       {/* RIGHT */}
@@ -67,10 +69,10 @@ export default function Pagination({
           onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
           className="ml-3 rounded-full border px-3 py-1 text-sm"
         >
-          <option value={5}>5/page</option>
-          <option value={10}>10/page</option>
-          <option value={20}>20/page</option>
-          <option value={50}>50/page</option>
+          <option value={5}>{UI_TEXT.PAGINATION.PAGE_5}</option>
+          <option value={10}>{UI_TEXT.PAGINATION.PAGE_10}</option>
+          <option value={20}>{UI_TEXT.PAGINATION.PAGE_20}</option>
+          <option value={50}>{UI_TEXT.PAGINATION.PAGE_50}</option>
         </select>
       </div>
     </div>

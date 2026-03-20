@@ -3,6 +3,7 @@
 import { Button, Form, Input, Modal, Select, Space, Typography } from 'antd';
 
 import { PROFILE_UI } from '@/constants/user/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const { Text } = Typography;
 
@@ -26,7 +27,7 @@ export default function SkillEditModal({
         <Form.Item
           label={
             <>
-              {PROFILE_UI.SKILLS.ADD_LABEL} Name{' '}
+              {PROFILE_UI.SKILLS.ADD_LABEL} {UI_TEXT.USER_PROFILE.SKILL_NAME}{' '}
               <Text type="secondary">
                 {PROFILE_UI.SKILLS.MAX_LENGTH_HINT(editForm.name?.length || 0, 30)}
               </Text>

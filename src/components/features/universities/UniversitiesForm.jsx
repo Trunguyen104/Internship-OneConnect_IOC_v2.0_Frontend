@@ -7,6 +7,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import LogoUploader from '@/components/ui/logouploader';
 import { Spinner } from '@/components/ui/spinner';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { universityService } from '@/services/university.service';
 import { useUniversitiesStore } from '@/store/useUniversitiesStore';
@@ -79,7 +80,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
 
       <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Field className="md:col-span-2">
-          <FieldLabel htmlFor="name">University Name</FieldLabel>
+          <FieldLabel htmlFor="name">{UI_TEXT.UNIVERSITIES.NAME}</FieldLabel>
           <Input
             id="name"
             name="name"
@@ -92,7 +93,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="code">University Code</FieldLabel>
+          <FieldLabel htmlFor="code">{UI_TEXT.UNIVERSITIES.CODE}</FieldLabel>
           <Input
             id="code"
             name="code"
@@ -105,7 +106,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
         </Field>
 
         <Field className="md:col-span-2">
-          <FieldLabel htmlFor="address">Address</FieldLabel>
+          <FieldLabel htmlFor="address">{UI_TEXT.UNIVERSITIES.ADDRESS}</FieldLabel>
           <Input
             id="address"
             name="address"
@@ -132,14 +133,20 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           className="h-11 rounded-full bg-slate-50 px-6 font-semibold text-slate-500 hover:bg-slate-100"
           onClick={() => onCancel?.()}
         >
-          Cancel
+          {UI_TEXT.BUTTON.CANCEL}
         </Button>
         <Button
           type="submit"
           disabled={loading}
           className="bg-primary hover:bg-primary/90 shadow-primary/20 h-11 min-w-[140px] rounded-full px-8 font-semibold text-white shadow-lg transition-all active:scale-[0.98]"
         >
-          {loading ? <Spinner className="mr-2" /> : isEdit ? 'Update Changes' : 'Create University'}
+          {loading ? (
+            <Spinner className="mr-2" />
+          ) : isEdit ? (
+            UI_TEXT.BUTTON.SAVE_CHANGES
+          ) : (
+            UI_TEXT.UNIVERSITIES.CREATE
+          )}
         </Button>
       </div>
     </form>

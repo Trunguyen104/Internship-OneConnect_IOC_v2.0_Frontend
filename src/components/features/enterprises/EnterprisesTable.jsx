@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import EnterprisesAction from './EnterprisesAction';
 
@@ -16,10 +17,12 @@ export default function EnterprisesTable({ enterprises = [], loading = false }) 
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="pl-8">Tax ID</TableHead>
-          <TableHead>Enterprise</TableHead>
-          <TableHead className="hidden lg:table-cell">Industry</TableHead>
-          <TableHead className="pr-8 text-right">Action</TableHead>
+          <TableHead className="pl-8">{UI_TEXT.ENTERPRISES.TAX_ID_SHORT}</TableHead>
+          <TableHead>{UI_TEXT.ENTERPRISES.ENTERPRISE}</TableHead>
+          <TableHead className="hidden lg:table-cell">
+            {UI_TEXT.ENTERPRISES.INDUSTRY_COLUMN}
+          </TableHead>
+          <TableHead className="pr-8 text-right">{UI_TEXT.COMMON.ACTION}</TableHead>
         </TableRow>
       </TableHeader>
 

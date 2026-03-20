@@ -11,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import UniversitiesForm from './UniversitiesForm';
 
@@ -35,7 +36,7 @@ export default function UniversitiesDialog({
           <div className="rounded-full bg-white/20 p-1 transition-transform duration-300 group-hover:rotate-90">
             <Plus className="h-4 w-4 text-white" />
           </div>
-          Create University
+          {UI_TEXT.UNIVERSITIES.CREATE}
         </Button>
       ) : null}
 
@@ -43,7 +44,7 @@ export default function UniversitiesDialog({
         <SheetContent className="flex flex-col p-4 sm:max-w-[560px]">
           <SheetHeader className="mt-2 text-center">
             <SheetTitle className="text-3xl">
-              {isEdit ? 'Update University' : 'Create University'}
+              {isEdit ? UI_TEXT.ADMIN_USERS.UPDATE_PROFILE : UI_TEXT.UNIVERSITIES.CREATE}
             </SheetTitle>
             <SheetDescription>
               {isEdit

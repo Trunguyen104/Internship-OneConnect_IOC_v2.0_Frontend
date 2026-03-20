@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import LogoUploader from '@/components/ui/logouploader';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
@@ -75,7 +76,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         <div className="mb-4 flex items-end justify-center gap-6">
           <div className="flex flex-col items-center gap-2">
             <span className="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-              Brand Logo
+              {UI_TEXT.ENTERPRISES.BRAND_LOGO}
             </span>
             <LogoUploader
               value={logoUrl}
@@ -87,7 +88,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           </div>
           <div className="flex flex-col items-center gap-2">
             <span className="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-              Cover Image
+              {UI_TEXT.ENTERPRISES.COVER_IMAGE}
             </span>
             <LogoUploader
               value={backgroundUrl}
@@ -102,7 +103,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
 
       <FieldGroup className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <Field className="md:col-span-2">
-          <FieldLabel htmlFor="name">Enterprise Name</FieldLabel>
+          <FieldLabel htmlFor="name">{UI_TEXT.ENTERPRISES.NAME}</FieldLabel>
           <Input
             id="name"
             name="name"
@@ -115,7 +116,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="taxCode">Tax Identification Number</FieldLabel>
+          <FieldLabel htmlFor="taxCode">{UI_TEXT.ENTERPRISES.TAX_ID_LONG}</FieldLabel>
           <Input
             id="taxCode"
             name="taxCode"
@@ -126,7 +127,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="industry">Industry Section</FieldLabel>
+          <FieldLabel htmlFor="industry">{UI_TEXT.ENTERPRISES.INDUSTRY}</FieldLabel>
           <Input
             id="industry"
             name="industry"
@@ -137,7 +138,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         </Field>
 
         <Field className="md:col-span-2">
-          <FieldLabel htmlFor="description">Company Description</FieldLabel>
+          <FieldLabel htmlFor="description">{UI_TEXT.ENTERPRISES.DESC}</FieldLabel>
           <Textarea
             id="description"
             name="description"
@@ -148,7 +149,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         </Field>
 
         <Field className="md:col-span-2">
-          <FieldLabel htmlFor="address">Headquarters Address</FieldLabel>
+          <FieldLabel htmlFor="address">{UI_TEXT.ENTERPRISES.ADDRESS}</FieldLabel>
           <Input
             id="address"
             name="address"
@@ -159,7 +160,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         </Field>
 
         <Field className="md:col-span-2">
-          <FieldLabel htmlFor="website">Corporate Website</FieldLabel>
+          <FieldLabel htmlFor="website">{UI_TEXT.ENTERPRISES.WEBSITE}</FieldLabel>
           <Input
             id="website"
             name="website"
@@ -184,7 +185,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           className="h-11 rounded-full bg-slate-50 px-8 font-bold text-slate-500 hover:bg-slate-100"
           onClick={() => onCancel?.()}
         >
-          Cancel
+          {UI_TEXT.BUTTON.CANCEL}
         </Button>
         <Button
           type="submit"
@@ -194,7 +195,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           {loading ? (
             <Spinner className="mr-2" />
           ) : isEdit ? (
-            'Save Changes'
+            UI_TEXT.BUTTON.SAVE_CHANGES
           ) : (
             'Initialize Enterprise'
           )}
