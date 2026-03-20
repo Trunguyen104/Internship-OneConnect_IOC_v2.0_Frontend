@@ -24,12 +24,7 @@ const PageLayout = ({ children, className }) => (
 const PageHeader = (props) => <StudentPageHeader {...props} />;
 
 const PageCard = ({ children, className }) => (
-  <Card
-    className={cn(
-      'flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto',
-      className,
-    )}
-  >
+  <Card className={cn('flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8!', className)}>
     {children}
   </Card>
 );
@@ -39,7 +34,7 @@ const PageToolbar = (props) => (
 );
 
 const PageContent = ({ children, className }) => (
-  <div className={cn('min-h-0 flex-1 overflow-hidden', className)}>{children}</div>
+  <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', className)}>{children}</div>
 );
 
 const PagePagination = (props) => (

@@ -3,9 +3,15 @@
 import React from 'react';
 import { cn } from '@/lib/cn';
 
-function Table({ className, ...props }) {
+function Table({ className, containerClassName, ...props }) {
   return (
-    <div data-slot='table-container' className='relative w-full overflow-x-auto'>
+    <div
+      data-slot='table-container'
+      className={cn(
+        'relative min-h-0 w-full flex-1 overflow-x-auto overflow-y-auto',
+        containerClassName,
+      )}
+    >
       <table
         data-slot='table'
         className={cn('w-full caption-bottom text-sm', className)}
@@ -19,7 +25,10 @@ function TableHeader({ className, ...props }) {
   return (
     <thead
       data-slot='table-header'
-      className={cn('[&_tr]:border-b [&_tr]:border-gray-300', className)}
+      className={cn(
+        'sticky top-0 z-10 bg-white shadow-sm [&_tr]:border-b [&_tr]:border-gray-300',
+        className,
+      )}
       {...props}
     />
   );
