@@ -430,6 +430,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           NAME_PLACEHOLDER: 'Ex: Semester 1 - 2024',
           NAME_REQUIRED: 'Please enter term name',
           NAME_MAX: 'Name cannot exceed 100 characters',
+          UNIVERSITY_LABEL: 'University',
+          UNIVERSITY_REQUIRED: 'Please select a university',
           START_DATE_LABEL: 'Start Date',
           START_DATE_REQUIRED: 'Please select start date',
           END_DATE_LABEL: 'End Date',

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { Form, Input, DatePicker, Row, Col } from 'antd';
+import { Form, Input, DatePicker, Row, Col, Select } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -49,7 +49,15 @@ const TermStats = ({ initialValues }) => {
   );
 };
 
-const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) => {
+const TermFormBody = ({
+  initialValues,
+  onSave,
+  onCancel,
+  loading,
+  viewOnly,
+  universities,
+  isSuperAdmin,
+}) => {
   const [form] = Form.useForm();
   const { FORM } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
 
@@ -59,6 +67,7 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
         ...initialValues,
         startDate: initialValues.startDate ? dayjs(initialValues.startDate) : null,
         endDate: initialValues.endDate ? dayjs(initialValues.endDate) : null,
+        universityId: initialValues.universityId || initialValues.university?.universityId,
       });
     } else {
       form.resetFields();
@@ -92,6 +101,24 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
 
       <CompoundModal.Content>
         <Form form={form} layout='vertical' disabled={viewOnly || loading} requiredMark={!viewOnly}>
+          {isSuperAdmin && (
+            <Form.Item
+              name='universityId'
+              label={FORM.UNIVERSITY_LABEL}
+              rules={[{ required: true, message: FORM.UNIVERSITY_REQUIRED }]}
+            >
+              <Select
+                showSearch
+                placeholder={FORM.UNIVERSITY_LABEL}
+                optionFilterProp='children'
+                className='h-10'
+                options={(universities || []).map((u) => ({
+                  value: u.universityId || u.id,
+                  label: u.name,
+                }))}
+              />
+            </Form.Item>
+          )}
           <Form.Item
             name='name'
             label={FORM.NAME_LABEL}

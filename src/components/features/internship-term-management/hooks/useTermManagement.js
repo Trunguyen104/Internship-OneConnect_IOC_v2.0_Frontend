@@ -11,7 +11,47 @@ export const useTermManagement = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [universities, setUniversities] = useState([]);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [_fetchingProfile, setFetchingProfile] = useState(true);
   const knownVersions = useRef({});
+
+  // Fetch character role and universities if SuperAdmin
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        setFetchingProfile(true);
+        const { userService } = await import('@/components/features/user/services/userService');
+        const userRes = await userService.getMe();
+
+        const userData = userRes?.data || userRes;
+        setUserProfile(userData);
+
+        const rawRole = userData?.role;
+        const isAdmin =
+          rawRole === 1 ||
+          rawRole === '1' ||
+          rawRole === 'SuperAdmin' ||
+          (typeof rawRole === 'string' && rawRole.toLowerCase().includes('superadmin')) ||
+          rawRole?.roleId === 1 ||
+          rawRole?.name?.toLowerCase().includes('superadmin');
+
+        setIsSuperAdmin(isAdmin);
+
+        if (isAdmin) {
+          const { universityService } = await import('@/services/university.service');
+          const uniRes = await universityService.getAll({ PageNumber: 1, PageSize: 1000 });
+          setUniversities(uniRes?.data?.items || uniRes?.items || []);
+        }
+      } catch (err) {
+        console.error('Failed to initialize user data', err);
+      } finally {
+        setFetchingProfile(false);
+      }
+    };
+    initialize();
+  }, []);
 
   const {
     searchTerm,
@@ -178,6 +218,7 @@ export const useTermManagement = () => {
           Name: payload.name,
           StartDate: payload.startDate,
           EndDate: payload.endDate,
+          UniversityId: isSuperAdmin ? payload.universityId : undefined,
         };
 
         if (isUpdate) {
@@ -213,7 +254,7 @@ export const useTermManagement = () => {
         setSubmitLoading(false);
       }
     },
-    [editingRecord, fetchData, toast, setModalVisible],
+    [editingRecord, fetchData, toast, setModalVisible, userProfile],
   );
 
   return {
@@ -229,6 +270,9 @@ export const useTermManagement = () => {
     viewOnly,
     statusModalState,
     deleteModalState,
+    userProfile,
+    universities,
+    isSuperAdmin,
 
     setModalVisible,
     setStatusModalState,

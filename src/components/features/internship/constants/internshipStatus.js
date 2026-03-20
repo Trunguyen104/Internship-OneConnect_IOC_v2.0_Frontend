@@ -6,10 +6,10 @@
  * 3: Closed - Internship cycle is closed.
  */
 export const INTERNSHIP_STATUS = {
-  UPCOMING: 0,
-  ACTIVE: 1,
-  ENDED: 2,
-  CLOSED: 3,
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
+  CLOSED: 4,
 };
 
 export const INTERNSHIP_STATUS_CONFIG = {

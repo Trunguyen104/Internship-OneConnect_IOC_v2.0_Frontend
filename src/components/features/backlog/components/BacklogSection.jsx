@@ -79,7 +79,7 @@ export function BacklogSection({
           className='bg-primary hover:bg-primary-hover active:bg-primary-700 flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-colors'
         >
           <Plus className='h-4 w-4' />
-          {BACKLOG_UI.CREATE_TASK}
+          Xin chào
         </button>
       </div>
     </div>
