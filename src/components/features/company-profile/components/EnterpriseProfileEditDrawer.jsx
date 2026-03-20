@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { Button, Drawer, Form, Input, Space, Typography } from 'antd';
 
 import AvatarUploader from '@/components/ui/avataruploader';
+import BannerUploader from '@/components/ui/banneruploader';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+import { Col, Row } from 'antd';
 
 function isHttpUrl(value) {
   if (!value) return true;
@@ -16,6 +18,7 @@ function normalizeProfileToForm(profile) {
     profile?.taxCode ?? profile?.taxcode ?? profile?.tax_code ?? profile?.taxCODE ?? '';
   return {
     logoUrl: profile?.logoUrl ?? '',
+    backgroundUrl: profile?.backgroundUrl ?? '',
     name: profile?.name ?? '',
     website: profile?.website ?? '',
     industry: profile?.industry ?? '',
@@ -82,9 +85,44 @@ export default function EnterpriseProfileEditDrawer({ open, saving, profile, onC
     >
       <Form form={form} layout='vertical' requiredMark={false}>
         <div className='space-y-6 p-1'>
-          <Form.Item name='logoUrl' label='Logo'>
-            <AvatarUploader size={104} fullName={initialValues?.name} />
-          </Form.Item>
+          <div className='rounded-2xl border border-slate-100 bg-slate-50/50 p-6 shadow-sm'>
+            <Row gutter={[48, 24]} align='top' justify='center'>
+              {/* Logo Section */}
+              <Col xs={24} md={8} lg={7}>
+                <div className='flex flex-col items-center'>
+                  <div className='mb-4 w-full text-center'>
+                    <span className='font-bold whitespace-nowrap text-slate-700'>
+                      {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.COMPANY_LOGO}
+                    </span>
+                  </div>
+
+                  <Form.Item name='logoUrl' className='mb-0'>
+                    <div className='flex justify-center'>
+                      <AvatarUploader size={100} fullName={initialValues?.name} />
+                    </div>
+                  </Form.Item>
+                </div>
+              </Col>
+
+              {/* Banner Section */}
+              <Col xs={24} md={16} lg={17}>
+                <div className='flex flex-col items-center'>
+                  <div className='mb-4 w-full text-center'>
+                    <span className='font-bold whitespace-nowrap text-slate-700'>
+                      {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.COVER_BANNER}
+                    </span>
+                  </div>
+
+                  <Form.Item name='backgroundUrl' className='mb-0 w-full'>
+                    <BannerUploader />
+                  </Form.Item>
+                </div>
+              </Col>
+            </Row>
+            <div className='mt-8 text-center text-xs font-medium text-slate-400 italic'>
+              {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.LOGO_OVERLAP_HINT}
+            </div>
+          </div>
 
           <Form.Item
             name='name'

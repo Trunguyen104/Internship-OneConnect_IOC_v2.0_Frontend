@@ -13,7 +13,7 @@ export const ProfileDescription = memo(function ProfileDescription({ profile, on
     return (
       <EmptyState
         title={ENTERPRISE_PROFILE_UI.ENTERPRISE.NO_DESCRIPTION}
-        description='Add a short overview to make your company profile more complete.'
+        description={ENTERPRISE_PROFILE_UI.ENTERPRISE.ADD_OVERVIEW_HINT}
         minHeightClassName='min-h-[260px]'
       />
     );

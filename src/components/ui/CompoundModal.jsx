@@ -20,7 +20,7 @@ const CompoundModal = ({
       onCancel={onCancel}
       centered
       width={width}
-      destroyOnClose={destroyOnClose}
+      destroyOnHidden={destroyOnClose}
       footer={null}
       closeIcon={<CloseOutlined className='text-muted hover:text-text transition-colors' />}
       className='premium-modal'
@@ -69,17 +69,17 @@ const Content = ({ children, className = '' }) => (
 const Footer = ({
   onCancel,
   onConfirm,
-  onSubmit, // Alias for onConfirm
+  onSubmit,
   cancelText = 'Cancel',
   confirmText = 'Confirm',
-  submitText, // Alias for confirmText
+  submitText,
   loading = false,
   danger = false,
-  submitDanger, // Alias for danger
+  submitDanger,
   confirmIcon,
-  icon, // Alias for confirmIcon
+  icon,
   disabled = false,
-  submitDisabled, // Alias for disabled
+  submitDisabled,
   showCancel = true,
   className = '',
 }) => {
@@ -142,6 +142,7 @@ const InfoBox = ({ label, value, color = 'primary' }) => (
 
 CompoundModal.Header = Header;
 CompoundModal.Content = Content;
+CompoundModal.Body = Content; // Alias for Content
 CompoundModal.Footer = Footer;
 CompoundModal.InfoBox = InfoBox;
 

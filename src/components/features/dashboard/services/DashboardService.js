@@ -1,6 +1,6 @@
-import httpClient from '@/services/httpClient';
-import { TermService } from '../../TermManagement/services/term.service';
+import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import { userService } from '@/components/features/user/services/userService';
+import httpClient from '@/services/httpClient';
 
 export const DashboardService = {
   async getProfile() {
@@ -10,51 +10,45 @@ export const DashboardService = {
   async getStats() {
     const stats = {
       totalStudents: 0,
-      activeTerms: 0,
+      totalTerms: 0,
       totalGroups: 0,
+      totalPlaced: 0,
+      statusCounts: {
+        upcoming: 0,
+        active: 0,
+        ended: 0,
+        closed: 0,
+      },
     };
+    let terms = [];
 
-    // 1. Fetch Terms for active counts
+    // 1. Fetch Terms for counts
     try {
-      const termsRes = await TermService.getAll({ pageSize: 100 });
-      if (termsRes?.data) {
-        const items = termsRes.data.items || [];
-        stats.activeTerms = items.filter((t) => t.status === 2 || t.status === 'Active').length;
-      }
+      const termsRes = await TermService.getAll({ PageNumber: 1, PageSize: 100 });
+      const termsData = termsRes?.data || termsRes;
+      terms = termsData?.items || [];
+
+      // Native BE Aggregation: Sum up counts from all terms
+      terms.forEach((term) => {
+        stats.totalStudents += term.totalEnrolled || 0;
+        stats.totalPlaced += term.totalPlaced || 0;
+        stats.totalGroups += term.totalGroups || 0;
+
+        // Status counts
+        const status = Number(term.status);
+        if (status === 1) stats.statusCounts.upcoming++;
+        else if (status === 2) stats.statusCounts.active++;
+        else if (status === 3) stats.statusCounts.ended++;
+        else if (status === 4) stats.statusCounts.closed++;
+      });
+
+      // Count total terms count from pagination metadata
+      const finalTermsData = termsData?.data || termsData;
+      stats.totalTerms = finalTermsData?.totalCount || terms.length;
     } catch (e) {
       console.warn('Dashboard stats: terms fetch failed', e);
     }
 
-    // 2. Fetch Enrollment count
-    try {
-      const enrollRes = await httpClient.httpGet('/enrollments', { pageSize: 1 });
-      if (enrollRes?.data) {
-        stats.totalStudents = enrollRes.data.totalCount || 0;
-      }
-    } catch (e) {
-      console.warn('Dashboard stats: enrollment fetch failed', e);
-    }
-
-    // 3. Fetch Internship Groups count
-    try {
-      const groupsRes = await httpClient.httpGet('/internship-groups', { pageSize: 1 });
-      if (groupsRes?.data) {
-        stats.totalGroups = groupsRes.data.totalCount || 0;
-      }
-    } catch (e) {
-      console.warn('Dashboard stats: groups fetch failed', e);
-    }
-
-    return stats;
-  },
-
-  async getRecentTerms(limit = 5) {
-    try {
-      const res = await TermService.getAll({ pageSize: limit });
-      return res?.data?.items || [];
-    } catch (e) {
-      console.warn('Dashboard: recent terms fetch failed', e);
-      return [];
-    }
+    return { stats, terms: terms.slice(0, 20) };
   },
 };
