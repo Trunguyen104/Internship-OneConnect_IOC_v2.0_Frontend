@@ -1,6 +1,8 @@
 import { Tag } from 'antd';
-import { ROLE_MAP } from '../constants/roleMap';
+
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
+
+import { ROLE_MAP } from '../constants/roleMap';
 
 export default function StudentRoleTag({ role }) {
   const r = ROLE_MAP[role] || {
@@ -9,7 +11,7 @@ export default function StudentRoleTag({ role }) {
   };
 
   return (
-    <Tag color={r.color} variant='filled'>
+    <Tag color={r.color} variant="filled">
       {r.label}
     </Tag>
   );

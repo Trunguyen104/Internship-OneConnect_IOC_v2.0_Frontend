@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut, httpDelete } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPost, httpPut } from '@/services/httpClient';
 
 export const InternshipGroupService = {
   getAll(params = {}) {
@@ -9,6 +9,11 @@ export const InternshipGroupService = {
   getMine(params = {}) {
     const query = new URLSearchParams(params).toString();
     return httpGet(`/mine${query ? `?${query}` : ''}`);
+  },
+
+  getMyTerms(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return httpGet(`/mine/internship-terms${query ? `?${query}` : ''}`);
   },
 
   getTermById(id) {

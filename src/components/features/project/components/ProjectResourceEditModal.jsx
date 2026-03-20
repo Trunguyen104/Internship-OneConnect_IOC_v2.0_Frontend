@@ -1,11 +1,11 @@
 'use client';
 
+import { Form, Input, Modal, Select } from 'antd';
 import React from 'react';
-import { Modal, Form, Input, Select } from 'antd';
-import { PROJECT_UI } from '@/constants/project/uiText';
-import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
+import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
+import { PROJECT_UI } from '@/constants/project/uiText';
 
 export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, form, loading }) {
   return (
@@ -18,9 +18,9 @@ export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, 
       okText={PROJECT_UI.BUTTON.UPDATE}
       cancelText={PROJECT_UI.BUTTON.CANCEL}
     >
-      <Form form={form} layout='vertical' onFinish={onUpdate}>
+      <Form form={form} layout="vertical" onFinish={onUpdate}>
         <Form.Item
-          name='resourceName'
+          name="resourceName"
           label={PROJECT_UI.FORM.RESOURCE_NAME}
           rules={[{ required: true, message: PROJECT_MESSAGES.ERROR.RESOURCE_NAME_REQUIRED }]}
         >
@@ -28,7 +28,7 @@ export default function ProjectResourceEditModal({ visible, onCancel, onUpdate, 
         </Form.Item>
 
         <Form.Item
-          name='resourceType'
+          name="resourceType"
           label={PROJECT_UI.FORM.RESOURCE_TYPE}
           rules={[{ required: true, message: PROJECT_MESSAGES.ERROR.RESOURCE_TYPE_REQUIRED }]}
         >

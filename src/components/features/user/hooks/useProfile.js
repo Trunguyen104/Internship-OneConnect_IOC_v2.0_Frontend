@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useEffect, useState } from 'react';
+
 import { userService } from '@/components/features/user/services/userService';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { useToast } from '@/providers/ToastProvider';
 
 export function useProfile() {
   const toast = useToast();
@@ -72,7 +73,7 @@ export function useProfile() {
     setShowAddForm(false);
     toast.success(
       'Skills added successfully',
-      `${newSkill.name}${newSkill.level ? ` (${newSkill.level})` : ''}`,
+      `${newSkill.name}${newSkill.level ? ` (${newSkill.level})` : ''}`
     );
   };
 
@@ -123,11 +124,23 @@ export function useProfile() {
     setEditForm,
     handleAddSkill,
     handleDeleteSelected,
-    updateSkill,
-    deleteSkill,
-    selectMode,
-    setSelectMode,
-    selectedSkills,
     setSelectedSkills,
+    updateProfile: async (data) => {
+      try {
+        setLoadingUser(true);
+        await userService.updateMe(data);
+        toast.success('Cập nhật thành công');
+        await fetchMe();
+        return true;
+      } catch (err) {
+        console.error('Failed to update profile', err);
+        toast.error('Lỗi khi cập nhật thông tin cá nhân');
+        return false;
+      } finally {
+        setLoadingUser(false);
+      }
+    },
+    isEditModalOpen: editMode,
+    setIsEditModalOpen: setEditMode,
   };
 }

@@ -1,14 +1,15 @@
 'use client';
 
+import { Spin } from 'antd';
 import { useEffect, useState } from 'react';
-import Header from '@/components/layout/Header';
+
+import { userService } from '@/components/features/user/services/userService';
 import EnterpriseSidebar from '@/components/layout/EnterpriseSidebar';
+import Header from '@/components/layout/Header';
+import Sidebar from '@/components/layout/Sidebar';
 import SidebarAdmin from '@/components/layout/SidebarAdmin';
 import SidebarSuperAdmin from '@/components/layout/SidebarSuperAdmin';
-import Sidebar from '@/components/layout/Sidebar';
-import { userService } from '@/components/features/user/services/userService';
 import { USER_ROLE } from '@/constants/common/enums';
-import { Spin } from 'antd';
 
 export default function ProfileLayout({ children }) {
   const [role, setRole] = useState(null);
@@ -66,19 +67,19 @@ export default function ProfileLayout({ children }) {
 
   if (loading) {
     return (
-      <div className='flex h-screen items-center justify-center bg-gray-50'>
-        <Spin size='large' description='Initializing profile layout...' />
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <Spin size="large" description="Initializing profile layout..." />
       </div>
     );
   }
 
   return (
-    <div className='flex h-screen overflow-hidden bg-white'>
+    <div className="flex h-screen overflow-hidden bg-white">
       {renderSidebar()}
-      <div className='flex h-screen min-w-0 flex-1 flex-col overflow-hidden'>
+      <div className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
         <Header />
-        <main className='flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-50 p-6 2xl:px-10'>
-          <div className='mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col 2xl:max-w-[2200px]'>
+        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-gray-50 p-6 2xl:px-10">
+          <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col 2xl:max-w-[2200px]">
             {children}
           </div>
         </main>

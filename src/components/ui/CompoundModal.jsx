@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Modal, Button, Typography } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
+import { Button, Modal, Typography } from 'antd';
+import React from 'react';
 
 const { Text, Title } = Typography;
 
@@ -20,13 +20,13 @@ const CompoundModal = ({
       onCancel={onCancel}
       centered
       width={width}
-      destroyOnClose={destroyOnClose}
+      destroyOnHidden={destroyOnClose}
       footer={null}
-      closeIcon={<CloseOutlined className='text-muted hover:text-text transition-colors' />}
-      className='premium-modal'
+      closeIcon={<CloseOutlined className="text-muted hover:text-text transition-colors" />}
+      className="premium-modal"
       {...props}
     >
-      <div className='flex flex-col'>{children}</div>
+      <div className="flex flex-col">{children}</div>
     </Modal>
   );
 };
@@ -40,7 +40,7 @@ const Header = ({ icon, title, subtitle, type = 'default' }) => {
   };
 
   return (
-    <div className='border-border flex flex-col items-center gap-4 border-b pt-2 pb-6 text-center'>
+    <div className="border-border flex flex-col items-center gap-4 border-b pt-2 pb-6 text-center">
       {icon && (
         <div
           className={`flex size-14 items-center justify-center rounded-2xl text-2xl shadow-sm ${typeClasses[type] || typeClasses.default}`}
@@ -48,12 +48,12 @@ const Header = ({ icon, title, subtitle, type = 'default' }) => {
           {icon}
         </div>
       )}
-      <div className='space-y-1'>
-        <Title level={4} className='text-text !m-0 text-xl font-black tracking-tight'>
+      <div className="space-y-1">
+        <Title level={4} className="text-text !m-0 text-xl font-black tracking-tight">
           {title}
         </Title>
         {subtitle && (
-          <div className='text-muted text-sm leading-relaxed font-medium opacity-70'>
+          <div className="text-muted text-sm leading-relaxed font-medium opacity-70">
             {subtitle}
           </div>
         )}
@@ -69,17 +69,17 @@ const Content = ({ children, className = '' }) => (
 const Footer = ({
   onCancel,
   onConfirm,
-  onSubmit, // Alias for onConfirm
+  onSubmit,
   cancelText = 'Cancel',
   confirmText = 'Confirm',
-  submitText, // Alias for confirmText
+  submitText,
   loading = false,
   danger = false,
-  submitDanger, // Alias for danger
+  submitDanger,
   confirmIcon,
-  icon, // Alias for confirmIcon
+  icon,
   disabled = false,
-  submitDisabled, // Alias for disabled
+  submitDisabled,
   showCancel = true,
   className = '',
 }) => {
@@ -95,13 +95,13 @@ const Footer = ({
         <Button
           onClick={onCancel}
           disabled={loading}
-          className='border-border text-muted hover:bg-surface hover:text-text h-11 rounded-xl px-6 font-bold transition-all'
+          className="border-border text-muted hover:bg-surface hover:text-text h-11 rounded-xl px-6 font-bold transition-all"
         >
           {cancelText}
         </Button>
       )}
       <Button
-        type='primary'
+        type="primary"
         danger={finalDanger}
         loading={loading}
         onClick={finalOnConfirm}
@@ -129,12 +129,12 @@ const InfoBox = ({ label, value, color = 'primary' }) => (
     className={`bg-surface border-border rounded-xl border p-3 transition-colors ${COLOR_MAP[color] || COLOR_MAP.primary}`}
   >
     <Text
-      type='secondary'
-      className='text-muted mb-1 block text-[10px] font-black tracking-wider uppercase opacity-60'
+      type="secondary"
+      className="text-muted mb-1 block text-[10px] font-black tracking-wider uppercase opacity-60"
     >
       {label}
     </Text>
-    <Text strong className='text-text text-sm'>
+    <Text strong className="text-text text-sm">
       {value}
     </Text>
   </div>
@@ -142,6 +142,7 @@ const InfoBox = ({ label, value, color = 'primary' }) => (
 
 CompoundModal.Header = Header;
 CompoundModal.Content = Content;
+CompoundModal.Body = Content; // Alias for Content
 CompoundModal.Footer = Footer;
 CompoundModal.InfoBox = InfoBox;
 

@@ -1,9 +1,11 @@
 'use client';
 
-import React, { memo } from 'react';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
-import { ISSUE_STATUS } from '../constants/issueStatus';
+import React, { memo } from 'react';
+
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+
+import { ISSUE_STATUS } from '../constants/issueStatus';
 
 const ISSUE_STATUS_MAP = {
   [ISSUE_STATUS.OPEN]: {

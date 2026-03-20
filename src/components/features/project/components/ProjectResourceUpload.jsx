@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
-import { Form, Input, Select, Button, Upload } from 'antd';
-import { useToast } from '@/providers/ToastProvider';
 import { UploadOutlined } from '@ant-design/icons';
-import { PROJECT_UI } from '@/constants/project/uiText';
+import { Button, Form, Input, Select, Upload } from 'antd';
+import React from 'react';
+
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
+import { PROJECT_UI } from '@/constants/project/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function ProjectResourceUpload({
   form,
@@ -16,6 +17,9 @@ export default function ProjectResourceUpload({
   setFileList,
 }) {
   const toast = useToast();
+  const selectedType = Form.useWatch('resourceType', form);
+  const isLinkType = selectedType === 8;
+
   const uploadProps = {
     onRemove: () => {
       setFileList([]);
@@ -44,7 +48,7 @@ export default function ProjectResourceUpload({
   };
 
   return (
-    <div className='pt-2'>
+    <div className="pt-2">
       <Form form={form} layout={'vertical'} onFinish={onUpload} className={'space-y-4'}>
         <Form.Item
           label={PROJECT_UI.FORM.RESOURCE_NAME}
@@ -76,18 +80,33 @@ export default function ProjectResourceUpload({
           <Select options={RESOURCE_TYPES} />
         </Form.Item>
 
-        <Form.Item label={PROJECT_UI.FORM.ATTACH_FILE} required>
-          <Upload {...uploadProps}>
-            <Button icon={<UploadOutlined />}>{PROJECT_UI.BUTTON.SELECT_FILE}</Button>
-          </Upload>
-        </Form.Item>
+        {isLinkType ? (
+          <Form.Item
+            label="External URL"
+            name="externalUrl"
+            rules={[
+              { required: true, message: 'Please enter link URL' },
+              { type: 'url', message: 'Please enter a valid URL' },
+            ]}
+          >
+            <Input placeholder="https://docs.google.com/... or https://figma.com/..." />
+          </Form.Item>
+        ) : null}
+
+        {!isLinkType ? (
+          <Form.Item label={PROJECT_UI.FORM.ATTACH_FILE} required>
+            <Upload {...uploadProps}>
+              <Button icon={<UploadOutlined />}>{PROJECT_UI.BUTTON.SELECT_FILE}</Button>
+            </Upload>
+          </Form.Item>
+        ) : null}
 
         <Form.Item style={{ marginBottom: 0 }}>
           <Button
             type={'primary'}
             htmlType={'submit'}
             loading={uploading}
-            disabled={fileList.length === 0}
+            disabled={!isLinkType && fileList.length === 0}
             block
           >
             {PROJECT_UI.BUTTON.UPLOAD}

@@ -10,9 +10,9 @@ export default function AdminUsersCount() {
   const title = `${UI_TEXT.ADMIN_USERS.TITLE} (${count})`;
 
   return (
-    <div className='flex items-center space-x-2'>
-      <Users className='h-5 w-5 text-slate-400' />
-      <h2 className='text-xl font-semibold tracking-tight text-slate-800'>{title}</h2>
+    <div className="flex items-center space-x-2">
+      <Users className="h-5 w-5 text-slate-400" />
+      <h2 className="text-xl font-semibold tracking-tight text-slate-800">{title}</h2>
     </div>
   );
 }

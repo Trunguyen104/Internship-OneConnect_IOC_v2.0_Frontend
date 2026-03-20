@@ -1,17 +1,17 @@
 'use client';
 
-import { memo } from 'react';
 import {
   CameraOutlined,
   CheckCircleFilled,
   EditOutlined,
   SolutionOutlined,
 } from '@ant-design/icons';
-import { Grid, Space, Tag, Typography, Upload, theme } from 'antd';
+import { Grid, Space, Tag, theme, Typography, Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
+import { memo } from 'react';
 
-import AvatarUploader from '@/components/ui/avataruploader';
 import { Card } from '@/components/ui/atoms';
+import AvatarUploader from '@/components/ui/avataruploader';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
 const { Title } = Typography;
@@ -49,15 +49,15 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
   };
 
   return (
-    <Card className='group/card overflow-hidden rounded-3xl border-none bg-white p-0 shadow-xl'>
+    <Card className="group/card overflow-hidden rounded-3xl border-none bg-white p-0 shadow-xl">
       {/* 1. Cover Banner Layer */}
       <div
-        className='group/banner relative w-full overflow-hidden transition-all duration-300'
+        className="group/banner relative w-full overflow-hidden transition-all duration-300"
         style={{ height: bannerHeight, ...backgroundStyle }}
       >
         {!profile?.backgroundUrl && (
           <div
-            className='absolute inset-0 opacity-20'
+            className="absolute inset-0 opacity-20"
             style={{
               background:
                 'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 100%)',
@@ -67,10 +67,10 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
 
         {/* Change Banner Hover Control */}
         {onBannerChange && (
-          <div className='absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover/banner:opacity-100'>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover/banner:opacity-100">
             <ImgCrop rotationSlider aspect={4 / 1}>
               <Upload showUploadList={false} beforeUpload={beforeBannerUpload}>
-                <button className='text-text flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 font-semibold shadow-md transition-all hover:bg-white'>
+                <button className="text-text flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 font-semibold shadow-md transition-all hover:bg-white">
                   <CameraOutlined />
                   <span>{ENTERPRISE_PROFILE_UI.ENTERPRISE.CHANGE_COVER}</span>
                 </button>
@@ -81,9 +81,9 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
 
         {/* Edit Profile Button - Top Right */}
         {onEdit && (
-          <div className='absolute top-6 right-6 z-30 transition-transform duration-300 group-hover/card:scale-105'>
-            <button type='button' onClick={onEdit} className={primaryButtonClassName}>
-              <EditOutlined aria-hidden='true' />
+          <div className="absolute top-6 right-6 z-30 transition-transform duration-300 group-hover/card:scale-105">
+            <button type="button" onClick={onEdit} className={primaryButtonClassName}>
+              <EditOutlined aria-hidden="true" />
               {isMobile ? '' : ENTERPRISE_PROFILE_UI.ENTERPRISE.EDIT_PROFILE}
             </button>
           </div>
@@ -91,10 +91,10 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
       </div>
 
       {/* 2. Content Layer (Avatar + Info) */}
-      <div className='relative px-6 pt-2 pb-8 md:px-10'>
+      <div className="relative px-6 pt-2 pb-8 md:px-10">
         {/* Overlapping Avatar Area */}
         <div
-          className='absolute z-20 transition-transform duration-500 hover:scale-105'
+          className="absolute z-20 transition-transform duration-500 hover:scale-105"
           style={{
             top: -avatarOverlap,
             left: isMobile ? '50%' : '40px',
@@ -102,7 +102,7 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
           }}
         >
           <div
-            className='overflow-hidden rounded-full bg-white p-[5px] shadow-2xl'
+            className="overflow-hidden rounded-full bg-white p-[5px] shadow-2xl"
             style={{ border: 'none' }}
           >
             <AvatarUploader
@@ -121,10 +121,10 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
             paddingLeft: isMobile ? 0 : avatarSize + 24,
             textAlign: isMobile ? 'center' : 'left',
           }}
-          className='flex flex-col justify-between gap-6 md:flex-row md:items-end'
+          className="flex flex-col justify-between gap-6 md:flex-row md:items-end"
         >
-          <div className='flex-1 space-y-3 py-2'>
-            <div className='flex flex-col gap-2 md:flex-row md:items-center md:gap-4'>
+          <div className="flex-1 space-y-3 py-2">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
               <Title
                 level={1}
                 style={{
@@ -141,9 +141,9 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
 
               {profile?.isVerified && (
                 <Tag
-                  color='blue'
+                  color="blue"
                   icon={<CheckCircleFilled />}
-                  className='w-fit self-center border-none bg-blue-50 font-bold text-blue-600 shadow-sm md:self-auto'
+                  className="w-fit self-center border-none bg-blue-50 font-bold text-blue-600 shadow-sm md:self-auto"
                   style={{
                     borderRadius: 999,
                     paddingInline: 14,
@@ -159,7 +159,7 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
             <Space size={8} wrap className={isMobile ? 'justify-center' : ''}>
               <Tag
                 icon={<SolutionOutlined />}
-                className='border-none bg-slate-100 font-bold text-slate-500 shadow-sm'
+                className="border-none bg-slate-100 font-bold text-slate-500 shadow-sm"
                 style={{ borderRadius: 999, paddingInline: 16, paddingBlock: 6 }}
               >
                 {profile?.industry || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}

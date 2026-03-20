@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { LogBookService } from '@/components/features/logbook/services/logBook.service';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import { userService } from '@/components/features/user/services/userService';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -62,7 +63,7 @@ export function useLogbook() {
       }
       router.replace(`${pathname}?${params.toString()}`);
     },
-    [searchParams, router, pathname],
+    [searchParams, router, pathname]
   );
 
   useEffect(() => {

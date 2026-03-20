@@ -1,8 +1,10 @@
+import { DeleteOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { Upload } from 'antd';
-import { LoadingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import { useToast } from '@/providers/ToastProvider';
+
 import { cn } from '@/lib/cn';
+import { UI_TEXT } from '@/lib/UI_Text';
+import { useToast } from '@/providers/ToastProvider';
 import { mediaService } from '@/services/media.service';
 
 export default function LogoUploader({
@@ -52,36 +54,38 @@ export default function LogoUploader({
   };
 
   return (
-    <div className='flex flex-col gap-2'>
+    <div className="flex flex-col gap-2">
       <Upload showUploadList={false} beforeUpload={beforeUpload}>
         <div
           className={cn(
             'group hover:border-primary/50 relative flex cursor-pointer items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 transition-all hover:bg-slate-100',
-            value && 'border-solid border-slate-100 bg-white shadow-sm',
+            value && 'border-solid border-slate-100 bg-white shadow-sm'
           )}
           style={{ width: size, height: size }}
         >
           {loading ? (
-            <div className='flex flex-col items-center gap-2 text-slate-400'>
-              <LoadingOutlined className='text-2xl' />
-              <span className='text-[10px] font-bold tracking-widest uppercase'>Loading</span>
+            <div className="flex flex-col items-center gap-2 text-slate-400">
+              <LoadingOutlined className="text-2xl" />
+              <span className="text-[10px] font-bold tracking-widest uppercase">
+                {UI_TEXT.COMMON.LOADING}
+              </span>
             </div>
           ) : value ? (
             <>
               <img
                 src={value}
                 alt={label}
-                className='h-full w-full object-contain p-3'
+                className="h-full w-full object-contain p-3"
                 draggable={false}
               />
-              <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100'>
-                <div className='flex gap-2'>
-                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-900 shadow-lg transition-transform active:scale-90'>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-slate-900 shadow-lg transition-transform active:scale-90">
                     <PlusOutlined />
                   </div>
                   <button
                     onClick={handleRemove}
-                    className='flex h-8 w-8 items-center justify-center rounded-full bg-rose-500 text-white shadow-lg transition-transform hover:bg-rose-600 active:scale-90'
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500 text-white shadow-lg transition-transform hover:bg-rose-600 active:scale-90"
                   >
                     <DeleteOutlined />
                   </button>
@@ -89,12 +93,12 @@ export default function LogoUploader({
               </div>
             </>
           ) : (
-            <div className='flex flex-col items-center gap-2 text-slate-400'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm'>
-                <PlusOutlined className='text-lg' />
+            <div className="flex flex-col items-center gap-2 text-slate-400">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-100 bg-white shadow-sm">
+                <PlusOutlined className="text-lg" />
               </div>
-              <span className='text-[10px] font-bold tracking-widest uppercase'>
-                Upload {label}
+              <span className="text-[10px] font-bold tracking-widest uppercase">
+                {UI_TEXT.COMMON.UPLOAD} {label}
               </span>
             </div>
           )}

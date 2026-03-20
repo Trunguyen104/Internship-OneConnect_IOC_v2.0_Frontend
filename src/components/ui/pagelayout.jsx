@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { cn } from '@/lib/cn';
+
 import Card from './card';
 import DataTableToolbar from './datatabletoolbar';
 import Pagination from './pagination';
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 /**
  * Compound Pattern for standardizing Page Layout across the application.
@@ -14,7 +16,7 @@ const PageLayout = ({ children, className }) => (
   <section
     className={cn(
       'animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 py-4 duration-500',
-      className,
+      className
     )}
   >
     {children}
@@ -24,12 +26,7 @@ const PageLayout = ({ children, className }) => (
 const PageHeader = (props) => <StudentPageHeader {...props} />;
 
 const PageCard = ({ children, className }) => (
-  <Card
-    className={cn(
-      'flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8! 2xl:h-auto',
-      className,
-    )}
-  >
+  <Card className={cn('flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8!', className)}>
     {children}
   </Card>
 );
@@ -39,11 +36,11 @@ const PageToolbar = (props) => (
 );
 
 const PageContent = ({ children, className }) => (
-  <div className={cn('min-h-0 flex-1 overflow-hidden', className)}>{children}</div>
+  <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', className)}>{children}</div>
 );
 
 const PagePagination = (props) => (
-  <div className='mt-5 border-t border-gray-300 pt-5'>
+  <div className="mt-5 border-t border-gray-300 pt-5">
     <Pagination {...props} />
   </div>
 );

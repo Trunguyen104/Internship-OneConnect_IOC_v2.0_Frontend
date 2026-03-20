@@ -1,20 +1,22 @@
 'use client';
 
-import PageLayout from '@/components/ui/pagelayout';
-import { Select } from 'antd';
 import { FilterOutlined } from '@ant-design/icons';
-import { Skeleton } from '@/components/ui/skeleton';
-import { EmptyState } from '@/components/ui/emptystate';
-import LogbookTable from './LogbookTable';
-import LogbookFormModal from './LogbookFormModal';
-import LogbookDetailModal from './LogbookDetailModal';
-import { useLogbook } from '../hooks/useLogbook';
-import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
-import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
-import { useToast } from '@/providers/ToastProvider';
-import { LogBookService } from '@/components/features/logbook/services/logBook.service';
-import { useCallback, useState } from 'react';
+import { Select } from 'antd';
 import dayjs from 'dayjs';
+import { useCallback, useState } from 'react';
+
+import { LogBookService } from '@/components/features/logbook/services/logBook.service';
+import { EmptyState } from '@/components/ui/emptystate';
+import PageLayout from '@/components/ui/pagelayout';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
+import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import { useToast } from '@/providers/ToastProvider';
+
+import { useLogbook } from '../hooks/useLogbook';
+import LogbookDetailModal from './LogbookDetailModal';
+import LogbookFormModal from './LogbookFormModal';
+import LogbookTable from './LogbookTable';
 
 export default function LogbookPage() {
   const {
@@ -81,7 +83,7 @@ export default function LogbookPage() {
       }
       if (res && res.isSuccess !== false) {
         toast.success(
-          editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE,
+          editingId ? DAILY_REPORT_MESSAGES.SUCCESS.UPDATE : DAILY_REPORT_MESSAGES.SUCCESS.CREATE
         );
 
         if (!editingId) {
@@ -187,9 +189,9 @@ export default function LogbookPage() {
                 setStatusFilter(val);
                 setPageNumber(1);
               }}
-              className='w-56 shadow-sm'
-              rootClassName='custom-select-premium'
-              suffixIcon={<FilterOutlined className='text-muted' />}
+              className="w-56 shadow-sm"
+              rootClassName="custom-select-premium"
+              suffixIcon={<FilterOutlined className="text-muted" />}
               options={[
                 { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
                 { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
@@ -204,21 +206,21 @@ export default function LogbookPage() {
 
         <PageLayout.Content>
           {loading && data.length === 0 ? (
-            <div className='space-y-4 px-6 py-4'>
+            <div className="space-y-4 px-6 py-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className='flex h-[72px] items-center gap-4 border-b border-slate-50'>
-                  <Skeleton className='h-4 w-24' />
-                  <Skeleton className='h-4 w-32' />
-                  <Skeleton className='h-4 flex-1' />
-                  <Skeleton className='h-6 w-16 rounded-full' />
-                  <Skeleton className='h-8 w-16 rounded-lg' />
+                <div key={i} className="flex h-[72px] items-center gap-4 border-b border-slate-50">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                  <Skeleton className="h-8 w-16 rounded-lg" />
                 </div>
               ))}
             </div>
           ) : data.length === 0 ? (
             <EmptyState
               title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
-              description='Keep track of your learning journey! Start by adding your first daily report.'
+              description="Keep track of your learning journey! Start by adding your first daily report."
             />
           ) : (
             <LogbookTable

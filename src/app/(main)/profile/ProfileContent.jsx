@@ -1,11 +1,12 @@
 'use client';
 
+import { Spin } from 'antd';
 import { useEffect, useState } from 'react';
-import { userService } from '@/components/features/user/services/userService';
-import { USER_ROLE } from '@/constants/common/enums';
+
 import EnterpriseProfileContainer from '@/components/features/company-profile/components/EnterpriseProfileContainer';
 import ProfilePage from '@/components/features/user/components/ProfilePage';
-import { Spin } from 'antd';
+import { userService } from '@/components/features/user/services/userService';
+import { USER_ROLE } from '@/constants/common/enums';
 
 /**
  * ProfileContent dynamically renders the appropriate profile component
@@ -35,8 +36,8 @@ export default function ProfileContent() {
 
   if (loading) {
     return (
-      <div className='flex h-[60vh] items-center justify-center'>
-        <Spin size='large' description='Loading profile...' />
+      <div className="flex h-[60vh] items-center justify-center">
+        <Spin size="large" description="Loading profile..." />
       </div>
     );
   }

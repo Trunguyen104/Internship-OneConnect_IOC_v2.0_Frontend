@@ -1,7 +1,9 @@
 ﻿'use client';
 
 import { InfoCircleOutlined } from '@ant-design/icons';
+
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+
 import { ProfileDescription } from './ProfileDescription';
 import { ProfileSectionCard } from './ProfileSectionCard';
 

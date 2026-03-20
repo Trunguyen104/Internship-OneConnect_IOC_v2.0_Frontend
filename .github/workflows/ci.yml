@@ -65,7 +65,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            NEXT_PUBLIC_API_URL=https://ioc-v1.duckdns.org
+            NEXT_PUBLIC_API_URL=https://iocv2.duckdns.org
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/iocv2-frontend:latest
             ${{ secrets.DOCKER_USERNAME }}/iocv2-frontend:${{ github.sha }}

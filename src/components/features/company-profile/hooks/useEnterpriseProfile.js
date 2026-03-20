@@ -1,13 +1,15 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+
+import { userService } from '@/components/features/user/services/userService';
+import { USER_ROLE } from '@/constants/common/enums';
+import { mediaService } from '@/services/media.service';
+
 import {
   getMyEnterpriseProfile,
   updateEnterpriseProfile,
 } from '../services/enterpriseProfile.service';
-import { mediaService } from '@/services/media.service';
-import { userService } from '@/components/features/user/services/userService';
-import { USER_ROLE } from '@/constants/common/enums';
 
 function normalizeProfileResponse(response) {
   if (response?.data?.data) return response.data.data;
@@ -143,7 +145,7 @@ export function useEnterpriseProfile() {
         const updateResponse = await updateEnterpriseProfile(enterpriseId, payload);
 
         const updatedFromResponse = normalizeEnterpriseProfile(
-          normalizeProfileResponse(updateResponse),
+          normalizeProfileResponse(updateResponse)
         );
         if (updatedFromResponse) {
           setProfile((prev) => {
@@ -164,7 +166,7 @@ export function useEnterpriseProfile() {
         setSaving(false);
       }
     },
-    [fetchProfile, profile],
+    [fetchProfile, profile]
   );
 
   const refetch = useCallback(() => fetchProfile(true), [fetchProfile]);

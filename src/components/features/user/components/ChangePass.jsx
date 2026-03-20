@@ -1,10 +1,11 @@
 'use client';
 
-import Card from '@/components/ui/card';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { useToast } from '@/providers/ToastProvider';
+
+import Card from '@/components/ui/card';
 import { PROFILE_UI } from '@/constants/user/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 export default function ChangePass() {
   const toast = useToast();
@@ -62,16 +63,16 @@ export default function ChangePass() {
 
   return (
     <>
-      <div className='mb-5'>
-        <h1 className='text-text text-2xl font-bold'>{PROFILE_UI.CHANGE_PASSWORD.TITLE}</h1>
-        <label className='text-muted text-sm'>{PROFILE_UI.CHANGE_PASSWORD.HINT}</label>
+      <div className="mb-5">
+        <h1 className="text-text text-2xl font-bold">{PROFILE_UI.CHANGE_PASSWORD.TITLE}</h1>
+        <label className="text-muted text-sm">{PROFILE_UI.CHANGE_PASSWORD.HINT}</label>
       </div>
       <Card>
-        <div className='space-y-8'>
-          <div className='w-full space-y-6'>
+        <div className="space-y-8">
+          <div className="w-full space-y-6">
             <PasswordField
               label={PROFILE_UI.CHANGE_PASSWORD.CURRENT_PASSWORD}
-              name='currentPassword'
+              name="currentPassword"
               value={form.currentPassword}
               onChange={handleChange}
               show={show.current}
@@ -80,7 +81,7 @@ export default function ChangePass() {
 
             <PasswordField
               label={PROFILE_UI.CHANGE_PASSWORD.NEW_PASSWORD}
-              name='newPassword'
+              name="newPassword"
               value={form.newPassword}
               onChange={handleChange}
               show={show.new}
@@ -89,7 +90,7 @@ export default function ChangePass() {
 
             <PasswordField
               label={PROFILE_UI.CHANGE_PASSWORD.CONFIRM_PASSWORD}
-              name='confirmPassword'
+              name="confirmPassword"
               value={form.confirmPassword}
               onChange={handleChange}
               show={show.confirm}
@@ -102,7 +103,7 @@ export default function ChangePass() {
             />
           </div>
 
-          <div className='border-border flex items-center justify-end border-t pt-6'>
+          <div className="border-border flex items-center justify-end border-t pt-6">
             <button
               onClick={handleSubmit}
               disabled={!isValid}
@@ -123,12 +124,12 @@ export default function ChangePass() {
 
 function PasswordField({ label, name, value, onChange, show, onToggle, hint, error }) {
   return (
-    <div className='space-y-1'>
-      <label className='text-text mb-4 text-sm font-semibold'>
-        {label} <span className='text-danger'>*</span>
+    <div className="space-y-1">
+      <label className="text-text mb-4 text-sm font-semibold">
+        {label} <span className="text-danger">*</span>
       </label>
 
-      <div className='relative mt-2'>
+      <div className="relative mt-2">
         <input
           name={name}
           value={value}
@@ -138,16 +139,16 @@ function PasswordField({ label, name, value, onChange, show, onToggle, hint, err
         />
 
         <button
-          type='button'
+          type="button"
           onClick={onToggle}
-          className='text-muted hover:text-text absolute top-1/2 right-4 -translate-y-1/2 transition'
+          className="text-muted hover:text-text absolute top-1/2 right-4 -translate-y-1/2 transition"
         >
           {show ? <EyeInvisibleOutlined /> : <EyeOutlined />}
         </button>
       </div>
 
-      {hint && <p className='text-muted text-xs'>{hint}</p>}
-      {error && <p className='text-danger text-xs'>{error}</p>}
+      {hint && <p className="text-muted text-xs">{hint}</p>}
+      {error && <p className="text-danger text-xs">{error}</p>}
     </div>
   );
 }

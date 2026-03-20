@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { resolveAuthBaseUrl } from '@/lib/server/backend-url';
 
 const BE_URL = resolveAuthBaseUrl();

@@ -1,28 +1,83 @@
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
-import prettier from 'eslint-plugin-prettier';
+import nextTs from 'eslint-config-next/typescript';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import react from 'eslint-plugin-react';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
+import unusedImports from 'eslint-plugin-unused-imports';
 
-export default defineConfig([
+const eslintConfig = defineConfig([
   ...nextVitals,
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'dist/**', 'next-env.d.ts', 'node_modules/**']),
+  ...nextTs,
+  prettierRecommended,
   {
-    files: ['**/*.{js,jsx}'],
     plugins: {
-      prettier,
-      react,
+      'simple-import-sort': simpleImportSort,
+      'unused-imports': unusedImports,
+      react: react,
     },
     rules: {
-      'prettier/prettier': 'warn', // Chuyển sang warn để không làm đỏ lòm cả màn hình khi đang code
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
 
-      // TẮT QUY TẮC NÀY ĐỂ HẾT 2000 LỖI
-      'react/jsx-no-literals': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
 
-      // Các quy tắc bổ sung để code "dễ thở" hơn trong lúc OJT
-      'react/display-name': 'off',
-      'react/prop-types': 'off',
-      'no-unused-vars': 'warn',
-      'react-hooks/exhaustive-deps': 'warn',
+      'no-unused-vars': 'off',
+
+      '@next/next/no-img-element': 'off',
+
+      // ❗ CẤM TEXT TRỰC TIẾP TRONG JSX
+      'react/jsx-no-literals': [
+        'warn',
+        {
+          noStrings: true,
+          allowedStrings: [
+            '*',
+            '-',
+            ':',
+            '⋮',
+            '‹',
+            '›',
+            '…',
+            '(',
+            ')',
+            '/',
+            '%',
+            '?',
+            '|',
+            '#',
+            '@',
+            '=',
+            '+',
+            '->',
+            '<-',
+            '.',
+            ',',
+            '[',
+            ']',
+            '{',
+            '}',
+            '/ 10',
+            '--',
+            '***',
+            '&quot;',
+            'LOGO',
+          ],
+          ignoreProps: true,
+        },
+      ],
     },
   },
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'node_modules/**']),
 ]);
+
+export default eslintConfig;

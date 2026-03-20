@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut, httpDelete, httpPatch } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
 
 export const EvaluationService = {
   // --- Cycle Endpoints ---
@@ -54,17 +54,17 @@ export const EvaluationService = {
 
   submitEvaluations(cycleId, internshipId) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`,
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`
     );
   },
 
   publishEvaluations(cycleId, internshipId) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`,
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`
     );
   },
 
-  // --- Student Endpoints ---
+  // --- Student Endpoints (api/students/me prefixed) ---
   getStudentEvaluationCycles(internshipId) {
     return httpGet(`/students/me/internships/${internshipId}/evaluation-cycles`);
   },

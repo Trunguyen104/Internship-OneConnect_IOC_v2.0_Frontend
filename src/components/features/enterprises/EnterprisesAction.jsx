@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { Edit3, Trash2, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Tooltip } from 'antd';
+import { Edit3, ExternalLink, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
+
 import EnterprisesDialog from './EnterprisesDialog';
 
 export default function EnterprisesAction({ enterprise }) {
@@ -30,40 +32,40 @@ export default function EnterprisesAction({ enterprise }) {
   };
 
   return (
-    <div className='flex items-center justify-end gap-1.5'>
+    <div className="flex items-center justify-end gap-1.5">
       {enterprise.website && (
-        <Tooltip title='Mở trang web'>
+        <Tooltip title="Mở trang web">
           <Button
-            variant='ghost'
-            size='icon'
-            className='hover:text-primary h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-slate-100'
+            variant="ghost"
+            size="icon"
+            className="hover:text-primary h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-slate-100"
             onClick={() => window.open(enterprise.website, '_blank')}
           >
-            <ExternalLink className='h-4 w-4' />
+            <ExternalLink className="h-4 w-4" />
           </Button>
         </Tooltip>
       )}
 
-      <Tooltip title='Chỉnh sửa hồ sơ'>
+      <Tooltip title="Chỉnh sửa hồ sơ">
         <Button
-          variant='ghost'
-          size='icon'
-          className='hover:text-primary h-10 w-10 rounded-full text-slate-500 transition-all hover:bg-slate-100'
+          variant="ghost"
+          size="icon"
+          className="hover:text-primary h-10 w-10 rounded-full text-slate-500 transition-all hover:bg-slate-100"
           onClick={() => setOpenEdit(true)}
         >
-          <Edit3 className='h-4 w-4' />
+          <Edit3 className="h-4 w-4" />
         </Button>
       </Tooltip>
 
-      <Tooltip title='Xóa doanh nghiệp'>
+      <Tooltip title="Xóa doanh nghiệp">
         <Button
-          variant='ghost'
-          size='icon'
-          className='h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95'
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
           onClick={handleDelete}
           disabled={loading}
         >
-          <Trash2 className='h-4 w-4' />
+          <Trash2 className="h-4 w-4" />
         </Button>
       </Tooltip>
 

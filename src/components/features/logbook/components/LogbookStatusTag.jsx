@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
+
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
 const LOGBOOK_STATUS = {

@@ -1,8 +1,9 @@
 'use client';
 
+import { X } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+
 import { cn } from '@/lib/cn';
 
 const SheetCtx = createContext(null);
@@ -44,47 +45,47 @@ function SheetContent({
   return createPortal(
     <>
       <div
-        data-slot='sheet-overlay'
-        className='fixed inset-0 z-50 bg-black/40'
+        data-slot="sheet-overlay"
+        className="fixed inset-0 z-50 bg-black/40"
         onMouseDown={() => onOpenChange?.(false)}
       />
       <div
-        data-slot='sheet-content'
-        role='dialog'
-        aria-modal='true'
+        data-slot="sheet-content"
+        role="dialog"
+        aria-modal="true"
         className={cn(
           'fixed top-0 z-50 h-full w-full max-w-[520px] border-l border-slate-100 bg-white shadow-2xl',
           sideClass,
           'animate-in duration-200',
-          className,
+          className
         )}
         {...props}
       >
         {children}
         {showCloseButton ? (
           <button
-            type='button'
-            aria-label='Close'
+            type="button"
+            aria-label="Close"
             onClick={() => onOpenChange?.(false)}
-            className='absolute top-4 right-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
+            className="absolute top-4 right-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
-            <X className='size-4' />
+            <X className="size-4" />
           </button>
         ) : null}
       </div>
     </>,
-    document.body,
+    document.body
   );
 }
 
 function SheetHeader({ className = '', ...props }) {
-  return <div data-slot='sheet-header' className={cn('space-y-2', className)} {...props} />;
+  return <div data-slot="sheet-header" className={cn('space-y-2', className)} {...props} />;
 }
 
 function SheetTitle({ className = '', ...props }) {
   return (
     <div
-      data-slot='sheet-title'
+      data-slot="sheet-title"
       className={cn('text-2xl font-semibold text-slate-900', className)}
       {...props}
     />
@@ -94,11 +95,11 @@ function SheetTitle({ className = '', ...props }) {
 function SheetDescription({ className = '', ...props }) {
   return (
     <div
-      data-slot='sheet-description'
+      data-slot="sheet-description"
       className={cn('text-sm text-slate-500', className)}
       {...props}
     />
   );
 }
 
-export { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription };
+export { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle };

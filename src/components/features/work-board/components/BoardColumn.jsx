@@ -1,14 +1,15 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
 import { SortableIssueCard } from './IssueCard';
 
 export function BoardColumn({ column, tasks, onCardClick }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
   return (
-    <div className='flex h-full w-full flex-col'>
-      <div className='mb-3 flex items-center gap-3'>
-        <span className='text-text text-[15px] leading-none font-bold'>{column.title}</span>
-        <div className='bg-surface border-border/60 text-muted flex h-6 min-w-[24px] items-center justify-center rounded-full border px-1.5 text-[11px] font-bold shadow-sm'>
+    <div className="flex h-full w-full flex-col">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="text-text text-[15px] leading-none font-bold">{column.title}</span>
+        <div className="bg-surface border-border/60 text-muted flex h-6 min-w-[24px] items-center justify-center rounded-full border px-1.5 text-[11px] font-bold shadow-sm">
           {tasks.length}
         </div>
       </div>

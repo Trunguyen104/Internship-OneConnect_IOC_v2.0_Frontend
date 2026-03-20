@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { MoreVertical, GripVertical, Trash2 } from 'lucide-react';
-import { WORK_ITEM_STATUS, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
-import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { GripVertical, MoreVertical, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS } from '@/constants/common/enums';
 
 const statusToneText = {
   [WORK_ITEM_STATUS.TODO]: 'bg-gray-100 text-muted',
@@ -89,50 +90,50 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
         {...listeners}
         onClick={(e) => e.stopPropagation()}
         style={{ touchAction: 'none' }}
-        className='mr-2 flex h-8 w-8 shrink-0 cursor-grab items-center justify-center text-gray-300 hover:text-gray-500 active:cursor-grabbing'
+        className="mr-2 flex h-8 w-8 shrink-0 cursor-grab items-center justify-center text-gray-300 hover:text-gray-500 active:cursor-grabbing"
       >
-        <GripVertical className='h-4 w-4' />
+        <GripVertical className="h-4 w-4" />
       </div>
 
-      <div className='flex flex-1 items-center'>
-        <div className='text-text w-20 shrink-0 pl-1 text-[13px] font-medium tracking-wide whitespace-nowrap'>
+      <div className="flex flex-1 items-center">
+        <div className="text-text w-20 shrink-0 pl-1 text-[13px] font-medium tracking-wide whitespace-nowrap">
           {BACKLOG_UI.ISSUE || 'Issue'} {itemOrder || '-'}
         </div>
 
-        <div className='w-0 min-w-0 flex-1 pr-4'>
-          <div className='text-text truncate text-[13.5px] font-medium' title={it.title || it.name}>
+        <div className="w-0 min-w-0 flex-1 pr-4">
+          <div className="text-text truncate text-[13.5px] font-medium" title={it.title || it.name}>
             {it.title || it.name}
           </div>
         </div>
 
-        <div className='flex w-32 shrink-0 justify-center'>
+        <div className="flex w-32 shrink-0 justify-center">
           <span className={`${statusConfig} rounded-lg px-2.5 py-0.5 text-[12px] font-semibold`}>
             {getStatusLabel(currentStatus)}
           </span>
         </div>
 
-        <div className='flex w-32 min-w-0 shrink-0 justify-center px-2'>
+        <div className="flex w-32 min-w-0 shrink-0 justify-center px-2">
           {it.epicName ? (
             <span
-              className='bg-primary-surface text-primary block w-full truncate rounded-lg px-2.5 py-0.5 text-center text-xs font-semibold'
+              className="bg-primary-surface text-primary block w-full truncate rounded-lg px-2.5 py-0.5 text-center text-xs font-semibold"
               title={it.epicName}
             >
               {it.epicName}
             </span>
           ) : (
-            <span className='w-full'></span>
+            <span className="w-full"></span>
           )}
         </div>
 
-        <div className='text-muted w-24 shrink-0 text-center text-[13px] font-medium'>
+        <div className="text-muted w-24 shrink-0 text-center text-[13px] font-medium">
           {it.dueDate ? new Date(it.dueDate).toLocaleDateString('vi-VN') : '-'}
         </div>
 
-        <div className='text-primary w-24 shrink-0 text-center text-[13px] font-bold'>
+        <div className="text-primary w-24 shrink-0 text-center text-[13px] font-bold">
           {it.storyPoint || it.points || '-'}
         </div>
 
-        <div className='flex w-20 shrink-0 justify-center'>
+        <div className="flex w-20 shrink-0 justify-center">
           <span
             className={`rounded-lg px-2.5 py-0.5 text-[12px] font-semibold ${isHigh ? 'bg-danger-surface text-danger' : isLow ? 'bg-success-surface text-success' : 'bg-info-surface text-info'}`}
           >
@@ -146,9 +147,9 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
           </span>
         </div>
 
-        <div className='flex w-12 shrink-0 justify-center'>
+        <div className="flex w-12 shrink-0 justify-center">
           <div
-            className='flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold'
+            className="flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold"
             style={{
               backgroundColor: stringToColorTuple(it.assigneeName || 'U').bg,
               color: stringToColorTuple(it.assigneeName || 'U').text,
@@ -159,24 +160,24 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
         </div>
       </div>
 
-      <div className='flex w-8 shrink-0 justify-center text-gray-400 opacity-50 transition-opacity hover:opacity-100'>
-        <div ref={menuRef} className='relative'>
+      <div className="flex w-8 shrink-0 justify-center text-gray-400 opacity-50 transition-opacity hover:opacity-100">
+        <div ref={menuRef} className="relative">
           <button
-            type='button'
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               setIsMenuOpen((v) => !v);
             }}
-            className='flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100'
-            aria-label='Work item actions'
+            className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100"
+            aria-label="Work item actions"
           >
-            <MoreVertical className='h-4 w-4' />
+            <MoreVertical className="h-4 w-4" />
           </button>
 
           {isMenuOpen ? (
-            <div className='absolute top-full right-0 z-50 mt-1 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg'>
+            <div className="absolute top-full right-0 z-50 mt-1 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
               <button
-                type='button'
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMenuOpen(false);
@@ -189,9 +190,9 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
                     cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                   });
                 }}
-                className='text-danger flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-red-50'
+                className="text-danger flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-red-50"
               >
-                <Trash2 className='text-danger h-4 w-4' />
+                <Trash2 className="text-danger h-4 w-4" />
                 {BACKLOG_UI.DELETE || 'Delete'}
               </button>
             </div>
@@ -204,37 +205,37 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
 
 export function ColumnHeaders() {
   return (
-    <div className='mb-2 flex items-center justify-between rounded-lg border-b border-gray-100/50 bg-gray-50/80 px-2 py-2'>
-      <div className='mr-2 w-8 shrink-0' />
+    <div className="mb-2 flex items-center justify-between rounded-lg border-b border-gray-100/50 bg-gray-50/80 px-2 py-2">
+      <div className="mr-2 w-8 shrink-0" />
 
-      <div className='flex flex-1 items-center'>
-        <div className='text-muted w-20 shrink-0 pl-1 text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+      <div className="flex flex-1 items-center">
+        <div className="text-muted w-20 shrink-0 pl-1 text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.ISSUE || 'Issue'}
         </div>
-        <div className='text-muted min-w-0 flex-1 truncate text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+        <div className="text-muted min-w-0 flex-1 truncate text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.FIELD_SUMMARY || 'Summary'}
         </div>
-        <div className='text-muted w-32 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+        <div className="text-muted w-32 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.FIELD_STATUS || 'Status'}
         </div>
-        <div className='text-muted w-32 shrink-0 px-2 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+        <div className="text-muted w-32 shrink-0 px-2 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.TYPE_EPIC || 'Epic'}
         </div>
-        <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+        <div className="text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
         </div>
-        <div className='text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase'>
+        <div className="text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.FIELD_STORY_POINTS || 'Pts'}
         </div>
-        <div className='text-muted w-20 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+        <div className="text-muted w-20 shrink-0 text-center text-xs font-semibold tracking-wider uppercase">
           {BACKLOG_UI.FIELD_PRIORITY || 'Priority'}
         </div>
-        <div className='text-muted w-12 shrink-0 text-center text-xs font-semibold tracking-wider uppercase'>
+        <div className="text-muted w-12 shrink-0 text-center text-xs font-semibold tracking-wider uppercase">
           {BACKLOG_UI.FIELD_ASSIGNEE || 'User'}
         </div>
       </div>
 
-      <div className='w-8 shrink-0' />
+      <div className="w-8 shrink-0" />
     </div>
   );
 }
