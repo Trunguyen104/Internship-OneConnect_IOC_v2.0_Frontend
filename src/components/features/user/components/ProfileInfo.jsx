@@ -7,8 +7,17 @@ import { Button, Space, Spin } from 'antd';
 import AvatarUploader from '@/components/ui/avataruploader';
 import Card from '@/components/ui/card';
 import { PROFILE_UI } from '@/constants/user/uiText';
+import ProfileEditModal from './ProfileEditModal';
 
-export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatarChange }) {
+export default function ProfileInfo({
+  userInfo,
+  loadingUser,
+  avatarUrl,
+  onAvatarChange,
+  isEditModalOpen,
+  setIsEditModalOpen,
+  onSaveProfile,
+}) {
   return (
     <>
       <h1 className='text-text text-2xl font-bold'>{PROFILE_UI.PERSONAL_INFO}</h1>
@@ -27,11 +36,11 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
           </div>
 
           <Space className='mt-4 ml-auto flex gap-2'>
-            <Button type='primary' danger>
+            <Button type='primary' danger onClick={() => setIsEditModalOpen(true)}>
               {PROFILE_UI.BUTTONS.EDIT}
             </Button>
 
-            <Button>{PROFILE_UI.BUTTONS.UPLOAD_CV}</Button>
+            {userInfo?.role === 'Student' && <Button>{PROFILE_UI.BUTTONS.UPLOAD_CV}</Button>}
           </Space>
         </div>
 
@@ -62,12 +71,77 @@ export default function ProfileInfo({ userInfo, loadingUser, avatarUrl, onAvatar
                     : '—'
                 }
               />
-              <InfoItem label={PROFILE_UI.LABELS.UNIVERSITY} value='—' />
-              <InfoItem label={PROFILE_UI.LABELS.GENDER} value='—' />
+              <InfoItem label={PROFILE_UI.LABELS.GENDER} value={userInfo?.gender || '—'} />
+
+              {/* Role Specific Metadata */}
+              {userInfo?.role === 'Student' && (
+                <>
+                  <InfoItem
+                    label={PROFILE_UI.LABELS.UNIVERSITY}
+                    value={userInfo?.universityName || '—'}
+                  />
+                  <InfoItem label='Major' value={userInfo?.major || '—'} />
+                  <InfoItem label={PROFILE_UI.LABELS.PORTFOLIO}>
+                    {userInfo?.portfolioUrl ? (
+                      <a
+                        href={userInfo.portfolioUrl}
+                        target='_blank'
+                        rel='noreferrer'
+                        className='text-primary hover:underline'
+                      >
+                        View Link
+                      </a>
+                    ) : (
+                      '—'
+                    )}
+                  </InfoItem>
+                </>
+              )}
+
+              {(userInfo?.role === 'Mentor' ||
+                userInfo?.role === 'HR' ||
+                userInfo?.role === 'EnterpriseAdmin') && (
+                <>
+                  <InfoItem label='Enterprise' value={userInfo?.enterpriseName || '—'} />
+                  <InfoItem label={PROFILE_UI.LABELS.POSITION} value={userInfo?.position || '—'} />
+                  <InfoItem
+                    label={PROFILE_UI.LABELS.EXPERTISE}
+                    value={userInfo?.expertise || '—'}
+                  />
+                  <div className='md:col-span-4'>
+                    <InfoItem label={PROFILE_UI.LABELS.BIO} value={userInfo?.bio || '—'} />
+                  </div>
+                </>
+              )}
+
+              {userInfo?.role === 'SchoolAdmin' && (
+                <>
+                  <InfoItem
+                    label={PROFILE_UI.LABELS.UNIVERSITY}
+                    value={userInfo?.universityName || '—'}
+                  />
+                  <InfoItem
+                    label={PROFILE_UI.LABELS.DEPARTMENT}
+                    value={userInfo?.department || '—'}
+                  />
+                  <InfoItem label={PROFILE_UI.LABELS.POSITION} value={userInfo?.position || '—'} />
+                  <div className='md:col-span-4'>
+                    <InfoItem label={PROFILE_UI.LABELS.BIO} value={userInfo?.bio || '—'} />
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
       </Card>
+
+      <ProfileEditModal
+        open={isEditModalOpen}
+        onCancel={() => setIsEditModalOpen(false)}
+        userInfo={userInfo}
+        onSave={onSaveProfile}
+        loading={loadingUser}
+      />
     </>
   );
 }

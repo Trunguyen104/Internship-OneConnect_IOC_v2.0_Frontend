@@ -16,6 +16,9 @@ export default function ProjectResourceUpload({
   setFileList,
 }) {
   const toast = useToast();
+  const selectedType = Form.useWatch('resourceType', form);
+  const isLinkType = selectedType === 8;
+
   const uploadProps = {
     onRemove: () => {
       setFileList([]);
@@ -76,18 +79,33 @@ export default function ProjectResourceUpload({
           <Select options={RESOURCE_TYPES} />
         </Form.Item>
 
-        <Form.Item label={PROJECT_UI.FORM.ATTACH_FILE} required>
-          <Upload {...uploadProps}>
-            <Button icon={<UploadOutlined />}>{PROJECT_UI.BUTTON.SELECT_FILE}</Button>
-          </Upload>
-        </Form.Item>
+        {isLinkType ? (
+          <Form.Item
+            label='External URL'
+            name='externalUrl'
+            rules={[
+              { required: true, message: 'Please enter link URL' },
+              { type: 'url', message: 'Please enter a valid URL' },
+            ]}
+          >
+            <Input placeholder='https://docs.google.com/... or https://figma.com/...' />
+          </Form.Item>
+        ) : null}
+
+        {!isLinkType ? (
+          <Form.Item label={PROJECT_UI.FORM.ATTACH_FILE} required>
+            <Upload {...uploadProps}>
+              <Button icon={<UploadOutlined />}>{PROJECT_UI.BUTTON.SELECT_FILE}</Button>
+            </Upload>
+          </Form.Item>
+        ) : null}
 
         <Form.Item style={{ marginBottom: 0 }}>
           <Button
             type={'primary'}
             htmlType={'submit'}
             loading={uploading}
-            disabled={fileList.length === 0}
+            disabled={!isLinkType && fileList.length === 0}
             block
           >
             {PROJECT_UI.BUTTON.UPLOAD}

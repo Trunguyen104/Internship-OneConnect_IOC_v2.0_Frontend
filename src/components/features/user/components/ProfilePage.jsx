@@ -39,9 +39,12 @@ export default function ProfilePage() {
         loadingUser={profile.loadingUser}
         avatarUrl={profile.avatarUrl}
         onAvatarChange={profile.setAvatarUrl}
+        isEditModalOpen={profile.isEditModalOpen}
+        setIsEditModalOpen={profile.setIsEditModalOpen}
+        onSaveProfile={profile.updateProfile}
       />
 
-      <SkillList {...skillProps} />
+      {profile.userInfo?.role === 'Student' && <SkillList {...skillProps} />}
     </section>
   );
 }

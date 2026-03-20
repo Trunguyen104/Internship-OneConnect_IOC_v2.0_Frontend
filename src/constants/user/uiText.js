@@ -23,6 +23,11 @@ export const PROFILE_UI = {
     DATE_OF_BIRTH: 'Date of Birth',
     UNIVERSITY: 'University',
     GENDER: 'Gender',
+    BIO: 'Bio/About Me',
+    EXPERTISE: 'Expertise',
+    DEPARTMENT: 'Department',
+    POSITION: 'Position',
+    PORTFOLIO: 'Portfolio/CV Link',
   },
   SKILLS: {
     TITLE: 'Skills',
