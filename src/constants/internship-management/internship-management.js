@@ -4,14 +4,32 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     CREATE_BTN: 'Create New Group',
     ALL_GROUPS: 'All Groups',
     ACTIVE: 'Active',
+    FINISHED: 'Finished',
     ARCHIVED: 'Archived',
     SEARCH_PLACEHOLDER: 'Search groups...',
+    FILTERS: {
+      SEARCH_PLACEHOLDER: 'Search groups...',
+      STATUS_FILTER: 'Status',
+    },
+    TABLE: {
+      COLUMNS: {
+        GROUP_NAME: 'GROUP NAME',
+        TERM: 'TERM',
+        MENTOR: 'MENTOR',
+        MEMBERS: 'MEMBERS',
+        STATUS: 'STATUS',
+        ACTION: 'ACTION',
+      },
+      NOT_ASSIGNED: 'Not Assigned',
+      EMPTY_TEXT: 'No groups match your search',
+    },
 
     CARD: {
       CHANGE_MENTOR: 'Change Mentor',
       ASSIGN_MENTOR: 'Assign Mentor',
       VIEW_ARCHIVE: 'View Archive',
       VIEW_DETAILS: 'View Details',
+      ARCHIVE_TOOLTIP: 'Archive Group',
       DELETE_TOOLTIP: 'Delete Group',
       MENTOR_LABEL: 'Mentor:',
       NOT_ASSIGNED: 'Not Assigned',
@@ -21,7 +39,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     MODALS: {
       CREATE: {
         TITLE: 'Create New Internship Group',
+        SUBTITLE: 'Create a new internship group for this term',
         SUBMIT: 'Create Group',
+        CANCEL: 'Cancel',
         NAME_LABEL: 'Group Name',
         NAME_REQUIRED: 'Please enter group name',
         NAME_PLACEHOLDER: 'Ex: Web Frontend A',
@@ -44,12 +64,23 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         REASON_LABEL: 'Reason for change',
         REASON_REQUIRED: 'Please enter a reason',
         REASON_PLACEHOLDER: 'Why are you changing the Mentor?',
+        GROUP_LABEL: 'Group:',
+        CANCEL: 'Cancel',
+        CONFIRM: 'Confirm',
       },
       VIEW: {
         TITLE: 'Group Details:',
-        TRACK: 'Track',
+        TRACK: 'Track / Field',
         STATUS: 'Status',
-        MEMBERS: 'Members',
+        MEMBERS: 'Team Members',
+        TERM: 'Term / Semester',
+        TOTAL_MEMBERS: 'Total Members',
+        MENTOR: 'Assigned Mentor',
+        PROJECT_NAME: 'Project Name',
+        NOT_ASSIGNED: 'Not Assigned',
+        STUDENTS_SUFFIX: 'Students',
+        DEFAULT_SUBTITLE: 'Internship Group',
+        CLOSE: 'Close',
       },
     },
 
@@ -62,6 +93,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       DELETE_CONFIRM_TEXT: 'Are you sure you want to delete the group',
       DELETE_SUCCESS: 'Group disbanded successfully',
       CREATE_SUCCESS: 'Group created successfully',
+      ARCHIVE_CONFIRM_TITLE: 'Archive Group',
+      ARCHIVE_CONFIRM_TEXT: 'Are you sure you want to archive the group',
+      ARCHIVE_SUCCESS: 'Group archived successfully',
     },
   },
   INTERNSHIP_LIST: {
@@ -71,10 +105,11 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     TABLE: {
       COLUMNS: {
         FULL_NAME: 'FULL NAME',
-        STUDENT_ID: 'STUDENT ID',
+        STUDENT_ID: 'ID',
         EMAIL: 'EMAIL',
         MAJOR: 'MAJOR',
         STATUS: 'STATUS',
+        GROUP: 'GROUP',
         MENTOR: 'MENTOR',
         ACTION: 'ACTION',
       },
@@ -95,6 +130,17 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       ALL_STUDENTS: 'All Students',
       MENTOR_PLACEHOLDER: 'Mentor',
       STATUS_FILTER: 'Status',
+      GROUP_FILTER: 'Group',
+      GROUP_OPTIONS: [
+        { label: 'In Group', value: 'HAS_GROUP' },
+        { label: 'No Group', value: 'NO_GROUP' },
+      ],
+      ASSIGNMENT_FILTER: 'Assignment',
+      ASSIGNMENT_OPTIONS: [
+        { label: 'Assigned', value: 'ASSIGNED' },
+        { label: 'Unassigned', value: 'UNASSIGNED' },
+      ],
+      DATE_FILTER_PLACEHOLDER: 'Month/Year',
     },
     STATUS_LABELS: {
       PENDING: 'Pending',
@@ -109,6 +155,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       CHANGE_GROUP: 'Change Group',
       ADD_TO_GROUP: 'Add to Group',
       VIEW_BIO: 'View Full Profile',
+      BULK_ACTIONS: 'Bulk Actions',
     },
     MODALS: {
       ADD: {
@@ -127,6 +174,14 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         MAJOR_LABEL: 'Major',
         MAJOR_REQUIRED: 'Please select a major',
         MAJOR_PLACEHOLDER: 'Select major',
+        DOB_LABEL: 'Date of Birth',
+        DOB_REQUIRED: 'Please enter Date of Birth',
+        PHONE_LABEL: 'Phone Number',
+        PHONE_REQUIRED: 'Please enter phone number',
+        PHONE_INVALID: 'Invalid phone number format (10-11 digits)',
+        PHONE_PLACEHOLDER: 'Ex: 0912345678',
+        DATE_FORMAT_PLACEHOLDER: 'DD/MM/YYYY',
+        DATE_FORMAT: 'DD/MM/YYYY',
         CANCEL: 'Cancel',
         SUBMIT: 'Save Student',
         MAJOR_OPTIONS: [
@@ -139,13 +194,14 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         TITLE: 'Reject Application',
         WARNING_TEXT_1: 'You are about to reject student',
         WARNING_TEXT_2:
-          '. This action cannot be undone and the student will be notified immediately.',
+          'This action cannot be undone and the student will be notified immediately.',
         REASON_LABEL: 'Reason for rejection',
         REASON_PLACEHOLDER:
           'Please provide detailed reason (e.g., lack of skills, failed interview)...',
         REASON_REQUIRED: 'Please enter a rejection reason',
         CANCEL: 'Cancel',
         SUBMIT: 'Confirm Rejection',
+        DATE_FORMAT_PLACEHOLDER: 'DD/MM/YYYY',
       },
       ASSIGN: {
         TITLE: 'Assign Mentor & Project',
@@ -173,6 +229,18 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         CANCEL: 'Cancel',
         SUBMIT_ADD: 'Confirm Addition',
         SUBMIT_CHANGE: 'Confirm Change',
+      },
+      DETAIL: {
+        TITLE: 'Student Information',
+        MAJOR: 'Major / Field',
+        STATUS: 'Status',
+        EMAIL: 'Email Address',
+        PHONE: 'Phone Number',
+        DOB: 'Date of Birth',
+        GROUP: 'Group',
+        MENTOR: 'Mentor',
+        PLACEMENT_DATE: 'Placement Date',
+        CLOSE: 'Close',
       },
     },
     MESSAGES: {
@@ -267,6 +335,21 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           SUBMIT_ADD: 'Add Student',
           SUBMIT_EDIT: 'Update',
           CLOSE: 'Close',
+
+          TABS: {
+            GENERAL: 'General',
+            PLACEMENT: 'Placement',
+            FEEDBACK: 'Feedback',
+          },
+          FEEDBACK_EMPTY: {
+            TITLE: 'No Feedback Records',
+            SUBTITLE: 'Evaluations will appear here later',
+          },
+          PHASE_TEXT: {
+            PREFIX: 'This student is currently in the',
+            SUFFIX:
+              'phase. Business details and evaluations will be updated as the internship progresses.',
+          },
         },
         IMPORT: {
           TITLE: 'Import Student List',
@@ -279,6 +362,17 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           INVALID_TAG: 'Error',
           CANCEL: 'Cancel',
           SUBMIT: 'Start Import',
+
+          PREVIEW_COLUMNS: {
+            FULL_NAME: 'Full Name',
+            STUDENT_ID: 'Student ID',
+            EMAIL: 'Email',
+            VALIDITY: 'Validity',
+          },
+          TOOLTIPS: {
+            VALID: 'Valid Data',
+            ERROR: 'Data Error',
+          },
         },
       },
       MESSAGES: {
@@ -391,16 +485,26 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       TITLE: 'University Dashboard',
       METRICS: {
         TOTAL_STUDENTS: 'Total Students',
-        ACTIVE_TERMS: 'Active Terms',
+        TOTAL_TERMS: 'Total Terms',
         INTERNSHIP_GROUPS: 'Internship Groups',
         ENROLLED: 'Enrolled',
-        IN_PROGRESS: 'In Progress',
+        TOTAL: 'Cumulative',
         COORDINATED: 'Coordinated',
+      },
+      ANALYTICS: {
+        TITLE: 'Term Lifecycle Status',
+        ENDED: 'Ended Terms',
+        UPCOMING: 'Upcoming Terms',
+        ACTIVE: 'Active Terms',
+        CLOSED: 'Closed Terms',
       },
       RECENT_TERMS: {
         TITLE: 'Recent Internship Terms',
-        SUBTITLE: 'Internship Phase',
+        SUBTITLE: 'Internship Program',
+        START_DATE: 'Start Date',
+        START_MONTH_FORMAT: 'MMM YYYY',
         VIEW_ALL_BTN: 'View All',
+        EMPTY_TEXT: 'No recent terms found.',
         TABLE: {
           COLUMNS: {
             NAME: 'TERM NAME',
@@ -408,6 +512,10 @@ export const INTERNSHIP_MANAGEMENT_UI = {
             STATUS: 'STATUS',
           },
         },
+      },
+      MESSAGES: {
+        GENERATING_STATS: 'Generating system analytics...',
+        GENERATE_SUCCESS: 'Analytics report generated successfully!',
       },
     },
   },

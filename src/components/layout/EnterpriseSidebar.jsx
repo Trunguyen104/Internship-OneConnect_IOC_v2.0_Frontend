@@ -3,9 +3,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { AppstoreOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  TeamOutlined,
+  SolutionOutlined,
+  DashboardOutlined,
+} from '@ant-design/icons';
 
-const enterpriseMenu = [{ icon: <AppstoreOutlined />, label: 'Dashboard', href: '/dashboard' }];
+const enterpriseMenu = [
+  { icon: <DashboardOutlined />, label: 'Dashboard', href: '/dashboard' },
+  {
+    icon: <SolutionOutlined />,
+    label: 'Internship Students',
+    href: '/internship-student-management',
+  },
+  {
+    icon: <TeamOutlined />,
+    label: 'Internship Groups',
+    href: '/internship-group-management',
+  },
+];
 
 export default function EnterpriseSidebar() {
   const pathname = usePathname();

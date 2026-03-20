@@ -12,16 +12,16 @@ const getEvalStatusText = (evalStatus) => {
   const status = typeof evalStatus === 'string' ? evalStatus.toUpperCase() : evalStatus;
 
   switch (status) {
-    case 0:
+    case 1:
     case 'PENDING':
       return { label: EVALUATION_UI.STATUS.PENDING, color: 'default' };
-    case 1:
+    case 2:
     case 'DRAFT':
       return { label: EVALUATION_UI.STATUS.DRAFT, color: 'warning' };
-    case 2:
+    case 3:
     case 'SUBMITTED':
       return { label: EVALUATION_UI.STATUS.SUBMITTED, color: 'processing' };
-    case 3:
+    case 4:
     case 'PUBLISHED':
       return { label: EVALUATION_UI.STATUS.PUBLISHED, color: 'success' };
     default:
@@ -60,7 +60,7 @@ export default function TeamEvaluationsModal({
     },
     {
       title: EVALUATION_UI.TABLE_COLUMNS.STATUS,
-      dataIndex: 'evaluationStatus',
+      dataIndex: 'status',
       align: 'center',
       render: (status) => {
         const conf = getEvalStatusText(status);
@@ -72,9 +72,9 @@ export default function TeamEvaluationsModal({
       dataIndex: 'totalScore',
       align: 'center',
       render: (score, record) => {
-        const status = record.evaluationStatus;
+        const status = record.status;
         const isPublished =
-          status === 3 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
+          status === 4 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
 
         if (!isPublished) {
           return <Text type='secondary'>--</Text>;
@@ -97,9 +97,9 @@ export default function TeamEvaluationsModal({
       render: (_, record) => {
         if (record.studentId !== myStudentId) return null;
 
-        const status = record.evaluationStatus;
+        const status = record.status;
         const isPublished =
-          status === 3 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
+          status === 4 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
 
         if (!isPublished) {
           return (
