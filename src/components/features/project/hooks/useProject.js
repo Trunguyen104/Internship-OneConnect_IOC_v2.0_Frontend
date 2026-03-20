@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { Form } from 'antd';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useEffect, useState } from 'react';
+
+import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import {
-  getProjectResources,
   createProjectResource,
   deleteProjectResource,
-  updateProjectResource,
   downloadProjectResource,
+  getProjectResources,
   readProjectResource,
+  updateProjectResource,
 } from '@/components/features/project/services/projectResources';
 import { ProjectService } from '@/components/features/project/services/projectService';
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
+import { useToast } from '@/providers/ToastProvider';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 export function useProject(initialProjectId = null) {
@@ -54,7 +55,7 @@ export function useProject(initialProjectId = null) {
         setLoading(false);
       }
     },
-    [toast],
+    [toast]
   );
 
   const initProject = useCallback(async () => {
@@ -149,7 +150,7 @@ export function useProject(initialProjectId = null) {
     const proposedFileName = file?.name?.toLowerCase();
 
     const isDuplicateName = resources.some(
-      (r) => r.resourceName?.trim().toLowerCase() === proposedName,
+      (r) => r.resourceName?.trim().toLowerCase() === proposedName
     );
     const isDuplicateFile =
       !isLinkUpload && proposedFileName
@@ -163,7 +164,7 @@ export function useProject(initialProjectId = null) {
 
     if (isDuplicateName) {
       toast.error(
-        `A resource with name "${values.resourceName || values.externalUrl || file?.name || 'resource'}" already exists.`,
+        `A resource with name "${values.resourceName || values.externalUrl || file?.name || 'resource'}" already exists.`
       );
       setUploading(false);
       return false;
@@ -180,7 +181,7 @@ export function useProject(initialProjectId = null) {
     formData.append('ProjectId', projectId);
     formData.append(
       'ResourceName',
-      values.resourceName || values.externalUrl || file?.name || 'Resource',
+      values.resourceName || values.externalUrl || file?.name || 'Resource'
     );
     formData.append('ResourceType', values.resourceType || 1);
     if (isLinkUpload) {
@@ -239,7 +240,7 @@ export function useProject(initialProjectId = null) {
       const isDuplicateName = resources.some(
         (r) =>
           r.projectResourceId !== editingResource.projectResourceId &&
-          r.resourceName?.trim().toLowerCase() === newName,
+          r.resourceName?.trim().toLowerCase() === newName
       );
 
       if (isDuplicateName) {

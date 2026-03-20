@@ -1,9 +1,9 @@
 'use client';
 
-import { Modal, Typography, Tag, Button, Tooltip, Space } from 'antd';
-import { TeamOutlined, LockOutlined, EyeOutlined, ClockCircleFilled } from '@ant-design/icons';
-import AppTable from '@/components/ui/apptable';
+import { ClockCircleFilled, EyeOutlined, LockOutlined, TeamOutlined } from '@ant-design/icons';
+import { Button, Modal, Space, Tag, Tooltip, Typography } from 'antd';
 
+import AppTable from '@/components/ui/apptable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const { Text, Title } = Typography;
@@ -53,7 +53,7 @@ export default function TeamEvaluationsModal({
       title: EVALUATION_UI.TABLE_COLUMNS.STUDENT_CODE,
       dataIndex: 'studentCode',
       render: (text) => (
-        <Text type='secondary' code>
+        <Text type="secondary" code>
           {text}
         </Text>
       ),
@@ -77,7 +77,7 @@ export default function TeamEvaluationsModal({
           status === 4 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
 
         if (!isPublished) {
-          return <Text type='secondary'>--</Text>;
+          return <Text type="secondary">--</Text>;
         }
 
         if (record.studentId !== myStudentId) {
@@ -88,7 +88,7 @@ export default function TeamEvaluationsModal({
           );
         }
 
-        return <Tag color='error'>{Number(score).toFixed(1)}</Tag>;
+        return <Tag color="error">{Number(score).toFixed(1)}</Tag>;
       },
     },
     {
@@ -104,7 +104,7 @@ export default function TeamEvaluationsModal({
         if (!isPublished) {
           return (
             <Tooltip title={EVALUATION_UI.LABELS.NOT_PUBLISHED}>
-              <Button type='text' disabled icon={<ClockCircleFilled />}>
+              <Button type="text" disabled icon={<ClockCircleFilled />}>
                 {EVALUATION_UI.LABELS.AWAITING_RESULTS}
               </Button>
             </Tooltip>
@@ -113,11 +113,11 @@ export default function TeamEvaluationsModal({
 
         return (
           <Button
-            type='primary'
-            size='small'
+            type="primary"
+            size="small"
             icon={<EyeOutlined />}
             onClick={() => onViewDetails(cycle)}
-            className='bg-primary/95 hover:!bg-primary border-none shadow-sm transition-all'
+            className="bg-primary/95 hover:!bg-primary border-none shadow-sm transition-all"
           >
             {EVALUATION_UI.LABELS.VIEW_REPORT}
           </Button>
@@ -130,7 +130,7 @@ export default function TeamEvaluationsModal({
     <Modal
       title={
         <Space>
-          <TeamOutlined className='text-primary' />
+          <TeamOutlined className="text-primary" />
           <Title level={4} style={{ margin: 0 }}>
             {EVALUATION_UI.MODAL_TEAM_TITLE}
           </Title>
@@ -142,8 +142,8 @@ export default function TeamEvaluationsModal({
       width={850}
       centered
     >
-      <Space orientation='vertical' size='large' style={{ width: '100%' }}>
-        <AppTable columns={columns} data={teamData} pagination={false} rowKey='studentId' />
+      <Space orientation="vertical" size="large" style={{ width: '100%' }}>
+        <AppTable columns={columns} data={teamData} pagination={false} rowKey="studentId" />
       </Space>
     </Modal>
   );

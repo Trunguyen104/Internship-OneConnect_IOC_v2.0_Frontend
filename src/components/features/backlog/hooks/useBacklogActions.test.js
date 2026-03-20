@@ -1,10 +1,12 @@
-import { renderHook, act } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { useBacklogActions } from './useBacklogActions';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { useToast } from '@/providers/ToastProvider';
-import { SPRINT_STATUS, MOVE_INCOMPLETE_ITEMS_OPTION, WORK_ITEM_STATUS } from '@/constants/enums';
 import { BACKLOG_UI } from '@/constants/backlog';
+import { MOVE_INCOMPLETE_ITEMS_OPTION, SPRINT_STATUS } from '@/constants/enums';
+import { useToast } from '@/providers/ToastProvider';
+
+import { useBacklogActions } from './useBacklogActions';
 
 // Mock dependencies
 vi.mock('@/providers/ToastProvider', () => ({
@@ -78,7 +80,7 @@ describe('useBacklogActions Hook', () => {
         expect.objectContaining({
           title: 'New Epic',
           description: 'Desc',
-        }),
+        })
       );
       expect(mockToast.success).toHaveBeenCalledWith(BACKLOG_UI.SUCCESS_CREATE_EPIC);
       expect(mockProps.ui.setOpenCreateEpic).toHaveBeenCalledWith(false);
@@ -229,7 +231,7 @@ describe('useBacklogActions Hook', () => {
       expect(productBacklogService.moveWorkItemToSprint).toHaveBeenCalledWith(
         'project-123',
         'task-1',
-        'sprint-new',
+        'sprint-new'
       );
       expect(mockToast.success).toHaveBeenCalledWith(BACKLOG_UI.SUCCESS_UPDATE_TASK);
     });

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useStudentModals = () => {
   const [addVisible, setAddVisible] = useState(false);

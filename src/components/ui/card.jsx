@@ -3,7 +3,7 @@ import { cn } from '@/lib/cn';
 function CardRoot({ children, className = '', ...props }) {
   return (
     <div
-      data-slot='card'
+      data-slot="card"
       className={cn('flex min-h-[420px] flex-col rounded-2xl bg-white p-5 shadow-sm', className)}
       {...props}
     >
@@ -15,7 +15,7 @@ function CardRoot({ children, className = '', ...props }) {
 function CardHeader({ children, className = '', ...props }) {
   return (
     <div
-      data-slot='card-header'
+      data-slot="card-header"
       className={cn('flex items-start justify-between gap-4', className)}
       {...props}
     >
@@ -27,7 +27,7 @@ function CardHeader({ children, className = '', ...props }) {
 function CardTitle({ children, className = '', ...props }) {
   return (
     <div
-      data-slot='card-title'
+      data-slot="card-title"
       className={cn('text-lg leading-snug font-semibold text-slate-900', className)}
       {...props}
     >
@@ -39,7 +39,7 @@ function CardTitle({ children, className = '', ...props }) {
 function CardDescription({ children, className = '', ...props }) {
   return (
     <div
-      data-slot='card-description'
+      data-slot="card-description"
       className={cn('text-sm text-slate-500', className)}
       {...props}
     >
@@ -50,7 +50,7 @@ function CardDescription({ children, className = '', ...props }) {
 
 function CardAction({ children, className = '', ...props }) {
   return (
-    <div data-slot='card-action' className={cn('shrink-0', className)} {...props}>
+    <div data-slot="card-action" className={cn('shrink-0', className)} {...props}>
       {children}
     </div>
   );
@@ -58,7 +58,7 @@ function CardAction({ children, className = '', ...props }) {
 
 function CardContent({ children, className = '', ...props }) {
   return (
-    <div data-slot='card-content' className={cn('min-h-0 flex-1', className)} {...props}>
+    <div data-slot="card-content" className={cn('min-h-0 flex-1', className)} {...props}>
       {children}
     </div>
   );
@@ -67,7 +67,7 @@ function CardContent({ children, className = '', ...props }) {
 function CardFooter({ children, className = '', ...props }) {
   return (
     <div
-      data-slot='card-footer'
+      data-slot="card-footer"
       className={cn('mt-auto flex items-center justify-end gap-2', className)}
       {...props}
     >
@@ -88,11 +88,11 @@ const Card = Object.assign(CardRoot, {
 export default Card;
 export {
   Card,
-  CardRoot,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardAction,
   CardContent,
+  CardDescription,
   CardFooter,
+  CardHeader,
+  CardRoot,
+  CardTitle,
 };

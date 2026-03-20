@@ -1,8 +1,10 @@
 'use client';
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useToast } from '@/providers/ToastProvider';
-import { TermService } from '../services/term.service';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
+
+import { TermService } from '../services/term.service';
 import { useTermFilters } from './useTermFilters';
 import { useTermModals } from './useTermModals';
 
@@ -97,7 +99,7 @@ export const useTermManagement = () => {
         toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
       }
     },
-    [openFormModal, toast],
+    [openFormModal, toast]
   );
 
   const handleView = useCallback(
@@ -112,7 +114,7 @@ export const useTermManagement = () => {
         toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
       }
     },
-    [openFormModal, toast],
+    [openFormModal, toast]
   );
 
   const handleDelete = useCallback(async () => {
@@ -127,7 +129,7 @@ export const useTermManagement = () => {
       fetchData();
     } catch (error) {
       toast.error(
-        error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR,
+        error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR
       );
     } finally {
       setSubmitLoading(false);
@@ -150,8 +152,8 @@ export const useTermManagement = () => {
           knownVersions.current[record.termId] = response.data.version;
           setData((prev) =>
             prev.map((item) =>
-              item.termId === record.termId ? { ...item, ...response.data } : item,
-            ),
+              item.termId === record.termId ? { ...item, ...response.data } : item
+            )
           );
         }
 
@@ -164,7 +166,7 @@ export const useTermManagement = () => {
         setSubmitLoading(false);
       }
     },
-    [statusModalState, fetchData, toast, setStatusModalState],
+    [statusModalState, fetchData, toast, setStatusModalState]
   );
 
   const handleSaveModal = useCallback(
@@ -191,7 +193,7 @@ export const useTermManagement = () => {
           if (response?.data) {
             knownVersions.current[termId] = response.data.version;
             setData((prev) =>
-              prev.map((item) => (item.termId === termId ? { ...item, ...response.data } : item)),
+              prev.map((item) => (item.termId === termId ? { ...item, ...response.data } : item))
             );
           }
           toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.UPDATE_SUCCESS);
@@ -207,13 +209,13 @@ export const useTermManagement = () => {
         fetchData();
       } catch (error) {
         toast.error(
-          error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR,
+          error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR
         );
       } finally {
         setSubmitLoading(false);
       }
     },
-    [editingRecord, fetchData, toast, setModalVisible],
+    [editingRecord, fetchData, toast, setModalVisible]
   );
 
   return {

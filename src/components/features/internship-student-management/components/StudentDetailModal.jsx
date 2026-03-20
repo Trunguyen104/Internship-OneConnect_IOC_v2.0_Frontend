@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
-import { Row, Col } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import { Col, Row } from 'antd';
+import React from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
-import { MOCK_MENTORS, MOCK_GROUPS } from '../constants/internshipData';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import StatusTag from './StatusTag';
+import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
 import SimpleDetailItem from './SimpleDetailItem';
+import StatusTag from './StatusTag';
 
 const StudentDetailModal = ({ open, student, onCancel }) => {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
@@ -27,7 +28,7 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
         subtitle={student.studentId}
       />
 
-      <div className='px-10 py-10'>
+      <div className="px-10 py-10">
         <Row gutter={[32, 32]}>
           <Col span={12}>
             <SimpleDetailItem label={DETAIL.MAJOR} value={student.major} />
@@ -64,7 +65,7 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
           cancelText={DETAIL.CLOSE}
           onCancel={onCancel}
           confirmText={null}
-          className='mt-12 flex justify-center border-none pt-0'
+          className="mt-12 flex justify-center border-none pt-0"
         />
       </div>
     </CompoundModal>

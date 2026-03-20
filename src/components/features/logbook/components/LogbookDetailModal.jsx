@@ -1,9 +1,11 @@
 'use client';
 
-import React, { memo } from 'react';
-import { Modal, Typography, Space, Divider } from 'antd';
+import { Divider, Modal, Space, Typography } from 'antd';
 import dayjs from 'dayjs';
+import React, { memo } from 'react';
+
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+
 import LogbookStatusTag from './LogbookStatusTag';
 
 const { Text, Paragraph } = Typography;
@@ -22,21 +24,21 @@ const LogbookDetailModal = memo(function LogbookDetailModal({ visible, record, o
       centered
       title={VIEW_MODAL.TITLE}
     >
-      <Space orientation='vertical' size={12} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={12} style={{ width: '100%' }}>
         <div>
-          <Text type='secondary'>{FORM.REPORT_DATE}</Text>
+          <Text type="secondary">{FORM.REPORT_DATE}</Text>
           <br />
           <Text strong>{dayjs(record.dateReport).format('DD/MM/YYYY')}</Text>
         </div>
 
         <div>
-          <Text type='secondary'>{TABLE.STUDENT}</Text>
+          <Text type="secondary">{TABLE.STUDENT}</Text>
           <br />
           <Text strong>{record.studentName}</Text>
         </div>
 
         <div>
-          <Text type='secondary'>{TABLE.STATUS}</Text>
+          <Text type="secondary">{TABLE.STATUS}</Text>
           <br />
           <LogbookStatusTag status={record.status} />
         </div>

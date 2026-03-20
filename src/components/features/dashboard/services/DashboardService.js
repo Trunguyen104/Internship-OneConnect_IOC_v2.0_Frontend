@@ -1,6 +1,5 @@
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import { userService } from '@/components/features/user/services/userService';
-import httpClient from '@/services/httpClient';
 
 export const DashboardService = {
   async getProfile() {

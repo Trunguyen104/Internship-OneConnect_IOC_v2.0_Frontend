@@ -1,6 +1,4 @@
-const ACCESS_TOKEN_KEY = 'accessToken';
-
-export function setAccessToken(token) {
+export function setAccessToken(_token) {
   // Handled via HttpOnly cookies
 }
 

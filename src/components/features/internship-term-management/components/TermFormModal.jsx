@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Form, Input, DatePicker, Row, Col } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
+import { Col, DatePicker, Form, Input, Row } from 'antd';
 import dayjs from 'dayjs';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import React, { useEffect } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const TermStats = ({ initialValues }) => {
   if (!initialValues) return null;
@@ -33,13 +34,13 @@ const TermStats = ({ initialValues }) => {
   ];
 
   return (
-    <div className='grid grid-cols-3 gap-3 py-2'>
+    <div className="grid grid-cols-3 gap-3 py-2">
       {stats.map((stat, idx) => (
         <div
           key={idx}
           className={`rounded-lg border p-3 text-center transition-all ${stat.containerClass}`}
         >
-          <div className='text-muted mb-1 text-[10px] font-bold tracking-wider uppercase'>
+          <div className="text-muted mb-1 text-[10px] font-bold tracking-wider uppercase">
             {stat.label}
           </div>
           <div className={`text-lg font-bold ${stat.textClass}`}>{stat.value}</div>
@@ -91,35 +92,35 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
       {viewOnly && <TermStats initialValues={initialValues} />}
 
       <CompoundModal.Content>
-        <Form form={form} layout='vertical' disabled={viewOnly || loading} requiredMark={!viewOnly}>
+        <Form form={form} layout="vertical" disabled={viewOnly || loading} requiredMark={!viewOnly}>
           <Form.Item
-            name='name'
+            name="name"
             label={FORM.NAME_LABEL}
             rules={[
               { required: true, message: FORM.NAME_REQUIRED },
               { max: 100, message: FORM.NAME_MAX },
             ]}
           >
-            <Input placeholder={FORM.NAME_PLACEHOLDER} className='h-10' />
+            <Input placeholder={FORM.NAME_PLACEHOLDER} className="h-10" />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name='startDate'
+                name="startDate"
                 label={FORM.START_DATE_LABEL}
                 rules={[{ required: true, message: FORM.START_DATE_REQUIRED }]}
               >
                 <DatePicker
-                  className='h-10 w-full'
-                  format='DD/MM/YYYY'
+                  className="h-10 w-full"
+                  format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name='endDate'
+                name="endDate"
                 label={FORM.END_DATE_LABEL}
                 dependencies={['startDate']}
                 rules={[
@@ -139,8 +140,8 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
                 ]}
               >
                 <DatePicker
-                  className='h-10 w-full'
-                  format='DD/MM/YYYY'
+                  className="h-10 w-full"
+                  format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
               </Form.Item>

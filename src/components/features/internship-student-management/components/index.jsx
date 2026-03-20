@@ -1,21 +1,23 @@
 'use client';
 
+import { CalendarOutlined, FilterOutlined, TeamOutlined, UserAddOutlined } from '@ant-design/icons';
+import { DatePicker, Select } from 'antd';
 import React from 'react';
+
+import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
 import PageTitle from '@/components/ui/pagetitle';
-import { FilterOutlined, UserAddOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
-import { Select, DatePicker } from 'antd';
+import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { useInternshipManagement } from '../hooks/useInternshipManagement';
+
 import { MOCK_STUDENTS } from '../constants/internshipData';
-import InternshipTable from './InternshipTable';
+import { useInternshipManagement } from '../hooks/useInternshipManagement';
 import AddStudentModal from './AddStudentModal';
-import RejectStudentModal from './RejectStudentModal';
 import AssignMentorModal from './AssignMentorModal';
 import GroupActionModal from './GroupActionModal';
+import InternshipTable from './InternshipTable';
+import RejectStudentModal from './RejectStudentModal';
 import StudentDetailModal from './StudentDetailModal';
-import Card from '@/components/ui/card';
 
 export default function InternshipManagement() {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
@@ -56,10 +58,10 @@ export default function InternshipManagement() {
 
   return (
     <>
-      <div className='mx-auto flex min-h-[420px] w-full flex-1 flex-col'>
+      <div className="mx-auto flex min-h-[420px] w-full flex-1 flex-col">
         <PageTitle title={INTERNSHIP_LIST.TITLE} />
-        <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
-          <DataTableToolbar className='mb-6'>
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
+          <DataTableToolbar className="mb-6">
             <DataTableToolbar.Search
               placeholder={INTERNSHIP_LIST.FILTERS.SEARCH_PLACEHOLDER}
               value={search}
@@ -67,14 +69,14 @@ export default function InternshipManagement() {
             />
 
             <DataTableToolbar.Filters>
-              <div className='flex flex-wrap items-center gap-3'>
+              <div className="flex flex-wrap items-center gap-3">
                 <DatePicker
-                  picker='month'
+                  picker="month"
                   placeholder={INTERNSHIP_LIST.FILTERS.DATE_FILTER_PLACEHOLDER}
                   value={dateFilter}
                   onChange={setDateFilter}
-                  className='h-9 w-40 rounded-lg'
-                  suffixIcon={<CalendarOutlined className='text-muted' />}
+                  className="h-9 w-40 rounded-lg"
+                  suffixIcon={<CalendarOutlined className="text-muted" />}
                 />
 
                 <Select
@@ -82,11 +84,11 @@ export default function InternshipManagement() {
                   placeholder={INTERNSHIP_LIST.FILTERS.STATUS_FILTER || 'Status'}
                   value={statusFilter === 'ALL' ? undefined : statusFilter}
                   onChange={handleStatusChange}
-                  className='h-9 min-w-[130px]'
+                  className="h-9 min-w-[130px]"
                   options={INTERNSHIP_LIST.FILTERS.STATUS_OPTIONS.filter(
-                    (opt) => opt.value !== 'ALL',
+                    (opt) => opt.value !== 'ALL'
                   )}
-                  suffixIcon={<FilterOutlined className='text-muted' />}
+                  suffixIcon={<FilterOutlined className="text-muted" />}
                 />
 
                 <Select
@@ -94,9 +96,9 @@ export default function InternshipManagement() {
                   placeholder={INTERNSHIP_LIST.FILTERS.GROUP_FILTER}
                   value={groupFilter === 'ALL' ? undefined : groupFilter}
                   onChange={setGroupFilter}
-                  className='h-9 min-w-[130px]'
+                  className="h-9 min-w-[130px]"
                   options={INTERNSHIP_LIST.FILTERS.GROUP_OPTIONS}
-                  suffixIcon={<TeamOutlined className='text-muted' />}
+                  suffixIcon={<TeamOutlined className="text-muted" />}
                 />
 
                 <Select
@@ -104,9 +106,9 @@ export default function InternshipManagement() {
                   placeholder={INTERNSHIP_LIST.FILTERS.ASSIGNMENT_FILTER}
                   value={assignmentFilter === 'ALL' ? undefined : assignmentFilter}
                   onChange={setAssignmentFilter}
-                  className='h-9 min-w-[130px]'
+                  className="h-9 min-w-[130px]"
                   options={INTERNSHIP_LIST.FILTERS.ASSIGNMENT_OPTIONS}
-                  suffixIcon={<FilterOutlined className='text-muted' />}
+                  suffixIcon={<FilterOutlined className="text-muted" />}
                 />
               </div>
             </DataTableToolbar.Filters>
@@ -159,7 +161,7 @@ export default function InternshipManagement() {
             }
           />
           {filteredData.length > 0 && (
-            <div className='border-border/50 mt-6 flex-shrink-0 border-t pt-6'>
+            <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
               <Pagination
                 total={filteredData.length}
                 page={pagination.current}

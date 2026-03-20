@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Typography, Input } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { Input, Typography } from 'antd';
+import React, { useState } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Text } = Typography;
 
@@ -21,9 +22,9 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
       <CompoundModal.Header title={STATUS.TITLE} />
 
       <CompoundModal.Content>
-        <div className='flex flex-col gap-4'>
-          <div className='text-muted text-sm'>
-            {STATUS.CONTENT} <span className='text-text font-bold'>&quot;{statusLabel}&quot;</span>
+        <div className="flex flex-col gap-4">
+          <div className="text-muted text-sm">
+            {STATUS.CONTENT} <span className="text-text font-bold">&quot;{statusLabel}&quot;</span>
           </div>
 
           <CompoundModal.InfoBox
@@ -32,8 +33,8 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
           />
 
           {!isOpening && (
-            <div className='text-left'>
-              <Text strong className='mb-2 block text-sm'>
+            <div className="text-left">
+              <Text strong className="mb-2 block text-sm">
                 {STATUS.REASON_LABEL}
               </Text>
               <Input.TextArea

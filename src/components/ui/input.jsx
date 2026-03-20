@@ -1,8 +1,9 @@
 'use client';
 
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
+
 import { cn } from '@/lib/cn';
-import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 const Input = React.forwardRef(({ className, type = 'text', label, error, ...props }, ref) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,18 +11,18 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, ...pro
   const inputId = props.id || props.name || label;
 
   return (
-    <div className='flex w-full flex-col gap-1.5'>
+    <div className="flex w-full flex-col gap-1.5">
       {label && (
-        <label htmlFor={inputId} className='text-sm font-medium text-slate-700'>
-          {label} {props.required && <span className='text-red-500'>*</span>}
+        <label htmlFor={inputId} className="text-sm font-medium text-slate-700">
+          {label} {props.required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <div className='relative'>
+      <div className="relative">
         <input
           {...props}
           id={inputId}
           type={isPassword && showPassword ? 'text' : type}
-          data-slot='input'
+          data-slot="input"
           ref={ref}
           className={cn(
             'flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900',
@@ -30,20 +31,20 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, ...pro
             'disabled:cursor-not-allowed disabled:opacity-50',
             isPassword && 'pr-10',
             error && 'border-red-500 focus-visible:ring-red-500/20',
-            className,
+            className
           )}
         />
         {isPassword && (
           <button
-            type='button'
+            type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className='absolute top-1/2 right-3 -translate-y-1/2 text-slate-500 hover:text-slate-700'
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-500 hover:text-slate-700"
           >
             {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
           </button>
         )}
       </div>
-      {error && <p className='text-xs font-medium text-red-500'>{error}</p>}
+      {error && <p className="text-xs font-medium text-red-500">{error}</p>}
     </div>
   );
 });

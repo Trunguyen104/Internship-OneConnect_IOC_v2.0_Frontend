@@ -1,5 +1,6 @@
-import LoginPage from '@/components/features/auth/components/LoginPage';
 import React from 'react';
+
+import LoginPage from '@/components/features/auth/components/LoginPage';
 
 export const metadata = {
   title: 'Login',

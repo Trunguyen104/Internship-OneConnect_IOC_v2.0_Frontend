@@ -1,14 +1,14 @@
 import React from 'react';
-import { useBacklogActions } from '@/components/features/backlog/hooks/useBacklogActions';
 
-import CreateTaskModal from '@/components/features/backlog/components/CreateTaskModal';
-import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
-import CreateEpicModal from '@/components/features/backlog/components/CreateEpicModal';
-import UpdateEpicModal from '@/components/features/backlog/components/UpdateEpicModal';
-import StartSprintModal from '@/components/features/backlog/components/StartSprintModal';
 import CompleteSprintModal from '@/components/features/backlog/components/CompleteSprintModal';
+import CreateEpicModal from '@/components/features/backlog/components/CreateEpicModal';
 import CreateSprintModal from '@/components/features/backlog/components/CreateSprintModal';
+import CreateTaskModal from '@/components/features/backlog/components/CreateTaskModal';
+import StartSprintModal from '@/components/features/backlog/components/StartSprintModal';
+import UpdateEpicModal from '@/components/features/backlog/components/UpdateEpicModal';
 import UpdateSprintModal from '@/components/features/backlog/components/UpdateSprintModal';
+import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
+import { useBacklogActions } from '@/components/features/backlog/hooks/useBacklogActions';
 
 export const BacklogModals = ({
   projectId,

@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut, httpDelete } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPost, httpPut } from '@/services/httpClient';
 export const LogBookService = {
   getAll(internshipId, params = {}) {
     return httpGet('/logbook', {

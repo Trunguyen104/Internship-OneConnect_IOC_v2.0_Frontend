@@ -1,6 +1,7 @@
+import React from 'react';
+
 import JobBoardPage from '@/components/features/job-board/components/JobBoardPage';
 import Header from '@/components/layout/Header';
-import React from 'react';
 
 function page() {
   return (

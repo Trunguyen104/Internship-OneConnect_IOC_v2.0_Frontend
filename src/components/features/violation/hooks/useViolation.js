@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 const MOCK_VIOLATIONS = [
   // {
@@ -47,7 +47,7 @@ export function useViolation() {
     return violations.filter(
       (v) =>
         v.type.toLowerCase().includes(search.toLowerCase()) ||
-        v.description.toLowerCase().includes(search.toLowerCase()),
+        v.description.toLowerCase().includes(search.toLowerCase())
     );
   }, [violations, search]);
 

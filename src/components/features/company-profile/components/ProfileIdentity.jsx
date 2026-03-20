@@ -1,14 +1,15 @@
 'use client';
 
-import { memo } from 'react';
-import Image from 'next/image';
 import {
   CheckCircleFilled,
   EnvironmentOutlined,
   GlobalOutlined,
   SolutionOutlined,
 } from '@ant-design/icons';
-import { Col, Grid, Row, Space, Tag, Typography, theme } from 'antd';
+import { Col, Grid, Row, Space, Tag, theme, Typography } from 'antd';
+import Image from 'next/image';
+import { memo } from 'react';
+
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
 const { Title, Link } = Typography;
@@ -21,14 +22,14 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
 
   return (
     <section
-      aria-label='Company identity'
+      aria-label="Company identity"
       style={{
         marginTop: token.marginLG,
         marginBottom: token.marginXL,
         paddingInline: token.paddingLG,
       }}
     >
-      <Row gutter={[16, 16]} align='bottom' wrap>
+      <Row gutter={[16, 16]} align="bottom" wrap>
         <Col>
           <div
             style={{
@@ -46,7 +47,7 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
               <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                 <Image
                   src={profile.logoUrl}
-                  alt='Company logo'
+                  alt="Company logo"
                   fill
                   style={{ objectFit: 'contain', padding: 12 }}
                 />
@@ -59,9 +60,9 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
           </div>
         </Col>
 
-        <Col flex='auto'>
-          <Space orientation='vertical' size={6} style={{ width: '100%' }}>
-            <Space align='center' size={8} wrap>
+        <Col flex="auto">
+          <Space orientation="vertical" size={6} style={{ width: '100%' }}>
+            <Space align="center" size={8} wrap>
               <Title
                 level={2}
                 style={{ margin: 0, lineHeight: 1.15 }}
@@ -73,7 +74,7 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
               </Title>
               {profile?.isVerified ? (
                 <Tag
-                  icon={<CheckCircleFilled aria-hidden='true' />}
+                  icon={<CheckCircleFilled aria-hidden="true" />}
                   style={{
                     marginInlineEnd: 0,
                     borderRadius: 999,
@@ -88,9 +89,9 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
               ) : null}
             </Space>
 
-            <Space size='small' wrap aria-label='Company metadata'>
+            <Space size="small" wrap aria-label="Company metadata">
               <Tag
-                icon={<SolutionOutlined aria-hidden='true' />}
+                icon={<SolutionOutlined aria-hidden="true" />}
                 style={{
                   marginInlineEnd: 0,
                   borderRadius: 999,
@@ -103,7 +104,7 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
                 {profile?.industry || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
               </Tag>
               <Tag
-                icon={<EnvironmentOutlined aria-hidden='true' />}
+                icon={<EnvironmentOutlined aria-hidden="true" />}
                 style={{
                   marginInlineEnd: 0,
                   borderRadius: 999,
@@ -117,7 +118,7 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
               </Tag>
               {profile?.website ? (
                 <Tag
-                  icon={<GlobalOutlined aria-hidden='true' />}
+                  icon={<GlobalOutlined aria-hidden="true" />}
                   style={{
                     marginInlineEnd: 0,
                     borderRadius: 999,
@@ -127,7 +128,7 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
                     fontWeight: 600,
                   }}
                 >
-                  <Link href={profile.website} target='_blank' rel='noopener noreferrer'>
+                  <Link href={profile.website} target="_blank" rel="noopener noreferrer">
                     {ENTERPRISE_PROFILE_UI.ENTERPRISE.WEBSITE}
                   </Link>
                 </Tag>

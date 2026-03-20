@@ -1,7 +1,8 @@
-import { Plus, MoreVertical, Pencil, Trash2 } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
-import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export function EpicSidebar({
   isSidebarOpen,
@@ -29,13 +30,13 @@ export function EpicSidebar({
 
   if (!isSidebarOpen) {
     return (
-      <div className='flex h-full w-12 shrink-0 flex-col items-center rounded-3xl border border-gray-200 bg-white py-6 shadow-sm transition-all duration-300'>
+      <div className="flex h-full w-12 shrink-0 flex-col items-center rounded-3xl border border-gray-200 bg-white py-6 shadow-sm transition-all duration-300">
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className='flex h-full w-full flex-col items-center justify-center text-gray-500 hover:text-gray-900'
+          className="flex h-full w-full flex-col items-center justify-center text-gray-500 hover:text-gray-900"
         >
           <span
-            className='text-sm font-bold tracking-[0.3em] uppercase'
+            className="text-sm font-bold tracking-[0.3em] uppercase"
             style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
           >
             {BACKLOG_UI.TYPE_EPIC}
@@ -46,27 +47,27 @@ export function EpicSidebar({
   }
 
   return (
-    <div className='flex h-full w-[260px] shrink-0 flex-col overflow-y-auto rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300'>
-      <div className='mb-6 flex items-center justify-between'>
-        <div className='text-[15px] font-bold text-gray-900'>{BACKLOG_UI.TYPE_EPIC}</div>
-        <div className='flex items-center gap-3'>
+    <div className="flex h-full w-[260px] shrink-0 flex-col overflow-y-auto rounded-3xl border border-gray-200 bg-white p-5 shadow-sm transition-all duration-300">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="text-[15px] font-bold text-gray-900">{BACKLOG_UI.TYPE_EPIC}</div>
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className='text-primary text-xs font-bold hover:underline'
+            className="text-primary text-xs font-bold hover:underline"
           >
             {BACKLOG_UI.HIDE}
           </button>
           <button
             onClick={() => setOpenCreateEpic(true)}
-            className='bg-primary hover:bg-primary-hover flex h-[22px] w-[22px] items-center justify-center rounded-full text-white transition-colors'
+            className="bg-primary hover:bg-primary-hover flex h-[22px] w-[22px] items-center justify-center rounded-full text-white transition-colors"
             title={BACKLOG_UI.CREATE_EPIC}
           >
-            <Plus className='h-3.5 w-3.5' />
+            <Plus className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      <div className='flex flex-col gap-1'>
+      <div className="flex flex-col gap-1">
         <button
           onClick={() => setSelectedEpicId('ALL')}
           className={`rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${
@@ -79,7 +80,7 @@ export function EpicSidebar({
         </button>
 
         {epics.map((epic) => (
-          <div key={epic.id} className='group relative'>
+          <div key={epic.id} className="group relative">
             <button
               onClick={() => setSelectedEpicId(epic.id)}
               className={`w-full rounded-2xl px-4 py-2.5 text-left text-[14px] font-semibold transition-colors ${
@@ -88,25 +89,25 @@ export function EpicSidebar({
                   : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <div className='truncate pr-6'>{epic.title || epic.name || 'Untitled Epic'}</div>
+              <div className="truncate pr-6">{epic.title || epic.name || 'Untitled Epic'}</div>
             </button>
 
             {/* More Menu */}
-            <div className='absolute top-1/2 right-2 -translate-y-1/2'>
+            <div className="absolute top-1/2 right-2 -translate-y-1/2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setOpenMenuId(openMenuId === epic.id ? null : epic.id);
                 }}
-                className='flex h-7 w-7 items-center justify-center rounded-full text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100'
+                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100"
               >
-                <MoreVertical className='h-4 w-4' />
+                <MoreVertical className="h-4 w-4" />
               </button>
 
               {openMenuId === epic.id && (
                 <div
                   ref={menuRef}
-                  className='absolute top-full right-0 z-50 mt-1 min-w-[120px] rounded-xl border border-gray-200 bg-white p-1 shadow-lg'
+                  className="absolute top-full right-0 z-50 mt-1 min-w-[120px] rounded-xl border border-gray-200 bg-white p-1 shadow-lg"
                 >
                   <button
                     onClick={(e) => {
@@ -115,9 +116,9 @@ export function EpicSidebar({
                       setOpenUpdateEpic(true);
                       setOpenMenuId(null);
                     }}
-                    className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50'
+                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
-                    <Pencil className='text-primary h-3.5 w-3.5' />
+                    <Pencil className="text-primary h-3.5 w-3.5" />
                     {BACKLOG_UI.UPDATE || 'Edit'}
                   </button>
                   <button
@@ -133,9 +134,9 @@ export function EpicSidebar({
                         cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                       });
                     }}
-                    className='text-primary hover:bg-primary-50 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium'
+                    className="text-primary hover:bg-primary-50 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium"
                   >
-                    <Trash2 className='h-3.5 w-3.5' />
+                    <Trash2 className="h-3.5 w-3.5" />
                     {BACKLOG_UI.DELETE || 'Delete'}
                   </button>
                 </div>

@@ -1,14 +1,16 @@
 'use client';
 
 import React, { memo } from 'react';
+
 import Card from '@/components/ui/card';
-import Pagination from '@/components/ui/pagination';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import Pagination from '@/components/ui/pagination';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+
 import { useIssueTab } from '../hooks/useIssueTab';
-import IssueTable from './IssueTable';
-import IssueFormModal from './IssueFormModal';
 import IssueDetailModal from './IssueDetailModal';
+import IssueFormModal from './IssueFormModal';
+import IssueTable from './IssueTable';
 
 const IssueTab = memo(function IssueTab() {
   const {
@@ -36,10 +38,10 @@ const IssueTab = memo(function IssueTab() {
   } = useIssueTab();
 
   return (
-    <div className='animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500'>
-      <Card className='flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto'>
+    <div className="animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500">
+      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
         <DataTableToolbar
-          className='mb-6 !border-0 !p-0'
+          className="mb-6 !border-0 !p-0"
           searchProps={{
             placeholder: ISSUE_UI.SEARCH_PLACEHOLDER,
             value: search,
@@ -68,7 +70,7 @@ const IssueTab = memo(function IssueTab() {
         />
 
         {total > 0 && (
-          <div className='border-border/50 mt-6 border-t pt-6'>
+          <div className="border-border/50 mt-6 border-t pt-6">
             <Pagination
               total={total}
               page={page}

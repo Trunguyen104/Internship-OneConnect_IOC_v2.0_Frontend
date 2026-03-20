@@ -1,8 +1,9 @@
+import { EditOutlined, TeamOutlined } from '@ant-design/icons';
+import { Form, Input, Select } from 'antd';
 import React, { memo, useEffect } from 'react';
-import { Form, Input, Select, Button } from 'antd';
-import { TeamOutlined, EditOutlined } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 export const CreateGroupModal = memo(({ open, onCancel, onFinish }) => {
   const [form] = Form.useForm();
@@ -31,39 +32,39 @@ export const CreateGroupModal = memo(({ open, onCancel, onFinish }) => {
 
       <Form
         form={form}
-        layout='vertical'
+        layout="vertical"
         onFinish={handleFinish}
-        className='p-6 pt-8'
+        className="p-6 pt-8"
         requiredMark={false}
       >
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {CREATE.NAME_LABEL}
             </span>
           }
-          name='name'
+          name="name"
           rules={[{ required: true, message: CREATE.NAME_REQUIRED }]}
         >
           <Input
-            prefix={<EditOutlined className='text-muted' />}
+            prefix={<EditOutlined className="text-muted" />}
             placeholder={CREATE.NAME_PLACEHOLDER}
-            className='bg-surface border-border h-11 rounded-xl'
+            className="bg-surface border-border h-11 rounded-xl"
           />
         </Form.Item>
 
         <Form.Item
           label={
-            <span className='text-text text-xs font-bold tracking-wider uppercase'>
+            <span className="text-text text-xs font-bold tracking-wider uppercase">
               {CREATE.TRACK_LABEL}
             </span>
           }
-          name='track'
-          initialValue='FRONTEND'
+          name="track"
+          initialValue="FRONTEND"
           rules={[{ required: true, message: CREATE.TRACK_REQUIRED }]}
         >
           <Select
-            className='h-11 w-full rounded-xl'
+            className="h-11 w-full rounded-xl"
             options={[
               { label: CREATE.TRACK_OPTIONS.FRONTEND, value: 'FRONTEND' },
               { label: CREATE.TRACK_OPTIONS.BACKEND, value: 'BACKEND' },
@@ -78,11 +79,12 @@ export const CreateGroupModal = memo(({ open, onCancel, onFinish }) => {
           confirmText={CREATE.SUBMIT}
           onCancel={handleCancel}
           onConfirm={() => form.submit()}
-          className='mt-8 pt-6'
+          className="mt-8 pt-6"
         />
       </Form>
     </CompoundModal>
   );
 });
+CreateGroupModal.displayName = 'CreateGroupModal';
 
 export default CreateGroupModal;

@@ -27,7 +27,7 @@ export function useAdminUsersStore(selector = (s) => s) {
   return useSyncExternalStore(
     subscribe,
     () => selector(store.state),
-    () => selector(store.state),
+    () => selector(store.state)
   );
 }
 

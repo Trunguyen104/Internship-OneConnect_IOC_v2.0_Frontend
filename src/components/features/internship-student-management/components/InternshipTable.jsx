@@ -1,19 +1,20 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
-import { Tooltip, Button, Dropdown } from 'antd';
 import {
   CheckOutlined,
   CloseOutlined,
-  UserOutlined,
-  TeamOutlined,
-  MoreOutlined,
   EyeOutlined,
+  MoreOutlined,
+  TeamOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import { Button, Dropdown } from 'antd';
+import React, { memo, useMemo } from 'react';
+
 import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { MOCK_MENTORS, MOCK_GROUPS } from '../constants/internshipData';
 
+import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
 import StatusTag from './StatusTag';
 
 const InternshipTable = memo(function InternshipTable({
@@ -53,10 +54,10 @@ const InternshipTable = memo(function InternshipTable({
         width: 160,
         render: (text, record) => {
           return (
-            <div className='flex items-center gap-2'>
-              <div className='flex flex-col overflow-hidden'>
-                <span className='text-text truncate text-sm font-bold'>{text || 'N/A'}</span>
-                <span className='text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60'>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-text truncate text-sm font-bold">{text || 'N/A'}</span>
+                <span className="text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60">
                   {record.major || 'None'}
                 </span>
               </div>
@@ -70,7 +71,7 @@ const InternshipTable = memo(function InternshipTable({
         key: 'studentId',
         width: 70,
         render: (id) => (
-          <span className='text-muted font-mono text-xs font-semibold uppercase'>{id}</span>
+          <span className="text-muted font-mono text-xs font-semibold uppercase">{id}</span>
         ),
       },
       {
@@ -89,12 +90,12 @@ const InternshipTable = memo(function InternshipTable({
         render: (id) => {
           const group = MOCK_GROUPS.find((g) => g.id === id);
           return group ? (
-            <div className='flex items-center gap-1.5 overflow-hidden'>
-              <TeamOutlined className='text-primary text-xs opacity-60' />
-              <span className='text-text truncate text-xs font-bold'>{group.name}</span>
+            <div className="flex items-center gap-1.5 overflow-hidden">
+              <TeamOutlined className="text-primary text-xs opacity-60" />
+              <span className="text-text truncate text-xs font-bold">{group.name}</span>
             </div>
           ) : (
-            <span className='text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40'>
+            <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
               {TABLE.NOT_ASSIGNED}
             </span>
           );
@@ -108,12 +109,12 @@ const InternshipTable = memo(function InternshipTable({
         render: (id) => {
           const mentor = MOCK_MENTORS.find((m) => m.id === id);
           return mentor ? (
-            <div className='flex items-center gap-1.5 overflow-hidden'>
-              <div className='bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full' />
-              <span className='text-text truncate text-xs font-bold'>{mentor.name}</span>
+            <div className="flex items-center gap-1.5 overflow-hidden">
+              <div className="bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full" />
+              <span className="text-text truncate text-xs font-bold">{mentor.name}</span>
             </div>
           ) : (
-            <span className='text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40'>
+            <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
               {TABLE.NOT_ASSIGNED}
             </span>
           );
@@ -129,7 +130,7 @@ const InternshipTable = memo(function InternshipTable({
             {
               key: 'view',
               label: ACTIONS.VIEW_BIO,
-              icon: <EyeOutlined className='text-primary' />,
+              icon: <EyeOutlined className="text-primary" />,
               onClick: () => onView(record),
             },
             { type: 'divider' },
@@ -138,13 +139,13 @@ const InternshipTable = memo(function InternshipTable({
                   {
                     key: 'accept',
                     label: ACTIONS.ACCEPT,
-                    icon: <CheckOutlined className='text-success' />,
+                    icon: <CheckOutlined className="text-success" />,
                     onClick: () => onAccept(record),
                   },
                   {
                     key: 'reject',
                     label: ACTIONS.REJECT,
-                    icon: <CloseOutlined className='text-danger' />,
+                    icon: <CloseOutlined className="text-danger" />,
                     onClick: () => onReject(record),
                   },
                   { type: 'divider' },
@@ -153,25 +154,25 @@ const InternshipTable = memo(function InternshipTable({
             {
               key: 'assign',
               label: ACTIONS.ASSIGN,
-              icon: <UserOutlined className='text-primary' />,
+              icon: <UserOutlined className="text-primary" />,
               onClick: () => onAssign(record),
             },
             {
               key: 'group',
               label: ACTIONS.ADD_TO_GROUP,
-              icon: <TeamOutlined className='text-primary' />,
+              icon: <TeamOutlined className="text-primary" />,
               onClick: () => onGroup(record),
             },
           ];
 
           return (
             <div onClick={(e) => e.stopPropagation()}>
-              <Dropdown menu={{ items }} trigger={['click']} placement='bottomRight'>
+              <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
                 <Button
-                  type='text'
-                  size='small'
+                  type="text"
+                  size="small"
                   icon={<MoreOutlined />}
-                  className='hover:bg-primary/10 text-muted flex h-8 w-8 items-center justify-center rounded-lg'
+                  className="hover:bg-primary/10 text-muted flex h-8 w-8 items-center justify-center rounded-lg"
                 />
               </Dropdown>
             </div>
@@ -179,7 +180,7 @@ const InternshipTable = memo(function InternshipTable({
         },
       },
     ],
-    [page, pageSize, onAccept, onReject, onAssign, onGroup, onView, TABLE, ACTIONS, STATUS_LABELS],
+    [page, pageSize, onAccept, onReject, onAssign, onGroup, onView, TABLE, ACTIONS, STATUS_LABELS]
   );
 
   return (
@@ -187,11 +188,11 @@ const InternshipTable = memo(function InternshipTable({
       columns={columns}
       data={data}
       loading={loading}
-      rowKey='id'
+      rowKey="id"
       rowSelection={rowSelection}
-      minWidth='780px'
-      tableLayout='fixed'
-      className='no-scrollbar mt-2 min-h-0 flex-1'
+      minWidth="780px"
+      tableLayout="fixed"
+      className="no-scrollbar mt-2 min-h-0 flex-1"
       onRowClick={onView}
     />
   );

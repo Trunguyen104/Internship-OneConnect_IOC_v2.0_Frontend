@@ -1,6 +1,8 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { useToast } from '@/providers/ToastProvider';
+
 import { StudentService } from '../services/student.service';
 import { useStudentFilters } from './useStudentFilters';
 import { useStudentModals } from './useStudentModals';
@@ -8,7 +10,7 @@ import { useStudentModals } from './useStudentModals';
 export const useStudentEnrollment = (initialStudents) => {
   const toast = useToast();
   const [students, setStudents] = useState(() =>
-    (initialStudents || []).map(StudentService.mapStudent),
+    (initialStudents || []).map(StudentService.mapStudent)
   );
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -73,7 +75,7 @@ export const useStudentEnrollment = (initialStudents) => {
         },
       });
     },
-    [toast],
+    [toast]
   );
 
   const handleUpdateStudent = useCallback(
@@ -92,7 +94,7 @@ export const useStudentEnrollment = (initialStudents) => {
         setSubmitLoading(false);
       }
     },
-    [selectedRecord, setEditVisible, setDetailsVisible, toast],
+    [selectedRecord, setEditVisible, setDetailsVisible, toast]
   );
 
   const handleAddStudent = useCallback(
@@ -114,7 +116,7 @@ export const useStudentEnrollment = (initialStudents) => {
         setSubmitLoading(false);
       }
     },
-    [setAddVisible, toast],
+    [setAddVisible, toast]
   );
 
   const handleImportStudents = useCallback(
@@ -134,7 +136,7 @@ export const useStudentEnrollment = (initialStudents) => {
         setSubmitLoading(false);
       }
     },
-    [setImportVisible, toast],
+    [setImportVisible, toast]
   );
 
   return {

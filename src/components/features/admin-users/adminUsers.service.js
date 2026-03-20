@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut, httpDelete, httpPatch } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
 
 export const adminUsersService = {
   getList(params = {}) {

@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useEffect, useState } from 'react';
+
 import { ProjectService } from '@/components/features/project/services/projectService';
+import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
 import { STAKEHOLDER_MESSAGES } from '@/constants/stakeholder/messages';
+import { useToast } from '@/providers/ToastProvider';
 
 export function useStakeholderTab() {
   const toast = useToast();
@@ -105,7 +106,7 @@ export function useStakeholderTab() {
         toast.success(
           editingStakeholderId
             ? STAKEHOLDER_MESSAGES.UPDATE_SUCCESS
-            : STAKEHOLDER_MESSAGES.CREATE_SUCCESS,
+            : STAKEHOLDER_MESSAGES.CREATE_SUCCESS
         );
         setOpenStakeholderForm(false);
         setEditingStakeholderId(null);

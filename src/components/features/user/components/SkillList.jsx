@@ -1,13 +1,15 @@
 'use client';
 
 // import Card from '@/components/shared/Card';
-import SkillTag from './SkillTag';
-import SkillAddForm from './SkillAddForm';
-import SkillEditModal from './SkillEditModal';
-import { Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { Button, Space } from 'antd';
+
 import Card from '@/components/ui/card';
 import { PROFILE_UI } from '@/constants/user/uiText';
+
+import SkillAddForm from './SkillAddForm';
+import SkillEditModal from './SkillEditModal';
+import SkillTag from './SkillTag';
 
 export default function SkillList({
   skills,
@@ -32,10 +34,10 @@ export default function SkillList({
 }) {
   return (
     <>
-      <h1 className='text-text mt-7 text-2xl font-bold'>{PROFILE_UI.SKILLS.TITLE}</h1>
+      <h1 className="text-text mt-7 text-2xl font-bold">{PROFILE_UI.SKILLS.TITLE}</h1>
 
       <Card>
-        <div className='flex min-h-[400px] flex-col'>
+        <div className="flex min-h-[400px] flex-col">
           {(skills.length === 0 || showAddForm) && (
             <SkillAddForm
               newSkill={newSkill}
@@ -46,13 +48,13 @@ export default function SkillList({
             />
           )}
 
-          <div className='flex items-center justify-between'>
-            <label className='text-xl font-medium italic'>{PROFILE_UI.SKILLS.YOUR_SKILLS}</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xl font-medium italic">{PROFILE_UI.SKILLS.YOUR_SKILLS}</label>
 
             {skills.length > 0 && (
-              <div className='flex items-center gap-4'>
+              <div className="flex items-center gap-4">
                 {selectMode && selectedSkills.length > 0 && (
-                  <Button danger type='primary' onClick={handleDeleteSelected}>
+                  <Button danger type="primary" onClick={handleDeleteSelected}>
                     {PROFILE_UI.BUTTONS.DELETE} ({selectedSkills.length})
                   </Button>
                 )}
@@ -60,7 +62,7 @@ export default function SkillList({
             )}
           </div>
 
-          <Space wrap size={12} className='mt-5'>
+          <Space wrap size={12} className="mt-5">
             {skills.map((skill) => (
               <SkillTag
                 key={skill.id}
@@ -80,9 +82,9 @@ export default function SkillList({
             )}
           </Space>
 
-          <div className='mt-auto flex justify-end pt-6'>
+          <div className="mt-auto flex justify-end pt-6">
             <Button
-              type='primary'
+              type="primary"
               danger
               style={{ minWidth: 120 }}
               onClick={() => {
