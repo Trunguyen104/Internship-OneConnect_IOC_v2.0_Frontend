@@ -43,6 +43,8 @@ export default function InternshipTermManagement() {
     handleRequestChangeStatus,
     handleChangeStatus,
     handleSaveModal,
+    universities,
+    isSuperAdmin,
   } = useTermManagement();
 
   return (
@@ -106,6 +108,8 @@ export default function InternshipTermManagement() {
         loading={submitLoading}
         initialValues={editingRecord}
         viewOnly={viewOnly}
+        universities={universities}
+        isSuperAdmin={isSuperAdmin}
       />
 
       <TermStatusModal

@@ -373,14 +373,23 @@ export const INTERNSHIP_MANAGEMENT_UI = {
             VALID: 'Valid Data',
             ERROR: 'Data Error',
           },
+          ERRORS: {
+            MISSING_ID: 'Missing Student ID',
+          },
         },
       },
       MESSAGES: {
         IMPORT_SUCCESS: 'Student list imported successfully',
+        IMPORT_ERROR: 'Failed to import student data',
         ADD_SUCCESS: 'Student added successfully',
+        ADD_ERROR: 'Failed to add student',
         UPDATE_SUCCESS: 'Information updated successfully',
-        DELETE_CONFIRM: 'Are you sure you want to delete this student from the internship term?',
+        UPDATE_ERROR: 'Failed to update student',
+        DELETE_CONFIRM_TITLE: 'Withdraw Student',
+        DELETE_CONFIRM:
+          'Are you sure you want to withdraw this student from the internship term? This action cannot be undone.',
         DELETE_SUCCESS: 'Student deleted successfully',
+        DELETE_ERROR: 'Failed to withdraw student',
       },
     },
     TERM_MANAGEMENT: {
@@ -430,6 +439,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           NAME_PLACEHOLDER: 'Ex: Semester 1 - 2024',
           NAME_REQUIRED: 'Please enter term name',
           NAME_MAX: 'Name cannot exceed 100 characters',
+          UNIVERSITY_LABEL: 'University',
+          UNIVERSITY_REQUIRED: 'Please select a university',
           START_DATE_LABEL: 'Start Date',
           START_DATE_REQUIRED: 'Please select start date',
           END_DATE_LABEL: 'End Date',
