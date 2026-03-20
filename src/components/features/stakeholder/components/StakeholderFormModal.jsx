@@ -1,8 +1,9 @@
 'use client';
 
+import { EditOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Input, Modal, Select, Space, Typography } from 'antd';
 import React, { memo } from 'react';
-import { Modal, Input, Select, Space, Button, Typography } from 'antd';
-import { UserOutlined, SaveOutlined, EditOutlined } from '@ant-design/icons';
+
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 
 const { Text, Title } = Typography;
@@ -48,20 +49,20 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
       centered
       destroyOnHidden
       title={
-        <Space className='mb-2'>
+        <Space className="mb-2">
           {editingId ? (
-            <EditOutlined className='text-primary' />
+            <EditOutlined className="text-primary" />
           ) : (
-            <UserOutlined className='text-primary' />
+            <UserOutlined className="text-primary" />
           )}
           <span>{editingId ? MODAL_EDIT : MODAL_ADD}</span>
         </Space>
       }
     >
-      <div className='mt-4 space-y-4'>
-        <div className='flex flex-col gap-1.5'>
+      <div className="mt-4 space-y-4">
+        <div className="flex flex-col gap-1.5">
           <Text strong>
-            {FIELD_NAME} <span className='text-danger'>*</span>
+            {FIELD_NAME} <span className="text-danger">*</span>
           </Text>
           <Input
             placeholder={PLACEHOLDER_NAME}
@@ -73,16 +74,16 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
             status={errors.name ? 'error' : ''}
           />
           {errors.name && (
-            <Text type='danger' className='text-xs'>
+            <Text type="danger" className="text-xs">
               {errors.name}
             </Text>
           )}
         </div>
 
         {/* Email */}
-        <div className='flex flex-col gap-1.5'>
+        <div className="flex flex-col gap-1.5">
           <Text strong>
-            {FIELD_EMAIL} <span className='text-danger'>*</span>
+            {FIELD_EMAIL} <span className="text-danger">*</span>
           </Text>
           <Input
             placeholder={PLACEHOLDER_EMAIL}
@@ -94,14 +95,14 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
             status={errors.email ? 'error' : ''}
           />
           {errors.email && (
-            <Text type='danger' className='text-xs'>
+            <Text type="danger" className="text-xs">
               {errors.email}
             </Text>
           )}
         </div>
 
-        <div className='grid grid-cols-2 gap-4'>
-          <div className='flex flex-col gap-1.5'>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
             <Text strong>{FIELD_ROLE}</Text>
             <Select
               placeholder={ROLE_SELECT}
@@ -111,7 +112,7 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
                 if (errors.role) setErrors((prev) => ({ ...prev, role: null }));
               }}
               status={errors.role ? 'error' : ''}
-              className='w-full'
+              className="w-full"
               options={[
                 { value: 'Mentor', label: ROLE_MENTOR },
                 { value: 'Supervisor', label: ROLE_SUPERVISOR },
@@ -120,13 +121,13 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
               ]}
             />
             {errors.role && (
-              <Text type='danger' className='text-xs'>
+              <Text type="danger" className="text-xs">
                 {errors.role}
               </Text>
             )}
           </div>
 
-          <div className='flex flex-col gap-1.5'>
+          <div className="flex flex-col gap-1.5">
             <Text strong>{FIELD_PHONE}</Text>
             <Input
               placeholder={PLACEHOLDER_PHONE}
@@ -139,14 +140,14 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
               status={errors.phoneNumber ? 'error' : ''}
             />
             {errors.phoneNumber && (
-              <Text type='danger' className='text-xs'>
+              <Text type="danger" className="text-xs">
                 {errors.phoneNumber}
               </Text>
             )}
           </div>
         </div>
 
-        <div className='flex flex-col gap-1.5'>
+        <div className="flex flex-col gap-1.5">
           <Text strong>{FIELD_DESC}</Text>
           <Input.TextArea
             rows={3}
@@ -159,15 +160,15 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
             status={errors.description ? 'error' : ''}
           />
           {errors.description && (
-            <Text type='danger' className='text-xs'>
+            <Text type="danger" className="text-xs">
               {errors.description}
             </Text>
           )}
         </div>
 
-        <div className='mt-6 flex justify-end gap-3'>
+        <div className="mt-6 flex justify-end gap-3">
           <Button onClick={onClose}>{CANCEL}</Button>
-          <Button type='primary' onClick={onSave} icon={<SaveOutlined />}>
+          <Button type="primary" onClick={onSave} icon={<SaveOutlined />}>
             {editingId ? UPDATE : SAVE}
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { CONFIG } from '@/constants/common/config';
 import { resolveApiRoot } from '@/lib/server/backend-url';
 

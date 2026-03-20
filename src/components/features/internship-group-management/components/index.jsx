@@ -1,18 +1,20 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
+import React from 'react';
+
 import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
 import PageTitle from '@/components/ui/pagetitle';
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
+import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
 import { useGroupManagement } from '../hooks/useGroupManagement';
-import GroupTable from './GroupTable';
-import { CreateGroupModal } from './CreateGroupModal';
-import { ViewGroupModal } from './ViewGroupModal';
 import { AssignMentorModal } from './AssignMentorModal';
+import { CreateGroupModal } from './CreateGroupModal';
+import GroupTable from './GroupTable';
+import { ViewGroupModal } from './ViewGroupModal';
 
 export default function GroupManagement() {
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
@@ -45,10 +47,10 @@ export default function GroupManagement() {
 
   return (
     <>
-      <div className='mx-auto flex min-h-[420px] w-full max-w-full flex-1 flex-col'>
+      <div className="mx-auto flex min-h-[420px] w-full max-w-full flex-1 flex-col">
         <PageTitle title={GROUP_MANAGEMENT.TITLE} />
-        <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
-          <DataTableToolbar className='mb-6'>
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
+          <DataTableToolbar className="mb-6">
             <DataTableToolbar.Search
               placeholder={GROUP_MANAGEMENT.SEARCH_PLACEHOLDER}
               value={search}
@@ -56,13 +58,13 @@ export default function GroupManagement() {
             />
 
             <DataTableToolbar.Filters>
-              <div className='flex flex-wrap items-center gap-3'>
+              <div className="flex flex-wrap items-center gap-3">
                 <Select
                   allowClear
                   placeholder={GROUP_MANAGEMENT.FILTERS.STATUS_FILTER}
                   value={activeTab === 'ALL' ? undefined : activeTab}
                   onChange={setActiveTab}
-                  className='h-9 min-w-[160px]'
+                  className="h-9 min-w-[160px]"
                   options={[
                     {
                       label: `${GROUP_MANAGEMENT.ACTIVE} (${groups.filter((g) => g.status === 'ACTIVE').length})`,
@@ -73,7 +75,7 @@ export default function GroupManagement() {
                       value: 'ARCHIVED',
                     },
                   ]}
-                  suffixIcon={<FilterOutlined className='text-muted' />}
+                  suffixIcon={<FilterOutlined className="text-muted" />}
                 />
               </div>
             </DataTableToolbar.Filters>
@@ -97,7 +99,7 @@ export default function GroupManagement() {
           />
 
           {filteredGroups.length > 0 && (
-            <div className='border-border/50 mt-6 flex-shrink-0 border-t pt-6'>
+            <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
               <Pagination
                 total={filteredGroups.length}
                 page={pagination.current}

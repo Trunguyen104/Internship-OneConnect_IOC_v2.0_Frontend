@@ -1,9 +1,10 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+
 import Header from '@/components/layout/Header';
 import SidebarAdmin from '@/components/layout/SidebarAdmin';
 import PageTitle from '@/components/ui/pagetitle';
-import { usePathname } from 'next/navigation';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 
 export default function Admin({ children }) {

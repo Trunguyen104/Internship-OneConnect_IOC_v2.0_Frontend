@@ -56,37 +56,38 @@ export default function AdminUserDeleteModal({ open, userId, label, onToggle }) 
 
   return (
     <Dialog open={open} onOpenChange={onToggle}>
-      <DialogContent aria-describedby={undefined} className='sm:max-w-sm'>
+      <DialogContent aria-describedby={undefined} className="sm:max-w-sm">
         <form onSubmit={doDelete}>
           <DialogHeader>
-            <DialogTitle className='flex items-center gap-2 text-xl font-bold'>
-              <Trash2 className='h-6 w-6 text-rose-600' />
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+              <Trash2 className="h-6 w-6 text-rose-600" />
               {UI_TEXT.ADMIN_USERS.DELETE}
             </DialogTitle>
-            <DialogDescription>This action cannot be undone.</DialogDescription>
+            <DialogDescription>{UI_TEXT.ADMIN_USERS.DELETE_HINT}</DialogDescription>
           </DialogHeader>
 
-          <div className='mt-4 space-y-3'>
-            <div className='text-sm text-slate-700'>
-              Delete <b>{label || '-'}</b>?
+          <div className="mt-4 space-y-3">
+            <div className="text-sm text-slate-700">
+              {UI_TEXT.ADMIN_USERS.DELETE_BTN} <b>{label || UI_TEXT.COMMON.MINUS}</b>
+              {UI_TEXT.COMMON.QUESTION}
             </div>
 
-            <Field orientation='horizontal' className='gap-3'>
+            <Field orientation="horizontal" className="gap-3">
               <Checkbox checked={confirmed} onCheckedChange={setConfirmed} />
-              <div className='space-y-1'>
-                <span className='text-sm font-semibold'>Confirm delete</span>
-                <p className='text-xs text-slate-500'>User will lose access to the system.</p>
+              <div className="space-y-1">
+                <span className="text-sm font-semibold">{UI_TEXT.ADMIN_USERS.CONFIRM_DELETE}</span>
+                <p className="text-xs text-slate-500">{UI_TEXT.ADMIN_USERS.LOSS_ACCESS_HINT}</p>
               </div>
             </Field>
           </div>
 
-          <DialogFooter className='mt-4'>
+          <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button type='button' variant='outline'>
+              <Button type="button" variant="outline">
                 {UI_TEXT.BUTTON.CLOSE}
               </Button>
             </DialogClose>
-            <Button type='submit' disabled={busy || !confirmed} variant='destructive'>
+            <Button type="submit" disabled={busy || !confirmed} variant="destructive">
               {UI_TEXT.BUTTON.DELETE}
             </Button>
           </DialogFooter>

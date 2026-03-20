@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+
 import { cn } from '@/lib/cn';
 
 const SelectCtx = createContext(null);
@@ -36,7 +37,7 @@ function Select({ value, defaultValue, onValueChange, name, required, children }
   return (
     <SelectCtx.Provider value={ctx}>
       {name ? (
-        <input type='hidden' name={name} value={currentValue} required={required} readOnly />
+        <input type="hidden" name={name} value={currentValue} required={required} readOnly />
       ) : null}
       {children}
     </SelectCtx.Provider>
@@ -53,25 +54,25 @@ function SelectTrigger({ className = '', children, ...props }) {
   const { open, setOpen } = useSelect();
   return (
     <button
-      type='button'
-      data-slot='select-trigger'
+      type="button"
+      data-slot="select-trigger"
       onClick={() => setOpen(!open)}
       className={cn(
         'flex h-11 w-full items-center justify-between gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 px-4 text-sm font-medium text-slate-600',
         'hover:bg-white focus:ring-2 focus:ring-[var(--primary-600)]/20 focus:outline-none',
-        className,
+        className
       )}
       {...props}
     >
       {children}
-      <ChevronDown className='h-4 w-4 text-slate-400' />
+      <ChevronDown className="h-4 w-4 text-slate-400" />
     </button>
   );
 }
 
 function SelectValue({ placeholder }) {
   const { value, labels } = useSelect();
-  if (!value) return <span className='text-slate-400'>{placeholder}</span>;
+  if (!value) return <span className="text-slate-400">{placeholder}</span>;
   return <span>{labels[String(value)] ?? String(value)}</span>;
 }
 
@@ -99,12 +100,12 @@ function SelectContent({ className = '', children, position }) {
   if (!open) return null;
 
   return (
-    <div ref={rootRef} data-slot='select-content' className={cn('relative')}>
+    <div ref={rootRef} data-slot="select-content" className={cn('relative')}>
       <div
         className={cn(
           'absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-slate-100 bg-white p-1 shadow-xl',
           position === 'popper' ? '' : '',
-          className,
+          className
         )}
       >
         {children}
@@ -126,8 +127,8 @@ function SelectItem({ value, className = '', children, ...props }) {
 
   return (
     <button
-      type='button'
-      data-slot='select-item'
+      type="button"
+      data-slot="select-item"
       onClick={() => {
         setValue(v);
         setOpen(false);
@@ -136,12 +137,12 @@ function SelectItem({ value, className = '', children, ...props }) {
         'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm text-slate-700',
         'hover:bg-slate-50',
         selected ? 'bg-slate-50 font-semibold' : '',
-        className,
+        className
       )}
       {...props}
     >
       <span>{children}</span>
-      {selected ? <Check className='size-4 text-slate-600' /> : null}
+      {selected ? <Check className="size-4 text-slate-600" /> : null}
     </button>
   );
 }

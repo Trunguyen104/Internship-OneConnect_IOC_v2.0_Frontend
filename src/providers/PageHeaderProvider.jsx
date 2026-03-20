@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const PageHeaderContext = createContext(null);
 
@@ -52,7 +52,7 @@ export const PageHeaderProvider = ({ children }) => {
       headerConfig,
       setHeaderConfig: updateHeader,
     }),
-    [headerConfig, updateHeader],
+    [headerConfig, updateHeader]
   );
 
   return <PageHeaderContext.Provider value={value}>{children}</PageHeaderContext.Provider>;

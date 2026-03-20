@@ -20,4 +20,8 @@ export const PROJECT_MESSAGES = {
   WARNING: {
     FILE_REQUIRED: 'Please select a file!',
   },
+
+  INFO: {
+    LINK_DOWNLOAD_NOT_SUPPORTED: 'This resource is a link. Please use View to open it.',
+  },
 };

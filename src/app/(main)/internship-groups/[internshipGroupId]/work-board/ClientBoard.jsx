@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import Board from '@/components/features/work-board/components/Board';
 
 export default function ClientBoard() {

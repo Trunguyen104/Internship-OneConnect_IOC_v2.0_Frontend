@@ -1,13 +1,13 @@
 'use client';
 
-import { useToast } from '@/providers/ToastProvider';
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import {
+  MOVE_INCOMPLETE_ITEMS_OPTION,
   SPRINT_STATUS,
   WORK_ITEM_STATUS,
-  MOVE_INCOMPLETE_ITEMS_OPTION,
 } from '@/constants/common/enums';
-import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 /**
  * Hook to manage actions triggered from Backlog Modals
@@ -120,8 +120,8 @@ export function useBacklogActions({
           prevSprints.map((s) =>
             s.sprintId === selectedSprintAction.sprintId
               ? { ...s, status: SPRINT_STATUS.ACTIVE }
-              : s,
-          ),
+              : s
+          )
         );
         ui.setOpenStartSprint(false);
         fetchData(projectId);
@@ -144,12 +144,12 @@ export function useBacklogActions({
       const resComp = await productBacklogService.completeSprint(
         projectId,
         selectedSprintAction.sprintId || selectedSprintAction.id,
-        completePayload,
+        completePayload
       );
 
       if (resComp && resComp.isSuccess === false) {
         return toast.error(
-          resComp.message || BACKLOG_UI.ERROR_COMPLETE_SPRINT || 'Error completing sprint',
+          resComp.message || BACKLOG_UI.ERROR_COMPLETE_SPRINT || 'Error completing sprint'
         );
       }
 
@@ -219,8 +219,8 @@ export function useBacklogActions({
                   items: [...(s.items || []), optimisticItem],
                   itemCount: (s.itemCount || 0) + 1,
                 }
-              : s,
-          ),
+              : s
+          )
         );
       } else {
         setBacklogItems((prev) => [...prev, optimisticItem]);
@@ -230,7 +230,7 @@ export function useBacklogActions({
         targetSprintId
           ? BACKLOG_UI.SUCCESS_CREATE_TASK_SPRINT ||
               'Task created and added to sprint successfully!'
-          : BACKLOG_UI.SUCCESS_CREATE_TASK || 'Task created successfully!',
+          : BACKLOG_UI.SUCCESS_CREATE_TASK || 'Task created successfully!'
       );
       ui.setOpenCreateTask(false);
       ui.setActiveSprintForTask(null);
@@ -264,7 +264,7 @@ export function useBacklogActions({
       const resUpdate = await productBacklogService.updateWorkItem(
         projectId,
         workItemId,
-        apiPayload,
+        apiPayload
       );
       if (!resUpdate || resUpdate.isSuccess === false) throw new Error('Update failed');
 
@@ -312,8 +312,8 @@ export function useBacklogActions({
 
       setSprints((prev) =>
         prev.map((s) =>
-          String(s.sprintId || s.id) === String(sprintId) ? { ...s, ...payload } : s,
-        ),
+          String(s.sprintId || s.id) === String(sprintId) ? { ...s, ...payload } : s
+        )
       );
 
       toast.success('Sprint updated successfully!');

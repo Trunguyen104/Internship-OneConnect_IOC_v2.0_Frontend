@@ -1,23 +1,23 @@
 'use client';
-import PageShell from '@/components/layout/PageShell';
-import StudentTabs from '@/components/layout/StudentTabs';
 import {
+  closestCorners,
   DndContext,
   DragOverlay,
   PointerSensor,
   useSensor,
   useSensors,
-  closestCorners,
 } from '@dnd-kit/core';
 
 import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
-
-import { useBoard, COLUMNS } from '../hooks/useBoard';
-import { BoardColumn } from './BoardColumn';
-import { IssueCard } from './IssueCard';
+import PageShell from '@/components/layout/PageShell';
+import StudentTabs from '@/components/layout/StudentTabs';
 import SearchBar from '@/components/ui/searchbar';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
+
+import { COLUMNS, useBoard } from '../hooks/useBoard';
+import { BoardColumn } from './BoardColumn';
 import { EmptySprintState } from './EmptySprintState';
+import { IssueCard } from './IssueCard';
 
 export default function Board() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
@@ -44,14 +44,14 @@ export default function Board() {
 
   return (
     <PageShell>
-      <div className='mb-4 flex flex-col gap-4'>
+      <div className="mb-4 flex flex-col gap-4">
         <StudentTabs />
         {activeSprint && (
           <SearchBar
             value={query}
             onChange={setQuery}
             placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
-            width='w-full max-w-sm'
+            width="w-full max-w-sm"
           />
         )}
       </div>
@@ -66,13 +66,13 @@ export default function Board() {
           onDragOver={onDragOver}
           onDragEnd={onDragEnd}
         >
-          <div className='grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
+          <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {COLUMNS.map((col) => (
               <BoardColumn
                 key={col.id}
                 column={col}
                 tasks={byColumn[col.id].filter((t) =>
-                  t.title.toLowerCase().includes(query.toLowerCase()),
+                  t.title.toLowerCase().includes(query.toLowerCase())
                 )}
                 onCardClick={handleTaskClick}
               />

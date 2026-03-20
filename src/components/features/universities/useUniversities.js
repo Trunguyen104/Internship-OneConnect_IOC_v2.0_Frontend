@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { universityService } from '@/services/university.service';
 import { useUniversitiesStore } from '@/store/useUniversitiesStore';
 

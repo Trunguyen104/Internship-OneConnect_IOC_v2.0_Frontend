@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
-import { useToast } from '@/providers/ToastProvider';
 import {
+  SPRINT_STATUS,
+  WORK_ITEM_PRIORITY,
   WORK_ITEM_STATUS,
   WORK_ITEM_TYPE,
-  WORK_ITEM_PRIORITY,
-  SPRINT_STATUS,
 } from '@/constants/common/enums';
-
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 export const COLUMNS = [
   { id: WORK_ITEM_STATUS.TODO, title: WORK_BOARD_UI.COLUMN_TODO, underline: 'bg-muted' },
@@ -128,7 +128,7 @@ export function useBoardData() {
         setLoading(false);
       }
     },
-    [projectId, toast],
+    [projectId, toast]
   );
 
   useEffect(() => {

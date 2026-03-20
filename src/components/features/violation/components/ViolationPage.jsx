@@ -1,13 +1,13 @@
 'use client';
 
-import Card from '@/components/ui/card';
-import Pagination from '@/components/ui/pagination';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import ViolationTable from './ViolationTable';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import { useViolation } from '../hooks/useViolation';
-
+import Card from '@/components/ui/card';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import Pagination from '@/components/ui/pagination';
 import { VIOLATION_UI } from '@/constants/violation/uiText';
+
+import { useViolation } from '../hooks/useViolation';
+import ViolationTable from './ViolationTable';
 
 export default function ViolationPage() {
   const {
@@ -25,12 +25,12 @@ export default function ViolationPage() {
   } = useViolation();
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
+    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={VIOLATION_UI.PAGE_TITLE} />
 
-      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
         <DataTableToolbar
-          className='mb-5 !border-0 !p-0'
+          className="mb-5 !border-0 !p-0"
           searchProps={{
             placeholder: VIOLATION_UI.SEARCH.PLACEHOLDER,
             value: search,
@@ -50,7 +50,7 @@ export default function ViolationPage() {
         />
 
         {total > 0 && (
-          <div className='border-border/50 mt-6 border-t pt-6'>
+          <div className="border-border/50 mt-6 border-t pt-6">
             <Pagination
               total={total}
               page={page}

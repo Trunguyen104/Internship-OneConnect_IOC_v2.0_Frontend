@@ -1,7 +1,8 @@
 'use client';
 
+import { CalendarOutlined, DashboardOutlined, TeamOutlined } from '@ant-design/icons';
 import React from 'react';
-import { CalendarOutlined, TeamOutlined, DashboardOutlined } from '@ant-design/icons';
+
 import BaseSidebar from './BaseSidebar';
 
 const adminMenu = [
@@ -11,5 +12,5 @@ const adminMenu = [
 ];
 
 export default function SidebarAdmin() {
-  return <BaseSidebar menus={adminMenu} activeStrategy='prefix' />;
+  return <BaseSidebar menus={adminMenu} activeStrategy="prefix" />;
 }

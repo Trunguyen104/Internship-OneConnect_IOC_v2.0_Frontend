@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -86,7 +87,7 @@ export function useCreateSprint(projectId, open) {
 
   const toggleSelection = useCallback((id) => {
     setSelectedItemIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   }, []);
 

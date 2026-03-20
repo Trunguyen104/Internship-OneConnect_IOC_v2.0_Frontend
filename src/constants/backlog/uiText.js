@@ -12,6 +12,7 @@ export const BACKLOG_UI = {
   ALL: 'All',
   HIDE: 'Hide',
   EPIC_HIDDEN: 'Epic is hidden',
+  UNKNOWN_EPIC: 'Unknown Epic',
 
   // Sections & Headers
   BACKLOG_TITLE: 'Backlog',

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { cn } from '@/lib/cn';
 
 const VARIANT = {
@@ -27,7 +28,7 @@ function Button({ className, variant = 'default', size = 'default', type = 'butt
   return (
     <button
       type={type}
-      data-slot='button'
+      data-slot="button"
       data-variant={variant}
       data-size={size}
       className={cn(
@@ -35,7 +36,7 @@ function Button({ className, variant = 'default', size = 'default', type = 'butt
         'disabled:pointer-events-none disabled:opacity-50',
         VARIANT[variant] || VARIANT.default,
         SIZE[size] || SIZE.default,
-        className,
+        className
       )}
       {...props}
     />

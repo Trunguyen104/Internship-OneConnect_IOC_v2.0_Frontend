@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfigProvider, App } from 'antd';
+import { App, ConfigProvider } from 'antd';
 import { createContext, useContext, useLayoutEffect } from 'react';
 
 const ToastContext = createContext(null);
@@ -67,7 +67,7 @@ export function ToastProvider({ children }) {
         },
       }}
     >
-      <App component='div'>
+      <App component="div">
         <AntdAppHookHelper />
         <ToastContext.Provider value={toast}>{children}</ToastContext.Provider>
       </App>

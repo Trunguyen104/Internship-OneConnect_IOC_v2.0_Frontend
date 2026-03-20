@@ -2,6 +2,8 @@
 
 import { Fragment } from 'react';
 
+import { UI_TEXT } from '@/lib/UI_Text';
+
 export default function Pagination({
   total = 0,
   page = 1,
@@ -15,19 +17,19 @@ export default function Pagination({
   const pages = getVisiblePages(page, calculatedTotalPages);
 
   return (
-    <div className='flex items-center justify-between text-sm text-slate-600'>
+    <div className="flex items-center justify-between text-sm text-slate-600">
       {/* LEFT */}
       <span>
-        Total records: <b className='text-slate-800'>{total}</b>
+        {UI_TEXT.PAGINATION.TOTAL} <b className="text-slate-800">{total}</b>
       </span>
 
       {/* RIGHT */}
-      <div className='flex items-center gap-2'>
+      <div className="flex items-center gap-2">
         {/* PREV */}
         <button
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className='h-9 w-9 rounded-full border text-slate-500 hover:bg-slate-100 disabled:opacity-40'
+          className="h-9 w-9 rounded-full border text-slate-500 hover:bg-slate-100 disabled:opacity-40"
         >
           ‹
         </button>
@@ -39,7 +41,7 @@ export default function Pagination({
 
           return (
             <Fragment key={`${p}-${index}`}>
-              {showDots && <span className='px-1 text-slate-400'>…</span>}
+              {showDots && <span className="px-1 text-slate-400">…</span>}
 
               <button
                 onClick={() => onPageChange(p)}
@@ -57,7 +59,7 @@ export default function Pagination({
         <button
           disabled={page >= calculatedTotalPages}
           onClick={() => onPageChange(page + 1)}
-          className='h-9 w-9 rounded-full border text-slate-500 hover:bg-slate-100 disabled:opacity-40'
+          className="h-9 w-9 rounded-full border text-slate-500 hover:bg-slate-100 disabled:opacity-40"
         >
           ›
         </button>
@@ -65,12 +67,12 @@ export default function Pagination({
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
-          className='ml-3 rounded-full border px-3 py-1 text-sm'
+          className="ml-3 rounded-full border px-3 py-1 text-sm"
         >
-          <option value={5}>5/page</option>
-          <option value={10}>10/page</option>
-          <option value={20}>20/page</option>
-          <option value={50}>50/page</option>
+          <option value={5}>{UI_TEXT.PAGINATION.PAGE_5}</option>
+          <option value={10}>{UI_TEXT.PAGINATION.PAGE_10}</option>
+          <option value={20}>{UI_TEXT.PAGINATION.PAGE_20}</option>
+          <option value={50}>{UI_TEXT.PAGINATION.PAGE_50}</option>
         </select>
       </div>
     </div>

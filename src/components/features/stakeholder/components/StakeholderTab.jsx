@@ -1,11 +1,13 @@
 import React, { memo } from 'react';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-import { useStakeholderTab } from '../hooks/useStakeholderTab';
-import StakeholderList from './StakeholderList';
-import StakeholderFormModal from './StakeholderFormModal';
+
 import Card from '@/components/ui/card';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import Pagination from '@/components/ui/pagination';
+import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
+
+import { useStakeholderTab } from '../hooks/useStakeholderTab';
+import StakeholderFormModal from './StakeholderFormModal';
+import StakeholderList from './StakeholderList';
 
 const StakeholderTab = memo(function StakeholderTab() {
   const {
@@ -32,10 +34,10 @@ const StakeholderTab = memo(function StakeholderTab() {
   } = useStakeholderTab();
 
   return (
-    <div className='animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500'>
-      <Card className='flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto'>
+    <div className="animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500">
+      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
         <DataTableToolbar
-          className='mb-6 !border-0 !p-0'
+          className="mb-6 !border-0 !p-0"
           searchProps={{
             placeholder: STAKEHOLDER_UI.SEARCH_PLACEHOLDER,
             value: search,
@@ -80,7 +82,7 @@ const StakeholderTab = memo(function StakeholderTab() {
         />
 
         {total > 0 && (
-          <div className='border-border/50 mt-6 border-t pt-6'>
+          <div className="border-border/50 mt-6 border-t pt-6">
             <Pagination
               page={page}
               pageSize={pageSize}

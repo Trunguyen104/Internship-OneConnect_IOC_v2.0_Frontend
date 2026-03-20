@@ -1,6 +1,8 @@
-import { useMemo, useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { useToast } from '@/providers/ToastProvider';
+
 import { useBacklogData } from './useBacklogData';
 import { useBacklogUI } from './useBacklogUI';
 
@@ -86,7 +88,7 @@ export function useBacklogBoard() {
       prev.map((s) => ({
         ...s,
         items: (s.items || []).filter((it) => (it.workItemId || it.id) !== workItemId),
-      })),
+      }))
     );
 
     try {
@@ -158,8 +160,8 @@ export function useBacklogBoard() {
             prev.map((s) =>
               s.sprintId === sourceSprintId
                 ? { ...s, items: s.items.filter((it) => (it.workItemId || it.id) !== activeId) }
-                : s,
-            ),
+                : s
+            )
           );
           setBacklogItems((prev) => [...prev, draggedItem]);
 
@@ -188,8 +190,8 @@ export function useBacklogBoard() {
                         ...s,
                         items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }],
                       }
-                    : s,
-              ),
+                    : s
+              )
             );
           } else {
             setBacklogItems((prev) => prev.filter((it) => (it.workItemId || it.id) !== activeId));
@@ -200,15 +202,15 @@ export function useBacklogBoard() {
                       ...s,
                       items: [...(s.items || []), { ...draggedItem, sprintId: targetSprintId }],
                     }
-                  : s,
-              ),
+                  : s
+              )
             );
           }
 
           const res = await productBacklogService.moveWorkItemToSprint(
             projectId,
             workItemId,
-            targetSprintId,
+            targetSprintId
           );
           if (res?.isSuccess === false || res?.success === false) {
             throw new Error(res.message || 'Unable to move to sprint');
@@ -220,7 +222,7 @@ export function useBacklogBoard() {
         }
       }
     },
-    [projectId, sprints, backlogItems, setSprints, setBacklogItems, fetchData, toast],
+    [projectId, sprints, backlogItems, setSprints, setBacklogItems, fetchData, toast]
   );
 
   return {

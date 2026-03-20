@@ -29,7 +29,7 @@ const Badge = ({ children, variant = 'default', size = 'md', className = '', ico
     <span
       className={`${baseStyles} ${variantStyles} ${sizeStyles} tracking-wide uppercase ${className}`}
     >
-      {icon && <span className='mr-1.5'>{icon}</span>}
+      {icon && <span className="mr-1.5">{icon}</span>}
       {children}
     </span>
   );

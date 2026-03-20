@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { Form } from 'antd';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useEffect, useState } from 'react';
+
+import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import {
-  getProjectResources,
   createProjectResource,
   deleteProjectResource,
-  updateProjectResource,
   downloadProjectResource,
+  getProjectResources,
   readProjectResource,
+  updateProjectResource,
 } from '@/components/features/project/services/projectResources';
 import { ProjectService } from '@/components/features/project/services/projectService';
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
+import { useToast } from '@/providers/ToastProvider';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 export function useProject(initialProjectId = null) {
@@ -54,7 +55,7 @@ export function useProject(initialProjectId = null) {
         setLoading(false);
       }
     },
-    [toast],
+    [toast]
   );
 
   const initProject = useCallback(async () => {
@@ -90,7 +91,7 @@ export function useProject(initialProjectId = null) {
 
       setProjectId(targetProjectId);
 
-      const [detailRes, _] = await Promise.all([
+      const [detailRes] = await Promise.all([
         ProjectService.getById(targetProjectId),
         loadResources(targetProjectId),
       ]);
@@ -111,7 +112,9 @@ export function useProject(initialProjectId = null) {
   }, [initProject]);
 
   const handleUpload = async (values) => {
-    if (fileList.length === 0) {
+    const isLinkUpload = Number(values.resourceType || 1) === 8;
+
+    if (!isLinkUpload && fileList.length === 0) {
       toast.warning(PROJECT_MESSAGES.WARNING.FILE_REQUIRED);
       return;
     }
@@ -119,7 +122,7 @@ export function useProject(initialProjectId = null) {
     setUploading(true);
     const file = fileList[0];
     const selectedType = values.resourceType || 1;
-    const currentExt = file.name.split('.').pop().toLowerCase();
+    const currentExt = file?.name?.split('.').pop()?.toLowerCase();
 
     const typeExtensionMap = {
       1: ['pdf'],
@@ -131,7 +134,7 @@ export function useProject(initialProjectId = null) {
       7: ['png'],
     };
 
-    if (typeExtensionMap[selectedType]) {
+    if (!isLinkUpload && typeExtensionMap[selectedType]) {
       if (!typeExtensionMap[selectedType].includes(currentExt)) {
         const typeLabel =
           RESOURCE_TYPES.find((t) => t.value === selectedType)?.label || 'selected type';
@@ -141,19 +144,28 @@ export function useProject(initialProjectId = null) {
       }
     }
 
-    const proposedName = (values.resourceName || file.name).trim().toLowerCase();
-    const proposedFileName = file.name.toLowerCase();
+    const proposedName = (values.resourceName || values.externalUrl || file?.name || '')
+      .trim()
+      .toLowerCase();
+    const proposedFileName = file?.name?.toLowerCase();
 
     const isDuplicateName = resources.some(
-      (r) => r.resourceName?.trim().toLowerCase() === proposedName,
+      (r) => r.resourceName?.trim().toLowerCase() === proposedName
     );
-    const isDuplicateFile = resources.some((r) => {
-      const urlLower = r.resourceUrl?.toLowerCase() || '';
-      return urlLower.endsWith('/' + proposedFileName) || urlLower.includes('_' + proposedFileName);
-    });
+    const isDuplicateFile =
+      !isLinkUpload && proposedFileName
+        ? resources.some((r) => {
+            const urlLower = r.resourceUrl?.toLowerCase() || '';
+            return (
+              urlLower.endsWith('/' + proposedFileName) || urlLower.includes('_' + proposedFileName)
+            );
+          })
+        : false;
 
     if (isDuplicateName) {
-      toast.error(`A resource with name "${values.resourceName || file.name}" already exists.`);
+      toast.error(
+        `A resource with name "${values.resourceName || values.externalUrl || file?.name || 'resource'}" already exists.`
+      );
       setUploading(false);
       return false;
     }
@@ -167,9 +179,16 @@ export function useProject(initialProjectId = null) {
 
     const formData = new FormData();
     formData.append('ProjectId', projectId);
-    formData.append('ResourceName', values.resourceName || file.name);
+    formData.append(
+      'ResourceName',
+      values.resourceName || values.externalUrl || file?.name || 'Resource'
+    );
     formData.append('ResourceType', values.resourceType || 1);
-    formData.append('File', file.originFileObj || file);
+    if (isLinkUpload) {
+      formData.append('ExternalUrl', values.externalUrl || '');
+    } else {
+      formData.append('File', file.originFileObj || file);
+    }
 
     try {
       const result = await createProjectResource(formData);
@@ -185,7 +204,6 @@ export function useProject(initialProjectId = null) {
     } catch (err) {
       console.error('Upload error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
-      return false;
       return false;
     } finally {
       setUploading(false);
@@ -222,7 +240,7 @@ export function useProject(initialProjectId = null) {
       const isDuplicateName = resources.some(
         (r) =>
           r.projectResourceId !== editingResource.projectResourceId &&
-          r.resourceName?.trim().toLowerCase() === newName,
+          r.resourceName?.trim().toLowerCase() === newName
       );
 
       if (isDuplicateName) {
@@ -248,47 +266,14 @@ export function useProject(initialProjectId = null) {
     }
   };
 
-  const getResourceMimeType = (url, type) => {
-    let ext = '';
-    try {
-      const pathPart = url?.split('?')[0] || '';
-      ext = pathPart.split('.').pop()?.toLowerCase();
-    } catch (e) {
-      ext = '';
-    }
-
-    const mimeMap = {
-      pdf: 'application/pdf',
-      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      doc: 'application/msword',
-      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      ppt: 'application/vnd.ms-powerpoint',
-      zip: 'application/zip',
-      rar: 'application/x-rar-compressed',
-      jpg: 'image/jpeg',
-      jpeg: 'image/jpeg',
-      png: 'image/png',
-      txt: 'text/plain',
-    };
-
-    if (mimeMap[ext]) return mimeMap[ext];
-
-    const typeMap = {
-      1: 'application/pdf',
-      2: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      3: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      4: 'application/zip',
-      5: 'application/x-rar-compressed',
-      6: 'image/jpeg',
-      7: 'image/png',
-    };
-
-    return typeMap[type] || 'application/octet-stream';
-  };
-
   const handleDownload = async (resource) => {
     if (!resource?.projectResourceId) {
       toast.error('Resource ID not found');
+      return;
+    }
+
+    if (Number(resource.resourceType) === 8) {
+      toast.warning(PROJECT_MESSAGES.INFO.LINK_DOWNLOAD_NOT_SUPPORTED);
       return;
     }
 
@@ -339,7 +324,10 @@ export function useProject(initialProjectId = null) {
     try {
       const result = await readProjectResource(resource.projectResourceId);
       if (result.success && result.data?.resourceUrl) {
-        const fullUrl = resolveResourceUrl(result.data.resourceUrl);
+        const fullUrl =
+          Number(resource.resourceType) === 8
+            ? result.data.resourceUrl
+            : resolveResourceUrl(result.data.resourceUrl);
         window.open(fullUrl, '_blank');
       } else {
         throw new Error(result.message || 'Failed to get file URL');

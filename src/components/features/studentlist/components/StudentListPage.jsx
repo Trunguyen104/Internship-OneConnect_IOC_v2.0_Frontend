@@ -1,14 +1,16 @@
 'use client';
 
-import React from 'react';
 import { Empty } from 'antd';
+import React from 'react';
+
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import Card from '@/components/ui/card';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import Pagination from '@/components/ui/pagination';
+import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
+
 import { useStudentList } from '../hooks/useStudentList';
 import StudentTable from './StudentTable';
-import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
-import Card from '@/components/ui/card';
-import Pagination from '@/components/ui/pagination';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
 
 export default function StudentListPage() {
   const {
@@ -30,15 +32,15 @@ export default function StudentListPage() {
   const showNoGroup = !internshipId && !currentId && !loading && !groupDetail;
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
+    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={STUDENT_LIST_UI.PAGE_TITLE} />
 
-      <Card className='flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto'>
+      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
         {showNoGroup ? (
-          <div className='flex flex-1 items-center justify-center py-12'>
+          <div className="flex flex-1 items-center justify-center py-12">
             <Empty
               description={
-                <span className='text-muted font-medium'>
+                <span className="text-muted font-medium">
                   {STUDENT_LIST_UI.EMPTY.NO_GROUP}
                   <br />
                   {STUDENT_LIST_UI.EMPTY.NOT_ASSIGNED}
@@ -49,7 +51,7 @@ export default function StudentListPage() {
         ) : (
           <>
             <DataTableToolbar
-              className='mb-5 !border-0 !p-0'
+              className="mb-5 !border-0 !p-0"
               searchProps={{
                 placeholder: STUDENT_LIST_UI.SEARCH.PLACEHOLDER,
                 value: searchText,
@@ -64,7 +66,7 @@ export default function StudentListPage() {
             />
 
             {!showNoGroup && total > 0 && (
-              <div className='border-border/50 mt-6 border-t pt-6'>
+              <div className="border-border/50 mt-6 border-t pt-6">
                 <Pagination
                   total={total}
                   page={page}

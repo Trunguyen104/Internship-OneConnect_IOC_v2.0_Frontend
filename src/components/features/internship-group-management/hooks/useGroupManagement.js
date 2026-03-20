@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useMemo, useState } from 'react';
+
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
+
 import { MOCK_GROUPS } from '../constants/groupData';
 
 export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
@@ -59,8 +61,8 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
                 mentorId: values.mentorId,
                 project: values.projectId,
               }
-            : g,
-        ),
+            : g
+        )
       );
 
       setAssignModal({ open: false, group: null });
@@ -71,7 +73,7 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
         toast.success(MESSAGES.ASSIGN_SUCCESS);
       }
     },
-    [assignModal, toast, MESSAGES],
+    [assignModal, toast, MESSAGES]
   );
 
   const handleDeleteGroup = useCallback(
@@ -91,7 +93,7 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
         },
       });
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   const handleArchiveGroup = useCallback(
@@ -103,13 +105,13 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
         type: 'warning',
         onOk() {
           setGroups((prev) =>
-            prev.map((g) => (g.id === group.id ? { ...g, status: 'ARCHIVED' } : g)),
+            prev.map((g) => (g.id === group.id ? { ...g, status: 'ARCHIVED' } : g))
           );
           toast.success(MESSAGES.ARCHIVE_SUCCESS);
         },
       });
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   const handleCreateGroup = useCallback(
@@ -127,7 +129,7 @@ export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
       setCreateModal(false);
       toast.success(MESSAGES.CREATE_SUCCESS);
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   return {

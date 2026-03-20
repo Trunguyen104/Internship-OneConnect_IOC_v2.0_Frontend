@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { Form, Input, DatePicker, Row, Col, Select } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
+import { Col, DatePicker, Form, Input, Row } from 'antd';
 import dayjs from 'dayjs';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import React, { useEffect } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const TermStats = ({ initialValues }) => {
   if (!initialValues) return null;
@@ -33,13 +34,13 @@ const TermStats = ({ initialValues }) => {
   ];
 
   return (
-    <div className='grid grid-cols-3 gap-3 py-2'>
+    <div className="grid grid-cols-3 gap-3 py-2">
       {stats.map((stat, idx) => (
         <div
           key={idx}
           className={`rounded-lg border p-3 text-center transition-all ${stat.containerClass}`}
         >
-          <div className='text-muted mb-1 text-[10px] font-bold tracking-wider uppercase'>
+          <div className="text-muted mb-1 text-[10px] font-bold tracking-wider uppercase">
             {stat.label}
           </div>
           <div className={`text-lg font-bold ${stat.textClass}`}>{stat.value}</div>
@@ -49,15 +50,7 @@ const TermStats = ({ initialValues }) => {
   );
 };
 
-const TermFormBody = ({
-  initialValues,
-  onSave,
-  onCancel,
-  loading,
-  viewOnly,
-  universities,
-  isSuperAdmin,
-}) => {
+const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) => {
   const [form] = Form.useForm();
   const { FORM } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
 
@@ -67,7 +60,6 @@ const TermFormBody = ({
         ...initialValues,
         startDate: initialValues.startDate ? dayjs(initialValues.startDate) : null,
         endDate: initialValues.endDate ? dayjs(initialValues.endDate) : null,
-        universityId: initialValues.universityId || initialValues.university?.universityId,
       });
     } else {
       form.resetFields();
@@ -100,53 +92,35 @@ const TermFormBody = ({
       {viewOnly && <TermStats initialValues={initialValues} />}
 
       <CompoundModal.Content>
-        <Form form={form} layout='vertical' disabled={viewOnly || loading} requiredMark={!viewOnly}>
-          {isSuperAdmin && (
-            <Form.Item
-              name='universityId'
-              label={FORM.UNIVERSITY_LABEL}
-              rules={[{ required: true, message: FORM.UNIVERSITY_REQUIRED }]}
-            >
-              <Select
-                showSearch
-                placeholder={FORM.UNIVERSITY_LABEL}
-                optionFilterProp='children'
-                className='h-10'
-                options={(universities || []).map((u) => ({
-                  value: u.universityId || u.id,
-                  label: u.name,
-                }))}
-              />
-            </Form.Item>
-          )}
+        <Form form={form} layout="vertical" disabled={viewOnly || loading} requiredMark={!viewOnly}>
           <Form.Item
-            name='name'
+            name="name"
             label={FORM.NAME_LABEL}
             rules={[
               { required: true, message: FORM.NAME_REQUIRED },
               { max: 100, message: FORM.NAME_MAX },
             ]}
           >
-            <Input placeholder={FORM.NAME_PLACEHOLDER} className='h-10' />
+            <Input placeholder={FORM.NAME_PLACEHOLDER} className="h-10" />
           </Form.Item>
 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                name='startDate'
+                name="startDate"
                 label={FORM.START_DATE_LABEL}
                 rules={[{ required: true, message: FORM.START_DATE_REQUIRED }]}
               >
                 <DatePicker
-                  className='h-10 w-full'
-                  format='DD/MM/YYYY'
+                  className="h-10 w-full"
+                  format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
-                name='endDate'
+                name="endDate"
                 label={FORM.END_DATE_LABEL}
                 dependencies={['startDate']}
                 rules={[
@@ -166,8 +140,8 @@ const TermFormBody = ({
                 ]}
               >
                 <DatePicker
-                  className='h-10 w-full'
-                  format='DD/MM/YYYY'
+                  className="h-10 w-full"
+                  format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
               </Form.Item>

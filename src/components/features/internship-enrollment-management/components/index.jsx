@@ -1,19 +1,20 @@
 'use client';
 
-import React from 'react';
-import Card from '@/components/ui/card';
-import Pagination from '@/components/ui/pagination';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import { BookOutlined, FilterOutlined, UploadOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
-import { FilterOutlined, UserAddOutlined, UploadOutlined, BookOutlined } from '@ant-design/icons';
+import React from 'react';
+
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import Card from '@/components/ui/card';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
+import { MOCK_STUDENTS } from '../constants/studentData';
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
 import DataGrid from './DataGrid';
 import ImportModal from './ImportModal';
 import StudentFormModal from './StudentFormModal';
-
-import { MOCK_STUDENTS } from '../constants/studentData';
 
 export default function StudentEnrollment() {
   const { STUDENT_ENROLLMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
@@ -49,40 +50,40 @@ export default function StudentEnrollment() {
   const total = filteredStudents.length;
   const paginatedData = filteredStudents.slice(
     (pagination.current - 1) * pagination.pageSize,
-    pagination.current * pagination.pageSize,
+    pagination.current * pagination.pageSize
   );
 
   return (
-    <section className='animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500'>
+    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={STUDENT_ENROLLMENT.TITLE} />
 
-      <Card className='flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8'>
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
         <DataTableToolbar
-          className='mb-5 flex-shrink-0 !border-0 !p-0'
+          className="mb-5 flex-shrink-0 !border-0 !p-0"
           searchProps={{
             placeholder: STUDENT_ENROLLMENT.SEARCH_PLACEHOLDER,
             value: searchTerm,
             onChange: (e) => onSearchChange(e.target.value),
           }}
           filterContent={
-            <div className='flex flex-wrap items-center gap-3'>
+            <div className="flex flex-wrap items-center gap-3">
               <Select
                 allowClear
                 placeholder={STUDENT_ENROLLMENT.STATUS_FILTER}
                 value={statusFilter || undefined}
                 onChange={onStatusChange}
-                className='h-9 min-w-[160px]'
+                className="h-9 min-w-[160px]"
                 options={STUDENT_ENROLLMENT.STATUS_OPTIONS}
-                suffixIcon={<FilterOutlined className='text-muted' />}
+                suffixIcon={<FilterOutlined className="text-muted" />}
               />
               <Select
                 allowClear
                 placeholder={STUDENT_ENROLLMENT.MAJOR_FILTER}
                 value={majorFilter || undefined}
                 onChange={onMajorChange}
-                className='h-9 min-w-[200px]'
+                className="h-9 min-w-[200px]"
                 options={STUDENT_ENROLLMENT.MAJOR_OPTIONS}
-                suffixIcon={<BookOutlined className='text-muted' />}
+                suffixIcon={<BookOutlined className="text-muted" />}
               />
             </div>
           }
@@ -120,7 +121,7 @@ export default function StudentEnrollment() {
         />
 
         {total > 0 && (
-          <div className='border-border/50 mt-6 flex-shrink-0 border-t pt-6'>
+          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
             <Pagination
               total={total}
               page={pagination.current}

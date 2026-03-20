@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback, useEffect } from 'react';
 import { App } from 'antd';
+import { useCallback, useEffect } from 'react';
+
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+
 import { useEnterpriseProfile } from '../hooks/useEnterpriseProfile';
 import { EnterpriseProfile } from './EnterpriseProfile';
 import EnterpriseProfileEditDrawer from './EnterpriseProfileEditDrawer';
@@ -38,7 +40,7 @@ export default function EnterpriseProfileContainer() {
         message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
       }
     },
-    [closeEdit, message, saveProfile],
+    [closeEdit, message, saveProfile]
   );
 
   const handleRetry = useCallback(async () => {
@@ -55,7 +57,7 @@ export default function EnterpriseProfileContainer() {
         message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
       }
     },
-    [message, profile, saveProfile],
+    [message, profile, saveProfile]
   );
 
   const handleBannerChange = useCallback(
@@ -67,7 +69,7 @@ export default function EnterpriseProfileContainer() {
         message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
       }
     },
-    [message, profile, saveProfile],
+    [message, profile, saveProfile]
   );
 
   if (loading) return <ProfileLoading />;

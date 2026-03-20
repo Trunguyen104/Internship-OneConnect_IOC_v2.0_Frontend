@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { STUDENT_LIST_MESSAGES } from '@/constants/studentList/messages';
 import { useToast } from '@/providers/ToastProvider';
@@ -43,7 +44,7 @@ export function useStudentList() {
         setGroupDetail(res.data);
       } else {
         toast.error(
-          res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED,
+          res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED
         );
       }
     } catch (error) {
@@ -74,7 +75,7 @@ export function useStudentList() {
           fetchGroupDetail();
         } else {
           toast.error(
-            res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.REMOVE_FAILED,
+            res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.REMOVE_FAILED
           );
         }
       } catch (error) {
@@ -82,7 +83,7 @@ export function useStudentList() {
         toast.error(STUDENT_LIST_MESSAGES.ERROR.REMOVE_EXCEPTION);
       }
     },
-    [currentId, internshipId, fetchGroupDetail, toast],
+    [currentId, internshipId, fetchGroupDetail, toast]
   );
 
   const filteredMembers = useMemo(() => {
@@ -91,7 +92,7 @@ export function useStudentList() {
       (m) =>
         m.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
         m.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-        m.studentCode?.toLowerCase().includes(searchText.toLowerCase()),
+        m.studentCode?.toLowerCase().includes(searchText.toLowerCase())
     );
   }, [groupDetail, searchText]);
   const paginatedMembers = useMemo(() => {

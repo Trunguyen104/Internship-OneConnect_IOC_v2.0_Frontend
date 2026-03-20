@@ -1,8 +1,10 @@
 'use client';
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { useToast } from '@/providers/ToastProvider';
-import { TermService } from '../services/term.service';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
+
+import { TermService } from '../services/term.service';
 import { useTermFilters } from './useTermFilters';
 import { useTermModals } from './useTermModals';
 
@@ -11,47 +13,7 @@ export const useTermManagement = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
-  const [universities, setUniversities] = useState([]);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [_fetchingProfile, setFetchingProfile] = useState(true);
   const knownVersions = useRef({});
-
-  // Fetch character role and universities if SuperAdmin
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        setFetchingProfile(true);
-        const { userService } = await import('@/components/features/user/services/userService');
-        const userRes = await userService.getMe();
-
-        const userData = userRes?.data || userRes;
-        setUserProfile(userData);
-
-        const rawRole = userData?.role;
-        const isAdmin =
-          rawRole === 1 ||
-          rawRole === '1' ||
-          rawRole === 'SuperAdmin' ||
-          (typeof rawRole === 'string' && rawRole.toLowerCase().includes('superadmin')) ||
-          rawRole?.roleId === 1 ||
-          rawRole?.name?.toLowerCase().includes('superadmin');
-
-        setIsSuperAdmin(isAdmin);
-
-        if (isAdmin) {
-          const { universityService } = await import('@/services/university.service');
-          const uniRes = await universityService.getAll({ PageNumber: 1, PageSize: 1000 });
-          setUniversities(uniRes?.data?.items || uniRes?.items || []);
-        }
-      } catch (err) {
-        console.error('Failed to initialize user data', err);
-      } finally {
-        setFetchingProfile(false);
-      }
-    };
-    initialize();
-  }, []);
 
   const {
     searchTerm,
@@ -137,7 +99,7 @@ export const useTermManagement = () => {
         toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
       }
     },
-    [openFormModal, toast],
+    [openFormModal, toast]
   );
 
   const handleView = useCallback(
@@ -152,7 +114,7 @@ export const useTermManagement = () => {
         toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
       }
     },
-    [openFormModal, toast],
+    [openFormModal, toast]
   );
 
   const handleDelete = useCallback(async () => {
@@ -167,7 +129,7 @@ export const useTermManagement = () => {
       fetchData();
     } catch (error) {
       toast.error(
-        error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR,
+        error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR
       );
     } finally {
       setSubmitLoading(false);
@@ -190,8 +152,8 @@ export const useTermManagement = () => {
           knownVersions.current[record.termId] = response.data.version;
           setData((prev) =>
             prev.map((item) =>
-              item.termId === record.termId ? { ...item, ...response.data } : item,
-            ),
+              item.termId === record.termId ? { ...item, ...response.data } : item
+            )
           );
         }
 
@@ -204,7 +166,7 @@ export const useTermManagement = () => {
         setSubmitLoading(false);
       }
     },
-    [statusModalState, fetchData, toast, setStatusModalState],
+    [statusModalState, fetchData, toast, setStatusModalState]
   );
 
   const handleSaveModal = useCallback(
@@ -218,7 +180,6 @@ export const useTermManagement = () => {
           Name: payload.name,
           StartDate: payload.startDate,
           EndDate: payload.endDate,
-          UniversityId: isSuperAdmin ? payload.universityId : undefined,
         };
 
         if (isUpdate) {
@@ -232,7 +193,7 @@ export const useTermManagement = () => {
           if (response?.data) {
             knownVersions.current[termId] = response.data.version;
             setData((prev) =>
-              prev.map((item) => (item.termId === termId ? { ...item, ...response.data } : item)),
+              prev.map((item) => (item.termId === termId ? { ...item, ...response.data } : item))
             );
           }
           toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.UPDATE_SUCCESS);
@@ -248,13 +209,13 @@ export const useTermManagement = () => {
         fetchData();
       } catch (error) {
         toast.error(
-          error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR,
+          error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR
         );
       } finally {
         setSubmitLoading(false);
       }
     },
-    [editingRecord, fetchData, toast, setModalVisible, userProfile],
+    [editingRecord, fetchData, toast, setModalVisible]
   );
 
   return {
@@ -270,9 +231,6 @@ export const useTermManagement = () => {
     viewOnly,
     statusModalState,
     deleteModalState,
-    userProfile,
-    universities,
-    isSuperAdmin,
 
     setModalVisible,
     setStatusModalState,

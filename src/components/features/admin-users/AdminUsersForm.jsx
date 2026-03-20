@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
 import {
   Select,
   SelectContent,
@@ -13,13 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/providers/ToastProvider';
-import { useAdminUsersStore } from '@/store/useAdminUsersStore';
+import { Spinner } from '@/components/ui/spinner';
 import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/admin-users/enums';
+import { useToast } from '@/providers/ToastProvider';
+import { enterpriseService } from '@/services/enterprise.service';
+import { universityService } from '@/services/university.service';
+import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
 import { adminUsersService } from './adminUsers.service';
-import { universityService } from '@/services/university.service';
-import { enterpriseService } from '@/services/enterprise.service';
 
 function isUniversityRole(role) {
   return role === USER_ROLE.SCHOOL_ADMIN || role === USER_ROLE.STUDENT;
@@ -119,35 +119,35 @@ export default function AdminUsersForm({ onSuccess, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
-      <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-        <Field className='md:col-span-2'>
-          <FieldLabel htmlFor='fullName'>Full Name</FieldLabel>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Field className="md:col-span-2">
+          <FieldLabel htmlFor="fullName">{UI_TEXT.ADMIN_USERS.FULL_NAME}</FieldLabel>
           <Input
-            id='fullName'
-            name='fullName'
+            id="fullName"
+            name="fullName"
             required
-            placeholder='Enter full name'
-            className='rounded-xl'
+            placeholder="Enter full name"
+            className="rounded-xl"
             error={errors.fullName}
           />
         </Field>
 
         <Field>
-          <FieldLabel htmlFor='email'>Email Address</FieldLabel>
+          <FieldLabel htmlFor="email">{UI_TEXT.ADMIN_USERS.EMAIL_ADDRESS}</FieldLabel>
           <Input
-            id='email'
-            name='email'
-            type='email'
+            id="email"
+            name="email"
+            type="email"
             required
-            placeholder='Enter email address'
-            className='rounded-xl'
+            placeholder="Enter email address"
+            className="rounded-xl"
             error={errors.email}
           />
         </Field>
 
         <Field>
-          <FieldLabel>Assigned Role</FieldLabel>
+          <FieldLabel>{UI_TEXT.ADMIN_USERS.ASSIGNED_ROLE}</FieldLabel>
           <Select
             value={String(role)}
             onValueChange={(val) => {
@@ -155,12 +155,12 @@ export default function AdminUsersForm({ onSuccess, onCancel }) {
               setUnitId('');
             }}
           >
-            <SelectTrigger className='rounded-xl'>
+            <SelectTrigger className="rounded-xl">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {Object.values(USER_ROLE).map((v) => (
-                <SelectItem key={v} value={String(v)} className='rounded-lg'>
+                <SelectItem key={v} value={String(v)} className="rounded-lg">
                   {USER_ROLE_LABEL[v]}
                 </SelectItem>
               ))}
@@ -169,10 +169,10 @@ export default function AdminUsersForm({ onSuccess, onCancel }) {
         </Field>
 
         {unitRequired(role) && (
-          <Field className='animate-in slide-in-from-top-2 duration-300 md:col-span-2'>
+          <Field className="animate-in slide-in-from-top-2 duration-300 md:col-span-2">
             <FieldLabel>{unitLabel}</FieldLabel>
             <Select value={unitId} onValueChange={setUnitId}>
-              <SelectTrigger className='rounded-xl'>
+              <SelectTrigger className="rounded-xl">
                 <SelectValue placeholder={fetchingUnits ? 'Loading...' : `Select ${unitLabel}`} />
               </SelectTrigger>
               <SelectContent>
@@ -180,45 +180,46 @@ export default function AdminUsersForm({ onSuccess, onCancel }) {
                   <SelectItem
                     key={u.universityId || u.enterpriseId || u.id}
                     value={u.universityId || u.enterpriseId || u.id}
-                    className='rounded-lg'
+                    className="rounded-lg"
                   >
                     {u.name}
                   </SelectItem>
                 ))}
                 {currentUnits.length === 0 && !fetchingUnits && (
-                  <div className='p-2 text-center text-xs text-slate-400'>
-                    No {unitLabel.toLowerCase()}s found
+                  <div className="p-2 text-center text-xs text-slate-400">
+                    {UI_TEXT.ADMIN_USERS.NO} {unitLabel.toLowerCase()}
+                    {UI_TEXT.ADMIN_USERS.S_FOUND || 's found'}
                   </div>
                 )}
               </SelectContent>
             </Select>
             {errors.unitId ? (
-              <div className='mt-1 text-xs font-semibold text-rose-600'>{errors.unitId}</div>
+              <div className="mt-1 text-xs font-semibold text-rose-600">{errors.unitId}</div>
             ) : null}
           </Field>
         )}
 
         <Field>
-          <FieldLabel htmlFor='phoneNumber'>Phone Number</FieldLabel>
+          <FieldLabel htmlFor="phoneNumber">{UI_TEXT.ADMIN_USERS.PHONE_NUMBER}</FieldLabel>
           <Input
-            id='phoneNumber'
-            name='phoneNumber'
-            placeholder='Enter phone number'
-            className='rounded-xl'
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="Enter phone number"
+            className="rounded-xl"
           />
         </Field>
       </FieldGroup>
 
-      <div className='flex justify-end gap-3'>
-        <Button type='button' variant='ghost' className='rounded-full' onClick={() => onCancel?.()}>
-          Cancel
+      <div className="flex justify-end gap-3">
+        <Button type="button" variant="ghost" className="rounded-full" onClick={() => onCancel?.()}>
+          {UI_TEXT.COMMON.CANCEL}
         </Button>
         <Button
-          type='submit'
+          type="submit"
           disabled={loading || fetchingUnits}
-          className='bg-primary hover:bg-primary-hover min-w-[120px] rounded-full'
+          className="bg-primary hover:bg-primary-hover min-w-[120px] rounded-full"
         >
-          {loading ? <Spinner className='mr-2' /> : 'Create User'}
+          {loading ? <Spinner className="mr-2" /> : UI_TEXT.ADMIN_USERS.CREATE_BTN}
         </Button>
       </div>
     </form>

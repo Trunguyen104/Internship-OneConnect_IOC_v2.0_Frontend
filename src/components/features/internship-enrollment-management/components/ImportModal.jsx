@@ -1,16 +1,17 @@
 'use client';
 
-import React, { memo, useState } from 'react';
-import { Upload, Table, Tooltip, Tag, Button, Space } from 'antd';
 import {
-  UploadOutlined,
   CheckCircleOutlined,
+  DownloadOutlined,
   ExclamationCircleOutlined,
   FileExcelOutlined,
-  DownloadOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { Button, Space, Table, Tag, Tooltip, Upload } from 'antd';
+import React, { memo, useState } from 'react';
+
 import CompoundModal from '@/components/ui/CompoundModal';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Dragger } = Upload;
 
@@ -51,17 +52,17 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport, load
     {
       title: IMPORT.PREVIEW_COLUMNS.FULL_NAME,
       dataIndex: 'name',
-      render: (text) => <span className='text-sm font-bold'>{text}</span>,
+      render: (text) => <span className="text-sm font-bold">{text}</span>,
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.STUDENT_ID,
       dataIndex: 'studentId',
-      render: (text) => <span className='font-mono text-xs'>{text}</span>,
+      render: (text) => <span className="font-mono text-xs">{text}</span>,
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.EMAIL,
       dataIndex: 'email',
-      render: (text) => <span className='text-muted text-xs'>{text}</span>,
+      render: (text) => <span className="text-muted text-xs">{text}</span>,
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.VALIDITY,
@@ -70,11 +71,11 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport, load
       render: (_, record) =>
         record.valid ? (
           <Tooltip title={IMPORT.TOOLTIPS.VALID}>
-            <CheckCircleOutlined className='text-success text-lg' />
+            <CheckCircleOutlined className="text-success text-lg" />
           </Tooltip>
         ) : (
           <Tooltip title={record.error || IMPORT.TOOLTIPS.ERROR}>
-            <ExclamationCircleOutlined className='text-danger text-lg' />
+            <ExclamationCircleOutlined className="text-danger text-lg" />
           </Tooltip>
         ),
     },
@@ -90,20 +91,20 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport, load
       <CompoundModal.Content>
         <Dragger
           {...uploadProps}
-          className='bg-muted/5 border-border hover:border-primary group mb-6 rounded-2xl border-2 border-dashed transition-all'
+          className="bg-muted/5 border-border hover:border-primary group mb-6 rounded-2xl border-2 border-dashed transition-all"
           disabled={loading}
         >
-          <div className='py-8'>
-            <div className='bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full transition-transform group-hover:scale-110'>
-              <UploadOutlined className='text-primary text-3xl' />
+          <div className="py-8">
+            <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full transition-transform group-hover:scale-110">
+              <UploadOutlined className="text-primary text-3xl" />
             </div>
-            <p className='text-text text-lg font-bold'>{IMPORT.DRAG_TEXT}</p>
-            <p className='text-muted text-sm'>{IMPORT.HINT_TEXT}</p>
+            <p className="text-text text-lg font-bold">{IMPORT.DRAG_TEXT}</p>
+            <p className="text-muted text-sm">{IMPORT.HINT_TEXT}</p>
 
             <Button
               icon={<DownloadOutlined />}
-              type='link'
-              className='text-primary mt-4 font-semibold'
+              type="link"
+              className="text-primary mt-4 font-semibold"
             >
               {IMPORT.DOWNLOAD_TEMPLATE}
             </Button>
@@ -111,29 +112,29 @@ const ImportModal = memo(function ImportModal({ visible, onClose, onImport, load
         </Dragger>
 
         {previewData.length > 0 && (
-          <div className='animate-in fade-in slide-in-from-bottom-4 mt-8 duration-500'>
-            <div className='mb-4 flex items-center justify-between'>
-              <span className='text-text text-sm font-bold tracking-wider uppercase'>
+          <div className="animate-in fade-in slide-in-from-bottom-4 mt-8 duration-500">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-text text-sm font-bold tracking-wider uppercase">
                 {IMPORT.PREVIEW_TITLE}
               </span>
-              <Space className='text-xs'>
-                <Tag color='success' className='border-none px-3 font-bold uppercase'>
+              <Space className="text-xs">
+                <Tag color="success" className="border-none px-3 font-bold uppercase">
                   {validCount} {IMPORT.VALID_TAG}
                 </Tag>
-                <Tag color='error' className='border-none px-3 font-bold uppercase'>
+                <Tag color="error" className="border-none px-3 font-bold uppercase">
                   {invalidCount} {IMPORT.INVALID_TAG}
                 </Tag>
               </Space>
             </div>
 
-            <div className='border-border overflow-hidden rounded-xl border'>
+            <div className="border-border overflow-hidden rounded-xl border">
               <Table
                 dataSource={previewData}
                 columns={previewColumns}
                 pagination={false}
-                rowKey='id'
-                size='middle'
-                className='custom-table'
+                rowKey="id"
+                size="middle"
+                className="custom-table"
               />
             </div>
           </div>

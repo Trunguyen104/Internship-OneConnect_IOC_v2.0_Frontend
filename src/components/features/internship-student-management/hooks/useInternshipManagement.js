@@ -1,8 +1,10 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useMemo, useState } from 'react';
+
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { MOCK_MENTORS, MOCK_GROUPS } from '../constants/internshipData';
+import { useToast } from '@/providers/ToastProvider';
+
+import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
 
 export const useInternshipManagement = (initialStudents) => {
   const toast = useToast();
@@ -35,7 +37,7 @@ export const useInternshipManagement = (initialStudents) => {
         (item) =>
           (item.fullName || '').toLowerCase().includes(s) ||
           (item.email || '').toLowerCase().includes(s) ||
-          (item.major || '').toLowerCase().includes(s),
+          (item.major || '').toLowerCase().includes(s)
       );
     }
     if (statusFilter !== 'ALL') data = data.filter((item) => item.status === statusFilter);
@@ -94,13 +96,13 @@ export const useInternshipManagement = (initialStudents) => {
         type: 'warning',
         onOk: () => {
           setStudents((prev) =>
-            prev.map((s) => (s.id === student.id ? { ...s, status: 'ACCEPTED' } : s)),
+            prev.map((s) => (s.id === student.id ? { ...s, status: 'ACCEPTED' } : s))
           );
           toast.success(MESSAGES.ACCEPT_SUCCESS);
         },
       });
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   const handleAddStudent = useCallback(
@@ -124,18 +126,18 @@ export const useInternshipManagement = (initialStudents) => {
       setIsAddModalOpen(false);
       toast.success(MESSAGES.ADD_SUCCESS);
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   const handleRejectStudent = useCallback(
     (studentId, reason) => {
       setStudents((prev) =>
-        prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s)),
+        prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s))
       );
       setRejectModal({ open: false, student: null });
       toast.warning(MESSAGES.REJECT_SUCCESS);
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   const handleAssignMentor = useCallback(
@@ -144,7 +146,7 @@ export const useInternshipManagement = (initialStudents) => {
       setAssignModal({ open: false, student: null });
       toast.success(MESSAGES.ASSIGN_SUCCESS);
     },
-    [toast, MESSAGES],
+    [toast, MESSAGES]
   );
 
   const handleGroupSubmit = useCallback(
@@ -164,8 +166,8 @@ export const useInternshipManagement = (initialStudents) => {
                   ? MOCK_MENTORS.find((m) => m.name === selectedGroup.mentor)?.id || null
                   : null,
               }
-            : s,
-        ),
+            : s
+        )
       );
 
       if (type === 'ADD') {
@@ -176,7 +178,7 @@ export const useInternshipManagement = (initialStudents) => {
 
       setGroupModal({ open: false, student: null, type: 'ADD' });
     },
-    [groupModal, toast, MESSAGES],
+    [groupModal, toast, MESSAGES]
   );
 
   return {
