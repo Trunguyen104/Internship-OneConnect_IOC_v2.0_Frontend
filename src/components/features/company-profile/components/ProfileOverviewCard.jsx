@@ -11,7 +11,7 @@ export function ProfileOverviewCard({ profile, onEdit }) {
       title={ENTERPRISE_PROFILE_UI.ENTERPRISE.OVERVIEW}
       icon={<InfoCircleOutlined />}
     >
-      <ProfileDescription profile={profile} onEdit={onEdit} />
+      <ProfileDescription profile={profile} />
     </ProfileSectionCard>
   );
 }
