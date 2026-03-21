@@ -1,8 +1,11 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { userService } from '@/components/features/user/services/userService';
+import { USER_ROLE } from '@/constants/common/enums';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
+import { universityService } from '@/services/university.service';
 
 import { TermService } from '../services/term.service';
 import { useTermFilters } from './useTermFilters';
@@ -13,6 +16,9 @@ export const useTermManagement = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [universities, setUniversities] = useState([]);
+  const [userUniversity, setUserUniversity] = useState(null);
   const knownVersions = useRef({});
 
   const {
@@ -87,6 +93,32 @@ export const useTermManagement = () => {
     fetchData();
   }, [fetchData]);
 
+  useEffect(() => {
+    const checkRoleAndFetchUniversities = async () => {
+      try {
+        const res = await userService.getMe();
+        const userData = res?.data || res;
+        const role = userData?.role;
+        const superAdmin =
+          role === USER_ROLE.SUPER_ADMIN || String(role).toLowerCase() === 'superadmin';
+        setIsSuperAdmin(superAdmin);
+
+        if (superAdmin) {
+          const uniRes = await universityService.getAll({ pageNumber: 1, pageSize: 100 });
+          setUniversities(uniRes?.data?.items || []);
+        } else {
+          setUserUniversity({
+            id: userData?.universityId,
+            name: userData?.universityName,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch user role or universities:', error);
+      }
+    };
+    checkRoleAndFetchUniversities();
+  }, []);
+
   const handleEdit = useCallback(
     async (record) => {
       try {
@@ -144,7 +176,9 @@ export const useTermManagement = () => {
       setSubmitLoading(true);
       try {
         const response = await TermService.closeTerm(record.termId, {
-          Reason: reason || 'Term closed by Admin',
+          Reason:
+            reason ||
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.CLOSE_DEFAULT_REASON,
           Version: record.version || knownVersions.current[record.termId] || 1,
         });
 
@@ -161,7 +195,10 @@ export const useTermManagement = () => {
         setStatusModalState({ open: false, record: null, newStatus: null });
         fetchData();
       } catch (error) {
-        toast.error(error.message || 'Failed to update status');
+        toast.error(
+          error.message ||
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.STATUS_UPDATE_ERROR
+        );
       } finally {
         setSubmitLoading(false);
       }
@@ -181,6 +218,10 @@ export const useTermManagement = () => {
           StartDate: payload.startDate,
           EndDate: payload.endDate,
         };
+
+        if (isSuperAdmin && payload.universityId) {
+          basePayload.UniversityId = payload.universityId;
+        }
 
         if (isUpdate) {
           const updatePayload = {
@@ -215,7 +256,7 @@ export const useTermManagement = () => {
         setSubmitLoading(false);
       }
     },
-    [editingRecord, fetchData, toast, setModalVisible]
+    [editingRecord, fetchData, toast, setModalVisible, isSuperAdmin]
   );
 
   return {
@@ -246,5 +287,8 @@ export const useTermManagement = () => {
     handleRequestChangeStatus,
     handleChangeStatus,
     handleSaveModal,
+    isSuperAdmin,
+    universities,
+    userUniversity,
   };
 };

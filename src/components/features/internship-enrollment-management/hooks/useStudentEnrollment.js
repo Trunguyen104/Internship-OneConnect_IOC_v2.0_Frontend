@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { StudentService } from '../services/student.service';
@@ -9,6 +10,9 @@ import { useStudentModals } from './useStudentModals';
 
 export const useStudentEnrollment = (initialStudents) => {
   const toast = useToast();
+  const { STUDENT_ENROLLMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { MESSAGES } = STUDENT_ENROLLMENT;
+
   const [students, setStudents] = useState(() =>
     (initialStudents || []).map(StudentService.mapStudent)
   );
@@ -59,23 +63,23 @@ export const useStudentEnrollment = (initialStudents) => {
   const handleDelete = useCallback(
     (student) => {
       showDeleteConfirm({
-        title: 'Delete Student',
-        content: `Are you sure you want to delete student "${student.name}"? This action cannot be undone.`,
+        title: MESSAGES.DELETE_CONFIRM_TITLE,
+        content: MESSAGES.DELETE_CONFIRM_TEXT.replace('{name}', student.name),
         onOk: async () => {
           setSubmitLoading(true);
           try {
             await StudentService.delete(student.id);
             setStudents((prev) => prev.filter((s) => s.id !== student.id));
-            toast.success('Student deleted successfully');
+            toast.success(MESSAGES.DELETE_SUCCESS);
           } catch (_error) {
-            toast.error('Failed to delete student');
+            toast.error(MESSAGES.DELETE_ERROR);
           } finally {
             setSubmitLoading(false);
           }
         },
       });
     },
-    [toast]
+    [toast, MESSAGES]
   );
 
   const handleUpdateStudent = useCallback(
@@ -87,14 +91,14 @@ export const useStudentEnrollment = (initialStudents) => {
         setStudents((prev) => prev.map((s) => (s.id === selectedRecord.id ? updated : s)));
         setEditVisible(false);
         setDetailsVisible(false);
-        toast.success('Student updated successfully');
+        toast.success(MESSAGES.UPDATE_SUCCESS);
       } catch (_error) {
-        toast.error('Update failed');
+        toast.error(MESSAGES.UPDATE_ERROR);
       } finally {
         setSubmitLoading(false);
       }
     },
-    [selectedRecord, setEditVisible, setDetailsVisible, toast]
+    [selectedRecord, setEditVisible, setDetailsVisible, toast, MESSAGES]
   );
 
   const handleAddStudent = useCallback(
@@ -109,14 +113,14 @@ export const useStudentEnrollment = (initialStudents) => {
         await StudentService.create(newStudent);
         setStudents((prev) => [newStudent, ...prev]);
         setAddVisible(false);
-        toast.success('Student added successfully');
+        toast.success(MESSAGES.ADD_SUCCESS);
       } catch (_error) {
-        toast.error('Failed to add student');
+        toast.error(MESSAGES.ADD_ERROR);
       } finally {
         setSubmitLoading(false);
       }
     },
-    [setAddVisible, toast]
+    [setAddVisible, toast, MESSAGES]
   );
 
   const handleImportStudents = useCallback(
@@ -129,14 +133,14 @@ export const useStudentEnrollment = (initialStudents) => {
         await StudentService.importStudents(validStudents);
         setStudents((prev) => [...validStudents, ...prev]);
         setImportVisible(false);
-        toast.success(`Successfully imported ${validStudents.length} students`);
+        toast.success(MESSAGES.IMPORT_BULK_SUCCESS.replace('{count}', validStudents.length));
       } catch (_error) {
-        toast.error('Data import failed');
+        toast.error(MESSAGES.IMPORT_ERROR);
       } finally {
         setSubmitLoading(false);
       }
     },
-    [setImportVisible, toast]
+    [setImportVisible, toast, MESSAGES]
   );
 
   return {

@@ -4,38 +4,25 @@ import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import {
+  INTERNSHIP_MANAGEMENT_UI,
+  TERM_STATUS,
+} from '@/constants/internship-management/internship-management';
 
 const STATUS_CONFIG = {
-  1: {
+  [TERM_STATUS.UPCOMING]: {
     bgClass: '!bg-info-surface',
     textClass: '!text-info',
   },
-  2: {
+  [TERM_STATUS.ACTIVE]: {
     bgClass: '!bg-success-surface',
     textClass: '!text-success',
   },
-  3: {
+  [TERM_STATUS.ENDED]: {
     bgClass: '!bg-warning-surface',
-    textClass: '!text-warning',
+    textClass: '!text-warning-text',
   },
-  4: {
-    bgClass: '!bg-danger-surface',
-    textClass: '!text-danger',
-  },
-  Upcoming: {
-    bgClass: '!bg-info-surface',
-    textClass: '!text-info',
-  },
-  Active: {
-    bgClass: '!bg-success-surface',
-    textClass: '!text-success',
-  },
-  Ended: {
-    bgClass: '!bg-warning-surface',
-    textClass: '!text-warning',
-  },
-  Closed: {
+  [TERM_STATUS.CLOSED]: {
     bgClass: '!bg-danger-surface',
     textClass: '!text-danger',
   },
@@ -93,10 +80,11 @@ const TermTable = memo(function TermTable({
         width: '120px',
         align: 'center',
         render: (status) => {
-          const config = STATUS_CONFIG[status] || {
-            bgClass: '!bg-gray-100',
-            textClass: '!text-gray-500',
-          };
+          const config = STATUS_CONFIG[status] ||
+            STATUS_CONFIG[TERM_STATUS[String(status).toUpperCase()]] || {
+              bgClass: '!bg-muted/10',
+              textClass: '!text-muted',
+            };
           const label =
             INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || status;
           return (
@@ -114,9 +102,10 @@ const TermTable = memo(function TermTable({
         width: '120px',
         align: 'right',
         render: (_, record) => {
-          const isClosed = record.status === 'Closed' || record.status === 4;
-          const isUpcoming = record.status === 'Upcoming' || record.status === 1;
-          const isActive = record.status === 'Active' || record.status === 2;
+          const status = Number(record.status);
+          const isClosed = status === TERM_STATUS.CLOSED;
+          const isUpcoming = status === TERM_STATUS.UPCOMING;
+          const isActive = status === TERM_STATUS.ACTIVE;
 
           return (
             <div className="flex items-center justify-end gap-1">
@@ -178,7 +167,7 @@ const TermTable = memo(function TermTable({
                     className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRequestChangeStatus(record, 4); // 4 is Closed
+                      onRequestChangeStatus(record, TERM_STATUS.CLOSED);
                     }}
                   />
                 </Tooltip>
