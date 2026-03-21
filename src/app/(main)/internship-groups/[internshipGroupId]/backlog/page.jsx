@@ -1,18 +1,17 @@
 'use client';
 
 import BacklogBoard from '@/components/features/backlog/components/BacklogBoard';
-import PageShell from '@/components/layout/PageShell';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import StudentTabs from '@/components/layout/StudentTabs';
 
 export default function BacklogBoardPage() {
   return (
-    <PageShell>
-      <div className="mb-4 flex items-center gap-4">
-        <div className="min-w-0 flex-1">
-          <StudentTabs />
-        </div>
+    <div className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+      <StudentPageHeader hidden />
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <StudentTabs />
       </div>
       <BacklogBoard />
-    </PageShell>
+    </div>
   );
 }
