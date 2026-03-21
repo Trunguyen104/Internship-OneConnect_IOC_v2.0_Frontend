@@ -1,9 +1,5 @@
-import ProfileContent from './ProfileContent';
+import ProfileRoute from '@/components/features/user/routes/ProfileRoute';
 
-export default function ProfilePage() {
-  return (
-    <div className="w-full">
-      <ProfileContent />
-    </div>
-  );
+export default function Page() {
+  return <ProfileRoute />;
 }

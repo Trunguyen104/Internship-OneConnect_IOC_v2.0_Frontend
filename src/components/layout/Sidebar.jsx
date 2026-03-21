@@ -11,7 +11,7 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import React, { useMemo } from 'react';
 
 import BaseSidebar from './BaseSidebar';
@@ -19,7 +19,9 @@ import BaseSidebar from './BaseSidebar';
 export default function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
+  const searchParams = useSearchParams();
   const internshipGroupId = params?.internshipGroupId;
+  const returnTo = searchParams?.get('returnTo');
 
   const basePath = useMemo(
     () => (internshipGroupId ? `/internship-groups/${internshipGroupId}` : ''),
@@ -46,23 +48,41 @@ export default function Sidebar() {
     ];
   }, [internshipGroupId]);
 
-  const profileMenu = useMemo(
-    () => [
-      { icon: <UserOutlined />, label: 'Profile', href: `${basePath || ''}/profile` },
+  const profileMenu = useMemo(() => {
+    const computedReturnTo =
+      returnTo || (internshipGroupId ? `/internship-groups/${internshipGroupId}/space` : null);
+
+    const query = computedReturnTo ? `?returnTo=${encodeURIComponent(computedReturnTo)}` : '';
+
+    return [
+      { icon: <UserOutlined />, label: 'Profile', href: `/profile${query}` },
       {
         icon: <LockOutlined />,
         label: 'Change Password',
-        href: `${basePath || ''}/profile/change-password`,
+        href: `/profile/change-password${query}`,
       },
-    ],
-    [basePath]
-  );
+    ];
+  }, [internshipGroupId, returnTo]);
 
-  const isProfile = pathname.startsWith(`${basePath}/profile`);
+  const isProfile = pathname.startsWith('/profile');
   const menus = isProfile ? profileMenu : studentMenu;
 
   const getBackButton = () => {
     if (isProfile) {
+      if (returnTo) {
+        return {
+          href: returnTo,
+          label: 'Back',
+          className: 'text-primary hover:text-primary-hover text-xs font-black',
+        };
+      }
+      if (!internshipGroupId) {
+        return {
+          href: '/internship-groups',
+          label: 'Back',
+          className: 'text-primary hover:text-primary-hover text-xs font-black',
+        };
+      }
       return {
         href: `${basePath}/space`,
         label: 'Back',
