@@ -7,47 +7,59 @@ import {
   EditOutlined,
   EyeOutlined,
   MinusCircleFilled,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import React, { memo, useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
+import { STUDENT_ENROLLMENT } from '../constants/enrollment';
 
 const STATUS_CONFIG = {
   PLACED: {
     icon: <CheckCircleFilled className="text-success" />,
-    bgClass: '!bg-success-surface',
-    textClass: '!text-success',
+    bgClass: 'bg-success-surface',
+    textClass: 'text-success',
+  },
+  ACTIVE: {
+    icon: <CheckCircleFilled className="text-success" />,
+    bgClass: 'bg-success-surface',
+    textClass: 'text-success',
   },
   UNPLACED: {
     icon: <MinusCircleFilled className="text-info" />,
-    bgClass: '!bg-info-surface',
-    textClass: '!text-info',
+    bgClass: 'bg-info-surface',
+    textClass: 'text-info',
   },
   WITHDRAWN: {
     icon: <CloseCircleFilled className="text-danger" />,
-    bgClass: '!bg-danger-surface',
-    textClass: '!text-danger',
+    bgClass: 'bg-danger-surface',
+    textClass: 'text-danger',
   },
   default: {
     icon: <MinusCircleFilled className="text-muted" />,
-    bgClass: '!bg-muted/10',
-    textClass: '!text-muted',
+    bgClass: 'bg-muted/10',
+    textClass: 'text-muted',
   },
 };
 
 const DataGrid = memo(function DataGrid({
-  students,
+  data,
   loading,
   page = 1,
   pageSize = 10,
+  selectedRowKeys,
+  onSelectionChange,
   onView,
   onEdit,
   onDelete,
+  onRestore,
+  sortBy,
+  sortOrder,
+  onSort,
 }) {
-  const { STUDENT_ENROLLMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
-  const { TABLE, STATUS_LABELS, ACTIONS } = STUDENT_ENROLLMENT;
+  const { TABLE, ACTIONS, STATUS_LABELS, PLACEMENT_LABELS } = STUDENT_ENROLLMENT;
 
   const columns = useMemo(
     () => [
@@ -62,17 +74,19 @@ const DataGrid = memo(function DataGrid({
       {
         title: TABLE.COLUMNS.FULL_NAME,
         key: 'name',
+        sortKey: 'fullname',
         width: '230px',
         render: (_, record) => (
           <div className="flex items-center gap-3">
-            <span className="text-text text-sm font-bold">{record.name}</span>
+            <span className="text-text text-sm font-semibold">{record.name}</span>
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.STUDENT_ID,
         key: 'id',
-        width: '120px',
+        sortKey: 'studentcode',
+        width: '140px',
         render: (_, record) => (
           <span className="text-muted font-mono text-xs font-semibold">{record.id}</span>
         ),
@@ -84,86 +98,118 @@ const DataGrid = memo(function DataGrid({
         render: (_, record) => <span className="text-text text-xs">{record.major}</span>,
       },
       {
+        title: TABLE.COLUMNS.PLACEMENT,
+        key: 'placement',
+        width: '180px',
+        render: (_, record) => {
+          const isPlaced = record.placementStatus === 'PLACED';
+          return (
+            <div className="flex flex-col">
+              {isPlaced ? (
+                <span className="text-text text-[11px] font-bold uppercase tracking-wider truncate max-w-[150px]">
+                  {record.enterpriseName}
+                </span>
+              ) : (
+                <span className="text-muted text-[11px] font-bold uppercase tracking-wider">
+                  {PLACEMENT_LABELS.UNPLACED}
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+      {
         title: TABLE.COLUMNS.STATUS,
+        dataIndex: 'status',
         key: 'status',
-        width: '160px',
+        width: '120px',
         align: 'center',
         render: (status) => {
           const config = STATUS_CONFIG[status] || STATUS_CONFIG.default;
-          const label = STATUS_LABELS[status] || status;
           return (
-            <div
-              className={`m-0 inline-flex h-6 w-fit items-center justify-center gap-1.5 rounded-full px-2.5 py-0.5 ${config.bgClass}`}
+            <span
+              className={`${config.bgClass} ${config.textClass} inline-flex h-6 items-center rounded-full px-2.5 text-[10px] font-bold uppercase transition-all`}
             >
-              <span className="flex items-center text-xs">{config.icon}</span>
-              <span
-                className={`${config.textClass} text-[10px] leading-none font-black tracking-wider uppercase transition-all`}
-              >
-                {label}
-              </span>
-            </div>
+              {STATUS_LABELS[status] || status}
+            </span>
           );
         },
       },
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: '120px',
+        width: '140px',
         align: 'right',
-        render: (_, record) => (
-          <div className="flex items-center justify-end gap-1">
-            <Tooltip title={ACTIONS.VIEW}>
-              <Button
-                type="text"
-                size="small"
-                icon={<EyeOutlined />}
-                className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onView(record);
-                }}
-              />
-            </Tooltip>
-            <Tooltip title={ACTIONS.EDIT}>
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(record);
-                }}
-              />
-            </Tooltip>
-            <Tooltip title={ACTIONS.DELETE}>
-              <Button
-                type="text"
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(record);
-                }}
-              />
-            </Tooltip>
-          </div>
-        ),
+        render: (_, record) => {
+          const isWithdrawn = record.status === 'WITHDRAWN';
+
+          return (
+            <div className="flex items-center justify-end gap-1">
+              <Tooltip title={ACTIONS.VIEW}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EyeOutlined />}
+                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                  onClick={() => onView(record)}
+                />
+              </Tooltip>
+              {!isWithdrawn ? (
+                <>
+                  <Tooltip title={ACTIONS.EDIT}>
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<EditOutlined />}
+                      className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                      onClick={() => onEdit(record)}
+                    />
+                  </Tooltip>
+                  <Tooltip title={ACTIONS.DELETE}>
+                    <Button
+                      type="text"
+                      size="small"
+                      danger
+                      icon={<DeleteOutlined />}
+                      className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                      onClick={() => onDelete(record)}
+                    />
+                  </Tooltip>
+                </>
+              ) : (
+                <Tooltip title={ACTIONS.RECOVER}>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<ReloadOutlined />}
+                    className="hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                    onClick={() => onRestore(record)}
+                  />
+                </Tooltip>
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [onView, onEdit, onDelete, TABLE, STATUS_LABELS, ACTIONS, page, pageSize]
+    [onView, onEdit, onDelete, onRestore, onSort, TABLE, STATUS_LABELS, ACTIONS, page, pageSize]
   );
 
   return (
     <DataTable
       columns={columns}
-      data={students}
+      data={data}
       loading={loading}
-      rowKey="id"
-      minWidth="800px"
-      className="no-scrollbar mt-2 min-h-0 flex-1"
+      rowKey="studentTermId"
+      minWidth="1000px"
+      className="mt-2 min-h-0 flex-1"
+      sortBy={sortBy}
+      sortOrder={sortOrder}
+      onSort={onSort}
+      rowSelection={{
+        selectedRowKeys,
+        onChange: onSelectionChange,
+      }}
     />
   );
 });
