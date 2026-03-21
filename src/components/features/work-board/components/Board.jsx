@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/core';
 
 import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
-import PageShell from '@/components/layout/PageShell';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import StudentTabs from '@/components/layout/StudentTabs';
 import SearchBar from '@/components/ui/searchbar';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
@@ -43,8 +43,9 @@ export default function Board() {
   } = useBoard();
 
   return (
-    <PageShell>
-      <div className="mb-4 flex flex-col gap-4">
+    <div className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+      <StudentPageHeader hidden />
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <StudentTabs />
         {activeSprint && (
           <SearchBar
@@ -98,6 +99,6 @@ export default function Board() {
         }}
         onSubmit={handleUpdateSubmit}
       />
-    </PageShell>
+    </div>
   );
 }
