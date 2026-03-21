@@ -1,3 +1,14 @@
+export const TERM_STATUS = {
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
+  CLOSED: 4,
+};
+
+export const TERM_STATUS_MAP = Object.fromEntries(
+  Object.entries(TERM_STATUS).map(([k, v]) => [v, k])
+);
+
 export const INTERNSHIP_MANAGEMENT_UI = {
   GROUP_MANAGEMENT: {
     TITLE: 'Internship Group Management',
@@ -381,13 +392,14 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       MESSAGES: {
         IMPORT_SUCCESS: 'Student list imported successfully',
         IMPORT_ERROR: 'Failed to import student data',
+        IMPORT_BULK_SUCCESS: 'Successfully imported {count} students',
         ADD_SUCCESS: 'Student added successfully',
         ADD_ERROR: 'Failed to add student',
         UPDATE_SUCCESS: 'Information updated successfully',
         UPDATE_ERROR: 'Failed to update student',
         DELETE_CONFIRM_TITLE: 'Withdraw Student',
-        DELETE_CONFIRM:
-          'Are you sure you want to withdraw this student from the internship term? This action cannot be undone.',
+        DELETE_CONFIRM_TEXT:
+          'Are you sure you want to withdraw student "{name}" from the internship term? This action cannot be undone.',
         DELETE_SUCCESS: 'Student deleted successfully',
         DELETE_ERROR: 'Failed to withdraw student',
       },
@@ -423,6 +435,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         Active: 'Active',
         Ended: 'Ended',
         Closed: 'Closed',
+        STALE: 'Stale / Unknown',
       },
       ACTIONS: {
         CLOSE: 'Close Term',
@@ -490,6 +503,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         ID_ERROR: 'Could not identify term ID',
         SAVE_ERROR: 'Failed to save term information',
         DELETE_ERROR: 'Failed to delete term',
+        STATUS_UPDATE_ERROR: 'Failed to update status',
+        CLOSE_DEFAULT_REASON: 'Term closed by Admin',
       },
     },
     DASHBOARD: {

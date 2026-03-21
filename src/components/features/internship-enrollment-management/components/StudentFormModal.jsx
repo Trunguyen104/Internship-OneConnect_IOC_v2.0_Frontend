@@ -80,7 +80,7 @@ const StudentFormBody = memo(function StudentFormBody({
         <Col span={12}>
           <Form.Item
             label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
+              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
                 {ADD_EDIT.NAME_LABEL}
               </span>
             }
@@ -97,7 +97,7 @@ const StudentFormBody = memo(function StudentFormBody({
         <Col span={12}>
           <Form.Item
             label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
+              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
                 {ADD_EDIT.ID_LABEL}
               </span>
             }
@@ -136,7 +136,7 @@ const StudentFormBody = memo(function StudentFormBody({
         <Col span={12}>
           <Form.Item
             label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
+              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
                 {ADD_EDIT.MAJOR_LABEL}
               </span>
             }
@@ -154,7 +154,7 @@ const StudentFormBody = memo(function StudentFormBody({
         <Col span={12}>
           <Form.Item
             label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider text-zinc-600 uppercase">
+              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
                 {ADD_EDIT.PHONE_LABEL}
               </span>
             }

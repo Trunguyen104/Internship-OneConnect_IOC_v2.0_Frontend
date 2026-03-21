@@ -31,9 +31,9 @@ const STATUS_CONFIG = {
     textClass: '!text-danger',
   },
   default: {
-    icon: <MinusCircleFilled className="text-gray-400" />,
-    bgClass: '!bg-gray-100',
-    textClass: '!text-gray-500',
+    icon: <MinusCircleFilled className="text-muted" />,
+    bgClass: '!bg-muted/10',
+    textClass: '!text-muted',
   },
 };
 

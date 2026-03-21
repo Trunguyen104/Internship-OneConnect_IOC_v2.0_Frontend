@@ -45,6 +45,7 @@ export default function InternshipTermManagement() {
     handleSaveModal,
     universities,
     isSuperAdmin,
+    userUniversity,
   } = useTermManagement();
 
   return (
@@ -110,6 +111,7 @@ export default function InternshipTermManagement() {
         viewOnly={viewOnly}
         universities={universities}
         isSuperAdmin={isSuperAdmin}
+        userUniversity={userUniversity}
       />
 
       <TermStatusModal
