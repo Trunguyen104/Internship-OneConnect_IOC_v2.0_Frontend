@@ -34,9 +34,9 @@ export default function Header() {
     ],
     onClick: async ({ key }) => {
       if (key === 'profile') {
-        router.push(
-          internshipGroupId ? `/internship-groups/${internshipGroupId}/profile` : '/profile'
-        );
+        const returnTo = internshipGroupId ? `/internship-groups/${internshipGroupId}/space` : null;
+        const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
+        router.push(`/profile${query}`);
       }
       if (key === 'settings') router.push('/settings');
 

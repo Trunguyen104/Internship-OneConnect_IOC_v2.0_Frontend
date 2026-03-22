@@ -1,29 +1,40 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import {
+  ENROLLMENT_STATUS,
+  PLACEMENT_STATUS,
+} from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
+import { STUDENT_ENROLLMENT } from '../constants/enrollment';
 import { StudentService } from '../services/student.service';
 import { useStudentFilters } from './useStudentFilters';
 import { useStudentModals } from './useStudentModals';
 
-export const useStudentEnrollment = (initialStudents) => {
+export const useStudentEnrollment = () => {
   const toast = useToast();
-  const [students, setStudents] = useState(() =>
-    (initialStudents || []).map(StudentService.mapStudent)
-  );
+  const { MESSAGES } = STUDENT_ENROLLMENT;
+
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const {
+    termId,
     searchTerm,
+    debouncedSearchTerm,
     statusFilter,
-    majorFilter,
+    sortBy,
+    sortOrder,
     pagination,
     setPagination,
+    handleTermChange,
     handleSearchChange,
     handleStatusChange,
-    handleMajorChange,
     handlePageChange,
+    handleSortChange,
   } = useStudentFilters();
 
   const {
@@ -36,136 +47,293 @@ export const useStudentEnrollment = (initialStudents) => {
     detailsVisible,
     setDetailsVisible,
     selectedRecord,
+    handleOpenAdd,
     handleOpenEdit,
     handleOpenDetails,
   } = useStudentModals();
 
-  const filteredStudents = useMemo(() => {
-    return students.filter((s) => {
-      const matchSearch =
-        s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.id.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchStatus = statusFilter ? s.status === statusFilter : true;
-      const matchMajor = majorFilter ? s.major === majorFilter : true;
-      return matchSearch && matchStatus && matchMajor;
-    });
-  }, [students, searchTerm, statusFilter, majorFilter]);
+  const fetchStudents = useCallback(async () => {
+    if (!termId) {
+      setStudents([]);
+      setPagination((prev) => ({ ...prev, total: 0 }));
+      return;
+    }
 
-  // Sync pagination total when filtered list changes
+    setLoading(true);
+    try {
+      const params = {
+        pageNumber: pagination.current,
+        pageSize: pagination.pageSize,
+        searchTerm: debouncedSearchTerm || undefined,
+        // EnrollmentStatus: 1=Active, 2=Withdrawn
+        enrollmentStatus: statusFilter === 'WITHDRAWN' ? ENROLLMENT_STATUS.WITHDRAWN : undefined,
+        // PlacementStatus: 0=Unplaced, 1=Placed
+        placementStatus:
+          statusFilter === 'PLACED'
+            ? PLACEMENT_STATUS.PLACED
+            : statusFilter === 'UNPLACED'
+              ? PLACEMENT_STATUS.UNPLACED
+              : undefined,
+        sortBy: sortBy || undefined,
+        sortOrder: sortOrder || undefined,
+      };
+
+      const response = await StudentService.getAll(termId, params);
+      if (response?.data) {
+        setStudents((response.data.items || []).map(StudentService.mapStudent));
+        setPagination((prev) => ({
+          ...prev,
+          total: response.data.totalCount || 0,
+        }));
+      }
+    } catch {
+      console.error('Fetch students failed');
+      toast.error(MESSAGES.LOAD_ERROR);
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    termId,
+    pagination.current,
+    pagination.pageSize,
+    debouncedSearchTerm,
+    statusFilter,
+    sortBy,
+    sortOrder,
+    toast,
+    MESSAGES,
+    setPagination,
+  ]);
+
   useEffect(() => {
-    setPagination((prev) => ({ ...prev, total: filteredStudents.length }));
-  }, [filteredStudents.length, setPagination]);
+    fetchStudents();
+  }, [fetchStudents]);
 
   const handleDelete = useCallback(
     (student) => {
+      if (student.placementStatus === 'PLACED') {
+        toast.error(MESSAGES.WITHDRAW_PLACED_ERROR);
+        return;
+      }
       showDeleteConfirm({
-        title: 'Delete Student',
-        content: `Are you sure you want to delete student "${student.name}"? This action cannot be undone.`,
+        title: MESSAGES.DELETE_CONFIRM_TITLE,
+        content: MESSAGES.DELETE_CONFIRM_TEXT.replace('{name}', student.name),
         onOk: async () => {
           setSubmitLoading(true);
           try {
-            await StudentService.delete(student.id);
-            setStudents((prev) => prev.filter((s) => s.id !== student.id));
-            toast.success('Student deleted successfully');
-          } catch (_error) {
-            toast.error('Failed to delete student');
+            await StudentService.withdraw(student.studentTermId);
+            toast.success(MESSAGES.DELETE_SUCCESS);
+            fetchStudents();
+          } catch {
+            toast.error(MESSAGES.DELETE_ERROR);
           } finally {
             setSubmitLoading(false);
           }
         },
       });
     },
-    [toast]
+    [toast, MESSAGES, fetchStudents]
   );
 
   const handleUpdateStudent = useCallback(
     async (values) => {
+      if (!selectedRecord) return;
       setSubmitLoading(true);
       try {
-        const updated = StudentService.mapStudent({ ...selectedRecord, ...values });
-        await StudentService.update(selectedRecord.id, updated);
-        setStudents((prev) => prev.map((s) => (s.id === selectedRecord.id ? updated : s)));
+        const payload = StudentService.mapStudentForUpdate({
+          ...values,
+          studentTermId: selectedRecord.studentTermId,
+        });
+        await StudentService.update(selectedRecord.studentTermId, payload);
+        toast.success(MESSAGES.UPDATE_SUCCESS);
         setEditVisible(false);
-        setDetailsVisible(false);
-        toast.success('Student updated successfully');
-      } catch (_error) {
-        toast.error('Update failed');
+        fetchStudents();
+      } catch {
+        toast.error(MESSAGES.UPDATE_ERROR);
       } finally {
         setSubmitLoading(false);
       }
     },
-    [selectedRecord, setEditVisible, setDetailsVisible, toast]
+    [selectedRecord, setEditVisible, toast, MESSAGES, fetchStudents]
   );
 
   const handleAddStudent = useCallback(
     async (values) => {
+      if (!termId) return;
       setSubmitLoading(true);
       try {
-        const newStudent = StudentService.mapStudent({
+        const payload = StudentService.mapStudentForCreate({
           ...values,
-          id: values.studentCode, // mapStudent will handle normalization
-          status: 'INTERNSHIP',
+          termId: termId,
         });
-        await StudentService.create(newStudent);
-        setStudents((prev) => [newStudent, ...prev]);
+        await StudentService.create(termId, payload);
+        toast.success(MESSAGES.ADD_SUCCESS);
         setAddVisible(false);
-        toast.success('Student added successfully');
-      } catch (_error) {
-        toast.error('Failed to add student');
+        fetchStudents();
+      } catch {
+        toast.error(MESSAGES.ADD_ERROR);
       } finally {
         setSubmitLoading(false);
       }
     },
-    [setAddVisible, toast]
+    [termId, setAddVisible, toast, MESSAGES, fetchStudents]
   );
 
-  const handleImportStudents = useCallback(
-    async (importedStudents) => {
+  const handleImportPreview = useCallback(
+    async (file) => {
+      if (!termId) return null;
       setSubmitLoading(true);
       try {
-        const validStudents = importedStudents
-          .filter((s) => s.valid)
-          .map(StudentService.mapStudent);
-        await StudentService.importStudents(validStudents);
-        setStudents((prev) => [...validStudents, ...prev]);
-        setImportVisible(false);
-        toast.success(`Successfully imported ${validStudents.length} students`);
-      } catch (_error) {
-        toast.error('Data import failed');
+        const response = await StudentService.importPreview(termId, file);
+        return response?.data;
+      } catch {
+        toast.error(MESSAGES.IMPORT_ERROR);
+        return null;
       } finally {
         setSubmitLoading(false);
       }
     },
-    [setImportVisible, toast]
+    [termId, toast, MESSAGES]
+  );
+
+  const handleImportConfirm = useCallback(
+    async (validRecords) => {
+      if (!termId) return;
+      setSubmitLoading(true);
+      try {
+        const response = await StudentService.importConfirm(termId, validRecords);
+        toast.success(
+          MESSAGES.IMPORT_BULK_SUCCESS.replace('{count}', response?.data?.importedCount || 0)
+        );
+        setImportVisible(false);
+        fetchStudents();
+
+        // If password file returned, handle it (e.g. download)
+        if (response?.data?.passwordFileBase64) {
+          // Logic to download could go here
+        }
+      } catch {
+        toast.error(MESSAGES.IMPORT_ERROR);
+      } finally {
+        setSubmitLoading(false);
+      }
+    },
+    [termId, setImportVisible, toast, MESSAGES, fetchStudents]
+  );
+
+  const handleBulkWithdraw = useCallback(async () => {
+    if (!termId || selectedIds.length === 0) return;
+
+    // Check if any selected student is PLACED
+    const placedStudents = students.filter(
+      (s) => selectedIds.includes(s.studentTermId) && s.placementStatus === 'PLACED'
+    );
+
+    if (placedStudents.length > 0) {
+      toast.error(MESSAGES.BULK_WITHDRAW_PLACED_ERROR.replace('{count}', placedStudents.length));
+      return;
+    }
+
+    setSubmitLoading(true);
+    try {
+      await StudentService.bulkWithdraw(termId, selectedIds);
+      toast.success(MESSAGES.BULK_WITHDRAW_SUCCESS);
+      setSelectedIds([]);
+      fetchStudents();
+    } catch {
+      toast.error(MESSAGES.DELETE_ERROR);
+    } finally {
+      setSubmitLoading(false);
+    }
+  }, [termId, selectedIds, students, toast, MESSAGES, fetchStudents, setSelectedIds]);
+
+  const handleRestore = useCallback(
+    async (student) => {
+      setSubmitLoading(true);
+      try {
+        await StudentService.restore(student.studentTermId);
+        toast.success(MESSAGES.RESTORE_SUCCESS);
+        fetchStudents();
+      } catch {
+        toast.error(MESSAGES.RESTORE_ERROR);
+      } finally {
+        setSubmitLoading(false);
+      }
+    },
+    [toast, MESSAGES, fetchStudents]
+  );
+
+  const handleDownloadTemplate = useCallback(async () => {
+    if (!termId) return;
+    try {
+      const response = await StudentService.getTemplate(termId);
+      const url = window.URL.createObjectURL(new Blob([response]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', STUDENT_ENROLLMENT.MODALS.IMPORT.TEMPLATE_FILENAME);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      toast.error(MESSAGES.DOWNLOAD_TEMPLATE_ERROR);
+    }
+  }, [termId, toast]);
+
+  const handleView = useCallback(
+    async (student) => {
+      setLoading(true);
+      try {
+        const response = await StudentService.getById(student.studentTermId);
+        if (response?.data) {
+          handleOpenDetails(StudentService.mapStudent(response.data));
+        }
+      } catch {
+        toast.error(MESSAGES.DETAIL_LOAD_ERROR);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [handleOpenDetails, toast]
   );
 
   return {
+    termId,
     searchTerm,
     statusFilter,
-    majorFilter,
     pagination,
     importVisible,
     addVisible,
     editVisible,
     detailsVisible,
+    loading,
     submitLoading,
     selectedStudent: selectedRecord,
-    filteredStudents,
+    students,
+    selectedIds,
 
-    setSearchTerm: handleSearchChange, // maintain old naming for internal consistency if needed
-    setStatusFilter: handleStatusChange,
-    setMajorFilter: handleMajorChange,
-    setCurrentPage: handlePageChange,
+    onTermChange: handleTermChange,
+    onSearchChange: handleSearchChange,
+    onStatusChange: handleStatusChange,
+    onPageChange: handlePageChange,
     setImportVisible,
     setAddVisible,
+    onAdd: handleOpenAdd,
     setEditVisible,
     setDetailsVisible,
+    setSelectedIds,
 
-    handleView: handleOpenDetails,
+    handleView,
     handleEdit: handleOpenEdit,
     handleDelete,
+    handleRestore,
     handleUpdateStudent,
     handleAddStudent,
-    handleImportStudents,
+    handleImportPreview,
+    handleImportConfirm,
+    handleBulkWithdraw,
+    handleDownloadTemplate,
+    sortBy,
+    sortOrder,
+    handleSortChange,
   };
 };

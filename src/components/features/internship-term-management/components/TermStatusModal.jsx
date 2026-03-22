@@ -3,13 +3,16 @@ import { Input, Typography } from 'antd';
 import React, { useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import {
+  INTERNSHIP_MANAGEMENT_UI,
+  TERM_STATUS,
+} from '@/constants/internship-management/internship-management';
 
 const { Text } = Typography;
 
 const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
   const { STATUS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
-  const isOpening = Number(newStatus) === 2;
+  const isOpening = Number(newStatus) === TERM_STATUS.ACTIVE;
   const [reason, setReason] = useState('');
 
   const statusLabel =

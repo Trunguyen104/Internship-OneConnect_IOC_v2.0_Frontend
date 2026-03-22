@@ -1,3 +1,24 @@
+export const TERM_STATUS = {
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
+  CLOSED: 4,
+};
+
+export const ENROLLMENT_STATUS = {
+  ACTIVE: 1,
+  WITHDRAWN: 2,
+};
+
+export const PLACEMENT_STATUS = {
+  UNPLACED: 0,
+  PLACED: 1,
+};
+
+export const TERM_STATUS_MAP = Object.fromEntries(
+  Object.entries(TERM_STATUS).map(([k, v]) => [v, k])
+);
+
 export const INTERNSHIP_MANAGEMENT_UI = {
   GROUP_MANAGEMENT: {
     TITLE: 'Internship Group Management',
@@ -10,6 +31,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     FILTERS: {
       SEARCH_PLACEHOLDER: 'Search groups...',
       STATUS_FILTER: 'Status',
+      SELECT_TERM: 'Select Term',
+      SELECT_STATUS: 'Select Status',
     },
     TABLE: {
       COLUMNS: {
@@ -39,14 +62,20 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     MODALS: {
       CREATE: {
         TITLE: 'Create New Internship Group',
+        TITLE_EDIT: 'Edit Internship Group',
         SUBTITLE: 'Create a new internship group for this term',
+        SUBTITLE_EDIT: 'Update group information and field',
         SUBMIT: 'Create Group',
+        SUBMIT_EDIT: 'Update Group',
         CANCEL: 'Cancel',
         NAME_LABEL: 'Group Name',
         NAME_REQUIRED: 'Please enter group name',
         NAME_PLACEHOLDER: 'Ex: Web Frontend A',
         TRACK_LABEL: 'Track',
         TRACK_REQUIRED: 'Please select a track',
+        STUDENTS_LABEL: 'Select Students',
+        STUDENTS_PLACEHOLDER: 'Search and select at least 1 student...',
+        STUDENTS_REQUIRED: 'Internship group must have at least 1 student',
         TRACK_OPTIONS: {
           FRONTEND: 'Frontend',
           BACKEND: 'Backend',
@@ -70,6 +99,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
       VIEW: {
         TITLE: 'Group Details:',
+        DEFAULT_SUBTITLE: 'Internship Group Information',
         TRACK: 'Track / Field',
         STATUS: 'Status',
         MEMBERS: 'Team Members',
@@ -77,9 +107,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         TOTAL_MEMBERS: 'Total Members',
         MENTOR: 'Assigned Mentor',
         PROJECT_NAME: 'Project Name',
-        NOT_ASSIGNED: 'Not Assigned',
-        STUDENTS_SUFFIX: 'Students',
-        DEFAULT_SUBTITLE: 'Internship Group',
+        STUDENTS_SUFFIX: 'students',
         CLOSE: 'Close',
       },
     },
@@ -232,6 +260,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
       DETAIL: {
         TITLE: 'Student Information',
+        UNIVERSITY: 'University',
         MAJOR: 'Major / Field',
         STATUS: 'Status',
         EMAIL: 'Email Address',
@@ -239,6 +268,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         DOB: 'Date of Birth',
         GROUP: 'Group',
         MENTOR: 'Mentor',
+        PROJECT: 'Project',
         PLACEMENT_DATE: 'Placement Date',
         CLOSE: 'Close',
       },
@@ -256,133 +286,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     },
   },
   UNI_ADMIN: {
-    STUDENT_ENROLLMENT: {
-      TITLE: 'Student Enrollment',
-      SEARCH_PLACEHOLDER: 'Search by name or student ID...',
-      STATUS_FILTER: 'Status: All',
-      MAJOR_FILTER: 'Major: All',
-      STATUS_OPTIONS: [
-        { label: 'Placed', value: 'PLACED' },
-        { label: 'Unplaced', value: 'UNPLACED' },
-        { label: 'Withdrawn', value: 'WITHDRAWN' },
-      ],
-      STATUS_LABELS: {
-        PLACED: 'Placed',
-        UNPLACED: 'Unplaced',
-        WITHDRAWN: 'Withdrawn',
-      },
-      MAJOR_OPTIONS: [
-        { label: 'Software Engineering', value: 'Software Engineering' },
-        { label: 'Information Security', value: 'Information Security' },
-        { label: 'Graphic Design', value: 'Graphic Design' },
-      ],
-      ACTIONS: {
-        ADD: 'Add Student',
-        IMPORT: 'Import from Excel',
-        EDIT: 'Edit',
-        DELETE: 'Withdraw',
-        VIEW: 'View Details',
-        RECOVER: 'Re-enroll',
-      },
-      TABLE: {
-        COLUMNS: {
-          FULL_NAME: 'FULL NAME',
-          STUDENT_ID: 'STUDENT ID',
-          EMAIL: 'EMAIL',
-          MAJOR: 'MAJOR',
-          PLACEMENT: 'PLACEMENT',
-          STATUS: 'STATUS',
-          ACTIONS: 'ACTIONS',
-        },
-      },
-      MODALS: {
-        ADD_EDIT: {
-          TITLE_ADD: 'Add New Student',
-          SUBTITLE_ADD: 'Add a new student to the internship enrollment list',
-          TITLE_EDIT: 'Update Student Information',
-          SUBTITLE_EDIT: 'Update detailed information for student',
-          TITLE_VIEW: 'Student Details',
-          SUBTITLE_VIEW: 'View detailed information and internship status',
-
-          SECTION_PERSONAL: 'Personal Information',
-          SECTION_PLACEMENT: 'Placement Settings',
-
-          NAME_LABEL: 'Full Name',
-          NAME_PLACEHOLDER: 'Ex: John Doe',
-          NAME_REQUIRED: 'Please enter full name',
-
-          ID_LABEL: 'Student ID',
-          ID_PLACEHOLDER: 'Ex: ST2024001',
-          ID_REQUIRED: 'Please enter student ID',
-
-          EMAIL_LABEL: 'Student Email',
-          EMAIL_PLACEHOLDER: 'Ex: student@university.edu',
-          EMAIL_REQUIRED: 'Please enter student email',
-          EMAIL_INVALID: 'Invalid email address',
-
-          MAJOR_LABEL: 'Major',
-          MAJOR_PLACEHOLDER: 'Select major',
-          MAJOR_REQUIRED: 'Please select a major',
-
-          PHONE_LABEL: 'Phone Number',
-          PHONE_PLACEHOLDER: 'Ex: 0901234567',
-
-          STATUS_LABEL: 'Current Status',
-          ENTERPRISE_LABEL: 'Assigned Enterprise',
-          ENTERPRISE_PLACEHOLDER: 'Not assigned yet',
-
-          CANCEL: 'Cancel',
-          SUBMIT_ADD: 'Add Student',
-          SUBMIT_EDIT: 'Update',
-          CLOSE: 'Close',
-
-          TABS: {
-            GENERAL: 'General',
-            PLACEMENT: 'Placement',
-            FEEDBACK: 'Feedback',
-          },
-          FEEDBACK_EMPTY: {
-            TITLE: 'No Feedback Records',
-            SUBTITLE: 'Evaluations will appear here later',
-          },
-          PHASE_TEXT: {
-            PREFIX: 'This student is currently in the',
-            SUFFIX:
-              'phase. Business details and evaluations will be updated as the internship progresses.',
-          },
-        },
-        IMPORT: {
-          TITLE: 'Import Student List',
-          SUBTITLE: 'Upload student list to enroll them in the internship term',
-          DRAG_TEXT: 'Drag & drop file here or click to select',
-          HINT_TEXT: 'Supports .xls, .xlsx files. Max size 10MB.',
-          DOWNLOAD_TEMPLATE: 'Download template here',
-          PREVIEW_TITLE: 'Data Preview',
-          VALID_TAG: 'Valid',
-          INVALID_TAG: 'Error',
-          CANCEL: 'Cancel',
-          SUBMIT: 'Start Import',
-
-          PREVIEW_COLUMNS: {
-            FULL_NAME: 'Full Name',
-            STUDENT_ID: 'Student ID',
-            EMAIL: 'Email',
-            VALIDITY: 'Validity',
-          },
-          TOOLTIPS: {
-            VALID: 'Valid Data',
-            ERROR: 'Data Error',
-          },
-        },
-      },
-      MESSAGES: {
-        IMPORT_SUCCESS: 'Student list imported successfully',
-        ADD_SUCCESS: 'Student added successfully',
-        UPDATE_SUCCESS: 'Information updated successfully',
-        DELETE_CONFIRM: 'Are you sure you want to delete this student from the internship term?',
-        DELETE_SUCCESS: 'Student deleted successfully',
-      },
-    },
     TERM_MANAGEMENT: {
       TITLE: 'Internship Term Management',
       CREATE_BTN: 'Create New Term',
@@ -414,6 +317,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         Active: 'Active',
         Ended: 'Ended',
         Closed: 'Closed',
+        STALE: 'Stale / Unknown',
       },
       ACTIONS: {
         CLOSE: 'Close Term',
@@ -430,6 +334,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           NAME_PLACEHOLDER: 'Ex: Semester 1 - 2024',
           NAME_REQUIRED: 'Please enter term name',
           NAME_MAX: 'Name cannot exceed 100 characters',
+          UNIVERSITY_LABEL: 'University',
+          UNIVERSITY_REQUIRED: 'Please select a university',
           START_DATE_LABEL: 'Start Date',
           START_DATE_REQUIRED: 'Please select start date',
           END_DATE_LABEL: 'End Date',
@@ -479,6 +385,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         ID_ERROR: 'Could not identify term ID',
         SAVE_ERROR: 'Failed to save term information',
         DELETE_ERROR: 'Failed to delete term',
+        STATUS_UPDATE_ERROR: 'Failed to update status',
+        CLOSE_DEFAULT_REASON: 'Term closed by Admin',
       },
     },
     DASHBOARD: {

@@ -58,7 +58,7 @@ async function request(path, options = {}) {
           }
           return await retryRes.text();
         }
-      } catch (e) {
+      } catch {
         // Silent: caller will handle the 401/refresh failure via thrown error below.
       }
     }
@@ -79,7 +79,7 @@ async function request(path, options = {}) {
 export const httpGet = (path, params = {}, options = {}) => {
   // Filter out undefined and null values
   const cleanParams = Object.fromEntries(
-    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null)
+    Object.entries(params).filter(([, v]) => v !== undefined && v !== null)
   );
 
   const query = new URLSearchParams(cleanParams).toString();

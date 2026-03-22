@@ -1,9 +1,8 @@
 'use client';
 
 import { CalendarOutlined, DashboardOutlined, TeamOutlined } from '@ant-design/icons';
-import React from 'react';
 
-import BaseSidebar from './BaseSidebar';
+import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
 const adminMenu = [
   { icon: <DashboardOutlined />, label: 'Dashboard', href: '/admin-dashboard' },
@@ -12,5 +11,15 @@ const adminMenu = [
 ];
 
 export default function SidebarAdmin() {
-  return <BaseSidebar menus={adminMenu} activeStrategy="prefix" />;
+  return (
+    <ProfileAwareSidebar
+      defaultMenus={adminMenu}
+      profilePrefix="/profile"
+      profileBackButton={{
+        href: '/admin-dashboard',
+        label: 'Back',
+        className: 'text-primary hover:text-primary-hover',
+      }}
+    />
+  );
 }

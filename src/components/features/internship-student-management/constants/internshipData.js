@@ -60,6 +60,26 @@ export const MOCK_STUDENTS = [
     placedDate: '2024-03-10',
     avatar:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuCaU9FTU6qNRwJ_VLQVNsjlI5KMYyltjw0mXBvLZWYqHyVr2BxhziIC1287YoOGgEywagsmncipmfU-b_OI5eRpAPbZGVRaGa_z1VLq-soJB72FCBahfmoGVYvApM1QaZqOT3xVrNPlKmo1v_wrg1fVm2N7HtLPu8oPaIPpGYTDxNWUnf1DojH1XbCag9L1aTdiTRA2cEKTEoA6ywVo2KFyGJf-8YeON5kLc5nJWg5FhQOF7eWzm9Gl4yP2RUd_fianSgVV2Km7mBM',
+    logs: [
+      {
+        action: 'Student confirmed internship placement.',
+        timestamp: '2024-03-10T09:00:00Z',
+        type: 'SYSTEM',
+        actor: 'System',
+      },
+      {
+        action: 'Assigned to group Web Frontend A.',
+        timestamp: '2024-03-12T14:30:00Z',
+        type: 'GROUP_CHANGE',
+        actor: 'HR Alice',
+      },
+      {
+        action: 'Assigned mentor Sarah Jenkins.',
+        timestamp: '2024-03-15T10:15:00Z',
+        type: 'MENTOR_CHANGE',
+        actor: 'HR Bob',
+      },
+    ],
   },
   {
     key: '6',

@@ -1,15 +1,30 @@
-'use client';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useStudentFilters = () => {
+  const [termId, setTermId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [majorFilter, setMajorFilter] = useState('');
+  const [sortBy, setSortBy] = useState('FullName');
+  const [sortOrder, setSortOrder] = useState('Asc');
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const handleTermChange = useCallback((value) => {
+    setTermId(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, []);
 
   const handleSearchChange = useCallback((value) => {
     setSearchTerm(value);
@@ -21,24 +36,29 @@ export const useStudentFilters = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
-  const handleMajorChange = useCallback((value) => {
-    setMajorFilter(value || '');
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
   const handlePageChange = useCallback((page) => {
     setPagination((prev) => ({ ...prev, current: page }));
   }, []);
 
+  const handleSortChange = useCallback((newSortBy, newSortOrder) => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, []);
+
   return {
+    termId,
     searchTerm,
+    debouncedSearchTerm,
     statusFilter,
-    majorFilter,
+    sortBy,
+    sortOrder,
     pagination,
     setPagination,
+    handleTermChange,
     handleSearchChange,
     handleStatusChange,
-    handleMajorChange,
     handlePageChange,
+    handleSortChange,
   };
 };

@@ -1,0 +1,54 @@
+﻿
+> ioc@0.1.0 lint
+> eslint .
+
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\components\DataGrid.jsx
+  195:5  warning  React Hook useMemo has a missing dependency: 'PLACEMENT_LABELS.UNPLACED'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\components\StudentFormModal.jsx
+  96:1  error  Delete `ΓÉìΓÅÄ`  prettier/prettier
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-enrollment-management\hooks\useStudentEnrollment.js
+   95:6   warning  React Hook useCallback has a missing dependency: 'pagination'. Either include it or remove the dependency array. Mutable values like 'pagination.current' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  243:14  warning  'error' is defined but never used                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  243:14  warning  'error' is defined but never used                                                                                                                                                                                                          unused-imports/no-unused-vars
+  257:16  warning  'error' is defined but never used                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  257:16  warning  'error' is defined but never used                                                                                                                                                                                                          unused-imports/no-unused-vars
+  277:14  warning  'error' is defined but never used                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  277:14  warning  'error' is defined but never used                                                                                                                                                                                                          unused-imports/no-unused-vars
+  280:6   warning  React Hook useCallback has a missing dependency: 'MESSAGES.DOWNLOAD_TEMPLATE_ERROR'. Either include it or remove the dependency array                                                                                                      react-hooks/exhaustive-deps
+  290:16  warning  'error' is defined but never used                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  290:16  warning  'error' is defined but never used                                                                                                                                                                                                          unused-imports/no-unused-vars
+  296:5   warning  React Hook useCallback has a missing dependency: 'MESSAGES.DETAIL_LOAD_ERROR'. Either include it or remove the dependency array                                                                                                            react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-management\components\InternshipTable.jsx
+  183:5  warning  React Hook useMemo has an unnecessary dependency: 'STATUS_LABELS'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-management\hooks\useInternshipManagement.js
+  15:24  warning  'setMentorFilter' is assigned a value but never used                                        @typescript-eslint/no-unused-vars
+  15:24  warning  'setMentorFilter' is assigned a value but never used. Allowed unused vars must match /^_/u  unused-imports/no-unused-vars
+  79:1   error    Delete `ΓÉìΓÅÄ`                                                                                 prettier/prettier
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-term-management\hooks\useTermManagement.js
+  82:6  warning  React Hook useCallback has a missing dependency: 'statusFilter'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  82:7  error    Replace `ΓÉìΓÅÄ┬╖┬╖┬╖┬╖pagination,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖sortConfig,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖searchTerm,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖toast,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖setPagination,ΓÉìΓÅÄ┬╖┬╖` with `pagination,┬╖sortConfig,┬╖searchTerm,┬╖toast,┬╖setPagination`  prettier/prettier
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\logbook\hooks\useLogbook.js
+  53:6  warning  React Hook useEffect has a missing dependency: 'internshipId'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\user\hooks\useProfile.js
+  93:1  error  Delete `ΓÉìΓÅÄ`  prettier/prettier
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\violation-reports\components\ViolationReportTable.jsx
+  24:1  error  Delete `ΓÉìΓÅÄ`  prettier/prettier
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\violation-reports\hooks\useViolationReports.js
+  53:7  error  Replace `ΓÉìΓÅÄ┬╖┬╖┬╖┬╖debouncedSearch,ΓÉìΓÅÄ┬╖┬╖┬╖┬╖params,ΓÉìΓÅÄ┬╖┬╖` with `debouncedSearch,┬╖params`  prettier/prettier
+
+D:\ProjectOJT\internship-oneconnect_ioc_v2.0_frontend\src\components\features\violation-reports\services\violationReportService.js
+  1:1  error  Delete `ΓÉìΓÅÄ`  prettier/prettier
+
+Γ£û 24 problems (7 errors, 17 warnings)
+  7 errors and 0 warnings potentially fixable with the `--fix` option.
+

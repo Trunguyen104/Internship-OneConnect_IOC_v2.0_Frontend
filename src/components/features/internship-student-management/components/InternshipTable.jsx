@@ -180,7 +180,7 @@ const InternshipTable = memo(function InternshipTable({
         },
       },
     ],
-    [page, pageSize, onAccept, onReject, onAssign, onGroup, onView, TABLE, ACTIONS, STATUS_LABELS]
+    [page, pageSize, onAccept, onReject, onAssign, onGroup, onView, TABLE, ACTIONS]
   );
 
   return (

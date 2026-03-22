@@ -1,7 +1,7 @@
 'use client';
 
 import { SaveOutlined } from '@ant-design/icons';
-import { Col, DatePicker, Form, Input, Row } from 'antd';
+import { Col, DatePicker, Form, Input, Row, Select } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 
@@ -50,7 +50,16 @@ const TermStats = ({ initialValues }) => {
   );
 };
 
-const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) => {
+const TermFormBody = ({
+  initialValues,
+  onSave,
+  onCancel,
+  loading,
+  viewOnly,
+  isSuperAdmin,
+  universities,
+  userUniversity,
+}) => {
   const [form] = Form.useForm();
   const { FORM } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
 
@@ -103,6 +112,32 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
           >
             <Input placeholder={FORM.NAME_PLACEHOLDER} className="h-10" />
           </Form.Item>
+
+          {isSuperAdmin ? (
+            <Form.Item
+              name="universityId"
+              label={FORM.UNIVERSITY_LABEL}
+              rules={[{ required: true, message: FORM.UNIVERSITY_REQUIRED }]}
+            >
+              <Select
+                placeholder={FORM.UNIVERSITY_LABEL}
+                className="h-10 w-full"
+                loading={loading}
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                options={universities.map((uni) => ({
+                  value: uni.universityId,
+                  label: uni.name,
+                }))}
+              />
+            </Form.Item>
+          ) : (
+            <Form.Item label={FORM.UNIVERSITY_LABEL}>
+              <Input value={userUniversity?.name || ''} disabled className="h-10" />
+            </Form.Item>
+          )}
 
           <Row gutter={16}>
             <Col span={12}>

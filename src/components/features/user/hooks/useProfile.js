@@ -25,7 +25,6 @@ export function useProfile() {
   const [newSkill, setNewSkill] = useState({ name: '', level: '' });
   const [skillError, setSkillError] = useState('');
 
-  const [selectMode, setSelectMode] = useState(false);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [editingSkill, setEditingSkill] = useState(null);
@@ -89,19 +88,6 @@ export function useProfile() {
         toast.success('Skills deleted successfully', `Removed ${count} skills`);
       },
     });
-  };
-
-  const updateSkill = () => {
-    if (!editForm.name.trim()) return;
-    setSkills((prev) => prev.map((s) => (s.name === editingSkill ? editForm : s)));
-    setEditingSkill(null);
-    toast.success('Cập nhật thành công');
-  };
-
-  const deleteSkill = (skillName) => {
-    setSkills((prev) => prev.filter((s) => s.name !== skillName));
-    setEditingSkill(null);
-    toast.success('Đã xóa kỹ năng');
   };
 
   return {

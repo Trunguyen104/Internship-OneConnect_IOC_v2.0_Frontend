@@ -6,6 +6,7 @@ import { Button, Space, Spin } from 'antd';
 
 import AvatarUploader from '@/components/ui/avataruploader';
 import Card from '@/components/ui/card';
+import { USER_ROLE } from '@/constants/common/enums';
 import { PROFILE_UI } from '@/constants/user/uiText';
 import { UI_TEXT } from '@/lib/UI_Text';
 
@@ -43,7 +44,9 @@ export default function ProfileInfo({
               {PROFILE_UI.BUTTONS.EDIT}
             </Button>
 
-            {userInfo?.role === 'Student' && <Button>{PROFILE_UI.BUTTONS.UPLOAD_CV}</Button>}
+            {[USER_ROLE.STUDENT, 'student'].includes(String(userInfo?.role).toLowerCase()) && (
+              <Button>{PROFILE_UI.BUTTONS.UPLOAD_CV}</Button>
+            )}
           </Space>
         </div>
 
@@ -77,7 +80,7 @@ export default function ProfileInfo({
               <InfoItem label={PROFILE_UI.LABELS.GENDER} value={userInfo?.gender || '—'} />
 
               {/* Role Specific Metadata */}
-              {userInfo?.role === 'Student' && (
+              {[USER_ROLE.STUDENT, 'student'].includes(String(userInfo?.role).toLowerCase()) && (
                 <>
                   <InfoItem
                     label={PROFILE_UI.LABELS.UNIVERSITY}
@@ -104,9 +107,14 @@ export default function ProfileInfo({
                 </>
               )}
 
-              {(userInfo?.role === 'Mentor' ||
-                userInfo?.role === 'HR' ||
-                userInfo?.role === 'EnterpriseAdmin') && (
+              {[
+                USER_ROLE.MENTOR,
+                USER_ROLE.HR,
+                USER_ROLE.ENTERPRISE_ADMIN,
+                'mentor',
+                'hr',
+                'enterpriseadmin',
+              ].includes(String(userInfo?.role).toLowerCase()) && (
                 <>
                   <InfoItem
                     label={UI_TEXT.ENTERPRISES.ENTERPRISE}
@@ -123,7 +131,9 @@ export default function ProfileInfo({
                 </>
               )}
 
-              {userInfo?.role === 'SchoolAdmin' && (
+              {[USER_ROLE.SCHOOL_ADMIN, 'schooladmin'].includes(
+                String(userInfo?.role).toLowerCase()
+              ) && (
                 <>
                   <InfoItem
                     label={PROFILE_UI.LABELS.UNIVERSITY}

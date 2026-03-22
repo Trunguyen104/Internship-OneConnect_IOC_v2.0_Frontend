@@ -1,4 +1,4 @@
-export function setAccessToken(_token) {
+export function setAccessToken() {
   // Handled via HttpOnly cookies
 }
 
