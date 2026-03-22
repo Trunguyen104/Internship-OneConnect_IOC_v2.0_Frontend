@@ -1,6 +1,7 @@
 'use client';
 
 import { Empty } from 'antd';
+
 import SkeletonTable from './SkeletonTable';
 
 export default function DataTable({
@@ -15,7 +16,7 @@ export default function DataTable({
 }) {
   if (loading && (!Array.isArray(data) || data.length === 0)) {
     return (
-      <div className='flex flex-1 flex-col py-6'>
+      <div className="flex flex-1 flex-col py-6">
         <SkeletonTable rows={10} columns={columns.length || 4} />
       </div>
     );
@@ -23,17 +24,17 @@ export default function DataTable({
 
   if (!Array.isArray(data) || data.length === 0) {
     return (
-      <div className='flex flex-1 items-center justify-center py-12'>
-        <Empty description={<span className='text-muted font-medium'>{emptyText}</span>} />
+      <div className="flex flex-1 items-center justify-center py-12">
+        <Empty description={<span className="text-muted font-medium">{emptyText}</span>} />
       </div>
     );
   }
 
   return (
     <div className={`mt-5 flex min-h-0 flex-1 flex-col ${className}`}>
-      <div className='flex-1 overflow-auto'>
-        <table className='w-full table-fixed border-collapse text-left' style={{ minWidth }}>
-          <thead className='border-border bg-bg sticky top-0 z-10 border-b'>
+      <div className="flex-1 overflow-auto">
+        <table className="w-full table-fixed border-collapse text-left" style={{ minWidth }}>
+          <thead className="border-border bg-bg sticky top-0 z-10 border-b">
             <tr>
               {columns.map((col, index) => (
                 <th
@@ -46,7 +47,7 @@ export default function DataTable({
               ))}
             </tr>
           </thead>
-          <tbody className='divide-border/50 divide-y'>
+          <tbody className="divide-border/50 divide-y">
             {data.filter(Boolean).map((record, index) => (
               <tr
                 key={record?.[rowKey] || record?.id || record?.key || index}

@@ -1,4 +1,4 @@
-import { httpGet, httpPost, httpPut, httpDelete, httpPatch } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
 
 export const EvaluationService = {
   // --- CYCLES ---
@@ -56,15 +56,19 @@ export const EvaluationService = {
     return httpPost(`/evaluations/cycles/${cycleId}/evaluations/batch`, data);
   },
 
-  individualGrade(cycleId, data) {
-    return httpPost(`/evaluations/cycles/${cycleId}/evaluations/individual`, data);
+  submitEvaluations(cycleId, internshipId) {
+    return httpPatch(
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`
+    );
   },
 
-  publishEvaluations(cycleId, data) {
-    return httpPatch(`/evaluations/cycles/${cycleId}/evaluations/publish`, data);
+  publishEvaluations(cycleId, internshipId) {
+    return httpPatch(
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`
+    );
   },
 
-  // --- STUDENT ---
+  // --- Student Endpoints (api/students/me prefixed) ---
   getStudentEvaluationCycles(internshipId) {
     return httpGet(`/students/me/internships/${internshipId}/evaluation-cycles`);
   },

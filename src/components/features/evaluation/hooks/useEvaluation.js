@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { EvaluationService } from '../services/evaluation.service';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { useToast } from '@/providers/ToastProvider';
+
+import { EvaluationService } from '../services/evaluation.service';
 
 export function useEvaluation() {
   const toast = useToast();
@@ -98,7 +100,7 @@ export function useEvaluation() {
         setLoadingTeam(false);
       }
     },
-    [toast],
+    [toast]
   );
 
   // =========================
@@ -117,7 +119,7 @@ export function useEvaluation() {
         setLoadingMyEval(false);
       }
     },
-    [toast],
+    [toast]
   );
 
   // =========================

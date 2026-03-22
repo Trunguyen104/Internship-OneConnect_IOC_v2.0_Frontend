@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import Input from '@/components/ui/input';
 
-import { AUTH_UI, AUTH_MESSAGES } from '@/constants/auth/uiText';
+import Input from '@/components/ui/input';
+import { AUTH_MESSAGES, AUTH_UI } from '@/constants/auth/uiText';
 
 export default function ForgotPasswordPage() {
   const [form, setForm] = useState({
@@ -49,31 +49,31 @@ export default function ForgotPasswordPage() {
 
   return (
     <div
-      className='flex h-screen w-full items-center justify-center'
+      className="flex h-screen w-full items-center justify-center"
       style={{
         background:
           'radial-gradient(circle at top left, var(--primary-100) 0%, var(--color-surface) 65%)',
       }}
     >
-      <div className='w-full max-w-105 px-6'>
+      <div className="w-full max-w-105 px-6">
         <Image
-          src='/assets/images/logo.svg'
+          src="/assets/images/logo.svg"
           alt={AUTH_UI.LABELS.LOGO}
           width={180}
           height={45}
-          className='mx-auto mb-6'
+          className="mx-auto mb-6"
         />
 
-        <h1 className='mb-4 text-center text-4xl font-bold text-black'>
+        <h1 className="mb-4 text-center text-4xl font-bold text-black">
           {AUTH_UI.FORGOT_PASSWORD.TITLE}
         </h1>
-        <p className='mb-6 text-center text-gray-500'>{AUTH_UI.FORGOT_PASSWORD.DESC}</p>
+        <p className="mb-6 text-center text-gray-500">{AUTH_UI.FORGOT_PASSWORD.DESC}</p>
 
         {success ? (
-          <div className='text-center'>
-            <p className='text-success mb-4'>{AUTH_UI.FORGOT_PASSWORD.SUCCESS_TEXT}</p>
+          <div className="text-center">
+            <p className="text-success mb-4">{AUTH_UI.FORGOT_PASSWORD.SUCCESS_TEXT}</p>
 
-            <Link href='/login' className='font-semibold text-(--primary-700) hover:underline'>
+            <Link href="/login" className="font-semibold text-(--primary-700) hover:underline">
               {AUTH_UI.FORGOT_PASSWORD.BACK_TO_LOGIN}
             </Link>
           </div>
@@ -81,8 +81,8 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit}>
             <Input
               label={AUTH_UI.LABELS.EMAIL}
-              name='email'
-              type='email'
+              name="email"
+              type="email"
               value={form.email}
               onChange={handleChange}
               placeholder={AUTH_UI.LABELS.EMAIL_PLACEHOLDER}
@@ -90,14 +90,14 @@ export default function ForgotPasswordPage() {
             />
 
             <button
-              type='submit'
-              className='mt-2 h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)'
+              type="submit"
+              className="mt-2 h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)"
             >
               {AUTH_UI.FORGOT_PASSWORD.BUTTON}
             </button>
 
-            <div className='mt-4 text-center text-sm'>
-              <Link href='/login' className='font-medium text-(--primary-700) hover:underline'>
+            <div className="mt-4 text-center text-sm">
+              <Link href="/login" className="font-medium text-(--primary-700) hover:underline">
                 {AUTH_UI.FORGOT_PASSWORD.BACK_TO_LOGIN}
               </Link>
             </div>

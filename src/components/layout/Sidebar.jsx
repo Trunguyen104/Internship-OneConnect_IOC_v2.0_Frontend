@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { useParams, usePathname } from 'next/navigation';
 import {
   AppstoreOutlined,
   BarChartOutlined,
-  TeamOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  UserOutlined,
-  ShopOutlined,
   LockOutlined,
   ProjectOutlined,
+  ShopOutlined,
+  TeamOutlined,
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
 } from '@ant-design/icons';
+import { useParams, usePathname } from 'next/navigation';
+import React, { useMemo } from 'react';
+
 import BaseSidebar from './BaseSidebar';
 
 export default function Sidebar() {
@@ -22,7 +23,7 @@ export default function Sidebar() {
 
   const basePath = useMemo(
     () => (internshipGroupId ? `/internship-groups/${internshipGroupId}` : '/internship-groups'),
-    [internshipGroupId],
+    [internshipGroupId]
   );
 
   const studentMenu = useMemo(
@@ -40,7 +41,7 @@ export default function Sidebar() {
       { icon: <UserOutlined />, label: 'Stakeholders', href: `${basePath}/stakeholder` },
       { icon: <ShopOutlined />, label: 'Violations', href: `${basePath}/violation` },
     ],
-    [basePath],
+    [basePath]
   );
 
   const profileMenu = useMemo(
@@ -52,7 +53,7 @@ export default function Sidebar() {
         href: `${basePath}/profile/change-password`,
       },
     ],
-    [basePath],
+    [basePath]
   );
 
   const isProfile = pathname.startsWith(`${basePath}/profile`);

@@ -1,13 +1,13 @@
 'use client';
 
+import { PlusOutlined } from '@ant-design/icons';
 import { Upload } from 'antd';
 import ImgCrop from 'antd-img-crop';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function AvatarUploader({ value, onChange, size = 116, fullName }) {
-  const [loading, setLoading] = useState(false);
   const toast = useToast();
 
   const getInitials = (name) => {
@@ -30,56 +30,46 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
       return false;
     }
 
-    setLoading(true);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      onChange?.(reader.result);
-      setLoading(false);
-
-      toast.success('Update avatar successfully');
-    };
-
-    reader.readAsDataURL(file);
+    onChange?.(file);
     return false;
   };
 
+  const displayImage = value instanceof File ? URL.createObjectURL(value) : value;
+
   return (
-    <ImgCrop rotationSlider>
+    <ImgCrop rotationSlider aspect={1}>
       <Upload showUploadList={false} beforeUpload={beforeUpload}>
         <div
-          className='group relative flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-slate-300 bg-slate-200 hover:border-red-400'
+          className="group relative flex cursor-pointer items-center justify-center overflow-hidden rounded-full border border-slate-300 bg-slate-200 hover:border-red-400"
           style={{ width: size, height: size }}
         >
-          {value ? (
+          {displayImage ? (
             <>
               <img
-                src={value}
-                alt='avatar'
-                className='h-full w-full object-cover'
+                src={displayImage}
+                alt="avatar"
+                className="h-full w-full object-cover"
                 draggable={false}
               />
-              <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
-                <PlusOutlined className='text-xl' />
-                <span className='mt-1 text-xs font-semibold'>Edit avatar</span>
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                <PlusOutlined className="text-xl" />
+                <span className="mt-1 text-xs font-semibold">{UI_TEXT.UPLOADER.EDIT_AVATAR}</span>
               </div>
             </>
           ) : (
-            <div className='flex h-full w-full flex-col items-center justify-center text-slate-500'>
-              {loading ? (
-                <LoadingOutlined className='text-3xl' />
-              ) : fullName ? (
+            <div className="flex h-full w-full flex-col items-center justify-center text-slate-500">
+              {fullName ? (
                 <>
-                  <span className='text-4xl font-bold text-slate-700'>{getInitials(fullName)}</span>
-                  <div className='absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100'>
-                    <PlusOutlined className='text-xl' />
-                    <span className='mt-1 text-xs font-semibold'>Upload</span>
+                  <span className="text-4xl font-bold text-slate-700">{getInitials(fullName)}</span>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                    <PlusOutlined className="text-xl" />
+                    <span className="mt-1 text-xs font-semibold">{UI_TEXT.COMMON.UPLOAD}</span>
                   </div>
                 </>
               ) : (
                 <>
-                  <PlusOutlined className='mb-1 text-2xl' />
-                  <span className='text-xs font-medium'>Upload</span>
+                  <PlusOutlined className="mb-1 text-2xl" />
+                  <span className="text-xs font-medium">{UI_TEXT.COMMON.UPLOAD}</span>
                 </>
               )}
             </div>

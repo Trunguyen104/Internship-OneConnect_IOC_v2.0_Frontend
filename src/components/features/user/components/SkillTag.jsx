@@ -7,7 +7,7 @@ export default function SkillTag({ skill, editMode, onEdit }) {
       <span>{skill.name}</span>
 
       {skill.level && (
-        <span className='bg-muted/10 text-muted rounded-full px-2 py-0.5 text-xs'>
+        <span className="bg-muted/10 text-muted rounded-full px-2 py-0.5 text-xs">
           {skill.level}
         </span>
       )}

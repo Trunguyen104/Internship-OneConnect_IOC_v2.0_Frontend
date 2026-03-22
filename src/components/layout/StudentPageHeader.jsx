@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 
 export default function StudentPageHeader({ title, subtitle, extra, hidden }) {

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { DashboardService } from './DashboardService';
 
 export const useUniAdminDashboard = () => {
@@ -8,23 +9,32 @@ export const useUniAdminDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState({
     totalStudents: 0,
-    activeTerms: 0,
+    totalTerms: 0,
     totalGroups: 0,
+    statusCounts: {
+      upcoming: 0,
+      active: 0,
+      ended: 0,
+      closed: 0,
+    },
   });
   const [recentTerms, setRecentTerms] = useState([]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [profileRes, statsRes, terms] = await Promise.all([
+      const [profileRes, dashboardData] = await Promise.all([
         DashboardService.getProfile(),
         DashboardService.getStats(),
-        DashboardService.getRecentTerms(5),
       ]);
 
-      if (profileRes?.data) setProfile(profileRes.data);
-      setStats(statsRes);
-      setRecentTerms(terms);
+      const profileData = profileRes?.data || profileRes;
+      if (profileData) setProfile(profileData);
+
+      if (dashboardData) {
+        setStats(dashboardData.stats);
+        setRecentTerms(dashboardData.terms);
+      }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {

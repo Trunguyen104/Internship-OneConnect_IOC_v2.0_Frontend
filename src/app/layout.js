@@ -1,6 +1,7 @@
-import { ToastProvider } from '../providers/ToastProvider';
-import { PageHeaderProvider } from '../providers/PageHeaderProvider';
 import './globals.css';
+
+import { PageHeaderProvider } from '../providers/PageHeaderProvider';
+import { ToastProvider } from '../providers/ToastProvider';
 
 export const metadata = {
   title: 'Internship OneConnect',
@@ -12,7 +13,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body>
         <PageHeaderProvider>
           <ToastProvider>{children}</ToastProvider>

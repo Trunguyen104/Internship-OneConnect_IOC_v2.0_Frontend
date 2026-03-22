@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { useToast } from '@/providers/ToastProvider';
-import { useUniversitiesStore } from '@/store/useUniversitiesStore';
-import { universityService } from '@/services/university.service';
 import LogoUploader from '@/components/ui/logouploader';
+import { Spinner } from '@/components/ui/spinner';
+import { UI_TEXT } from '@/lib/UI_Text';
+import { useToast } from '@/providers/ToastProvider';
+import { universityService } from '@/services/university.service';
+import { useUniversitiesStore } from '@/store/useUniversitiesStore';
 
 export default function UniversitiesForm({ university, onSuccess, onCancel }) {
   const toast = useToast();
@@ -63,82 +65,88 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className='mx-auto flex max-w-2xl flex-col gap-6'>
+    <form onSubmit={handleSubmit} className="mx-auto flex max-w-2xl flex-col gap-6">
       {isEdit && (
-        <div className='mb-6 flex justify-center'>
+        <div className="mb-6 flex justify-center">
           <LogoUploader
             value={logoUrl}
             onChange={setLogoUrl}
             size={160}
-            label='University Logo'
-            folder='Universities'
+            label="University Logo"
+            folder="Universities"
           />
         </div>
       )}
 
-      <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-        <Field className='md:col-span-2'>
-          <FieldLabel htmlFor='name'>University Name</FieldLabel>
+      <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Field className="md:col-span-2">
+          <FieldLabel htmlFor="name">{UI_TEXT.UNIVERSITIES.NAME}</FieldLabel>
           <Input
-            id='name'
-            name='name'
+            id="name"
+            name="name"
             defaultValue={university?.name}
             required
-            placeholder='Enter official name'
-            className='focus:ring-primary/20 h-12 rounded-xl border-slate-200 shadow-inner'
+            placeholder="Enter official name"
+            className="focus:ring-primary/20 h-12 rounded-xl border-slate-200 shadow-inner"
             error={errors.name}
           />
         </Field>
 
         <Field>
-          <FieldLabel htmlFor='code'>University Code</FieldLabel>
+          <FieldLabel htmlFor="code">{UI_TEXT.UNIVERSITIES.CODE}</FieldLabel>
           <Input
-            id='code'
-            name='code'
+            id="code"
+            name="code"
             defaultValue={university?.code}
             required
-            placeholder='EX: BK-HN'
-            className='h-11 rounded-xl border-slate-200'
+            placeholder="EX: BK-HN"
+            className="h-11 rounded-xl border-slate-200"
             error={errors.code}
           />
         </Field>
 
-        <Field className='md:col-span-2'>
-          <FieldLabel htmlFor='address'>Address</FieldLabel>
+        <Field className="md:col-span-2">
+          <FieldLabel htmlFor="address">{UI_TEXT.UNIVERSITIES.ADDRESS}</FieldLabel>
           <Input
-            id='address'
-            name='address'
+            id="address"
+            name="address"
             defaultValue={university?.address}
             required
-            placeholder='Enter headquarters address'
-            className='h-11 rounded-xl border-slate-200'
+            placeholder="Enter headquarters address"
+            className="h-11 rounded-xl border-slate-200"
             error={errors.address}
           />
         </Field>
       </FieldGroup>
 
       {formError && (
-        <div className='flex items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50 p-4 text-center text-sm font-semibold text-rose-600'>
-          <div className='h-2 w-2 animate-pulse rounded-full bg-rose-600' />
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50 p-4 text-center text-sm font-semibold text-rose-600">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-rose-600" />
           {formError}
         </div>
       )}
 
-      <div className='flex justify-end gap-3 border-t border-slate-100 pt-6'>
+      <div className="flex justify-end gap-3 border-t border-slate-100 pt-6">
         <Button
-          type='button'
-          variant='ghost'
-          className='h-11 rounded-full bg-slate-50 px-6 font-semibold text-slate-500 hover:bg-slate-100'
+          type="button"
+          variant="ghost"
+          className="h-11 rounded-full bg-slate-50 px-6 font-semibold text-slate-500 hover:bg-slate-100"
           onClick={() => onCancel?.()}
         >
-          Cancel
+          {UI_TEXT.BUTTON.CANCEL}
         </Button>
         <Button
-          type='submit'
+          type="submit"
           disabled={loading}
-          className='bg-primary hover:bg-primary/90 shadow-primary/20 h-11 min-w-[140px] rounded-full px-8 font-semibold text-white shadow-lg transition-all active:scale-[0.98]'
+          className="bg-primary hover:bg-primary/90 shadow-primary/20 h-11 min-w-[140px] rounded-full px-8 font-semibold text-white shadow-lg transition-all active:scale-[0.98]"
         >
-          {loading ? <Spinner className='mr-2' /> : isEdit ? 'Update Changes' : 'Create University'}
+          {loading ? (
+            <Spinner className="mr-2" />
+          ) : isEdit ? (
+            UI_TEXT.BUTTON.SAVE_CHANGES
+          ) : (
+            UI_TEXT.UNIVERSITIES.CREATE
+          )}
         </Button>
       </div>
     </form>

@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import StakeholderIssueService from '@/components/features/stakeholder/services/stakeholderIssue';
-import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { ProjectService } from '@/components/features/project/services/projectService';
-import { useToast } from '@/providers/ToastProvider';
+import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
+import StakeholderIssueService from '@/components/features/stakeholder/services/stakeholderIssue';
 import { ISSUE_MESSAGES } from '@/constants/stakeholderIssue/messages';
+import { useToast } from '@/providers/ToastProvider';
+
 import { ISSUE_STATUS } from '../constants/issueStatus';
 
 export function useIssueTab() {
@@ -141,7 +143,7 @@ export function useIssueTab() {
       }
 
       toast.success(
-        newStatus === ISSUE_STATUS.RESOLVED ? ISSUE_MESSAGES.RESOLVED : ISSUE_MESSAGES.REOPENED,
+        newStatus === ISSUE_STATUS.RESOLVED ? ISSUE_MESSAGES.RESOLVED : ISSUE_MESSAGES.REOPENED
       );
 
       fetchIssues();

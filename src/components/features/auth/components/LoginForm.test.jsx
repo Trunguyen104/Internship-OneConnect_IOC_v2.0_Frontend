@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import LoginForm from './LoginForm';
 
 /**
@@ -84,7 +85,7 @@ describe('LoginForm Component', () => {
           target: expect.objectContaining({
             value: 'a',
           }),
-        }),
+        })
       );
 
       await user.type(passwordInput, 'p');

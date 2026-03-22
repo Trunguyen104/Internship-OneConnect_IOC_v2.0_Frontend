@@ -1,10 +1,12 @@
-import { renderHook, act } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { useLogin } from './useLogin';
+import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { login } from '@/components/features/auth/services/authService';
 import { setAccessToken } from '@/components/features/auth/services/authStorage';
 import { useToast } from '@/providers/ToastProvider';
+
+import { useLogin } from './useLogin';
 
 // Mock các module của Next.js và services
 vi.mock('next/navigation', () => ({
@@ -214,7 +216,7 @@ describe('useLogin Hook', () => {
 
       expect(window.localStorage.setItem).toHaveBeenCalledWith(
         'rememberEmail',
-        'remembered@example.com',
+        'remembered@example.com'
       );
       expect(window.localStorage.setItem).toHaveBeenCalledWith('rememberPassword', 'securePass');
     });

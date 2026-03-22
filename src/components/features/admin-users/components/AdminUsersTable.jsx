@@ -1,7 +1,7 @@
 'use client';
 
-import Card from '@/components/ui/card';
 import AppTable from '@/components/ui/apptable';
+import Card from '@/components/ui/card';
 import Pagination from '@/components/ui/pagination';
 
 import { useAdminUsersContext } from '../context/AdminUsersContext';
@@ -20,13 +20,13 @@ export default function AdminUsersTable() {
   } = useAdminUsersContext();
 
   return (
-    <Card className='min-h-0'>
+    <Card className="min-h-0">
       <Card.Content>
         <AppTable
           columns={columns}
           data={items}
           loading={loading}
-          rowKey='userId'
+          rowKey="userId"
           pagination={{
             current: pageNumber,
             pageSize,
@@ -35,11 +35,11 @@ export default function AdminUsersTable() {
             pageSizeOptions: ['10', '20', '50', '100'],
           }}
           onChange={handleTableChange}
-          emptyText='No admin users'
+          emptyText="No admin users"
         />
       </Card.Content>
 
-      <Card.Footer className='border-t border-slate-200 pt-4'>
+      <Card.Footer className="border-t border-slate-200 pt-4">
         <Pagination
           total={total}
           page={pageNumber}

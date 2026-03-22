@@ -1,8 +1,9 @@
 'use client';
 
 import { RefreshCcw } from 'lucide-react';
-import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+
 import { EmptyState, Loading } from '@/components/ui/atoms';
+import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
 function normalizeEllipsis(value) {
   if (!value) return value;
@@ -11,7 +12,7 @@ function normalizeEllipsis(value) {
 
 export function ProfileLoading() {
   return (
-    <div className='flex min-h-[400px] items-center justify-center'>
+    <div className="flex min-h-[400px] items-center justify-center">
       <Loading text={normalizeEllipsis(ENTERPRISE_PROFILE_UI.LOADING)} />
     </div>
   );
@@ -19,19 +20,19 @@ export function ProfileLoading() {
 
 export function ProfileEmpty({ onRetry }) {
   return (
-    <div className='border-border/60 bg-surface rounded-3xl border p-12 shadow-sm'>
+    <div className="border-border/60 bg-surface rounded-3xl border p-12 shadow-sm">
       <EmptyState
         title={ENTERPRISE_PROFILE_UI.EMPTY.NO_DATA}
-        description='We couldn’t load your company profile right now. Please try again.'
-        minHeightClassName='min-h-[280px]'
+        description={ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.LOAD_FAILED_DESCRIPTION}
+        minHeightClassName="min-h-[280px]"
         action={
           <button
-            type='button'
+            type="button"
             onClick={onRetry}
-            className='border-border/60 bg-surface hover:bg-bg text-text inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-[13px] font-semibold transition-colors'
+            className="border-border/60 bg-surface hover:bg-bg text-text inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-[13px] font-semibold transition-colors"
           >
-            <RefreshCcw className='h-4 w-4' />
-            Try Again
+            <RefreshCcw className="h-4 w-4" />
+            {ENTERPRISE_PROFILE_UI.BUTTONS.RETRY}
           </button>
         }
       />

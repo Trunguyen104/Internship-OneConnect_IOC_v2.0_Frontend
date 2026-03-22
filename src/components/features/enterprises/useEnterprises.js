@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { enterpriseService } from '@/services/enterprise.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
 

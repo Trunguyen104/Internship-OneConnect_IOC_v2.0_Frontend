@@ -1,6 +1,7 @@
 'use client';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
+
 import { useProfile } from '../hooks/useProfile';
 import ProfileInfo from './ProfileInfo';
 import SkillList from './SkillList';
@@ -31,7 +32,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <section className='space-y-6'>
+    <section className="space-y-6">
       <StudentPageHeader hidden />
 
       <ProfileInfo
@@ -39,9 +40,12 @@ export default function ProfilePage() {
         loadingUser={profile.loadingUser}
         avatarUrl={profile.avatarUrl}
         onAvatarChange={profile.setAvatarUrl}
+        isEditModalOpen={profile.isEditModalOpen}
+        setIsEditModalOpen={profile.setIsEditModalOpen}
+        onSaveProfile={profile.updateProfile}
       />
 
-      <SkillList {...skillProps} />
+      {profile.userInfo?.role === 'Student' && <SkillList {...skillProps} />}
     </section>
   );
 }

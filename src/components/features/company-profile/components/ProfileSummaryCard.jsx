@@ -1,124 +1,172 @@
 'use client';
 
-import { memo, useMemo } from 'react';
-import Image from 'next/image';
-import { CheckCircleFilled, EditOutlined, SolutionOutlined } from '@ant-design/icons';
-import { Col, Grid, Row, Space, Tag, Typography, theme } from 'antd';
+import {
+  CameraOutlined,
+  CheckCircleFilled,
+  EditOutlined,
+  SolutionOutlined,
+} from '@ant-design/icons';
+import { Grid, Space, Tag, theme, Typography, Upload } from 'antd';
+import ImgCrop from 'antd-img-crop';
+import { memo } from 'react';
 
 import { Card } from '@/components/ui/atoms';
+import AvatarUploader from '@/components/ui/avataruploader';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
 const { Title } = Typography;
 
 const primaryButtonClassName =
-  'bg-primary hover:bg-primary-hover active:bg-primary-700 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60';
+  'bg-primary hover:bg-primary-hover active:bg-primary-700 shadow-lg inline-flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60';
 
-export const ProfileSummaryCard = memo(function ProfileSummaryCard({ profile, onEdit }) {
+export const ProfileSummaryCard = memo(function ProfileSummaryCard({
+  profile,
+  onEdit,
+  onLogoChange,
+  onBannerChange,
+}) {
   const { token } = theme.useToken();
   const screens = Grid.useBreakpoint();
 
-  const logoSize = screens.md ? 144 : 120;
+  const isMobile = !screens.md;
+  const bannerHeight = isMobile ? 160 : 240;
+  const avatarSize = isMobile ? 96 : 124;
+  const avatarOverlap = avatarSize * 0.35; // 35% overlap
 
-  const logoContainerStyle = useMemo(
-    () => ({
-      borderRadius: token.borderRadiusLG * 2,
-      borderWidth: 1,
-      borderStyle: 'solid',
-      overflow: 'hidden',
-      width: logoSize,
-      height: logoSize,
-      display: 'grid',
-      placeItems: 'center',
-    }),
-    [logoSize, token.borderRadiusLG],
-  );
+  const backgroundStyle = profile?.backgroundUrl
+    ? {
+        backgroundImage: `url(${profile.backgroundUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {
+        background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPurple} 100%)`,
+      };
+
+  const beforeBannerUpload = (file) => {
+    onBannerChange?.(file);
+    return false;
+  };
 
   return (
-    <Card className='min-h-0'>
-      <div className='flex min-h-0 flex-1 flex-col p-6'>
-        <Row gutter={[20, 16]} align='middle' wrap>
-          <Col>
-            <div className='bg-surface border-border/60 shadow-sm' style={logoContainerStyle}>
-              {profile?.logoUrl ? (
-                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                  <Image
-                    src={profile.logoUrl}
-                    alt='Company logo'
-                    fill
-                    style={{ objectFit: 'contain', padding: 16 }}
-                  />
-                </div>
-              ) : (
-                <SolutionOutlined style={{ color: token.colorTextTertiary, fontSize: 38 }} />
+    <Card className="group/card overflow-hidden rounded-3xl border-none bg-white p-0 shadow-xl">
+      {/* 1. Cover Banner Layer */}
+      <div
+        className="group/banner relative w-full overflow-hidden transition-all duration-300"
+        style={{ height: bannerHeight, ...backgroundStyle }}
+      >
+        {!profile?.backgroundUrl && (
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              background:
+                'radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4) 0%, transparent 100%)',
+            }}
+          />
+        )}
+
+        {/* Change Banner Hover Control */}
+        {onBannerChange && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover/banner:opacity-100">
+            <ImgCrop rotationSlider aspect={4 / 1}>
+              <Upload showUploadList={false} beforeUpload={beforeBannerUpload}>
+                <button className="text-text flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 font-semibold shadow-md transition-all hover:bg-white">
+                  <CameraOutlined />
+                  <span>{ENTERPRISE_PROFILE_UI.ENTERPRISE.CHANGE_COVER}</span>
+                </button>
+              </Upload>
+            </ImgCrop>
+          </div>
+        )}
+
+        {/* Edit Profile Button - Top Right */}
+        {onEdit && (
+          <div className="absolute top-6 right-6 z-30 transition-transform duration-300 group-hover/card:scale-105">
+            <button type="button" onClick={onEdit} className={primaryButtonClassName}>
+              <EditOutlined aria-hidden="true" />
+              {isMobile ? '' : ENTERPRISE_PROFILE_UI.ENTERPRISE.EDIT_PROFILE}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 2. Content Layer (Avatar + Info) */}
+      <div className="relative px-6 pt-2 pb-8 md:px-10">
+        {/* Overlapping Avatar Area */}
+        <div
+          className="absolute z-20 transition-transform duration-500 hover:scale-105"
+          style={{
+            top: -avatarOverlap,
+            left: isMobile ? '50%' : '40px',
+            transform: isMobile ? 'translateX(-50%)' : 'none',
+          }}
+        >
+          <div
+            className="overflow-hidden rounded-full bg-white p-[5px] shadow-2xl"
+            style={{ border: 'none' }}
+          >
+            <AvatarUploader
+              value={profile?.logoUrl}
+              onChange={onLogoChange}
+              size={avatarSize}
+              fullName={profile?.name}
+            />
+          </div>
+        </div>
+
+        {/* Info Area below/beside avatar */}
+        <div
+          style={{
+            marginTop: isMobile ? avatarSize - avatarOverlap + 12 : 0,
+            paddingLeft: isMobile ? 0 : avatarSize + 24,
+            textAlign: isMobile ? 'center' : 'left',
+          }}
+          className="flex flex-col justify-between gap-6 md:flex-row md:items-end"
+        >
+          <div className="flex-1 space-y-3 py-2">
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+              <Title
+                level={1}
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? 26 : 36,
+                  fontWeight: 900,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.1,
+                  color: token.colorText,
+                }}
+              >
+                {profile?.name || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
+              </Title>
+
+              {profile?.isVerified && (
+                <Tag
+                  color="blue"
+                  icon={<CheckCircleFilled />}
+                  className="w-fit self-center border-none bg-blue-50 font-bold text-blue-600 shadow-sm md:self-auto"
+                  style={{
+                    borderRadius: 999,
+                    paddingInline: 14,
+                    paddingBlock: 6,
+                    fontSize: '13px',
+                  }}
+                >
+                  {ENTERPRISE_PROFILE_UI.ENTERPRISE.VERIFIED}
+                </Tag>
               )}
             </div>
-          </Col>
 
-          <Col flex='auto'>
-            <Space orientation='vertical' size={10} style={{ width: '100%' }}>
-              <Space align='center' size={10} wrap>
-                <Title
-                  level={2}
-                  style={{
-                    margin: 0,
-                    lineHeight: 1.1,
-                    fontWeight: 900,
-                    fontSize: screens.md ? 36 : 30,
-                  }}
-                  ellipsis={{
-                    tooltip: profile?.name || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED,
-                  }}
-                >
-                  {profile?.name || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
-                </Title>
-                {profile?.isVerified ? (
-                  <Tag
-                    icon={<CheckCircleFilled aria-hidden='true' />}
-                    style={{
-                      marginInlineEnd: 0,
-                      borderRadius: 999,
-                      borderColor: 'transparent',
-                      background: token.colorSuccessBg,
-                      color: token.colorSuccessText,
-                      fontWeight: 700,
-                      paddingInline: 12,
-                      paddingBlock: 4,
-                    }}
-                  >
-                    Verified
-                  </Tag>
-                ) : null}
-              </Space>
-
-              <Space size='small' wrap aria-label='Company metadata'>
-                <Tag
-                  icon={<SolutionOutlined aria-hidden='true' />}
-                  style={{
-                    marginInlineEnd: 0,
-                    borderRadius: 999,
-                    borderColor: 'transparent',
-                    background: token.colorFillTertiary,
-                    color: token.colorTextSecondary,
-                    fontWeight: 600,
-                    paddingInline: 12,
-                    paddingBlock: 6,
-                  }}
-                >
-                  {profile?.industry || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
-                </Tag>
-              </Space>
+            <Space size={8} wrap className={isMobile ? 'justify-center' : ''}>
+              <Tag
+                icon={<SolutionOutlined />}
+                className="border-none bg-slate-100 font-bold text-slate-500 shadow-sm"
+                style={{ borderRadius: 999, paddingInline: 16, paddingBlock: 6 }}
+              >
+                {profile?.industry || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
+              </Tag>
             </Space>
-          </Col>
-
-          {onEdit && (
-            <Col>
-              <button type='button' onClick={onEdit} className={primaryButtonClassName}>
-                <EditOutlined aria-hidden='true' />
-                {ENTERPRISE_PROFILE_UI.ENTERPRISE.EDIT_PROFILE}
-              </button>
-            </Col>
-          )}
-        </Row>
+          </div>
+        </div>
       </div>
     </Card>
   );

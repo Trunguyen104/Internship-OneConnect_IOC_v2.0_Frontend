@@ -1,8 +1,9 @@
-import { useState, useCallback, useEffect, useMemo, useDeferredValue } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
+
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
-import { useToast } from '@/providers/ToastProvider';
 import { SPRINT_STATUS } from '@/constants/common/enums';
+import { useToast } from '@/providers/ToastProvider';
 
 /**
  * Hook for core backlog data (Epics, Sprints, Items)
@@ -68,19 +69,19 @@ export function useBacklogData() {
                 sprintId: s.sprintId || s.id,
                 items: (s.items || []).map((it) => ({ ...it, id: it.workItemId || it.id })),
               };
-            }),
+            })
           );
 
           const bkItems = resBacklog.data.productBacklog?.items || resBacklog.data.items || [];
           setBacklogItems(bkItems.map((it) => ({ ...it, id: it.workItemId || it.id })));
         }
-      } catch (err) {
+      } catch {
         toast.error('Error loading backlog board data');
       } finally {
         setLoading(false);
       }
     },
-    [toast],
+    [toast]
   );
 
   useEffect(() => {
@@ -93,7 +94,7 @@ export function useBacklogData() {
       const found = epics.find((e) => e.id === item.parentId);
       return { ...item, epicName: found ? found.title || found.name : '' };
     },
-    [epics],
+    [epics]
   );
 
   const filteredBacklogItems = useMemo(() => {

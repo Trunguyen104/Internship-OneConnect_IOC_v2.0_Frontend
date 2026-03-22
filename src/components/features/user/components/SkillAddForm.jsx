@@ -1,6 +1,7 @@
 'use client';
 
-import { Form, Input, Select, Button, Row, Col, Typography } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Typography } from 'antd';
+
 import { PROFILE_UI } from '@/constants/user/uiText';
 
 const { Text } = Typography;
@@ -13,16 +14,16 @@ export default function SkillAddForm({
   handleAddSkill,
 }) {
   return (
-    <div className='border-border bg-surface rounded-lg border p-6'>
-      <Form layout='vertical'>
-        <Row gutter={16} align='bottom'>
-          <Col flex='auto'>
+    <div className="border-border bg-surface rounded-lg border p-6">
+      <Form layout="vertical">
+        <Row gutter={16} align="bottom">
+          <Col flex="auto">
             <Form.Item
               style={{ marginBottom: 0 }}
               label={
                 <>
                   {PROFILE_UI.SKILLS.ADD_LABEL}{' '}
-                  <Text type='secondary'>
+                  <Text type="secondary">
                     {PROFILE_UI.SKILLS.MAX_LENGTH_HINT(newSkill.name.length, 30)}
                   </Text>
                 </>
@@ -53,7 +54,7 @@ export default function SkillAddForm({
 
           <Col>
             <Form.Item style={{ marginBottom: 0 }}>
-              <Button type='primary' danger onClick={handleAddSkill}>
+              <Button type="primary" danger onClick={handleAddSkill}>
                 {PROFILE_UI.BUTTONS.ADD}
               </Button>
             </Form.Item>
@@ -61,7 +62,7 @@ export default function SkillAddForm({
         </Row>
       </Form>
 
-      {skillError && <Text type='danger'>{skillError}</Text>}
+      {skillError && <Text type="danger">{skillError}</Text>}
     </div>
   );
 }

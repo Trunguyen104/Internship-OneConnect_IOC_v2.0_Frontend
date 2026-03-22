@@ -65,7 +65,7 @@ async function request(path, options = {}) {
 
     // Standardize error shape by throwing
     const error = new Error(
-      typeof data === 'string' ? data : data?.message || `Request failed with status ${res.status}`,
+      typeof data === 'string' ? data : data?.message || `Request failed with status ${res.status}`
     );
     error.status = res.status;
     error.data = data;
@@ -79,7 +79,7 @@ async function request(path, options = {}) {
 export const httpGet = (path, params = {}, options = {}) => {
   // Filter out undefined and null values
   const cleanParams = Object.fromEntries(
-    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null),
+    Object.entries(params).filter(([_, v]) => v !== undefined && v !== null)
   );
 
   const query = new URLSearchParams(cleanParams).toString();

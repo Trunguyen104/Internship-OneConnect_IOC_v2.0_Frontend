@@ -34,10 +34,10 @@ export default function MoreMenuButton({
   }
 
   return (
-    <div ref={rootRef} className='relative inline-flex'>
+    <div ref={rootRef} className="relative inline-flex">
       {/* Icon-only button (default) */}
       <button
-        type='button'
+        type="button"
         onClick={() => setOpen((v) => !v)}
         className={[
           'group',
@@ -55,17 +55,17 @@ export default function MoreMenuButton({
           // focus
           'focus:outline-none',
         ].join(' ')}
-        title='More'
-        aria-haspopup='menu'
+        title="More"
+        aria-haspopup="menu"
         aria-expanded={open}
       >
-        <span className='text-xl leading-none'>⋮</span>
+        <span className="text-xl leading-none">⋮</span>
       </button>
 
       {/* Popover */}
       {open ? (
         <div
-          role='menu'
+          role="menu"
           className={[
             'absolute top-10 z-50 min-w-[120px]',
             align === 'left' ? 'left-0' : 'right-0',
@@ -77,8 +77,8 @@ export default function MoreMenuButton({
           {items.map((it) => (
             <button
               key={it.value}
-              type='button'
-              role='menuitem'
+              type="button"
+              role="menuitem"
               onClick={() => handleSelect(it)}
               className={[
                 'flex w-full items-center gap-3',
@@ -100,14 +100,14 @@ export default function MoreMenuButton({
 
 function TrashIcon() {
   return (
-    <svg width='18' height='18' viewBox='0 0 24 24' fill='none' aria-hidden='true'>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
-        d='M9 3h6m-8 4h10m-9 0 1 14h6l1-14'
-        stroke='currentColor'
-        strokeWidth='2'
-        strokeLinecap='round'
+        d="M9 3h6m-8 4h10m-9 0 1 14h6l1-14"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
-      <path d='M10 11v6M14 11v6' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
+      <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

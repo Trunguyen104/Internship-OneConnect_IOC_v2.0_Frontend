@@ -1,9 +1,10 @@
 'use client';
 
-import { memo, useMemo } from 'react';
-import Image from 'next/image';
 import { EditOutlined } from '@ant-design/icons';
 import { Grid, theme } from 'antd';
+import Image from 'next/image';
+import { memo, useMemo } from 'react';
+
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
 const primaryButtonClassName =
@@ -25,7 +26,7 @@ export const ProfileBanner = memo(function ProfileBanner({ backgroundUrl, onEdit
       border: `1px solid ${token.colorBorderSecondary}`,
       backgroundImage: `radial-gradient(circle at 20% 20%, ${token.colorPrimaryBg} 0%, transparent 55%), radial-gradient(circle at 85% 25%, ${token.colorFillSecondary} 0%, transparent 50%), linear-gradient(135deg, ${token.colorBgContainer} 0%, ${token.colorBgLayout} 100%)`,
     }),
-    [coverHeight, token],
+    [coverHeight, token]
   );
 
   return (
@@ -33,7 +34,7 @@ export const ProfileBanner = memo(function ProfileBanner({ backgroundUrl, onEdit
       {backgroundUrl ? (
         <Image
           src={backgroundUrl}
-          alt='Cover'
+          alt="Cover"
           fill
           priority
           style={{ objectFit: 'cover', opacity: 0.18 }}
@@ -41,7 +42,7 @@ export const ProfileBanner = memo(function ProfileBanner({ backgroundUrl, onEdit
       ) : null}
 
       <div
-        aria-hidden='true'
+        aria-hidden="true"
         style={{
           pointerEvents: 'none',
           position: 'absolute',
@@ -52,8 +53,8 @@ export const ProfileBanner = memo(function ProfileBanner({ backgroundUrl, onEdit
       />
 
       <div style={{ position: 'absolute', top: token.paddingLG, right: token.paddingLG }}>
-        <button type='button' onClick={onEdit} className={primaryButtonClassName}>
-          <EditOutlined aria-hidden='true' />
+        <button type="button" onClick={onEdit} className={primaryButtonClassName}>
+          <EditOutlined aria-hidden="true" />
           {ENTERPRISE_PROFILE_UI.ENTERPRISE.EDIT_PROFILE}
         </button>
       </div>
