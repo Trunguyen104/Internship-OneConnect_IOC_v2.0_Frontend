@@ -1,11 +1,27 @@
 'use client';
 
-import { DashboardOutlined, SolutionOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  CalendarOutlined,
+  DashboardOutlined,
+  SolutionOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 
 import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
 const enterpriseMenu = [
   { icon: <DashboardOutlined />, label: 'Dashboard', href: '/dashboard' },
+  {
+    icon: <BankOutlined />,
+    label: 'My Company',
+    href: '/company-profile',
+  },
+  {
+    icon: <CalendarOutlined />,
+    label: 'Active Terms',
+    href: '/active-terms',
+  },
   {
     icon: <SolutionOutlined />,
     label: 'Internship Students',
