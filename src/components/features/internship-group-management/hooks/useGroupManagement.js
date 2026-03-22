@@ -1,157 +1,172 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { useToast } from '@/providers/ToastProvider';
 
-import { MOCK_GROUPS } from '../constants/groupData';
+import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
+import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
+import { useEnterpriseGroupActions } from '../hooks/useEnterpriseGroupActions';
+import { useEnterpriseGroupFilters } from '../hooks/useEnterpriseGroupFilters';
+import { useEnterpriseGroups } from '../hooks/useEnterpriseGroups';
 
-export const useGroupManagement = (initialGroups = MOCK_GROUPS) => {
-  const toast = useToast();
-  const { MESSAGES } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
-  const [groups, setGroups] = useState(initialGroups);
-  const [activeTab, setActiveTab] = useState('ALL');
-  const [search, setSearch] = useState('');
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
+export const useGroupManagement = () => {
+  const filters = useEnterpriseGroupFilters();
+
+  // Real data fetching
+  const { data, total, loading, refetch } = useEnterpriseGroups({
+    termId: filters.termId, // Will be undefined initially, API will fetch all/current
+    filters: filters.filters,
+    search: filters.debouncedSearch,
+    pagination: filters.pagination,
+    sort: filters.sort,
   });
+
+  const {
+    createGroup,
+    updateGroup,
+    archiveGroup,
+    assignMentor,
+    deleteGroup,
+    loading: actionLoading,
+  } = useEnterpriseGroupActions(refetch);
 
   const [assignModal, setAssignModal] = useState({ open: false, group: null });
   const [viewModal, setViewModal] = useState({ open: false, group: null });
   const [createModal, setCreateModal] = useState(false);
+  const [editModal, setEditModal] = useState({ open: false, group: null });
+  const [unassignedStudents, setUnassignedStudents] = useState([]);
+  const [fetchingStudents, setFetchingStudents] = useState(false);
 
-  const filteredGroups = useMemo(() => {
-    let data = [...groups];
-    if (activeTab === 'ACTIVE') data = data.filter((g) => g.status === 'ACTIVE');
-    if (activeTab === 'FINISHED') data = data.filter((g) => g.status === 'FINISHED');
-    if (activeTab === 'ARCHIVED') data = data.filter((g) => g.status === 'ARCHIVED');
-    if (search) {
-      data = data.filter((g) => g.name.toLowerCase().includes(search.toLowerCase()));
+  const fetchUnassignedStudents = useCallback(async () => {
+    if (!filters.termId) return;
+    try {
+      setFetchingStudents(true);
+      const res = await EnterpriseStudentService.getApplications({
+        termId: filters.termId,
+        status: 1, // Fetch only ACCEPTED students
+        pageIndex: 1,
+        pageSize: 100,
+      });
+      const items = res?.data?.items || [];
+      // Filter for approved students without a group
+      const unassigned = items
+        .filter((s) => s.status === 1 && !s.groupId)
+        .map(EnterpriseStudentService.mapApplication);
+      setUnassignedStudents(unassigned);
+    } catch (err) {
+      console.error('Failed to fetch unassigned students:', err);
+    } finally {
+      setFetchingStudents(false);
     }
-    return data;
-  }, [groups, activeTab, search]);
+  }, [filters.termId]);
 
-  const handleTableChange = useCallback((page) => {
-    setPagination((prev) => ({ ...prev, current: page }));
-  }, []);
-
-  const handlePageSizeChange = useCallback((size) => {
-    setPagination((prev) => ({ ...prev, pageSize: size, current: 1 }));
-  }, []);
-
-  const paginatedGroups = useMemo(() => {
-    const start = (pagination.current - 1) * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    return filteredGroups.slice(start, end);
-  }, [filteredGroups, pagination]);
+  useEffect(() => {
+    if (createModal || editModal.open) {
+      fetchUnassignedStudents();
+    }
+  }, [createModal, editModal.open, fetchUnassignedStudents]);
 
   const handleAssignSubmit = useCallback(
-    (values) => {
+    async (values) => {
       const { group } = assignModal;
-      const isChangingMentor = group.mentorId && group.mentorId !== values.mentorId;
-
-      setGroups((prev) =>
-        prev.map((g) =>
-          g.id === group.id
-            ? {
-                ...g,
-                mentorId: values.mentorId,
-                project: values.projectId,
-              }
-            : g
-        )
-      );
-
+      if (!group) return;
+      await assignMentor(group.id, values.mentorId);
       setAssignModal({ open: false, group: null });
-
-      if (isChangingMentor) {
-        toast.success(`${MESSAGES.MENTOR_CHANGED} ${values.reason}`);
-      } else {
-        toast.success(MESSAGES.ASSIGN_SUCCESS);
-      }
     },
-    [assignModal, toast, MESSAGES]
+    [assignModal, assignMentor]
   );
 
   const handleDeleteGroup = useCallback(
     (group) => {
-      if (group.memberCount > 0) {
-        toast.error(MESSAGES.DELETE_ERROR_STU);
-        return;
-      }
-
       showDeleteConfirm({
-        title: MESSAGES.DELETE_CONFIRM_TITLE,
-        content: `${MESSAGES.DELETE_CONFIRM_TEXT} [${group.name}]?`,
-        okText: MESSAGES.DELETE_CONFIRM_TITLE,
-        onOk() {
-          setGroups((prev) => prev.filter((g) => g.id !== group.id));
-          toast.success(MESSAGES.DELETE_SUCCESS);
+        title: ENTERPRISE_GROUP_UI.MODALS.DELETE.TITLE,
+        content: ENTERPRISE_GROUP_UI.MODALS.DELETE.CONTENT,
+        okText: ENTERPRISE_GROUP_UI.MODALS.DELETE.SUBMIT,
+        onOk: async () => {
+          await deleteGroup(group.id, group.memberCount || 0);
         },
       });
     },
-    [toast, MESSAGES]
+    [deleteGroup]
   );
 
   const handleArchiveGroup = useCallback(
     (group) => {
       showDeleteConfirm({
-        title: MESSAGES.ARCHIVE_CONFIRM_TITLE,
-        content: `${MESSAGES.ARCHIVE_CONFIRM_TEXT} [${group.name}]?`,
-        okText: MESSAGES.ARCHIVE_CONFIRM_TITLE,
+        title: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.TITLE,
+        content: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.CONTENT,
+        okText: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.SUBMIT,
         type: 'warning',
-        onOk() {
-          setGroups((prev) =>
-            prev.map((g) => (g.id === group.id ? { ...g, status: 'ARCHIVED' } : g))
-          );
-          toast.success(MESSAGES.ARCHIVE_SUCCESS);
+        onOk: async () => {
+          await archiveGroup(group.id);
         },
       });
     },
-    [toast, MESSAGES]
+    [archiveGroup]
   );
 
   const handleCreateGroup = useCallback(
-    (values) => {
-      const newGroup = {
-        id: `g${Date.now()}`,
-        name: values.name,
-        track: values.track || 'FRONTEND',
-        status: 'ACTIVE',
-        mentorId: null,
-        memberCount: 0,
-        avatars: [],
-      };
-      setGroups((prev) => [newGroup, ...prev]);
+    async (values) => {
+      await createGroup({
+        Name: values.name,
+        Track: values.track,
+        InternshipTermId: filters.termId,
+        TermId: filters.termId, // Fallback
+        InternshipStudentIds: values.studentIds,
+        StudentIds: values.studentIds, // Fallback
+        studentIds: values.studentIds, // Fallback
+      });
       setCreateModal(false);
-      toast.success(MESSAGES.CREATE_SUCCESS);
     },
-    [toast, MESSAGES]
+    [createGroup, filters.termId]
+  );
+
+  const handleUpdateGroup = useCallback(
+    async (values) => {
+      const { group } = editModal;
+      if (!group) return;
+      await updateGroup(group.id, {
+        ...values,
+        termId: filters.termId,
+      });
+      setEditModal({ open: false, group: null });
+    },
+    [editModal, updateGroup, filters.termId]
   );
 
   return {
-    groups,
-    activeTab,
-    setActiveTab,
-    search,
-    setSearch,
-    filteredGroups,
+    groups: data,
+    activeTab: filters.filters.status !== null ? filters.filters.status : 'ALL',
+    setActiveTab: (val) => filters.handleFilterChange('status', val === 'ALL' ? null : val),
+    search: filters.searchValue,
+    setSearch: filters.handleSearch,
+    filteredGroups: data,
+    paginatedGroups: data,
+    total,
+    loading: loading || actionLoading,
     assignModal,
     setAssignModal,
     viewModal,
     setViewModal,
     createModal,
     setCreateModal,
+    editModal,
+    setEditModal,
+    unassignedStudents,
+    fetchingStudents,
     handleAssignSubmit,
     handleDeleteGroup,
     handleArchiveGroup,
     handleCreateGroup,
-    pagination,
-    handleTableChange,
-    handlePageSizeChange,
-    paginatedGroups,
+    handleUpdateGroup,
+    termId: filters.termId,
+    setTermId: filters.setTermId,
+    termOptions: filters.termOptions,
+    fetchingTerms: filters.fetchingTerms,
+    pagination: filters.pagination,
+    handleTableChange: (page) =>
+      filters.handleTableChange({ current: page, pageSize: filters.pagination.pageSize }),
+    handlePageSizeChange: (size) => filters.handleTableChange({ current: 1, pageSize: size }),
   };
 };

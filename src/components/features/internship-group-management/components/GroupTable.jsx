@@ -3,6 +3,7 @@
 import {
   CalendarOutlined,
   DeleteOutlined,
+  EditOutlined,
   EyeOutlined,
   InboxOutlined,
   MoreOutlined,
@@ -13,12 +14,11 @@ import { Avatar, Button, Dropdown } from 'antd';
 import React, { memo, useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { MOCK_MENTORS } from '../constants/groupData';
+import { ENTERPRISE_GROUP_UI, GROUP_STATUS_MAP } from '../constants/enterprise-group.constants';
 
 const STATUS_CONFIG = {
-  ACTIVE: {
+  InProgress: {
     bgClass: '!bg-success-surface',
     textClass: '!text-success',
   },
@@ -45,8 +45,9 @@ const GroupTable = memo(function GroupTable({
   onDelete,
   onArchive,
   onView,
+  onEdit,
 }) {
-  const { TABLE, CARD } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
+  const { TABLE, CARD } = ENTERPRISE_GROUP_UI;
 
   const columns = useMemo(
     () => [
@@ -93,13 +94,12 @@ const GroupTable = memo(function GroupTable({
         dataIndex: 'mentorId',
         key: 'mentor',
         width: 140,
-        render: (id) => {
-          const mentor = MOCK_MENTORS.find((m) => m.id === id);
-          return mentor ? (
+        render: (_, record) => {
+          return record.mentorName ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <div className="bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full" />
               <span className="text-text truncate text-xs leading-none font-bold">
-                {mentor.name}
+                {record.mentorName}
               </span>
             </div>
           ) : (
@@ -135,13 +135,18 @@ const GroupTable = memo(function GroupTable({
         key: 'status',
         width: 90,
         align: 'center',
-        render: (status) => {
-          const config = STATUS_CONFIG[status] || STATUS_CONFIG.default;
+        render: (statusValue) => {
+          const statusStr = GROUP_STATUS_MAP[statusValue] || 'InProgress';
+          const uiLabel =
+            ENTERPRISE_GROUP_UI.STATUS[
+              statusStr === 'InProgress' ? 'IN_PROGRESS' : statusStr.toUpperCase()
+            ];
+          const config = STATUS_CONFIG[statusStr] || STATUS_CONFIG.default;
           return (
             <span
               className={`${config.bgClass} ${config.textClass} m-0 inline-flex h-6 w-fit items-center justify-center rounded-full px-2.5 text-[10px] font-bold uppercase transition-all`}
             >
-              {INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT[status] || status}
+              {uiLabel}
             </span>
           );
         },
@@ -152,7 +157,8 @@ const GroupTable = memo(function GroupTable({
         width: 40,
         align: 'center',
         render: (_, record) => {
-          const isArchived = record.status === 'ARCHIVED';
+          // 2 = Archived
+          const isArchived = record.status === 2;
           const items = [
             {
               key: 'view',
@@ -162,6 +168,12 @@ const GroupTable = memo(function GroupTable({
             },
             ...(!isArchived
               ? [
+                  {
+                    key: 'edit',
+                    label: CARD.EDIT_GROUP || 'Edit Group',
+                    icon: <EditOutlined className="text-primary" />,
+                    onClick: () => onEdit(record),
+                  },
                   {
                     key: 'assign',
                     label: record.mentorId ? CARD.CHANGE_MENTOR : CARD.ASSIGN_MENTOR,
@@ -205,7 +217,7 @@ const GroupTable = memo(function GroupTable({
         },
       },
     ],
-    [page, pageSize, onAssign, onDelete, onArchive, onView, TABLE, CARD]
+    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, TABLE, CARD]
   );
 
   return (
@@ -217,7 +229,6 @@ const GroupTable = memo(function GroupTable({
       minWidth="780px"
       tableLayout="fixed"
       className="no-scrollbar mt-2 min-h-0 flex-1"
-      onRowClick={onView}
     />
   );
 });
