@@ -1,3 +1,9 @@
+import dayjs from 'dayjs';
+
+import {
+  ENROLLMENT_STATUS,
+  PLACEMENT_STATUS,
+} from '@/constants/internship-management/internship-management';
 import { httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
 
 import {
@@ -46,32 +52,34 @@ const mapStudent = (item) => {
 
 const mapStudentForCreate = (values) => {
   return cleanPayload({
-    termId: values.termId,
-    fullName: values.fullName,
-    studentCode: values.studentCode,
-    email: values.email,
-    phone: values.phone,
-    dateOfBirth: values.dateOfBirth,
-    major: values.major,
+    TermId: values.termId,
+    FullName: values.fullName,
+    StudentCode: values.studentCode,
+    Email: values.email,
+    Phone: values.phone || null,
+    DateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : null,
+    Major: values.major,
   });
 };
 
 const mapStudentForUpdate = (values) => {
   return {
-    studentTermId: values.studentTermId,
-    fullName: values.fullName,
-    email: values.email,
-    phone: values.phone || null,
-    major: values.major,
-    dateOfBirth: values.dateOfBirth || null,
-    enrollmentDate: values.enrollmentDate || null,
-    enrollmentStatus:
+    StudentTermId: values.studentTermId,
+    FullName: values.fullName,
+    Email: values.email,
+    Phone: values.phone || null,
+    Major: values.major,
+    DateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : null,
+    EnrollmentDate: values.enrollmentDate
+      ? dayjs(values.enrollmentDate).format('YYYY-MM-DD')
+      : null,
+    EnrollmentStatus:
       REVERSE_ENROLLMENT_MAP[values.status] ??
       REVERSE_ENROLLMENT_MAP[values.enrollmentStatus] ??
       ENROLLMENT_STATUS.ACTIVE,
-    enrollmentNote: values.enrollmentNote || null,
-    placementStatus: REVERSE_PLACEMENT_MAP[values.placementStatus] ?? PLACEMENT_STATUS.UNPLACED,
-    enterpriseId: values.enterpriseId || null,
+    EnrollmentNote: values.enrollmentNote || null,
+    PlacementStatus: REVERSE_PLACEMENT_MAP[values.placementStatus] ?? PLACEMENT_STATUS.UNPLACED,
+    EnterpriseId: values.enterpriseId || null,
   };
 };
 

@@ -114,10 +114,10 @@ const StudentTable = memo(function StudentTable({
         width: '100px',
         align: 'center',
         render: (statusIdx) => {
-          // Status enum: 0 Pending, 1 Approved, 2 Rejected
+          // Backend Enum: 1=Pending, 2=Approved, 3=Rejected
           let statusText = 'Pending';
-          if (statusIdx === 1) statusText = 'Approved';
-          if (statusIdx === 2) statusText = 'Rejected';
+          if (statusIdx === 2) statusText = 'Approved';
+          if (statusIdx === 3) statusText = 'Rejected';
 
           const config = STATUS_CONFIG[statusText] || STATUS_CONFIG.default;
           // Map to UI Label
@@ -186,8 +186,8 @@ const StudentTable = memo(function StudentTable({
         width: '80px',
         align: 'center',
         render: (_, record) => {
-          const isPending = record.status === 0;
-          const isApproved = record.status === 1;
+          const isPending = record.status === 1;
+          const isApproved = record.status === 2;
 
           const menuItems = [
             {

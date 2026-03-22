@@ -40,15 +40,15 @@ export const useEnterpriseGroupActions = (onSuccess) => {
   const assignMentor = (id, mentorId) =>
     handleAction(() => EnterpriseGroupService.assignMentor(id, mentorId), MESSAGES.UPDATE_SUCCESS);
 
-  const addStudents = (id, studentIds) =>
+  const addStudents = (id, students) =>
     handleAction(
-      () => EnterpriseGroupService.addStudents(id, studentIds),
+      () => EnterpriseGroupService.addStudents(id, students),
       MESSAGES.ADD_STUDENT_SUCCESS
     );
 
-  const removeStudent = (id, studentId) =>
+  const removeStudents = (id, studentIds) =>
     handleAction(
-      () => EnterpriseGroupService.removeStudent(id, studentId),
+      () => EnterpriseGroupService.removeStudents(id, studentIds),
       MESSAGES.REMOVE_STUDENT_SUCCESS
     );
 
@@ -67,7 +67,7 @@ export const useEnterpriseGroupActions = (onSuccess) => {
     archiveGroup,
     assignMentor,
     addStudents,
-    removeStudent,
+    removeStudents,
     deleteGroup,
   };
 };

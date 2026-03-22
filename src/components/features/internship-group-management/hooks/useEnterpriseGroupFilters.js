@@ -22,7 +22,7 @@ export const useEnterpriseGroupFilters = () => {
 
         if (items.length > 0) {
           setTermOptions(items.map((t) => ({ label: t.name, value: t.termId || t.id })));
-          const activeTerm = items.find((t) => t.status === 1 || t.status === 'Active') || items[0];
+          const activeTerm = items.find((t) => t.status === 2 || t.status === 'Active') || items[0];
           setTermId(activeTerm.termId || activeTerm.id);
         }
       } catch (err) {

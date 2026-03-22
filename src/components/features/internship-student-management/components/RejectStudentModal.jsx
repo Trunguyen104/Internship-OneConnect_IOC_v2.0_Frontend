@@ -26,7 +26,7 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
       <CompoundModal.Header
         icon={<ExclamationCircleOutlined className="text-danger" />}
         title={REJECT.TITLE}
-        subtitle={`${REJECT.WARNING_TEXT_1} ${student?.fullName || ''}`}
+        subtitle={`${REJECT.WARNING_TEXT_1} ${student?.studentFullName || ''}`}
         type="danger"
       />
 

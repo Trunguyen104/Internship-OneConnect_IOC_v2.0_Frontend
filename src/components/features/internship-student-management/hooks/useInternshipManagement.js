@@ -86,8 +86,11 @@ export const useInternshipManagement = () => {
 
   const handleGroupSubmit = useCallback(
     async (values) => {
-      const studentIds = groupModal.students.map((s) => s.id);
-      const success = await addStudents(values.groupId, studentIds);
+      const studentsPayload = groupModal.students.map((s) => ({
+        studentId: s.id,
+        role: 1, // Default Member
+      }));
+      const success = await addStudents(values.groupId, studentsPayload);
 
       if (success) {
         setGroupModal({ open: false, students: [], type: 'ADD' });
@@ -150,9 +153,9 @@ export const useInternshipManagement = () => {
         GroupName: values.name,
         Track: values.track,
         TermId: termId,
-        Students: studentIds.map((id) => ({
-          StudentId: id,
-          Role: 1, // Member default
+        students: studentIds.map((id) => ({
+          studentId: id,
+          role: 1, // Member default
         })),
       };
 

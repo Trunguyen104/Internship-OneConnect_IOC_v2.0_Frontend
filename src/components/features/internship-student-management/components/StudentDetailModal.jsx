@@ -18,9 +18,9 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
   if (!student) return null;
 
   const statusMap = {
-    0: 'PENDING',
-    1: 'ACCEPTED',
-    2: 'REJECTED',
+    1: 'PENDING',
+    2: 'ACCEPTED',
+    3: 'REJECTED',
   };
   const displayStatus = statusMap[student.status] || 'PENDING';
 

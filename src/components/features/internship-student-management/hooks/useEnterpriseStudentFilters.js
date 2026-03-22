@@ -25,7 +25,8 @@ export const useEnterpriseStudentFilters = () => {
         const terms = termRes?.data?.items || [];
         if (terms.length > 0) {
           setTermOptions(terms.map((t) => ({ label: t.name, value: t.termId || t.id })));
-          const activeTerm = terms.find((t) => t.status === 1 || t.status === 'Active') || terms[0];
+          // Backend Status: 1=Upcoming, 2=Active, 4=Ended/Closed (based on user swagger)
+          const activeTerm = terms.find((t) => t.status === 2 || t.status === 'Active') || terms[0];
           setTermId(activeTerm.termId || activeTerm.id);
         }
 

@@ -32,13 +32,14 @@ export const EnterpriseGroupService = {
     return httpPatch(`${BASE_URL}/${id}/assign-mentor`, { mentorId });
   },
 
-  async addStudents(id, studentIds) {
-    // Expected payload: { studentIds: [guid1, guid2] }
-    return httpPatch(`${BASE_URL}/${id}/add-students`, { studentIds });
+  async addStudents(id, students) {
+    // Expected payload: AddStudentsToGroupCommand { internshipId, students: [{ studentId, role }] }
+    return httpPost(`${BASE_URL}/students`, { internshipId: id, students });
   },
 
-  async removeStudent(id, studentId) {
-    return httpPatch(`${BASE_URL}/${id}/remove-student`, { studentId });
+  async removeStudents(id, studentIds) {
+    // Expected payload: RemoveStudentsFromGroupCommand { internshipId, studentIds: [guid1, guid2] }
+    return httpDelete(`${BASE_URL}/students`, { internshipId: id, studentIds });
   },
 
   async archiveGroup(id) {
