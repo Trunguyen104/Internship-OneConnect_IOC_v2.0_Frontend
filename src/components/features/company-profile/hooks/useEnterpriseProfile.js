@@ -6,10 +6,7 @@ import { userService } from '@/components/features/user/services/userService';
 import { USER_ROLE } from '@/constants/common/enums';
 import { mediaService } from '@/services/media.service';
 
-import {
-  getMyEnterpriseProfile,
-  updateEnterpriseProfile,
-} from '../services/enterpriseProfile.service';
+import { getEnterpriseById, updateEnterpriseProfile } from '../services/enterpriseProfile.service';
 
 function normalizeProfileResponse(response) {
   if (response?.data?.data) return response.data.data;
@@ -89,18 +86,25 @@ export function useEnterpriseProfile() {
   const fetchProfile = useCallback(async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true);
-      const [response, meResponse] = await Promise.all([
-        getMyEnterpriseProfile(),
-        userService.getMe(),
-      ]);
-      const profileData = normalizeEnterpriseProfile(normalizeProfileResponse(response));
-      if (!profileData) throw new Error('Profile data format is invalid');
-      setProfile(profileData);
 
+      const meResponse = await userService.getMe();
       const meData = meResponse?.data || meResponse;
+
       if (meData?.role) {
         setUserRole(meData.role);
       }
+
+      const enterpriseId = meData?.enterpriseId || meData?.enterprise_id || meData?.enterpriseID;
+
+      if (!enterpriseId) {
+        throw new Error('Unable to find enterprise ID for the current user');
+      }
+
+      const response = await getEnterpriseById(enterpriseId);
+
+      const profileData = normalizeEnterpriseProfile(normalizeProfileResponse(response));
+      if (!profileData) throw new Error('Profile data format is invalid');
+      setProfile(profileData);
 
       setError(null);
       return { ok: true, data: profileData, error: null };
