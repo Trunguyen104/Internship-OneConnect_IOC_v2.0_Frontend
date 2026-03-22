@@ -30,7 +30,7 @@ const InternshipTable = memo(function InternshipTable({
   selectedRowKeys = [],
   onSelectRowChange,
 }) {
-  const { TABLE, ACTIONS, STATUS_LABELS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
+  const { TABLE, ACTIONS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
 
   const rowSelection = {
     selectedRowKeys,

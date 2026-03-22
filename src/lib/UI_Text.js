@@ -41,6 +41,8 @@ export const UI_TEXT = {
   },
   USER_MANAGEMENT: {
     TITLE: 'User Management',
+    STUDENT_TITLE: 'Student Management',
+    STAFF_TITLE: 'Staff Management',
     SUBTITLE: 'Manage accounts and their roles across the hierarchy.',
     CREATE_TITLE: 'Create User',
     EDIT_TITLE: 'Edit User',
@@ -136,6 +138,21 @@ export const UI_TEXT = {
     STUDENT_IN_PHASE: 'This student is currently in the',
     PHASE_HINT:
       'phase. Business details and evaluations will be updated as the internship progresses.',
+    IMPORT_TITLE: 'Import Student List',
+    IMPORT_SUBTITLE: 'Upload student list to enroll them',
+    DOWNLOAD_TEMPLATE: 'Download template',
+    DRAG_HINT: 'Drag file here or click to upload (.xls, .xlsx)',
+    FILE_SIZE_ERROR: (size) => `File must be < ${size}MB`,
+    VALID: 'VALID',
+    INVALID: 'INVALID',
+    ERROR: 'ERROR',
+    TOOLTIP_VALID: 'Valid',
+    COLUMNS: {
+      FULL_NAME: 'Full Name',
+      STUDENT_ID: 'Student ID',
+      EMAIL: 'Email',
+      VALIDITY: 'Validity',
+    },
   },
   USER_PROFILE: {
     VIEW_LINK: 'View Link',

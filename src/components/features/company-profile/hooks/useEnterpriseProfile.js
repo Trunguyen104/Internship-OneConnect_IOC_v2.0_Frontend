@@ -25,11 +25,21 @@ function normalizeEnterpriseProfile(profile) {
   const normalized = { ...profile };
 
   if (normalized.taxCode == null) {
-    normalized.taxCode = profile.taxcode ?? profile.tax_code ?? profile.taxCODE ?? null;
+    normalized.taxCode =
+      profile.taxcode ?? profile.tax_code ?? profile.taxCODE ?? profile.TaxCode ?? null;
   }
 
   if (normalized.enterpriseId == null) {
-    normalized.enterpriseId = profile.enterpriseID ?? profile.enterprise_id ?? null;
+    normalized.enterpriseId =
+      profile.enterpriseID ?? profile.enterprise_id ?? profile.EnterpriseId ?? null;
+  }
+
+  if (normalized.logoUrl == null) {
+    normalized.logoUrl = profile.LogoUrl ?? null;
+  }
+
+  if (normalized.backgroundUrl == null) {
+    normalized.backgroundUrl = profile.BackgroundUrl ?? null;
   }
 
   return normalized;

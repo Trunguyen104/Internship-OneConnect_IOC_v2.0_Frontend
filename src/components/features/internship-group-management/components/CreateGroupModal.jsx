@@ -35,12 +35,12 @@ export const CreateGroupModal = memo(
           );
           console.log('MODAL INITIAL IDS:', ids);
           form.setFieldsValue({
-            name: `Nhóm ${Math.floor(Math.random() * 1000)}`,
+            name: `${CREATE.DEFAULT_NAME_PREFIX}${Math.floor(Math.random() * 1000)}`,
             studentIds: ids,
           });
         }
       }
-    }, [open, form, group, isEdit, initialStudents]);
+    }, [open, form, group, isEdit, initialStudents, CREATE.DEFAULT_NAME_PREFIX]);
 
     const handleCancel = () => {
       onCancel();
@@ -73,7 +73,7 @@ export const CreateGroupModal = memo(
               {s.studentFullName || s.name || s.fullName || 'Unknown Student'}
             </Text>
             <Text className="text-muted text-[10px] uppercase opacity-60">
-              {s.studentCode || s.code || 'No Code'} {'\u2022'} {s.major || 'No Major'}
+              {s.studentCode || s.code || 'No Code'} {CREATE.BULLET} {s.major || 'No Major'}
             </Text>
           </div>
         </div>

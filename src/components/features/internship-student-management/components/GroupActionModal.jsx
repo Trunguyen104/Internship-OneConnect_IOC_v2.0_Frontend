@@ -39,7 +39,7 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
             <span className="text-text font-bold">
               {students.length === 1
                 ? students[0]?.studentFullName || students[0]?.fullName
-                : `${students.length} students selected`}
+                : `${students.length} ${GROUP_ACTION.STUDENTS_SELECTED}`}
             </span>
           </div>
         }
@@ -69,13 +69,14 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
             loading={fetchingGroups}
             options={activeGroups.map((g) => {
               const isCurrent = currentGroupIds.includes(g.id);
+              const groupLabel = `${g.name}${GROUP_ACTION.SEPARATOR}${g.mentorName || GROUP_ACTION.NO_MENTOR}${GROUP_ACTION.SEPARATOR}${g.memberCount}${GROUP_ACTION.SPACE}${GROUP_ACTION.STUDENTS_SUFFIX}`;
               return {
                 label: (
                   <div className="flex justify-between items-center w-full">
-                    <span>{`${g.name} \u2014 ${g.mentorName || 'No Mentor'} \u2014 ${g.memberCount} ${GROUP_ACTION.STUDENTS_SUFFIX}`}</span>
+                    <span>{groupLabel}</span>
                     {isCurrent && (
                       <span className="bg-gray-100 text-muted px-2 py-0.5 rounded text-[10px] uppercase font-bold">
-                        {'Current Group'}
+                        {GROUP_ACTION.CURRENT_GROUP}
                       </span>
                     )}
                   </div>

@@ -8,6 +8,7 @@ const adminMenu = [
   { icon: <DashboardOutlined />, label: 'Dashboard', href: '/admin-dashboard' },
   { icon: <CalendarOutlined />, label: 'Internship Terms', href: '/internship-terms' },
   { icon: <TeamOutlined />, label: 'Enrollments', href: '/enrollments' },
+  { icon: <TeamOutlined />, label: 'Student Management', href: '/student-management' },
 ];
 
 export default function SidebarAdmin() {

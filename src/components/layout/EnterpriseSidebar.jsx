@@ -12,9 +12,13 @@ const enterpriseMenu = [
     href: '/internship-student-management',
   },
   {
-    icon: <TeamOutlined />,
     label: 'Internship Groups',
     href: '/internship-group-management',
+  },
+  {
+    icon: <TeamOutlined />,
+    label: 'Staff Management',
+    href: '/staff-management',
   },
 ];
 
