@@ -28,7 +28,6 @@ const ImportModal = memo(function ImportModal({
   const toast = useToast();
   const { IMPORT } = STUDENT_ENROLLMENT.MODALS;
   const [previewData, setPreviewData] = useState([]);
-  const [fileList, setFileList] = useState([]);
 
   const uploadProps = {
     multiple: false,
@@ -46,15 +45,13 @@ const ImportModal = memo(function ImportModal({
   const handlePreview = async (file) => {
     if (!onPreview) return;
     setPreviewData([]);
-    setFileList([file]);
 
     try {
       const data = await onPreview(file);
       if (data) {
         setPreviewData(data.previewData || []);
       }
-    } catch (error) {
-      setFileList([]);
+    } catch {
       // Error is already toasted by the hook
     }
   };

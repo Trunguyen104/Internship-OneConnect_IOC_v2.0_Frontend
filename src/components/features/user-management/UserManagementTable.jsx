@@ -9,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { USER_ROLE_LABEL, USER_STATUS, USER_STATUS_LABEL } from '@/constants/admin-users/enums';
+import { USER_ROLE_LABEL, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import AdminUsersAction from './AdminUsersAction';
+import UserManagementAction from './UserManagementAction';
 
-export default function AdminUsersTable({ users = [], loading = false, error = '', refresh }) {
+export default function UserManagementTable({ users = [], loading = false, error = '', refresh }) {
   const getRoleLabel = (role) => {
     return USER_ROLE_LABEL[role] || role || UI_TEXT.COMMON.NULL;
   };
@@ -33,11 +33,11 @@ export default function AdminUsersTable({ users = [], loading = false, error = '
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="pl-8">{UI_TEXT.ADMIN_USERS.CODE}</TableHead>
-          <TableHead>{UI_TEXT.ADMIN_USERS.USER}</TableHead>
-          <TableHead className="hidden lg:table-cell">{UI_TEXT.ADMIN_USERS.UNIT}</TableHead>
-          <TableHead>{UI_TEXT.ADMIN_USERS.ROLE}</TableHead>
-          <TableHead>{UI_TEXT.ADMIN_USERS.STATUS}</TableHead>
+          <TableHead className="pl-8">{UI_TEXT.USER_MANAGEMENT.CODE}</TableHead>
+          <TableHead>{UI_TEXT.USER_MANAGEMENT.USER}</TableHead>
+          <TableHead className="hidden lg:table-cell">{UI_TEXT.USER_MANAGEMENT.UNIT}</TableHead>
+          <TableHead>{UI_TEXT.USER_MANAGEMENT.ROLE}</TableHead>
+          <TableHead>{UI_TEXT.USER_MANAGEMENT.STATUS}</TableHead>
           <TableHead className="pr-8 text-right">{UI_TEXT.COMMON.ACTION}</TableHead>
         </TableRow>
       </TableHeader>
@@ -78,7 +78,7 @@ export default function AdminUsersTable({ users = [], loading = false, error = '
                   onClick={refresh}
                   className="text-xs underline opacity-70 hover:opacity-100"
                 >
-                  {UI_TEXT.ADMIN_USERS.RETRY}
+                  {UI_TEXT.USER_MANAGEMENT.RETRY}
                 </Button>
               </div>
             </TableCell>
@@ -87,8 +87,8 @@ export default function AdminUsersTable({ users = [], loading = false, error = '
           <TableRow>
             <TableCell colSpan={6} className="p-0">
               <EmptyState
-                title={UI_TEXT.ADMIN_USERS.NOT_FOUND}
-                description="We couldn't find any administrators matching your criteria."
+                title={UI_TEXT.USER_MANAGEMENT.NOT_FOUND}
+                description={UI_TEXT.USER_MANAGEMENT.NOT_MATCHING_CRITERIA}
               />
             </TableCell>
           </TableRow>
@@ -151,7 +151,7 @@ export default function AdminUsersTable({ users = [], loading = false, error = '
 
               <TableCell className="pr-8 text-right">
                 <div className="flex justify-end transition-opacity duration-200 group-hover:opacity-100 sm:opacity-0">
-                  <AdminUsersAction user={u} />
+                  <UserManagementAction user={u} />
                 </div>
               </TableCell>
             </TableRow>

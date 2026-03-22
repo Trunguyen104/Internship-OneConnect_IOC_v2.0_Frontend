@@ -9,13 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/admin-users/enums';
+import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { adminUsersService } from './adminUsers.service';
+import { userManagementService } from './userManagement.service';
 
-export default function AdminUsersFilter() {
+export default function UserManagementFilter() {
   const handleSelectedRole = async (value) => {
     try {
       const params = {
@@ -23,7 +23,7 @@ export default function AdminUsersFilter() {
         PageSize: 100,
         Role: value === 'all' ? undefined : Number(value),
       };
-      const res = await adminUsersService.getList(params);
+      const res = await userManagementService.getList(params);
       const data = res?.data ?? res;
       useAdminUsersStore.setUsers(data?.items ?? data?.Items ?? []);
     } catch {

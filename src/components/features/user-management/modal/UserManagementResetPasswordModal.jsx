@@ -18,9 +18,9 @@ import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { adminUsersService } from '../adminUsers.service';
+import { userManagementService } from '../userManagement.service';
 
-export default function AdminUserResetPasswordModal({ open, userId, email, onToggle }) {
+export default function UserManagementResetPasswordModal({ open, userId, email, onToggle }) {
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [reason, setReason] = useState('');
@@ -44,7 +44,7 @@ export default function AdminUserResetPasswordModal({ open, userId, email, onTog
 
     setBusy(true);
     try {
-      await adminUsersService.resetPassword(userId, trimmed);
+      await userManagementService.resetPassword(userId, trimmed);
       toast.success('Password reset email queued');
       useAdminUsersStore.increment();
       onToggle?.(false);
@@ -60,20 +60,20 @@ export default function AdminUserResetPasswordModal({ open, userId, email, onTog
       <DialogContent aria-describedby={undefined} className="sm:max-w-sm">
         <form onSubmit={doReset}>
           <DialogHeader>
-            <DialogTitle>{UI_TEXT.ADMIN_USERS.RESET_PASSWORD}</DialogTitle>
-            <DialogDescription>{UI_TEXT.ADMIN_USERS.ACCOUNT_SECURITY}</DialogDescription>
+            <DialogTitle>{UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}</DialogTitle>
+            <DialogDescription>{UI_TEXT.USER_MANAGEMENT.ACCOUNT_SECURITY}</DialogDescription>
           </DialogHeader>
 
           <FieldGroup className="mt-4 gap-4">
             <Field>
-              <FieldLabel>{UI_TEXT.ADMIN_USERS.TARGET}</FieldLabel>
+              <FieldLabel>{UI_TEXT.USER_MANAGEMENT.TARGET}</FieldLabel>
               <div className="rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-sm text-slate-700">
                 {email || UI_TEXT.COMMON.MINUS}
               </div>
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="reason">{UI_TEXT.ADMIN_USERS.REASON}</FieldLabel>
+              <FieldLabel htmlFor="reason">{UI_TEXT.USER_MANAGEMENT.REASON}</FieldLabel>
               <Textarea
                 id="reason"
                 value={reason}
@@ -90,7 +90,7 @@ export default function AdminUserResetPasswordModal({ open, userId, email, onTog
               </Button>
             </DialogClose>
             <Button type="submit" disabled={busy}>
-              {UI_TEXT.ADMIN_USERS.RESET_PASSWORD}
+              {UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
             </Button>
           </DialogFooter>
         </form>

@@ -50,17 +50,7 @@ export const useViolationReports = () => {
     } finally {
       setLoading(false);
     }
-  }, [
-    params.page,
-    params.pageSize,
-    params.sortBy,
-    params.sortOrder,
-    params.groupId,
-    params.startDate,
-    params.endDate,
-    params.createdBy,
-    debouncedSearch,
-  ]);
+  }, [debouncedSearch, params]);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -107,7 +97,7 @@ export const useViolationReports = () => {
       toast.success(VIOLATION_REPORT_UI.CREATE_SUCCESS);
       fetchReports();
       return true;
-    } catch (error) {
+    } catch {
       toast.error(VIOLATION_REPORT_UI.CREATE_FAIL);
       return false;
     }
@@ -119,7 +109,7 @@ export const useViolationReports = () => {
       toast.success(VIOLATION_REPORT_UI.UPDATE_SUCCESS);
       fetchReports();
       return true;
-    } catch (error) {
+    } catch {
       toast.error(VIOLATION_REPORT_UI.UPDATE_FAIL);
       return false;
     }
@@ -131,7 +121,7 @@ export const useViolationReports = () => {
       toast.success(VIOLATION_REPORT_UI.DELETE_SUCCESS);
       fetchReports();
       return true;
-    } catch (error) {
+    } catch {
       toast.error(VIOLATION_REPORT_UI.DELETE_FAIL);
       return false;
     }

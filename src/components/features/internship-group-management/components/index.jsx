@@ -37,7 +37,6 @@ export default function GroupManagement() {
     pagination,
     handleTableChange,
     handlePageSizeChange,
-    paginatedGroups,
     filteredGroups,
   } = useGroupManagement();
 

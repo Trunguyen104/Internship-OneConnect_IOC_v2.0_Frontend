@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 
-import AdminUsersDialog from '@/components/features/admin-users/AdminUsersDialog';
-import AdminUsersTable from '@/components/features/admin-users/AdminUsersTable';
+import UserManagementDialog from '@/components/features/user-management/UserManagementDialog';
+import UserManagementTable from '@/components/features/user-management/UserManagementTable';
 import PageLayout from '@/components/ui/pagelayout';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import { useAdminUsers } from './useAdminUsers';
+import { useUserManagement } from './useUserManagement';
 
-export default function AdminUsersPage() {
+export default function UserManagementPage() {
   const {
     users,
     loading,
@@ -22,29 +22,29 @@ export default function AdminUsersPage() {
     search,
     setSearch,
     refresh,
-  } = useAdminUsers();
+  } = useUserManagement();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <PageLayout>
-      <PageLayout.Header title={UI_TEXT.ADMIN_USERS.TITLE} />
+      <PageLayout.Header title={UI_TEXT.USER_MANAGEMENT.TITLE} />
 
       <PageLayout.Card>
         <PageLayout.Toolbar
           searchProps={{
-            placeholder: UI_TEXT.ADMIN_USERS.SEARCH_PLACEHOLDER || 'Search users...',
+            placeholder: UI_TEXT.USER_MANAGEMENT.SEARCH_PLACEHOLDER || 'Search users...',
             value: search,
             onChange: (e) => setSearch(e.target.value),
           }}
           actionProps={{
-            label: UI_TEXT.ADMIN_USERS.ADD,
+            label: UI_TEXT.USER_MANAGEMENT.ADD,
             onClick: () => setIsDialogOpen(true),
           }}
         />
 
         <PageLayout.Content>
-          <AdminUsersTable users={users} loading={loading} error={error} refresh={refresh} />
+          <UserManagementTable users={users} loading={loading} error={error} refresh={refresh} />
         </PageLayout.Content>
 
         {total > 0 && (
@@ -58,7 +58,7 @@ export default function AdminUsersPage() {
         )}
       </PageLayout.Card>
 
-      <AdminUsersDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} controlled />
+      <UserManagementDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} controlled />
     </PageLayout>
   );
 }

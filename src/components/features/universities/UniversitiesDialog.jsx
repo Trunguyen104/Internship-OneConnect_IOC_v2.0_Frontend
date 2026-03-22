@@ -44,7 +44,7 @@ export default function UniversitiesDialog({
         <SheetContent className="flex flex-col p-4 sm:max-w-[560px]">
           <SheetHeader className="mt-2 text-center">
             <SheetTitle className="text-3xl">
-              {isEdit ? UI_TEXT.ADMIN_USERS.UPDATE_PROFILE : UI_TEXT.UNIVERSITIES.CREATE}
+              {isEdit ? UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE : UI_TEXT.UNIVERSITIES.CREATE}
             </SheetTitle>
             <SheetDescription>
               {isEdit

@@ -74,20 +74,12 @@ export const useTermManagement = () => {
           total: response.data.totalCount || 0,
         }));
       }
-    } catch (_error) {
+    } catch {
       toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR);
     } finally {
       setLoading(false);
     }
-  }, [
-    pagination.current,
-    pagination.pageSize,
-    searchTerm,
-    statusFilter,
-    sortConfig,
-    toast,
-    setPagination,
-  ]);
+  }, [pagination, sortConfig, searchTerm, statusFilter, toast, setPagination]);
 
   useEffect(() => {
     fetchData();

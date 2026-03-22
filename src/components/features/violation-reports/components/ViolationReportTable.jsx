@@ -21,8 +21,6 @@ const ViolationReportTable = memo(function ViolationReportTable({
   selectedRowKeys = [],
   onSelectRowChange,
 }) {
-  const { TABLE } = VIOLATION_REPORT_UI;
-
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectRowChange,

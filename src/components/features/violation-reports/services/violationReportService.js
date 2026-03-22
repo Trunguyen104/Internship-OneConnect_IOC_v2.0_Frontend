@@ -1,5 +1,3 @@
-const BASE_URL = '/violation-reports';
-
 // Mock data for demonstration
 const MOCK_REPORTS = [
   {

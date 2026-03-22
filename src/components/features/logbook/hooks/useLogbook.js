@@ -50,7 +50,7 @@ export function useLogbook() {
     if (urlInternshipId && urlInternshipId !== internshipId) {
       setInternshipIdState(urlInternshipId);
     }
-  }, [urlInternshipId]);
+  }, [urlInternshipId, internshipId]);
 
   const setInternshipId = useCallback(
     (id) => {

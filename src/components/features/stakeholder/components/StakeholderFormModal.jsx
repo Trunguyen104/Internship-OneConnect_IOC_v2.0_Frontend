@@ -6,7 +6,7 @@ import React, { memo } from 'react';
 
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const StakeholderFormModal = memo(function StakeholderFormModal({
   isOpen,

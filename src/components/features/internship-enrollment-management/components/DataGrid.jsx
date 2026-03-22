@@ -192,7 +192,19 @@ const DataGrid = memo(function DataGrid({
         },
       },
     ],
-    [onView, onEdit, onDelete, onRestore, onSort, TABLE, STATUS_LABELS, ACTIONS, page, pageSize]
+    [
+      onView,
+      onEdit,
+      onDelete,
+      onRestore,
+      onSort,
+      TABLE,
+      STATUS_LABELS,
+      ACTIONS,
+      page,
+      pageSize,
+      PLACEMENT_LABELS,
+    ]
   );
 
   return (

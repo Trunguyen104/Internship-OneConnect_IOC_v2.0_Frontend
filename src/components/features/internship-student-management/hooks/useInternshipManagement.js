@@ -12,7 +12,7 @@ export const useInternshipManagement = (initialStudents) => {
   const [students, setStudents] = useState(initialStudents || []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [mentorFilter, setMentorFilter] = useState(undefined);
+  const [mentorFilter] = useState(undefined);
   const [groupFilter, setGroupFilter] = useState('ALL');
   const [assignmentFilter, setAssignmentFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState(null);
@@ -27,7 +27,6 @@ export const useInternshipManagement = (initialStudents) => {
   const [detailModal, setDetailModal] = useState({ open: false, student: null });
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [createModal, setCreateModal] = useState(false);
 
   const filteredData = useMemo(() => {
     let data = [...students];
@@ -74,11 +73,6 @@ export const useInternshipManagement = (initialStudents) => {
 
   const handleStatusChange = useCallback((value) => {
     setStatusFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleMentorChange = useCallback((value) => {
-    setMentorFilter(value);
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
@@ -130,7 +124,7 @@ export const useInternshipManagement = (initialStudents) => {
   );
 
   const handleRejectStudent = useCallback(
-    (studentId, reason) => {
+    (studentId) => {
       setStudents((prev) =>
         prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s))
       );
