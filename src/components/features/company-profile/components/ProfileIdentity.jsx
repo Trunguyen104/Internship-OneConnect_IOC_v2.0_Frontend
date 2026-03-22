@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  CheckCircleFilled,
-  EnvironmentOutlined,
-  GlobalOutlined,
-  SolutionOutlined,
-} from '@ant-design/icons';
+import { EnvironmentOutlined, GlobalOutlined, SolutionOutlined } from '@ant-design/icons';
 import { Col, Grid, Row, Space, Tag, theme, Typography } from 'antd';
 import Image from 'next/image';
 import { memo } from 'react';
@@ -72,21 +67,6 @@ export const ProfileIdentity = memo(function ProfileIdentity({ profile }) {
               >
                 {profile?.name || ENTERPRISE_PROFILE_UI.ENTERPRISE.NOT_PROVIDED}
               </Title>
-              {profile?.isVerified ? (
-                <Tag
-                  icon={<CheckCircleFilled aria-hidden="true" />}
-                  style={{
-                    marginInlineEnd: 0,
-                    borderRadius: 999,
-                    borderColor: 'transparent',
-                    background: token.colorSuccessBg,
-                    color: token.colorSuccessText,
-                    fontWeight: 700,
-                  }}
-                >
-                  {ENTERPRISE_PROFILE_UI.ENTERPRISE.VERIFIED}
-                </Tag>
-              ) : null}
             </Space>
 
             <Space size="small" wrap aria-label="Company metadata">
