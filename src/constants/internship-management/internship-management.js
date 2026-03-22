@@ -31,8 +31,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     FILTERS: {
       SEARCH_PLACEHOLDER: 'Search groups...',
       STATUS_FILTER: 'Status',
-      SELECT_TERM: 'Select Term',
-      SELECT_STATUS: 'Select Status',
     },
     TABLE: {
       COLUMNS: {
@@ -62,20 +60,14 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     MODALS: {
       CREATE: {
         TITLE: 'Create New Internship Group',
-        TITLE_EDIT: 'Edit Internship Group',
         SUBTITLE: 'Create a new internship group for this term',
-        SUBTITLE_EDIT: 'Update group information and field',
         SUBMIT: 'Create Group',
-        SUBMIT_EDIT: 'Update Group',
         CANCEL: 'Cancel',
         NAME_LABEL: 'Group Name',
         NAME_REQUIRED: 'Please enter group name',
         NAME_PLACEHOLDER: 'Ex: Web Frontend A',
         TRACK_LABEL: 'Track',
         TRACK_REQUIRED: 'Please select a track',
-        STUDENTS_LABEL: 'Select Students',
-        STUDENTS_PLACEHOLDER: 'Search and select at least 1 student...',
-        STUDENTS_REQUIRED: 'Internship group must have at least 1 student',
         TRACK_OPTIONS: {
           FRONTEND: 'Frontend',
           BACKEND: 'Backend',
@@ -99,7 +91,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
       VIEW: {
         TITLE: 'Group Details:',
-        DEFAULT_SUBTITLE: 'Internship Group Information',
         TRACK: 'Track / Field',
         STATUS: 'Status',
         MEMBERS: 'Team Members',
@@ -107,7 +98,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         TOTAL_MEMBERS: 'Total Members',
         MENTOR: 'Assigned Mentor',
         PROJECT_NAME: 'Project Name',
-        STUDENTS_SUFFIX: 'students',
+        NOT_ASSIGNED: 'Not Assigned',
+        STUDENTS_SUFFIX: 'Students',
+        DEFAULT_SUBTITLE: 'Internship Group',
         CLOSE: 'Close',
       },
     },
@@ -260,7 +253,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
       DETAIL: {
         TITLE: 'Student Information',
-        UNIVERSITY: 'University',
         MAJOR: 'Major / Field',
         STATUS: 'Status',
         EMAIL: 'Email Address',
@@ -268,7 +260,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         DOB: 'Date of Birth',
         GROUP: 'Group',
         MENTOR: 'Mentor',
-        PROJECT: 'Project',
         PLACEMENT_DATE: 'Placement Date',
         CLOSE: 'Close',
       },

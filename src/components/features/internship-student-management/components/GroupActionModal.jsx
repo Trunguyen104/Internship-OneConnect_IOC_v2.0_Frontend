@@ -7,26 +7,15 @@ import React, { useEffect } from 'react';
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { useEnterpriseGroups } from '../../internship-group-management/hooks/useEnterpriseGroups';
+import { MOCK_GROUPS } from '../constants/internshipData';
 
-const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) => {
+const GroupActionModal = ({ open, student, type, onCancel, onConfirm }) => {
   const [form] = Form.useForm();
   const { GROUP_ACTION } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
 
   useEffect(() => {
     if (open) form.resetFields();
   }, [open, form]);
-
-  const { data: activeGroups, loading: fetchingGroups } = useEnterpriseGroups({
-    termId: students[0]?.termId, // Use the first student's termId, mock will fall back if undefined
-    filters: { status: 1 }, // Changed from 0 to 1 based on backend validation error
-    pagination: { current: 1, pageSize: 100 }, // Fetch a large chunk for dropdown
-    search: '',
-  });
-
-  const currentGroupIds = React.useMemo(() => {
-    return students.map((s) => s.groupId).filter(Boolean);
-  }, [students]);
 
   return (
     <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden>
@@ -36,11 +25,7 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
         subtitle={
           <div className="flex items-center gap-2">
             <span className="opacity-70">{GROUP_ACTION.STUDENT_LABEL}</span>
-            <span className="text-text font-bold">
-              {students.length === 1
-                ? students[0]?.studentFullName || students[0]?.fullName
-                : `${students.length} students selected`}
-            </span>
+            <span className="text-text font-bold">{student?.fullName}</span>
           </div>
         }
       />
@@ -66,29 +51,13 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
             placeholder={GROUP_ACTION.GROUP_PLACEHOLDER}
             className="h-11 w-full rounded-xl"
             suffixIcon={<SearchOutlined className="text-muted" />}
-            loading={fetchingGroups}
-            options={activeGroups.map((g) => {
-              const isCurrent = currentGroupIds.includes(g.id);
-              return {
-                label: (
-                  <div className="flex justify-between items-center w-full">
-                    <span>{`${g.name} \u2014 ${g.mentorName || 'No Mentor'} \u2014 ${g.memberCount} ${GROUP_ACTION.STUDENTS_SUFFIX}`}</span>
-                    {isCurrent && (
-                      <span className="bg-gray-100 text-muted px-2 py-0.5 rounded text-[10px] uppercase font-bold">
-                        {'Current Group'}
-                      </span>
-                    )}
-                  </div>
-                ),
-                value: g.id,
-                disabled: isCurrent,
-              };
-            })}
-            filterOption={(input, option) => {
-              // Extract text from the complex label object for filtering
-              const labelText = activeGroups.find((g) => g.id === option.value)?.name || '';
-              return labelText.toLowerCase().includes(input.toLowerCase());
-            }}
+            options={MOCK_GROUPS.map((g) => ({
+              label: `${g.name} — ${g.mentor} — ${g.project} — ${g.memberCount} ${GROUP_ACTION.STUDENTS_SUFFIX}`,
+              value: g.id,
+            }))}
+            filterOption={(input, option) =>
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
           />
         </Form.Item>
 

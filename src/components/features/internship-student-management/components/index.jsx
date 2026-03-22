@@ -1,6 +1,7 @@
 'use client';
 
-import { EditOutlined, TeamOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { CalendarOutlined, FilterOutlined, TeamOutlined, UserAddOutlined } from '@ant-design/icons';
+import { DatePicker, Select } from 'antd';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -9,155 +10,163 @@ import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
+import { MOCK_STUDENTS } from '../constants/internshipData';
 import { useInternshipManagement } from '../hooks/useInternshipManagement';
+import AddStudentModal from './AddStudentModal';
 import AssignMentorModal from './AssignMentorModal';
 import GroupActionModal from './GroupActionModal';
+import InternshipTable from './InternshipTable';
 import RejectStudentModal from './RejectStudentModal';
 import StudentDetailModal from './StudentDetailModal';
-import StudentFilters from './StudentFilters';
-import StudentTable from './StudentTable';
-// CreateGroupModal removed to align with requirements (use Group Management tab instead)
 
 export default function InternshipManagement() {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
-
   const {
     search,
     statusFilter,
     groupFilter,
-    setGroupFilter,
     assignmentFilter,
-    setAssignmentFilter,
+    dateFilter,
     pagination,
     filteredData,
-    total,
-    loading,
+    paginatedData,
     rejectModal,
+    assignModal,
     groupModal,
     detailModal,
-    assignModal,
+    isAddModalOpen,
     selectedRowKeys,
     setRejectModal,
+    setAssignModal,
     setGroupModal,
     setDetailModal,
-    setAssignModal,
+    setIsAddModalOpen,
     setSelectedRowKeys,
+    setGroupFilter,
+    setAssignmentFilter,
+    setDateFilter,
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
     handlePageSizeChange,
     handleAcceptStudent,
+    handleAddStudent,
     handleRejectStudent,
-    handleGroupSubmit,
     handleAssignMentor,
-    termId,
-    setTermId,
-    termOptions,
-    fetchingTerms,
-    resetFilters,
-    projectFilter,
-    setProjectFilter,
-    universityFilter,
-    setUniversityFilter,
-    majorFilter,
-    setMajorFilter,
-    universityOptions,
-  } = useInternshipManagement();
-
-  const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
-  const hasNoGroup = selectedStudents.some((s) => !s.groupId);
-  const hasGroup = selectedStudents.some((s) => !!s.groupId);
-
-  const bulkItems = [
-    {
-      key: 'addToGroup',
-      label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
-      icon: <UsergroupAddOutlined />,
-      disabled: hasGroup,
-      onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'ADD' }),
-    },
-    {
-      key: 'changeGroup',
-      label: INTERNSHIP_LIST.ACTIONS.CHANGE_GROUP,
-      icon: <EditOutlined />,
-      disabled: hasNoGroup,
-      onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'CHANGE' }),
-    },
-  ];
+    handleGroupSubmit,
+  } = useInternshipManagement(MOCK_STUDENTS);
 
   return (
     <>
-      <div className="mx-auto flex w-full max-w-full flex-1 flex-col">
-        <PageTitle title={INTERNSHIP_LIST.TITLE} showBack={false} />
-
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 shadow-sm">
+      <div className="mx-auto flex min-h-[420px] w-full flex-1 flex-col">
+        <PageTitle title={INTERNSHIP_LIST.TITLE} />
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
           <DataTableToolbar className="mb-6">
             <DataTableToolbar.Search
               placeholder={INTERNSHIP_LIST.FILTERS.SEARCH_PLACEHOLDER}
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="max-w-xs"
             />
 
             <DataTableToolbar.Filters>
-              <StudentFilters
-                termId={termId}
-                setTermId={setTermId}
-                termOptions={termOptions}
-                fetchingTerms={fetchingTerms}
-                statusFilter={statusFilter}
-                setStatusFilter={handleStatusChange}
-                groupFilter={groupFilter}
-                setGroupFilter={setGroupFilter}
-                assignmentFilter={assignmentFilter}
-                setAssignmentFilter={setAssignmentFilter}
-                projectFilter={projectFilter}
-                setProjectFilter={setProjectFilter}
-                universityFilter={universityFilter}
-                setUniversityFilter={setUniversityFilter}
-                majorFilter={majorFilter}
-                setMajorFilter={setMajorFilter}
-                universityOptions={universityOptions}
-                resetFilters={resetFilters}
-              />
+              <div className="flex flex-wrap items-center gap-3">
+                <DatePicker
+                  picker="month"
+                  placeholder={INTERNSHIP_LIST.FILTERS.DATE_FILTER_PLACEHOLDER}
+                  value={dateFilter}
+                  onChange={setDateFilter}
+                  className="h-9 w-40 rounded-lg"
+                  suffixIcon={<CalendarOutlined className="text-muted" />}
+                />
+
+                <Select
+                  allowClear
+                  placeholder={INTERNSHIP_LIST.FILTERS.STATUS_FILTER || 'Status'}
+                  value={statusFilter === 'ALL' ? undefined : statusFilter}
+                  onChange={handleStatusChange}
+                  className="h-9 min-w-[130px]"
+                  options={INTERNSHIP_LIST.FILTERS.STATUS_OPTIONS.filter(
+                    (opt) => opt.value !== 'ALL'
+                  )}
+                  suffixIcon={<FilterOutlined className="text-muted" />}
+                />
+
+                <Select
+                  allowClear
+                  placeholder={INTERNSHIP_LIST.FILTERS.GROUP_FILTER}
+                  value={groupFilter === 'ALL' ? undefined : groupFilter}
+                  onChange={setGroupFilter}
+                  className="h-9 min-w-[130px]"
+                  options={INTERNSHIP_LIST.FILTERS.GROUP_OPTIONS}
+                  suffixIcon={<TeamOutlined className="text-muted" />}
+                />
+
+                <Select
+                  allowClear
+                  placeholder={INTERNSHIP_LIST.FILTERS.ASSIGNMENT_FILTER}
+                  value={assignmentFilter === 'ALL' ? undefined : assignmentFilter}
+                  onChange={setAssignmentFilter}
+                  className="h-9 min-w-[130px]"
+                  options={INTERNSHIP_LIST.FILTERS.ASSIGNMENT_OPTIONS}
+                  suffixIcon={<FilterOutlined className="text-muted" />}
+                />
+              </div>
             </DataTableToolbar.Filters>
 
-            {selectedRowKeys.length > 0 && (
-              <DataTableToolbar.Actions
-                label={`${INTERNSHIP_LIST.ACTIONS.BULK_ACTIONS} (${selectedRowKeys.length})`}
-                icon={<TeamOutlined />}
-                menu={{
-                  items: bulkItems,
-                }}
-              />
-            )}
+            <DataTableToolbar.Actions
+              {...(selectedRowKeys.length > 0
+                ? {
+                    label: `${INTERNSHIP_LIST.ACTIONS.BULK_ACTIONS} (${selectedRowKeys.length})`,
+                    icon: <TeamOutlined />,
+                    menu: {
+                      items: [
+                        {
+                          key: 'add-to-group',
+                          label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
+                          icon: <UserAddOutlined />,
+                          onClick: () =>
+                            setGroupModal({
+                              open: true,
+                              student: { id: selectedRowKeys[0] }, // Mock single for now
+                              type: 'ADD',
+                            }),
+                        },
+                      ],
+                    },
+                  }
+                : {
+                    label: INTERNSHIP_LIST.ADD_STUDENT_BTN,
+                    onClick: () => setIsAddModalOpen(true),
+                    icon: <UserAddOutlined />,
+                  })}
+            />
           </DataTableToolbar>
 
-          <StudentTable
-            data={filteredData}
+          <InternshipTable
+            data={paginatedData}
             page={pagination.current}
             pageSize={pagination.pageSize}
-            loading={loading}
             selectedRowKeys={selectedRowKeys}
             onSelectRowChange={setSelectedRowKeys}
             onAccept={handleAcceptStudent}
             onReject={(student) => setRejectModal({ open: true, student, reason: '' })}
-            onView={(student) => setDetailModal({ open: true, student })}
             onAssign={(student) => setAssignModal({ open: true, student })}
-            onAddToGroup={(student) =>
-              setGroupModal({ open: true, students: [student], type: 'ADD' })
-            }
-            onChangeGroup={(student) =>
-              setGroupModal({ open: true, students: [student], type: 'CHANGE' })
+            onView={(student) => setDetailModal({ open: true, student })}
+            onGroup={(student) =>
+              setGroupModal({
+                open: true,
+                student,
+                type: student.groupId ? 'CHANGE' : 'ADD',
+              })
             }
           />
-          {total > 0 && (
+          {filteredData.length > 0 && (
             <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
               <Pagination
-                total={total}
+                total={filteredData.length}
                 page={pagination.current}
                 pageSize={pagination.pageSize}
-                totalPages={Math.ceil(total / pagination.pageSize)}
+                totalPages={Math.ceil(filteredData.length / pagination.pageSize)}
                 onPageChange={handleTableChange}
                 onPageSizeChange={handlePageSizeChange}
               />
@@ -166,17 +175,17 @@ export default function InternshipManagement() {
         </Card>
       </div>
 
+      <AddStudentModal
+        open={isAddModalOpen}
+        onCancel={() => setIsAddModalOpen(false)}
+        onSave={handleAddStudent}
+      />
+
       <RejectStudentModal
         open={rejectModal.open}
         student={rejectModal.student}
         onCancel={() => setRejectModal({ open: false, student: null, reason: '' })}
         onConfirm={handleRejectStudent}
-      />
-
-      <StudentDetailModal
-        open={detailModal.open}
-        student={detailModal.student}
-        onCancel={() => setDetailModal({ open: false, student: null })}
       />
 
       <AssignMentorModal
@@ -188,10 +197,16 @@ export default function InternshipManagement() {
 
       <GroupActionModal
         open={groupModal.open}
-        students={groupModal.students}
+        student={groupModal.student}
         type={groupModal.type}
-        onCancel={() => setGroupModal({ open: false, students: [], type: 'ADD' })}
+        onCancel={() => setGroupModal({ open: false, student: null, type: 'ADD' })}
         onConfirm={handleGroupSubmit}
+      />
+
+      <StudentDetailModal
+        open={detailModal.open}
+        student={detailModal.student}
+        onCancel={() => setDetailModal({ open: false, student: null })}
       />
     </>
   );

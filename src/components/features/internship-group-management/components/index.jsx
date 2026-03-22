@@ -19,6 +19,7 @@ import { ViewGroupModal } from './ViewGroupModal';
 export default function GroupManagement() {
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
   const {
+    groups,
     activeTab,
     setActiveTab,
     search,
@@ -29,33 +30,19 @@ export default function GroupManagement() {
     setViewModal,
     createModal,
     setCreateModal,
-    editModal,
-    setEditModal,
     handleAssignSubmit,
     handleDeleteGroup,
     handleArchiveGroup,
     handleCreateGroup,
-    handleUpdateGroup,
     pagination,
     handleTableChange,
     handlePageSizeChange,
+    paginatedGroups,
     filteredGroups,
-    total,
-    loading,
-    termId,
-    setTermId,
-    termOptions,
-    fetchingTerms,
-    unassignedStudents,
-    fetchingStudents,
   } = useGroupManagement();
 
   const onViewDetailed = (group) => {
     setViewModal({ open: true, group });
-  };
-
-  const onEditGroup = (group) => {
-    setEditModal({ open: true, group });
   };
 
   return (
@@ -73,23 +60,20 @@ export default function GroupManagement() {
             <DataTableToolbar.Filters>
               <div className="flex flex-wrap items-center gap-3">
                 <Select
-                  placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_TERM}
-                  value={termId}
-                  onChange={setTermId}
-                  className="h-9 min-w-[150px]"
-                  options={termOptions}
-                  loading={fetchingTerms}
-                />
-
-                <Select
                   allowClear
-                  placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_STATUS}
+                  placeholder={GROUP_MANAGEMENT.FILTERS.STATUS_FILTER}
                   value={activeTab === 'ALL' ? undefined : activeTab}
                   onChange={setActiveTab}
                   className="h-9 min-w-[160px]"
                   options={[
-                    { label: GROUP_MANAGEMENT.ACTIVE, value: 0 },
-                    { label: GROUP_MANAGEMENT.ARCHIVED, value: 2 },
+                    {
+                      label: `${GROUP_MANAGEMENT.ACTIVE} (${groups.filter((g) => g.status === 'ACTIVE').length})`,
+                      value: 'ACTIVE',
+                    },
+                    {
+                      label: `${GROUP_MANAGEMENT.ARCHIVED} (${groups.filter((g) => g.status === 'ARCHIVED').length})`,
+                      value: 'ARCHIVED',
+                    },
                   ]}
                   suffixIcon={<FilterOutlined className="text-muted" />}
                 />
@@ -105,23 +89,22 @@ export default function GroupManagement() {
 
           <GroupTable
             data={filteredGroups}
-            loading={loading}
+            loading={false}
             page={pagination.current}
             pageSize={pagination.pageSize}
             onAssign={setAssignModal}
             onDelete={handleDeleteGroup}
             onArchive={handleArchiveGroup}
             onView={onViewDetailed}
-            onEdit={onEditGroup}
           />
 
-          {total > 0 && (
+          {filteredGroups.length > 0 && (
             <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
               <Pagination
-                total={total}
+                total={filteredGroups.length}
                 page={pagination.current}
                 pageSize={pagination.pageSize}
-                totalPages={Math.ceil(total / pagination.pageSize)}
+                totalPages={Math.ceil(filteredGroups.length / pagination.pageSize)}
                 onPageChange={handleTableChange}
                 onPageSizeChange={handlePageSizeChange}
               />
@@ -144,15 +127,9 @@ export default function GroupManagement() {
       />
 
       <CreateGroupModal
-        open={createModal || editModal.open}
-        group={editModal.group}
-        students={unassignedStudents}
-        loadingStudents={fetchingStudents}
-        onCancel={() => {
-          setCreateModal(false);
-          setEditModal({ open: false, group: null });
-        }}
-        onFinish={editModal.open ? handleUpdateGroup : handleCreateGroup}
+        open={createModal}
+        onCancel={() => setCreateModal(false)}
+        onFinish={handleCreateGroup}
       />
     </>
   );
