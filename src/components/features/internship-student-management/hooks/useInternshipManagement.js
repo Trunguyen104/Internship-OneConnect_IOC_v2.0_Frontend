@@ -1,223 +1,243 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
-import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
+import { useEnterpriseGroupActions } from '../../internship-group-management/hooks/useEnterpriseGroupActions';
+import { useEnterpriseStudentActions } from '../hooks/useEnterpriseStudentActions';
+import { useEnterpriseStudentFilters } from '../hooks/useEnterpriseStudentFilters';
+import { useEnterpriseStudents } from '../hooks/useEnterpriseStudents';
+import { EnterpriseStudentService } from '../services/enterprise-student.service';
 
-export const useInternshipManagement = (initialStudents) => {
+export const useInternshipManagement = () => {
   const toast = useToast();
   const { MESSAGES } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
-  const [students, setStudents] = useState(initialStudents || []);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [mentorFilter, setMentorFilter] = useState(undefined);
-  const [groupFilter, setGroupFilter] = useState('ALL');
-  const [assignmentFilter, setAssignmentFilter] = useState('ALL');
-  const [dateFilter, setDateFilter] = useState(null);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
+
+  const {
+    termId,
+    setTermId,
+    termOptions,
+    fetchingTerms,
+    searchValue,
+    filters: filterState,
+    pagination,
+    sort,
+    handleSearch,
+    debouncedSearch,
+    handleFilterChange,
+    handleTableChange,
+    resetFilters,
+    universityOptions,
+  } = useEnterpriseStudentFilters();
+
+  const { data, total, loading, refetch } = useEnterpriseStudents({
+    termId: termId,
+    filters: filterState,
+    search: debouncedSearch,
+    pagination: pagination,
+    sort: sort,
   });
 
+  const {
+    acceptApplication,
+    rejectApplication,
+    loading: actionLoading,
+  } = useEnterpriseStudentActions(refetch);
+  const {
+    createGroup,
+    addStudents,
+    loading: groupActionLoading,
+  } = useEnterpriseGroupActions(refetch);
+
   const [rejectModal, setRejectModal] = useState({ open: false, student: null });
-  const [assignModal, setAssignModal] = useState({ open: false, student: null });
-  const [groupModal, setGroupModal] = useState({ open: false, student: null, type: 'ADD' });
+  const [groupModal, setGroupModal] = useState({ open: false, students: [], type: 'ADD' });
   const [detailModal, setDetailModal] = useState({ open: false, student: null });
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [assignModal, setAssignModal] = useState({ open: false, student: null });
+  const [createModal, setCreateModal] = useState({ open: false, students: [] });
+  const [unassignedStudents, setUnassignedStudents] = useState([]);
+  const [fetchingStudents, setFetchingStudents] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [createModal, setCreateModal] = useState(false);
-
-  const filteredData = useMemo(() => {
-    let data = [...students];
-    if (search) {
-      const s = search.toLowerCase();
-      data = data.filter(
-        (item) =>
-          (item.fullName || '').toLowerCase().includes(s) ||
-          (item.email || '').toLowerCase().includes(s) ||
-          (item.major || '').toLowerCase().includes(s)
-      );
-    }
-    if (statusFilter !== 'ALL') data = data.filter((item) => item.status === statusFilter);
-    if (mentorFilter) data = data.filter((item) => item.mentorId === mentorFilter);
-
-    if (groupFilter === 'HAS_GROUP') data = data.filter((item) => item.groupId);
-    if (groupFilter === 'NO_GROUP') data = data.filter((item) => !item.groupId);
-
-    if (assignmentFilter === 'ASSIGNED') data = data.filter((item) => item.mentorId);
-    if (assignmentFilter === 'UNASSIGNED') data = data.filter((item) => !item.mentorId);
-
-    if (dateFilter) {
-      const filterMonth = dateFilter.month();
-      const filterYear = dateFilter.year();
-      data = data.filter((item) => {
-        const d = new Date(item.placedDate || item.id);
-        return d.getMonth() === filterMonth && d.getFullYear() === filterYear;
-      });
-    }
-
-    return data;
-  }, [students, search, statusFilter, mentorFilter, groupFilter, assignmentFilter, dateFilter]);
-
-  const paginatedData = useMemo(() => {
-    const start = (pagination.current - 1) * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    return filteredData.slice(start, end);
-  }, [filteredData, pagination]);
-
-  const handleSearchChange = useCallback((value) => {
-    setSearch(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleStatusChange = useCallback((value) => {
-    setStatusFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleMentorChange = useCallback((value) => {
-    setMentorFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleTableChange = useCallback((page) => {
-    setPagination((prev) => ({ ...prev, current: page }));
-  }, []);
 
   const handleAcceptStudent = useCallback(
-    (student) => {
+    async (student) => {
       if (!student) return;
       showDeleteConfirm({
         title: MESSAGES.ACCEPT_CONFIRM_TITLE,
-        content: `${MESSAGES.ACCEPT_CONFIRM_CONTENT} ${student.fullName}?`,
+        content: `${MESSAGES.ACCEPT_CONFIRM_CONTENT} ${student.studentFullName}?`,
         okText: MESSAGES.ACCEPT_CONFIRM_OK,
         type: 'warning',
-        onOk: () => {
-          setStudents((prev) =>
-            prev.map((s) => (s.id === student.id ? { ...s, status: 'ACCEPTED' } : s))
-          );
-          toast.success(MESSAGES.ACCEPT_SUCCESS);
+        onOk: async () => {
+          await acceptApplication(student.id);
         },
       });
     },
-    [toast, MESSAGES]
-  );
-
-  const handleAddStudent = useCallback(
-    (values) => {
-      const newStudent = {
-        key: Date.now().toString(),
-        id: Date.now(),
-        fullName: values.fullName,
-        studentId: values.studentId,
-        email: values.email,
-        major: values.major,
-        status: 'PENDING',
-        mentorId: null,
-        avatar: (values.fullName || '')
-          .split(' ')
-          .map((n) => n[0])
-          .join('')
-          .toUpperCase(),
-      };
-      setStudents((prev) => [newStudent, ...prev]);
-      setIsAddModalOpen(false);
-      toast.success(MESSAGES.ADD_SUCCESS);
-    },
-    [toast, MESSAGES]
+    [MESSAGES, acceptApplication]
   );
 
   const handleRejectStudent = useCallback(
-    (studentId, reason) => {
-      setStudents((prev) =>
-        prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s))
-      );
+    async (reason) => {
+      if (!rejectModal.student) return;
+      await rejectApplication(rejectModal.student.id, reason);
       setRejectModal({ open: false, student: null });
-      toast.warning(MESSAGES.REJECT_SUCCESS);
     },
-    [toast, MESSAGES]
-  );
-
-  const handleAssignMentor = useCallback(
-    (studentId, mentorId) => {
-      setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, mentorId } : s)));
-      setAssignModal({ open: false, student: null });
-      toast.success(MESSAGES.ASSIGN_SUCCESS);
-    },
-    [toast, MESSAGES]
+    [rejectModal.student, rejectApplication]
   );
 
   const handleGroupSubmit = useCallback(
-    (values) => {
-      const { student, type } = groupModal;
-      if (!student) return;
+    async (values) => {
+      const studentsPayload = groupModal.students.map((s) => ({
+        studentId: s.id,
+        role: 1, // Default Member
+      }));
+      const success = await addStudents(values.groupId, studentsPayload);
 
-      const selectedGroup = MOCK_GROUPS.find((g) => g.id === values.groupId);
-
-      setStudents((prev) =>
-        prev.map((s) =>
-          s.id === student.id
-            ? {
-                ...s,
-                groupId: values.groupId,
-                mentorId: selectedGroup
-                  ? MOCK_MENTORS.find((m) => m.name === selectedGroup.mentor)?.id || null
-                  : null,
-              }
-            : s
-        )
-      );
-
-      if (type === 'ADD') {
-        toast.success(MESSAGES.GROUP_ADD_SUCCESS);
-      } else {
-        toast.success(MESSAGES.GROUP_CHANGE_SUCCESS);
+      if (success) {
+        setGroupModal({ open: false, students: [], type: 'ADD' });
       }
-
-      setGroupModal({ open: false, student: null, type: 'ADD' });
     },
-    [groupModal, toast, MESSAGES]
+    [groupModal.students, addStudents]
   );
 
+  const handleAssignMentor = useCallback(
+    async (_values) => {
+      if (!assignModal.student) return;
+      // TODO: Call API to assign mentor/project
+      toast.success(INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MESSAGES.ASSIGN_SUCCESS);
+      setAssignModal({ open: false, student: null });
+      refetch();
+    },
+    [assignModal.student, toast, refetch]
+  );
+
+  const fetchUnassignedStudents = useCallback(async () => {
+    if (!termId) return;
+    try {
+      setFetchingStudents(true);
+      const res = await EnterpriseStudentService.getApplications({
+        termId, // Working key from useGroupManagement
+        TermId: termId, // Fallback
+        status: 1, // Working key
+        Status: 1, // Fallback
+        pageIndex: 1, // Working key
+        PageNumber: 1, // Fallback
+        pageSize: 100,
+        PageSize: 100,
+      });
+      const items = res?.data?.items || [];
+      const unassigned = items
+        .filter((s) => s.status === 1 && !s.groupId)
+        .map(EnterpriseStudentService.mapApplication);
+      setUnassignedStudents(unassigned);
+    } catch (err) {
+      console.error('Failed to fetch unassigned students:', err);
+    } finally {
+      setFetchingStudents(false);
+    }
+  }, [termId]);
+
+  const handleCreateGroup = useCallback(
+    async (values) => {
+      // Ưu tiên lấy studentId cho việc tạo nhóm (Bắt buộc theo backend Handler)
+      const studentIds =
+        values.studentIds && values.studentIds.length > 0
+          ? values.studentIds
+          : createModal.students.map((s) => s.studentId || s.StudentId || s.id || s.applicationId);
+
+      if (!studentIds || studentIds.length === 0) {
+        toast.error('Vui lòng chọn ít nhất 1 sinh viên để tạo nhóm.');
+        return;
+      }
+
+      const payload = {
+        GroupName: values.name,
+        Track: values.track,
+        TermId: termId,
+        students: studentIds.map((id) => ({
+          studentId: id,
+          role: 1, // Member default
+        })),
+      };
+
+      console.log('DEBUG PAYLOAD (FINAL FIX):', payload);
+
+      const success = await createGroup(payload);
+      if (success) {
+        setCreateModal({ open: false, students: [] });
+      }
+    },
+    [createGroup, termId, createModal.students, toast]
+  );
+
+  useEffect(() => {
+    if (createModal.open) fetchUnassignedStudents();
+  }, [createModal.open, fetchUnassignedStudents]);
+
   return {
-    students,
-    search,
-    statusFilter,
-    mentorFilter,
-    pagination,
-    filteredData,
-    paginatedData,
+    students: data,
+    search: searchValue,
+    statusFilter: filterState.status !== null ? filterState.status : 'ALL',
+    pagination: pagination,
+    filteredData: data,
+    total,
+    loading: loading || actionLoading || groupActionLoading,
     rejectModal,
-    assignModal,
     groupModal,
     detailModal,
-    isAddModalOpen,
+    assignModal,
     selectedRowKeys,
     setRejectModal,
-    setAssignModal,
     setGroupModal,
     setDetailModal,
-    setIsAddModalOpen,
+    setAssignModal,
     setSelectedRowKeys,
-    setGroupFilter,
-    setAssignmentFilter,
-    setDateFilter,
-    handleSearchChange,
-    handleStatusChange,
-    handleTableChange,
+    handleSearchChange: handleSearch,
+    handleStatusChange: (val) => handleFilterChange('status', val),
+    handleTableChange: (page, pageSize) => handleTableChange({ current: page, pageSize }),
     handlePageSizeChange: (pageSize) => {
-      setPagination((prev) => ({ ...prev, pageSize, current: 1 }));
+      handleTableChange({ current: 1, pageSize });
     },
     handleAcceptStudent,
-    handleAddStudent,
     handleRejectStudent,
-    handleAssignMentor,
     handleGroupSubmit,
-    setStatusFilter,
-    groupFilter,
-    assignmentFilter,
-    dateFilter,
+    handleAssignMentor,
+    resetFilters,
+    groupFilter:
+      filterState.hasGroup === null ? 'ALL' : filterState.hasGroup ? 'HAS_GROUP' : 'NO_GROUP',
+    assignmentFilter:
+      filterState.mentorAssigned === null
+        ? 'ALL'
+        : filterState.mentorAssigned
+          ? 'ASSIGNED'
+          : 'UNASSIGNED',
+    projectFilter:
+      filterState.projectAssigned === null
+        ? 'ALL'
+        : filterState.projectAssigned
+          ? 'PROJECT_ASSIGNED'
+          : 'PROJECT_UNASSIGNED',
+    universityFilter: filterState.universityId,
+    majorFilter: filterState.major,
+    setGroupFilter: (val) =>
+      handleFilterChange('hasGroup', val === 'ALL' || !val ? null : val === 'HAS_GROUP'),
+    setAssignmentFilter: (val) =>
+      handleFilterChange('mentorAssigned', val === 'ALL' || !val ? null : val === 'ASSIGNED'),
+    setProjectFilter: (val) =>
+      handleFilterChange(
+        'projectAssigned',
+        val === 'ALL' || !val ? null : val === 'PROJECT_ASSIGNED'
+      ),
+    setUniversityFilter: (val) => handleFilterChange('universityId', val),
+    setMajorFilter: (val) => handleFilterChange('major', val),
+    termId,
+    setTermId,
+    termOptions,
+    fetchingTerms,
+    universityOptions,
+    setCreateModal,
+    createModal,
+    unassignedStudents,
+    fetchingStudents,
+    handleCreateGroup,
   };
 };

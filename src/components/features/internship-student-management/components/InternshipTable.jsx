@@ -14,7 +14,6 @@ import React, { memo, useMemo } from 'react';
 import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
 import StatusTag from './StatusTag';
 
 const InternshipTable = memo(function InternshipTable({
@@ -56,9 +55,11 @@ const InternshipTable = memo(function InternshipTable({
           return (
             <div className="flex items-center gap-2">
               <div className="flex flex-col overflow-hidden">
-                <span className="text-text truncate text-sm font-bold">{text || 'N/A'}</span>
+                <span className="text-text truncate text-sm font-bold">
+                  {record.studentFullName || 'N/A'}
+                </span>
                 <span className="text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60">
-                  {record.major || 'None'}
+                  {record.universityName || 'None'}
                 </span>
               </div>
             </div>
@@ -67,8 +68,8 @@ const InternshipTable = memo(function InternshipTable({
       },
       {
         title: TABLE.COLUMNS.STUDENT_ID,
-        dataIndex: 'studentId',
-        key: 'studentId',
+        dataIndex: 'studentCode',
+        key: 'studentCode',
         width: 70,
         render: (id) => (
           <span className="text-muted font-mono text-xs font-semibold uppercase">{id}</span>
@@ -80,19 +81,20 @@ const InternshipTable = memo(function InternshipTable({
         key: 'status',
         width: 90,
         align: 'center',
-        render: (status) => <StatusTag status={status} />,
+        render: (status) => {
+          let strStatus = 'PENDING';
+          if (status === 2) strStatus = 'ACCEPTED';
+          if (status === 3) strStatus = 'REJECTED';
+          return <StatusTag status={strStatus} />;
+        },
       },
       {
         title: TABLE.COLUMNS.GROUP,
-        dataIndex: 'groupId',
-        key: 'group',
-        width: 120,
-        render: (id) => {
-          const group = MOCK_GROUPS.find((g) => g.id === id);
-          return group ? (
+        render: (_, record) => {
+          return record.groupName ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <TeamOutlined className="text-primary text-xs opacity-60" />
-              <span className="text-text truncate text-xs font-bold">{group.name}</span>
+              <span className="text-text truncate text-xs font-bold">{record.groupName}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -103,15 +105,11 @@ const InternshipTable = memo(function InternshipTable({
       },
       {
         title: TABLE.COLUMNS.MENTOR,
-        dataIndex: 'mentorId',
-        key: 'mentor',
-        width: 120,
-        render: (id) => {
-          const mentor = MOCK_MENTORS.find((m) => m.id === id);
-          return mentor ? (
+        render: (_, record) => {
+          return record.mentorName ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <div className="bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full" />
-              <span className="text-text truncate text-xs font-bold">{mentor.name}</span>
+              <span className="text-text truncate text-xs font-bold">{record.mentorName}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -134,7 +132,7 @@ const InternshipTable = memo(function InternshipTable({
               onClick: () => onView(record),
             },
             { type: 'divider' },
-            ...(record.status === 'PENDING'
+            ...(record.status === 1 // 1 = PENDING (Backend Enum)
               ? [
                   {
                     key: 'accept',
@@ -180,7 +178,7 @@ const InternshipTable = memo(function InternshipTable({
         },
       },
     ],
-    [page, pageSize, onAccept, onReject, onAssign, onGroup, onView, TABLE, ACTIONS, STATUS_LABELS]
+    [page, pageSize, onAccept, onReject, onAssign, onGroup, onView, TABLE, ACTIONS]
   );
 
   return (
