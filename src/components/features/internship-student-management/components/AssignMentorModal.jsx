@@ -31,7 +31,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
         subtitle={
           <div className="flex items-center gap-2">
             <span className="opacity-70">{ASSIGN.STUDENT_LABEL}</span>
-            <span className="text-text font-bold">{student?.fullName}</span>
+            <span className="text-text font-bold">{student?.studentFullName}</span>
           </div>
         }
       />
