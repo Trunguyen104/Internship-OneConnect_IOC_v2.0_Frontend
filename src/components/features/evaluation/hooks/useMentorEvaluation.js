@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
-import { EvaluationService } from '../services/evaluation.service';
-import { useToast } from '@/providers/ToastProvider';
+import { useCallback, useEffect, useState } from 'react';
+
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import { useToast } from '@/providers/ToastProvider';
+
+import { EvaluationService } from '../services/evaluation.service';
 
 export function useMentorEvaluation(internshipId, termId) {
   const toast = useToast();
@@ -31,7 +33,7 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       setLoadingCycles(true);
       const res = await EvaluationService.getCycles(termId);
-      setCycles(res?.data || []);
+      setCycles(res?.data?.items || res?.data || []);
     } catch {
       toast.error(MESSAGES.FETCH_ERROR);
     } finally {
@@ -46,14 +48,14 @@ export function useMentorEvaluation(internshipId, termId) {
       try {
         setLoadingCriteria(true);
         const res = await EvaluationService.getCriteria(cycleId);
-        setCriteria(res?.data || []);
+        setCriteria(res?.data?.items || res?.data || []);
       } catch {
         toast.error(MESSAGES.FETCH_ERROR);
       } finally {
         setLoadingCriteria(false);
       }
     },
-    [toast, MESSAGES.FETCH_ERROR],
+    [toast, MESSAGES.FETCH_ERROR]
   );
 
   const fetchGradingGrid = useCallback(
@@ -62,7 +64,7 @@ export function useMentorEvaluation(internshipId, termId) {
 
       try {
         setLoadingGrading(true);
-        const res = await EvaluationService.getEvaluations(cycleId, internshipId);
+        const res = await EvaluationService.getGradingGrid(cycleId, internshipId);
         setGradingData(res?.data || { criteria: [], students: [] });
       } catch {
         toast.error(MESSAGES.FETCH_ERROR);
@@ -70,7 +72,7 @@ export function useMentorEvaluation(internshipId, termId) {
         setLoadingGrading(false);
       }
     },
-    [internshipId, toast, MESSAGES.FETCH_ERROR],
+    [internshipId, toast, MESSAGES.FETCH_ERROR]
   );
 
   useEffect(() => {
@@ -91,7 +93,11 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchCycles();
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      if (error.status === 409) {
+        toast.error(MESSAGES.CONFLICT_ERROR);
+      } else {
+        toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+      }
       return false;
     }
   };
@@ -103,7 +109,11 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchCycles();
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      if (error.status === 409) {
+        toast.error(MESSAGES.CONFLICT_ERROR);
+      } else {
+        toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+      }
       return false;
     }
   };
@@ -115,7 +125,7 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchCycles();
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.FETCH_ERROR);
+      toast.error(error.message || MESSAGES.FETCH_ERROR);
       return false;
     }
   };
@@ -127,7 +137,11 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchCriteria(cycleId);
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      if (error.status === 409) {
+        toast.error(MESSAGES.CONFLICT_ERROR);
+      } else {
+        toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+      }
       return false;
     }
   };
@@ -140,7 +154,11 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchCriteria(cycleId);
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      if (error.status === 409) {
+        toast.error(MESSAGES.CONFLICT_ERROR);
+      } else {
+        toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+      }
       return false;
     }
   };
@@ -152,19 +170,19 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchCriteria(cycleId);
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.FETCH_ERROR);
+      toast.error(error.message || MESSAGES.FETCH_ERROR);
       return false;
     }
   };
 
   const handleSaveEvaluations = async (cycleId, data) => {
     try {
-      await EvaluationService.saveEvaluations(cycleId, internshipId, data);
+      await EvaluationService.batchGrade(cycleId, data);
       toast.success(MESSAGES.GRADE_SUCCESS);
       fetchGradingGrid(cycleId);
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      toast.error(error.message || MESSAGES.VALIDATION_ERROR);
       return false;
     }
   };
@@ -176,7 +194,7 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchGradingGrid(cycleId);
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.FETCH_ERROR);
+      toast.error(error.message || MESSAGES.FETCH_ERROR);
       return false;
     }
   };
@@ -188,7 +206,7 @@ export function useMentorEvaluation(internshipId, termId) {
       fetchGradingGrid(cycleId);
       return true;
     } catch (error) {
-      toast.error(error?.response?.data?.message || MESSAGES.FETCH_ERROR);
+      toast.error(error.message || MESSAGES.FETCH_ERROR);
       return false;
     }
   };

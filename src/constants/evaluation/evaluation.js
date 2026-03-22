@@ -85,6 +85,8 @@ export const EVALUATION_UI = {
     GRADE_SUCCESS: 'Grading saved successfully',
     PUBLISH_SUCCESS: 'Scores published successfully',
     FETCH_ERROR: 'Failed to load evaluation data',
+    LOADING: 'Loading evaluation data...',
+    CONFLICT_ERROR: 'Cycle dates or name conflict with existing cycles.',
     VALIDATION_ERROR: 'Please check your inputs',
     NAME_REQUIRED: 'Name is required',
     MAX_SCORE_POSITIVE: 'Max score must be greater than 0',
