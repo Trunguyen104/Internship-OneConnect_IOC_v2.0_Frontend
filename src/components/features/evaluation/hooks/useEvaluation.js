@@ -7,79 +7,92 @@ import { useToast } from '@/providers/ToastProvider';
 
 export function useEvaluation() {
   const toast = useToast();
+
+  // --- Core State ---
   const [internshipId, setInternshipId] = useState(null);
   const [myStudentId, setMyStudentId] = useState(null);
-  const [cycles, setCycles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCycle, setSelectedCycle] = useState(null);
 
+  // --- Cycles ---
+  const [cycles, setCycles] = useState([]);
+  const [loadingCycles, setLoadingCycles] = useState(false);
+
+  // --- Team ---
   const [teamData, setTeamData] = useState([]);
-  const [myEvaluation, setMyEvaluation] = useState(null);
   const [loadingTeam, setLoadingTeam] = useState(false);
+
+  // --- My Evaluation ---
+  const [myEvaluation, setMyEvaluation] = useState(null);
   const [loadingMyEval, setLoadingMyEval] = useState(false);
 
+  // --- UI ---
+  const [selectedCycle, setSelectedCycle] = useState(null);
   const [teamVisible, setTeamVisible] = useState(false);
   const [detailVisible, setDetailVisible] = useState(false);
 
+  // --- Pagination ---
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    const fetchInternship = async () => {
-      try {
-        setLoading(true);
-        const res = await InternshipGroupService.getAll();
-        const items = res?.data?.items || res?.data || [];
+  // =========================
+  // 🔧 Helper normalize data
+  // =========================
+  const normalizeArray = (res) => {
+    const data = res?.data ?? res ?? [];
+    return Array.isArray(data) ? data : [];
+  };
 
-        if (items.length > 0) {
-          const activeItem = items.find((it) => it.status !== 'Failed') || items[0];
-          const id = activeItem.internshipId || activeItem.id;
-          const sId = activeItem.studentId;
+  // =========================
+  // 1. Fetch Internship
+  // =========================
+  const fetchInternship = useCallback(async () => {
+    try {
+      const res = await InternshipGroupService.getAll();
+      const items = normalizeArray(res);
 
-          setInternshipId(id);
-          setMyStudentId(sId);
-        } else {
-          toast.warning('You are not currently enrolled in any internship.');
-        }
-      } catch (error) {
-        console.error('Error fetching internship:', error);
-      } finally {
-        setLoading(false);
+      if (!items.length) {
+        toast.warning('You are not currently enrolled in any internship.');
+        return;
       }
-    };
-    fetchInternship();
+
+      const active = items.find((it) => it.status !== 'Failed') || items[0];
+
+      setInternshipId(active.internshipId || active.id);
+      setMyStudentId(active.studentId);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load internship.');
+    }
   }, [toast]);
 
-  useEffect(() => {
+  // =========================
+  // 2. Fetch Cycles
+  // =========================
+  const fetchCycles = useCallback(async () => {
     if (!internshipId) return;
 
-    const fetchCycles = async () => {
-      try {
-        setLoading(true);
-        const res = await EvaluationService.getStudentEvaluationCycles(internshipId);
-        const data = res?.data || res || [];
-        setCycles(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Error fetching evaluation cycles:', error);
-        toast.error('Failed to load evaluation cycles.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCycles();
+    try {
+      setLoadingCycles(true);
+      const res = await EvaluationService.getStudentEvaluationCycles(internshipId);
+      setCycles(normalizeArray(res));
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load evaluation cycles.');
+    } finally {
+      setLoadingCycles(false);
+    }
   }, [internshipId, toast]);
 
-  // 3. Fetch Team Evaluations when a cycle is selected
+  // =========================
+  // 3. Fetch Team
+  // =========================
   const fetchTeamData = useCallback(
     async (cycleId) => {
       try {
         setLoadingTeam(true);
         const res = await EvaluationService.getStudentTeamEvaluations(cycleId);
-        const data = res?.data || res || [];
-        setTeamData(Array.isArray(data) ? data : []);
+        setTeamData(normalizeArray(res));
       } catch (error) {
-        console.error('Error fetching team evaluations:', error);
+        console.error(error);
         toast.error('Failed to load team evaluations.');
       } finally {
         setLoadingTeam(false);
@@ -88,17 +101,18 @@ export function useEvaluation() {
     [toast],
   );
 
-  // 4. Fetch My Evaluation details
+  // =========================
+  // 4. Fetch My Evaluation
+  // =========================
   const fetchMyEvalData = useCallback(
     async (cycleId) => {
       try {
         setLoadingMyEval(true);
         const res = await EvaluationService.getStudentMyEvaluation(cycleId);
-        const data = res?.data || res || null;
-        setMyEvaluation(data);
+        setMyEvaluation(res?.data ?? res ?? null);
       } catch (error) {
-        console.error('Error fetching my evaluation:', error);
-        toast.error('Failed to load individual evaluation details.');
+        console.error(error);
+        toast.error('Failed to load evaluation details.');
       } finally {
         setLoadingMyEval(false);
       }
@@ -106,6 +120,20 @@ export function useEvaluation() {
     [toast],
   );
 
+  // =========================
+  // 🔁 Effects
+  // =========================
+  useEffect(() => {
+    fetchInternship();
+  }, [fetchInternship]);
+
+  useEffect(() => {
+    if (internshipId) fetchCycles();
+  }, [internshipId, fetchCycles]);
+
+  // =========================
+  // 📄 Pagination
+  // =========================
   const total = cycles.length;
   const totalPages = Math.ceil(total / pageSize);
 
@@ -114,56 +142,58 @@ export function useEvaluation() {
     return cycles.slice(start, start + pageSize);
   }, [cycles, page, pageSize]);
 
+  // =========================
+  // 🎯 Actions
+  // =========================
   const openTeamOverview = (cycle) => {
     setSelectedCycle(cycle);
     setTeamVisible(true);
     fetchTeamData(cycle.cycleId);
   };
 
-  const closeTeam = () => {
-    setTeamVisible(false);
-  };
-
   const openDetail = (cycle) => {
-    // If cycle is passed from Team Modal, it might already be selected
-    const targetCycle = cycle || selectedCycle;
-    if (!targetCycle) return;
+    const target = cycle || selectedCycle;
+    if (!target) return;
 
-    setSelectedCycle(targetCycle);
+    setSelectedCycle(target);
     setTeamVisible(false);
-    fetchMyEvalData(targetCycle.cycleId);
+    setDetailVisible(true); // ❌ bỏ setTimeout
 
-    setTimeout(() => {
-      setDetailVisible(true);
-    }, 250);
+    fetchMyEvalData(target.cycleId);
   };
 
-  const closeDetail = () => {
-    setDetailVisible(false);
-  };
+  const closeTeam = () => setTeamVisible(false);
+  const closeDetail = () => setDetailVisible(false);
 
+  // =========================
+  // 🚀 Return
+  // =========================
   return {
-    loading,
+    // loading
+    loadingCycles,
     loadingTeam,
     loadingMyEval,
 
+    // data
     myStudentId,
-    page,
-    pageSize,
     paginated,
     total,
     totalPages,
-
-    setPage,
-    setPageSize,
-
-    selectedCycle,
     teamData,
     myEvaluation,
 
+    // pagination
+    page,
+    pageSize,
+    setPage,
+    setPageSize,
+
+    // UI
+    selectedCycle,
     teamVisible,
     detailVisible,
 
+    // actions
     openTeamOverview,
     openDetail,
     closeTeam,

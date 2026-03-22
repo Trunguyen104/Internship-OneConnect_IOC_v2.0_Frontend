@@ -3,9 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { AppstoreOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, AuditOutlined } from '@ant-design/icons';
 
-const enterpriseMenu = [{ icon: <AppstoreOutlined />, label: 'Dashboard', href: '/dashboard' }];
+const enterpriseMenu = [
+  { icon: <AppstoreOutlined />, label: 'Dashboard', href: '/dashboard' },
+  { icon: <AuditOutlined />, label: 'Quản lý Đánh giá', href: '/evaluation' },
+];
 
 export default function EnterpriseSidebar() {
   const pathname = usePathname();
