@@ -2,7 +2,7 @@
 
 import { SaveOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Divider, Input, InputNumber } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,23 +16,31 @@ export default function IndividualGrading({
   student,
   cycle,
   internshipId,
-  allCriteria = [],
   open,
-  onCancel,
+  onClose,
   onSuccess,
 }) {
-  const { LABELS, BUTTONS, MESSAGES, STATUS, TABLE_COLUMNS } = EVALUATION_UI;
+  const { LABELS, BUTTONS, MESSAGES, STATUS } = EVALUATION_UI;
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    generalComment: student?.note || student?.generalComment || '',
-    scores:
-      (student?.details?.length > 0 ? student.details : allCriteria).map((s) => ({
-        criteriaId: s.criteriaId || s.id,
-        score: s.score || 0,
-        comment: s.comment || '',
-      })) || [],
+    generalComment: '',
+    scores: [],
   });
+
+  useEffect(() => {
+    if (open && student) {
+      setFormData({
+        generalComment: student.generalComment || '',
+        scores:
+          student.scores?.map((s) => ({
+            criteriaId: s.criteriaId,
+            score: s.score,
+            comment: s.comment || '',
+          })) || [],
+      });
+    }
+  }, [open, student]);
 
   const handleScoreChange = (criteriaId, field, value) => {
     setFormData((prev) => ({
@@ -52,7 +60,8 @@ export default function IndividualGrading({
       });
 
       if (statusOverride === 'publish') {
-        await EvaluationService.publishEvaluations(cycle.cycleId, internshipId, {
+        await EvaluationService.publishEvaluations(cycle.cycleId, {
+          internshipId,
           studentIds: [student.studentId],
         });
         toast.success(`${MESSAGES.PUBLISH_SUCCESS}: ${student.fullName}`);
@@ -62,39 +71,31 @@ export default function IndividualGrading({
 
       onSuccess();
     } catch (error) {
-      toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+      toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
     } finally {
       setLoading(false);
     }
   };
 
   const getCriteriaInfo = (id) =>
-    allCriteria?.find((c) => c.criteriaId === id) || { name: STATUS.UNKNOWN, maxScore: 10 };
+    student.criteria?.find((c) => c.criteriaId === id) || { name: STATUS.UNKNOWN, maxScore: 10 };
 
   return (
     <CompoundModal
       title={`${LABELS.DETAILS}: ${student?.fullName}`}
       open={open}
-      onCancel={onCancel}
+      onClose={onClose}
       className="w-full max-w-4xl"
       footer={
         <div className="flex w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-gray-500">{TABLE_COLUMNS.STATUS}:</span>
-            {(() => {
-              const statusMap = {
-                Pending: { label: STATUS.PENDING, variant: 'secondary' },
-                Draft: { label: STATUS.DRAFT, variant: 'warning' },
-                Submitted: { label: STATUS.SUBMITTED, variant: 'primary' },
-                Published: { label: STATUS.PUBLISHED, variant: 'success' },
-              };
-
-              const statusInfo = statusMap[student?.status] || statusMap['Pending'];
-              return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
-            })()}
+            <Badge variant={['gray', 'blue', 'orange', 'green'][student.status] || 'default'}>
+              {[STATUS.PENDING, STATUS.DRAFT, STATUS.SUBMITTED, STATUS.PUBLISHED][student.status]}
+            </Badge>
           </div>
           <div className="flex gap-2 py-3">
-            <Button variant="outline" onClick={onCancel}>
+            <Button variant="outline" onClick={onClose}>
               {BUTTONS.CANCEL}
             </Button>
             <Button variant="outline" onClick={() => handleSave()} loading={loading}>

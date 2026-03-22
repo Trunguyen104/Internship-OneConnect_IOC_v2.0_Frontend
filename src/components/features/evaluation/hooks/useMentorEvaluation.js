@@ -177,7 +177,7 @@ export function useMentorEvaluation(internshipId, termId) {
 
   const handleSaveEvaluations = async (cycleId, data) => {
     try {
-      await EvaluationService.batchGrade(cycleId, internshipId, data);
+      await EvaluationService.batchGrade(cycleId, data);
       toast.success(MESSAGES.GRADE_SUCCESS);
       fetchGradingGrid(cycleId);
       return true;
@@ -199,9 +199,9 @@ export function useMentorEvaluation(internshipId, termId) {
     }
   };
 
-  const handlePublish = async (cycleId, data = {}) => {
+  const handlePublish = async (cycleId) => {
     try {
-      await EvaluationService.publishEvaluations(cycleId, internshipId, data);
+      await EvaluationService.publishEvaluations(cycleId, internshipId);
       toast.success(MESSAGES.PUBLISH_SUCCESS);
       fetchGradingGrid(cycleId);
       return true;

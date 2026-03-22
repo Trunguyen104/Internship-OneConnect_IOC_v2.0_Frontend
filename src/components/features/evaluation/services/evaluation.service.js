@@ -32,60 +32,43 @@ export const EvaluationService = {
 
   // --- CRITERIA ---
   getCriteria(cycleId) {
-    // Backend is [HttpGet("criteria")] with [FromQuery] Guid cycleId
-    return httpGet('/evaluations/criteria', { cycleId });
+    return httpGet(`/evaluations/cycles/${cycleId}/criteria`);
   },
 
   createCriteria(cycleId, data) {
-    // Backend is [HttpPost("cycles/{cycleId:guid}/criteria")]
     return httpPost(`/evaluations/cycles/${cycleId}/criteria`, data);
   },
 
-  updateCriteria(criteriaId, data) {
-    // Backend is [HttpPut("criteria/{criteriaId:guid}")]
-    return httpPut(`/evaluations/criteria/${criteriaId}`, data);
+  updateCriteria(cycleId, criteriaId, data) {
+    return httpPut(`/evaluations/cycles/${cycleId}/criteria/${criteriaId}`, data);
   },
 
-  deleteCriteria(criteriaId) {
-    // Backend is [HttpDelete("criteria/{criteriaId:guid}")]
-    return httpDelete(`/evaluations/criteria/${criteriaId}`);
+  deleteCriteria(cycleId, criteriaId) {
+    return httpDelete(`/evaluations/cycles/${cycleId}/criteria/${criteriaId}`);
   },
 
   // --- GRADING ---
   getGradingGrid(cycleId, internshipId) {
-    // Backend is [HttpGet("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
-    return httpGet(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations`);
+    return httpGet(`/evaluations/cycles/${cycleId}/evaluations`, { internshipId });
   },
 
-  batchGrade(cycleId, internshipId, data) {
-    // Backend is [HttpPut("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations")]
-    // Data contains SaveEvaluationsCommand
-    return httpPut(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations`, data);
+  batchGrade(cycleId, data) {
+    return httpPost(`/evaluations/cycles/${cycleId}/evaluations/batch`, data);
   },
 
-  individualGrade(cycleId, data) {
-    // New endpoint to be added to backend (Issue 93)
-    return httpPost(`/evaluations/cycles/${cycleId}/evaluations/individual`, data);
-  },
-
-  submitEvaluations(cycleId, internshipId, data) {
-    // Backend is [HttpPatch("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations/submit")]
-    // Requires Body according to controller
+  submitEvaluations(cycleId, internshipId) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`,
-      data
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`
     );
   },
 
-  publishEvaluations(cycleId, internshipId, data) {
-    // Backend is [HttpPatch("cycles/{cycleId:guid}/internships/{internshipId:guid}/evaluations/publish")]
+  publishEvaluations(cycleId, internshipId) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`,
-      data
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`
     );
   },
 
-  // --- Student Endpoints (api/students/me prefix handled by proxy) ---
+  // --- Student Endpoints (api/students/me prefixed) ---
   getStudentEvaluationCycles(internshipId) {
     return httpGet(`/students/me/internships/${internshipId}/evaluation-cycles`);
   },

@@ -11,7 +11,7 @@ import BatchGrading from './BatchGrading';
 import CycleDialog from './CycleDialog';
 import CycleList from './CycleList';
 
-export default function MentorEvaluationPage({ internshipId, groupName, termId, termDates }) {
+export default function MentorEvaluationPage({ internshipId, termId }) {
   const { LABELS, TITLE, SUBTITLE, BUTTONS } = EVALUATION_UI;
   const {
     cycles,
@@ -67,15 +67,14 @@ export default function MentorEvaluationPage({ internshipId, groupName, termId, 
   // 🎨 Render Logic
   // =========================
   const headerProps = useMemo(() => {
-    const groupSuffix = groupName ? ` - ${groupName}` : '';
     if (view === 'list') {
-      return { title: TITLE, description: `${SUBTITLE}${groupSuffix}` };
+      return { title: TITLE, description: SUBTITLE };
     }
     return {
       title: `${BUTTONS.QUICK_GRADE}: ${selectedCycle?.name}`,
-      description: `${LABELS.TIME}: ${new Date(selectedCycle?.startDate).toLocaleDateString()} - ${new Date(selectedCycle?.endDate).toLocaleDateString()}${groupSuffix}`,
+      description: `${LABELS.TIME}: ${new Date(selectedCycle?.startDate).toLocaleDateString()} - ${new Date(selectedCycle?.endDate).toLocaleDateString()}`,
     };
-  }, [view, selectedCycle, groupName, TITLE, SUBTITLE, BUTTONS.QUICK_GRADE, LABELS.TIME]);
+  }, [view, selectedCycle, TITLE, SUBTITLE, BUTTONS.QUICK_GRADE, LABELS.TIME]);
 
   return (
     <PageLayout>
@@ -119,15 +118,13 @@ export default function MentorEvaluationPage({ internshipId, groupName, termId, 
         </PageLayout.Content>
       </PageLayout.Card>
 
-      {isDialogOpen && (
-        <CycleDialog
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          onSave={handleSaveCycle}
-          initialData={editingCycle}
-          termDates={termDates}
-        />
-      )}
+      <CycleDialog
+        key={editingCycle?.cycleId || 'new'}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSave={handleSaveCycle}
+        initialData={editingCycle}
+      />
     </PageLayout>
   );
 }

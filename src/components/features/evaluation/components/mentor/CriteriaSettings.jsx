@@ -12,7 +12,7 @@ import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../../services/evaluation.service';
 
-export default function CriteriaSettings({ cycle, open, onClose, onOpenChange }) {
+export default function CriteriaSettings({ cycle, open, onClose }) {
   const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
   const [criteria, setCriteria] = useState([]);
@@ -50,7 +50,7 @@ export default function CriteriaSettings({ cycle, open, onClose, onOpenChange })
         await EvaluationService.createCriteria(cycle.cycleId, formData);
         toast.success(MESSAGES.CREATE_SUCCESS);
       } else {
-        await EvaluationService.updateCriteria(editingItem.criteriaId, formData);
+        await EvaluationService.updateCriteria(cycle.cycleId, editingItem.criteriaId, formData);
         toast.success(MESSAGES.UPDATE_SUCCESS);
       }
       setEditingItem(null);
@@ -62,7 +62,7 @@ export default function CriteriaSettings({ cycle, open, onClose, onOpenChange })
 
   const handleDelete = async (criteriaId) => {
     try {
-      await EvaluationService.deleteCriteria(criteriaId);
+      await EvaluationService.deleteCriteria(cycle.cycleId, criteriaId);
       toast.success(MESSAGES.DELETE_SUCCESS);
       fetchCriteria();
     } catch (error) {
@@ -112,7 +112,7 @@ export default function CriteriaSettings({ cycle, open, onClose, onOpenChange })
     <CompoundModal
       title={`${LABELS.EDIT_CRITERIA}: ${cycle?.name}`}
       open={open}
-      onCancel={onClose}
+      onClose={onClose}
       className="w-full max-w-3xl"
     >
       <div className="space-y-6 py-4">

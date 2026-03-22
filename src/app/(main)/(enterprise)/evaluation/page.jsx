@@ -1,16 +1,37 @@
 'use client';
 
 import { Empty, Select, Spin } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import MentorEvaluationPage from '@/components/features/evaluation/components/mentor/MentorEvaluationPage';
-import { useEvaluationGroups } from '@/components/features/evaluation/hooks/useEvaluationGroups';
+import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import Card from '@/components/ui/card';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 export default function EvaluationEntry() {
   const { LABELS, MESSAGES } = EVALUATION_UI;
-  const { groups, selectedGroup, loading, handleSelectGroup } = useEvaluationGroups();
+  const [loading, setLoading] = useState(true);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        setLoading(true);
+        const res = await InternshipGroupService.getAll();
+        const items = res?.data?.items || res?.data || [];
+        setGroups(items);
+        if (items.length > 0) {
+          setSelectedGroup(items[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching groups:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGroups();
+  }, []);
 
   if (loading) {
     return (
@@ -30,20 +51,6 @@ export default function EvaluationEntry() {
     );
   }
 
-  // Map groups to Select options, ensuring correct property names
-  const groupOptions = groups.map((g) => ({
-    label:
-      g.groupName ||
-      g.GroupName ||
-      g.name ||
-      `Internship Group ${g.internshipId?.slice(0, 8) || ''}`,
-    value: g.internshipId || g.id,
-  }));
-
-  const selectedGroupId = selectedGroup?.internshipId || selectedGroup?.id;
-  const selectedGroupName =
-    selectedGroup?.groupName || selectedGroup?.GroupName || selectedGroup?.name;
-
   return (
     <div className="flex flex-1 flex-col space-y-4">
       {groups.length > 1 && (
@@ -51,24 +58,19 @@ export default function EvaluationEntry() {
           <span className="text-sm font-semibold">{LABELS.CHOOSE_GROUP}</span>
           <Select
             className="w-64"
-            value={selectedGroupId}
-            onChange={handleSelectGroup}
-            options={groupOptions}
-            placeholder={LABELS.CHOOSE_GROUP}
+            value={selectedGroup?.internshipId || selectedGroup?.id}
+            onChange={(val) =>
+              setSelectedGroup(groups.find((g) => (g.internshipId || g.id) === val))
+            }
+            options={groups.map((g) => ({ label: g.name, value: g.internshipId || g.id }))}
           />
         </div>
       )}
 
       {selectedGroup && (
         <MentorEvaluationPage
-          key={selectedGroupId}
-          internshipId={selectedGroupId}
-          groupName={selectedGroupName}
+          internshipId={selectedGroup.internshipId || selectedGroup.id}
           termId={selectedGroup.termId}
-          termDates={{
-            startDate: selectedGroup.startDate,
-            endDate: selectedGroup.endDate,
-          }}
         />
       )}
     </div>
