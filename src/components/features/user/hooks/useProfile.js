@@ -47,7 +47,7 @@ export function useProfile() {
       }
     } catch (err) {
       console.error('Failed to fetch user info', err);
-      toast.error('Lỗi khi tải thông tin cá nhân');
+      toast.error('Failed to load profile information');
     } finally {
       setLoadingUser(false);
     }
@@ -126,7 +126,7 @@ export function useProfile() {
           }
         } catch (uploadErr) {
           console.error('Avatar upload failed', uploadErr);
-          toast.error('Lỗi khi tải ảnh lên server');
+          toast.error('Failed to upload avatar to server');
           return false;
         }
       }
@@ -140,12 +140,12 @@ export function useProfile() {
 
       // 4. Submit update
       await userService.updateMe(formData);
-      toast.success('Cập nhật thành công');
+      toast.success('Update successful');
       await fetchMe();
       return true;
     } catch (err) {
       console.error('Failed to update profile', err);
-      toast.error('Lỗi khi cập nhật thông tin cá nhân');
+      toast.error('Failed to update profile information');
       return false;
     } finally {
       setLoadingUser(false);
@@ -170,7 +170,7 @@ export function useProfile() {
       downloadBlob(blob, defaultFilename);
     } catch (err) {
       console.error('Download CV error:', err);
-      toast.error('Không thể tải xuống CV. Vui lòng thử lại sau.');
+      toast.error('Could not download CV. Please try again later.');
     } finally {
       setLoadingUser(false);
     }

@@ -56,7 +56,7 @@ const InternshipDashboard = () => {
         setInternships(enrichedInternships);
       } catch (error) {
         console.error('Dashboard Fetch Error:', error);
-        toast.error('Lỗi', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
+        toast.error('Error', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { userService } from '@/components/features/user/services/userService';
 import { userManagementService } from '@/components/features/user-management/userManagement.service';

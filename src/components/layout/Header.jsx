@@ -82,7 +82,7 @@ export default function Header() {
           menu={avatarMenu}
           trigger={['click']}
           placement="bottomRight"
-          overlayClassName="min-w-[180px]"
+          classNames={{ root: 'min-w-[180px]' }}
         >
           <div className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:bg-slate-50">
             <Avatar
