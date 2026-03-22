@@ -30,9 +30,13 @@ export const CreateGroupModal = memo(
             track: group.track?.toUpperCase() || 'FRONTEND',
           });
         } else if (initialStudents.length > 0) {
+          const ids = initialStudents.map(
+            (s) => s.studentId || s.StudentId || s.id || s.applicationId
+          );
+          console.log('MODAL INITIAL IDS:', ids);
           form.setFieldsValue({
             name: `Nhóm ${Math.floor(Math.random() * 1000)}`,
-            studentIds: initialStudents.map((s) => s.id),
+            studentIds: ids,
           });
         }
       }
@@ -43,7 +47,18 @@ export const CreateGroupModal = memo(
     };
 
     const handleFinish = (values) => {
-      const payload = { ...values };
+      // Đảm bảo studentIds luôn có dữ liệu, thử mọi thuộc tính ID có thể
+      const ids =
+        values.studentIds && values.studentIds.length > 0
+          ? values.studentIds
+          : initialStudents.map((s) => s.studentId || s.StudentId || s.id || s.applicationId);
+
+      console.log('MODAL FINISH IDS:', ids);
+
+      const payload = {
+        ...values,
+        studentIds: ids,
+      };
       // backend expects studentIds for creation
       onFinish(payload);
       form.resetFields();
@@ -63,7 +78,7 @@ export const CreateGroupModal = memo(
           </div>
         </div>
       ),
-      value: s.id || s.applicationId,
+      value: s.studentId || s.StudentId || s.id || s.applicationId,
       searchValue: `${s.studentFullName || ''} ${s.name || ''} ${s.studentCode || ''}`,
     }));
 

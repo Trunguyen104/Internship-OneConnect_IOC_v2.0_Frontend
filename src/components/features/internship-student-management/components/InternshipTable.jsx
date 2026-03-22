@@ -83,8 +83,8 @@ const InternshipTable = memo(function InternshipTable({
         align: 'center',
         render: (status) => {
           let strStatus = 'PENDING';
-          if (status === 1) strStatus = 'ACCEPTED';
-          if (status === 2) strStatus = 'REJECTED';
+          if (status === 2) strStatus = 'ACCEPTED';
+          if (status === 3) strStatus = 'REJECTED';
           return <StatusTag status={strStatus} />;
         },
       },
@@ -132,7 +132,7 @@ const InternshipTable = memo(function InternshipTable({
               onClick: () => onView(record),
             },
             { type: 'divider' },
-            ...(record.status === 0 // 0 = PENDING
+            ...(record.status === 1 // 1 = PENDING (Backend Enum)
               ? [
                   {
                     key: 'accept',

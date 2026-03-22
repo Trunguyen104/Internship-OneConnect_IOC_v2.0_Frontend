@@ -17,8 +17,7 @@ export const useEnterpriseStudents = ({ termId, filters, search, pagination, sor
     try {
       setLoading(true);
       const params = {
-        TermId: termId,
-        PageNumber: pagination.current,
+        PageIndex: pagination.current,
         PageSize: pagination.pageSize,
         SearchTerm: search || undefined,
         Search: search || undefined,
@@ -26,6 +25,7 @@ export const useEnterpriseStudents = ({ termId, filters, search, pagination, sor
           filters.status !== undefined ? (filters.status === 'ALL' ? null : filters.status) : null,
         // camelCase just in case
         termId,
+        TermId: termId,
         pageIndex: pagination.current,
         pageSize: pagination.pageSize,
         searchTerm: search || undefined,

@@ -9,6 +9,7 @@ import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
+import CreateGroupModal from '../../internship-group-management/components/CreateGroupModal';
 import { useInternshipManagement } from '../hooks/useInternshipManagement';
 import AssignMentorModal from './AssignMentorModal';
 import GroupActionModal from './GroupActionModal';
@@ -16,7 +17,6 @@ import RejectStudentModal from './RejectStudentModal';
 import StudentDetailModal from './StudentDetailModal';
 import StudentFilters from './StudentFilters';
 import StudentTable from './StudentTable';
-// CreateGroupModal removed to align with requirements (use Group Management tab instead)
 
 export default function InternshipManagement() {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
@@ -62,6 +62,11 @@ export default function InternshipManagement() {
     majorFilter,
     setMajorFilter,
     universityOptions,
+    setCreateModal,
+    createModal,
+    unassignedStudents,
+    fetchingStudents,
+    handleCreateGroup,
   } = useInternshipManagement();
 
   const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
@@ -70,17 +75,22 @@ export default function InternshipManagement() {
 
   const bulkItems = [
     {
+      key: 'createGroup',
+      label: INTERNSHIP_LIST.ACTIONS.CREATE_GROUP,
+      icon: <UsergroupAddOutlined />,
+      disabled: hasGroup || selectedStudents.some((s) => s.status !== 2),
+      onClick: () => setCreateModal({ open: true, students: selectedStudents }),
+    },
+    {
       key: 'addToGroup',
       label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
       icon: <UsergroupAddOutlined />,
-      disabled: hasGroup,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'ADD' }),
     },
     {
       key: 'changeGroup',
       label: INTERNSHIP_LIST.ACTIONS.CHANGE_GROUP,
       icon: <EditOutlined />,
-      disabled: hasNoGroup,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'CHANGE' }),
     },
   ];
@@ -144,6 +154,7 @@ export default function InternshipManagement() {
             onReject={(student) => setRejectModal({ open: true, student, reason: '' })}
             onView={(student) => setDetailModal({ open: true, student })}
             onAssign={(student) => setAssignModal({ open: true, student })}
+            onCreateGroup={(student) => setCreateModal({ open: true, students: [student] })}
             onAddToGroup={(student) =>
               setGroupModal({ open: true, students: [student], type: 'ADD' })
             }
@@ -192,6 +203,15 @@ export default function InternshipManagement() {
         type={groupModal.type}
         onCancel={() => setGroupModal({ open: false, students: [], type: 'ADD' })}
         onConfirm={handleGroupSubmit}
+      />
+
+      <CreateGroupModal
+        open={createModal.open}
+        students={unassignedStudents} // We can re-use fetching logic
+        loadingStudents={fetchingStudents}
+        initialStudents={createModal.students}
+        onCancel={() => setCreateModal({ open: false, students: [] })}
+        onFinish={handleCreateGroup}
       />
     </>
   );

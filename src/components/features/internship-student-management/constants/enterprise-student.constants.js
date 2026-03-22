@@ -6,7 +6,7 @@ export const ENTERPRISE_STUDENT_UI = {
   },
   SEARCH_PLACEHOLDER: 'Search by name, student code, email...',
   EMPTY_STATE: {
-    MESSAGE: 'No students have been assigned to this company for the current term.',
+    MESSAGE: 'Chưa có sinh viên nào được gán vào công ty trong kỳ này',
   },
   TABLE: {
     COLUMNS: {
@@ -66,13 +66,16 @@ export const ENTERPRISE_STUDENT_UI = {
 };
 
 export const APPLICATION_STATUS_MAP = {
-  0: 'Pending',
-  1: 'Approved',
-  2: 'Rejected',
+  1: 'Pending',
+  2: 'Approved',
+  3: 'Rejected',
+  4: 'Withdrawn',
 };
 
 export const REVERSE_APPLICATION_STATUS_MAP = {
-  PENDING: 0,
-  APPROVED: 1,
-  REJECTED: 2,
+  PENDING: 1,
+  APPROVED: 2,
+  ACCEPTED: 2, // Alias for frontend consistency
+  REJECTED: 3,
+  WITHDRAWN: 4,
 };

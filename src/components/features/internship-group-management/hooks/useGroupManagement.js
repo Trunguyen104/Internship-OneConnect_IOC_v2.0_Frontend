@@ -108,18 +108,27 @@ export const useGroupManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (values) => {
-      await createGroup({
-        Name: values.name,
+      const studentIds =
+        values.studentIds && values.studentIds.length > 0
+          ? values.studentIds
+          : unassignedStudents.map((s) => s.studentId || s.StudentId || s.id || s.applicationId);
+
+      const payload = {
+        GroupName: values.name,
         Track: values.track,
-        InternshipTermId: filters.termId,
-        TermId: filters.termId, // Fallback
-        InternshipStudentIds: values.studentIds,
-        StudentIds: values.studentIds, // Fallback
-        studentIds: values.studentIds, // Fallback
-      });
+        TermId: filters.termId,
+        Students: studentIds.map((id) => ({
+          StudentId: id,
+          Role: 1, // Member default
+        })),
+      };
+
+      console.log('DEBUG PAYLOAD (GROUP HOOK - FINAL FIX):', payload);
+
+      await createGroup(payload);
       setCreateModal(false);
     },
-    [createGroup, filters.termId]
+    [createGroup, filters.termId, unassignedStudents]
   );
 
   const handleUpdateGroup = useCallback(

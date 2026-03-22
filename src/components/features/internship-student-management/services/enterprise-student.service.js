@@ -29,13 +29,53 @@ export const EnterpriseStudentService = {
   },
 
   mapApplication(item) {
+    const applicationId =
+      item.ApplicationId ||
+      item.applicationId ||
+      item.studentTermId ||
+      item.StudentTermId ||
+      item.id;
+    const studentId = item.StudentId || item.studentId;
+    const termId = item.TermId || item.termId || item.internshipTermId;
+
+    // Chuẩn hóa status sang số để tránh lỗi so sánh string/number
+    let rawStatus = item.Status !== undefined ? item.Status : item.status;
+    if (typeof rawStatus === 'string') {
+      if (rawStatus === 'Pending') rawStatus = 1;
+      else if (rawStatus === 'Approved') rawStatus = 2;
+      else if (rawStatus === 'Rejected') rawStatus = 3;
+    }
+    const status = parseInt(rawStatus, 10) || 1;
+
+    console.log(`[DEBUG] Member ${item.studentFullName || 'N/A'}:`, {
+      applicationId,
+      studentId,
+      termId,
+      status, // 1=Pending, 2=Approved, 3=Rejected
+      rawStatus: item.Status || item.status,
+    });
+
     return {
       ...item,
-      id: item.applicationId || item.studentId || item.studentTermId || item.id,
-      studentFullName: item.studentFullName || item.fullName || item.name || 'Unknown Student',
-      studentCode: item.studentCode || item.code || '-',
-      status: item.status !== undefined ? item.status : item.enrollmentStatus,
-      isPlaced: item.placementStatus === 1,
+      id: applicationId,
+      applicationId,
+      studentId: studentId || applicationId,
+      termId,
+      studentFullName:
+        item.studentFullName ||
+        item.StudentFullName ||
+        item.fullName ||
+        item.FullName ||
+        item.name ||
+        'Unknown Student',
+      studentCode: item.studentCode || item.StudentCode || item.code || item.UserCode || '-',
+      universityName: item.universityName || item.UniversityName || '-',
+      major: item.major || item.Major || '-',
+      status,
+      appliedAt: item.appliedAt || item.AppliedAt,
+      groupName: item.groupName || item.GroupName,
+      mentorName: item.mentorName || item.MentorName,
+      projectName: item.projectName || item.ProjectName,
     };
   },
 };

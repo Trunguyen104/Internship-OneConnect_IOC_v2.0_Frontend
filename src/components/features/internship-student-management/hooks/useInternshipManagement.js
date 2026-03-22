@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -8,6 +8,7 @@ import { useEnterpriseGroupActions } from '../../internship-group-management/hoo
 import { useEnterpriseStudentActions } from '../hooks/useEnterpriseStudentActions';
 import { useEnterpriseStudentFilters } from '../hooks/useEnterpriseStudentFilters';
 import { useEnterpriseStudents } from '../hooks/useEnterpriseStudents';
+import { EnterpriseStudentService } from '../services/enterprise-student.service';
 
 export const useInternshipManagement = () => {
   const toast = useToast();
@@ -43,12 +44,19 @@ export const useInternshipManagement = () => {
     rejectApplication,
     loading: actionLoading,
   } = useEnterpriseStudentActions(refetch);
-  const { addStudents, loading: groupActionLoading } = useEnterpriseGroupActions(refetch);
+  const {
+    createGroup,
+    addStudents,
+    loading: groupActionLoading,
+  } = useEnterpriseGroupActions(refetch);
 
   const [rejectModal, setRejectModal] = useState({ open: false, student: null });
   const [groupModal, setGroupModal] = useState({ open: false, students: [], type: 'ADD' });
   const [detailModal, setDetailModal] = useState({ open: false, student: null });
   const [assignModal, setAssignModal] = useState({ open: false, student: null });
+  const [createModal, setCreateModal] = useState({ open: false, students: [] });
+  const [unassignedStudents, setUnassignedStudents] = useState([]);
+  const [fetchingStudents, setFetchingStudents] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const handleAcceptStudent = useCallback(
@@ -98,6 +106,69 @@ export const useInternshipManagement = () => {
     },
     [assignModal.student, toast, refetch]
   );
+
+  const fetchUnassignedStudents = useCallback(async () => {
+    if (!termId) return;
+    try {
+      setFetchingStudents(true);
+      const res = await EnterpriseStudentService.getApplications({
+        termId, // Working key from useGroupManagement
+        TermId: termId, // Fallback
+        status: 1, // Working key
+        Status: 1, // Fallback
+        pageIndex: 1, // Working key
+        PageNumber: 1, // Fallback
+        pageSize: 100,
+        PageSize: 100,
+      });
+      const items = res?.data?.items || [];
+      const unassigned = items
+        .filter((s) => s.status === 1 && !s.groupId)
+        .map(EnterpriseStudentService.mapApplication);
+      setUnassignedStudents(unassigned);
+    } catch (err) {
+      console.error('Failed to fetch unassigned students:', err);
+    } finally {
+      setFetchingStudents(false);
+    }
+  }, [termId]);
+
+  const handleCreateGroup = useCallback(
+    async (values) => {
+      // Ưu tiên lấy studentId cho việc tạo nhóm (Bắt buộc theo backend Handler)
+      const studentIds =
+        values.studentIds && values.studentIds.length > 0
+          ? values.studentIds
+          : createModal.students.map((s) => s.studentId || s.StudentId || s.id || s.applicationId);
+
+      if (!studentIds || studentIds.length === 0) {
+        toast.error('Vui lòng chọn ít nhất 1 sinh viên để tạo nhóm.');
+        return;
+      }
+
+      const payload = {
+        GroupName: values.name,
+        Track: values.track,
+        TermId: termId,
+        Students: studentIds.map((id) => ({
+          StudentId: id,
+          Role: 1, // Member default
+        })),
+      };
+
+      console.log('DEBUG PAYLOAD (FINAL FIX):', payload);
+
+      const success = await createGroup(payload);
+      if (success) {
+        setCreateModal({ open: false, students: [] });
+      }
+    },
+    [createGroup, termId, createModal.students, toast]
+  );
+
+  useEffect(() => {
+    if (createModal.open) fetchUnassignedStudents();
+  }, [createModal.open, fetchUnassignedStudents]);
 
   return {
     students: data,
@@ -160,5 +231,10 @@ export const useInternshipManagement = () => {
     termOptions,
     fetchingTerms,
     universityOptions,
+    setCreateModal,
+    createModal,
+    unassignedStudents,
+    fetchingStudents,
+    handleCreateGroup,
   };
 };

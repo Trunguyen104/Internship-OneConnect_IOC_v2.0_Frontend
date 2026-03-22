@@ -79,8 +79,11 @@ const StudentTable = memo(function StudentTable({
         sortKey: 'studentFullName',
         width: '180px',
         render: (_, record) => (
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col">
             <span className="text-text text-sm font-semibold">{record.studentFullName}</span>
+            <span className="text-muted text-[11px] font-medium uppercase opacity-60">
+              {record.universityName || '-'}
+            </span>
           </div>
         ),
       },
@@ -91,6 +94,16 @@ const StudentTable = memo(function StudentTable({
         width: '100px',
         render: (_, record) => (
           <span className="text-muted font-mono text-xs font-semibold">{record.studentCode}</span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.EMAIL,
+        key: 'studentEmail',
+        width: '180px',
+        render: (_, record) => (
+          <span className="text-muted text-xs truncate max-w-[170px] inline-block">
+            {record.studentEmail || '-'}
+          </span>
         ),
       },
       {
@@ -136,8 +149,8 @@ const StudentTable = memo(function StudentTable({
                 className="bg-warning-surface text-warning hover:bg-warning/20 cursor-pointer inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onAddToGroup(record);
-                }} // Changed from onCreateGroup
+                  onCreateGroup(record);
+                }}
               >
                 {BADGES.NO_GROUP}
               </span>
