@@ -1,12 +1,26 @@
 'use client';
 
-import { AppstoreOutlined, AuditOutlined } from '@ant-design/icons';
+import { DashboardOutlined, SolutionOutlined, TeamOutlined } from '@ant-design/icons';
 
 import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
 const enterpriseMenu = [
-  { icon: <AppstoreOutlined />, label: 'Dashboard', href: '/dashboard' },
-  { icon: <AuditOutlined />, label: 'Evaluation Management', href: '/evaluation' },
+  { icon: <DashboardOutlined />, label: 'Dashboard', href: '/dashboard' },
+  {
+    icon: <SolutionOutlined />,
+    label: 'Internship Students',
+    href: '/internship-student-management',
+  },
+  {
+    icon: <TeamOutlined />,
+    label: 'Internship Groups',
+    href: '/internship-group-management',
+  },
+  {
+    icon: <TeamOutlined />,
+    label: 'Evaluation Cycle',
+    href: '/evaluation',
+  },
 ];
 
 export default function EnterpriseSidebar() {

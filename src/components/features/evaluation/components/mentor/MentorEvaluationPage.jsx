@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import PageLayout from '@/components/ui/pagelayout';
-import { useMentorEvaluation } from '../../hooks/useMentorEvaluation';
-import CycleList from './CycleList';
-import BatchGrading from './BatchGrading';
-import CycleDialog from './CycleDialog';
 import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
+import React, { useCallback, useMemo, useState } from 'react';
+
+import PageLayout from '@/components/ui/pagelayout';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
-export default function MentorEvaluationPage({ internshipId, termId }) {
+import { useMentorEvaluation } from '../../hooks/useMentorEvaluation';
+import BatchGrading from './BatchGrading';
+import CycleDialog from './CycleDialog';
+import CycleList from './CycleList';
+
+export default function MentorEvaluationPage({ internshipId, groupName, termId, termDates }) {
   const { LABELS, TITLE, SUBTITLE, BUTTONS } = EVALUATION_UI;
   const {
     cycles,
@@ -35,7 +37,7 @@ export default function MentorEvaluationPage({ internshipId, termId }) {
       setSelectedCycle(cycle);
       setView('grading');
     },
-    [setSelectedCycle],
+    [setSelectedCycle]
   );
 
   const handleBackToList = useCallback(() => {
@@ -65,14 +67,15 @@ export default function MentorEvaluationPage({ internshipId, termId }) {
   // 🎨 Render Logic
   // =========================
   const headerProps = useMemo(() => {
+    const groupSuffix = groupName ? ` - ${groupName}` : '';
     if (view === 'list') {
-      return { title: TITLE, description: SUBTITLE };
+      return { title: TITLE, description: `${SUBTITLE}${groupSuffix}` };
     }
     return {
       title: `${BUTTONS.QUICK_GRADE}: ${selectedCycle?.name}`,
-      description: `${LABELS.TIME}: ${new Date(selectedCycle?.startDate).toLocaleDateString()} - ${new Date(selectedCycle?.endDate).toLocaleDateString()}`,
+      description: `${LABELS.TIME}: ${new Date(selectedCycle?.startDate).toLocaleDateString()} - ${new Date(selectedCycle?.endDate).toLocaleDateString()}${groupSuffix}`,
     };
-  }, [view, selectedCycle, TITLE, SUBTITLE, BUTTONS.QUICK_GRADE, LABELS.TIME]);
+  }, [view, selectedCycle, groupName, TITLE, SUBTITLE, BUTTONS.QUICK_GRADE, LABELS.TIME]);
 
   return (
     <PageLayout>
@@ -116,13 +119,15 @@ export default function MentorEvaluationPage({ internshipId, termId }) {
         </PageLayout.Content>
       </PageLayout.Card>
 
-      <CycleDialog
-        key={editingCycle?.cycleId || 'new'}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSave={handleSaveCycle}
-        initialData={editingCycle}
-      />
+      {isDialogOpen && (
+        <CycleDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          onSave={handleSaveCycle}
+          initialData={editingCycle}
+          termDates={termDates}
+        />
+      )}
     </PageLayout>
   );
 }

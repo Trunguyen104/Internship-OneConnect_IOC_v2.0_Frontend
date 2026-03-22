@@ -18,6 +18,7 @@ export const EVALUATION_UI = {
     CRITERIA_COUNT: 'Criteria Count',
     TOTAL_SCORE: 'Total Score',
     DETAILS: 'Details',
+    GRADING_BOARD: 'Grading Board',
   },
 
   STATUS: {
@@ -88,6 +89,7 @@ export const EVALUATION_UI = {
     LOADING: 'Loading evaluation data...',
     CONFLICT_ERROR: 'Cycle dates or name conflict with existing cycles.',
     VALIDATION_ERROR: 'Please check your inputs',
+    UNSAVED_CHANGES: 'Unsaved changes',
     NAME_REQUIRED: 'Name is required',
     MAX_SCORE_POSITIVE: 'Max score must be greater than 0',
   },

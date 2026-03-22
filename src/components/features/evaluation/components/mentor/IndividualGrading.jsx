@@ -1,44 +1,38 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import CompoundModal from '@/components/ui/CompoundModal';
-import { Button } from '@/components/ui/button';
 import { SaveOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import { Input, InputNumber, Divider } from 'antd';
-import { EvaluationService } from '../../services/evaluation.service';
-import { useToast } from '@/providers/ToastProvider';
+import { Divider, Input, InputNumber } from 'antd';
+import React, { useState } from 'react';
+
 import Badge from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import { useToast } from '@/providers/ToastProvider';
+
+import { EvaluationService } from '../../services/evaluation.service';
 
 export default function IndividualGrading({
   student,
   cycle,
   internshipId,
+  allCriteria = [],
   open,
-  onClose,
+  onCancel,
   onSuccess,
 }) {
-  const { LABELS, BUTTONS, MESSAGES, STATUS } = EVALUATION_UI;
+  const { LABELS, BUTTONS, MESSAGES, STATUS, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    generalComment: '',
-    scores: [],
+    generalComment: student?.note || student?.generalComment || '',
+    scores:
+      (student?.details?.length > 0 ? student.details : allCriteria).map((s) => ({
+        criteriaId: s.criteriaId || s.id,
+        score: s.score || 0,
+        comment: s.comment || '',
+      })) || [],
   });
-
-  useEffect(() => {
-    if (open && student) {
-      setFormData({
-        generalComment: student.generalComment || '',
-        scores:
-          student.scores?.map((s) => ({
-            criteriaId: s.criteriaId,
-            score: s.score,
-            comment: s.comment || '',
-          })) || [],
-      });
-    }
-  }, [open, student]);
 
   const handleScoreChange = (criteriaId, field, value) => {
     setFormData((prev) => ({
@@ -58,8 +52,7 @@ export default function IndividualGrading({
       });
 
       if (statusOverride === 'publish') {
-        await EvaluationService.publishEvaluations(cycle.cycleId, {
-          internshipId,
+        await EvaluationService.publishEvaluations(cycle.cycleId, internshipId, {
           studentIds: [student.studentId],
         });
         toast.success(`${MESSAGES.PUBLISH_SUCCESS}: ${student.fullName}`);
@@ -69,41 +62,49 @@ export default function IndividualGrading({
 
       onSuccess();
     } catch (error) {
-      toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      toast.error(error.message || MESSAGES.VALIDATION_ERROR);
     } finally {
       setLoading(false);
     }
   };
 
   const getCriteriaInfo = (id) =>
-    student.criteria?.find((c) => c.criteriaId === id) || { name: STATUS.UNKNOWN, maxScore: 10 };
+    allCriteria?.find((c) => c.criteriaId === id) || { name: STATUS.UNKNOWN, maxScore: 10 };
 
   return (
     <CompoundModal
       title={`${LABELS.DETAILS}: ${student?.fullName}`}
       open={open}
-      onClose={onClose}
-      className='w-full max-w-4xl'
+      onCancel={onCancel}
+      className="w-full max-w-4xl"
       footer={
-        <div className='flex w-full items-center justify-between px-4'>
-          <div className='flex items-center gap-2'>
-            <span className='text-xs font-semibold text-gray-500'>{TABLE_COLUMNS.STATUS}:</span>
-            <Badge variant={['gray', 'blue', 'orange', 'green'][student.status] || 'default'}>
-              {[STATUS.PENDING, STATUS.DRAFT, STATUS.SUBMITTED, STATUS.PUBLISHED][student.status]}
-            </Badge>
+        <div className="flex w-full items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-gray-500">{TABLE_COLUMNS.STATUS}:</span>
+            {(() => {
+              const statusMap = {
+                Pending: { label: STATUS.PENDING, variant: 'secondary' },
+                Draft: { label: STATUS.DRAFT, variant: 'warning' },
+                Submitted: { label: STATUS.SUBMITTED, variant: 'primary' },
+                Published: { label: STATUS.PUBLISHED, variant: 'success' },
+              };
+
+              const statusInfo = statusMap[student?.status] || statusMap['Pending'];
+              return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+            })()}
           </div>
-          <div className='flex gap-2 py-3'>
-            <Button variant='outline' onClick={onClose}>
+          <div className="flex gap-2 py-3">
+            <Button variant="outline" onClick={onCancel}>
               {BUTTONS.CANCEL}
             </Button>
-            <Button variant='outline' onClick={() => handleSave()} loading={loading}>
+            <Button variant="outline" onClick={() => handleSave()} loading={loading}>
               <SaveOutlined /> {BUTTONS.SAVE_DRAFT}
             </Button>
             <Button
-              variant='primary'
+              variant="primary"
               onClick={() => handleSave('publish')}
               loading={loading}
-              className='flex items-center gap-2 bg-green-600 hover:bg-green-700'
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
             >
               <ThunderboltOutlined /> {BUTTONS.PUBLISH_NOW}
             </Button>
@@ -111,25 +112,25 @@ export default function IndividualGrading({
         </div>
       }
     >
-      <div className='space-y-6 py-4'>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+      <div className="space-y-6 py-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {formData.scores.map((s) => {
             const critInfo = getCriteriaInfo(s.criteriaId);
             return (
-              <div key={s.criteriaId} className='space-y-3 rounded-xl border bg-gray-50/50 p-4'>
-                <div className='flex items-center justify-between'>
-                  <h4 className='w-2/3 truncate text-sm font-bold text-gray-700'>
+              <div key={s.criteriaId} className="space-y-3 rounded-xl border bg-gray-50/50 p-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="w-2/3 truncate text-sm font-bold text-gray-700">
                     {critInfo.name}
                   </h4>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-[10px] text-gray-400'>Max: {critInfo.maxScore}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-400">Max: {critInfo.maxScore}</span>
                     <InputNumber
                       min={0}
                       max={critInfo.maxScore}
                       precision={2}
                       value={s.score}
                       onChange={(val) => handleScoreChange(s.criteriaId, 'score', val)}
-                      className='w-20'
+                      className="w-20"
                     />
                   </div>
                 </div>
@@ -137,7 +138,7 @@ export default function IndividualGrading({
                   placeholder={LABELS.COMMENT}
                   value={s.comment}
                   onChange={(e) => handleScoreChange(s.criteriaId, 'comment', e.target.value)}
-                  className='text-xs'
+                  className="text-xs"
                   rows={2}
                 />
               </div>
@@ -145,17 +146,17 @@ export default function IndividualGrading({
           })}
         </div>
 
-        <Divider orientation='left' className='!my-2'>
-          <span className='text-sm font-semibold'>{LABELS.GENERAL_COMMENT}</span>
+        <Divider orientation="left" className="!my-2">
+          <span className="text-sm font-semibold">{LABELS.GENERAL_COMMENT}</span>
         </Divider>
 
-        <div className='space-y-2'>
+        <div className="space-y-2">
           <Input.TextArea
             placeholder={LABELS.GENERAL_COMMENT}
             value={formData.generalComment}
             onChange={(e) => setFormData({ ...formData, generalComment: e.target.value })}
             rows={4}
-            className='rounded-xl'
+            className="rounded-xl"
           />
         </div>
       </div>

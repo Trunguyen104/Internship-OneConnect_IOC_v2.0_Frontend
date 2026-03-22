@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import CompoundModal from '@/components/ui/CompoundModal';
-import { Button } from '@/components/ui/button';
-import DataTable from '@/components/ui/datatable';
-import { PlusOutlined, EditOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Input, InputNumber } from 'antd';
-import { EvaluationService } from '../../services/evaluation.service';
-import { useToast } from '@/providers/ToastProvider';
-import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import React, { useCallback, useEffect, useState } from 'react';
 
-export default function CriteriaSettings({ cycle, open, onClose }) {
+import { Button } from '@/components/ui/button';
+import CompoundModal from '@/components/ui/CompoundModal';
+import DataTable from '@/components/ui/datatable';
+import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import { useToast } from '@/providers/ToastProvider';
+
+import { EvaluationService } from '../../services/evaluation.service';
+
+export default function CriteriaSettings({ cycle, open, onClose, onOpenChange }) {
   const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
   const [criteria, setCriteria] = useState([]);
@@ -48,7 +50,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
         await EvaluationService.createCriteria(cycle.cycleId, formData);
         toast.success(MESSAGES.CREATE_SUCCESS);
       } else {
-        await EvaluationService.updateCriteria(cycle.cycleId, editingItem.criteriaId, formData);
+        await EvaluationService.updateCriteria(editingItem.criteriaId, formData);
         toast.success(MESSAGES.UPDATE_SUCCESS);
       }
       setEditingItem(null);
@@ -60,7 +62,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
 
   const handleDelete = async (criteriaId) => {
     try {
-      await EvaluationService.deleteCriteria(cycle.cycleId, criteriaId);
+      await EvaluationService.deleteCriteria(criteriaId);
       toast.success(MESSAGES.DELETE_SUCCESS);
       fetchCriteria();
     } catch (error) {
@@ -77,10 +79,10 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <div className='flex justify-end gap-1'>
+        <div className="flex justify-end gap-1">
           <Button
-            variant='ghost'
-            size='sm'
+            variant="ghost"
+            size="sm"
             onClick={() => {
               setEditingItem(record);
               setFormData({
@@ -94,10 +96,10 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
             <EditOutlined />
           </Button>
           <Button
-            variant='ghost'
-            size='sm'
+            variant="ghost"
+            size="sm"
             onClick={() => handleDelete(record.criteriaId)}
-            className='text-red-500'
+            className="text-red-500"
           >
             <DeleteOutlined />
           </Button>
@@ -110,67 +112,67 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
     <CompoundModal
       title={`${LABELS.EDIT_CRITERIA}: ${cycle?.name}`}
       open={open}
-      onClose={onClose}
-      className='w-full max-w-3xl'
+      onCancel={onClose}
+      className="w-full max-w-3xl"
     >
-      <div className='space-y-6 py-4'>
+      <div className="space-y-6 py-4">
         {editingItem ? (
-          <div className='space-y-4 rounded-xl border bg-gray-50 p-4'>
-            <div className='flex items-center justify-between'>
-              <h4 className='text-sm font-bold'>
+          <div className="space-y-4 rounded-xl border bg-gray-50 p-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold">
                 {editingItem === 'new' ? LABELS.ADD_NEW : BUTTONS.EDIT}
               </h4>
-              <Button variant='ghost' size='sm' onClick={() => setEditingItem(null)}>
+              <Button variant="ghost" size="sm" onClick={() => setEditingItem(null)}>
                 <CloseOutlined />
               </Button>
             </div>
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='col-span-2 space-y-1'>
-                <label className='text-xs font-semibold'>{LABELS.CRITERIA_NAME}</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2 space-y-1">
+                <label className="text-xs font-semibold">{LABELS.CRITERIA_NAME}</label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
-              <div className='space-y-1'>
-                <label className='text-xs font-semibold'>{LABELS.MAX_SCORE}</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold">{LABELS.MAX_SCORE}</label>
                 <InputNumber
-                  className='w-full'
+                  className="w-full"
                   min={1}
                   value={formData.maxScore}
                   onChange={(val) => setFormData({ ...formData, maxScore: val })}
                 />
               </div>
-              <div className='space-y-1'>
-                <label className='text-xs font-semibold'>{LABELS.WEIGHT}</label>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold">{LABELS.WEIGHT}</label>
                 <InputNumber
-                  className='w-full'
+                  className="w-full"
                   min={0}
                   step={0.1}
                   value={formData.weight}
                   onChange={(val) => setFormData({ ...formData, weight: val })}
                 />
               </div>
-              <div className='col-span-2 space-y-1'>
-                <label className='text-xs font-semibold'>{LABELS.DESCRIPTION}</label>
+              <div className="col-span-2 space-y-1">
+                <label className="text-xs font-semibold">{LABELS.DESCRIPTION}</label>
                 <Input.TextArea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </div>
             </div>
-            <div className='flex justify-end'>
-              <Button variant='primary' size='sm' onClick={handleSave}>
+            <div className="flex justify-end">
+              <Button variant="primary" size="sm" onClick={handleSave}>
                 {BUTTONS.SAVE}
               </Button>
             </div>
           </div>
         ) : (
-          <div className='flex justify-end'>
+          <div className="flex justify-end">
             <Button
-              variant='outline'
-              size='sm'
-              className='flex items-center gap-1'
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1"
               onClick={() => {
                 setEditingItem('new');
                 setFormData({ name: '', description: '', maxScore: 10, weight: 1 });
@@ -185,7 +187,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
           columns={columns}
           data={criteria}
           loading={loading}
-          minWidth='600px'
+          minWidth="600px"
           emptyText={LABELS.NO_CRITERIA}
         />
       </div>
