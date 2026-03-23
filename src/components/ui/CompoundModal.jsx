@@ -10,7 +10,7 @@ const CompoundModal = ({
   children,
   open,
   onCancel,
-  width = 520,
+  width = 440,
   destroyOnClose = true,
   ...props
 }) => {
@@ -40,20 +40,20 @@ const Header = ({ icon, title, subtitle, type = 'default' }) => {
   };
 
   return (
-    <div className="border-border flex flex-col items-center gap-4 border-b pt-2 pb-6 text-center">
+    <div className="border-border flex flex-col items-center gap-2.5 border-b pt-0.5 pb-3 text-center">
       {icon && (
         <div
-          className={`flex size-14 items-center justify-center rounded-2xl text-2xl shadow-sm ${typeClasses[type] || typeClasses.default}`}
+          className={`flex size-10 items-center justify-center rounded-xl text-lg shadow-sm ${typeClasses[type] || typeClasses.default}`}
         >
           {icon}
         </div>
       )}
-      <div className="space-y-1">
-        <Title level={4} className="text-text !m-0 text-xl font-black tracking-tight">
+      <div className="space-y-0.5">
+        <Title level={4} className="text-text !m-0 text-base font-black tracking-tight">
           {title}
         </Title>
         {subtitle && (
-          <div className="text-muted text-sm leading-relaxed font-medium opacity-70">
+          <div className="text-muted text-[11px] leading-relaxed font-medium opacity-60">
             {subtitle}
           </div>
         )}
@@ -90,12 +90,12 @@ const Footer = ({
   const finalDisabled = disabled || submitDisabled;
 
   return (
-    <div className={`border-border mt-4 flex justify-end gap-3 border-t pt-6 ${className}`}>
+    <div className={`border-border mt-1.5 flex justify-end gap-2 border-t pt-3.5 ${className}`}>
       {showCancel && (
         <Button
           onClick={onCancel}
           disabled={loading}
-          className="border-border text-muted hover:bg-surface hover:text-text h-11 rounded-xl px-6 font-bold transition-all"
+          className="border-border text-muted hover:bg-surface hover:text-text h-9 rounded-xl px-4 text-[11px] font-bold transition-all"
         >
           {cancelText}
         </Button>
@@ -107,7 +107,7 @@ const Footer = ({
         onClick={finalOnConfirm}
         icon={finalIcon}
         disabled={finalDisabled}
-        className={`h-11 min-w-[120px] rounded-xl px-6 font-bold shadow-sm transition-all ${
+        className={`h-9 min-w-[90px] rounded-xl px-4 text-[11px] font-bold shadow-sm transition-all ${
           !finalDanger ? 'bg-primary hover:bg-primary-hover border-none' : ''
         }`}
       >
@@ -126,15 +126,15 @@ const COLOR_MAP = {
 
 const InfoBox = ({ label, value, color = 'primary' }) => (
   <div
-    className={`bg-surface border-border rounded-xl border p-3 transition-colors ${COLOR_MAP[color] || COLOR_MAP.primary}`}
+    className={`bg-slate-50/50 border-gray-100 rounded-xl border p-2.5 transition-colors ${COLOR_MAP[color] || COLOR_MAP.primary}`}
   >
     <Text
       type="secondary"
-      className="text-muted mb-1 block text-[10px] font-black tracking-wider uppercase opacity-60"
+      className="text-muted mb-0.5 block text-[9px] font-bold tracking-wide opacity-70"
     >
       {label}
     </Text>
-    <Text strong className="text-text text-sm">
+    <Text strong className="text-text text-[13px] leading-tight block">
       {value}
     </Text>
   </div>

@@ -22,7 +22,7 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
   };
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden>
+    <CompoundModal open={open} onCancel={onCancel} width={520} destroyOnHidden>
       <CompoundModal.Header
         icon={<ExclamationCircleOutlined className="text-danger" />}
         title={REJECT.TITLE}

@@ -6,7 +6,7 @@ import {
   PlusOutlined,
   UserDeleteOutlined,
 } from '@ant-design/icons';
-import { Select } from 'antd';
+import { Button, Dropdown, Select, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
@@ -14,14 +14,17 @@ import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import Pagination from '@/components/ui/pagination';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { STUDENT_ENROLLMENT } from '../constants/enrollment';
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
 import DataGrid from './DataGrid';
 import ImportModal from './ImportModal';
 import StudentFormModal from './StudentFormModal';
 
 export default function TermStudentManagement() {
+  const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { MESSAGES, ACTIONS, SEARCH, STATUS_OPTIONS } = ENROLLMENT_MANAGEMENT;
+
   const [terms, setTerms] = useState([]);
   const [termsLoading, setTermsLoading] = useState(false);
 
@@ -62,6 +65,7 @@ export default function TermStudentManagement() {
     sortBy,
     sortOrder,
     handleSortChange,
+    onTableChange,
   } = useStudentEnrollment();
 
   useEffect(() => {
@@ -70,9 +74,10 @@ export default function TermStudentManagement() {
       try {
         const response = await TermService.getAll({ pageSize: 100 });
         if (response?.data?.items) {
-          setTerms(response.data.items);
-          if (!termId && response.data.items.length > 0) {
-            onTermChange(response.data.items[0].termId);
+          const items = response.data.items;
+          setTerms(items);
+          if (!termId && items.length > 0) {
+            onTermChange(items[0].termId);
           }
         }
       } catch (error) {
@@ -82,78 +87,97 @@ export default function TermStudentManagement() {
       }
     };
     fetchTerms();
-  }, [onTermChange, termId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onTermChange]);
 
   const activeTerm = terms.find((t) => t.termId === termId);
   const isClosed = activeTerm?.status === 4; // TERM_STATUS.CLOSED is 4
 
   return (
     <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={STUDENT_ENROLLMENT.TITLE} />
+      <StudentPageHeader title={ENROLLMENT_MANAGEMENT.TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar className="mb-5 flex-shrink-0 !border-0 !p-0">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !rounded-3xl border-none !p-6 shadow-sm sm:!p-8">
+        <DataTableToolbar className="mb-6 !border-0 !p-0">
           <DataTableToolbar.Search
-            placeholder={STUDENT_ENROLLMENT.SEARCH.PLACEHOLDER}
+            placeholder={SEARCH.PLACEHOLDER}
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
           />
-          <DataTableToolbar.Filters className="gap-3">
-            <Select
-              loading={termsLoading}
-              placeholder={STUDENT_ENROLLMENT.SEARCH.TERM_PLACEHOLDER}
-              value={termId}
-              onChange={onTermChange}
-              className="h-9 min-w-[200px]"
-              options={terms.map((t) => ({ label: t.name, value: t.termId }))}
-            />
-            <Select
-              allowClear
-              placeholder={STUDENT_ENROLLMENT.STATUS_FILTER}
-              value={statusFilter || undefined}
-              onChange={onStatusChange}
-              className="h-9 min-w-[150px]"
-              options={STUDENT_ENROLLMENT.STATUS_OPTIONS}
-              suffixIcon={<FilterOutlined className="text-muted" />}
-            />
+          <DataTableToolbar.Filters className="gap-0">
+            <Space.Compact className="w-full sm:w-auto shadow-sm !rounded-xl overflow-hidden border border-border">
+              <Select
+                loading={termsLoading}
+                placeholder={SEARCH.TERM_PLACEHOLDER}
+                value={termId}
+                onChange={onTermChange}
+                className="!h-10 min-w-[150px] !border-0 focus:!ring-0"
+                variant="borderless"
+                options={terms.map((t) => ({ label: t.name, value: t.termId }))}
+                suffixIcon={<FilterOutlined className="text-muted/40" />}
+              />
+              <div className="bg-border h-6 w-[1px] self-center opacity-50" />
+              <Select
+                allowClear
+                placeholder={ENROLLMENT_MANAGEMENT.STATUS_FILTER}
+                value={statusFilter || undefined}
+                onChange={onStatusChange}
+                className="!h-10 min-w-[140px] !border-0 focus:!ring-0"
+                variant="borderless"
+                options={STATUS_OPTIONS}
+                suffixIcon={<FilterOutlined className="text-muted/40" />}
+              />
+            </Space.Compact>
           </DataTableToolbar.Filters>
-          <div className="flex shrink-0 items-center justify-end gap-2 ml-auto">
-            <DataTableToolbar.Actions
-              label={STUDENT_ENROLLMENT.ACTIONS.IMPORT}
-              onClick={() => setImportVisible(true)}
-              icon={<DownloadOutlined />}
+          <DataTableToolbar.Actions className="ml-auto gap-3">
+            <Button
+              danger
+              type="primary"
+              icon={<UserDeleteOutlined />}
+              onClick={handleBulkWithdraw}
+              disabled={selectedIds.length === 0 || isClosed}
+              className="!h-10 !rounded-xl shadow-md"
+            >
+              {MESSAGES.BULK_WITHDRAW.ACTION_LABEL}
+              {selectedIds.length > 0 && ` (${selectedIds.length})`}
+            </Button>
+            <Dropdown
               disabled={isClosed}
-              className="!bg-bg !text-primary border border-primary hover:!bg-primary/5 hover:!text-primary-hover !ml-0"
-            />
-            <DataTableToolbar.Actions
-              label={STUDENT_ENROLLMENT.ACTIONS.ADD}
-              onClick={onAdd}
-              icon={<PlusOutlined />}
-              disabled={isClosed}
-              className="!ml-0"
-              menu={
-                selectedIds.length > 0 && !isClosed
-                  ? {
-                      items: [
-                        {
-                          key: 'withdraw',
-                          label: `${STUDENT_ENROLLMENT.ACTIONS.DELETE} (${selectedIds.length})`,
-                          icon: <UserDeleteOutlined />,
-                          danger: true,
-                          onClick: handleBulkWithdraw,
-                        },
-                      ],
-                    }
-                  : undefined
-              }
-            />
-          </div>
+              trigger={['click']}
+              menu={{
+                items: [
+                  {
+                    key: 'add',
+                    icon: <PlusOutlined />,
+                    label: ACTIONS.ADD,
+                    onClick: onAdd,
+                  },
+                  {
+                    type: 'divider',
+                  },
+                  {
+                    key: 'import',
+                    icon: <DownloadOutlined />,
+                    label: ACTIONS.IMPORT,
+                    onClick: () => setImportVisible(true),
+                  },
+                ],
+              }}
+            >
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                className="!h-10 !rounded-xl shadow-md"
+              >
+                {ACTIONS.ADD}
+              </Button>
+            </Dropdown>
+          </DataTableToolbar.Actions>
         </DataTableToolbar>
 
         <DataGrid
           data={students}
           loading={loading}
-          total={pagination.total || 0}
           page={pagination.current}
           pageSize={pagination.pageSize}
           selectedRowKeys={selectedIds}

@@ -28,8 +28,9 @@ export const EnterpriseGroupService = {
     return httpPut(`${BASE_URL}/${id}`, data);
   },
 
-  async assignMentor(id, mentorId) {
-    return httpPatch(`${BASE_URL}/${id}/assign-mentor`, { mentorId });
+  async moveStudents(data) {
+    // Expected payload: MoveStudentsBetweenGroupsCommand { fromGroupId, toGroupId, studentIds }
+    return httpPost(`${BASE_URL}/move-students`, data);
   },
 
   async addStudents(id, students) {

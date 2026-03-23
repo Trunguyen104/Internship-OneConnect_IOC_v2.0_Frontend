@@ -13,8 +13,6 @@ const TermStats = ({ initialValues }) => {
 
   const { STATS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
 
-  // Sanitize and recalculate locally for logical consistency
-  // Support both potential backend field names
   const totalEnrolled = Math.max(0, initialValues.totalEnrolled || initialValues.studentCount || 0);
   const totalPlaced = Math.min(totalEnrolled, Math.max(0, initialValues.totalPlaced || 0));
   const totalUnplaced = totalEnrolled - totalPlaced;
@@ -23,35 +21,29 @@ const TermStats = ({ initialValues }) => {
     {
       label: STATS.TOTAL_ENROLLED,
       value: totalEnrolled,
-      containerClass: 'bg-info-surface border-info/10',
-      textClass: 'text-info',
+      variant: 'primary',
     },
     {
       label: STATS.TOTAL_PLACED,
       value: totalPlaced,
-      containerClass: 'bg-success-surface border-success/10',
-      textClass: 'text-success',
+      variant: 'success',
     },
     {
       label: STATS.TOTAL_UNPLACED,
       value: totalUnplaced,
-      containerClass: 'bg-warning-surface border-warning/10',
-      textClass: 'text-warning',
+      variant: 'warning',
     },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3 py-2">
+    <div className="grid grid-cols-3 gap-3 pt-2 pb-6">
       {stats.map((stat, idx) => (
-        <div
+        <CompoundModal.InfoBox
           key={idx}
-          className={`rounded-lg border p-3 text-center transition-all ${stat.containerClass}`}
-        >
-          <div className="text-muted mb-1 text-[10px] font-bold tracking-wider uppercase">
-            {stat.label}
-          </div>
-          <div className={`text-lg font-bold ${stat.textClass}`}>{stat.value}</div>
-        </div>
+          label={stat.label}
+          value={stat.value}
+          color={stat.variant}
+        />
       ))}
     </div>
   );
@@ -79,7 +71,6 @@ const TermFormBody = ({
       });
     } else {
       form.resetFields();
-      // Pre-fill universityId for non-SuperAdmins (SchoolAdmins)
       if (!isSuperAdmin && userUniversity?.id) {
         form.setFieldsValue({ universityId: userUniversity.id });
       }
@@ -105,14 +96,35 @@ const TermFormBody = ({
       : FORM.TITLE_EDIT
     : FORM.TITLE_ADD;
 
+  const modalSubtitle = viewOnly
+    ? initialValues.name
+    : initialValues
+      ? FORM.TITLE_EDIT
+      : FORM.TITLE_ADD;
+
   return (
     <>
-      <CompoundModal.Header title={modalTitle} />
+      <CompoundModal.Header
+        title={modalTitle}
+        subtitle={
+          viewOnly
+            ? initialValues.name
+            : initialValues
+              ? 'Update term details'
+              : 'Create a new internship semester'
+        }
+      />
 
-      {viewOnly && <TermStats initialValues={initialValues} />}
+      <CompoundModal.Content className="!pb-0">
+        {viewOnly && <TermStats initialValues={initialValues} />}
 
-      <CompoundModal.Content>
-        <Form form={form} layout="vertical" disabled={viewOnly || loading} requiredMark={!viewOnly}>
+        <Form
+          form={form}
+          layout="vertical"
+          disabled={viewOnly || loading}
+          requiredMark={!viewOnly}
+          className="premium-form"
+        >
           <Form.Item
             name="name"
             label={FORM.NAME_LABEL}
@@ -121,7 +133,7 @@ const TermFormBody = ({
               { max: 100, message: FORM.NAME_MAX },
             ]}
           >
-            <Input placeholder={FORM.NAME_PLACEHOLDER} className="h-10" />
+            <Input placeholder={FORM.NAME_PLACEHOLDER} className="!h-11 !rounded-xl" />
           </Form.Item>
 
           {isSuperAdmin && (
@@ -132,7 +144,7 @@ const TermFormBody = ({
             >
               <Select
                 placeholder={FORM.UNIVERSITY_LABEL}
-                className="h-10 w-full"
+                className="!h-11 w-full"
                 loading={loading}
                 showSearch
                 filterOption={(input, option) =>
@@ -160,7 +172,7 @@ const TermFormBody = ({
                 rules={[{ required: true, message: FORM.START_DATE_REQUIRED }]}
               >
                 <DatePicker
-                  className="h-10 w-full"
+                  className="!h-11 w-full !rounded-xl"
                   format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
@@ -188,7 +200,7 @@ const TermFormBody = ({
                 ]}
               >
                 <DatePicker
-                  className="h-10 w-full"
+                  className="!h-11 w-full !rounded-xl"
                   format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
@@ -204,6 +216,7 @@ const TermFormBody = ({
         loading={loading}
         confirmIcon={!viewOnly && <SaveOutlined />}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SUBMIT}
+        className="!mt-0"
       />
     </>
   );

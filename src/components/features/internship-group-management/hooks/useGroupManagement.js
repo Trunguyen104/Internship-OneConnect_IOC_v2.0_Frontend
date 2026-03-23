@@ -26,7 +26,7 @@ export const useGroupManagement = () => {
     createGroup,
     updateGroup,
     archiveGroup,
-    assignMentor,
+    moveStudents,
     deleteGroup,
     loading: actionLoading,
   } = useEnterpriseGroupActions(refetch);
@@ -39,14 +39,13 @@ export const useGroupManagement = () => {
   const [fetchingStudents, setFetchingStudents] = useState(false);
 
   const fetchUnassignedStudents = useCallback(async () => {
-    if (!filters.termId) return;
     try {
       setFetchingStudents(true);
       const res = await EnterpriseStudentService.getApplications({
-        termId: filters.termId,
-        status: 1, // Fetch only ACCEPTED students
-        pageIndex: 1,
-        pageSize: 100,
+        TermId: filters.termId || undefined,
+        Status: 1, // Approved (which equals Placed)
+        PageIndex: 1,
+        PageSize: 100,
       });
       const items = res?.data?.items || [];
       // Filter for approved students without a group
@@ -71,10 +70,15 @@ export const useGroupManagement = () => {
     async (values) => {
       const { group } = assignModal;
       if (!group) return;
-      await assignMentor(group.id, values.mentorId);
+      // Assign mentor and project name via updateGroup
+      await updateGroup(group.id, {
+        ...group,
+        mentorId: values.mentorId,
+        projectName: values.projectName,
+      });
       setAssignModal({ open: false, group: null });
     },
-    [assignModal, assignMentor]
+    [assignModal, updateGroup]
   );
 
   const handleDeleteGroup = useCallback(
@@ -108,27 +112,24 @@ export const useGroupManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (values) => {
-      const studentIds =
-        values.studentIds && values.studentIds.length > 0
-          ? values.studentIds
-          : unassignedStudents.map((s) => s.studentId || s.StudentId || s.id || s.applicationId);
+      const studentIds = values.students || [];
 
       const payload = {
-        GroupName: values.name,
-        Track: values.track,
-        TermId: filters.termId,
-        Students: studentIds.map((id) => ({
-          StudentId: id,
-          Role: 1, // Member default
+        name: values.name,
+        track: values.track,
+        description: values.description,
+        termId: filters.termId,
+        mentorId: values.mentorId,
+        students: studentIds.map((id) => ({
+          studentId: id,
+          role: 1, // Member default
         })),
       };
-
-      console.log('DEBUG PAYLOAD (GROUP HOOK - FINAL FIX):', payload);
 
       await createGroup(payload);
       setCreateModal(false);
     },
-    [createGroup, filters.termId, unassignedStudents]
+    [createGroup, filters.termId]
   );
 
   const handleUpdateGroup = useCallback(
@@ -145,13 +146,11 @@ export const useGroupManagement = () => {
   );
 
   return {
-    groups: data,
+    filteredGroups: data,
     activeTab: filters.filters.status !== null ? filters.filters.status : 'ALL',
     setActiveTab: (val) => filters.handleFilterChange('status', val === 'ALL' ? null : val),
     search: filters.searchValue,
     setSearch: filters.handleSearch,
-    filteredGroups: data,
-    paginatedGroups: data,
     total,
     loading: loading || actionLoading,
     assignModal,
@@ -174,8 +173,9 @@ export const useGroupManagement = () => {
     termOptions: filters.termOptions,
     fetchingTerms: filters.fetchingTerms,
     pagination: filters.pagination,
-    handleTableChange: (page) =>
-      filters.handleTableChange({ current: page, pageSize: filters.pagination.pageSize }),
+    handleTableChange: (page, filter, sorter) => filters.handleTableChange(page, filter, sorter),
     handlePageSizeChange: (size) => filters.handleTableChange({ current: 1, pageSize: size }),
+    isTermEditable:
+      filters.termId && filters.termOptions.find((t) => t.value === filters.termId)?.status < 3,
   };
 };

@@ -28,6 +28,11 @@ export const EnterpriseStudentService = {
     return httpPatch(`${BASE_URL}/${applicationId}/reject`, { reason });
   },
 
+  async assignMentor(applicationId, data) {
+    // Body: { mentorId: uuid, projectName: string }
+    return httpPatch(`${BASE_URL}/${applicationId}/assign`, data);
+  },
+
   mapApplication(item) {
     const applicationId =
       item.ApplicationId ||
@@ -41,17 +46,17 @@ export const EnterpriseStudentService = {
     // Chuẩn hóa status sang số để tránh lỗi so sánh string/number
     let rawStatus = item.Status !== undefined ? item.Status : item.status;
     if (typeof rawStatus === 'string') {
-      if (rawStatus === 'Pending') rawStatus = 1;
-      else if (rawStatus === 'Approved') rawStatus = 2;
+      if (rawStatus === 'Pending') rawStatus = 0;
+      else if (rawStatus === 'Approved') rawStatus = 1;
       else if (rawStatus === 'Rejected') rawStatus = 3;
     }
-    const status = parseInt(rawStatus, 10) || 1;
+    const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 0;
 
     console.log(`[DEBUG] Member ${item.studentFullName || 'N/A'}:`, {
       applicationId,
       studentId,
       termId,
-      status, // 1=Pending, 2=Approved, 3=Rejected
+      status, // 0=Pending, 1=Approved, 3=Rejected
       rawStatus: item.Status || item.status,
     });
 

@@ -3,29 +3,18 @@ import { Button, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
+import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import {
   INTERNSHIP_MANAGEMENT_UI,
   TERM_STATUS,
 } from '@/constants/internship-management/internship-management';
 
-const STATUS_CONFIG = {
-  [TERM_STATUS.UPCOMING]: {
-    bgClass: '!bg-info-surface',
-    textClass: '!text-info',
-  },
-  [TERM_STATUS.ACTIVE]: {
-    bgClass: '!bg-success-surface',
-    textClass: '!text-success',
-  },
-  [TERM_STATUS.ENDED]: {
-    bgClass: '!bg-warning-surface',
-    textClass: '!text-warning-text',
-  },
-  [TERM_STATUS.CLOSED]: {
-    bgClass: '!bg-danger-surface',
-    textClass: '!text-danger',
-  },
+const STATUS_VARIANTS = {
+  [TERM_STATUS.UPCOMING]: 'info',
+  [TERM_STATUS.ACTIVE]: 'success',
+  [TERM_STATUS.ENDED]: 'warning',
+  [TERM_STATUS.CLOSED]: 'danger',
 };
 
 const TermTable = memo(function TermTable({
@@ -38,68 +27,71 @@ const TermTable = memo(function TermTable({
   onRequestDelete,
   onRequestChangeStatus,
 }) {
-  const { TABLE } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT;
+  const { TABLE, STATUS_LABELS, ACTIONS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT;
 
   const columns = useMemo(
     () => [
       {
         title: '#',
         key: 'index',
-        width: '60px',
+        width: 80,
         align: 'center',
-        render: (_, __, index) => (page - 1) * pageSize + index + 1,
-        className: 'text-muted font-semibold text-xs',
+        render: (_, __, index) => (
+          <span className="text-muted font-mono text-xs font-bold">
+            {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
+          </span>
+        ),
       },
       {
         title: TABLE.COLUMNS.NAME,
+        dataIndex: 'name',
         key: 'name',
-        width: '230px',
-        render: (text) => <span className="text-text text-sm font-bold">{text}</span>,
+        render: (text) => (
+          <span className="text-text block max-w-[300px] truncate text-sm font-bold tracking-tight">
+            {text}
+          </span>
+        ),
       },
       {
         title: TABLE.COLUMNS.START_DATE,
+        dataIndex: 'startDate',
         key: 'startDate',
-        width: '130px',
+        width: 150,
         align: 'center',
         render: (date) => (
-          <span className="text-muted text-sm">{dayjs(date).format('DD/MM/YYYY')}</span>
+          <span className="text-muted text-xs font-medium">
+            {dayjs(date).format('DD MMM, YYYY')}
+          </span>
         ),
       },
       {
         title: TABLE.COLUMNS.END_DATE,
+        dataIndex: 'endDate',
         key: 'endDate',
-        width: '130px',
+        width: 150,
         align: 'center',
         render: (date) => (
-          <span className="text-muted text-sm">{dayjs(date).format('DD/MM/YYYY')}</span>
+          <span className="text-muted text-xs font-medium">
+            {dayjs(date).format('DD MMM, YYYY')}
+          </span>
         ),
       },
       {
         title: TABLE.COLUMNS.STATUS,
+        dataIndex: 'status',
         key: 'status',
-        width: '120px',
+        width: 140,
         align: 'center',
         render: (status) => {
-          const config = STATUS_CONFIG[status] ||
-            STATUS_CONFIG[TERM_STATUS[String(status).toUpperCase()]] || {
-              bgClass: '!bg-muted/10',
-              textClass: '!text-muted',
-            };
-          const label =
-            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || status;
-          return (
-            <span
-              className={`${config.bgClass} ${config.textClass} m-0 inline-flex h-6 w-fit items-center justify-center rounded-full px-2.5 text-[10px] font-bold uppercase transition-all`}
-            >
-              {label}
-            </span>
-          );
+          const variant = STATUS_VARIANTS[status] || 'default';
+          const label = STATUS_LABELS[status] || status;
+          return <Badge variant={variant}>{label}</Badge>;
         },
       },
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: '120px',
+        width: 160,
         align: 'right',
         render: (_, record) => {
           const status = Number(record.status);
@@ -108,14 +100,13 @@ const TermTable = memo(function TermTable({
           const isActive = status === TERM_STATUS.ACTIVE;
 
           return (
-            <div className="flex items-center justify-end gap-1">
-              {/* View Action - Always visible */}
-              <Tooltip title={INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.VIEW}>
+            <div className="flex items-center justify-end gap-1.5">
+              <Tooltip title={ACTIONS.VIEW}>
                 <Button
                   type="text"
                   size="small"
                   icon={<EyeOutlined />}
-                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
                   onClick={(e) => {
                     e.stopPropagation();
                     onView(record);
@@ -123,14 +114,13 @@ const TermTable = memo(function TermTable({
                 />
               </Tooltip>
 
-              {/* Edit Action - Visible if not closed */}
               {!isClosed && (
-                <Tooltip title={INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.EDIT}>
+                <Tooltip title={ACTIONS.EDIT}>
                   <Button
                     type="text"
                     size="small"
                     icon={<EditOutlined />}
-                    className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                    className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(record);
@@ -139,15 +129,14 @@ const TermTable = memo(function TermTable({
                 </Tooltip>
               )}
 
-              {/* Delete Action - Visible only if upcoming */}
               {isUpcoming && (
-                <Tooltip title={INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.DELETE}>
+                <Tooltip title={ACTIONS.DELETE}>
                   <Button
                     type="text"
                     size="small"
                     danger
                     icon={<DeleteOutlined />}
-                    className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                    className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
                     onClick={(e) => {
                       e.stopPropagation();
                       onRequestDelete(record);
@@ -156,15 +145,14 @@ const TermTable = memo(function TermTable({
                 </Tooltip>
               )}
 
-              {/* Close Action - Visible only if active */}
               {isActive && (
-                <Tooltip title={INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.CLOSE}>
+                <Tooltip title={ACTIONS.CLOSE}>
                   <Button
                     type="text"
                     size="small"
                     danger
                     icon={<StopOutlined />}
-                    className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                    className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
                     onClick={(e) => {
                       e.stopPropagation();
                       onRequestChangeStatus(record, TERM_STATUS.CLOSED);
@@ -177,7 +165,17 @@ const TermTable = memo(function TermTable({
         },
       },
     ],
-    [page, pageSize, TABLE, onRequestChangeStatus, onEdit, onView, onRequestDelete]
+    [
+      page,
+      pageSize,
+      TABLE,
+      STATUS_LABELS,
+      ACTIONS,
+      onRequestChangeStatus,
+      onEdit,
+      onView,
+      onRequestDelete,
+    ]
   );
 
   return (
@@ -186,8 +184,12 @@ const TermTable = memo(function TermTable({
       data={data}
       loading={loading}
       rowKey="termId"
-      minWidth="800px"
-      className="mt-2 min-h-0 flex-1"
+      className="mt-4"
+      pagination={{
+        current: page,
+        pageSize: pageSize,
+        total: data?.totalCount || data?.length, // Assuming data has totalCount or it's the full list
+      }}
     />
   );
 });

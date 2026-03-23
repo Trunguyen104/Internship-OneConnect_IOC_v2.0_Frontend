@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { TermService } from '../../internship-term-management/services/term.service';
+import { EnterpriseTermService } from '../../internship-student-management/services/enterprise-term.service';
 import { useDebounce } from './useDebounce';
 
 const DEFAULT_PAGINATION = {
@@ -17,16 +17,16 @@ export const useEnterpriseGroupFilters = () => {
     const fetchTerms = async () => {
       try {
         setFetchingTerms(true);
-        const res = await TermService.getAll({ PageNumber: 1, PageSize: 100 });
-        const items = res?.data?.items || [];
+        const res = await EnterpriseTermService.getActiveTerms();
+        const terms = res?.data?.terms || [];
 
-        if (items.length > 0) {
-          setTermOptions(items.map((t) => ({ label: t.name, value: t.termId || t.id })));
-          const activeTerm = items.find((t) => t.status === 2 || t.status === 'Active') || items[0];
-          setTermId(activeTerm.termId || activeTerm.id);
+        if (terms.length > 0) {
+          setTermOptions(terms.map((t) => ({ label: t.termName, value: t.termId })));
+          // Priority to Active term if possible, otherwise first one
+          setTermId(terms[0].termId);
         }
       } catch (err) {
-        console.error('Failed to fetch terms:', err);
+        console.error('Failed to fetch enterprise active terms:', err);
       } finally {
         setFetchingTerms(false);
       }

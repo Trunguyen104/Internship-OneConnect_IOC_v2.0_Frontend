@@ -82,18 +82,14 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
 
       <CompoundModal.Content>
         <Form form={form} layout="vertical" disabled={viewOnly || loading} requiredMark={!viewOnly}>
-          <Form.Item
-            name="studentId"
-            label={FORM.STUDENT}
-            rules={[{ required: true, message: FORM.VALIDATION.STUDENT_REQUIRED }]}
-          >
+          <Form.Item label={FORM.STUDENT} required>
             <div className="flex items-center gap-2">
               <Input
                 placeholder={FORM.PLACEHOLDERS.STUDENT}
                 className="h-10 flex-1 cursor-default bg-slate-50"
                 value={
                   selectedStudent
-                    ? `${selectedStudent.studentFullName} (${selectedStudent.studentCode})`
+                    ? `${selectedStudent.studentFullName || selectedStudent.fullName} ${VIOLATION_REPORT.COMMON.LEFT_PAREN}${selectedStudent.studentCode || selectedStudent.userCode}${VIOLATION_REPORT.COMMON.RIGHT_PAREN}`
                     : ''
                 }
                 readOnly
@@ -109,7 +105,14 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
                 </Button>
               )}
             </div>
-            <Form.Item name="studentId" noStyle rules={[{ required: true }]} />
+            {/* Real form field for validation and value storage */}
+            <Form.Item
+              name="studentId"
+              noStyle
+              rules={[{ required: true, message: FORM.VALIDATION.STUDENT_REQUIRED }]}
+            >
+              <Input type="hidden" />
+            </Form.Item>
           </Form.Item>
 
           <Form.Item
@@ -200,7 +203,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
 
 const ViolationFormModal = ({ visible, onCancel, ...props }) => {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={640} destroyOnClose>
+    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnClose>
       {visible && <ViolationFormBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );

@@ -44,7 +44,7 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
   ];
 
   return (
-    <CompoundModal open={visible} onCancel={handleCancel} width={800} destroyOnClose>
+    <CompoundModal open={visible} onCancel={handleCancel} width={600} destroyOnClose>
       <CompoundModal.Header title={VIOLATION_REPORT.FORM.STUDENT} />
       <CompoundModal.Content className="!pb-0">
         <DataTableToolbar

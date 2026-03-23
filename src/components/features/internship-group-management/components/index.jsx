@@ -6,7 +6,6 @@ import React from 'react';
 
 import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -48,6 +47,7 @@ export default function GroupManagement() {
     fetchingTerms,
     unassignedStudents,
     fetchingStudents,
+    isTermEditable,
   } = useGroupManagement();
 
   const onViewDetailed = (group) => {
@@ -60,14 +60,14 @@ export default function GroupManagement() {
 
   return (
     <>
-      <div className="mx-auto flex min-h-[420px] w-full max-w-full flex-1 flex-col">
-        <PageTitle title={GROUP_MANAGEMENT.TITLE} />
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 border-0 shadow-sm">
           <DataTableToolbar className="mb-6">
             <DataTableToolbar.Search
               placeholder={GROUP_MANAGEMENT.SEARCH_PLACEHOLDER}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className="max-w-xs"
             />
 
             <DataTableToolbar.Filters>
@@ -76,7 +76,7 @@ export default function GroupManagement() {
                   placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_TERM}
                   value={termId}
                   onChange={setTermId}
-                  className="h-9 min-w-[150px]"
+                  className="h-9 min-w-[200px]"
                   options={termOptions}
                   loading={fetchingTerms}
                 />
@@ -87,10 +87,7 @@ export default function GroupManagement() {
                   value={activeTab === 'ALL' ? undefined : activeTab}
                   onChange={setActiveTab}
                   className="h-9 min-w-[160px]"
-                  options={[
-                    { label: GROUP_MANAGEMENT.ACTIVE, value: 0 },
-                    { label: GROUP_MANAGEMENT.ARCHIVED, value: 2 },
-                  ]}
+                  options={GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS}
                   suffixIcon={<FilterOutlined className="text-muted" />}
                 />
               </div>
@@ -100,6 +97,7 @@ export default function GroupManagement() {
               label={GROUP_MANAGEMENT.CREATE_BTN}
               onClick={() => setCreateModal(true)}
               icon={<PlusOutlined />}
+              disabled={!isTermEditable}
             />
           </DataTableToolbar>
 
@@ -108,6 +106,7 @@ export default function GroupManagement() {
             loading={loading}
             page={pagination.current}
             pageSize={pagination.pageSize}
+            isTermEditable={isTermEditable}
             onAssign={setAssignModal}
             onDelete={handleDeleteGroup}
             onArchive={handleArchiveGroup}

@@ -18,7 +18,11 @@ const Filters = ({ children, className = '' }) => (
   <div className={`flex shrink-0 items-center gap-2 ${className}`}>{children}</div>
 );
 
-const Actions = ({ label, onClick, icon, menu, className = '', disabled }) => {
+const Actions = ({ label, onClick, icon, menu, className = '', disabled, children }) => {
+  if (children) {
+    return <div className={`flex items-center gap-3 ${className}`}>{children}</div>;
+  }
+
   const renderButton = () => (
     <button
       onClick={!menu && !disabled ? onClick : undefined}
@@ -27,7 +31,7 @@ const Actions = ({ label, onClick, icon, menu, className = '', disabled }) => {
         disabled ? 'cursor-not-allowed opacity-50 grayscale' : 'cursor-pointer active:scale-95'
       } ${className}`}
     >
-      <span>{label}</span>
+      {label && <span>{label}</span>}
       {icon || <PlusCircleOutlined className="text-base" />}
       {menu && <DownOutlined className="ml-1 text-[10px]" />}
     </button>
