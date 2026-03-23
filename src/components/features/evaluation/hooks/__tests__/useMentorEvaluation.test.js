@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { useMentorEvaluation } from '../useMentorEvaluation';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { EvaluationService } from '../../services/evaluation.service';
+import { useMentorEvaluation } from '../useMentorEvaluation';
 
 // Mocking dependencies
 vi.mock('../../services/evaluation.service', () => ({
@@ -131,7 +132,7 @@ describe('useMentorEvaluation', () => {
     expect(EvaluationService.saveEvaluations).toHaveBeenCalledWith(
       'cycle-1',
       mockInternshipId,
-      payload,
+      payload
     );
   });
 
