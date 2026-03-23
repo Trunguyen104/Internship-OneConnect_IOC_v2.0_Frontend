@@ -209,6 +209,7 @@ const DataGrid = memo(function DataGrid({
       page,
       pageSize,
       readOnly,
+      PLACEMENT_LABELS.UNPLACED,
     ]
   );
 

@@ -50,7 +50,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
         await EvaluationService.createCriteria(cycle.cycleId, formData);
         toast.success(MESSAGES.CREATE_SUCCESS);
       } else {
-        await EvaluationService.updateCriteria(cycle.cycleId, editingItem.criteriaId, formData);
+        await EvaluationService.updateCriteria(editingItem.criteriaId, formData);
         toast.success(MESSAGES.UPDATE_SUCCESS);
       }
       setEditingItem(null);
@@ -62,7 +62,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
 
   const handleDelete = async (criteriaId) => {
     try {
-      await EvaluationService.deleteCriteria(cycle.cycleId, criteriaId);
+      await EvaluationService.deleteCriteria(criteriaId);
       toast.success(MESSAGES.DELETE_SUCCESS);
       fetchCriteria();
     } catch (error) {

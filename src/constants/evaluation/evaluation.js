@@ -55,7 +55,8 @@ export const EVALUATION_UI = {
     MAX_SCORE: 'Max Score',
     WEIGHT: 'Weight',
     GENERAL_COMMENT: 'General Comment',
-    STUDENT: 'Student',
+    TOTAL_STUDENT: 'Total Student',
+    STUDENT_NAME: 'Student Name',
     COMMENT: 'Comment',
     ADD_NEW: 'Add New',
     EDIT_CRITERIA: 'Edit Criteria',
@@ -72,7 +73,7 @@ export const EVALUATION_UI = {
 
   BUTTONS: {
     CREATE_CYCLE: 'Create New Cycle',
-    QUICK_GRADE: 'Quick Grade',
+    QUICK_GRADE: 'Grade',
     CRITERIA: 'Criteria',
     PUBLISH: 'Publish Scores',
     PUBLISH_NOW: 'Publish Now',
@@ -98,5 +99,9 @@ export const EVALUATION_UI = {
     VALIDATION_ERROR: 'Please check your inputs',
     NAME_REQUIRED: 'Name is required',
     MAX_SCORE_POSITIVE: 'Max score must be greater than 0',
+    GRADING_BOARD: 'Grading Board',
+    UNSCORED: 'Unscored',
+    SCORED: 'Scored',
+    UNSAVED_CHANGES: 'Unsaved changes',
   },
 };

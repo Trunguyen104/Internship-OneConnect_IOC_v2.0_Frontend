@@ -157,7 +157,7 @@ export default function IndividualGrading({
           })}
         </div>
 
-        <Divider orientation="left" className="!my-2">
+        <Divider titlePlacement="left" className="!my-2">
           <span className="text-sm font-semibold">{LABELS.GENERAL_COMMENT}</span>
         </Divider>
 

@@ -77,6 +77,24 @@ export default function MentorEvaluationPage({ internshipId, groupName, termId, 
     };
   }, [view, selectedCycle, groupName, TITLE, SUBTITLE, BUTTONS.QUICK_GRADE, LABELS.TIME]);
 
+  const isTermPast = useMemo(() => {
+    if (!termDates?.endDate) return false;
+    const now = new Date();
+    const end = new Date(termDates.endDate);
+    end.setHours(23, 59, 59, 999);
+    return now > end;
+  }, [termDates]);
+
+  const isTermOngoing = useMemo(() => {
+    if (!termDates?.startDate || !termDates?.endDate) return false;
+    const now = new Date();
+    const start = new Date(termDates.startDate);
+    const end = new Date(termDates.endDate);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+    return now >= start && now <= end;
+  }, [termDates]);
+
   return (
     <PageLayout>
       <PageLayout.Header {...headerProps} />
@@ -89,6 +107,7 @@ export default function MentorEvaluationPage({ internshipId, groupName, termId, 
                   label: BUTTONS.CREATE_CYCLE,
                   icon: <PlusOutlined />,
                   onClick: handleOpenCreate,
+                  disabled: !isTermOngoing,
                 }
               : {
                   label: BUTTONS.BACK_TO_LIST,
@@ -107,6 +126,8 @@ export default function MentorEvaluationPage({ internshipId, groupName, termId, 
               onOpenGrading={handleOpenGrading}
               onEdit={handleOpenEdit}
               onDelete={handleDeleteCycle}
+              isTermOngoing={isTermOngoing}
+              isTermPast={isTermPast}
             />
           ) : (
             <BatchGrading
@@ -114,6 +135,7 @@ export default function MentorEvaluationPage({ internshipId, groupName, termId, 
               internshipId={internshipId}
               onBatchGrade={handleSaveEvaluations}
               onPublish={handlePublish}
+              isTermOngoing={isTermOngoing}
             />
           )}
         </PageLayout.Content>

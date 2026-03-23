@@ -4,7 +4,6 @@ import { EyeOutlined, SaveOutlined } from '@ant-design/icons';
 import { Empty, InputNumber, Table } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
-import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
@@ -35,8 +34,8 @@ const GRADING_GRID_CSS = `
   }
 `;
 
-export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPublish }) {
-  const { LABELS, BUTTONS, MESSAGES, STATUS, TABLE_COLUMNS } = EVALUATION_UI;
+export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTermOngoing }) {
+  const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
   const [data, setData] = useState({ criteria: [], students: [] });
   const [loading, setLoading] = useState(false);
@@ -133,7 +132,7 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPub
 
   const columns = [
     {
-      title: LABELS.STUDENT,
+      title: LABELS.STUDENT_NAME,
       key: 'student',
       fixed: 'left',
       width: 250,
@@ -192,22 +191,6 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPub
       ),
     },
     {
-      title: TABLE_COLUMNS.STATUS,
-      key: 'status',
-      width: 120,
-      align: 'center',
-      render: (status) => {
-        const statusMap = {
-          Pending: { label: STATUS.PENDING, variant: 'secondary' },
-          Draft: { label: STATUS.DRAFT, variant: 'warning' },
-          Submitted: { label: STATUS.SUBMITTED, variant: 'primary' },
-          Published: { label: STATUS.PUBLISHED, variant: 'success' },
-        };
-        const config = statusMap[status] || statusMap['Pending'];
-        return <Badge variant={config.variant}>{config.label}</Badge>;
-      },
-    },
-    {
       title: '',
       key: 'actions',
       fixed: 'right',
@@ -235,9 +218,8 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPub
             <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight">
               {TABLE_COLUMNS.GRADING_BOARD}
             </h3>
-            <span className="text-[10px] text-gray-400 font-bold uppercase">
-              {data.students.length} {LABELS.STUDENT} {'\u2022'} {data.criteria.length}{' '}
-              {LABELS.CRITERIA}
+            <span className="text-[12px] text-black font-bold uppercase">
+              {LABELS.TOTAL_STUDENT} : {data.students.length}
             </span>
           </div>
 
@@ -267,7 +249,7 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPub
             size="sm"
             onClick={handleSubmitBatch}
             loading={sending}
-            disabled={!hasChanges && !sending}
+            disabled={(!hasChanges && !sending) || !isTermOngoing || cycle.status !== 1}
             className="flex items-center gap-2 shadow-sm"
           >
             <SaveOutlined /> {BUTTONS.SAVE_ALL}
@@ -283,7 +265,7 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPub
           pagination={false}
           size="middle"
           scroll={{ x: 'max-content', y: 'calc(100vh - 430px)' }}
-          className="grading-grid rounded-xl border overflow-hidden"
+          className="grading-grid rounded-xl overflow-hidden"
         />
       </div>
 

@@ -31,7 +31,7 @@ export default function EvaluationContainer() {
   return (
     <div className="flex flex-1 flex-col space-y-4">
       {/* SaaS Filter Bar - Always show if terms exist */}
-      <div className="flex items-center gap-6 rounded-xl border bg-white p-4 shadow-sm">
+      <div className="flex items-center gap-6 rounded-xl bg-white p-4 shadow-sm">
         {/* Term Select */}
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
