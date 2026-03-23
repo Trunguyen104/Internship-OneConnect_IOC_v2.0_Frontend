@@ -44,7 +44,9 @@ export default function EnterprisesDialog({
         <SheetContent className="flex flex-col p-4 sm:max-w-[640px]">
           <SheetHeader className="mt-2 text-center">
             <SheetTitle className="text-3xl">
-              {isEdit ? UI_TEXT.ADMIN_USERS.UPDATE_PROFILE : UI_TEXT.ADMIN_USERS.CREATE_TITLE}
+              {isEdit
+                ? UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE
+                : UI_TEXT.USER_MANAGEMENT.CREATE_TITLE}
             </SheetTitle>
             <SheetDescription>
               {isEdit

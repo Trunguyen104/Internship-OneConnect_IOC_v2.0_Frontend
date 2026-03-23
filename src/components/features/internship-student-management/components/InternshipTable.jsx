@@ -14,6 +14,7 @@ import React, { memo, useMemo } from 'react';
 import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
+import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
 import StatusTag from './StatusTag';
 
 const InternshipTable = memo(function InternshipTable({
@@ -29,7 +30,7 @@ const InternshipTable = memo(function InternshipTable({
   selectedRowKeys = [],
   onSelectRowChange,
 }) {
-  const { TABLE, ACTIONS, STATUS_LABELS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
+  const { TABLE, ACTIONS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
 
   const rowSelection = {
     selectedRowKeys,
@@ -55,11 +56,9 @@ const InternshipTable = memo(function InternshipTable({
           return (
             <div className="flex items-center gap-2">
               <div className="flex flex-col overflow-hidden">
-                <span className="text-text truncate text-sm font-bold">
-                  {record.studentFullName || 'N/A'}
-                </span>
+                <span className="text-text truncate text-sm font-bold">{text || 'N/A'}</span>
                 <span className="text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60">
-                  {record.universityName || 'None'}
+                  {record.major || 'None'}
                 </span>
               </div>
             </div>
@@ -68,8 +67,8 @@ const InternshipTable = memo(function InternshipTable({
       },
       {
         title: TABLE.COLUMNS.STUDENT_ID,
-        dataIndex: 'studentCode',
-        key: 'studentCode',
+        dataIndex: 'studentId',
+        key: 'studentId',
         width: 70,
         render: (id) => (
           <span className="text-muted font-mono text-xs font-semibold uppercase">{id}</span>
@@ -81,20 +80,19 @@ const InternshipTable = memo(function InternshipTable({
         key: 'status',
         width: 90,
         align: 'center',
-        render: (status) => {
-          let strStatus = 'PENDING';
-          if (status === 2) strStatus = 'ACCEPTED';
-          if (status === 3) strStatus = 'REJECTED';
-          return <StatusTag status={strStatus} />;
-        },
+        render: (status) => <StatusTag status={status} />,
       },
       {
         title: TABLE.COLUMNS.GROUP,
-        render: (_, record) => {
-          return record.groupName ? (
+        dataIndex: 'groupId',
+        key: 'group',
+        width: 120,
+        render: (id) => {
+          const group = MOCK_GROUPS.find((g) => g.id === id);
+          return group ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <TeamOutlined className="text-primary text-xs opacity-60" />
-              <span className="text-text truncate text-xs font-bold">{record.groupName}</span>
+              <span className="text-text truncate text-xs font-bold">{group.name}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -105,11 +103,15 @@ const InternshipTable = memo(function InternshipTable({
       },
       {
         title: TABLE.COLUMNS.MENTOR,
-        render: (_, record) => {
-          return record.mentorName ? (
+        dataIndex: 'mentorId',
+        key: 'mentor',
+        width: 120,
+        render: (id) => {
+          const mentor = MOCK_MENTORS.find((m) => m.id === id);
+          return mentor ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <div className="bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full" />
-              <span className="text-text truncate text-xs font-bold">{record.mentorName}</span>
+              <span className="text-text truncate text-xs font-bold">{mentor.name}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -132,7 +134,7 @@ const InternshipTable = memo(function InternshipTable({
               onClick: () => onView(record),
             },
             { type: 'divider' },
-            ...(record.status === 1 // 1 = PENDING (Backend Enum)
+            ...(record.status === 'PENDING'
               ? [
                   {
                     key: 'accept',

@@ -86,15 +86,7 @@ export const useTermManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [
-    pagination.current,
-    pagination.pageSize,
-    searchTerm,
-    statusFilter,
-    sortConfig,
-    toast,
-    setPagination,
-  ]);
+  }, [pagination, sortConfig, searchTerm, statusFilter, toast, setPagination]);
 
   useEffect(() => {
     fetchData();

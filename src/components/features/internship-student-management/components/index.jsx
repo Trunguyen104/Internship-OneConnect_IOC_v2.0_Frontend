@@ -70,7 +70,6 @@ export default function InternshipManagement() {
   } = useInternshipManagement();
 
   const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
-  const hasNoGroup = selectedStudents.some((s) => !s.groupId);
   const hasGroup = selectedStudents.some((s) => !!s.groupId);
 
   const bulkItems = [

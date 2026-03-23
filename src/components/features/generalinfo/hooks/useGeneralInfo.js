@@ -89,7 +89,7 @@ export function useGeneralInfo(initialId = null) {
             ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(data.updatedAt).toLocaleDateString('en-GB')}`
             : data.updatedText || '',
         });
-      } catch (error) {
+      } catch {
         toast.error(GENERAL_INFO_UI.MESSAGES.FETCH_ERROR);
       } finally {
         setLoading(false);

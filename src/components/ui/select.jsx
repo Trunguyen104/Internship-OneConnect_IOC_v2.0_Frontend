@@ -7,10 +7,18 @@ import { cn } from '@/lib/cn';
 
 const SelectCtx = createContext(null);
 
-function Select({ value, defaultValue, onValueChange, name, required, children }) {
+function Select({
+  value,
+  defaultValue,
+  onValueChange,
+  name,
+  required,
+  children,
+  labels: initialLabels,
+}) {
   const [open, setOpen] = useState(false);
   const [inner, setInner] = useState(defaultValue ?? '');
-  const [labels, setLabels] = useState({});
+  const [labels, setLabels] = useState(initialLabels ?? {});
   const currentValue = value !== undefined ? value : inner;
 
   const setValue = (v) => {
@@ -20,7 +28,10 @@ function Select({ value, defaultValue, onValueChange, name, required, children }
 
   const registerLabel = (v, label) => {
     if (!v || !label) return;
-    setLabels((prev) => (prev[v] ? prev : { ...prev, [v]: label }));
+    setLabels((prev) => {
+      if (prev[v] === label) return prev;
+      return { ...prev, [v]: label };
+    });
   };
 
   const ctx = {

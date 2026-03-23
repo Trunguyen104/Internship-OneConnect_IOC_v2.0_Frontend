@@ -76,6 +76,7 @@ export async function POST(req) {
     const response = NextResponse.json({
       email: data.data?.email,
       role: data.data?.role,
+      unitId: data.data?.unitId,
       expiresIn: data.data?.expiresIn,
     });
 

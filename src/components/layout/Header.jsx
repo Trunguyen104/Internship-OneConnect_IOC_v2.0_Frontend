@@ -2,18 +2,33 @@
 
 import { BellOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
+import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { logout } from '@/components/features/auth/services/authService';
 import { clearAuth } from '@/components/features/auth/services/authStorage';
+import { userService } from '@/components/features/user/services/userService';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function Header() {
+  const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
   const params = useParams();
   const internshipGroupId = params?.internshipGroupId;
-
   const toast = useToast();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await userService.getMe();
+        setUserInfo(res?.data || res);
+      } catch (err) {
+        console.error('Failed to fetch user header profile:', err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -27,6 +42,19 @@ export default function Header() {
   };
   const avatarMenu = {
     items: [
+      {
+        key: 'user-info',
+        label: (
+          <div className="flex flex-col px-1 pb-1">
+            <span className="text-sm font-bold text-slate-800">
+              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+            </span>
+            <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
+          </div>
+        ),
+        disabled: true,
+      },
+      { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
@@ -50,12 +78,26 @@ export default function Header() {
           <BellOutlined className="text-lg text-gray-700" />
         </button>
 
-        <Dropdown menu={avatarMenu} trigger={['click']} placement="bottomRight">
-          <Avatar
-            size={36}
-            style={{ backgroundColor: '#e5e7eb', color: '#374151' }}
-            icon={<UserOutlined className="text-lg" />}
-          />
+        <Dropdown
+          menu={avatarMenu}
+          trigger={['click']}
+          placement="bottomRight"
+          classNames={{ root: 'min-w-[180px]' }}
+        >
+          <div className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:bg-slate-50">
+            <Avatar
+              size={28}
+              src={userInfo?.avatarUrl || userInfo?.AvatarUrl}
+              icon={<UserOutlined />}
+            >
+              {!(userInfo?.avatarUrl || userInfo?.AvatarUrl) &&
+                (userInfo?.fullName || userInfo?.FullName || 'U').charAt(0).toUpperCase()}
+            </Avatar>
+            <span className="hidden text-sm font-semibold text-slate-700 md:block">
+              {(userInfo?.fullName || userInfo?.FullName || 'U').split(' ').pop()}
+            </span>
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+          </div>
         </Dropdown>
       </div>
     </header>

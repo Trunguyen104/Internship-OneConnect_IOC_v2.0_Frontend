@@ -131,7 +131,7 @@ export default function LogbookPage() {
         };
         setEditingId(fullData.logbookId);
         setCurrentRecord(fullData);
-      } catch (err) {
+      } catch {
         setEditingId(record.logbookId);
         setCurrentRecord(record);
       } finally {
@@ -156,7 +156,7 @@ export default function LogbookPage() {
       const res = await LogBookService.getById(record.logbookId);
       setViewRecord(res?.data || record);
       setIsDetailModalOpen(true);
-    } catch (err) {
+    } catch {
       setViewRecord(record);
       setIsDetailModalOpen(true);
     } finally {

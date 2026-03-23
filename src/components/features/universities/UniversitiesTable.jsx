@@ -17,7 +17,7 @@ export default function UniversitiesTable({ universities = [], loading = false }
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="pl-8">{UI_TEXT.ADMIN_USERS.CODE}</TableHead>
+          <TableHead className="pl-8">{UI_TEXT.USER_MANAGEMENT.CODE}</TableHead>
           <TableHead>{UI_TEXT.UNIVERSITIES.UNIVERSITY}</TableHead>
           <TableHead className="hidden lg:table-cell">{UI_TEXT.UNIVERSITIES.ADDRESS}</TableHead>
           <TableHead className="pr-8 text-right">{UI_TEXT.COMMON.ACTION}</TableHead>

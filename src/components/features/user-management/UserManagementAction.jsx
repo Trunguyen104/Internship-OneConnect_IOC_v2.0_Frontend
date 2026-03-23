@@ -13,11 +13,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import AdminUserDeleteModal from './modal/AdminUserDeleteModal';
-import AdminUserResetPasswordModal from './modal/AdminUserResetPasswordModal';
-import AdminUserUpdateModal from './modal/AdminUserUpdateModal';
+import UserManagementDeleteModal from './modal/UserManagementDeleteModal';
+import UserManagementResetPasswordModal from './modal/UserManagementResetPasswordModal';
+import UserManagementUpdateModal from './modal/UserManagementUpdateModal';
 
-export default function AdminUsersAction({ user }) {
+export default function UserManagementAction({ user }) {
   const [open, setOpen] = useState({ isOpen: false, modal: null });
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -51,8 +51,8 @@ export default function AdminUsersAction({ user }) {
               <UserPen className="size-4 text-blue-600" />
             </div>
             <div className="flex flex-col">
-              <span>{UI_TEXT.ADMIN_USERS.UPDATE_PROFILE}</span>
-              <span className="text-xs text-slate-400">{UI_TEXT.ADMIN_USERS.UPDATE_INFO}</span>
+              <span>{UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE}</span>
+              <span className="text-xs text-slate-400">{UI_TEXT.USER_MANAGEMENT.UPDATE_INFO}</span>
             </div>
           </DropdownMenuItem>
 
@@ -61,9 +61,11 @@ export default function AdminUsersAction({ user }) {
               <LockKeyhole className="size-4 text-emerald-600" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold">{UI_TEXT.ADMIN_USERS.RESET_PASSWORD}</span>
+              <span className="text-sm font-semibold">
+                {UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
+              </span>
               <span className="text-[10px] tracking-tight text-slate-400 uppercase">
-                {UI_TEXT.ADMIN_USERS.ACCOUNT_SECURITY}
+                {UI_TEXT.USER_MANAGEMENT.ACCOUNT_SECURITY}
               </span>
             </div>
           </DropdownMenuItem>
@@ -79,29 +81,29 @@ export default function AdminUsersAction({ user }) {
               <Trash2 className="size-4 text-rose-600" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold">{UI_TEXT.ADMIN_USERS.DELETE}</span>
+              <span className="text-sm font-semibold">{UI_TEXT.USER_MANAGEMENT.DELETE}</span>
               <span className="text-[10px] tracking-tight text-rose-400 uppercase">
-                {UI_TEXT.ADMIN_USERS.REMOVE_FROM_SYSTEM}
+                {UI_TEXT.USER_MANAGEMENT.REMOVE_FROM_SYSTEM}
               </span>
             </div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AdminUserUpdateModal
+      <UserManagementUpdateModal
         open={open.isOpen && open.modal === 'edit'}
         onToggle={() => handleEdit(null)}
         userId={selectedUser?.userId}
       />
 
-      <AdminUserResetPasswordModal
+      <UserManagementResetPasswordModal
         open={open.isOpen && open.modal === 'reset'}
         onToggle={() => handleEdit(null)}
         userId={selectedUser?.userId || ''}
         email={selectedUser?.email}
       />
 
-      <AdminUserDeleteModal
+      <UserManagementDeleteModal
         open={open.isOpen && open.modal === 'delete'}
         onToggle={() => handleEdit(null)}
         userId={selectedUser?.userId || ''}

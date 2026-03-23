@@ -19,9 +19,9 @@ import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { adminUsersService } from '../adminUsers.service';
+import { userManagementService } from '../userManagement.service';
 
-export default function AdminUserDeleteModal({ open, userId, label, onToggle }) {
+export default function UserManagementDeleteModal({ open, userId, label, onToggle }) {
   const toast = useToast();
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -43,7 +43,7 @@ export default function AdminUserDeleteModal({ open, userId, label, onToggle }) 
 
     setBusy(true);
     try {
-      await adminUsersService.delete(userId);
+      await userManagementService.delete(userId);
       toast.success('Deleted user');
       useAdminUsersStore.increment();
       onToggle?.(false);
@@ -61,22 +61,24 @@ export default function AdminUserDeleteModal({ open, userId, label, onToggle }) 
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl font-bold">
               <Trash2 className="h-6 w-6 text-rose-600" />
-              {UI_TEXT.ADMIN_USERS.DELETE}
+              {UI_TEXT.USER_MANAGEMENT.DELETE}
             </DialogTitle>
-            <DialogDescription>{UI_TEXT.ADMIN_USERS.DELETE_HINT}</DialogDescription>
+            <DialogDescription>{UI_TEXT.USER_MANAGEMENT.DELETE_HINT}</DialogDescription>
           </DialogHeader>
 
           <div className="mt-4 space-y-3">
             <div className="text-sm text-slate-700">
-              {UI_TEXT.ADMIN_USERS.DELETE_BTN} <b>{label || UI_TEXT.COMMON.MINUS}</b>
+              {UI_TEXT.USER_MANAGEMENT.DELETE_BTN} <b>{label || UI_TEXT.COMMON.MINUS}</b>
               {UI_TEXT.COMMON.QUESTION}
             </div>
 
             <Field orientation="horizontal" className="gap-3">
               <Checkbox checked={confirmed} onCheckedChange={setConfirmed} />
               <div className="space-y-1">
-                <span className="text-sm font-semibold">{UI_TEXT.ADMIN_USERS.CONFIRM_DELETE}</span>
-                <p className="text-xs text-slate-500">{UI_TEXT.ADMIN_USERS.LOSS_ACCESS_HINT}</p>
+                <span className="text-sm font-semibold">
+                  {UI_TEXT.USER_MANAGEMENT.CONFIRM_DELETE}
+                </span>
+                <p className="text-xs text-slate-500">{UI_TEXT.USER_MANAGEMENT.LOSS_ACCESS_HINT}</p>
               </div>
             </Field>
           </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import AvatarUploader from '@/components/ui/avataruploader';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -19,12 +20,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/admin-users/enums';
+import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { mediaService } from '@/services/media.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { adminUsersService } from '../adminUsers.service';
+import { userManagementService } from '../userManagement.service';
 
 const initialEditForm = {
   fullName: '',
@@ -38,7 +40,7 @@ const initialEditForm = {
   studentGpa: '',
 };
 
-export default function AdminUserUpdateModal({ open, userId, onToggle }) {
+export default function UserManagementUpdateModal({ open, userId, onToggle }) {
   const toast = useToast();
   const [busy, setBusy] = useState(false);
   const [detail, setDetail] = useState(null);
@@ -53,24 +55,28 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
     setBusy(true);
     setDetail(null);
 
-    adminUsersService
+    userManagementService
       .getById(userId)
       .then((res) => {
         if (!alive) return;
         const data = res?.data ?? res;
         setDetail(data);
         setEditForm({
-          fullName: data?.fullName || '',
-          phoneNumber: data?.phoneNumber || '',
-          status: data?.status ? String(data.status) : '',
-          dateOfBirth: data?.dateOfBirth ? String(data.dateOfBirth) : '',
-          gender: data?.gender ? String(data.gender) : '',
-          avatarUrl: data?.avatarUrl || '',
-          studentClass: data?.studentClass || '',
-          studentMajor: data?.studentMajor || '',
+          fullName: data?.fullName || data?.FullName || '',
+          phoneNumber: data?.phoneNumber || data?.PhoneNumber || '',
+          status: (data?.status ?? data?.Status) ? String(data.status ?? data.Status) : '',
+          dateOfBirth:
+            (data?.dateOfBirth ?? data?.DateOfBirth)
+              ? String(data.dateOfBirth ?? data.DateOfBirth)
+              : '',
+          gender: (data?.gender ?? data?.Gender) ? String(data.gender ?? data.Gender) : '',
+          avatarUrl: data?.avatarUrl || data?.AvatarUrl || '',
+          studentClass: data?.studentClass || data?.StudentClass || '',
+          studentMajor: data?.studentMajor || data?.StudentMajor || '',
           studentGpa:
-            data?.studentGpa !== null && data?.studentGpa !== undefined
-              ? String(data.studentGpa)
+            (data?.studentGpa ?? data?.StudentGpa) !== null &&
+            (data?.studentGpa ?? data?.StudentGpa) !== undefined
+              ? String(data.studentGpa ?? data.StudentGpa)
               : '',
         });
       })
@@ -102,21 +108,28 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 
-    const payload = {
-      fullName: editForm.fullName.trim(),
-      phoneNumber: editForm.phoneNumber?.trim() || undefined,
-      status: editForm.status ? Number(editForm.status) : undefined,
-      dateOfBirth: editForm.dateOfBirth?.trim() || undefined,
-      gender: editForm.gender ? Number(editForm.gender) : undefined,
-      avatarUrl: editForm.avatarUrl?.trim() || undefined,
-      studentClass: editForm.studentClass?.trim() || undefined,
-      studentMajor: editForm.studentMajor?.trim() || undefined,
-      studentGpa: editForm.studentGpa !== '' ? Number(editForm.studentGpa) : undefined,
-    };
-
     setBusy(true);
     try {
-      await adminUsersService.update(userId, payload);
+      let finalAvatarUrl = editForm.avatarUrl;
+      if (editForm.avatarUrl instanceof File) {
+        const uploadRes = await mediaService.uploadImage(editForm.avatarUrl, 'Users');
+        finalAvatarUrl = uploadRes?.data ?? uploadRes;
+      }
+
+      const payload = {
+        fullName: editForm.fullName.trim(),
+        phoneNumber: editForm.phoneNumber?.trim() || undefined,
+        status: editForm.status ? Number(editForm.status) : undefined,
+        dateOfBirth: editForm.dateOfBirth?.trim() || undefined,
+        gender: editForm.gender ? Number(editForm.gender) : undefined,
+        avatarUrl:
+          typeof finalAvatarUrl === 'string' ? finalAvatarUrl.trim() : finalAvatarUrl || undefined,
+        studentClass: editForm.studentClass?.trim() || undefined,
+        studentMajor: editForm.studentMajor?.trim() || undefined,
+        studentGpa: editForm.studentGpa !== '' ? Number(editForm.studentGpa) : undefined,
+      };
+
+      await userManagementService.update(userId, payload);
       toast.success('Updated user');
       useAdminUsersStore.increment();
       onToggle?.(false);
@@ -132,13 +145,13 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
       <SheetContent className="flex flex-col p-4 sm:max-w-[560px]">
         <form onSubmit={doUpdate} className="flex min-h-0 flex-1 flex-col">
           <SheetHeader className="mt-2 text-center">
-            <SheetTitle className="text-3xl">{UI_TEXT.ADMIN_USERS.UPDATE_PROFILE}</SheetTitle>
-            <SheetDescription>{UI_TEXT.ADMIN_USERS.UPDATE_INFO}</SheetDescription>
+            <SheetTitle className="text-3xl">{UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE}</SheetTitle>
+            <SheetDescription>{UI_TEXT.USER_MANAGEMENT.UPDATE_INFO}</SheetDescription>
           </SheetHeader>
 
           <FieldGroup className="mt-4 min-h-0 flex-1 gap-4 overflow-y-auto pb-8">
             <Field>
-              <FieldLabel htmlFor="fullName">{UI_TEXT.ADMIN_USERS.FULL_NAME_LABEL}</FieldLabel>
+              <FieldLabel htmlFor="fullName">{UI_TEXT.USER_MANAGEMENT.FULL_NAME_LABEL}</FieldLabel>
               <Input
                 id="fullName"
                 value={editForm.fullName}
@@ -148,7 +161,9 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="phoneNumber">{UI_TEXT.ADMIN_USERS.PHONE_OPTIONAL}</FieldLabel>
+              <FieldLabel htmlFor="phoneNumber">
+                {UI_TEXT.USER_MANAGEMENT.PHONE_OPTIONAL}
+              </FieldLabel>
               <Input
                 id="phoneNumber"
                 value={editForm.phoneNumber}
@@ -158,13 +173,14 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field>
-                <FieldLabel>{UI_TEXT.ADMIN_USERS.STATUS}</FieldLabel>
+                <FieldLabel>{UI_TEXT.USER_MANAGEMENT.STATUS}</FieldLabel>
                 <Select
                   value={editForm.status}
+                  labels={USER_STATUS_LABEL}
                   onValueChange={(v) => setEditForm((p) => ({ ...p, status: v }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={UI_TEXT.ADMIN_USERS.STATUS} />
+                    <SelectValue placeholder={UI_TEXT.USER_MANAGEMENT.STATUS} />
                   </SelectTrigger>
                   <SelectContent position="popper">
                     <SelectItem value="">{UI_TEXT.COMMON.MINUS}</SelectItem>
@@ -178,47 +194,52 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
               </Field>
 
               <Field>
-                <FieldLabel>{UI_TEXT.ADMIN_USERS.GENDER}</FieldLabel>
+                <FieldLabel>{UI_TEXT.USER_MANAGEMENT.GENDER}</FieldLabel>
                 <Select
                   value={editForm.gender}
                   onValueChange={(v) => setEditForm((p) => ({ ...p, gender: v }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={UI_TEXT.ADMIN_USERS.GENDER} />
+                    <SelectValue placeholder={UI_TEXT.USER_MANAGEMENT.GENDER} />
                   </SelectTrigger>
                   <SelectContent position="popper">
                     <SelectItem value="">{UI_TEXT.COMMON.MINUS}</SelectItem>
-                    <SelectItem value="1">{UI_TEXT.ADMIN_USERS.MALE}</SelectItem>
-                    <SelectItem value="2">{UI_TEXT.ADMIN_USERS.FEMALE}</SelectItem>
-                    <SelectItem value="3">{UI_TEXT.ADMIN_USERS.OTHER}</SelectItem>
+                    <SelectItem value="1">{UI_TEXT.USER_MANAGEMENT.MALE}</SelectItem>
+                    <SelectItem value="2">{UI_TEXT.USER_MANAGEMENT.FEMALE}</SelectItem>
+                    <SelectItem value="3">{UI_TEXT.USER_MANAGEMENT.OTHER}</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
             </div>
 
             <Field>
-              <FieldLabel htmlFor="dateOfBirth">{UI_TEXT.ADMIN_USERS.DOB_LABEL}</FieldLabel>
+              <FieldLabel htmlFor="dateOfBirth">{UI_TEXT.USER_MANAGEMENT.DOB_LABEL}</FieldLabel>
               <Input
                 id="dateOfBirth"
+                type="date"
                 value={editForm.dateOfBirth}
                 onChange={(e) => setEditForm((p) => ({ ...p, dateOfBirth: e.target.value }))}
                 error={errors.dateOfBirth}
               />
             </Field>
 
-            <Field>
-              <FieldLabel htmlFor="avatarUrl">{UI_TEXT.ADMIN_USERS.AVATAR_LABEL}</FieldLabel>
-              <Input
-                id="avatarUrl"
+            <Field className="flex flex-col items-center py-4">
+              <AvatarUploader
                 value={editForm.avatarUrl}
-                onChange={(e) => setEditForm((p) => ({ ...p, avatarUrl: e.target.value }))}
+                fullName={editForm.fullName}
+                onChange={(file) => setEditForm((p) => ({ ...p, avatarUrl: file }))}
               />
+              <span className="mt-2 text-xs text-slate-500">
+                {UI_TEXT.USER_MANAGEMENT.AVATAR_LABEL}
+              </span>
             </Field>
 
             {detail?.role === USER_ROLE.STUDENT ? (
               <>
                 <Field>
-                  <FieldLabel htmlFor="studentClass">{UI_TEXT.ADMIN_USERS.CLASS_LABEL}</FieldLabel>
+                  <FieldLabel htmlFor="studentClass">
+                    {UI_TEXT.USER_MANAGEMENT.CLASS_LABEL}
+                  </FieldLabel>
                   <Input
                     id="studentClass"
                     value={editForm.studentClass}
@@ -226,7 +247,9 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="studentMajor">{UI_TEXT.ADMIN_USERS.MAJOR_LABEL}</FieldLabel>
+                  <FieldLabel htmlFor="studentMajor">
+                    {UI_TEXT.USER_MANAGEMENT.MAJOR_LABEL}
+                  </FieldLabel>
                   <Input
                     id="studentMajor"
                     value={editForm.studentMajor}
@@ -234,7 +257,7 @@ export default function AdminUserUpdateModal({ open, userId, onToggle }) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="studentGpa">{UI_TEXT.ADMIN_USERS.GPA_LABEL}</FieldLabel>
+                  <FieldLabel htmlFor="studentGpa">{UI_TEXT.USER_MANAGEMENT.GPA_LABEL}</FieldLabel>
                   <Input
                     id="studentGpa"
                     value={editForm.studentGpa}

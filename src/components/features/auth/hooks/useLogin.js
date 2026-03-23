@@ -72,7 +72,7 @@ export function useLogin() {
         role === USER_ROLE.MODERATOR ||
         role === 'moderator'
       ) {
-        router.push('/admin-users');
+        router.push('/user-management');
         return;
       }
 

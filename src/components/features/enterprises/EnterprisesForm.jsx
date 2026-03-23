@@ -1,59 +1,98 @@
 'use client';
 
-import { useState } from 'react';
+import { Col, Form, Input, Row, Space } from 'antd';
+import { useEffect, useState } from 'react';
 
+import AvatarUploader from '@/components/ui/avataruploader';
+import BannerUploader from '@/components/ui/banneruploader';
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import LogoUploader from '@/components/ui/logouploader';
 import { Spinner } from '@/components/ui/spinner';
-import { Textarea } from '@/components/ui/textarea';
+import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
+import { mediaService } from '@/services/media.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
 
+function isHttpUrl(value) {
+  if (!value) return true;
+  return /^https?:\/\/.+/i.test(value);
+}
+
 export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
+  const [form] = Form.useForm();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
-  const [logoUrl, setLogoUrl] = useState(enterprise?.logoUrl || '');
-  const [backgroundUrl, setBackgroundUrl] = useState(enterprise?.backgroundUrl || '');
+
   const isEdit = !!enterprise;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    if (enterprise) {
+      const taxCodeValue =
+        enterprise.taxCode ?? enterprise.taxcode ?? enterprise.tax_code ?? enterprise.taxCODE ?? '';
 
-    const formData = new FormData(e.currentTarget);
-    const payload = {
-      name: String(formData.get('name') || '').trim(),
-      taxCode: String(formData.get('taxCode') || '').trim() || undefined,
-      industry: String(formData.get('industry') || '').trim() || undefined,
-      description: String(formData.get('description') || '').trim() || undefined,
-      address: String(formData.get('address') || '').trim() || undefined,
-      website: String(formData.get('website') || '').trim() || undefined,
-    };
-
-    const nextErrors = {};
-    if (!payload.name) nextErrors.name = 'Enterprise name is required';
-    if (payload.website && !/^https?:\/\/.+/i.test(payload.website))
-      nextErrors.website = 'Website must start with http:// or https://';
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length) {
-      setLoading(false);
-      return;
+      form.setFieldsValue({
+        logoUrl: enterprise.logoUrl ?? '',
+        backgroundUrl: enterprise.backgroundUrl ?? '',
+        name: enterprise.name ?? '',
+        website: enterprise.website ?? '',
+        industry: enterprise.industry ?? '',
+        taxCode: taxCodeValue,
+        description: enterprise.description ?? '',
+        address: enterprise.address ?? '',
+      });
+    } else {
+      form.resetFields();
     }
+  }, [enterprise, form]);
 
+  const handleSubmit = async () => {
     try {
+      const values = await form.validateFields();
+      setLoading(true);
       setFormError('');
+
+      let { logoUrl, backgroundUrl } = values;
+
+      if (logoUrl instanceof File) {
+        const uploadRes = await mediaService.uploadImage(logoUrl, 'Enterprises');
+        if (uploadRes?.success && uploadRes?.data) {
+          logoUrl = uploadRes.data;
+        } else {
+          throw new Error('Failed to upload logo');
+        }
+      }
+
+      if (backgroundUrl instanceof File) {
+        const uploadRes = await mediaService.uploadImage(backgroundUrl, 'Enterprises');
+        if (uploadRes?.success && uploadRes?.data) {
+          backgroundUrl = uploadRes.data;
+        } else {
+          throw new Error('Failed to upload background');
+        }
+      }
+
+      const payload = {
+        name: values.name?.trim() || '',
+        taxCode: values.taxCode?.trim() || undefined,
+        industry: values.industry?.trim() || undefined,
+        description: values.description?.trim() || undefined,
+        address: values.address?.trim() || undefined,
+        website: values.website?.trim() || undefined,
+      };
+
+      if (typeof logoUrl === 'string' && logoUrl.trim() !== '') {
+        payload.logoUrl = logoUrl.trim();
+      }
+
+      if (typeof backgroundUrl === 'string' && backgroundUrl.trim() !== '') {
+        payload.backgroundUrl = backgroundUrl.trim();
+      }
+
       if (isEdit) {
         await enterpriseService.update(enterprise.enterpriseId || enterprise.id, {
           ...payload,
-          logoUrl: logoUrl.trim() || undefined,
-          backgroundUrl: backgroundUrl.trim() || undefined,
           enterpriseId: enterprise.enterpriseId || enterprise.id,
         });
         toast.success(`Updated ${payload.name}`);
@@ -61,9 +100,18 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         await enterpriseService.create(payload);
         toast.success(`Created ${payload.name}`);
       }
-      useEnterprisesStore.increment();
+      if (useEnterprisesStore.increment) {
+        useEnterprisesStore.increment();
+      } else if (
+        useEnterprisesStore.getState &&
+        typeof useEnterprisesStore.getState().increment === 'function'
+      ) {
+        useEnterprisesStore.getState().increment();
+      }
+
       onSuccess?.();
     } catch (err) {
+      if (err.errorFields) return; // Ant Design form validation error
       setFormError(err?.data?.message || err?.message || 'Form submission failed');
     } finally {
       setLoading(false);
@@ -71,109 +119,107 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto flex max-w-2xl flex-col gap-6 pb-2">
-      {isEdit && (
-        <div className="mb-4 flex items-end justify-center gap-6">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-              {UI_TEXT.ENTERPRISES.BRAND_LOGO}
-            </span>
-            <LogoUploader
-              value={logoUrl}
-              onChange={setLogoUrl}
-              size={100}
-              label="Logo"
-              folder="Enterprises"
-            />
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[11px] font-bold tracking-widest text-slate-400 uppercase">
-              {UI_TEXT.ENTERPRISES.COVER_IMAGE}
-            </span>
-            <LogoUploader
-              value={backgroundUrl}
-              onChange={setBackgroundUrl}
-              size={180}
-              label="Background"
-              folder="Enterprises/Backgrounds"
-            />
-          </div>
-        </div>
-      )}
+    <div className="mx-auto flex max-w-2xl flex-col pb-2">
+      <Form form={form} layout="vertical" requiredMark={false}>
+        <div className="space-y-6 p-1">
+          {isEdit && (
+            <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6 shadow-sm">
+              <Row gutter={[48, 24]} align="top" justify="center">
+                <Col xs={24} md={8} lg={7}>
+                  <div className="flex flex-col items-center">
+                    <div className="mb-4 w-full text-center">
+                      <span className="font-bold whitespace-nowrap text-slate-700">
+                        {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.COMPANY_LOGO}
+                      </span>
+                    </div>
+                    <div className="flex justify-center">
+                      <Form.Item name="logoUrl" className="mb-0">
+                        <AvatarUploader size={100} fullName={enterprise?.name} />
+                      </Form.Item>
+                    </div>
+                  </div>
+                </Col>
 
-      <FieldGroup className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="name">{UI_TEXT.ENTERPRISES.NAME}</FieldLabel>
-          <Input
-            id="name"
+                <Col xs={24} md={16} lg={17}>
+                  <div className="flex flex-col items-center">
+                    <div className="mb-4 w-full text-center">
+                      <span className="font-bold whitespace-nowrap text-slate-700">
+                        {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.COVER_BANNER}
+                      </span>
+                    </div>
+                    <Form.Item name="backgroundUrl" className="mb-0 w-full">
+                      <BannerUploader />
+                    </Form.Item>
+                  </div>
+                </Col>
+              </Row>
+              <div className="mt-8 text-center text-xs font-medium text-slate-400 italic">
+                {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.LOGO_OVERLAP_HINT}
+              </div>
+            </div>
+          )}
+
+          <Form.Item
             name="name"
-            defaultValue={enterprise?.name}
-            required
-            placeholder="Official commercial name"
-            className="h-12 rounded-xl border-slate-200"
-            error={errors.name}
-          />
-        </Field>
+            label={ENTERPRISE_PROFILE_UI.ENTERPRISE.COMPANY_NAME_PLACEHOLDER}
+            rules={[{ required: true, message: ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.NAME }]}
+          >
+            <Input size="large" autoComplete="organization" />
+          </Form.Item>
 
-        <Field>
-          <FieldLabel htmlFor="taxCode">{UI_TEXT.ENTERPRISES.TAX_ID_LONG}</FieldLabel>
-          <Input
-            id="taxCode"
-            name="taxCode"
-            defaultValue={enterprise?.taxCode}
-            placeholder="Tax Code"
-            className="h-11 rounded-xl border-slate-200"
-          />
-        </Field>
+          <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
+            <Form.Item
+              name="website"
+              label={ENTERPRISE_PROFILE_UI.ENTERPRISE.WEBSITE}
+              rules={[
+                {
+                  validator: async (_, value) => {
+                    if (!isHttpUrl(value))
+                      throw new Error(ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.WEBSITE);
+                  },
+                },
+              ]}
+            >
+              <Input
+                size="large"
+                type="url"
+                inputMode="url"
+                autoComplete="url"
+                placeholder={ENTERPRISE_PROFILE_UI.ENTERPRISE.WEBSITE_PLACEHOLDER}
+              />
+            </Form.Item>
 
-        <Field>
-          <FieldLabel htmlFor="industry">{UI_TEXT.ENTERPRISES.INDUSTRY}</FieldLabel>
-          <Input
-            id="industry"
-            name="industry"
-            defaultValue={enterprise?.industry}
-            placeholder="E.g., Software Development"
-            className="h-11 rounded-xl border-slate-200"
-          />
-        </Field>
+            <Form.Item name="industry" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.INDUSTRY}>
+              <Input size="large" />
+            </Form.Item>
 
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="description">{UI_TEXT.ENTERPRISES.DESC}</FieldLabel>
-          <Textarea
-            id="description"
+            <Form.Item name="taxCode" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.TAX_CODE}>
+              <Input size="large" />
+            </Form.Item>
+
+            <Form.Item name="address" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.ADDRESS}>
+              <Input size="large" autoComplete="street-address" />
+            </Form.Item>
+          </Space>
+
+          <Form.Item
             name="description"
-            defaultValue={enterprise?.description}
-            placeholder="Brief company overview..."
-            className="min-h-[100px] resize-none rounded-xl border-slate-200"
-          />
-        </Field>
-
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="address">{UI_TEXT.ENTERPRISES.ADDRESS}</FieldLabel>
-          <Input
-            id="address"
-            name="address"
-            defaultValue={enterprise?.address}
-            placeholder="Full registered address"
-            className="h-11 rounded-xl border-slate-200"
-          />
-        </Field>
-
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="website">{UI_TEXT.ENTERPRISES.WEBSITE}</FieldLabel>
-          <Input
-            id="website"
-            name="website"
-            defaultValue={enterprise?.website}
-            placeholder="https://example.com"
-            className="text-primary h-11 rounded-xl border-slate-200"
-            error={errors.website}
-          />
-        </Field>
-      </FieldGroup>
+            label={ENTERPRISE_PROFILE_UI.ENTERPRISE.OVERVIEW}
+            rules={[{ max: 2000, message: ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.DESCRIPTION }]}
+          >
+            <Input.TextArea
+              placeholder={ENTERPRISE_PROFILE_UI.ENTERPRISE.DESCRIPTION_PLACEHOLDER}
+              autoComplete="off"
+              maxLength={2000}
+              showCount
+              autoSize={{ minRows: 6, maxRows: 12 }}
+            />
+          </Form.Item>
+        </div>
+      </Form>
 
       {formError && (
-        <div className="animate-in slide-in-from-top-1 rounded-xl border border-rose-100 bg-rose-50 p-4 text-center text-sm font-semibold text-rose-600">
+        <div className="animate-in slide-in-from-top-1 rounded-xl border border-rose-100 bg-rose-50 p-4 mt-2 text-center text-sm font-semibold text-rose-600">
           {formError}
         </div>
       )}
@@ -188,8 +234,9 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           {UI_TEXT.BUTTON.CANCEL}
         </Button>
         <Button
-          type="submit"
+          type="button"
           disabled={loading}
+          onClick={handleSubmit}
           className="bg-primary hover:bg-primary/90 shadow-primary/20 h-11 min-w-[160px] rounded-full px-8 font-bold text-white shadow-lg transition-all"
         >
           {loading ? (
@@ -201,6 +248,6 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           )}
         </Button>
       </div>
-    </form>
+    </div>
   );
 }

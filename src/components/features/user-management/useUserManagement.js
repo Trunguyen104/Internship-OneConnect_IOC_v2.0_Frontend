@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { adminUsersService } from '@/components/features/admin-users/adminUsers.service';
+import { userManagementService } from '@/components/features/user-management/userManagement.service';
 import { getErrorMessage } from '@/lib/error';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-export function useAdminUsers() {
+export function useUserManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { refreshCount, totalCount, users } = useAdminUsersStore();
@@ -33,7 +33,7 @@ export function useAdminUsers() {
         PageSize: pageSize,
         SearchTerm: debouncedSearch || undefined,
       };
-      const res = await adminUsersService.getList(params);
+      const res = await userManagementService.getList(params);
       const data = res?.data ?? res;
 
       const items = data?.items ?? data?.Items ?? [];

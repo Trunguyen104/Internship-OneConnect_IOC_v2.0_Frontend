@@ -5,9 +5,9 @@ import { Users } from 'lucide-react';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-export default function AdminUsersCount() {
+export default function UserManagementCount() {
   const count = useAdminUsersStore((s) => s.users.length);
-  const title = `${UI_TEXT.ADMIN_USERS.TITLE} (${count})`;
+  const title = `${UI_TEXT.USER_MANAGEMENT.TITLE} (${count})`;
 
   return (
     <div className="flex items-center space-x-2">

@@ -93,12 +93,6 @@ const StudentFormBody = memo(function StudentFormBody({
       ? ADD_EDIT.TITLE_EDIT
       : ADD_EDIT.TITLE_ADD;
 
-  const subtitle = viewOnly
-    ? ADD_EDIT.SUBTITLE_VIEW
-    : initialValues
-      ? ADD_EDIT.SUBTITLE_EDIT
-      : ADD_EDIT.SUBTITLE_ADD;
-
   const renderPersonalTab = () => (
     <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[350px] duration-300">
       <Row gutter={16}>
