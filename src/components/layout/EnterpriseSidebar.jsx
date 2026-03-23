@@ -2,7 +2,9 @@
 
 import {
   BankOutlined,
+  CalendarOutlined,
   DashboardOutlined,
+  ProjectOutlined,
   SolutionOutlined,
   TeamOutlined,
   WarningOutlined,
@@ -15,6 +17,11 @@ import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 const enterpriseMenu = [
   { icon: <DashboardOutlined />, label: 'Dashboard', href: '/dashboard' },
   {
+    icon: <CalendarOutlined />,
+    label: 'Active Term',
+    href: '/active-internship-terms',
+  },
+  {
     icon: <BankOutlined />,
     label: 'My Company',
     href: '/company-profile',
@@ -25,6 +32,7 @@ const enterpriseMenu = [
     href: '/internship-student-management',
   },
   {
+    icon: <ProjectOutlined />,
     label: 'Internship Groups',
     href: '/internship-group-management',
   },
