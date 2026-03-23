@@ -83,7 +83,7 @@ export const CreateGroupModal = memo(
     }));
 
     return (
-      <CompoundModal open={open} onCancel={handleCancel} width={580} destroyOnHidden>
+      <CompoundModal open={open} onCancel={handleCancel} width={520} destroyOnHidden>
         <CompoundModal.Header
           icon={<TeamOutlined />}
           title={isEdit ? CREATE.TITLE_EDIT : CREATE.TITLE}

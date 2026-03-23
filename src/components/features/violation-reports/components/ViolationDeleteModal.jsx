@@ -18,7 +18,7 @@ const ViolationDeleteModal = ({ open, onCancel, onConfirm, record, loading }) =>
 
           <CompoundModal.InfoBox
             label={TABLE.COLUMNS.STUDENT_NAME}
-            value={`${record?.studentName} (${record?.studentCode})`}
+            value={`${record?.studentName} ${VIOLATION_REPORT.COMMON.LEFT_PAREN}${record?.studentCode}${VIOLATION_REPORT.COMMON.RIGHT_PAREN}`}
             color="danger"
           />
         </div>

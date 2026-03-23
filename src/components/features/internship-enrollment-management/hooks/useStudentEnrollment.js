@@ -3,19 +3,20 @@ import { useCallback, useEffect, useState } from 'react';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import {
   ENROLLMENT_STATUS,
+  INTERNSHIP_MANAGEMENT_UI,
   PLACEMENT_STATUS,
 } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 import { getErrorDetail } from '@/utils/errorUtils';
 
-import { STUDENT_ENROLLMENT } from '../constants/enrollment';
 import { StudentService } from '../services/student.service';
 import { useStudentFilters } from './useStudentFilters';
 import { useStudentModals } from './useStudentModals';
 
 export const useStudentEnrollment = () => {
   const toast = useToast();
-  const { MESSAGES } = STUDENT_ENROLLMENT;
+  const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { MESSAGES } = ENROLLMENT_MANAGEMENT;
 
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -224,32 +225,85 @@ export const useStudentEnrollment = () => {
     [termId, setImportVisible, toast, MESSAGES, fetchStudents]
   );
 
+  // const handleBulkWithdraw = useCallback(async () => {
+  //   if (!termId || selectedIds.length === 0) return;
+
+  //   // Check if any selected student is PLACED
+  //   const placedStudents = students.filter(
+  //     (s) => selectedIds.includes(s.studentTermId) && s.placementStatus === 'PLACED'
+  //   );
+
+  //   if (placedStudents.length > 0) {
+  //     toast.error(MESSAGES.BULK_WITHDRAW_PLACED_ERROR.replace('{count}', placedStudents.length));
+  //     return;
+  //   }
+
+  //   setSubmitLoading(true);
+  //   try {
+  //     await StudentService.bulkWithdraw(termId, selectedIds);
+  //     toast.success(MESSAGES.BULK_WITHDRAW_SUCCESS);
+  //     setSelectedIds([]);
+  //     fetchStudents();
+  //   } catch (error) {
+  //     toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
+  //   } finally {
+  //     setSubmitLoading(false);
+  //   }
+  // }, [termId, selectedIds, students, toast, MESSAGES, fetchStudents]);
   const handleBulkWithdraw = useCallback(async () => {
     if (!termId || selectedIds.length === 0) return;
 
-    // Check if any selected student is PLACED
-    const placedStudents = students.filter(
-      (s) => selectedIds.includes(s.studentTermId) && s.placementStatus === 'PLACED'
-    );
+    const { BULK_WITHDRAW } = MESSAGES;
 
-    if (placedStudents.length > 0) {
-      toast.error(MESSAGES.BULK_WITHDRAW_PLACED_ERROR.replace('{count}', placedStudents.length));
+    const selectedStudents = students.filter((s) => selectedIds.includes(s.studentTermId));
+
+    const placedStudents = selectedStudents.filter((s) => s.placementStatus === 'PLACED');
+
+    const unplacedStudents = selectedStudents.filter((s) => s.placementStatus === 'UNPLACED');
+
+    const X = unplacedStudents.length;
+    const Y = placedStudents.length;
+
+    // CASE 3: All placed
+    if (X === 0 && Y > 0) {
+      toast.error(BULK_WITHDRAW.ERROR_ALL_PLACED);
       return;
     }
 
-    setSubmitLoading(true);
-    try {
-      await StudentService.bulkWithdraw(termId, selectedIds);
-      toast.success(MESSAGES.BULK_WITHDRAW_SUCCESS);
-      setSelectedIds([]);
-      fetchStudents();
-    } catch (error) {
-      toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
-    } finally {
-      setSubmitLoading(false);
-    }
-  }, [termId, selectedIds, students, toast, MESSAGES, fetchStudents]);
+    const confirmText =
+      Y === 0
+        ? BULK_WITHDRAW.CONFIRM_ALL_UNPLACED.replace('{count}', X)
+        : BULK_WITHDRAW.CONFIRM_MIXED.replace('{placedCount}', Y).replace('{unplacedCount}', X);
 
+    showDeleteConfirm({
+      title: BULK_WITHDRAW.ACTION_LABEL,
+      content: confirmText,
+      onOk: async () => {
+        setSubmitLoading(true);
+        try {
+          await StudentService.bulkWithdraw(
+            termId,
+            unplacedStudents.map((s) => s.studentTermId)
+          );
+
+          if (Y === 0) {
+            toast.success(BULK_WITHDRAW.SUCCESS_ALL_UNPLACED.replace('{count}', X));
+          } else {
+            toast.success(
+              BULK_WITHDRAW.SUCCESS_MIXED.replace('{unplacedCount}', X).replace('{placedCount}', Y)
+            );
+          }
+
+          setSelectedIds([]);
+          fetchStudents();
+        } catch (error) {
+          toast.error(BULK_WITHDRAW.ERROR_GENERIC);
+        } finally {
+          setSubmitLoading(false);
+        }
+      },
+    });
+  }, [termId, selectedIds, students, toast, fetchStudents, MESSAGES]);
   const handleRestore = useCallback(
     async (student) => {
       setSubmitLoading(true);
@@ -273,7 +327,7 @@ export const useStudentEnrollment = () => {
       const url = window.URL.createObjectURL(new Blob([response]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', STUDENT_ENROLLMENT.MODALS.IMPORT.TEMPLATE_FILENAME);
+      link.setAttribute('download', ENROLLMENT_MANAGEMENT.MODALS.IMPORT.TEMPLATE_FILENAME);
       document.body.appendChild(link);
       link.click();
       link.remove();

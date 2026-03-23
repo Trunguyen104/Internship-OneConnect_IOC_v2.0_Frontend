@@ -6,12 +6,25 @@ import {
 } from '@/constants/internship-management/internship-management';
 import { httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
 
-import {
-  ENROLLMENT_STATUS_MAP,
-  PLACEMENT_STATUS_MAP,
-  REVERSE_ENROLLMENT_MAP,
-  REVERSE_PLACEMENT_MAP,
-} from '../constants/enrollment';
+const ENROLLMENT_STATUS_MAP = {
+  [ENROLLMENT_STATUS.ACTIVE]: 'ACTIVE',
+  [ENROLLMENT_STATUS.WITHDRAWN]: 'WITHDRAWN',
+};
+
+const PLACEMENT_STATUS_MAP = {
+  [PLACEMENT_STATUS.UNPLACED]: 'UNPLACED',
+  [PLACEMENT_STATUS.PLACED]: 'PLACED',
+};
+
+const REVERSE_ENROLLMENT_MAP = {
+  ACTIVE: ENROLLMENT_STATUS.ACTIVE,
+  WITHDRAWN: ENROLLMENT_STATUS.WITHDRAWN,
+};
+
+const REVERSE_PLACEMENT_MAP = {
+  UNPLACED: PLACEMENT_STATUS.UNPLACED,
+  PLACED: PLACEMENT_STATUS.PLACED,
+};
 
 const cleanPayload = (obj) => {
   const newObj = { ...obj };

@@ -10,9 +10,15 @@ import {
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
+import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
+import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import {
+  INTERNSHIP_MANAGEMENT_UI,
+  TERM_STATUS_VARIANTS,
+} from '@/constants/internship-management/internship-management';
 
 import { ENTERPRISE_STUDENT_UI } from '../constants/enterprise-student.constants';
 
@@ -50,6 +56,7 @@ const StudentTable = memo(function StudentTable({
   onAssign,
   onCreateGroup,
   onChangeGroup,
+  isTermEditable,
   sortBy,
   sortOrder,
   onSort,
@@ -114,9 +121,9 @@ const StudentTable = memo(function StudentTable({
         width: '100px',
         align: 'center',
         render: (statusIdx) => {
-          // Backend Enum: 1=Pending, 2=Approved, 3=Rejected
+          // Backend Enum: 0=Pending, 1=Approved, 3=Rejected
           let statusText = 'Pending';
-          if (statusIdx === 2) statusText = 'Approved';
+          if (statusIdx === 1) statusText = 'Approved';
           if (statusIdx === 3) statusText = 'Rejected';
 
           const config = STATUS_CONFIG[statusText] || STATUS_CONFIG.default;
@@ -138,18 +145,54 @@ const StudentTable = memo(function StudentTable({
         },
       },
       {
+        title: TABLE.COLUMNS.TERM_STATUS,
+        key: 'termStatus',
+        width: '110px',
+        align: 'center',
+        render: (_, record) => {
+          const status = record.termStatus;
+          const variant = TERM_STATUS_VARIANTS[status] || 'default';
+          const label =
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || '-';
+          return (
+            <Badge variant={variant} size="sm">
+              {label}
+            </Badge>
+          );
+        },
+      },
+      {
+        title: TABLE.COLUMNS.INTERNSHIP_PERIOD,
+        key: 'period',
+        width: '160px',
+        align: 'center',
+        render: (_, record) => {
+          if (!record.startDate || !record.endDate)
+            return <span className="text-muted text-xs">-</span>;
+          return (
+            <div className="text-muted flex flex-col text-[10px] font-medium uppercase leading-tight">
+              <span>{dayjs(record.startDate).format('DD/MM/YYYY')}</span>
+              <span className="opacity-40">
+                {INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.COMMON.DASH_SEPARATOR}
+              </span>
+              <span>{dayjs(record.endDate).format('DD/MM/YYYY')}</span>
+            </div>
+          );
+        },
+      },
+      {
         title: TABLE.COLUMNS.GROUP,
         key: 'group',
-        width: '140px',
+        width: '150px',
         render: (_, record) => {
           // If approved but no group
           if (record.status === 1 && !record.groupId) {
             return (
               <span
-                className="bg-warning-surface text-warning hover:bg-warning/20 cursor-pointer inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors"
+                className={`${!isTermEditable ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-warning/20'} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onCreateGroup(record);
+                  if (isTermEditable) onCreateGroup(record);
                 }}
               >
                 {BADGES.NO_GROUP}
@@ -158,15 +201,27 @@ const StudentTable = memo(function StudentTable({
           }
           if (record.groupName) {
             return (
-              <span
-                className="text-primary hover:text-primary-focus cursor-pointer text-xs font-medium underline-offset-2 hover:underline transition-all"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onChangeGroup(record);
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'change',
+                      label: ACTIONS.CHANGE_GROUP,
+                      icon: <UsergroupAddOutlined />,
+                      disabled: !isTermEditable,
+                      onClick: () => onChangeGroup(record),
+                    },
+                  ],
                 }}
+                trigger={isTermEditable ? ['click'] : []}
               >
-                {record.groupName}
-              </span>
+                <span
+                  className={`${isTermEditable ? 'text-primary cursor-pointer underline-offset-2 hover:underline' : 'text-muted cursor-default'} text-xs font-medium transition-all`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {record.groupName}
+                </span>
+              </Dropdown>
             );
           }
           return <span className="text-muted text-xs">-</span>;
@@ -203,12 +258,14 @@ const StudentTable = memo(function StudentTable({
               key: 'assign',
               label: ACTIONS.ASSIGN,
               icon: <UserAddOutlined />,
+              disabled: !isTermEditable,
               onClick: () => onAssign(record),
             });
             menuItems.push({
               key: 'changeGroup',
               label: ACTIONS.CHANGE_GROUP,
               icon: <UsergroupAddOutlined />,
+              disabled: !isTermEditable,
               onClick: () => onChangeGroup(record),
             });
           }
@@ -218,12 +275,14 @@ const StudentTable = memo(function StudentTable({
               key: 'accept',
               label: ACTIONS.ACCEPT,
               icon: <CheckCircleFilled className="text-success" />,
+              disabled: !isTermEditable,
               onClick: () => onAccept(record),
             });
             menuItems.push({
               key: 'reject',
               label: ACTIONS.REJECT,
               icon: <CloseCircleFilled className="text-danger" />,
+              disabled: !isTermEditable,
               onClick: () => onReject(record),
             });
           }
@@ -251,6 +310,7 @@ const StudentTable = memo(function StudentTable({
       onAssign,
       onCreateGroup,
       onChangeGroup,
+      isTermEditable,
       ACTIONS,
       BADGES,
       STATUS,

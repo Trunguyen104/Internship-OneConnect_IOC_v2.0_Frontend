@@ -5,7 +5,6 @@ import React from 'react';
 
 import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -67,6 +66,9 @@ export default function InternshipManagement() {
     unassignedStudents,
     fetchingStudents,
     handleCreateGroup,
+    dateFilter,
+    setDateFilter,
+    isTermEditable,
   } = useInternshipManagement();
 
   const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
@@ -77,29 +79,29 @@ export default function InternshipManagement() {
       key: 'createGroup',
       label: INTERNSHIP_LIST.ACTIONS.CREATE_GROUP,
       icon: <UsergroupAddOutlined />,
-      disabled: hasGroup || selectedStudents.some((s) => s.status !== 2),
+      disabled: !isTermEditable || hasGroup || selectedStudents.some((s) => s.status !== 2),
       onClick: () => setCreateModal({ open: true, students: selectedStudents }),
     },
     {
       key: 'addToGroup',
       label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
       icon: <UsergroupAddOutlined />,
+      disabled: !isTermEditable,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'ADD' }),
     },
     {
       key: 'changeGroup',
       label: INTERNSHIP_LIST.ACTIONS.CHANGE_GROUP,
       icon: <EditOutlined />,
+      disabled: !isTermEditable,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'CHANGE' }),
     },
   ];
 
   return (
     <>
-      <div className="mx-auto flex w-full max-w-full flex-1 flex-col">
-        <PageTitle title={INTERNSHIP_LIST.TITLE} showBack={false} />
-
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 shadow-sm">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 border-0 shadow-sm">
           <DataTableToolbar className="mb-6">
             <DataTableToolbar.Search
               placeholder={INTERNSHIP_LIST.FILTERS.SEARCH_PLACEHOLDER}
@@ -127,11 +129,13 @@ export default function InternshipManagement() {
                 majorFilter={majorFilter}
                 setMajorFilter={setMajorFilter}
                 universityOptions={universityOptions}
+                dateFilter={dateFilter}
+                setDateFilter={setDateFilter}
                 resetFilters={resetFilters}
               />
             </DataTableToolbar.Filters>
 
-            {selectedRowKeys.length > 0 && (
+            {selectedRowKeys.length > 0 && isTermEditable && (
               <DataTableToolbar.Actions
                 label={`${INTERNSHIP_LIST.ACTIONS.BULK_ACTIONS} (${selectedRowKeys.length})`}
                 icon={<TeamOutlined />}
@@ -147,6 +151,7 @@ export default function InternshipManagement() {
             page={pagination.current}
             pageSize={pagination.pageSize}
             loading={loading}
+            isTermEditable={isTermEditable}
             selectedRowKeys={selectedRowKeys}
             onSelectRowChange={setSelectedRowKeys}
             onAccept={handleAcceptStudent}

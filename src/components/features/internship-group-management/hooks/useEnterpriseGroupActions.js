@@ -36,8 +36,8 @@ export const useEnterpriseGroupActions = (onSuccess) => {
   const archiveGroup = (id) =>
     handleAction(() => EnterpriseGroupService.archiveGroup(id), MESSAGES.ARCHIVE_SUCCESS);
 
-  const assignMentor = (id, mentorId) =>
-    handleAction(() => EnterpriseGroupService.assignMentor(id, mentorId), MESSAGES.UPDATE_SUCCESS);
+  const moveStudents = (data) =>
+    handleAction(() => EnterpriseGroupService.moveStudents(data), MESSAGES.UPDATE_SUCCESS);
 
   const addStudents = (id, students) =>
     handleAction(
@@ -64,7 +64,7 @@ export const useEnterpriseGroupActions = (onSuccess) => {
     createGroup,
     updateGroup,
     archiveGroup,
-    assignMentor,
+    moveStudents,
     addStudents,
     removeStudents,
     deleteGroup,
