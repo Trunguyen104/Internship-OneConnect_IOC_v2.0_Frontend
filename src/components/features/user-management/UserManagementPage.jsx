@@ -9,7 +9,10 @@ import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useUserManagement } from './useUserManagement';
 
-export default function UserManagementPage() {
+export default function UserManagementPage({
+  title = UI_TEXT.USER_MANAGEMENT.TITLE,
+  subtitle = UI_TEXT.USER_MANAGEMENT.SUBTITLE,
+}) {
   const {
     users,
     loading,
@@ -28,7 +31,7 @@ export default function UserManagementPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={UI_TEXT.USER_MANAGEMENT.TITLE} />
+      <PageLayout.Header title={title} subtitle={subtitle} />
 
       <PageLayout.Card>
         <PageLayout.Toolbar

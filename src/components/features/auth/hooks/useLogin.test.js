@@ -143,8 +143,8 @@ describe('useLogin Hook', () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
 
-      expect(result.current.errors.email).toBe('Email là bắt buộc');
-      expect(result.current.errors.password).toBe('Mật khẩu là bắt buộc');
+      expect(result.current.errors.email).toBe('Email is required');
+      expect(result.current.errors.password).toBe('Password is required');
       expect(login).not.toHaveBeenCalled();
     });
 
@@ -161,7 +161,7 @@ describe('useLogin Hook', () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
 
-      expect(result.current.errors.email).toBe('Email không hợp lệ');
+      expect(result.current.errors.email).toBe('Invalid email');
     });
   });
 
@@ -190,7 +190,7 @@ describe('useLogin Hook', () => {
         rememberMe: false,
       });
       expect(setAccessToken).toHaveBeenCalledWith('fake-token', false);
-      expect(mockToast.success).toHaveBeenCalledWith('Đăng nhập thành công');
+      expect(mockToast.success).toHaveBeenCalledWith('Login successful');
       expect(mockPush).toHaveBeenCalledWith('/internship-groups');
     });
 
@@ -244,7 +244,7 @@ describe('useLogin Hook', () => {
     });
 
     it('nên hiển thị lỗi khi API login thất bại', async () => {
-      const errorMessage = 'Sai tài khoản hoặc mật khẩu';
+      const errorMessage = 'Invalid email or password';
       login.mockRejectedValue(new Error(errorMessage));
 
       const { result } = renderHook(() => useLogin());
@@ -263,7 +263,7 @@ describe('useLogin Hook', () => {
       });
 
       expect(result.current.errors.password).toBe(errorMessage);
-      expect(mockToast.error).toHaveBeenCalledWith('Đăng nhập thất bại');
+      expect(mockToast.error).toHaveBeenCalledWith('Login failed');
       expect(mockPush).not.toHaveBeenCalled();
     });
   });

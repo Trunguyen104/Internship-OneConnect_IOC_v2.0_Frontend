@@ -44,6 +44,7 @@ export default function ProfilePage() {
         isEditModalOpen={profile.isEditModalOpen}
         setIsEditModalOpen={profile.setIsEditModalOpen}
         onSaveProfile={profile.updateProfile}
+        onDownloadCV={profile.handleDownloadCV}
       />
 
       {[USER_ROLE.STUDENT, 'student'].includes(String(profile.userInfo?.role).toLowerCase()) && (

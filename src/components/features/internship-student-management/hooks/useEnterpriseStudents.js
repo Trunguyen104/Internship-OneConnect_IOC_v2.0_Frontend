@@ -59,7 +59,6 @@ export const useEnterpriseStudents = ({ termId, filters, search, pagination, sor
     search,
     filters?.status,
     filters?.mentorAssigned,
-    filters?.hasGroup,
     sort?.column,
     sort?.order,
     toast,

@@ -74,7 +74,8 @@ export default function UserManagementForm({ onSuccess, onCancel }) {
         <Field>
           <FieldLabel>{UI_TEXT.USER_MANAGEMENT.ASSIGNED_ROLE}</FieldLabel>
           <Select
-            value={String(role)}
+            value={role ? String(role) : undefined}
+            labels={USER_ROLE_LABEL}
             onValueChange={(val) => {
               setRole(Number(val));
               if (!isUnitLocked) setUnitId('');
@@ -82,7 +83,7 @@ export default function UserManagementForm({ onSuccess, onCancel }) {
             disabled={allowedRoles.length <= 1}
           >
             <SelectTrigger className="rounded-xl">
-              <SelectValue />
+              <SelectValue placeholder="Select a role" />
             </SelectTrigger>
             <SelectContent>
               {allowedRoles.map((v) => (
@@ -94,7 +95,7 @@ export default function UserManagementForm({ onSuccess, onCancel }) {
           </Select>
         </Field>
 
-        {unitRequired(role) && (
+        {unitRequired(role) && !isUnitLocked && (
           <Field className="animate-in slide-in-from-top-2 duration-300 md:col-span-2">
             <FieldLabel>{unitLabel}</FieldLabel>
             <Select value={unitId} onValueChange={setUnitId} disabled={isUnitLocked}>

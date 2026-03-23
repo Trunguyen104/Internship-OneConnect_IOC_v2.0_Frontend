@@ -10,6 +10,7 @@ import { Button, Table, Tag, Tooltip, Upload } from 'antd';
 import { useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 const { Dragger } = Upload;
@@ -27,7 +28,7 @@ export default function ImportModal({
 
   const beforeUpload = async (file) => {
     if (file.size / 1024 / 1024 > 5) {
-      toast.error('File must be < 5MB');
+      toast.error(UI_TEXT.ENROLLMENT.FILE_SIZE_ERROR(5));
       return false;
     }
   };
@@ -45,26 +46,19 @@ export default function ImportModal({
       // Error is already toasted by the hook
     }
 
-    try {
-      const data = await onPreview?.(file);
-      setPreviewData(data?.previewData || []);
-    } catch {
-      setPreviewData([]);
-    }
-
     return false;
   };
 
   const columns = [
-    { title: 'Full Name', dataIndex: 'fullName' },
-    { title: 'Student ID', dataIndex: 'studentCode' },
-    { title: 'Email', dataIndex: 'email' },
+    { title: UI_TEXT.ENROLLMENT.COLUMNS.FULL_NAME, dataIndex: 'fullName' },
+    { title: UI_TEXT.ENROLLMENT.COLUMNS.STUDENT_ID, dataIndex: 'studentCode' },
+    { title: UI_TEXT.ENROLLMENT.COLUMNS.EMAIL, dataIndex: 'email' },
     {
-      title: 'Validity',
+      title: UI_TEXT.ENROLLMENT.COLUMNS.VALIDITY,
       align: 'center',
       render: (_, r) =>
         r.isValid ? (
-          <Tooltip title="Valid">
+          <Tooltip title={UI_TEXT.ENROLLMENT.TOOLTIP_VALID}>
             <CheckCircleOutlined style={{ color: 'green' }} />
           </Tooltip>
         ) : (
@@ -81,25 +75,29 @@ export default function ImportModal({
   return (
     <CompoundModal open={visible} onCancel={onCancel} width={520}>
       <CompoundModal.Header
-        title="Import Student List"
-        subtitle="Upload student list to enroll them"
+        title={UI_TEXT.ENROLLMENT.IMPORT_TITLE}
+        subtitle={UI_TEXT.ENROLLMENT.IMPORT_SUBTITLE}
       />
 
       <CompoundModal.Content>
         <Button icon={<DownloadOutlined />} type="link" onClick={onDownloadTemplate}>
-          Download template
+          {UI_TEXT.ENROLLMENT.DOWNLOAD_TEMPLATE}
         </Button>
 
-        <Dragger beforeUpload={beforeUpload} disabled={loading}>
+        <Dragger beforeUpload={beforeUpload} handlePreview={handlePreview} disabled={loading}>
           <UploadOutlined style={{ fontSize: 28 }} />
-          <p>Drag file here or click to upload (.xls, .xlsx)</p>
+          <p>{UI_TEXT.ENROLLMENT.DRAG_HINT}</p>
         </Dragger>
 
         {previewData.length > 0 && (
           <>
             <div style={{ margin: '10px 0' }}>
-              <Tag color="green">{valid} VALID</Tag>
-              <Tag color="red">{invalid} ERROR</Tag>
+              <Tag color="green">
+                {valid} {UI_TEXT.ENROLLMENT.VALID}
+              </Tag>
+              <Tag color="red">
+                {invalid} {UI_TEXT.ENROLLMENT.ERROR}
+              </Tag>
             </div>
 
             <Table

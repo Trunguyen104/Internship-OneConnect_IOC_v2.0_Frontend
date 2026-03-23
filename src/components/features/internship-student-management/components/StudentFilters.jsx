@@ -14,7 +14,42 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 
 const { Text } = Typography;
 
-const StudentFilters = ({
+const FILTER_STYLES = `
+  .student-filter-field .ant-select-selector,
+  .student-filter-value .ant-select-selector {
+    border-radius: 10px !important;
+    border-color: #e2e8f0 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .student-filter-field .ant-select-selector {
+    background-color: #f8fafc !important;
+  }
+  .student-filter-field:hover .ant-select-selector,
+  .student-filter-value:hover .ant-select-selector {
+    border-color: #6366f1 !important;
+  }
+  .filter-popover .ant-popover-inner {
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  }
+  .btn-primary-gradient {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+    border: none !important;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 2px;
+  }
+`;
+
+export const StudentFilters = ({
   termId,
   setTermId,
   termOptions,
@@ -41,7 +76,7 @@ const StudentFilters = ({
   const FILTER_CONFIG = useMemo(
     () => ({
       term: {
-        label: 'Internship Term',
+        label: INTERNSHIP_LIST.FILTERS.TERM_LABEL,
         options: termOptions,
         value: termId,
         onChange: setTermId,
@@ -66,22 +101,19 @@ const StudentFilters = ({
         onChange: setAssignmentFilter,
       },
       project: {
-        label: 'Project Status',
-        options: [
-          { label: 'Has Project', value: 'PROJECT_ASSIGNED' },
-          { label: 'No Project', value: 'PROJECT_UNASSIGNED' },
-        ],
+        label: INTERNSHIP_LIST.FILTERS.PROJECT_STATUS,
+        options: INTERNSHIP_LIST.FILTERS.PROJECT_OPTIONS,
         value: projectFilter === 'ALL' ? undefined : projectFilter,
         onChange: setProjectFilter,
       },
       university: {
-        label: 'University',
+        label: INTERNSHIP_LIST.FILTERS.UNIVERSITY_LABEL,
         options: universityOptions,
         value: universityFilter,
         onChange: setUniversityFilter,
       },
       major: {
-        label: 'Major',
+        label: INTERNSHIP_LIST.FILTERS.MAJOR_LABEL,
         options: INTERNSHIP_LIST.MODALS.ADD.MAJOR_OPTIONS,
         value: majorFilter,
         onChange: setMajorFilter,
@@ -110,7 +142,6 @@ const StudentFilters = ({
   );
 
   // Rows in the builder: each row is { id, type }
-  // We use an ID because multiple filters of the same type might be possible in some systems (though not here)
   const [rows, setRows] = useState(() => {
     const active = [];
     if (termId) active.push({ id: 'term', type: 'term' });
@@ -163,7 +194,7 @@ const StudentFilters = ({
         <div className="flex items-center gap-2">
           <FilterOutlined className="text-primary text-xs" />
           <Text strong className="text-slate-700 tracking-tight text-xs">
-            {'BỘ LỌC ĐIỀU KIỆN'}
+            {INTERNSHIP_LIST.FILTERS.BUILDER_TITLE}
           </Text>
         </div>
         <Button
@@ -173,7 +204,7 @@ const StudentFilters = ({
           icon={<UndoOutlined className="text-[10px]" />}
           className="text-red-500 hover:text-red-600 text-[11px] h-7 px-2"
         >
-          {'Xóa tất cả'}
+          {INTERNSHIP_LIST.FILTERS.CLEAR_ALL}
         </Button>
       </div>
 
@@ -185,7 +216,7 @@ const StudentFilters = ({
           >
             {/* Field Picker */}
             <Select
-              placeholder="Chọn trường..."
+              placeholder={INTERNSHIP_LIST.FILTERS.SELECT_FIELD}
               value={row.type}
               onChange={(val) => updateRowType(row.id, val)}
               className="w-[160px] student-filter-field"
@@ -196,11 +227,13 @@ const StudentFilters = ({
               }))}
             />
 
-            <Text className="text-slate-400 text-[10px] px-0.5">{'Bằng'}</Text>
+            <Text className="text-slate-400 text-[10px] px-0.5">
+              {INTERNSHIP_LIST.FILTERS.EQUAL_TO}
+            </Text>
 
             {/* Value Picker */}
             <Select
-              placeholder="Chọn giá trị..."
+              placeholder={INTERNSHIP_LIST.FILTERS.SELECT_VALUE}
               value={row.type ? FILTER_CONFIG[row.type].value : undefined}
               onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
               disabled={!row.type}
@@ -235,7 +268,7 @@ const StudentFilters = ({
           disabled={rows.length >= Object.keys(FILTER_CONFIG).length}
           className="text-primary font-semibold hover:bg-primary/5 rounded-lg px-2 py-1 h-auto text-[12px]"
         >
-          {'Thêm điều kiện'}
+          {INTERNSHIP_LIST.FILTERS.ADD_CONDITION}
         </Button>
 
         <Button
@@ -244,44 +277,12 @@ const StudentFilters = ({
           onClick={() => setOpen(false)}
           className="rounded-full px-6 h-8 text-[12px] font-medium btn-primary-gradient"
         >
-          {'Hoàn thành'}
+          {INTERNSHIP_LIST.FILTERS.FINISH}
         </Button>
       </div>
-
-      <style jsx global>{`
-        .student-filter-field .ant-select-selector,
-        .student-filter-value .ant-select-selector {
-          border-radius: 10px !important;
-          border-color: #e2e8f0 !important;
-          height: 40px !important;
-          display: flex !important;
-          align-items: center !important;
-        }
-        .student-filter-field .ant-select-selector {
-          background-color: #f8fafc !important;
-        }
-        .student-filter-field:hover .ant-select-selector,
-        .student-filter-value:hover .ant-select-selector {
-          border-color: #6366f1 !important;
-        }
-        .filter-popover .ant-popover-inner {
-          border-radius: 20px;
-          padding: 0;
-          overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-        .btn-primary-gradient {
-          background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
-          border: none !important;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e2e8f0;
-          border-radius: 2px;
-        }
-      `}</style>
+      <style jsx global>
+        {FILTER_STYLES}
+      </style>
     </div>
   );
 
@@ -302,7 +303,7 @@ const StudentFilters = ({
         }`}
       >
         <FilterOutlined />
-        <span>{'Bộ lọc'}</span>
+        <span>{INTERNSHIP_LIST.FILTERS.FILTER_TITLE}</span>
         {activeFiltersCount > 0 && (
           <Tag
             color="error"

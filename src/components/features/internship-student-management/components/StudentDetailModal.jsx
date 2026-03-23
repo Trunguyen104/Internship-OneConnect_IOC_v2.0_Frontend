@@ -1,15 +1,13 @@
 'use client';
 
 import { UserOutlined } from '@ant-design/icons';
-import { Descriptions, Typography } from 'antd';
+import { Descriptions } from 'antd';
 import React from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import StatusTag from './StatusTag';
-
-const { Text } = Typography;
 
 const StudentDetailModal = ({ open, student, onCancel }) => {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;

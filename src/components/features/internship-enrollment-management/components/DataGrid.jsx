@@ -197,7 +197,6 @@ const DataGrid = memo(function DataGrid({
       onEdit,
       onDelete,
       onRestore,
-      onSort,
       TABLE,
       STATUS_LABELS,
       ACTIONS,

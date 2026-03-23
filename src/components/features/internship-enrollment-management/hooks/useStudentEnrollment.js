@@ -52,6 +52,8 @@ export const useStudentEnrollment = () => {
     handleOpenDetails,
   } = useStudentModals();
 
+  const { current, pageSize } = pagination;
+
   const fetchStudents = useCallback(async () => {
     if (!termId) {
       setStudents([]);
@@ -62,8 +64,8 @@ export const useStudentEnrollment = () => {
     setLoading(true);
     try {
       const params = {
-        pageNumber: pagination.current,
-        pageSize: pagination.pageSize,
+        pageNumber: current,
+        pageSize: pageSize,
         searchTerm: debouncedSearchTerm || undefined,
         // EnrollmentStatus: 1=Active, 2=Withdrawn
         enrollmentStatus: statusFilter === 'WITHDRAWN' ? ENROLLMENT_STATUS.WITHDRAWN : undefined,
@@ -94,8 +96,8 @@ export const useStudentEnrollment = () => {
     }
   }, [
     termId,
-    pagination.current,
-    pagination.pageSize,
+    current,
+    pageSize,
     debouncedSearchTerm,
     statusFilter,
     sortBy,
@@ -245,7 +247,7 @@ export const useStudentEnrollment = () => {
     } finally {
       setSubmitLoading(false);
     }
-  }, [termId, selectedIds, students, toast, MESSAGES, fetchStudents, setSelectedIds]);
+  }, [termId, selectedIds, students, toast, MESSAGES, fetchStudents]);
 
   const handleRestore = useCallback(
     async (student) => {
@@ -277,7 +279,7 @@ export const useStudentEnrollment = () => {
     } catch {
       toast.error(MESSAGES.DOWNLOAD_TEMPLATE_ERROR);
     }
-  }, [termId, toast]);
+  }, [termId, toast, MESSAGES]);
 
   const handleView = useCallback(
     async (student) => {
@@ -293,7 +295,7 @@ export const useStudentEnrollment = () => {
         setLoading(false);
       }
     },
-    [handleOpenDetails, toast]
+    [handleOpenDetails, toast, MESSAGES]
   );
 
   return {

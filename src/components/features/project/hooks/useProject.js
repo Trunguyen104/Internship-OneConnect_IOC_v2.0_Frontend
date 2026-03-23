@@ -16,6 +16,7 @@ import { ProjectService } from '@/components/features/project/services/projectSe
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import { useToast } from '@/providers/ToastProvider';
+import { downloadBlob } from '@/utils/common/fileUtils';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 export function useProject(initialProjectId = null) {
@@ -294,21 +295,13 @@ export function useProject(initialProjectId = null) {
         }
       }
 
-      const objectUrl = window.URL.createObjectURL(rawBlob);
-
       const actualExt = resource.resourceUrl?.split('?')[0]?.split('.').pop()?.toLowerCase();
-      let filename = resource.resourceName || 'download';
-      if (actualExt && !filename.toLowerCase().endsWith('.' + actualExt)) {
-        filename = `${filename}.${actualExt}`;
+      let defaultFileName = resource.resourceName || 'download';
+      if (actualExt && !defaultFileName.toLowerCase().endsWith('.' + actualExt)) {
+        defaultFileName = `${defaultFileName}.${actualExt}`;
       }
 
-      const link = document.createElement('a');
-      link.href = objectUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(objectUrl);
+      downloadBlob(rawBlob, defaultFileName);
     } catch (err) {
       console.error('Download error:', err);
       toast.error(err.message || 'Could not download file.');

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import AvatarUploader from '@/components/ui/avataruploader';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ import {
 import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { mediaService } from '@/services/media.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
 import { userManagementService } from '../userManagement.service';
@@ -60,17 +62,21 @@ export default function UserManagementUpdateModal({ open, userId, onToggle }) {
         const data = res?.data ?? res;
         setDetail(data);
         setEditForm({
-          fullName: data?.fullName || '',
-          phoneNumber: data?.phoneNumber || '',
-          status: data?.status ? String(data.status) : '',
-          dateOfBirth: data?.dateOfBirth ? String(data.dateOfBirth) : '',
-          gender: data?.gender ? String(data.gender) : '',
-          avatarUrl: data?.avatarUrl || '',
-          studentClass: data?.studentClass || '',
-          studentMajor: data?.studentMajor || '',
+          fullName: data?.fullName || data?.FullName || '',
+          phoneNumber: data?.phoneNumber || data?.PhoneNumber || '',
+          status: (data?.status ?? data?.Status) ? String(data.status ?? data.Status) : '',
+          dateOfBirth:
+            (data?.dateOfBirth ?? data?.DateOfBirth)
+              ? String(data.dateOfBirth ?? data.DateOfBirth)
+              : '',
+          gender: (data?.gender ?? data?.Gender) ? String(data.gender ?? data.Gender) : '',
+          avatarUrl: data?.avatarUrl || data?.AvatarUrl || '',
+          studentClass: data?.studentClass || data?.StudentClass || '',
+          studentMajor: data?.studentMajor || data?.StudentMajor || '',
           studentGpa:
-            data?.studentGpa !== null && data?.studentGpa !== undefined
-              ? String(data.studentGpa)
+            (data?.studentGpa ?? data?.StudentGpa) !== null &&
+            (data?.studentGpa ?? data?.StudentGpa) !== undefined
+              ? String(data.studentGpa ?? data.StudentGpa)
               : '',
         });
       })
@@ -102,20 +108,27 @@ export default function UserManagementUpdateModal({ open, userId, onToggle }) {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 
-    const payload = {
-      fullName: editForm.fullName.trim(),
-      phoneNumber: editForm.phoneNumber?.trim() || undefined,
-      status: editForm.status ? Number(editForm.status) : undefined,
-      dateOfBirth: editForm.dateOfBirth?.trim() || undefined,
-      gender: editForm.gender ? Number(editForm.gender) : undefined,
-      avatarUrl: editForm.avatarUrl?.trim() || undefined,
-      studentClass: editForm.studentClass?.trim() || undefined,
-      studentMajor: editForm.studentMajor?.trim() || undefined,
-      studentGpa: editForm.studentGpa !== '' ? Number(editForm.studentGpa) : undefined,
-    };
-
     setBusy(true);
     try {
+      let finalAvatarUrl = editForm.avatarUrl;
+      if (editForm.avatarUrl instanceof File) {
+        const uploadRes = await mediaService.uploadImage(editForm.avatarUrl, 'Users');
+        finalAvatarUrl = uploadRes?.data ?? uploadRes;
+      }
+
+      const payload = {
+        fullName: editForm.fullName.trim(),
+        phoneNumber: editForm.phoneNumber?.trim() || undefined,
+        status: editForm.status ? Number(editForm.status) : undefined,
+        dateOfBirth: editForm.dateOfBirth?.trim() || undefined,
+        gender: editForm.gender ? Number(editForm.gender) : undefined,
+        avatarUrl:
+          typeof finalAvatarUrl === 'string' ? finalAvatarUrl.trim() : finalAvatarUrl || undefined,
+        studentClass: editForm.studentClass?.trim() || undefined,
+        studentMajor: editForm.studentMajor?.trim() || undefined,
+        studentGpa: editForm.studentGpa !== '' ? Number(editForm.studentGpa) : undefined,
+      };
+
       await userManagementService.update(userId, payload);
       toast.success('Updated user');
       useAdminUsersStore.increment();
@@ -163,6 +176,7 @@ export default function UserManagementUpdateModal({ open, userId, onToggle }) {
                 <FieldLabel>{UI_TEXT.USER_MANAGEMENT.STATUS}</FieldLabel>
                 <Select
                   value={editForm.status}
+                  labels={USER_STATUS_LABEL}
                   onValueChange={(v) => setEditForm((p) => ({ ...p, status: v }))}
                 >
                   <SelectTrigger>
@@ -202,19 +216,22 @@ export default function UserManagementUpdateModal({ open, userId, onToggle }) {
               <FieldLabel htmlFor="dateOfBirth">{UI_TEXT.USER_MANAGEMENT.DOB_LABEL}</FieldLabel>
               <Input
                 id="dateOfBirth"
+                type="date"
                 value={editForm.dateOfBirth}
                 onChange={(e) => setEditForm((p) => ({ ...p, dateOfBirth: e.target.value }))}
                 error={errors.dateOfBirth}
               />
             </Field>
 
-            <Field>
-              <FieldLabel htmlFor="avatarUrl">{UI_TEXT.USER_MANAGEMENT.AVATAR_LABEL}</FieldLabel>
-              <Input
-                id="avatarUrl"
+            <Field className="flex flex-col items-center py-4">
+              <AvatarUploader
                 value={editForm.avatarUrl}
-                onChange={(e) => setEditForm((p) => ({ ...p, avatarUrl: e.target.value }))}
+                fullName={editForm.fullName}
+                onChange={(file) => setEditForm((p) => ({ ...p, avatarUrl: file }))}
               />
+              <span className="mt-2 text-xs text-slate-500">
+                {UI_TEXT.USER_MANAGEMENT.AVATAR_LABEL}
+              </span>
             </Field>
 
             {detail?.role === USER_ROLE.STUDENT ? (
