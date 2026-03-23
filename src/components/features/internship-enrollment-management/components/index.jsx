@@ -84,6 +84,9 @@ export default function TermStudentManagement() {
     fetchTerms();
   }, [onTermChange, termId]);
 
+  const activeTerm = terms.find((t) => t.termId === termId);
+  const isClosed = activeTerm?.status === 4; // TERM_STATUS.CLOSED is 4
+
   return (
     <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={STUDENT_ENROLLMENT.TITLE} />
@@ -119,15 +122,17 @@ export default function TermStudentManagement() {
               label={STUDENT_ENROLLMENT.ACTIONS.IMPORT}
               onClick={() => setImportVisible(true)}
               icon={<DownloadOutlined />}
+              disabled={isClosed}
               className="!bg-bg !text-primary border border-primary hover:!bg-primary/5 hover:!text-primary-hover !ml-0"
             />
             <DataTableToolbar.Actions
               label={STUDENT_ENROLLMENT.ACTIONS.ADD}
               onClick={onAdd}
               icon={<PlusOutlined />}
+              disabled={isClosed}
               className="!ml-0"
               menu={
-                selectedIds.length > 0
+                selectedIds.length > 0 && !isClosed
                   ? {
                       items: [
                         {
@@ -160,6 +165,7 @@ export default function TermStudentManagement() {
           sortBy={sortBy}
           sortOrder={sortOrder}
           onSort={handleSortChange}
+          readOnly={isClosed}
         />
 
         {pagination.total > 0 && (

@@ -55,16 +55,12 @@ function toUpdatablePayload(values, profile) {
   if (nextTaxCode) payload.taxCode = nextTaxCode;
 
   const nextLogoUrl = values?.logoUrl;
-  if (nextLogoUrl && nextLogoUrl !== profile?.logoUrl && !String(nextLogoUrl).startsWith('data:')) {
+  if (nextLogoUrl && !String(nextLogoUrl).startsWith('data:')) {
     payload.logoUrl = nextLogoUrl;
   }
 
   const nextBackgroundUrl = values?.backgroundUrl;
-  if (
-    nextBackgroundUrl &&
-    nextBackgroundUrl !== profile?.backgroundUrl &&
-    !String(nextBackgroundUrl).startsWith('data:')
-  ) {
+  if (nextBackgroundUrl && !String(nextBackgroundUrl).startsWith('data:')) {
     payload.backgroundUrl = nextBackgroundUrl;
   }
 

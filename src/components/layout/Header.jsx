@@ -88,7 +88,6 @@ export default function Header() {
             <Avatar
               size={28}
               src={userInfo?.avatarUrl || userInfo?.AvatarUrl}
-              style={{ backgroundColor: '#dc2626', color: '#ffffff' }}
               icon={<UserOutlined />}
             >
               {!(userInfo?.avatarUrl || userInfo?.AvatarUrl) &&
