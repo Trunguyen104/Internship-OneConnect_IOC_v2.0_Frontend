@@ -18,11 +18,14 @@ const Filters = ({ children, className = '' }) => (
   <div className={`flex shrink-0 items-center gap-2 ${className}`}>{children}</div>
 );
 
-const Actions = ({ label, onClick, icon, menu, className = '' }) => {
+const Actions = ({ label, onClick, icon, menu, className = '', disabled }) => {
   const renderButton = () => (
     <button
-      onClick={!menu ? onClick : undefined}
-      className={`bg-primary hover:bg-primary-hover ml-auto flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm transition-all active:scale-95 ${className}`}
+      onClick={!menu && !disabled ? onClick : undefined}
+      disabled={disabled}
+      className={`bg-primary hover:bg-primary-hover flex shrink-0 items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm transition-all ${
+        disabled ? 'cursor-not-allowed opacity-50 grayscale' : 'cursor-pointer active:scale-95'
+      } ${className}`}
     >
       <span>{label}</span>
       {icon || <PlusCircleOutlined className="text-base" />}

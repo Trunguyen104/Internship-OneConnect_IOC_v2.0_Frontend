@@ -73,8 +73,8 @@ export const STUDENT_ENROLLMENT = {
       EMAIL_INVALID: 'Invalid email address',
 
       MAJOR_LABEL: 'Major',
-      MAJOR_PLACEHOLDER: 'Select major',
-      MAJOR_REQUIRED: 'Please select a major',
+      MAJOR_PLACEHOLDER: 'Ex: Software Engineering',
+      MAJOR_REQUIRED: 'Please enter major',
 
       PHONE_LABEL: 'Phone Number',
       PHONE_PLACEHOLDER: 'Ex: 0901234567',
@@ -140,7 +140,7 @@ export const STUDENT_ENROLLMENT = {
       VALIDATION: {
         FILE_SIZE_LIMIT: 'File must be smaller than 5MB!',
       },
-      TEMPLATE_FILENAME: 'template_import_sinhvien.xlsx',
+      TEMPLATE_FILENAME: 'student_import_template.xlsx',
     },
   },
   MESSAGES: {

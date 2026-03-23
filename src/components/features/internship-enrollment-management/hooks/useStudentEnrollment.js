@@ -6,6 +6,7 @@ import {
   PLACEMENT_STATUS,
 } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { STUDENT_ENROLLMENT } from '../constants/enrollment';
 import { StudentService } from '../services/student.service';
@@ -88,9 +89,9 @@ export const useStudentEnrollment = () => {
           total: response.data.totalCount || 0,
         }));
       }
-    } catch {
-      console.error('Fetch students failed');
-      toast.error(MESSAGES.LOAD_ERROR);
+    } catch (error) {
+      console.error('Fetch students failed:', error);
+      toast.error(getErrorDetail(error, MESSAGES.LOAD_ERROR));
     } finally {
       setLoading(false);
     }
@@ -126,8 +127,8 @@ export const useStudentEnrollment = () => {
             await StudentService.withdraw(student.studentTermId);
             toast.success(MESSAGES.DELETE_SUCCESS);
             fetchStudents();
-          } catch {
-            toast.error(MESSAGES.DELETE_ERROR);
+          } catch (error) {
+            toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
           } finally {
             setSubmitLoading(false);
           }
@@ -150,8 +151,8 @@ export const useStudentEnrollment = () => {
         toast.success(MESSAGES.UPDATE_SUCCESS);
         setEditVisible(false);
         fetchStudents();
-      } catch {
-        toast.error(MESSAGES.UPDATE_ERROR);
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.UPDATE_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -172,8 +173,8 @@ export const useStudentEnrollment = () => {
         toast.success(MESSAGES.ADD_SUCCESS);
         setAddVisible(false);
         fetchStudents();
-      } catch {
-        toast.error(MESSAGES.ADD_ERROR);
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.ADD_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -188,8 +189,8 @@ export const useStudentEnrollment = () => {
       try {
         const response = await StudentService.importPreview(termId, file);
         return response?.data;
-      } catch {
-        toast.error(MESSAGES.IMPORT_ERROR);
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
         return null;
       } finally {
         setSubmitLoading(false);
@@ -214,8 +215,8 @@ export const useStudentEnrollment = () => {
         if (response?.data?.passwordFileBase64) {
           // Logic to download could go here
         }
-      } catch {
-        toast.error(MESSAGES.IMPORT_ERROR);
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -242,8 +243,8 @@ export const useStudentEnrollment = () => {
       toast.success(MESSAGES.BULK_WITHDRAW_SUCCESS);
       setSelectedIds([]);
       fetchStudents();
-    } catch {
-      toast.error(MESSAGES.DELETE_ERROR);
+    } catch (error) {
+      toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
     } finally {
       setSubmitLoading(false);
     }
@@ -256,8 +257,8 @@ export const useStudentEnrollment = () => {
         await StudentService.restore(student.studentTermId);
         toast.success(MESSAGES.RESTORE_SUCCESS);
         fetchStudents();
-      } catch {
-        toast.error(MESSAGES.RESTORE_ERROR);
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.RESTORE_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -276,8 +277,8 @@ export const useStudentEnrollment = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-    } catch {
-      toast.error(MESSAGES.DOWNLOAD_TEMPLATE_ERROR);
+    } catch (error) {
+      toast.error(getErrorDetail(error, MESSAGES.DOWNLOAD_TEMPLATE_ERROR));
     }
   }, [termId, toast, MESSAGES]);
 
@@ -289,8 +290,8 @@ export const useStudentEnrollment = () => {
         if (response?.data) {
           handleOpenDetails(StudentService.mapStudent(response.data));
         }
-      } catch {
-        toast.error(MESSAGES.DETAIL_LOAD_ERROR);
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.DETAIL_LOAD_ERROR));
       } finally {
         setLoading(false);
       }

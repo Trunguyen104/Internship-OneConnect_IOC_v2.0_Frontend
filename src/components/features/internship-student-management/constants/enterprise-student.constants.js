@@ -6,7 +6,7 @@ export const ENTERPRISE_STUDENT_UI = {
   },
   SEARCH_PLACEHOLDER: 'Search by name, student code, email...',
   EMPTY_STATE: {
-    MESSAGE: 'Chưa có sinh viên nào được gán vào công ty trong kỳ này',
+    MESSAGE: 'No students have been assigned to the company this term',
   },
   TABLE: {
     COLUMNS: {
@@ -61,7 +61,7 @@ export const ENTERPRISE_STUDENT_UI = {
     DETAIL_LOAD_ERROR: 'Failed to load details',
   },
   BADGES: {
-    NO_GROUP: 'Chưa có nhóm', // Keeping Vietnamese for this specific badge as per AC-S01 if required, or translate to "No Group"
+    NO_GROUP: 'No Group',
   },
 };
 

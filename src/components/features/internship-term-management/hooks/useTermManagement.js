@@ -1,11 +1,13 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
 import { userService } from '@/components/features/user/services/userService';
 import { USER_ROLE } from '@/constants/common/enums';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 import { universityService } from '@/services/university.service';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { TermService } from '../services/term.service';
 import { useTermFilters } from './useTermFilters';
@@ -74,8 +76,13 @@ export const useTermManagement = () => {
           total: response.data.totalCount || 0,
         }));
       }
-    } catch {
-      toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR);
+    } catch (error) {
+      toast.error(
+        getErrorDetail(
+          error,
+          INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -99,10 +106,26 @@ export const useTermManagement = () => {
           const uniRes = await universityService.getAll({ pageNumber: 1, pageSize: 100 });
           setUniversities(uniRes?.data?.items || []);
         } else {
+          // Robust check for universityId and universityName
+          const uniId = userData?.universityId || userData?.university?.id;
+          const uniName = userData?.universityName || userData?.university?.name;
+
           setUserUniversity({
-            id: userData?.universityId,
-            name: userData?.universityName,
+            id: uniId,
+            name: uniName,
           });
+
+          // If we have an ID but no name, attempt to fetch it for clear UI display
+          if (uniId && !uniName) {
+            universityService
+              .getById(uniId)
+              .then((res) => {
+                if (res?.data?.name) {
+                  setUserUniversity({ id: uniId, name: res.data.name });
+                }
+              })
+              .catch(() => {});
+          }
         }
       } catch (error) {
         console.error('Failed to fetch user role or universities:', error);
@@ -114,13 +137,26 @@ export const useTermManagement = () => {
   const handleEdit = useCallback(
     async (record) => {
       try {
-        const response = await TermService.getById(record.termId);
-        if (response?.data) {
-          openFormModal(response.data, false);
+        const [termRes, enrollmentRes] = await Promise.all([
+          TermService.getById(record.termId),
+          StudentService.getAll(record.termId, { pageSize: 1 }),
+        ]);
+
+        if (termRes?.data) {
+          const detailData = {
+            ...termRes.data,
+            totalEnrolled: enrollmentRes?.data?.totalCount ?? termRes.data.totalEnrolled,
+          };
+          openFormModal(detailData, false);
         }
       } catch (error) {
         console.error('GetTermById failed:', error);
-        toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR
+          )
+        );
       }
     },
     [openFormModal, toast]
@@ -129,13 +165,26 @@ export const useTermManagement = () => {
   const handleView = useCallback(
     async (record) => {
       try {
-        const response = await TermService.getById(record.termId);
-        if (response?.data) {
-          openFormModal(response.data, true);
+        const [termRes, enrollmentRes] = await Promise.all([
+          TermService.getById(record.termId),
+          StudentService.getAll(record.termId, { pageSize: 1 }),
+        ]);
+
+        if (termRes?.data) {
+          const detailData = {
+            ...termRes.data,
+            totalEnrolled: enrollmentRes?.data?.totalCount ?? termRes.data.totalEnrolled,
+          };
+          openFormModal(detailData, true);
         }
       } catch (error) {
         console.error('GetTermById (View) failed:', error);
-        toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR
+          )
+        );
       }
     },
     [openFormModal, toast]
@@ -153,7 +202,10 @@ export const useTermManagement = () => {
       fetchData();
     } catch (error) {
       toast.error(
-        error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR
+        getErrorDetail(
+          error,
+          INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR
+        )
       );
     } finally {
       setSubmitLoading(false);
@@ -188,8 +240,10 @@ export const useTermManagement = () => {
         fetchData();
       } catch (error) {
         toast.error(
-          error.message ||
+          getErrorDetail(
+            error,
             INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.STATUS_UPDATE_ERROR
+          )
         );
       } finally {
         setSubmitLoading(false);
@@ -242,7 +296,10 @@ export const useTermManagement = () => {
         fetchData();
       } catch (error) {
         toast.error(
-          error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR
+          )
         );
       } finally {
         setSubmitLoading(false);

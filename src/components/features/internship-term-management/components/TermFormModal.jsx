@@ -12,22 +12,29 @@ const TermStats = ({ initialValues }) => {
   if (!initialValues) return null;
 
   const { STATS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
+
+  // Sanitize and recalculate locally for logical consistency
+  // Support both potential backend field names
+  const totalEnrolled = Math.max(0, initialValues.totalEnrolled || initialValues.studentCount || 0);
+  const totalPlaced = Math.min(totalEnrolled, Math.max(0, initialValues.totalPlaced || 0));
+  const totalUnplaced = totalEnrolled - totalPlaced;
+
   const stats = [
     {
       label: STATS.TOTAL_ENROLLED,
-      value: initialValues.totalEnrolled || 0,
+      value: totalEnrolled,
       containerClass: 'bg-info-surface border-info/10',
       textClass: 'text-info',
     },
     {
       label: STATS.TOTAL_PLACED,
-      value: initialValues.totalPlaced || 0,
+      value: totalPlaced,
       containerClass: 'bg-success-surface border-success/10',
       textClass: 'text-success',
     },
     {
       label: STATS.TOTAL_UNPLACED,
-      value: initialValues.totalUnplaced || 0,
+      value: totalUnplaced,
       containerClass: 'bg-warning-surface border-warning/10',
       textClass: 'text-warning',
     },
@@ -72,8 +79,12 @@ const TermFormBody = ({
       });
     } else {
       form.resetFields();
+      // Pre-fill universityId for non-SuperAdmins (SchoolAdmins)
+      if (!isSuperAdmin && userUniversity?.id) {
+        form.setFieldsValue({ universityId: userUniversity.id });
+      }
     }
-  }, [initialValues, form]);
+  }, [initialValues, form, isSuperAdmin, userUniversity]);
 
   const handleSubmit = async () => {
     try {
@@ -113,7 +124,7 @@ const TermFormBody = ({
             <Input placeholder={FORM.NAME_PLACEHOLDER} className="h-10" />
           </Form.Item>
 
-          {isSuperAdmin ? (
+          {isSuperAdmin && (
             <Form.Item
               name="universityId"
               label={FORM.UNIVERSITY_LABEL}
@@ -133,9 +144,11 @@ const TermFormBody = ({
                 }))}
               />
             </Form.Item>
-          ) : (
-            <Form.Item label={FORM.UNIVERSITY_LABEL}>
-              <Input value={userUniversity?.name || ''} disabled className="h-10" />
+          )}
+
+          {!isSuperAdmin && (
+            <Form.Item name="universityId" hidden>
+              <Input />
             </Form.Item>
           )}
 
