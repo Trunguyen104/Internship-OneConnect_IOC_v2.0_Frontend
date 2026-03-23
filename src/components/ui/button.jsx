@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingOutlined } from '@ant-design/icons';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
@@ -24,23 +25,37 @@ const SIZE = {
   'icon-lg': 'h-10 w-10',
 };
 
-function Button({ className, variant = 'default', size = 'default', type = 'button', ...props }) {
+function Button({
+  className,
+  variant = 'default',
+  size = 'default',
+  type = 'button',
+  loading = false,
+  disabled,
+  children,
+  ...props
+}) {
   return (
     <button
       type={type}
+      disabled={disabled || loading}
       data-slot="button"
       data-variant={variant}
       data-size={size}
       className={cn(
         'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors',
-        'disabled:pointer-events-none disabled:opacity-50',
+        'disabled:pointer-events-none disabled:opacity-50 relative',
         VARIANT[variant] || VARIANT.default,
         SIZE[size] || SIZE.default,
         className
       )}
       {...props}
-    />
+    >
+      {loading && <LoadingOutlined className="mr-2 animate-spin" />}
+      {children}
+    </button>
   );
 }
 
 export { Button };
+export default Button;

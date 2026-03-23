@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/emptystate';
+import { ErrorState } from '@/components/ui/errorstate';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -72,15 +72,7 @@ export default function UserManagementTable({ users = [], loading = false, error
         ) : error ? (
           <TableRow>
             <TableCell colSpan={6} className="py-20 text-center">
-              <div className="flex flex-col items-center gap-2 text-rose-600">
-                <span className="font-semibold">{error}</span>
-                <Button
-                  onClick={refresh}
-                  className="text-xs underline opacity-70 hover:opacity-100"
-                >
-                  {UI_TEXT.USER_MANAGEMENT.RETRY}
-                </Button>
-              </div>
+              <ErrorState error={error} onRetry={refresh} />
             </TableCell>
           </TableRow>
         ) : users.length === 0 ? (

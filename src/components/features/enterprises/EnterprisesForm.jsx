@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import AvatarUploader from '@/components/ui/avataruploader';
 import BannerUploader from '@/components/ui/banneruploader';
 import { Button } from '@/components/ui/button';
+import ErrorMessages from '@/components/ui/errormessages';
 import { Spinner } from '@/components/ui/spinner';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 import { UI_TEXT } from '@/lib/UI_Text';
@@ -23,7 +24,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
   const [form] = Form.useForm();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
-  const [formError, setFormError] = useState('');
+  const [formError, setFormError] = useState(null);
 
   const isEdit = !!enterprise;
 
@@ -51,7 +52,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
     try {
       const values = await form.validateFields();
       setLoading(true);
-      setFormError('');
+      setFormError(null);
 
       let { logoUrl, backgroundUrl } = values;
 
@@ -112,7 +113,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
       onSuccess?.();
     } catch (err) {
       if (err.errorFields) return; // Ant Design form validation error
-      setFormError(err?.data?.message || err?.message || 'Form submission failed');
+      setFormError(err);
     } finally {
       setLoading(false);
     }
@@ -218,11 +219,9 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         </div>
       </Form>
 
-      {formError && (
-        <div className="animate-in slide-in-from-top-1 rounded-xl border border-rose-100 bg-rose-50 p-4 mt-2 text-center text-sm font-semibold text-rose-600">
-          {formError}
-        </div>
-      )}
+      <div className="mt-4">
+        <ErrorMessages error={formError} />
+      </div>
 
       <div className="mt-2 flex justify-end gap-3 border-t border-slate-100 pt-6">
         <Button

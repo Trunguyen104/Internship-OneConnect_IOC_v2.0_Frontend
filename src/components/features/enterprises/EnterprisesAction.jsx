@@ -17,7 +17,10 @@ export default function EnterprisesAction({ enterprise }) {
   const [openEdit, setOpenEdit] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Confirm removal of ${enterprise.name}? This action cannot be reverted.`)) return;
+    if (
+      !confirm(`Are you sure you want to delete ${enterprise.name}? This action cannot be undone.`)
+    )
+      return;
 
     setLoading(true);
     try {
@@ -34,7 +37,7 @@ export default function EnterprisesAction({ enterprise }) {
   return (
     <div className="flex items-center justify-end gap-1.5">
       {enterprise.website && (
-        <Tooltip title="Mở trang web">
+        <Tooltip title="Open website">
           <Button
             variant="ghost"
             size="icon"
@@ -46,7 +49,7 @@ export default function EnterprisesAction({ enterprise }) {
         </Tooltip>
       )}
 
-      <Tooltip title="Chỉnh sửa hồ sơ">
+      <Tooltip title="Edit profile">
         <Button
           variant="ghost"
           size="icon"
@@ -57,7 +60,7 @@ export default function EnterprisesAction({ enterprise }) {
         </Button>
       </Tooltip>
 
-      <Tooltip title="Xóa doanh nghiệp">
+      <Tooltip title="Delete enterprise">
         <Button
           variant="ghost"
           size="icon"
