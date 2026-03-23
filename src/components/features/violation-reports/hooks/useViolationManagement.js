@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { userService } from '../../user/services/userService';
 import { ViolationService } from '../services/violation.service';
@@ -79,7 +80,7 @@ export const useViolationManagement = () => {
       }
     } catch (error) {
       console.error(VIOLATION_REPORT.LOGS.FETCH_ERROR, error);
-      toast.error(VIOLATION_REPORT.LOAD_ERROR);
+      toast.error(getErrorDetail(error, VIOLATION_REPORT.LOAD_ERROR));
     } finally {
       setLoading(false);
     }
@@ -154,10 +155,16 @@ export const useViolationManagement = () => {
         const groupsRes = await ViolationService.getGroups({ termId, pageSize: 100 });
         const groupsData = groupsRes?.data?.items || groupsRes?.items || [];
 
-        // Filter groups by mentor if needed (if backend doesn't do it)
-        const myGroups = me?.id ? groupsData.filter((g) => g.mentorId === me.id) : groupsData;
+        // Use all returned groups (backend should handle scoping)
+        const myGroups = groupsData || [];
 
-        setGroups(myGroups);
+        setGroups(
+          myGroups.map((g) => ({
+            ...g,
+            internshipGroupId: g.internshipGroupId || g.id,
+            id: g.id || g.internshipGroupId,
+          }))
+        );
 
         // Parallel fetch details for each group to get members
         const groupDetailPromises = myGroups.map(async (g) => {
@@ -210,11 +217,21 @@ export const useViolationManagement = () => {
         const response = await ViolationService.getById(record.violationReportId || record.id);
         const detailData = response?.data || response;
         if (detailData) {
-          openFormModal(detailData, false);
+          // Normalize and preserve IDs from original record
+          const normalizedData = {
+            ...detailData,
+            studentId: detailData.studentId || record.studentId,
+            violationReportId:
+              detailData.violationReportId ||
+              detailData.id ||
+              record.violationReportId ||
+              record.id,
+          };
+          openFormModal(normalizedData, false);
         }
       } catch (error) {
         console.error(VIOLATION_REPORT.LOGS.GET_BY_ID_ERROR, error);
-        toast.error(VIOLATION_REPORT.DETAILS_ERROR);
+        toast.error(getErrorDetail(error, VIOLATION_REPORT.DETAILS_ERROR));
       }
     },
     [openFormModal, toast, VIOLATION_REPORT]
@@ -226,11 +243,21 @@ export const useViolationManagement = () => {
         const response = await ViolationService.getById(record.violationReportId || record.id);
         const detailData = response?.data || response;
         if (detailData) {
-          openFormModal(detailData, true);
+          // Normalize and preserve IDs from original record
+          const normalizedData = {
+            ...detailData,
+            studentId: detailData.studentId || record.studentId,
+            violationReportId:
+              detailData.violationReportId ||
+              detailData.id ||
+              record.violationReportId ||
+              record.id,
+          };
+          openFormModal(normalizedData, true);
         }
       } catch (error) {
         console.error('GetViolationById failed:', error);
-        toast.error(VIOLATION_REPORT.DETAILS_ERROR);
+        toast.error(getErrorDetail(error, VIOLATION_REPORT.DETAILS_ERROR));
       }
     },
     [openFormModal, toast, VIOLATION_REPORT]
@@ -247,9 +274,7 @@ export const useViolationManagement = () => {
       setDeleteModalState({ open: false, record: null });
       fetchData();
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.errors?.[0] || error.message || VIOLATION_REPORT.DELETE_FAIL;
-      toast.error(errorMessage);
+      toast.error(getErrorDetail(error, VIOLATION_REPORT.DELETE_FAIL));
     } finally {
       setSubmitLoading(false);
     }
@@ -288,9 +313,13 @@ export const useViolationManagement = () => {
   const handleSaveModal = useCallback(
     async (payload) => {
       setSubmitLoading(true);
+      console.log('handleSaveModal payload:', payload);
+      console.log('handleSaveModal editingRecord:', editingRecord);
       try {
-        const id = editingRecord?.violationReportId || editingRecord?.id;
+        const id =
+          payload.violationReportId || editingRecord?.violationReportId || editingRecord?.id;
         const isUpdate = !!id;
+        console.log('isUpdate:', isUpdate, 'id:', id);
 
         if (isUpdate) {
           await ViolationService.update(id, {
@@ -307,9 +336,7 @@ export const useViolationManagement = () => {
         setModalVisible(false);
         fetchData();
       } catch (error) {
-        const errorMessage =
-          error.response?.data?.errors?.[0] || error.message || VIOLATION_REPORT.SAVE_ERROR;
-        toast.error(errorMessage);
+        toast.error(getErrorDetail(error, VIOLATION_REPORT.SAVE_ERROR));
       } finally {
         setSubmitLoading(false);
       }

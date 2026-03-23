@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { ENTERPRISE_STUDENT_UI } from '../constants/enterprise-student.constants';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
@@ -17,7 +18,7 @@ export const useEnterpriseStudentActions = (onSuccess) => {
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Accept Application Error:', error);
-      toast.error(error.message || ENTERPRISE_STUDENT_UI.MESSAGES.ACCEPT_ERROR);
+      toast.error(getErrorDetail(error, ENTERPRISE_STUDENT_UI.MESSAGES.ACCEPT_ERROR));
     } finally {
       setLoading(false);
     }
@@ -36,7 +37,7 @@ export const useEnterpriseStudentActions = (onSuccess) => {
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Reject Application Error:', error);
-      toast.error(error.message || ENTERPRISE_STUDENT_UI.MESSAGES.REJECT_ERROR);
+      toast.error(getErrorDetail(error, ENTERPRISE_STUDENT_UI.MESSAGES.REJECT_ERROR));
     } finally {
       setLoading(false);
     }

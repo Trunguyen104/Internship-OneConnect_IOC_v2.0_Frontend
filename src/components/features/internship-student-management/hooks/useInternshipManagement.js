@@ -138,14 +138,14 @@ export const useInternshipManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (values) => {
-      // Ưu tiên lấy studentId cho việc tạo nhóm (Bắt buộc theo backend Handler)
+      // Prioritize studentId for group creation (Required by backend Handler)
       const studentIds =
         values.studentIds && values.studentIds.length > 0
           ? values.studentIds
           : createModal.students.map((s) => s.studentId || s.StudentId || s.id || s.applicationId);
 
       if (!studentIds || studentIds.length === 0) {
-        toast.error('Vui lòng chọn ít nhất 1 sinh viên để tạo nhóm.');
+        toast.error('Please select at least 1 student to create group.');
         return;
       }
 

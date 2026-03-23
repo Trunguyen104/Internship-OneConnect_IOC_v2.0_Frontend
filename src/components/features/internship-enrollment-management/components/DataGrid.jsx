@@ -58,6 +58,7 @@ const DataGrid = memo(function DataGrid({
   sortBy,
   sortOrder,
   onSort,
+  readOnly = false,
 }) {
   const { TABLE, ACTIONS, STATUS_LABELS, PLACEMENT_LABELS } = STUDENT_ENROLLMENT;
 
@@ -154,45 +155,61 @@ const DataGrid = memo(function DataGrid({
                   onClick={() => onView(record)}
                 />
               </Tooltip>
-              {!isWithdrawn ? (
+              {!readOnly && (
                 <>
-                  <Tooltip title={ACTIONS.EDIT}>
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<EditOutlined />}
-                      className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
-                      onClick={() => onEdit(record)}
-                    />
-                  </Tooltip>
-                  <Tooltip title={ACTIONS.DELETE}>
-                    <Button
-                      type="text"
-                      size="small"
-                      danger
-                      icon={<DeleteOutlined />}
-                      className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
-                      onClick={() => onDelete(record)}
-                    />
-                  </Tooltip>
+                  {!isWithdrawn ? (
+                    <>
+                      <Tooltip title={ACTIONS.EDIT}>
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<EditOutlined />}
+                          className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                          onClick={() => onEdit(record)}
+                        />
+                      </Tooltip>
+                      <Tooltip title={ACTIONS.DELETE}>
+                        <Button
+                          type="text"
+                          size="small"
+                          danger
+                          icon={<DeleteOutlined />}
+                          className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                          onClick={() => onDelete(record)}
+                        />
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <Tooltip title={ACTIONS.RECOVER}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<ReloadOutlined />}
+                        className="hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
+                        onClick={() => onRestore(record)}
+                      />
+                    </Tooltip>
+                  )}
                 </>
-              ) : (
-                <Tooltip title={ACTIONS.RECOVER}>
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<ReloadOutlined />}
-                    className="hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center rounded-lg p-0 transition-all"
-                    onClick={() => onRestore(record)}
-                  />
-                </Tooltip>
               )}
             </div>
           );
         },
       },
     ],
-    [onView, onEdit, onDelete, onRestore, onSort, TABLE, STATUS_LABELS, ACTIONS, page, pageSize]
+    [
+      onView,
+      onEdit,
+      onDelete,
+      onRestore,
+      onSort,
+      TABLE,
+      STATUS_LABELS,
+      ACTIONS,
+      page,
+      pageSize,
+      readOnly,
+    ]
   );
 
   return (

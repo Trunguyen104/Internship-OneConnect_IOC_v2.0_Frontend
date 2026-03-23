@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
@@ -19,9 +20,7 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       return true;
     } catch (error) {
       console.error('Group Action Error:', error);
-      // For constraint errors like deleting group with students
-      const errorMsg = error.response?.data?.message || error.message || MESSAGES.ERROR;
-      toast.error(errorMsg);
+      toast.error(getErrorDetail(error, MESSAGES.ERROR));
       return false;
     } finally {
       setLoading(false);

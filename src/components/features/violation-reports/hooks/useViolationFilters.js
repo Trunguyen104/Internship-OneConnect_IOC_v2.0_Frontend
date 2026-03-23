@@ -24,10 +24,14 @@ export const useViolationFilters = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
-  const handleGroupChange = useCallback((value) => {
-    setGroupIdFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
+  const handleGroupChange = useCallback(
+    (value) => {
+      const normalizedValue = value ? value.toString().toLowerCase() : undefined;
+      setGroupIdFilter(normalizedValue);
+      setPagination((prev) => ({ ...prev, current: 1 }));
+    },
+    [setGroupIdFilter, setPagination]
+  );
 
   const handleCreatedByChange = useCallback((value) => {
     setCreatedByIdFilter(value);

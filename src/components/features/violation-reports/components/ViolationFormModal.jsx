@@ -1,21 +1,24 @@
 'use client';
 
 import { SaveOutlined } from '@ant-design/icons';
-import { DatePicker, Form, Input, Select } from 'antd';
+import { Button, DatePicker, Form, Input } from 'antd';
 import dayjs from 'dayjs';
-import React, { useEffect } from 'react';
+import React, { startTransition, useEffect, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
+import StudentPickerModal from './StudentPickerModal';
 
 const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly, students }) => {
   const [form] = Form.useForm();
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { FORM, DETAIL } = VIOLATION_REPORT;
 
-  const studentId = Form.useWatch('studentId', form);
-  const selectedStudent = students.find((s) => (s.studentId || s.id) === studentId);
+  const [pickerVisible, setPickerVisible] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
+  const studentId = Form.useWatch('studentId', form);
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({
@@ -24,16 +27,39 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
         occurredDate: initialValues.occurredDate ? dayjs(initialValues.occurredDate) : null,
         description: initialValues.description,
       });
+
+      const found = students.find((s) => (s.studentId || s.id) === initialValues.studentId);
+
+      startTransition(() => {
+        if (found) {
+          setSelectedStudent(found);
+        } else if (initialValues.studentFullName) {
+          setSelectedStudent({
+            studentFullName: initialValues.studentFullName,
+            studentCode: initialValues.studentCode,
+            groupStartDate: initialValues.groupStartDate,
+            groupEndDate: initialValues.groupEndDate,
+          });
+        }
+      });
     } else {
       form.resetFields();
+      startTransition(() => setSelectedStudent(null));
     }
-  }, [initialValues, form]);
+  }, [initialValues, form, students]);
+
+  const handleStudentSelect = (student) => {
+    setSelectedStudent(student);
+    form.setFieldsValue({ studentId: student.id || student.studentId });
+    setPickerVisible(false);
+  };
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
       await onSave({
         ...values,
+        violationReportId: initialValues?.violationReportId || initialValues?.id,
         occurredDate: values.occurredDate
           ? values.occurredDate.format(VIOLATION_REPORT.DATE_FORMATS.API)
           : null,
@@ -61,19 +87,29 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             label={FORM.STUDENT}
             rules={[{ required: true, message: FORM.VALIDATION.STUDENT_REQUIRED }]}
           >
-            <Select
-              placeholder={FORM.PLACEHOLDERS.STUDENT}
-              className="h-10 w-full"
-              loading={loading}
-              showSearch
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
-              options={students.map((s) => ({
-                label: `${s.fullName || s.studentFullName} (${s.studentCode})`,
-                value: s.studentId || s.id,
-              }))}
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder={FORM.PLACEHOLDERS.STUDENT}
+                className="h-10 flex-1 cursor-default bg-slate-50"
+                value={
+                  selectedStudent
+                    ? `${selectedStudent.studentFullName} (${selectedStudent.studentCode})`
+                    : ''
+                }
+                readOnly
+              />
+              {!initialValues && (
+                <Button
+                  type="primary"
+                  onClick={() => setPickerVisible(true)}
+                  className="h-10 rounded-lg px-4"
+                  disabled={viewOnly || loading}
+                >
+                  {FORM.STUDENT}
+                </Button>
+              )}
+            </div>
+            <Form.Item name="studentId" noStyle rules={[{ required: true }]} />
           </Form.Item>
 
           <Form.Item
@@ -150,6 +186,13 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
         loading={loading}
         confirmIcon={!viewOnly && <SaveOutlined />}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SAVE}
+      />
+      <StudentPickerModal
+        visible={pickerVisible}
+        onCancel={() => setPickerVisible(false)}
+        onSelect={handleStudentSelect}
+        students={students}
+        loading={loading}
       />
     </>
   );

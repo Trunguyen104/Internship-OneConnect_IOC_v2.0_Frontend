@@ -61,53 +61,36 @@ export default function ViolationManagement() {
       <PageTitle title={VIOLATION_REPORT.TITLE} />
 
       <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar
-          className="mb-5 flex-shrink-0 !border-0 !p-0"
-          searchProps={{
-            placeholder: VIOLATION_REPORT.SEARCH_PLACEHOLDER,
-            value: searchTerm,
-            onChange: (e) => handleSearchChange(e.target.value),
-          }}
-          filterContent={
-            <div className="flex flex-wrap items-center gap-2">
-              <Select
-                allowClear
-                placeholder={VIOLATION_REPORT.FILTERS.GROUP}
-                value={groupIdFilter}
-                onChange={handleGroupChange}
-                className="h-9 min-w-[150px]"
-                options={groups.map((g) => ({
-                  label: g.groupName || g.name,
-                  value: g.internshipGroupId || g.id,
-                }))}
-                suffixIcon={<FilterOutlined className="text-muted" />}
-              />
-              <Select
-                allowClear
-                placeholder={VIOLATION_REPORT.FILTERS.CREATED_BY}
-                value={createdByIdFilter}
-                onChange={handleCreatedByChange}
-                className="h-9 min-w-[150px]"
-                options={mentorOptions}
-                suffixIcon={<FilterOutlined className="text-muted" />}
-              />
-              <RangePicker
-                className="h-9 w-60"
-                value={dateRange}
-                onChange={handleDateRangeChange}
-                placeholder={[
-                  VIOLATION_REPORT.FILTERS.START_DATE,
-                  VIOLATION_REPORT.FILTERS.END_DATE,
-                ]}
-              />
-            </div>
-          }
-          actionProps={{
-            label: VIOLATION_REPORT.CREATE_BUTTON,
-            onClick: handleCreateNew,
-            icon: <PlusOutlined />,
-          }}
-        />
+        <DataTableToolbar className="mb-5 flex-shrink-0 !border-0 !p-0">
+          <DataTableToolbar.Search
+            placeholder={VIOLATION_REPORT.SEARCH_PLACEHOLDER}
+            value={searchTerm}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+          <DataTableToolbar.Filters>
+            <Select
+              allowClear
+              placeholder={VIOLATION_REPORT.FILTERS.CREATED_BY}
+              value={createdByIdFilter}
+              onChange={handleCreatedByChange}
+              className="h-9 min-w-[150px]"
+              options={mentorOptions}
+              suffixIcon={<FilterOutlined className="text-muted" />}
+            />
+            <RangePicker
+              className="h-9 w-60"
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              placeholder={[VIOLATION_REPORT.FILTERS.START_DATE, VIOLATION_REPORT.FILTERS.END_DATE]}
+            />
+          </DataTableToolbar.Filters>
+          <DataTableToolbar.Actions
+            label={VIOLATION_REPORT.CREATE_BUTTON}
+            onClick={handleCreateNew}
+            icon={<PlusOutlined />}
+            className="ml-auto"
+          />
+        </DataTableToolbar>
 
         <ViolationTable
           data={data}
@@ -127,6 +110,7 @@ export default function ViolationManagement() {
               pageSize={pagination.pageSize}
               totalPages={Math.ceil(pagination.total / pagination.pageSize)}
               onPageChange={(page) => handleTableChange({ current: page })}
+              onPageSizeChange={(size) => handleTableChange({ pageSize: size, current: 1 })}
             />
           </div>
         )}
@@ -140,6 +124,7 @@ export default function ViolationManagement() {
         initialValues={editingRecord}
         viewOnly={viewOnly}
         students={students}
+        groups={groups}
       />
 
       <ViolationDeleteModal

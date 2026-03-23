@@ -163,7 +163,7 @@ const StudentFilters = ({
         <div className="flex items-center gap-2">
           <FilterOutlined className="text-primary text-xs" />
           <Text strong className="text-slate-700 tracking-tight text-xs">
-            {'BỘ LỌC ĐIỀU KIỆN'}
+            {'CONDITION FILTERS'}
           </Text>
         </div>
         <Button
@@ -171,9 +171,9 @@ const StudentFilters = ({
           size="small"
           onClick={handleReset}
           icon={<UndoOutlined className="text-[10px]" />}
-          className="text-red-500 hover:text-red-600 text-[11px] h-7 px-2"
+          className="text-primary hover:text-primary-hover text-[11px] h-7 px-2"
         >
-          {'Xóa tất cả'}
+          {'Clear all'}
         </Button>
       </div>
 
@@ -185,7 +185,7 @@ const StudentFilters = ({
           >
             {/* Field Picker */}
             <Select
-              placeholder="Chọn trường..."
+              placeholder="Select field..."
               value={row.type}
               onChange={(val) => updateRowType(row.id, val)}
               className="w-[160px] student-filter-field"
@@ -196,11 +196,11 @@ const StudentFilters = ({
               }))}
             />
 
-            <Text className="text-slate-400 text-[10px] px-0.5">{'Bằng'}</Text>
+            <Text className="text-slate-400 text-[10px] px-0.5">{'Equal to'}</Text>
 
             {/* Value Picker */}
             <Select
-              placeholder="Chọn giá trị..."
+              placeholder="Select value..."
               value={row.type ? FILTER_CONFIG[row.type].value : undefined}
               onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
               disabled={!row.type}
@@ -215,7 +215,7 @@ const StudentFilters = ({
               type="text"
               size="small"
               icon={
-                <CloseOutlined className="text-slate-300 group-hover:text-red-400 text-[10px]" />
+                <CloseOutlined className="text-slate-300 group-hover:text-primary text-[10px]" />
               }
               onClick={() => removeRow(row.id, row.type)}
               className="flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6"
@@ -235,7 +235,7 @@ const StudentFilters = ({
           disabled={rows.length >= Object.keys(FILTER_CONFIG).length}
           className="text-primary font-semibold hover:bg-primary/5 rounded-lg px-2 py-1 h-auto text-[12px]"
         >
-          {'Thêm điều kiện'}
+          {'Add condition'}
         </Button>
 
         <Button
@@ -244,7 +244,7 @@ const StudentFilters = ({
           onClick={() => setOpen(false)}
           className="rounded-full px-6 h-8 text-[12px] font-medium btn-primary-gradient"
         >
-          {'Hoàn thành'}
+          {'Done'}
         </Button>
       </div>
 
@@ -271,7 +271,11 @@ const StudentFilters = ({
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
         .btn-primary-gradient {
-          background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+          background: linear-gradient(
+            135deg,
+            var(--color-primary-hover) 0%,
+            var(--color-primary) 100%
+          ) !important;
           border: none !important;
         }
         .custom-scrollbar::-webkit-scrollbar {
@@ -302,7 +306,7 @@ const StudentFilters = ({
         }`}
       >
         <FilterOutlined />
-        <span>{'Bộ lọc'}</span>
+        <span>{'Filter'}</span>
         {activeFiltersCount > 0 && (
           <Tag
             color="error"

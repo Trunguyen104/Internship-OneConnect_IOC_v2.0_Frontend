@@ -6,6 +6,7 @@ import {
   PLACEMENT_STATUS,
 } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { STUDENT_ENROLLMENT } from '../constants/enrollment';
 import { StudentService } from '../services/student.service';
@@ -88,7 +89,7 @@ export const useStudentEnrollment = () => {
       }
     } catch (error) {
       console.error('Fetch students failed:', error);
-      toast.error(MESSAGES.LOAD_ERROR);
+      toast.error(getErrorDetail(error, MESSAGES.LOAD_ERROR));
     } finally {
       setLoading(false);
     }
@@ -125,7 +126,7 @@ export const useStudentEnrollment = () => {
             toast.success(MESSAGES.DELETE_SUCCESS);
             fetchStudents();
           } catch (error) {
-            toast.error(error.message || MESSAGES.DELETE_ERROR);
+            toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
           } finally {
             setSubmitLoading(false);
           }
@@ -149,7 +150,7 @@ export const useStudentEnrollment = () => {
         setEditVisible(false);
         fetchStudents();
       } catch (error) {
-        toast.error(error.message || MESSAGES.UPDATE_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.UPDATE_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -171,7 +172,7 @@ export const useStudentEnrollment = () => {
         setAddVisible(false);
         fetchStudents();
       } catch (error) {
-        toast.error(error.message || MESSAGES.ADD_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.ADD_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -187,7 +188,7 @@ export const useStudentEnrollment = () => {
         const response = await StudentService.importPreview(termId, file);
         return response?.data;
       } catch (error) {
-        toast.error(error.message || MESSAGES.IMPORT_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
         return null;
       } finally {
         setSubmitLoading(false);
@@ -213,7 +214,7 @@ export const useStudentEnrollment = () => {
           // Logic to download could go here
         }
       } catch (error) {
-        toast.error(error.message || MESSAGES.IMPORT_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -241,7 +242,7 @@ export const useStudentEnrollment = () => {
       setSelectedIds([]);
       fetchStudents();
     } catch (error) {
-      toast.error(MESSAGES.DELETE_ERROR);
+      toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
     } finally {
       setSubmitLoading(false);
     }
@@ -255,7 +256,7 @@ export const useStudentEnrollment = () => {
         toast.success(MESSAGES.RESTORE_SUCCESS);
         fetchStudents();
       } catch (error) {
-        toast.error(MESSAGES.RESTORE_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.RESTORE_ERROR));
       } finally {
         setSubmitLoading(false);
       }
@@ -275,7 +276,7 @@ export const useStudentEnrollment = () => {
       link.click();
       link.remove();
     } catch (error) {
-      toast.error(MESSAGES.DOWNLOAD_TEMPLATE_ERROR);
+      toast.error(getErrorDetail(error, MESSAGES.DOWNLOAD_TEMPLATE_ERROR));
     }
   }, [termId, toast]);
 
@@ -288,7 +289,7 @@ export const useStudentEnrollment = () => {
           handleOpenDetails(StudentService.mapStudent(response.data));
         }
       } catch (error) {
-        toast.error(MESSAGES.DETAIL_LOAD_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.DETAIL_LOAD_ERROR));
       } finally {
         setLoading(false);
       }

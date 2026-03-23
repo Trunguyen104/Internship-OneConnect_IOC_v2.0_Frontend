@@ -33,7 +33,11 @@ export default function ImportModal({
 
     try {
       const data = await onPreview?.(file);
-      setPreviewData(data?.previewData || []);
+      const processed = (data?.previewData || []).map((row, idx) => ({
+        ...row,
+        id: row.id || row.studentCode || `preview-${idx}`,
+      }));
+      setPreviewData(processed);
     } catch {
       setPreviewData([]);
     }
@@ -65,20 +69,21 @@ export default function ImportModal({
   const invalid = previewData.length - valid;
 
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={520}>
-      <CompoundModal.Header
-        title="Import Student List"
-        subtitle="Upload student list to enroll them"
-      />
+    <CompoundModal open={visible} onCancel={onCancel} width={640}>
+      <CompoundModal.Header title="Import Student List" />
 
       <CompoundModal.Content>
         <Button icon={<DownloadOutlined />} type="link" onClick={onDownloadTemplate}>
           Download template
         </Button>
 
-        <Dragger beforeUpload={beforeUpload} disabled={loading}>
-          <UploadOutlined style={{ fontSize: 28 }} />
-          <p>Drag file here or click to upload (.xls, .xlsx)</p>
+        <Dragger
+          beforeUpload={beforeUpload}
+          disabled={loading}
+          style={{ padding: '8px 0', minHeight: 'auto' }}
+        >
+          <UploadOutlined style={{ fontSize: 22 }} />
+          <p className="text-xs mb-0 mt-1">Drag or click to upload (.xls, .xlsx)</p>
         </Dragger>
 
         {previewData.length > 0 && (
@@ -94,6 +99,8 @@ export default function ImportModal({
               pagination={false}
               rowKey="id"
               size="small"
+              scroll={{ y: 180 }}
+              className="mt-2 border rounded-lg"
             />
           </>
         )}

@@ -15,11 +15,27 @@ export const violationReportService = {
       CreatedById: params.CreatedById || undefined,
       OrderByCreatedAscending: params.OrderByCreatedAscending || false,
     };
-    return httpClient.httpGet(BASE_URL, queryParams);
+    const response = await httpClient.httpGet(BASE_URL, queryParams);
+    if (response?.data?.items) {
+      response.data.items = response.data.items.map((item) => {
+        const id = item.violationReportId || item.id;
+        return {
+          ...item,
+          violationReportId: typeof id === 'string' ? id.toLowerCase() : id,
+        };
+      });
+    }
+    return response;
   },
 
   async getReportById(id) {
-    return httpClient.httpGet(`${BASE_URL}/${id}`);
+    const response = await httpClient.httpGet(`${BASE_URL}/${id}`);
+    const data = response?.data || response;
+    const rawId = data?.violationReportId || data?.id;
+    if (data && rawId) {
+      data.violationReportId = typeof rawId === 'string' ? rawId.toLowerCase() : rawId;
+    }
+    return response;
   },
 
   async createReport(payload) {
@@ -47,10 +63,22 @@ export const violationReportService = {
 
   async getGroupsForMentor(params = {}) {
     // Fetching groups for the enterprise
-    return httpClient.httpGet('/internship-groups', {
+    const response = await httpClient.httpGet('/internship-groups', {
       pageSize: 100,
       ...params,
     });
+
+    if (response?.data?.items) {
+      response.data.items = response.data.items.map((g) => {
+        const gid = g.internshipGroupId || g.id;
+        return {
+          ...g,
+          internshipGroupId: typeof gid === 'string' ? gid.toLowerCase() : gid,
+          id: typeof gid === 'string' ? gid.toLowerCase() : gid,
+        };
+      });
+    }
+    return response;
   },
 
   async getGroupDetail(id) {
