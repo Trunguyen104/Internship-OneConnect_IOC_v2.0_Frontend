@@ -1,19 +1,26 @@
 'use client';
 
-import { Input } from 'antd';
+import { DatePicker, Input } from 'antd';
+import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import CompoundModal from '@/components/ui/CompoundModal';
-import DateInput from '@/components/ui/dateinput';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
-export default function CycleDialog({ open, onOpenChange, onSave, initialData = null }) {
+export default function CycleDialog({
+  open,
+  onOpenChange,
+  onSave,
+  initialData = null,
+  termDates = null,
+}) {
   const { LABELS, BUTTONS } = EVALUATION_UI;
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
     startDate: initialData?.startDate || '',
     endDate: initialData?.endDate || '',
+    status: initialData?.status ?? 1, // Default Pending
   });
 
   const handleSave = async () => {
@@ -23,11 +30,35 @@ export default function CycleDialog({ open, onOpenChange, onSave, initialData = 
     }
   };
 
+  const disabledStartDate = (current) => {
+    if (!termDates) return false;
+    return (
+      current &&
+      (current.isBefore(dayjs(termDates.startDate), 'day') ||
+        current.isAfter(dayjs(termDates.endDate), 'day'))
+    );
+  };
+
+  const disabledEndDate = (current) => {
+    if (!termDates) {
+      if (formData.startDate) {
+        return current && current.isBefore(dayjs(formData.startDate), 'day');
+      }
+      return false;
+    }
+
+    const termStart = dayjs(termDates.startDate);
+    const termEnd = dayjs(termDates.endDate);
+    const cycleStart = formData.startDate ? dayjs(formData.startDate) : termStart;
+
+    return current && (current.isBefore(cycleStart, 'day') || current.isAfter(termEnd, 'day'));
+  };
+
   return (
     <CompoundModal
       title={initialData ? BUTTONS.EDIT : BUTTONS.CREATE_CYCLE}
       open={open}
-      onClose={() => onOpenChange(false)}
+      onCancel={() => onOpenChange(false)}
       footer={
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -51,16 +82,36 @@ export default function CycleDialog({ open, onOpenChange, onSave, initialData = 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-semibold">{LABELS.START_DATE}</label>
-            <DateInput
-              value={formData.startDate}
-              onChange={(val) => setFormData({ ...formData, startDate: val })}
+            <DatePicker
+              className="w-full"
+              value={formData.startDate ? dayjs(formData.startDate) : null}
+              disabledDate={disabledStartDate}
+              getPopupContainer={(trigger) => trigger.parentElement}
+              onChange={(date) => {
+                const now = dayjs();
+                const iso = date
+                  ? date.hour(now.hour()).minute(now.minute()).second(now.second()).toISOString()
+                  : '';
+                setFormData({ ...formData, startDate: iso });
+              }}
+              format="DD/MM/YYYY"
             />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold">{LABELS.END_DATE}</label>
-            <DateInput
-              value={formData.endDate}
-              onChange={(val) => setFormData({ ...formData, endDate: val })}
+            <DatePicker
+              className="w-full"
+              value={formData.endDate ? dayjs(formData.endDate) : null}
+              disabledDate={disabledEndDate}
+              getPopupContainer={(trigger) => trigger.parentElement}
+              onChange={(date) => {
+                const now = dayjs();
+                const iso = date
+                  ? date.hour(now.hour()).minute(now.minute()).second(now.second()).toISOString()
+                  : '';
+                setFormData({ ...formData, endDate: iso });
+              }}
+              format="DD/MM/YYYY"
             />
           </div>
         </div>

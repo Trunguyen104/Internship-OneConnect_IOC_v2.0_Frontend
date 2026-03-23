@@ -16,11 +16,12 @@ export default function IndividualGrading({
   student,
   cycle,
   internshipId,
+  allCriteria = [],
   open,
-  onClose,
+  onCancel,
   onSuccess,
 }) {
-  const { LABELS, BUTTONS, MESSAGES, STATUS } = EVALUATION_UI;
+  const { LABELS, BUTTONS, MESSAGES, STATUS, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -60,8 +61,7 @@ export default function IndividualGrading({
       });
 
       if (statusOverride === 'publish') {
-        await EvaluationService.publishEvaluations(cycle.cycleId, {
-          internshipId,
+        await EvaluationService.publishEvaluations(cycle.cycleId, internshipId, {
           studentIds: [student.studentId],
         });
         toast.success(`${MESSAGES.PUBLISH_SUCCESS}: ${student.fullName}`);
@@ -71,31 +71,39 @@ export default function IndividualGrading({
 
       onSuccess();
     } catch (error) {
-      toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      toast.error(error.message || MESSAGES.VALIDATION_ERROR);
     } finally {
       setLoading(false);
     }
   };
 
   const getCriteriaInfo = (id) =>
-    student.criteria?.find((c) => c.criteriaId === id) || { name: STATUS.UNKNOWN, maxScore: 10 };
+    allCriteria?.find((c) => c.criteriaId === id) || { name: STATUS.UNKNOWN, maxScore: 10 };
 
   return (
     <CompoundModal
       title={`${LABELS.DETAILS}: ${student?.fullName}`}
       open={open}
-      onClose={onClose}
+      onCancel={onCancel}
       className="w-full max-w-4xl"
       footer={
         <div className="flex w-full items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-gray-500">{TABLE_COLUMNS.STATUS}:</span>
-            <Badge variant={['gray', 'blue', 'orange', 'green'][student.status] || 'default'}>
-              {[STATUS.PENDING, STATUS.DRAFT, STATUS.SUBMITTED, STATUS.PUBLISHED][student.status]}
-            </Badge>
+            {(() => {
+              const statusMap = {
+                Pending: { label: STATUS.PENDING, variant: 'secondary' },
+                Draft: { label: STATUS.DRAFT, variant: 'warning' },
+                Submitted: { label: STATUS.SUBMITTED, variant: 'primary' },
+                Published: { label: STATUS.PUBLISHED, variant: 'success' },
+              };
+
+              const statusInfo = statusMap[student?.status] || statusMap['Pending'];
+              return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
+            })()}
           </div>
           <div className="flex gap-2 py-3">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onCancel}>
               {BUTTONS.CANCEL}
             </Button>
             <Button variant="outline" onClick={() => handleSave()} loading={loading}>
@@ -124,7 +132,9 @@ export default function IndividualGrading({
                     {critInfo.name}
                   </h4>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400">Max: {critInfo.maxScore}</span>
+                    <span className="text-[10px] text-gray-400">
+                      {LABELS.MAX_LABEL} {critInfo.maxScore}
+                    </span>
                     <InputNumber
                       min={0}
                       max={critInfo.maxScore}

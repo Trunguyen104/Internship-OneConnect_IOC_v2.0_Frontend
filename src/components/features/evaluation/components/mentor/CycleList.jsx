@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
-import DataTable from '@/components/ui/datatable';
-import { Button } from '@/components/ui/button';
 import {
-  EditOutlined,
   DeleteOutlined,
-  ThunderboltOutlined,
+  EditOutlined,
   SettingOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
+import React, { useState } from 'react';
+
 import Badge from '@/components/ui/badge';
-import CriteriaSettings from './CriteriaSettings';
+import { Button } from '@/components/ui/button';
+import DataTable from '@/components/ui/datatable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+
+import CriteriaSettings from './CriteriaSettings';
 
 export default function CycleList({ cycles, loading, onOpenGrading, onEdit, onDelete }) {
   const { TABLE_COLUMNS, BUTTONS, STATUS, LABELS } = EVALUATION_UI;
@@ -22,17 +24,17 @@ export default function CycleList({ cycles, loading, onOpenGrading, onEdit, onDe
     {
       title: TABLE_COLUMNS.CYCLE,
       key: 'name',
-      render: (text) => <span className='font-bold'>{text}</span>,
+      render: (text) => <span className="font-bold">{text}</span>,
     },
     {
       title: TABLE_COLUMNS.START_DATE,
       key: 'startDate',
-      render: (text) => new Date(text).toLocaleDateString(),
+      render: (text) => new Date(text).toLocaleDateString('en-GB'),
     },
     {
       title: TABLE_COLUMNS.END_DATE,
       key: 'endDate',
-      render: (text) => new Date(text).toLocaleDateString(),
+      render: (text) => new Date(text).toLocaleDateString('en-GB'),
     },
     {
       title: TABLE_COLUMNS.STATUS,
@@ -54,18 +56,18 @@ export default function CycleList({ cycles, loading, onOpenGrading, onEdit, onDe
       key: 'actions',
       align: 'right',
       render: (_, record) => (
-        <div className='flex justify-end gap-2'>
+        <div className="flex justify-end gap-2">
           <Button
-            variant='primary'
-            size='sm'
+            variant="primary"
+            size="sm"
             onClick={() => onOpenGrading(record)}
-            className='flex items-center gap-1 bg-green-600 hover:bg-green-700'
+            className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
           >
             <ThunderboltOutlined /> {BUTTONS.QUICK_GRADE}
           </Button>
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onClick={() => {
               setSelectedItem(record);
               setModalType('criteria');
@@ -73,14 +75,14 @@ export default function CycleList({ cycles, loading, onOpenGrading, onEdit, onDe
           >
             <SettingOutlined /> {BUTTONS.CRITERIA}
           </Button>
-          <Button variant='ghost' size='sm' onClick={() => onEdit(record)}>
+          <Button variant="ghost" size="sm" onClick={() => onEdit(record)}>
             <EditOutlined />
           </Button>
           <Button
-            variant='ghost'
-            size='sm'
+            variant="ghost"
+            size="sm"
             onClick={() => onDelete(record.cycleId)}
-            className='text-red-500 hover:text-red-700'
+            className="text-red-500 hover:text-red-700"
           >
             <DeleteOutlined />
           </Button>
@@ -90,13 +92,13 @@ export default function CycleList({ cycles, loading, onOpenGrading, onEdit, onDe
   ];
 
   return (
-    <div className='flex flex-1 flex-col'>
+    <div className="flex flex-1 flex-col">
       <DataTable
         columns={columns}
         data={cycles}
         loading={loading}
         emptyText={LABELS.NO_CYCLES}
-        rowKey='cycleId'
+        rowKey="cycleId"
       />
 
       {/* Criteria Modal */}

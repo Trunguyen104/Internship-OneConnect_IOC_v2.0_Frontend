@@ -1,7 +1,7 @@
 'use client';
 
-import { EyeOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons';
-import { Empty, InputNumber, Table, Tooltip } from 'antd';
+import { EyeOutlined, SaveOutlined } from '@ant-design/icons';
+import { Empty, InputNumber, Table } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
@@ -13,15 +13,38 @@ import { useToast } from '@/providers/ToastProvider';
 import { EvaluationService } from '../../services/evaluation.service';
 import IndividualGrading from './IndividualGrading';
 
-export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPublish }) {
+const GRADING_GRID_CSS = `
+  .grading-grid .ant-table-thead > tr > th {
+    background: #f9fafb !important;
+    color: #6b7280;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.025em;
+    border-bottom: 1px solid #f3f4f6 !important;
+  }
+  .grading-grid .ant-table-cell {
+    padding: 8px 12px !important;
+  }
+  .grading-grid .ant-input-number {
+    transition: all 0.2s;
+  }
+  .grading-grid .ant-input-number-focused {
+    box-shadow: none !important;
+    border-bottom: 1px solid #d52020 !important;
+  }
+`;
+
+export default function BatchGrading({ cycle, internshipId, onBatchGrade, _onPublish }) {
   const { LABELS, BUTTONS, MESSAGES, STATUS, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
   const [data, setData] = useState({ criteria: [], students: [] });
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
-
-  const [scores, setScores] = useState({}); // { studentId: { criteriaId: score } }
-  const [selectedStudent, setSelectedStudent] = useState(null); // for IndividualGrading modal
+  const [scores, setScores] = useState({});
+  const [originalScores, setOriginalScores] = useState({});
+  const [hasChanges, setHasChanges] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -30,7 +53,6 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
       const grid = res?.data || { criteria: [], students: [] };
       setData(grid);
 
-      // Sync local state scores
       const initialScores = {};
       grid.students.forEach((student) => {
         initialScores[student.studentId] = {};
@@ -39,6 +61,8 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
         });
       });
       setScores(initialScores);
+      setOriginalScores(JSON.parse(JSON.stringify(initialScores)));
+      setHasChanges(false);
     } catch {
       toast.error(MESSAGES.FETCH_ERROR);
     } finally {
@@ -50,6 +74,11 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
     if (cycle && internshipId) fetchData();
   }, [fetchData, cycle, internshipId]);
 
+  useEffect(() => {
+    const changed = JSON.stringify(scores) !== JSON.stringify(originalScores);
+    setHasChanges(changed);
+  }, [scores, originalScores]);
+
   const handleScoreChange = (studentId, criteriaId, value) => {
     setScores((prev) => ({
       ...prev,
@@ -60,47 +89,48 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
     }));
   };
 
+  const handleCancelEdits = () => {
+    setScores(JSON.parse(JSON.stringify(originalScores)));
+  };
+
   const handleSubmitBatch = async () => {
     try {
       setSending(true);
-      // Transform local state to format expected by API
-      const evaluations = Object.keys(scores).map((studentId) => ({
+      const evaluationsInput = Object.keys(scores).map((studentId) => ({
         studentId,
-        scores: Object.keys(scores[studentId]).map((criteriaId) => ({
+        note: '',
+        details: Object.keys(scores[studentId]).map((criteriaId) => ({
           criteriaId,
-          score: scores[studentId][criteriaId],
+          score: scores[studentId][criteriaId] || 0,
         })),
       }));
 
-      await onBatchGrade(cycle.cycleId, evaluations);
-      fetchData(); // Refresh to get total points and status
+      await onBatchGrade(cycle.cycleId, { evaluations: evaluationsInput });
+      toast.success(MESSAGES.GRADE_SUCCESS);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
     } finally {
       setSending(false);
     }
   };
 
-  const handlePublishAll = async () => {
-    await onPublish(cycle.cycleId, null); // null studentIds = publish all
-    fetchData();
-  };
-
   if (loading)
     return (
-      <div className="p-4">
-        <SkeletonTable rows={10} columns={5} />
+      <div className="p-8">
+        <SkeletonTable rows={10} columns={6} />
       </div>
     );
 
   if (data.criteria.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-20">
+      <div className="flex flex-col items-center justify-center gap-4 py-32">
         <Empty description={LABELS.NO_CRITERIA} />
         <p className="text-sm text-gray-500">{LABELS.BATCH_GRADING_SUBTITLE}</p>
       </div>
     );
   }
 
-  // Ant Design Table Columns for dynamic criteria
   const columns = [
     {
       title: LABELS.STUDENT,
@@ -108,33 +138,48 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
       fixed: 'left',
       width: 250,
       render: (_, student) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-gray-800">{student.fullName}</span>
-          <span className="text-xs text-gray-500">{student.studentCode}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xs">
+            {student.fullName?.charAt(0)}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-gray-800 text-sm">{student.fullName}</span>
+            <span className="text-[10px] text-gray-400 font-medium tracking-wider">
+              {student.studentCode}
+            </span>
+          </div>
         </div>
       ),
     },
     ...data.criteria.map((crit) => ({
       title: (
-        <Tooltip title={`${crit.name} (Max: ${crit.maxScore})`}>
-          <div className="flex flex-col items-center">
-            <span className="w-24 truncate text-center">{crit.name}</span>
-            <span className="text-[10px] text-gray-400">Max: {crit.maxScore}</span>
-          </div>
-        </Tooltip>
+        <div className="flex flex-col items-center py-1">
+          <span className="w-24 truncate text-center text-xs font-bold">{crit.name}</span>
+          <span className="text-[9px] text-gray-400 font-medium uppercase">
+            {LABELS.MAX_LABEL} {crit.maxScore}
+          </span>
+        </div>
       ),
       key: crit.criteriaId,
       align: 'center',
-      width: 120,
+      width: 110,
       render: (_, student) => (
-        <InputNumber
-          min={0}
-          max={crit.maxScore}
-          precision={2}
-          value={scores[student.studentId]?.[crit.criteriaId]}
-          onChange={(val) => handleScoreChange(student.studentId, crit.criteriaId, val)}
-          className="w-full text-center"
-        />
+        <div className="group relative px-2">
+          <InputNumber
+            min={0}
+            max={crit.maxScore}
+            precision={1}
+            value={scores[student.studentId]?.[crit.criteriaId]}
+            onChange={(val) => handleScoreChange(student.studentId, crit.criteriaId, val)}
+            className={`w-full text-center transition-all border-none bg-transparent hover:bg-white focus:bg-white focus:shadow-sm ${
+              scores[student.studentId]?.[crit.criteriaId] > crit.maxScore
+                ? 'text-red-600 font-bold'
+                : ''
+            }`}
+            controls={false}
+          />
+          <div className="absolute bottom-0 left-1/2 h-[1px] w-8 -translate-x-1/2 bg-gray-200 group-hover:bg-primary/30 transition-colors" />
+        </div>
       ),
     })),
     {
@@ -143,29 +188,38 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
       width: 100,
       align: 'center',
       render: (_, student) => (
-        <span className="text-primary font-black">{student.totalScore || '--'}</span>
+        <span className="text-primary font-black text-base">{student.totalScore || '0'}</span>
       ),
     },
     {
       title: TABLE_COLUMNS.STATUS,
       key: 'status',
       width: 120,
+      align: 'center',
       render: (status) => {
-        const labels = [STATUS.PENDING, STATUS.DRAFT, STATUS.SUBMITTED, STATUS.PUBLISHED];
-        const variants = ['gray', 'blue', 'orange', 'green'];
-        return (
-          <Badge variant={variants[status] || 'default'}>{labels[status] || STATUS.UNKNOWN}</Badge>
-        );
+        const statusMap = {
+          Pending: { label: STATUS.PENDING, variant: 'secondary' },
+          Draft: { label: STATUS.DRAFT, variant: 'warning' },
+          Submitted: { label: STATUS.SUBMITTED, variant: 'primary' },
+          Published: { label: STATUS.PUBLISHED, variant: 'success' },
+        };
+        const config = statusMap[status] || statusMap['Pending'];
+        return <Badge variant={config.variant}>{config.label}</Badge>;
       },
     },
     {
-      title: TABLE_COLUMNS.DETAILS,
+      title: '',
       key: 'actions',
       fixed: 'right',
-      width: 80,
+      width: 60,
       align: 'center',
       render: (_, student) => (
-        <Button variant="ghost" size="sm" onClick={() => setSelectedStudent(student)}>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSelectedStudent(student)}
+          className="hover:bg-primary/5 text-gray-400 hover:text-primary"
+        >
           <EyeOutlined />
         </Button>
       ),
@@ -173,45 +227,63 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
   ];
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="mb-2 flex items-center justify-between py-3">
-        <div className="flex gap-4 text-xs font-medium text-gray-400">
-          <span className="flex items-center gap-1.5">
-            <div className="h-2 w-2 rounded-full bg-blue-500" /> {STATUS.DRAFT}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <div className="h-2 w-2 rounded-full bg-green-500" /> {STATUS.PUBLISHED}
-          </span>
+    <div className="flex flex-1 flex-col overflow-hidden bg-white">
+      {/* SaaS Toolbar */}
+      <div className="border-b bg-gray-50/50 px-6 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight">
+              {TABLE_COLUMNS.GRADING_BOARD}
+            </h3>
+            <span className="text-[10px] text-gray-400 font-bold uppercase">
+              {data.students.length} {LABELS.STUDENT} {'\u2022'} {data.criteria.length}{' '}
+              {LABELS.CRITERIA}
+            </span>
+          </div>
+
+          {hasChanges && (
+            <div className="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 border border-orange-100">
+              <div className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-orange-700 uppercase">
+                {MESSAGES.UNSAVED_CHANGES}
+              </span>
+            </div>
+          )}
         </div>
-        <div className="flex gap-2">
+
+        <div className="flex items-center gap-2">
+          {hasChanges && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCancelEdits}
+              className="text-xs font-bold text-gray-500"
+            >
+              {BUTTONS.CANCEL}
+            </Button>
+          )}
           <Button
             variant="primary"
             size="sm"
             onClick={handleSubmitBatch}
             loading={sending}
-            className="flex items-center gap-2"
+            disabled={!hasChanges && !sending}
+            className="flex items-center gap-2 shadow-sm"
           >
-            <SaveOutlined /> {BUTTONS.SUBMIT_ALL}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePublishAll}
-            className="flex items-center gap-2 border-green-600 text-green-600 hover:bg-green-50"
-          >
-            <SendOutlined /> {BUTTONS.PUBLISH}
+            <SaveOutlined /> {BUTTONS.SAVE_ALL}
           </Button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden p-4">
         <Table
           columns={columns}
           dataSource={data.students}
           rowKey="studentId"
           pagination={false}
-          scroll={{ x: 'max-content', y: 'calc(100vh - 420px)' }}
-          className="rounded-xl border"
+          size="middle"
+          scroll={{ x: 'max-content', y: 'calc(100vh - 430px)' }}
+          className="grading-grid rounded-xl border overflow-hidden"
         />
       </div>
 
@@ -220,14 +292,19 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, onPubl
           student={selectedStudent}
           cycle={cycle}
           internshipId={internshipId}
+          allCriteria={data.criteria}
           open={true}
-          onClose={() => setSelectedStudent(null)}
+          onCancel={() => setSelectedStudent(null)}
           onSuccess={() => {
             setSelectedStudent(null);
             fetchData();
           }}
         />
       )}
+
+      <style jsx global>
+        {GRADING_GRID_CSS}
+      </style>
     </div>
   );
 }

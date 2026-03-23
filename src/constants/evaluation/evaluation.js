@@ -60,6 +60,14 @@ export const EVALUATION_UI = {
     ADD_NEW: 'Add New',
     EDIT_CRITERIA: 'Edit Criteria',
     BATCH_GRADING_SUBTITLE: 'Real-time grading for students in this cycle.',
+    TERM: 'Academic Term',
+    GROUP: 'Internship Group',
+    SELECT_TERM_PLACEHOLDER: 'Select academic term...',
+    SELECT_GROUP_PLACEHOLDER: 'Choose an internship group...',
+    SELECT_GROUP_PROMPT:
+      'Please select an internship group from the dropdown above to view evaluations.',
+    NO_GROUPS: 'No groups found for this term.',
+    MAX_LABEL: 'Max:',
   },
 
   BUTTONS: {

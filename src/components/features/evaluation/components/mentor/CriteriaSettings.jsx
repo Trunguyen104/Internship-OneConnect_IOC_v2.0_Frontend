@@ -112,7 +112,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
     <CompoundModal
       title={`${LABELS.EDIT_CRITERIA}: ${cycle?.name}`}
       open={open}
-      onClose={onClose}
+      onCancel={onClose}
       className="w-full max-w-3xl"
     >
       <div className="space-y-6 py-4">

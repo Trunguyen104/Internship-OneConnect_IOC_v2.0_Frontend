@@ -32,39 +32,45 @@ export const EvaluationService = {
 
   // --- CRITERIA ---
   getCriteria(cycleId) {
-    return httpGet(`/evaluations/cycles/${cycleId}/criteria`);
+    return httpGet('/evaluations/criteria', { cycleId });
   },
 
   createCriteria(cycleId, data) {
     return httpPost(`/evaluations/cycles/${cycleId}/criteria`, data);
   },
 
-  updateCriteria(cycleId, criteriaId, data) {
-    return httpPut(`/evaluations/cycles/${cycleId}/criteria/${criteriaId}`, data);
+  updateCriteria(criteriaId, data) {
+    return httpPut(`/evaluations/criteria/${criteriaId}`, data);
   },
 
-  deleteCriteria(cycleId, criteriaId) {
-    return httpDelete(`/evaluations/cycles/${cycleId}/criteria/${criteriaId}`);
+  deleteCriteria(criteriaId) {
+    return httpDelete(`/evaluations/criteria/${criteriaId}`);
   },
 
   // --- GRADING ---
   getGradingGrid(cycleId, internshipId) {
-    return httpGet(`/evaluations/cycles/${cycleId}/evaluations`, { internshipId });
+    return httpGet(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations`);
   },
 
-  batchGrade(cycleId, data) {
-    return httpPost(`/evaluations/cycles/${cycleId}/evaluations/batch`, data);
+  batchGrade(cycleId, internshipId, data) {
+    return httpPut(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations`, data);
   },
 
-  submitEvaluations(cycleId, internshipId) {
+  individualGrade(cycleId, data) {
+    return httpPost(`/evaluations/cycles/${cycleId}/evaluations/individual`, data);
+  },
+
+  submitEvaluations(cycleId, internshipId, data) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`,
+      data
     );
   },
 
-  publishEvaluations(cycleId, internshipId) {
+  publishEvaluations(cycleId, internshipId, data) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`,
+      data
     );
   },
 
