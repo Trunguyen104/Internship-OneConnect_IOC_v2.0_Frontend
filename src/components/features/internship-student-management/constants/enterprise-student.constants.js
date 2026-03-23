@@ -15,6 +15,7 @@ export const ENTERPRISE_STUDENT_UI = {
       EMAIL: 'EMAIL',
       UNIVERSITY: 'UNIVERSITY',
       STATUS: 'STATUS',
+      PLACED_STATUS: 'PLACED STATUS',
       GROUP: 'GROUP',
       MENTOR: 'MENTOR',
       PLACED_DATE: 'PLACED DATE',
@@ -66,16 +67,17 @@ export const ENTERPRISE_STUDENT_UI = {
 };
 
 export const APPLICATION_STATUS_MAP = {
-  1: 'Pending',
-  2: 'Approved',
+  0: 'Pending',
+  1: 'Approved',
+  2: 'Reversed',
   3: 'Rejected',
   4: 'Withdrawn',
 };
 
 export const REVERSE_APPLICATION_STATUS_MAP = {
-  PENDING: 1,
-  APPROVED: 2,
-  ACCEPTED: 2, // Alias for frontend consistency
+  PENDING: 0,
+  APPROVED: 1,
+  ACCEPTED: 1,
   REJECTED: 3,
   WITHDRAWN: 4,
 };

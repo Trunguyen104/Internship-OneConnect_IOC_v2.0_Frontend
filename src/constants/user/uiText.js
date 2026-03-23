@@ -80,6 +80,10 @@ export const PROFILE_UI = {
       MATCH: 'Passwords do not match',
       FAILED: 'Failed to change password',
       GENERAL: 'An error occurred',
+      REQUIRED_CURRENT: 'Current password is required',
+      REQUIRED_NEW: 'New password is required',
+      STRENGTH_REQUIREMENTS:
+        'Must be ≥ 8 chars with uppercase, lowercase, digit, and special character.',
     },
     SUCCESS: 'Password changed successfully',
   },

@@ -3,21 +3,21 @@ import {
   CalendarOutlined,
   EditOutlined,
   IdcardOutlined,
+  InfoCircleOutlined,
   MailOutlined,
   PhoneOutlined,
   PlusCircleOutlined,
-  SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Col, Form, Input, Row, Select, Tabs } from 'antd';
+import { Col, Form, Input, Row, Select, Tabs, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useEffect, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
-import { UI_TEXT } from '@/lib/UI_Text';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { enterpriseService } from '@/services/enterprise.service';
 
-import { STUDENT_ENROLLMENT } from '../constants/enrollment';
+const { Text } = Typography;
 
 const StudentFormBody = memo(function StudentFormBody({
   initialValues,
@@ -28,7 +28,8 @@ const StudentFormBody = memo(function StudentFormBody({
 }) {
   const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState('1');
-  const { MODALS } = STUDENT_ENROLLMENT;
+  const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { MODALS, PLACEMENT_LABELS } = ENROLLMENT_MANAGEMENT;
   const { ADD_EDIT } = MODALS;
 
   const [enterprises, setEnterprises] = useState([]);
@@ -39,7 +40,8 @@ const StudentFormBody = memo(function StudentFormBody({
       setFetchingEnterprises(true);
       try {
         const res = await enterpriseService.getAll({ PageNumber: 1, PageSize: 100 });
-        setEnterprises(res?.data?.items || []);
+        const items = res?.data?.items ?? res?.items ?? (Array.isArray(res?.data) ? res.data : []);
+        setEnterprises(items);
       } catch (error) {
         console.error('Fetch enterprises failed:', error);
       } finally {
@@ -93,202 +95,186 @@ const StudentFormBody = memo(function StudentFormBody({
       ? ADD_EDIT.TITLE_EDIT
       : ADD_EDIT.TITLE_ADD;
 
+  const subtitle = viewOnly
+    ? initialValues.fullName
+    : initialValues
+      ? ADD_EDIT.SUBTITLE_EDIT
+      : ADD_EDIT.SUBTITLE_ADD;
+
   const renderPersonalTab = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[350px] duration-300">
-      <Row gutter={16}>
-        <Col span={12}>
+    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-3 pt-3 duration-300">
+      <Row gutter={12}>
+        <Col span={14}>
           <Form.Item
-            label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-                {ADD_EDIT.NAME_LABEL}
-              </span>
-            }
+            label={ADD_EDIT.NAME_LABEL}
             name="fullName"
             rules={[{ required: true, message: ADD_EDIT.NAME_REQUIRED }]}
+            hidden={viewOnly}
           >
             <Input
-              prefix={<UserOutlined className="text-muted ml-0.5" />}
+              prefix={<UserOutlined className="text-muted/60 ml-0.5" />}
               placeholder={ADD_EDIT.NAME_PLACEHOLDER}
-              className="h-10 rounded-lg"
+              className="!h-10 !rounded-xl"
             />
           </Form.Item>
+          {viewOnly && (
+            <CompoundModal.InfoBox
+              label={ADD_EDIT.NAME_LABEL}
+              value={initialValues?.fullName || '-'}
+            />
+          )}
         </Col>
-        <Col span={12}>
+        <Col span={10}>
           <Form.Item
-            label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-                {ADD_EDIT.ID_LABEL}
-              </span>
-            }
+            label={ADD_EDIT.ID_LABEL}
             name="studentCode"
             rules={[{ required: true, message: ADD_EDIT.ID_REQUIRED }]}
-            extra={
-              initialValues && !viewOnly ? (
-                <span className="text-[10px] text-info italic">{ADD_EDIT.ID_EDIT_INFO}</span>
-              ) : null
-            }
+            hidden={viewOnly}
           >
             <Input
-              prefix={<IdcardOutlined className="text-muted ml-0.5" />}
+              prefix={<IdcardOutlined className="text-muted/60 ml-0.5" />}
               placeholder={ADD_EDIT.ID_PLACEHOLDER}
-              className="h-10 rounded-lg"
+              className="!h-10 !rounded-xl font-mono"
               disabled={!!initialValues}
             />
           </Form.Item>
+          {viewOnly && (
+            <CompoundModal.InfoBox
+              label={ADD_EDIT.ID_LABEL}
+              value={initialValues?.studentCode || '-'}
+            />
+          )}
         </Col>
       </Row>
 
       <Form.Item
-        label={
-          <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-            {ADD_EDIT.EMAIL_LABEL}
-          </span>
-        }
+        label={ADD_EDIT.EMAIL_LABEL}
         name="email"
         rules={[
           { required: true, message: ADD_EDIT.EMAIL_REQUIRED },
           { type: 'email', message: ADD_EDIT.EMAIL_INVALID },
         ]}
+        hidden={viewOnly}
       >
         <Input
-          prefix={<MailOutlined className="text-muted ml-0.5" />}
+          prefix={<MailOutlined className="text-muted/60 ml-0.5" />}
           placeholder={ADD_EDIT.EMAIL_PLACEHOLDER}
-          className="h-10 rounded-lg"
+          className="!h-10 !rounded-xl"
         />
       </Form.Item>
+      {viewOnly && (
+        <CompoundModal.InfoBox label={ADD_EDIT.EMAIL_LABEL} value={initialValues?.email || '-'} />
+      )}
 
-      <Row gutter={16}>
+      <Row gutter={12}>
         <Col span={12}>
           <Form.Item
-            label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-                {ADD_EDIT.MAJOR_LABEL}
-              </span>
-            }
+            label={ADD_EDIT.MAJOR_LABEL}
             name="major"
             rules={[{ required: true, message: ADD_EDIT.MAJOR_REQUIRED }]}
+            hidden={viewOnly}
           >
             <Input
               placeholder={ADD_EDIT.MAJOR_PLACEHOLDER}
-              className="h-10 rounded-lg"
-              prefix={<BookOutlined className="text-muted ml-0.5" />}
+              className="!h-10 !rounded-xl"
+              prefix={<BookOutlined className="text-muted/60 ml-0.5" />}
             />
           </Form.Item>
+          {viewOnly && (
+            <CompoundModal.InfoBox
+              label={ADD_EDIT.MAJOR_LABEL}
+              value={initialValues?.major || '-'}
+            />
+          )}
         </Col>
         <Col span={12}>
-          <Form.Item
-            label={
-              <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-                {ADD_EDIT.PHONE_LABEL}
-              </span>
-            }
-            name="phone"
-          >
+          <Form.Item label={ADD_EDIT.PHONE_LABEL} name="phone" hidden={viewOnly}>
             <Input
-              prefix={<PhoneOutlined className="text-muted ml-0.5" />}
+              prefix={<PhoneOutlined className="text-muted/60 ml-0.5" />}
               placeholder={ADD_EDIT.PHONE_PLACEHOLDER}
-              className="h-10 rounded-lg"
+              className="!h-10 !rounded-xl"
             />
           </Form.Item>
+          {viewOnly && (
+            <CompoundModal.InfoBox
+              label={ADD_EDIT.PHONE_LABEL}
+              value={initialValues?.phone || '-'}
+            />
+          )}
         </Col>
       </Row>
 
-      <Form.Item
-        label={
-          <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-            {ADD_EDIT.DOB_LABEL}
-          </span>
-        }
-        name="dateOfBirth"
-      >
-        {viewOnly ? (
-          <div className="bg-primary/5 border-primary/20 flex h-10 items-center gap-2 rounded-lg border px-3">
-            <CalendarOutlined className="text-primary text-sm font-bold" />
-            <span className="text-text font-semibold text-sm">
-              {initialValues?.dateOfBirth
-                ? dayjs(initialValues.dateOfBirth).format('DD/MM/YYYY')
-                : UI_TEXT.COMMON.DOUBLE_MINUS}
-            </span>
-          </div>
-        ) : (
+      {!viewOnly && (
+        <Form.Item label={ADD_EDIT.DOB_LABEL} name="dateOfBirth">
           <Input
             type="date"
-            prefix={<CalendarOutlined className="text-muted ml-0.5" />}
-            className="h-10 rounded-lg"
+            prefix={<CalendarOutlined className="text-muted/60 ml-0.5" />}
+            className="!h-10 !rounded-xl"
           />
-        )}
-      </Form.Item>
+        </Form.Item>
+      )}
+      {viewOnly && (
+        <CompoundModal.InfoBox
+          label={ADD_EDIT.DOB_LABEL}
+          value={
+            initialValues?.dateOfBirth
+              ? dayjs(initialValues.dateOfBirth).format('DD MMM, YYYY')
+              : '-'
+          }
+          color="primary"
+        />
+      )}
     </div>
   );
 
   const renderPlacementTab = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[350px] space-y-4 duration-300">
-      <Form.Item
-        label={
-          <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-            {ADD_EDIT.STATUS_LABEL}
-          </span>
-        }
-        name="placementStatus"
-      >
-        <Select
-          className="h-10 w-full rounded-lg"
-          options={[
-            { label: STUDENT_ENROLLMENT.PLACEMENT_LABELS.PLACED, value: 'PLACED' },
-            { label: STUDENT_ENROLLMENT.PLACEMENT_LABELS.UNPLACED, value: 'UNPLACED' },
-          ]}
-        />
-      </Form.Item>
+    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-4 pt-3 duration-300">
+      <Row gutter={12}>
+        <Col span={12}>
+          <Form.Item label={ADD_EDIT.STATUS_LABEL} name="placementStatus" hidden={viewOnly}>
+            <Select
+              className="!h-10 w-full"
+              options={[
+                { label: PLACEMENT_LABELS.PLACED, value: 'PLACED' },
+                { label: PLACEMENT_LABELS.UNPLACED, value: 'UNPLACED' },
+              ]}
+            />
+          </Form.Item>
+          {viewOnly && (
+            <CompoundModal.InfoBox
+              label={ADD_EDIT.STATUS_LABEL}
+              value={
+                PLACEMENT_LABELS[initialValues?.placementStatus] ||
+                initialValues?.placementStatus ||
+                '-'
+              }
+              color="info"
+            />
+          )}
+        </Col>
+        <Col span={12}>
+          <Form.Item label={ADD_EDIT.ENROLL_DATE_LABEL} name="enrollmentDate" hidden={viewOnly}>
+            <Input type="date" className="!h-10 !rounded-xl" />
+          </Form.Item>
+          {viewOnly && (
+            <CompoundModal.InfoBox
+              label={ADD_EDIT.ENROLL_DATE_LABEL}
+              value={
+                initialValues?.enrollmentDate
+                  ? dayjs(initialValues.enrollmentDate).format('DD MMM, YYYY')
+                  : '-'
+              }
+              color="success"
+            />
+          )}
+        </Col>
+      </Row>
 
       <Form.Item
-        label={
-          <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-            {ADD_EDIT.ENROLL_DATE_LABEL}
-          </span>
-        }
-        name="enrollmentDate"
-      >
-        {viewOnly ? (
-          <div className="bg-success/5 border-success/20 flex h-10 items-center gap-2 rounded-lg border px-3">
-            <CalendarOutlined className="text-success text-sm font-bold" />
-            <span className="text-text font-semibold text-sm">
-              {initialValues?.enrollmentDate
-                ? dayjs(initialValues.enrollmentDate).format('DD/MM/YYYY')
-                : UI_TEXT.COMMON.DOUBLE_MINUS}
-            </span>
-          </div>
-        ) : (
-          <Input type="date" className="h-10 rounded-lg" />
-        )}
-      </Form.Item>
-
-      <Form.Item
-        label={
-          <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-            {ADD_EDIT.NOTE_LABEL}
-          </span>
-        }
-        name="enrollmentNote"
-      >
-        {viewOnly ? (
-          <div className="bg-muted/5 border-border min-h-[60px] rounded-lg border p-3">
-            <p className="text-text whitespace-pre-wrap text-sm leading-relaxed">
-              {initialValues?.enrollmentNote || UI_TEXT.COMMON.DOUBLE_MINUS}
-            </p>
-          </div>
-        ) : (
-          <Input.TextArea placeholder={ADD_EDIT.NOTE_PLACEHOLDER} rows={2} className="rounded-lg" />
-        )}
-      </Form.Item>
-
-      <Form.Item
-        label={
-          <span className="mb-1 block text-[10px] font-bold tracking-wider uppercase text-muted">
-            {ADD_EDIT.ENTERPRISE_LABEL}
-          </span>
-        }
+        label={ADD_EDIT.ENTERPRISE_LABEL}
         name="enterpriseId"
         dependencies={['placementStatus']}
+        hidden={viewOnly}
         rules={[
           ({ getFieldValue }) => ({
             required: getFieldValue('placementStatus') === 'PLACED',
@@ -296,26 +282,41 @@ const StudentFormBody = memo(function StudentFormBody({
           }),
         ]}
       >
-        {viewOnly ? (
-          <div className="bg-muted/5 border-border flex h-10 items-center gap-2 rounded-lg border px-3">
-            <SettingOutlined className="text-muted text-sm font-bold" />
-            <span className="text-text font-semibold text-sm">
-              {initialValues?.enterpriseName || UI_TEXT.COMMON.DOUBLE_MINUS}
-            </span>
-          </div>
-        ) : (
-          <Select
-            showSearch
-            loading={fetchingEnterprises}
-            placeholder={ADD_EDIT.ENTERPRISE_PLACEHOLDER}
-            className="h-10 w-full rounded-lg"
-            options={enterprises.map((e) => ({ label: e.name, value: e.enterpriseId }))}
-            filterOption={(input, option) =>
-              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-            }
-          />
-        )}
+        <Select
+          showSearch
+          loading={fetchingEnterprises}
+          placeholder={ADD_EDIT.ENTERPRISE_PLACEHOLDER}
+          className="!h-10 w-full"
+          options={enterprises.map((e) => ({
+            label: e.name || e.Name,
+            value: e.enterpriseId || e.EnterpriseId,
+          }))}
+          filterOption={(input, option) =>
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+          }
+        />
       </Form.Item>
+      {viewOnly && (
+        <CompoundModal.InfoBox
+          label={ADD_EDIT.ENTERPRISE_LABEL}
+          value={initialValues?.enterpriseName || '-'}
+        />
+      )}
+
+      <Form.Item label={ADD_EDIT.NOTE_LABEL} name="enrollmentNote" hidden={viewOnly}>
+        <Input.TextArea
+          placeholder={ADD_EDIT.NOTE_PLACEHOLDER}
+          rows={3}
+          className="!rounded-2xl !bg-gray-50/50 focus:!bg-white"
+        />
+      </Form.Item>
+      {viewOnly && (
+        <div className="bg-slate-50/50 border-gray-100 min-h-[80px] rounded-2xl border p-3.5">
+          <Text className="text-text whitespace-pre-wrap text-[13px] leading-relaxed block overflow-hidden">
+            {initialValues?.enrollmentNote || '-'}
+          </Text>
+        </div>
+      )}
     </div>
   );
 
@@ -334,12 +335,24 @@ const StudentFormBody = memo(function StudentFormBody({
 
   return (
     <>
-      <CompoundModal.Header title={title} />
-      <CompoundModal.Content className="!pb-2">
+      <CompoundModal.Header
+        title={title}
+        subtitle={subtitle}
+        icon={
+          viewOnly ? (
+            <InfoCircleOutlined />
+          ) : initialValues ? (
+            <EditOutlined />
+          ) : (
+            <PlusCircleOutlined />
+          )
+        }
+      />
+      <CompoundModal.Content className="!pb-0">
         <Form
           form={form}
           layout="vertical"
-          className="space-y-4"
+          className="premium-form"
           disabled={loading || viewOnly}
           requiredMark={!viewOnly}
           onValuesChange={(changedValues) => {
@@ -355,7 +368,7 @@ const StudentFormBody = memo(function StudentFormBody({
             activeKey={activeTab}
             onChange={setActiveTab}
             items={tabItems}
-            className="student-enrollment-tabs"
+            className="premium-tabs"
           />
         </Form>
       </CompoundModal.Content>
@@ -368,12 +381,14 @@ const StudentFormBody = memo(function StudentFormBody({
           cancelText={ADD_EDIT.CANCEL}
           confirmText={initialValues ? ADD_EDIT.SUBMIT_EDIT : ADD_EDIT.SUBMIT_ADD}
           confirmIcon={initialValues ? <EditOutlined /> : <PlusCircleOutlined />}
+          className="!mt-0"
         />
       ) : (
         <CompoundModal.Footer
           onCancel={onCancel}
           confirmText={ADD_EDIT.CLOSE}
           onConfirm={onCancel}
+          className="!mt-0"
         />
       )}
     </>
@@ -382,7 +397,7 @@ const StudentFormBody = memo(function StudentFormBody({
 
 const StudentFormModal = memo(function StudentFormModal({ visible, onCancel, ...props }) {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnClose>
+    <CompoundModal open={visible} onCancel={onCancel} width={480} destroyOnClose>
       {visible && <StudentFormBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );

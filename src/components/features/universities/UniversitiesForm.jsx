@@ -16,13 +16,26 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState('');
+  const [formError, setFormError] = useState(null);
   const [logoUrl, setLogoUrl] = useState(university?.logoUrl || '');
   const isEdit = !!university;
+
+  const validate = (payload) => {
+    const nextErrors = {};
+    if (!payload.name)
+      nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED || 'University name is required';
+    if (!payload.code)
+      nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED || 'University code is required';
+    if (!payload.address)
+      nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED || 'Address is required';
+    return nextErrors;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setFormError(null);
+    setErrors({});
 
     const formData = new FormData(e.currentTarget);
     const payload = {
@@ -31,34 +44,37 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
       address: String(formData.get('address') || '').trim(),
     };
 
-    const nextErrors = {};
-    if (!payload.name) nextErrors.name = 'University name is required';
-    if (!payload.code) nextErrors.code = 'University code is required';
-    if (!payload.address) nextErrors.address = 'Address is required';
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length) {
+    const nextErrors = validate(payload);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
       setLoading(false);
       return;
     }
 
     try {
-      setFormError('');
       if (isEdit) {
         await universityService.update(university.universityId, {
           ...payload,
           logoUrl: logoUrl.trim() || undefined,
           universityId: university.universityId,
         });
-        toast.success(`Updated ${payload.name}`);
+        toast.success(UI_TEXT.COMMON.UPDATE_SUCCESS || `Updated ${payload.name}`);
       } else {
         await universityService.create(payload);
-        toast.success(`Created ${payload.name}`);
+        toast.success(UI_TEXT.COMMON.CREATE_SUCCESS || `Created ${payload.name}`);
       }
+
       useUniversitiesStore.increment();
       onSuccess?.();
     } catch (err) {
-      setFormError(err?.data?.message || err?.message || 'Submit failed');
+      setFormError(err);
+      if (err.data?.validationErrors) {
+        const backendErrors = {};
+        Object.entries(err.data.validationErrors).forEach(([field, msgs]) => {
+          backendErrors[field] = Array.isArray(msgs) ? msgs[0] : msgs;
+        });
+        setErrors(backendErrors);
+      }
     } finally {
       setLoading(false);
     }
@@ -118,13 +134,6 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           />
         </Field>
       </FieldGroup>
-
-      {formError && (
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50 p-4 text-center text-sm font-semibold text-rose-600">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-rose-600" />
-          {formError}
-        </div>
-      )}
 
       <div className="flex justify-end gap-3 border-t border-slate-100 pt-6">
         <Button

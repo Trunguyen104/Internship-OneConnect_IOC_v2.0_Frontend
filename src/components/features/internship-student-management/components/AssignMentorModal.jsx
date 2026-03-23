@@ -1,25 +1,54 @@
 'use client';
 
-import { ProjectOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { Form, Input, Select } from 'antd';
-import React, { useEffect } from 'react';
+import { ProjectOutlined, UserOutlined } from '@ant-design/icons';
+import { Form, Input, Select, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { MOCK_MENTORS } from '../constants/internshipData';
+import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
 
 const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
   const [form] = Form.useForm();
   const { ASSIGN } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
+  const [mentors, setMentors] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open) form.resetFields();
-  }, [open, form]);
+    if (open) {
+      form.resetFields();
+      if (student?.mentorId) {
+        form.setFieldsValue({
+          mentorId: student.mentorId,
+          projectName: student.projectName,
+        });
+      }
+      fetchMentors();
+    }
+  }, [open, student, form]);
+
+  const fetchMentors = async () => {
+    try {
+      setLoading(true);
+      const res = await EnterpriseMentorService.getMentors();
+      const items = res?.data || [];
+      setMentors(
+        items.map((m) => ({
+          label: `${m.fullName} (${m.email})`,
+          value: m.id || m.mentorId,
+        }))
+      );
+    } catch (err) {
+      console.error('Failed to fetch mentors:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onFinish = (values) => {
     if (student) {
-      onConfirm(student.id, values.mentorId, values.project);
+      onConfirm(student.id, values);
     }
   };
 
@@ -56,14 +85,12 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
             showSearch
             placeholder={ASSIGN.MENTOR_PLACEHOLDER}
             className="h-11 w-full rounded-xl"
-            suffixIcon={<SearchOutlined className="text-muted" />}
-            options={MOCK_MENTORS.map((m) => ({
-              label: `${m.name} - ${m.role}`,
-              value: m.id,
-            }))}
+            loading={loading}
+            options={mentors}
             filterOption={(input, option) =>
               (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
+            notFoundContent={loading ? <Spin size="small" /> : null}
           />
         </Form.Item>
 
@@ -73,7 +100,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
               {ASSIGN.PROJECT_LABEL}
             </span>
           }
-          name="project"
+          name="projectName"
           rules={[{ required: true, message: ASSIGN.PROJECT_REQUIRED }]}
         >
           <Input

@@ -52,31 +52,30 @@ export default function InternshipTermManagement() {
     <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={TERM_MANAGEMENT.TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar className="mb-5 flex-shrink-0 !border-0 !p-0">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !rounded-3xl border-none !p-6 shadow-sm sm:!p-8">
+        <DataTableToolbar className="mb-6 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={TERM_MANAGEMENT.SEARCH_PLACEHOLDER}
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
           />
-          <DataTableToolbar.Filters className="gap-3">
+          <DataTableToolbar.Filters className="gap-4">
             <Select
               allowClear
               placeholder={TERM_MANAGEMENT.STATUS_FILTER}
               value={statusFilter ?? undefined}
               onChange={handleStatusChange}
-              className="h-9 min-w-[180px]"
+              className="!h-10 min-w-[200px]"
               options={TERM_MANAGEMENT.STATUS_OPTIONS}
-              suffixIcon={<FilterOutlined className="text-muted" />}
+              suffixIcon={<FilterOutlined className="text-muted/60" />}
             />
           </DataTableToolbar.Filters>
-          <div className="flex shrink-0 items-center justify-end gap-2 ml-auto">
-            <DataTableToolbar.Actions
-              label={TERM_MANAGEMENT.CREATE_BTN}
-              onClick={handleCreateNew}
-              icon={<PlusOutlined />}
-            />
-          </div>
+          <DataTableToolbar.Actions
+            label={TERM_MANAGEMENT.CREATE_BTN}
+            onClick={handleCreateNew}
+            icon={<PlusOutlined />}
+            className="ml-auto"
+          />
         </DataTableToolbar>
 
         <TermTable

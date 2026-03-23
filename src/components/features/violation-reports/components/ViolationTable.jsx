@@ -75,12 +75,12 @@ const ViolationTable = memo(function ViolationTable({
                 ? dayjs(record.occurredDate).format(VIOLATION_REPORT.DATE_FORMATS.UI)
                 : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
             </span>
-            <span className="text-muted opacity-30">•</span>
+            <span className="text-muted opacity-30">{VIOLATION_REPORT.COMMON.DOT}</span>
             <span className="text-text font-bold">
               {record.createdAt
                 ? `${dayjs(record.createdAt).format(
                     VIOLATION_REPORT.DATE_FORMATS.UI
-                  )} - ${dayjs(record.createdAt).format(VIOLATION_REPORT.DATE_FORMATS.TIME)}`
+                  )}${VIOLATION_REPORT.COMMON.DASH_SEPARATOR}${dayjs(record.createdAt).format(VIOLATION_REPORT.DATE_FORMATS.TIME)}`
                 : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
             </span>
           </div>

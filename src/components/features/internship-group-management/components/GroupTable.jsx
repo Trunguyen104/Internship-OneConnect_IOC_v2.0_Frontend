@@ -10,31 +10,15 @@ import {
   UserAddOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Dropdown } from 'antd';
+import { Button, Dropdown } from 'antd';
 import React, { memo, useMemo } from 'react';
 
+import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
-
-import { ENTERPRISE_GROUP_UI, GROUP_STATUS_MAP } from '../constants/enterprise-group.constants';
-
-const STATUS_CONFIG = {
-  InProgress: {
-    bgClass: '!bg-success-surface',
-    textClass: '!text-success',
-  },
-  FINISHED: {
-    bgClass: '!bg-info-surface',
-    textClass: '!text-info',
-  },
-  ARCHIVED: {
-    bgClass: '!bg-gray-100',
-    textClass: '!text-muted',
-  },
-  default: {
-    bgClass: '!bg-gray-100',
-    textClass: '!text-muted',
-  },
-};
+import {
+  GROUP_STATUS_VARIANTS,
+  INTERNSHIP_MANAGEMENT_UI,
+} from '@/constants/internship-management/internship-management';
 
 const GroupTable = memo(function GroupTable({
   data,
@@ -46,8 +30,9 @@ const GroupTable = memo(function GroupTable({
   onArchive,
   onView,
   onEdit,
+  isTermEditable,
 }) {
-  const { TABLE, CARD } = ENTERPRISE_GROUP_UI;
+  const { TABLE, CARD } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
 
   const columns = useMemo(
     () => [
@@ -64,22 +49,17 @@ const GroupTable = memo(function GroupTable({
         dataIndex: 'name',
         key: 'name',
         width: 180,
-        render: (text, record) => (
-          <div className="flex flex-col overflow-hidden">
-            <span className="text-text truncate text-sm font-bold capitalize">
-              {text || TABLE.NOT_ASSIGNED}
-            </span>
-            <span className="text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60">
-              {record.track || TABLE.NOT_ASSIGNED}
-            </span>
-          </div>
+        render: (text) => (
+          <span className="text-text truncate text-sm font-bold capitalize">
+            {text || TABLE.NOT_ASSIGNED}
+          </span>
         ),
       },
       {
         title: TABLE.COLUMNS.TERM,
         dataIndex: 'term',
         key: 'term',
-        width: 100,
+        width: 140,
         render: (text) => (
           <div className="flex items-center gap-1.5">
             <CalendarOutlined className="text-muted text-xs opacity-60" />
@@ -91,16 +71,14 @@ const GroupTable = memo(function GroupTable({
       },
       {
         title: TABLE.COLUMNS.MENTOR,
-        dataIndex: 'mentorId',
+        dataIndex: 'mentorName',
         key: 'mentor',
-        width: 140,
-        render: (_, record) => {
-          return record.mentorName ? (
+        width: 160,
+        render: (name) => {
+          return name ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
-              <div className="bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full" />
-              <span className="text-text truncate text-xs leading-none font-bold">
-                {record.mentorName}
-              </span>
+              <div className="bg-primary h-1.5 w-1.5 shrink-0 rounded-full" />
+              <span className="text-text truncate text-xs font-bold">{name}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -113,18 +91,11 @@ const GroupTable = memo(function GroupTable({
         title: TABLE.COLUMNS.MEMBERS,
         dataIndex: 'memberCount',
         key: 'members',
-        width: 90,
+        width: 120,
         align: 'center',
-        render: (count, record) => (
-          <div className="flex items-center justify-center gap-1.5">
-            <Avatar.Group max={{ count: 2 }} size="small">
-              {(record.avatars || []).map((url, i) => (
-                <Avatar key={i} src={url} className="border-surface border-2 shadow-sm" />
-              ))}
-              {(!record.avatars || record.avatars.length === 0) && count > 0 && (
-                <Avatar icon={<UserOutlined />} className="bg-muted/10 text-muted" />
-              )}
-            </Avatar.Group>
+        render: (count) => (
+          <div className="flex items-center justify-center gap-2">
+            <UserOutlined className="text-muted text-xs opacity-60" />
             <span className="text-muted text-xs font-bold">{count}</span>
           </div>
         ),
@@ -133,28 +104,24 @@ const GroupTable = memo(function GroupTable({
         title: TABLE.COLUMNS.STATUS,
         dataIndex: 'status',
         key: 'status',
-        width: 90,
+        width: 110,
         align: 'center',
-        render: (statusValue) => {
-          const statusStr = GROUP_STATUS_MAP[statusValue] || 'InProgress';
-          const uiLabel =
-            ENTERPRISE_GROUP_UI.STATUS[
-              statusStr === 'InProgress' ? 'IN_PROGRESS' : statusStr.toUpperCase()
-            ];
-          const config = STATUS_CONFIG[statusStr] || STATUS_CONFIG.default;
+        render: (status) => {
+          const variant = GROUP_STATUS_VARIANTS[status] || 'default';
+          const label =
+            INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.STATUS_OPTIONS.find((o) => o.value === status)
+              ?.label || '-';
           return (
-            <span
-              className={`${config.bgClass} ${config.textClass} m-0 inline-flex h-6 w-fit items-center justify-center rounded-full px-2.5 text-[10px] font-bold uppercase transition-all`}
-            >
-              {uiLabel}
-            </span>
+            <Badge variant={variant} size="sm">
+              {label}
+            </Badge>
           );
         },
       },
       {
-        title: TABLE.COLUMNS.ACTION,
+        title: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 40,
+        width: 60,
         align: 'center',
         render: (_, record) => {
           // 2 = Archived
@@ -172,6 +139,7 @@ const GroupTable = memo(function GroupTable({
                     key: 'edit',
                     label: CARD.EDIT_GROUP || 'Edit Group',
                     icon: <EditOutlined className="text-primary" />,
+                    disabled: !isTermEditable,
                     onClick: () => onEdit(record),
                   },
                   {
@@ -182,12 +150,14 @@ const GroupTable = memo(function GroupTable({
                     ) : (
                       <UserAddOutlined className="text-primary" />
                     ),
+                    disabled: !isTermEditable,
                     onClick: () => onAssign(record),
                   },
                   {
                     key: 'archive',
                     label: CARD.ARCHIVE_TOOLTIP,
                     icon: <InboxOutlined className="text-warning" />,
+                    disabled: !isTermEditable || record.termStatus !== 2,
                     onClick: () => onArchive(record),
                   },
                 ]
@@ -217,7 +187,7 @@ const GroupTable = memo(function GroupTable({
         },
       },
     ],
-    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, TABLE, CARD]
+    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, isTermEditable, TABLE, CARD]
   );
 
   return (

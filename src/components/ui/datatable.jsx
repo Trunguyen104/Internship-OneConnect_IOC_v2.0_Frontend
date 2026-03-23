@@ -2,8 +2,9 @@
 
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 
+import { Checkbox } from './checkbox';
 import SkeletonTable from './SkeletonTable';
 
 export default function DataTable({
@@ -18,6 +19,7 @@ export default function DataTable({
   sortBy,
   sortOrder,
   onSort,
+  rowSelection,
 }) {
   const handleSort = (columnKey) => {
     if (!onSort || !columnKey) return;
@@ -29,10 +31,71 @@ export default function DataTable({
     }
   };
 
+  const getRowKey = useCallback(
+    (record, index) => {
+      if (typeof rowKey === 'function') return rowKey(record, index);
+      return record?.[rowKey] || record?.id || record?.key || index;
+    },
+    [rowKey]
+  );
+
+  const isAllSelected = useMemo(() => {
+    if (!rowSelection || !data.length) return false;
+    const { selectedRowKeys = [], getCheckboxProps } = rowSelection;
+    const selectableData = getCheckboxProps
+      ? data.filter((record) => !getCheckboxProps(record).disabled)
+      : data;
+    if (selectableData.length === 0) return false;
+    return selectableData.every((record) => selectedRowKeys.includes(getRowKey(record)));
+  }, [rowSelection, data, getRowKey]);
+  const isIndeterminate = useMemo(() => {
+    if (!rowSelection || !data.length || isAllSelected) return false;
+    const { selectedRowKeys = [] } = rowSelection;
+    return data.some((record) => selectedRowKeys.includes(getRowKey(record)));
+  }, [rowSelection, data, getRowKey, isAllSelected]);
+  const handleSelectAll = (checked) => {
+    if (!rowSelection) return;
+    const { onChange, getCheckboxProps, selectedRowKeys = [] } = rowSelection;
+    const selectableData = getCheckboxProps
+      ? data.filter((record) => !getCheckboxProps(record).disabled)
+      : data;
+    const selectableKeys = selectableData.map((record) => getRowKey(record));
+
+    let nextSelectedRowKeys;
+    if (checked) {
+      nextSelectedRowKeys = Array.from(new Set([...selectedRowKeys, ...selectableKeys]));
+    } else {
+      nextSelectedRowKeys = selectedRowKeys.filter((key) => !selectableKeys.includes(key));
+    }
+
+    const nextSelectedRows = data.filter((record) =>
+      nextSelectedRowKeys.includes(getRowKey(record))
+    );
+    onChange?.(nextSelectedRowKeys, nextSelectedRows);
+  };
+
+  const handleSelectRow = (record, checked) => {
+    if (!rowSelection) return;
+    const { onChange, selectedRowKeys = [] } = rowSelection;
+    const key = getRowKey(record);
+
+    let nextSelectedRowKeys;
+    if (checked) {
+      nextSelectedRowKeys = [...selectedRowKeys, key];
+    } else {
+      nextSelectedRowKeys = selectedRowKeys.filter((k) => k !== key);
+    }
+
+    const nextSelectedRows = data.filter((record) =>
+      nextSelectedRowKeys.includes(getRowKey(record))
+    );
+    onChange?.(nextSelectedRowKeys, nextSelectedRows);
+  };
+
   if (loading && (!Array.isArray(data) || data.length === 0)) {
     return (
       <div className="flex flex-1 flex-col py-6">
-        <SkeletonTable rows={10} columns={columns.length || 4} />
+        <SkeletonTable rows={10} columns={columns.length + (rowSelection ? 1 : 0) || 4} />
       </div>
     );
   }
@@ -51,6 +114,24 @@ export default function DataTable({
         <table className="w-full table-fixed border-collapse text-left" style={{ minWidth }}>
           <thead className="border-border bg-bg sticky top-0 z-10 border-b">
             <tr>
+              {rowSelection && (
+                <th
+                  className="w-[60px] cursor-pointer px-4 py-5 align-middle"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelectAll(!isAllSelected);
+                  }}
+                >
+                  <div className="flex items-center justify-center">
+                    {/* <Checkbox checked={isAllSelected} indeterminate={isIndeterminate} /> */}
+                    <Checkbox
+                      checked={isAllSelected}
+                      indeterminate={isIndeterminate}
+                      onCheckedChange={(checked) => handleSelectAll(checked)}
+                    />
+                  </div>
+                </th>
+              )}
               {columns.map((col, index) => {
                 const isSorted = sortBy === col.sortKey;
                 const canSort = !!onSort && !!col.sortKey && col.sorter !== false;
@@ -83,22 +164,53 @@ export default function DataTable({
             </tr>
           </thead>
           <tbody className="divide-border/50 divide-y">
-            {data.filter(Boolean).map((record, index) => (
-              <tr
-                key={record?.[rowKey] || record?.id || record?.key || index}
-                onClick={() => onRowClick?.(record)}
-                className={`hover:bg-bg/80 h-[72px] transition-colors ${onRowClick ? 'cursor-pointer' : ''} `}
-              >
-                {columns.map((col, colIndex) => (
-                  <td
-                    key={col.key || col.title || colIndex}
-                    className={`px-6 py-4 align-middle text-sm transition-all ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${col.className || ''} `}
-                  >
-                    {col.render ? col.render(record[col.key], record, index) : record[col.key]}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {data.filter(Boolean).map((record, index) => {
+              const key = getRowKey(record, index);
+              const isSelected = rowSelection?.selectedRowKeys?.includes(key);
+              const { disabled = false } = rowSelection?.getCheckboxProps?.(record) || {};
+
+              return (
+                <tr
+                  key={key}
+                  onClick={() => !disabled && onRowClick?.(record)}
+                  className={`h-[72px] transition-all duration-200 ${
+                    isSelected
+                      ? 'bg-primary/5 border-l-2 border-l-primary shadow-sm'
+                      : 'hover:bg-bg/80'
+                  } ${onRowClick && !disabled ? 'cursor-pointer' : ''} `}
+                >
+                  {rowSelection && (
+                    <td
+                      className="w-[60px] cursor-pointer px-4 py-4 align-middle"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const { disabled = false } = rowSelection?.getCheckboxProps?.(record) || {};
+                        if (!disabled) {
+                          handleSelectRow(record, !isSelected);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center justify-center">
+                        {/* <Checkbox checked={isSelected} disabled={disabled} /> */}
+                        <Checkbox
+                          checked={isSelected}
+                          disabled={disabled}
+                          onCheckedChange={(checked) => handleSelectRow(record, checked)}
+                        />
+                      </div>
+                    </td>
+                  )}
+                  {columns.map((col, colIndex) => (
+                    <td
+                      key={col.key || col.title || colIndex}
+                      className={`px-6 py-4 align-middle text-sm transition-all ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${col.className || ''} `}
+                    >
+                      {col.render ? col.render(record[col.key], record, index) : record[col.key]}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

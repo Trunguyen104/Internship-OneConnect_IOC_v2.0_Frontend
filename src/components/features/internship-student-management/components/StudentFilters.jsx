@@ -7,47 +7,12 @@ import {
   PlusOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
-import { Button, Divider, Popover, Select, Tag, Typography } from 'antd';
-import React, { useMemo, useState } from 'react';
+import { Button, DatePicker, Divider, Popover, Select, Tag, Typography } from 'antd';
+import React, { useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Text } = Typography;
-
-const FILTER_STYLES = `
-  .student-filter-field .ant-select-selector,
-  .student-filter-value .ant-select-selector {
-    border-radius: 10px !important;
-    border-color: #e2e8f0 !important;
-    height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
-  }
-  .student-filter-field .ant-select-selector {
-    background-color: #f8fafc !important;
-  }
-  .student-filter-field:hover .ant-select-selector,
-  .student-filter-value:hover .ant-select-selector {
-    border-color: #6366f1 !important;
-  }
-  .filter-popover .ant-popover-inner {
-    border-radius: 20px;
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-  }
-  .btn-primary-gradient {
-    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
-    border: none !important;
-  }
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 2px;
-  }
-`;
 
 export const StudentFilters = ({
   termId,
@@ -66,80 +31,64 @@ export const StudentFilters = ({
   setUniversityFilter,
   majorFilter,
   setMajorFilter,
+  dateFilter,
+  setDateFilter,
   universityOptions,
   resetFilters,
 }) => {
   const [open, setOpen] = useState(false);
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
 
-  // Define the available filter types
-  const FILTER_CONFIG = useMemo(
-    () => ({
-      term: {
-        label: INTERNSHIP_LIST.FILTERS.TERM_LABEL,
-        options: termOptions,
-        value: termId,
-        onChange: setTermId,
-        loading: fetchingTerms,
-      },
-      status: {
-        label: INTERNSHIP_LIST.FILTERS.STATUS_FILTER,
-        options: INTERNSHIP_LIST.FILTERS.STATUS_OPTIONS.filter((o) => o.value !== 'ALL'),
-        value: statusFilter === 'ALL' ? undefined : statusFilter,
-        onChange: setStatusFilter,
-      },
-      group: {
-        label: INTERNSHIP_LIST.FILTERS.GROUP_FILTER,
-        options: INTERNSHIP_LIST.FILTERS.GROUP_OPTIONS.filter((o) => o.value !== 'ALL'),
-        value: groupFilter === 'ALL' ? undefined : groupFilter,
-        onChange: setGroupFilter,
-      },
-      assignment: {
-        label: INTERNSHIP_LIST.FILTERS.ASSIGNMENT_FILTER,
-        options: INTERNSHIP_LIST.FILTERS.ASSIGNMENT_OPTIONS.filter((o) => o.value !== 'ALL'),
-        value: assignmentFilter === 'ALL' ? undefined : assignmentFilter,
-        onChange: setAssignmentFilter,
-      },
-      project: {
-        label: INTERNSHIP_LIST.FILTERS.PROJECT_STATUS,
-        options: INTERNSHIP_LIST.FILTERS.PROJECT_OPTIONS,
-        value: projectFilter === 'ALL' ? undefined : projectFilter,
-        onChange: setProjectFilter,
-      },
-      university: {
-        label: INTERNSHIP_LIST.FILTERS.UNIVERSITY_LABEL,
-        options: universityOptions,
-        value: universityFilter,
-        onChange: setUniversityFilter,
-      },
-      major: {
-        label: INTERNSHIP_LIST.FILTERS.MAJOR_LABEL,
-        options: INTERNSHIP_LIST.MODALS.ADD.MAJOR_OPTIONS,
-        value: majorFilter,
-        onChange: setMajorFilter,
-      },
-    }),
-    [
-      termId,
-      setTermId,
-      termOptions,
-      fetchingTerms,
-      statusFilter,
-      setStatusFilter,
-      groupFilter,
-      setGroupFilter,
-      assignmentFilter,
-      setAssignmentFilter,
-      projectFilter,
-      setProjectFilter,
-      universityFilter,
-      setUniversityFilter,
-      majorFilter,
-      setMajorFilter,
-      universityOptions,
-      INTERNSHIP_LIST,
-    ]
-  );
+  const FILTER_CONFIG = {
+    term: {
+      label: INTERNSHIP_LIST.FILTERS.TERM_LABEL,
+      options: termOptions,
+      value: termId,
+      onChange: setTermId,
+      loading: fetchingTerms,
+    },
+    status: {
+      label: INTERNSHIP_LIST.FILTERS.STATUS_FILTER,
+      options: INTERNSHIP_LIST.FILTERS.STATUS_OPTIONS.filter((o) => o.value !== 'ALL'),
+      value: statusFilter === 'ALL' ? undefined : statusFilter,
+      onChange: setStatusFilter,
+    },
+    group: {
+      label: INTERNSHIP_LIST.FILTERS.GROUP_FILTER,
+      options: INTERNSHIP_LIST.FILTERS.GROUP_OPTIONS.filter((o) => o.value !== 'ALL'),
+      value: groupFilter === 'ALL' ? undefined : groupFilter,
+      onChange: setGroupFilter,
+    },
+    assignment: {
+      label: INTERNSHIP_LIST.FILTERS.ASSIGNMENT_FILTER,
+      options: INTERNSHIP_LIST.FILTERS.ASSIGNMENT_OPTIONS.filter((o) => o.value !== 'ALL'),
+      value: assignmentFilter === 'ALL' ? undefined : assignmentFilter,
+      onChange: setAssignmentFilter,
+    },
+    project: {
+      label: INTERNSHIP_LIST.FILTERS.PROJECT_STATUS,
+      options: INTERNSHIP_LIST.FILTERS.PROJECT_OPTIONS,
+      value: projectFilter === 'ALL' ? undefined : projectFilter,
+      onChange: setProjectFilter,
+    },
+    university: {
+      label: INTERNSHIP_LIST.FILTERS.UNIVERSITY_LABEL,
+      options: universityOptions,
+      value: universityFilter,
+      onChange: setUniversityFilter,
+    },
+    major: {
+      label: INTERNSHIP_LIST.FILTERS.MAJOR_LABEL,
+      options: INTERNSHIP_LIST.MODALS.ADD.MAJOR_OPTIONS,
+      value: majorFilter,
+      onChange: setMajorFilter,
+    },
+    date: {
+      label: INTERNSHIP_LIST.FILTERS.DATE_FILTER_PLACEHOLDER,
+      value: dateFilter,
+      onChange: setDateFilter,
+    },
+  };
 
   // Rows in the builder: each row is { id, type }
   const [rows, setRows] = useState(() => {
@@ -151,6 +100,7 @@ export const StudentFilters = ({
     if (projectFilter !== 'ALL') active.push({ id: 'project', type: 'project' });
     if (universityFilter) active.push({ id: 'university', type: 'university' });
     if (majorFilter) active.push({ id: 'major', type: 'major' });
+    if (dateFilter) active.push({ id: 'date', type: 'date' });
 
     return active.length > 0 ? active : [{ id: Date.now(), type: null }];
   });
@@ -184,8 +134,9 @@ export const StudentFilters = ({
     groupFilter !== 'ALL',
     assignmentFilter !== 'ALL',
     projectFilter !== 'ALL',
-    universityFilter !== null,
-    majorFilter !== null,
+    universityFilter !== undefined && universityFilter !== null,
+    majorFilter !== undefined && majorFilter !== null,
+    dateFilter !== undefined && dateFilter !== null,
   ].filter(Boolean).length;
 
   const content = (
@@ -230,16 +181,28 @@ export const StudentFilters = ({
             <Text className="text-slate-400 text-[10px] px-0.5">{'Equal to'}</Text>
 
             {/* Value Picker */}
-            <Select
-              placeholder="Select value..."
-              value={row.type ? FILTER_CONFIG[row.type].value : undefined}
-              onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
-              disabled={!row.type}
-              className="flex-1 student-filter-value"
-              options={row.type ? FILTER_CONFIG[row.type].options : []}
-              loading={row.type === 'term' && fetchingTerms}
-              allowClear
-            />
+            {row.type === 'date' ? (
+              <DatePicker
+                picker="month"
+                placeholder={INTERNSHIP_LIST.FILTERS.DATE_FILTER_PLACEHOLDER}
+                value={dateFilter}
+                onChange={setDateFilter}
+                className="flex-1 student-filter-value"
+                allowClear
+                format="MM/YYYY"
+              />
+            ) : (
+              <Select
+                placeholder="Select value..."
+                value={row.type ? FILTER_CONFIG[row.type].value : undefined}
+                onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
+                disabled={!row.type}
+                className="flex-1 student-filter-value"
+                options={row.type ? FILTER_CONFIG[row.type].options : []}
+                loading={row.type === 'term' && fetchingTerms}
+                allowClear
+              />
+            )}
 
             {/* Remove Button */}
             <Button
@@ -278,45 +241,6 @@ export const StudentFilters = ({
           {'Done'}
         </Button>
       </div>
-
-      <style jsx global>{`
-        .student-filter-field .ant-select-selector,
-        .student-filter-value .ant-select-selector {
-          border-radius: 10px !important;
-          border-color: #e2e8f0 !important;
-          height: 40px !important;
-          display: flex !important;
-          align-items: center !important;
-        }
-        .student-filter-field .ant-select-selector {
-          background-color: #f8fafc !important;
-        }
-        .student-filter-field:hover .ant-select-selector,
-        .student-filter-value:hover .ant-select-selector {
-          border-color: #6366f1 !important;
-        }
-        .filter-popover .ant-popover-inner {
-          border-radius: 20px;
-          padding: 0;
-          overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-        .btn-primary-gradient {
-          background: linear-gradient(
-            135deg,
-            var(--color-primary-hover) 0%,
-            var(--color-primary) 100%
-          ) !important;
-          border: none !important;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e2e8f0;
-          border-radius: 2px;
-        }
-      `}</style>
     </div>
   );
 

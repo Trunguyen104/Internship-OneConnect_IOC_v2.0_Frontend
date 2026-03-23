@@ -11,10 +11,12 @@ export const ENTERPRISE_GROUP_UI = {
   TABLE: {
     COLUMNS: {
       GROUP_NAME: 'GROUP NAME',
+      TRACK: 'TRACK',
       TERM: 'TERM',
       MENTOR: 'MENTOR',
       STUDENT_COUNT: 'STUDENTS',
       STATUS: 'STATUS',
+      CREATED_AT: 'CREATED AT',
       ACTIONS: 'ACTIONS',
     },
     NOT_ASSIGNED: 'Not Assigned',

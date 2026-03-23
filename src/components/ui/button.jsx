@@ -39,7 +39,7 @@ function Button({
       disabled={loading || props.disabled}
       className={cn(
         'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors',
-        'disabled:pointer-events-none disabled:opacity-50',
+        'disabled:pointer-events-none disabled:opacity-50 relative',
         VARIANT[variant] || VARIANT.default,
         SIZE[size] || SIZE.default,
         className
@@ -74,3 +74,4 @@ function Button({
 }
 
 export { Button };
+export default Button;
