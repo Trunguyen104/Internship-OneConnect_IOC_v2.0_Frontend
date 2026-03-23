@@ -4,15 +4,13 @@ import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
-import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
-
 export const useInternshipManagement = (initialStudents) => {
   const toast = useToast();
   const { MESSAGES } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
   const [students, setStudents] = useState(initialStudents || []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [mentorFilter] = useState(undefined);
+  const [mentorFilter, setMentorFilter] = useState(undefined);
   const [groupFilter, setGroupFilter] = useState('ALL');
   const [assignmentFilter, setAssignmentFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState(null);
@@ -148,70 +146,20 @@ export const useInternshipManagement = (initialStudents) => {
       const { student, type } = groupModal;
       if (!student) return;
 
-      const selectedGroup = MOCK_GROUPS.find((g) => g.id === values.groupId);
-
-      setStudents((prev) =>
-        prev.map((s) =>
-          s.id === student.id
-            ? {
-                ...s,
-                groupId: values.groupId,
-                mentorId: selectedGroup
-                  ? MOCK_MENTORS.find((m) => m.name === selectedGroup.mentor)?.id || null
-                  : null,
-              }
-            : s
-        )
-      );
-
       if (type === 'ADD') {
+        setStudents((prev) =>
+          prev.map((s) => (s.id === student.id ? { ...s, groupId: values.groupId } : s))
+        );
         toast.success(MESSAGES.GROUP_ADD_SUCCESS);
-      } else {
-        toast.success(MESSAGES.GROUP_CHANGE_SUCCESS);
+      }
+
+      if (type === 'REMOVE') {
+        setStudents((prev) => prev.map((s) => (s.id === student.id ? { ...s, groupId: null } : s)));
+        toast.success(MESSAGES.GROUP_REMOVE_SUCCESS);
       }
 
       setGroupModal({ open: false, student: null, type: 'ADD' });
     },
     [groupModal, toast, MESSAGES]
   );
-
-  return {
-    students,
-    search,
-    statusFilter,
-    mentorFilter,
-    pagination,
-    filteredData,
-    paginatedData,
-    rejectModal,
-    assignModal,
-    groupModal,
-    detailModal,
-    isAddModalOpen,
-    selectedRowKeys,
-    setRejectModal,
-    setAssignModal,
-    setGroupModal,
-    setDetailModal,
-    setIsAddModalOpen,
-    setSelectedRowKeys,
-    setGroupFilter,
-    setAssignmentFilter,
-    setDateFilter,
-    handleSearchChange,
-    handleStatusChange,
-    handleTableChange,
-    handlePageSizeChange: (pageSize) => {
-      setPagination((prev) => ({ ...prev, pageSize, current: 1 }));
-    },
-    handleAcceptStudent,
-    handleAddStudent,
-    handleRejectStudent,
-    handleAssignMentor,
-    handleGroupSubmit,
-    setStatusFilter,
-    groupFilter,
-    assignmentFilter,
-    dateFilter,
-  };
 };

@@ -53,14 +53,13 @@ export default function InternshipTermManagement() {
       <StudentPageHeader title={TERM_MANAGEMENT.TITLE} />
 
       <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar
-          className="mb-5 flex-shrink-0 !border-0 !p-0"
-          searchProps={{
-            placeholder: TERM_MANAGEMENT.SEARCH_PLACEHOLDER,
-            value: searchTerm,
-            onChange: (e) => handleSearchChange(e.target.value),
-          }}
-          filterContent={
+        <DataTableToolbar className="mb-5 flex-shrink-0 !border-0 !p-0">
+          <DataTableToolbar.Search
+            placeholder={TERM_MANAGEMENT.SEARCH_PLACEHOLDER}
+            value={searchTerm}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+          <DataTableToolbar.Filters className="gap-3">
             <Select
               allowClear
               placeholder={TERM_MANAGEMENT.STATUS_FILTER}
@@ -70,13 +69,15 @@ export default function InternshipTermManagement() {
               options={TERM_MANAGEMENT.STATUS_OPTIONS}
               suffixIcon={<FilterOutlined className="text-muted" />}
             />
-          }
-          actionProps={{
-            label: TERM_MANAGEMENT.CREATE_BTN,
-            onClick: handleCreateNew,
-            icon: <PlusOutlined />,
-          }}
-        />
+          </DataTableToolbar.Filters>
+          <div className="flex shrink-0 items-center justify-end gap-2 ml-auto">
+            <DataTableToolbar.Actions
+              label={TERM_MANAGEMENT.CREATE_BTN}
+              onClick={handleCreateNew}
+              icon={<PlusOutlined />}
+            />
+          </div>
+        </DataTableToolbar>
 
         <TermTable
           data={data}

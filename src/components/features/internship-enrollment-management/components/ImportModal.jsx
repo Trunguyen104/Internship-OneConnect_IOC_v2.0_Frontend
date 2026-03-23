@@ -38,10 +38,12 @@ export default function ImportModal({
     setPreviewData([]);
 
     try {
-      const data = await onPreview(file);
-      if (data) {
-        setPreviewData(data.previewData || []);
-      }
+      const data = await onPreview?.(file);
+      const processed = (data?.previewData || []).map((row, idx) => ({
+        ...row,
+        id: row.id || row.studentCode || `preview-${idx}`,
+      }));
+      setPreviewData(processed);
     } catch {
       // Error is already toasted by the hook
     }
@@ -73,20 +75,21 @@ export default function ImportModal({
   const invalid = previewData.length - valid;
 
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={520}>
-      <CompoundModal.Header
-        title={UI_TEXT.ENROLLMENT.IMPORT_TITLE}
-        subtitle={UI_TEXT.ENROLLMENT.IMPORT_SUBTITLE}
-      />
+    <CompoundModal open={visible} onCancel={onCancel} width={640}>
+      <CompoundModal.Header title="Import Student List" />
 
       <CompoundModal.Content>
         <Button icon={<DownloadOutlined />} type="link" onClick={onDownloadTemplate}>
           {UI_TEXT.ENROLLMENT.DOWNLOAD_TEMPLATE}
         </Button>
 
-        <Dragger beforeUpload={beforeUpload} handlePreview={handlePreview} disabled={loading}>
-          <UploadOutlined style={{ fontSize: 28 }} />
-          <p>{UI_TEXT.ENROLLMENT.DRAG_HINT}</p>
+        <Dragger
+          beforeUpload={beforeUpload}
+          disabled={loading}
+          style={{ padding: '8px 0', minHeight: 'auto' }}
+        >
+          <UploadOutlined style={{ fontSize: 22 }} />
+          <p className="text-xs mb-0 mt-1">Drag or click to upload (.xls, .xlsx)</p>
         </Dragger>
 
         {previewData.length > 0 && (
@@ -106,6 +109,8 @@ export default function ImportModal({
               pagination={false}
               rowKey="id"
               size="small"
+              scroll={{ y: 180 }}
+              className="mt-2 border rounded-lg"
             />
           </>
         )}

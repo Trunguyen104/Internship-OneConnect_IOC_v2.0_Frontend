@@ -194,7 +194,7 @@ export const StudentFilters = ({
         <div className="flex items-center gap-2">
           <FilterOutlined className="text-primary text-xs" />
           <Text strong className="text-slate-700 tracking-tight text-xs">
-            {INTERNSHIP_LIST.FILTERS.BUILDER_TITLE}
+            {'CONDITION FILTERS'}
           </Text>
         </div>
         <Button
@@ -202,9 +202,9 @@ export const StudentFilters = ({
           size="small"
           onClick={handleReset}
           icon={<UndoOutlined className="text-[10px]" />}
-          className="text-red-500 hover:text-red-600 text-[11px] h-7 px-2"
+          className="text-primary hover:text-primary-hover text-[11px] h-7 px-2"
         >
-          {INTERNSHIP_LIST.FILTERS.CLEAR_ALL}
+          {'Clear all'}
         </Button>
       </div>
 
@@ -216,7 +216,7 @@ export const StudentFilters = ({
           >
             {/* Field Picker */}
             <Select
-              placeholder={INTERNSHIP_LIST.FILTERS.SELECT_FIELD}
+              placeholder="Select field..."
               value={row.type}
               onChange={(val) => updateRowType(row.id, val)}
               className="w-[160px] student-filter-field"
@@ -227,13 +227,11 @@ export const StudentFilters = ({
               }))}
             />
 
-            <Text className="text-slate-400 text-[10px] px-0.5">
-              {INTERNSHIP_LIST.FILTERS.EQUAL_TO}
-            </Text>
+            <Text className="text-slate-400 text-[10px] px-0.5">{'Equal to'}</Text>
 
             {/* Value Picker */}
             <Select
-              placeholder={INTERNSHIP_LIST.FILTERS.SELECT_VALUE}
+              placeholder="Select value..."
               value={row.type ? FILTER_CONFIG[row.type].value : undefined}
               onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
               disabled={!row.type}
@@ -248,7 +246,7 @@ export const StudentFilters = ({
               type="text"
               size="small"
               icon={
-                <CloseOutlined className="text-slate-300 group-hover:text-red-400 text-[10px]" />
+                <CloseOutlined className="text-slate-300 group-hover:text-primary text-[10px]" />
               }
               onClick={() => removeRow(row.id, row.type)}
               className="flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity w-6 h-6"
@@ -268,7 +266,7 @@ export const StudentFilters = ({
           disabled={rows.length >= Object.keys(FILTER_CONFIG).length}
           className="text-primary font-semibold hover:bg-primary/5 rounded-lg px-2 py-1 h-auto text-[12px]"
         >
-          {INTERNSHIP_LIST.FILTERS.ADD_CONDITION}
+          {'Add condition'}
         </Button>
 
         <Button
@@ -277,12 +275,48 @@ export const StudentFilters = ({
           onClick={() => setOpen(false)}
           className="rounded-full px-6 h-8 text-[12px] font-medium btn-primary-gradient"
         >
-          {INTERNSHIP_LIST.FILTERS.FINISH}
+          {'Done'}
         </Button>
       </div>
-      <style jsx global>
-        {FILTER_STYLES}
-      </style>
+
+      <style jsx global>{`
+        .student-filter-field .ant-select-selector,
+        .student-filter-value .ant-select-selector {
+          border-radius: 10px !important;
+          border-color: #e2e8f0 !important;
+          height: 40px !important;
+          display: flex !important;
+          align-items: center !important;
+        }
+        .student-filter-field .ant-select-selector {
+          background-color: #f8fafc !important;
+        }
+        .student-filter-field:hover .ant-select-selector,
+        .student-filter-value:hover .ant-select-selector {
+          border-color: #6366f1 !important;
+        }
+        .filter-popover .ant-popover-inner {
+          border-radius: 20px;
+          padding: 0;
+          overflow: hidden;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-primary-gradient {
+          background: linear-gradient(
+            135deg,
+            var(--color-primary-hover) 0%,
+            var(--color-primary) 100%
+          ) !important;
+          border: none !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #e2e8f0;
+          border-radius: 2px;
+        }
+      `}</style>
     </div>
   );
 
@@ -303,7 +337,7 @@ export const StudentFilters = ({
         }`}
       >
         <FilterOutlined />
-        <span>{INTERNSHIP_LIST.FILTERS.FILTER_TITLE}</span>
+        <span>{'Filter'}</span>
         {activeFiltersCount > 0 && (
           <Tag
             color="error"

@@ -1,6 +1,14 @@
 'use client';
 
-import { BankOutlined, DashboardOutlined, SolutionOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  DashboardOutlined,
+  SolutionOutlined,
+  TeamOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
+
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
@@ -19,6 +27,11 @@ const enterpriseMenu = [
   {
     label: 'Internship Groups',
     href: '/internship-group-management',
+  },
+  {
+    icon: <WarningOutlined />,
+    label: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TITLE,
+    href: '/violation-reports',
   },
   {
     icon: <TeamOutlined />,
