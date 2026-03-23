@@ -36,7 +36,8 @@ function normalizeEnterpriseProfile(profile) {
   }
 
   if (normalized.backgroundUrl == null) {
-    normalized.backgroundUrl = profile.BackgroundUrl ?? null;
+    normalized.backgroundUrl =
+      profile.BackgroundUrl ?? profile.backgroundUrl1 ?? profile.BackgroundUrl1 ?? null;
   }
 
   return normalized;
