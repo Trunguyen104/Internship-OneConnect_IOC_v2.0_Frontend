@@ -61,13 +61,17 @@ export default function IndividualGrading({
     try {
       setLoading(true);
 
-      const validScores = formData.scores.filter((s) => s.score !== null && s.score !== undefined);
+      const evaluationsInput = formData.scores.map((s) => ({
+        criteriaId: s.criteriaId,
+        score: s.score ?? 0,
+        comment: s.comment || '',
+      }));
 
       await EvaluationService.individualGrade(cycle.cycleId, {
         internshipId,
         studentId: student.studentId,
         generalComment: formData.generalComment,
-        scores: validScores,
+        scores: evaluationsInput,
       });
 
       if (statusOverride === 'publish') {
@@ -95,9 +99,10 @@ export default function IndividualGrading({
       title={`${LABELS.DETAIL}: ${student?.fullName}`}
       open={open}
       onCancel={onCancel}
-      className="w-full max-w-6xl"
+      width={1100}
+      style={{ maxWidth: '95vw' }}
       footer={
-        <div className="w-full items-center justify-between">
+        <div className="flex flex-col sm:flex-row w-full items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-gray-500">{TABLE_COLUMNS.STATUS}:</span>
             {(() => {
@@ -131,46 +136,52 @@ export default function IndividualGrading({
         </div>
       }
     >
-      <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-6 py-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="max-h-[70vh] overflow-y-auto pr-2 space-y-6 py-4">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {formData.scores.map((s) => {
             const critInfo = getCriteriaInfo(s.criteriaId);
             return (
-              <div key={s.criteriaId} className="space-y-3 rounded-xl bg-gray-50/50 p-4">
-                <div className="flex flex-col gap-2">
-                  <h4
-                    className="text-sm font-bold text-gray-700 leading-tight"
-                    title={critInfo.name}
-                  >
-                    {critInfo.name}
-                  </h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-black font-semibold">
-                      {LABELS.MAX_LABEL} {critInfo.maxScore}
-                    </span>
-                    <InputNumber
-                      min={0}
-                      max={critInfo.maxScore}
-                      precision={2}
-                      value={s.score}
-                      onChange={(val) => handleScoreChange(s.criteriaId, 'score', val)}
-                      className="w-20"
-                    />
+              <div
+                key={s.criteriaId}
+                className="group flex flex-col gap-4 rounded-2xl border border-slate-100 bg-slate-50/50 p-5 transition-all hover:bg-white hover:shadow-md"
+              >
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <h4
+                      className="line-clamp-2 text-sm font-bold text-slate-800 leading-tight pt-1"
+                      title={critInfo.name}
+                    >
+                      {critInfo.name}
+                    </h4>
+                    <div className="flex flex-col items-end gap-1">
+                      <InputNumber
+                        min={0}
+                        max={critInfo.maxScore}
+                        precision={2}
+                        value={s.score}
+                        onChange={(val) => handleScoreChange(s.criteriaId, 'score', val)}
+                        className="w-20 rounded-lg border-slate-200!"
+                        placeholder="0.0"
+                      />
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        {LABELS.MAX_LABEL} {critInfo.maxScore}
+                      </span>
+                    </div>
                   </div>
+                  <Input.TextArea
+                    placeholder={LABELS.COMMENT}
+                    value={s.comment}
+                    onChange={(e) => handleScoreChange(s.criteriaId, 'comment', e.target.value)}
+                    className="rounded-xl border-slate-200 text-xs transition-all hover:border-primary/30 focus:border-primary/50"
+                    rows={2}
+                  />
                 </div>
-                <Input.TextArea
-                  placeholder={LABELS.COMMENT}
-                  value={s.comment}
-                  onChange={(e) => handleScoreChange(s.criteriaId, 'comment', e.target.value)}
-                  className="text-xs"
-                  rows={2}
-                />
               </div>
             );
           })}
         </div>
 
-        <Divider titlePlacement="left" className="!my-2">
+        <Divider titlePlacement="left" className="my-2!">
           <span className="text-sm font-semibold">{LABELS.GENERAL_COMMENT}</span>
         </Divider>
 

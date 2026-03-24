@@ -96,22 +96,23 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
   const handleSubmitBatch = async () => {
     try {
       setSending(true);
-      const evaluationsInput = Object.keys(scores).map((studentId) => {
-        const student = data.students.find((s) => s.studentId === studentId);
+      const evaluationsInput = data.students.map((student) => {
+        const studentId = student.studentId;
+        const studentScores = scores[studentId] || {};
         const originalDetails = student?.details || student?.scores || [];
+
         return {
           studentId,
           note: student?.note || student?.generalComment || '',
-          details: Object.keys(scores[studentId]).map((criteriaId) => ({
-            criteriaId,
-            score: scores[studentId][criteriaId] || 0,
-            comment: originalDetails.find((d) => d.criteriaId === criteriaId)?.comment || '',
+          details: data.criteria.map((crit) => ({
+            criteriaId: crit.criteriaId,
+            score: studentScores[crit.criteriaId] ?? 0,
+            comment: originalDetails.find((d) => d.criteriaId === crit.criteriaId)?.comment || '',
           })),
         };
       });
 
       await onBatchGrade(cycle.cycleId, { evaluations: evaluationsInput });
-      toast.success(MESSAGES.GRADE_SUCCESS);
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
@@ -183,7 +184,6 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             }`}
             controls={false}
           />
-          <div className="absolute bottom-0 left-1/2 h-[1px] w-8 -translate-x-1/2 bg-gray-200 group-hover:bg-primary/30 transition-colors" />
         </div>
       ),
     })),

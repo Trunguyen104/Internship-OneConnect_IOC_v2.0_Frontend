@@ -18,6 +18,7 @@ export const EVALUATION_UI = {
     CRITERIA_COUNT: 'Criteria Count',
     TOTAL_SCORE: 'Total Score',
     DETAILS: 'Details',
+    MANAGEMENT: 'Management',
   },
 
   STATUS: {
