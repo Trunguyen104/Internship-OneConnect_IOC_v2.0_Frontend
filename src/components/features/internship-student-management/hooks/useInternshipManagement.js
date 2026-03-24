@@ -5,6 +5,8 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
+import { userService } from '../../user/services/userService';
+import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
 import { EnterpriseTermService } from '../services/enterprise-term.service';
 
@@ -15,12 +17,28 @@ export const useInternshipManagement = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
-  const [termId, setTermId] = useState(undefined);
+  const [termId, setTermId] = useState(null);
   const [termOptions, setTermOptions] = useState([]);
   const [fetchingTerms, setFetchingTerms] = useState(false);
+  const [hasGroups, setHasGroups] = useState(false);
+  const [existingGroups, setExistingGroups] = useState([]);
+  const [enterpriseId, setEnterpriseId] = useState(null);
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await userService.getMe();
+        const data = res?.data || res;
+        setEnterpriseId(data?.enterpriseId || data?.enterprise_id || data?.enterpriseID);
+      } catch (err) {
+        console.error('Failed to fetch user info:', err);
+      }
+    };
+    fetchMe();
+  }, []);
 
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('1'); // Default to Placed
+  const [statusFilter, setStatusFilter] = useState(2); // Default to Placed (Approved = 2)
   const [groupFilter, setGroupFilter] = useState('ALL');
   const [assignmentFilter, setAssignmentFilter] = useState('ALL');
   const [projectFilter, setProjectFilter] = useState('ALL');
@@ -43,27 +61,54 @@ export const useInternshipManagement = () => {
 
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [fetchingStudents, setFetchingStudents] = useState(false);
+  const [mentors, setMentors] = useState([]);
+  const [loadingMentors, setLoadingMentors] = useState(false);
 
-  // Fetch Active Terms with Fallback
+  const fetchMentors = useCallback(async () => {
+    try {
+      setLoadingMentors(true);
+      const res = await EnterpriseMentorService.getMentors({ PageSize: 100 });
+      const items = res?.data?.items || res?.data || res?.items || [];
+      setMentors(items);
+    } catch (err) {
+      console.error('Failed to fetch mentors:', err);
+      setMentors([]);
+    } finally {
+      setLoadingMentors(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMentors();
+  }, [fetchMentors]);
+
   useEffect(() => {
     const fetchTerms = async () => {
       try {
         setFetchingTerms(true);
+        // Fallback to active terms if all terms endpoint not found
         const res = await EnterpriseTermService.getActiveTerms();
-        let terms = res?.data?.terms || [];
+        let terms = res?.data?.terms || res?.data || [];
 
-        // Fallback or empty handle: we might need to fetch all if active is empty
-        // For now, if empty, we keep it as is or log it.
-        // Requirement AC-S01: Nếu không có kỳ Active nào -> hiển thị kỳ Upcoming gần nhất.
-        // If the service already returns them in some way, we use it.
+        terms.sort((a, b) => {
+          if (a.status === 2 && b.status !== 2) return -1;
+          if (a.status !== 2 && b.status === 2) return 1;
+          return new Date(b.startDate) - new Date(a.startDate);
+        });
 
+        const { STATUS_LABELS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT;
         const options = terms.map((t) => ({
           label: t.termName,
           value: t.termId,
-          status: t.status, // Preserve status for badges
+          status: t.status,
+          termName: t.termName,
+          universityName: t.universityName,
         }));
+
         setTermOptions(options);
-        if (options.length > 0 && !termId) {
+
+        // Auto-select first term if none selected
+        if (!termId && options.length > 0) {
           setTermId(options[0].value);
         }
       } catch (err) {
@@ -73,38 +118,71 @@ export const useInternshipManagement = () => {
       }
     };
     fetchTerms();
-  }, []);
+  }, [termId]);
 
   // Fetch Applications (Students)
   const fetchStudents = useCallback(async () => {
+    if (!termId) return;
+
     try {
-      setLoading(true);
+      setFetchingStudents(true);
       const params = {
-        TermId: termId || undefined,
+        TermId: termId,
         PageIndex: pagination.current,
         PageSize: pagination.pageSize,
-        Search: search || undefined,
-        Status: statusFilter !== 'ALL' ? Number(statusFilter) : undefined,
+        Search: search,
+        Status: statusFilter === 'ALL' ? undefined : statusFilter,
+        HasGroup: groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP',
+        MentorAssigned: assignmentFilter === 'ALL' ? undefined : assignmentFilter === 'ASSIGNED',
+        ProjectAssigned: projectFilter === 'ALL' ? undefined : projectFilter === 'PROJECT_ASSIGNED',
+        Major: majorFilter,
+        UniversityName: universityFilter,
+        Month: dateFilter ? dateFilter.month() + 1 : undefined,
+        Year: dateFilter ? dateFilter.year() : undefined,
       };
 
-      if (dateFilter) {
-        params.Month = dateFilter.month() + 1;
-        params.Year = dateFilter.year();
-      }
-
-      if (groupFilter === 'HAS_GROUP') params.HasGroup = true;
-      if (groupFilter === 'NO_GROUP') params.HasGroup = false;
-      if (assignmentFilter === 'ASSIGNED') params.MentorAssigned = true;
-      if (assignmentFilter === 'UNASSIGNED') params.MentorAssigned = false;
-
       const res = await EnterpriseStudentService.getApplications(params);
-      const items = res?.data?.items || [];
-      setStudents(items.map(EnterpriseStudentService.mapApplication));
+      const items = res?.data?.items || res?.items || [];
+      const total = res?.data?.totalCount || res?.totalCount || 0;
+      const currentTermStatus = termOptions.find((t) => t.value === termId)?.status || 0;
+      setStudents(
+        items.map((item) => {
+          const mapped = EnterpriseStudentService.mapApplication(item);
+          // Fallback to current term's status if not provided by API
+          if (mapped.termStatus === 0 || mapped.termStatus === undefined) {
+            mapped.termStatus = currentTermStatus;
+          }
+          return mapped;
+        })
+      );
       setTotal(res?.data?.totalCount || 0);
 
-      // Extract unique universities for filter
+      // Set unassigned students for group creation modal
+      setUnassignedStudents(
+        items
+          .filter((i) => !i.groupName && !i.groupId)
+          .map((item) => {
+            const mapped = EnterpriseStudentService.mapApplication(item);
+            if (mapped.termStatus === 0 || mapped.termStatus === undefined) {
+              mapped.termStatus = currentTermStatus;
+            }
+            return mapped;
+          })
+      );
       const universities = Array.from(new Set(items.map((i) => i.universityName))).filter(Boolean);
       setUniversityOptions(universities.map((u) => ({ label: u, value: u })));
+
+      try {
+        const groupsRes = await EnterpriseGroupService.getGroups({
+          termId,
+          pageSize: 100,
+        });
+        const groups = groupsRes?.data?.items || groupsRes?.items || [];
+        setExistingGroups(groups);
+        setHasGroups(groups.length > 0);
+      } catch (err) {
+        console.error('Failed to check groups:', err);
+      }
     } catch (err) {
       console.error('Failed to fetch students:', err);
     } finally {
@@ -119,14 +197,15 @@ export const useInternshipManagement = () => {
     groupFilter,
     assignmentFilter,
     dateFilter,
+    universityFilter,
+    majorFilter,
   ]);
 
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents]);
 
-  const filteredData = students; // API handles most filtering
-
+  const filteredData = students;
   const handleSearchChange = useCallback((value) => {
     setSearch(value);
     setPagination((prev) => ({ ...prev, current: 1 }));
@@ -184,13 +263,6 @@ export const useInternshipManagement = () => {
   const handleAssignMentor = useCallback(
     async (studentId, values) => {
       try {
-        // Since we need to assign mentor to a group or update the application detail
-        // For now, assume we use UpdateInternshipGroup or a specific assign endpoint if available
-        // User requirements say AC-04: HR gán Mentor và Vị trí/Dự án.
-        // Controller doesn't have a direct "Assign Mentor to Application" endpoint.
-        // It might be handled via group management.
-        // However, Swagger shows: PATCH /api/enterprises/me/applications/{applicationId}/assign
-        // Wait, my EnterpriseStudentService doesn't have assignMentor. I'll add it.
         await EnterpriseStudentService.assignMentor(studentId, values);
         setAssignModal({ open: false, student: null });
         toast.success(MESSAGES.ASSIGN_SUCCESS);
@@ -213,9 +285,8 @@ export const useInternshipManagement = () => {
             values.groupId,
             students.map((s) => ({ studentId: s.studentId, role: 1 }))
           );
-          toast.success(MESSAGES.GROUP_ADD_SUCCESS);
+          toast.success(`Đã thêm ${students.length} sinh viên vào nhóm.`);
         } else if (type === 'CHANGE') {
-          // Move students logic
           await EnterpriseGroupService.moveStudents({
             fromGroupId: students[0].groupId,
             toGroupId: values.groupId,
@@ -226,7 +297,14 @@ export const useInternshipManagement = () => {
         setGroupModal({ open: false, students: [], type: 'ADD' });
         fetchStudents();
       } catch (err) {
-        toast.error('Failed to update group');
+        const errorMsg = err?.response?.data?.message || err?.message || '';
+        // AC-G05: Handle race condition where student already in another group
+        if (errorMsg.includes('already in another group') || err?.response?.status === 400) {
+          // If possible, extract student name from error or just show the error message
+          toast.error(errorMsg || 'Sinh viên đã thuộc một nhóm khác trong kỳ này, không thể thêm.');
+        } else {
+          toast.error('Failed to update group');
+        }
       }
     },
     [groupModal, toast, MESSAGES, fetchStudents]
@@ -234,24 +312,40 @@ export const useInternshipManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (payload) => {
+      // payload.students is passed from the modal context
+      const selectedStudents = createModal.students || [];
+      const termIds = new Set(selectedStudents.map((s) => s.termId).filter(Boolean));
+
+      if (termIds.size > 1) {
+        toast.error(
+          'Sinh viên được chọn thuộc nhiều kỳ thực tập khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một kỳ thực tập.'
+        );
+        return;
+      }
+
+      const firstStudent = selectedStudents[0];
+      const targetTermId = firstStudent?.termId || termId;
+
       try {
         await EnterpriseGroupService.createGroup({
           ...payload,
-          TermId: termId,
+          termId: targetTermId,
+          enterpriseId: enterpriseId,
         });
         toast.success('Group created successfully');
         setCreateModal({ open: false, students: [] });
         fetchStudents();
       } catch (err) {
-        toast.error('Failed to create group');
+        const errorMsg = err?.response?.data?.message || err?.message || 'Failed to create group';
+        toast.error(errorMsg);
       }
     },
-    [termId, fetchStudents, toast]
+    [termId, fetchStudents, toast, createModal.students]
   );
 
   const resetFilters = () => {
     setSearch('');
-    setStatusFilter('1');
+    setStatusFilter(2);
     setGroupFilter('ALL');
     setAssignmentFilter('ALL');
     setProjectFilter('ALL');
@@ -306,9 +400,13 @@ export const useInternshipManagement = () => {
     createModal,
     unassignedStudents,
     fetchingStudents,
+    mentors,
+    loadingMentors,
     handleCreateGroup,
     dateFilter,
     setDateFilter,
-    isTermEditable: termId && termOptions.find((t) => t.value === termId)?.status < 3,
+    isTermEditable: termId && termOptions.find((t) => t.value === termId)?.status === 2,
+    hasGroups,
+    existingGroups,
   };
 };

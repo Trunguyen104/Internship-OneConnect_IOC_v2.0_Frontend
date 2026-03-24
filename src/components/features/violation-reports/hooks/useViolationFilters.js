@@ -7,7 +7,6 @@ export const useViolationFilters = () => {
   const [fetchingTerms, setFetchingTerms] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [groupIdFilter, setGroupIdFilter] = useState(undefined);
-  const [createdByIdFilter, setCreatedByIdFilter] = useState(undefined);
   const [dateRange, setDateRange] = useState([null, null]);
   const [sortConfig, setSortConfig] = useState({
     column: 'createdAt',
@@ -33,11 +32,6 @@ export const useViolationFilters = () => {
     [setGroupIdFilter, setPagination]
   );
 
-  const handleCreatedByChange = useCallback((value) => {
-    setCreatedByIdFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
   const handleDateRangeChange = useCallback((dates) => {
     setDateRange(dates);
     setPagination((prev) => ({ ...prev, current: 1 }));
@@ -60,7 +54,6 @@ export const useViolationFilters = () => {
   const resetFilters = useCallback(() => {
     setSearchTerm('');
     setGroupIdFilter(undefined);
-    setCreatedByIdFilter(undefined);
     setDateRange([null, null]);
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
@@ -68,7 +61,6 @@ export const useViolationFilters = () => {
   return {
     searchTerm,
     groupIdFilter,
-    createdByIdFilter,
     dateRange,
     sortConfig,
     pagination,
@@ -81,7 +73,6 @@ export const useViolationFilters = () => {
     setPagination,
     handleSearchChange,
     handleGroupChange,
-    handleCreatedByChange,
     handleDateRangeChange,
     handleTableChange,
     resetFilters,

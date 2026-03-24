@@ -57,12 +57,13 @@ export const ENTERPRISE_GROUP_UI = {
     DELETE: {
       TITLE: 'Delete Group',
       CONTENT:
-        'Are you sure you want to delete this group? This action cannot be undone unless the group contains no students.',
+        'Are you sure you want to delete this group? This action cannot be undone and can only be performed if the group has no students and no internship data.',
       SUBMIT: 'Confirm Delete',
     },
     ARCHIVE: {
       TITLE: 'Archive Group',
-      CONTENT: 'Archiving this group will mark it as read-only. Are you sure?',
+      CONTENT:
+        'Are you sure you want to archive this group? The group will no longer be displayed in the default list, but the data will be retained for reference.',
       SUBMIT: 'Confirm Archive',
     },
     VIEW: {
@@ -80,15 +81,17 @@ export const ENTERPRISE_GROUP_UI = {
     },
   },
   MESSAGES: {
-    CREATE_SUCCESS: 'Group created successfully',
-    UPDATE_SUCCESS: 'Group updated successfully',
-    DELETE_SUCCESS: 'Group deleted successfully',
-    ARCHIVE_SUCCESS: 'Group archived successfully',
-    ADD_STUDENT_SUCCESS: 'Students added successfully',
-    REMOVE_STUDENT_SUCCESS: 'Student removed successfully',
-    ERROR: 'An error occurred. Please try again.',
+    CREATE_SUCCESS: 'Group created successfully.',
+    UPDATE_SUCCESS: 'Group updated successfully.',
+    DELETE_SUCCESS: 'Group deleted successfully.',
+    ARCHIVE_SUCCESS: 'Group archived successfully.',
+    ADD_STUDENT_SUCCESS: 'Student added successfully.',
+    REMOVE_STUDENT_SUCCESS: 'Student removed successfully.',
     DELETE_ERROR_HAS_STUDENTS:
-      'Cannot delete a group that currently has active students. Please remove students or archive the group instead.',
+      'Cannot delete this group because it still contains students. Please remove them or archive the group.',
+    DELETE_ERROR_HAS_DATA:
+      'This group already contains internship data (logbook, evaluations, etc.). Consider archiving it instead of deleting to keep the history.',
+    ERROR: 'Something went wrong. Please try again later.',
   },
 };
 

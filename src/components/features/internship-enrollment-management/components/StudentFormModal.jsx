@@ -102,7 +102,7 @@ const StudentFormBody = memo(function StudentFormBody({
       : ADD_EDIT.SUBTITLE_ADD;
 
   const renderPersonalTab = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-3 pt-3 duration-300">
+    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[400px] space-y-3 pt-3 duration-300">
       <Row gutter={12}>
         <Col span={14}>
           <Form.Item
@@ -135,7 +135,7 @@ const StudentFormBody = memo(function StudentFormBody({
               prefix={<IdcardOutlined className="text-muted/60 ml-0.5" />}
               placeholder={ADD_EDIT.ID_PLACEHOLDER}
               className="!h-10 !rounded-xl font-mono"
-              disabled={!!initialValues}
+              // disabled={!!initialValues}
             />
           </Form.Item>
           {viewOnly && (
@@ -228,7 +228,7 @@ const StudentFormBody = memo(function StudentFormBody({
   );
 
   const renderPlacementTab = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-2 space-y-4 pt-3 duration-300">
+    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[400px] space-y-4 pt-3 duration-300">
       <Row gutter={12}>
         <Col span={12}>
           <Form.Item label={ADD_EDIT.STATUS_LABEL} name="placementStatus" hidden={viewOnly}>
@@ -385,7 +385,7 @@ const StudentFormBody = memo(function StudentFormBody({
         />
       ) : (
         <CompoundModal.Footer
-          onCancel={onCancel}
+          showCancel={false}
           confirmText={ADD_EDIT.CLOSE}
           onConfirm={onCancel}
           className="!mt-0"

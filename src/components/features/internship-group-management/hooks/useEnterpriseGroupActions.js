@@ -56,7 +56,30 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       toast.error(MESSAGES.DELETE_ERROR_HAS_STUDENTS);
       return false;
     }
-    return handleAction(() => EnterpriseGroupService.deleteGroup(id), MESSAGES.DELETE_SUCCESS);
+
+    try {
+      setLoading(true);
+      await EnterpriseGroupService.deleteGroup(id);
+      toast.success(MESSAGES.DELETE_SUCCESS);
+      if (onSuccess) onSuccess();
+      return true;
+    } catch (error) {
+      console.error('Delete Group Error:', error);
+      // AC-G09: If group has data, suggest Archive
+      const errorMsg = error?.message || '';
+      if (
+        error?.status === 400 ||
+        errorMsg.toLowerCase().includes('data') ||
+        errorMsg.toLowerCase().includes('relation')
+      ) {
+        toast.warning(MESSAGES.DELETE_ERROR_HAS_DATA, { duration: 6 });
+      } else {
+        toast.error(getErrorDetail(error, MESSAGES.ERROR));
+      }
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {

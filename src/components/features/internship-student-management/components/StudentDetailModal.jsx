@@ -2,6 +2,7 @@
 
 import { UserOutlined } from '@ant-design/icons';
 import { Descriptions } from 'antd';
+import dayjs from 'dayjs';
 import React from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
@@ -23,14 +24,14 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
   const displayStatus = statusMap[student.status] || 'PENDING';
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={500} destroyOnHidden footer={null}>
+    <CompoundModal open={open} onCancel={onCancel} width={600} destroyOnHidden footer={null}>
       <CompoundModal.Header
         icon={<UserOutlined />}
         title={student.studentFullName}
         subtitle={student.studentCode}
       />
 
-      <div className="px-10 pb-6 pt-4">
+      <div className="px-10 pb-8 pt-4">
         <Descriptions
           column={1}
           size="small"
@@ -56,7 +57,9 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
           <Descriptions.Item label={DETAIL.PHONE}>
             {student.phone || '098-XXX-XXXX'}
           </Descriptions.Item>
-          <Descriptions.Item label={DETAIL.DOB}>{student.dob || '01/01/2002'}</Descriptions.Item>
+          <Descriptions.Item label={DETAIL.DOB}>
+            {student.dob ? dayjs(student.dob).format('DD/MM/YYYY') : '-'}
+          </Descriptions.Item>
           <Descriptions.Item label={DETAIL.GROUP}>{student.groupName || '-'}</Descriptions.Item>
           <Descriptions.Item label={DETAIL.MENTOR}>{student.mentorName || '-'}</Descriptions.Item>
           <Descriptions.Item label={DETAIL.PROJECT}>
@@ -64,9 +67,9 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
           </Descriptions.Item>
         </Descriptions>
 
-        <div className="mt-4 flex justify-end text-[10px] uppercase tracking-wider text-muted italic opacity-30">
+        <div className="mt-8 flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted italic opacity-30">
           {DETAIL.PLACEMENT_DATE}:{' '}
-          {student.appliedAt ? new Date(student.appliedAt).toLocaleDateString('en-GB') : '-'}
+          {student.appliedAt ? dayjs(student.appliedAt).format('DD/MM/YYYY') : '-'}
         </div>
       </div>
     </CompoundModal>

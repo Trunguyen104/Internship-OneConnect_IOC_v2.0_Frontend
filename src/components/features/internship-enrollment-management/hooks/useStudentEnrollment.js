@@ -225,31 +225,6 @@ export const useStudentEnrollment = () => {
     [termId, setImportVisible, toast, MESSAGES, fetchStudents]
   );
 
-  // const handleBulkWithdraw = useCallback(async () => {
-  //   if (!termId || selectedIds.length === 0) return;
-
-  //   // Check if any selected student is PLACED
-  //   const placedStudents = students.filter(
-  //     (s) => selectedIds.includes(s.studentTermId) && s.placementStatus === 'PLACED'
-  //   );
-
-  //   if (placedStudents.length > 0) {
-  //     toast.error(MESSAGES.BULK_WITHDRAW_PLACED_ERROR.replace('{count}', placedStudents.length));
-  //     return;
-  //   }
-
-  //   setSubmitLoading(true);
-  //   try {
-  //     await StudentService.bulkWithdraw(termId, selectedIds);
-  //     toast.success(MESSAGES.BULK_WITHDRAW_SUCCESS);
-  //     setSelectedIds([]);
-  //     fetchStudents();
-  //   } catch (error) {
-  //     toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
-  //   } finally {
-  //     setSubmitLoading(false);
-  //   }
-  // }, [termId, selectedIds, students, toast, MESSAGES, fetchStudents]);
   const handleBulkWithdraw = useCallback(async () => {
     if (!termId || selectedIds.length === 0) return;
 

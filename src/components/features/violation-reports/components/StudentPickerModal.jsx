@@ -11,15 +11,11 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
   const [search, setSearch] = useState('');
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
 
-  // useEffect(() => {
-  //   if (visible) {
-  //     setSearch('');
-  //   }
-  // }, [visible]);
   const handleCancel = () => {
     setSearch('');
     onCancel();
   };
+
   const filteredStudents = useMemo(() => {
     if (!search) return students;
     const lowerSearch = search.toLowerCase();
@@ -35,26 +31,33 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
       title: VIOLATION_REPORT.TABLE.COLUMNS.STUDENT_NAME,
       key: 'studentFullName',
       width: '60%',
+      render: (_, record) => record.studentFullName || record.fullName,
     },
     {
       title: VIOLATION_REPORT.TABLE.COLUMNS.STUDENT_CODE,
       key: 'studentCode',
       width: '40%',
+      render: (_, record) => record.studentCode || record.userCode,
     },
   ];
 
   return (
-    <CompoundModal open={visible} onCancel={handleCancel} width={600} destroyOnClose>
+    <CompoundModal
+      open={visible}
+      onCancel={handleCancel}
+      width={600}
+      destroyOnClose
+      closable={false}
+    >
       <CompoundModal.Header title={VIOLATION_REPORT.FORM.STUDENT} />
       <CompoundModal.Content className="!pb-0">
-        <DataTableToolbar
-          searchProps={{
-            placeholder: VIOLATION_REPORT.SEARCH_PLACEHOLDER,
-            value: search,
-            onChange: (e) => setSearch(e.target.value),
-          }}
-          className="mb-4"
-        />
+        <DataTableToolbar className="mb-4 !border-0 !p-0">
+          <DataTableToolbar.Search
+            placeholder={VIOLATION_REPORT.SEARCH_PLACEHOLDER}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </DataTableToolbar>
         <div className="min-h-[400px]">
           <DataTable
             columns={columns}
@@ -66,7 +69,7 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
           />
         </div>
       </CompoundModal.Content>
-      <CompoundModal.Footer onCancel={onCancel} hideConfirm />
+      <CompoundModal.Footer onCancel={onCancel} showConfirm={false} />
     </CompoundModal>
   );
 };

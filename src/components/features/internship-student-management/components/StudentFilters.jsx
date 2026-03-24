@@ -15,12 +15,10 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 const { Text } = Typography;
 
 export const StudentFilters = ({
-  termId,
-  setTermId,
-  termOptions,
-  fetchingTerms,
   statusFilter,
   setStatusFilter,
+  dateFilter,
+  setDateFilter,
   groupFilter,
   setGroupFilter,
   assignmentFilter,
@@ -31,8 +29,6 @@ export const StudentFilters = ({
   setUniversityFilter,
   majorFilter,
   setMajorFilter,
-  dateFilter,
-  setDateFilter,
   universityOptions,
   resetFilters,
 }) => {
@@ -40,13 +36,6 @@ export const StudentFilters = ({
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
 
   const FILTER_CONFIG = {
-    term: {
-      label: INTERNSHIP_LIST.FILTERS.TERM_LABEL,
-      options: termOptions,
-      value: termId,
-      onChange: setTermId,
-      loading: fetchingTerms,
-    },
     status: {
       label: INTERNSHIP_LIST.FILTERS.STATUS_FILTER,
       options: INTERNSHIP_LIST.FILTERS.STATUS_OPTIONS.filter((o) => o.value !== 'ALL'),
@@ -90,11 +79,10 @@ export const StudentFilters = ({
     },
   };
 
-  // Rows in the builder: each row is { id, type }
   const [rows, setRows] = useState(() => {
     const active = [];
-    if (termId) active.push({ id: 'term', type: 'term' });
-    if (statusFilter !== 'ALL') active.push({ id: 'status', type: 'status' });
+    if (statusFilter !== 'ALL' && statusFilter !== undefined)
+      active.push({ id: 'status', type: 'status' });
     if (groupFilter !== 'ALL') active.push({ id: 'group', type: 'group' });
     if (assignmentFilter !== 'ALL') active.push({ id: 'assignment', type: 'assignment' });
     if (projectFilter !== 'ALL') active.push({ id: 'project', type: 'project' });
@@ -111,12 +99,10 @@ export const StudentFilters = ({
 
   const removeRow = (id, type) => {
     setRows(rows.filter((r) => r.id !== id));
-    // Reset value if it was set
     if (type && FILTER_CONFIG[type]) {
       const { onChange } = FILTER_CONFIG[type];
-      if (type === 'term') onChange(null);
-      else if (['status', 'group', 'assignment', 'project'].includes(type)) onChange('ALL');
-      else onChange(null);
+      if (['status', 'group', 'assignment', 'project'].includes(type)) onChange('ALL');
+      else onChange(undefined);
     }
   };
 
@@ -130,7 +116,7 @@ export const StudentFilters = ({
   };
 
   const activeFiltersCount = [
-    statusFilter !== 'ALL',
+    statusFilter !== 'ALL' && statusFilter !== undefined,
     groupFilter !== 'ALL',
     assignmentFilter !== 'ALL',
     projectFilter !== 'ALL',
@@ -144,8 +130,8 @@ export const StudentFilters = ({
       <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
         <div className="flex items-center gap-2">
           <FilterOutlined className="text-primary text-xs" />
-          <Text strong className="text-slate-700 tracking-tight text-xs">
-            {'CONDITION FILTERS'}
+          <Text strong className="text-slate-700 tracking-tight text-xs uppercase">
+            {INTERNSHIP_LIST.FILTERS.BUILDER_TITLE}
           </Text>
         </div>
         <Button
@@ -155,7 +141,7 @@ export const StudentFilters = ({
           icon={<UndoOutlined className="text-[10px]" />}
           className="text-primary hover:text-primary-hover text-[11px] h-7 px-2"
         >
-          {'Clear all'}
+          {INTERNSHIP_LIST.FILTERS.CLEAR_ALL}
         </Button>
       </div>
 
@@ -165,9 +151,8 @@ export const StudentFilters = ({
             key={row.id}
             className="flex items-center gap-2 group animate-in slide-in-from-left-2 duration-200"
           >
-            {/* Field Picker */}
             <Select
-              placeholder="Select field..."
+              placeholder={INTERNSHIP_LIST.FILTERS.SELECT_FIELD}
               value={row.type}
               onChange={(val) => updateRowType(row.id, val)}
               className="w-[160px] student-filter-field"
@@ -178,9 +163,10 @@ export const StudentFilters = ({
               }))}
             />
 
-            <Text className="text-slate-400 text-[10px] px-0.5">{'Equal to'}</Text>
+            <Text className="text-slate-400 text-[10px] px-0.5">
+              {INTERNSHIP_LIST.FILTERS.EQUAL_TO}
+            </Text>
 
-            {/* Value Picker */}
             {row.type === 'date' ? (
               <DatePicker
                 picker="month"
@@ -193,7 +179,9 @@ export const StudentFilters = ({
               />
             ) : (
               <Select
-                placeholder="Select value..."
+                showSearch
+                optionFilterProp="label"
+                placeholder={INTERNSHIP_LIST.FILTERS.SELECT_VALUE}
                 value={row.type ? FILTER_CONFIG[row.type].value : undefined}
                 onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
                 disabled={!row.type}
@@ -204,7 +192,6 @@ export const StudentFilters = ({
               />
             )}
 
-            {/* Remove Button */}
             <Button
               type="text"
               size="small"
@@ -229,7 +216,7 @@ export const StudentFilters = ({
           disabled={rows.length >= Object.keys(FILTER_CONFIG).length}
           className="text-primary font-semibold hover:bg-primary/5 rounded-lg px-2 py-1 h-auto text-[12px]"
         >
-          {'Add condition'}
+          {INTERNSHIP_LIST.FILTERS.ADD_CONDITION}
         </Button>
 
         <Button
@@ -238,7 +225,7 @@ export const StudentFilters = ({
           onClick={() => setOpen(false)}
           className="rounded-full px-6 h-8 text-[12px] font-medium btn-primary-gradient"
         >
-          {'Done'}
+          {INTERNSHIP_LIST.FILTERS.FINISH}
         </Button>
       </div>
     </div>
@@ -261,7 +248,7 @@ export const StudentFilters = ({
         }`}
       >
         <FilterOutlined />
-        <span>{'Filter'}</span>
+        <span>{INTERNSHIP_LIST.FILTERS.FILTER_TITLE}</span>
         {activeFiltersCount > 0 && (
           <Tag
             color="error"

@@ -1,81 +1,105 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-const MOCK_VIOLATIONS = [
-  // {
-  //   id: 'V001',
-  //   type: 'Late Arrival',
-  //   description: 'Arrived 20 minutes late for the morning shift.',
-  //   violationTime: '2024-03-01T08:20:00',
-  //   reporter: 'Admin',
-  //   createdAt: '2024-03-01',
-  //   severity: 'MEDIUM',
-  // },
-  // {
-  //   id: 'V002',
-  //   type: 'Missed Meeting',
-  //   description: 'Did not attend the weekly progress review.',
-  //   violationTime: '2024-03-05T14:00:00',
-  //   reporter: 'Mentor',
-  //   createdAt: '2024-03-05',
-  //   severity: 'HIGH',
-  // },
-  // {
-  //   id: 'V003',
-  //   type: 'Dress Code',
-  //   description: 'Wore non-business casual attire on a Friday.',
-  //   violationTime: '2024-03-08T09:00:00',
-  //   reporter: 'HR',
-  //   createdAt: '2024-03-08',
-  //   severity: 'LOW',
-  // },
-];
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
+import { violationReportService } from '../services/violation.services';
 
 export function useViolation() {
-  const [violations] = useState(MOCK_VIOLATIONS);
+  const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
+  const [violations, setViolations] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [dateRange, setDateRange] = useState([null, null]);
   const [pageSize, setPageSize] = useState(10);
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [sortOrder] = useState('desc');
+  const [total, setTotal] = useState(0);
 
-  const handleSortDate = () => {
-    setSortOrder((prev) => (prev === 'desc' ? 'asc' : 'desc'));
-  };
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
 
-  const filtered = useMemo(() => {
-    return violations.filter(
-      (v) =>
-        v.type.toLowerCase().includes(search.toLowerCase()) ||
-        v.description.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [violations, search]);
+  const fetchViolations = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = {
+        PageNumber: page,
+        PageSize: pageSize,
+        SearchTerm: debouncedSearch || undefined,
+        OccurredFrom: dateRange[0]
+          ? dateRange[0].format(VIOLATION_REPORT.DATE_FORMATS.API)
+          : undefined,
+        OccurredTo: dateRange[1]
+          ? dateRange[1].format(VIOLATION_REPORT.DATE_FORMATS.API)
+          : undefined,
+        OrderByCreatedAscending: sortOrder === 'asc',
+      };
 
-  const sorted = useMemo(() => {
-    return [...filtered].sort((a, b) => {
-      const timeA = new Date(a.createdAt).getTime() || 0;
-      const timeB = new Date(b.createdAt).getTime() || 0;
-      return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
-    });
-  }, [filtered, sortOrder]);
+      const response = await violationReportService.getReports(params);
 
-  const total = sorted.length;
+      if (response?.data) {
+        const items = response.data.items || [];
+        const mapped = items.map((item) => ({
+          id: item.violationReportId || item.id,
+          name: item.studentName,
+          description: item.description,
+          violationTime: item.occurredDate,
+          reporter: item.mentorName || VIOLATION_REPORT.COMMON.REPORTER_DEFAULT,
+          reporterId: item.createdById,
+          createdAt: item.createdAt,
+          internshipGroupName: item.internshipGroupName,
+          studentCode: item.studentCode,
+          universityName: item.universityName,
+        }));
+
+        setViolations(mapped);
+        setTotal(response.data.totalCount || 0);
+      }
+    } catch (error) {
+      console.error(VIOLATION_REPORT.LOGS.FETCH_ERROR, error);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, pageSize, debouncedSearch, dateRange, sortOrder, VIOLATION_REPORT]);
+
+  useEffect(() => {
+    fetchViolations();
+  }, [fetchViolations]);
+
+  const resetFilters = useCallback(() => {
+    setSearch('');
+    setDateRange([null, null]);
+    setPage(1);
+  }, []);
+
   const totalPages = Math.ceil(total / pageSize);
-  const paginated = useMemo(() => {
-    return sorted.slice((page - 1) * pageSize, page * pageSize);
-  }, [sorted, page, pageSize]);
 
   return {
     search,
     setSearch,
     page,
     setPage,
+    dateRange,
+    setDateRange,
+    handleDateRangeChange: (dates) => {
+      setDateRange(dates || [null, null]);
+      setPage(1);
+    },
     pageSize,
     setPageSize,
     sortOrder,
-    handleSortDate,
-    paginated,
+    resetFilters,
+    paginated: violations,
+    loading,
     total,
     totalPages,
+    refresh: fetchViolations,
   };
 }

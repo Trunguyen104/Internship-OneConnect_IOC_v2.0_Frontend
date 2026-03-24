@@ -1,7 +1,7 @@
 'use client';
 
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
+import { DatePicker, Select } from 'antd';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -35,6 +35,8 @@ export default function GroupManagement() {
     handleArchiveGroup,
     handleCreateGroup,
     handleUpdateGroup,
+    handleViewGroup,
+    handleRemoveStudentFromGroup,
     pagination,
     handleTableChange,
     handlePageSizeChange,
@@ -48,86 +50,112 @@ export default function GroupManagement() {
     unassignedStudents,
     fetchingStudents,
     isTermEditable,
+    filters,
+    handleFilterChange,
   } = useGroupManagement();
 
   const onViewDetailed = (group) => {
-    setViewModal({ open: true, group });
+    handleViewGroup(group);
   };
 
   const onEditGroup = (group) => {
-    setEditModal({ open: true, group });
+    setEditModal({ open: true, group, isAddingStudents: false });
+  };
+
+  const onAddStudents = (group) => {
+    setEditModal({ open: true, group, isAddingStudents: true });
   };
 
   return (
-    <>
-      <div className="flex min-h-0 flex-1 flex-col">
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8 border-0 shadow-sm">
-          <DataTableToolbar className="mb-6">
-            <DataTableToolbar.Search
-              placeholder={GROUP_MANAGEMENT.SEARCH_PLACEHOLDER}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="max-w-xs"
-            />
-
-            <DataTableToolbar.Filters>
-              <div className="flex flex-wrap items-center gap-3">
-                <Select
-                  placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_TERM}
-                  value={termId}
-                  onChange={setTermId}
-                  className="h-9 min-w-[200px]"
-                  options={termOptions}
-                  loading={fetchingTerms}
-                />
-
-                <Select
-                  allowClear
-                  placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_STATUS}
-                  value={activeTab === 'ALL' ? undefined : activeTab}
-                  onChange={setActiveTab}
-                  className="h-9 min-w-[160px]"
-                  options={GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS}
-                  suffixIcon={<FilterOutlined className="text-muted" />}
-                />
-              </div>
-            </DataTableToolbar.Filters>
-
-            <DataTableToolbar.Actions
-              label={GROUP_MANAGEMENT.CREATE_BTN}
-              onClick={() => setCreateModal(true)}
-              icon={<PlusOutlined />}
-              disabled={!isTermEditable}
-            />
-          </DataTableToolbar>
-
-          <GroupTable
-            data={filteredGroups}
-            loading={loading}
-            page={pagination.current}
-            pageSize={pagination.pageSize}
-            isTermEditable={isTermEditable}
-            onAssign={setAssignModal}
-            onDelete={handleDeleteGroup}
-            onArchive={handleArchiveGroup}
-            onView={onViewDetailed}
-            onEdit={onEditGroup}
+    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !rounded-3xl border-none !p-4 shadow-sm sm:!p-8">
+        <DataTableToolbar className="mb-5 !border-0 !p-0">
+          <DataTableToolbar.Search
+            placeholder={GROUP_MANAGEMENT.SEARCH_PLACEHOLDER}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
 
-          {total > 0 && (
-            <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-              <Pagination
-                total={total}
-                page={pagination.current}
-                pageSize={pagination.pageSize}
-                totalPages={Math.ceil(total / pagination.pageSize)}
-                onPageChange={handleTableChange}
-                onPageSizeChange={handlePageSizeChange}
+          <DataTableToolbar.Filters>
+            <div className="flex flex-wrap items-center gap-3">
+              <Select
+                placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_TERM}
+                value={termId}
+                onChange={setTermId}
+                className="h-9 min-w-[200px]"
+                options={termOptions}
+                loading={fetchingTerms}
               />
+
+              <Select
+                allowClear
+                placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_STATUS}
+                value={activeTab === 'ALL' ? undefined : activeTab}
+                onChange={setActiveTab}
+                className="h-9 min-w-[140px]"
+                options={GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS}
+                suffixIcon={<FilterOutlined className="text-muted" />}
+              />
+
+              <DatePicker
+                picker="month"
+                placeholder="Tháng / Năm"
+                className="h-9 w-32"
+                value={filters.dateFilter}
+                onChange={(date) => handleFilterChange('dateFilter', date)}
+                allowClear
+              />
+
+              <label className="flex items-center gap-2 px-2 cursor-pointer transition-colors hover:text-primary">
+                <input
+                  type="checkbox"
+                  checked={filters.includeArchived}
+                  onChange={(e) => handleFilterChange('includeArchived', e.target.checked)}
+                  className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20"
+                />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted/80">
+                  Archived
+                </span>
+              </label>
             </div>
+          </DataTableToolbar.Filters>
+
+          {isTermEditable && (
+            <DataTableToolbar.Actions
+              label={GROUP_MANAGEMENT.CREATE_BTN}
+              onClick={() => setCreateModal({ open: true, group: null })}
+              icon={<PlusOutlined />}
+              className="ml-auto"
+            />
           )}
-        </Card>
-      </div>
+        </DataTableToolbar>
+
+        <GroupTable
+          data={filteredGroups}
+          loading={loading}
+          page={pagination.current}
+          pageSize={pagination.pageSize}
+          isTermEditable={isTermEditable}
+          onAssign={setAssignModal}
+          onDelete={handleDeleteGroup}
+          onArchive={handleArchiveGroup}
+          onView={onViewDetailed}
+          onEdit={onEditGroup}
+        />
+
+        {total > 0 && (
+          <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+            <Pagination
+              total={total}
+              page={pagination.current}
+              pageSize={pagination.pageSize}
+              totalPages={Math.ceil(total / pagination.pageSize)}
+              onPageChange={handleTableChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          </div>
+        )}
+      </Card>
 
       <AssignMentorModal
         open={assignModal.open}
@@ -139,20 +167,35 @@ export default function GroupManagement() {
       <ViewGroupModal
         open={viewModal.open}
         group={viewModal.group}
-        onCancel={() => setViewModal({ open: false, group: null })}
+        loading={viewModal.loading}
+        onCancel={() => setViewModal({ open: false, group: null, loading: false })}
+        onEdit={onEditGroup}
+        onAddStudents={onAddStudents}
+        onArchive={handleArchiveGroup}
+        onDelete={handleDeleteGroup}
+        onRemoveStudent={handleRemoveStudentFromGroup}
       />
 
       <CreateGroupModal
-        open={createModal || editModal.open}
+        open={createModal.open}
+        students={unassignedStudents}
+        existingGroups={filteredGroups}
+        loadingStudents={fetchingStudents}
+        initialStudents={createModal.students || []}
+        onCancel={() => setCreateModal({ open: false, students: [] })}
+        onFinish={handleCreateGroup}
+      />
+
+      <CreateGroupModal
+        open={editModal.open}
         group={editModal.group}
         students={unassignedStudents}
+        existingGroups={filteredGroups}
         loadingStudents={fetchingStudents}
-        onCancel={() => {
-          setCreateModal(false);
-          setEditModal({ open: false, group: null });
-        }}
-        onFinish={editModal.open ? handleUpdateGroup : handleCreateGroup}
+        isAddingStudents={editModal.isAddingStudents}
+        onCancel={() => setEditModal({ open: false, group: null, isAddingStudents: false })}
+        onFinish={handleUpdateGroup}
       />
-    </>
+    </section>
   );
 }

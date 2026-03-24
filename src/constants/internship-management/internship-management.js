@@ -9,7 +9,7 @@ export const TERM_STATUS_VARIANTS = {
   [TERM_STATUS.UPCOMING]: 'info',
   [TERM_STATUS.ACTIVE]: 'success',
   [TERM_STATUS.ENDED]: 'warning',
-  [TERM_STATUS.CLOSED]: 'danger',
+  [TERM_STATUS.CLOSED]: 'default',
 };
 
 export const ENROLLMENT_STATUS = {
@@ -23,13 +23,13 @@ export const PLACEMENT_STATUS = {
 };
 
 export const GROUP_STATUS = {
-  IN_PROGRESS: 0,
-  FINISHED: 1,
-  ARCHIVED: 2,
+  ACTIVE: 1,
+  FINISHED: 2,
+  ARCHIVED: 3,
 };
 
 export const GROUP_STATUS_VARIANTS = {
-  [GROUP_STATUS.IN_PROGRESS]: 'success',
+  [GROUP_STATUS.ACTIVE]: 'success',
   [GROUP_STATUS.FINISHED]: 'info',
   [GROUP_STATUS.ARCHIVED]: 'default',
 };
@@ -40,7 +40,7 @@ export const TERM_STATUS_MAP = Object.fromEntries(
 
 export const INTERNSHIP_MANAGEMENT_UI = {
   GROUP_MANAGEMENT: {
-    TITLE: 'Internship Group Management',
+    TITLE: 'Internship Management',
     TABS: {
       STUDENTS: 'Students',
       GROUPS: 'Internship Groups',
@@ -57,9 +57,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       SELECT_TERM: 'Select Term',
       SELECT_STATUS: 'Select Status',
       STATUS_OPTIONS: [
-        { label: 'Active', value: 0 },
-        { label: 'Finished', value: 1 },
-        { label: 'Archived', value: 2 },
+        { label: 'Active', value: 1 },
+        { label: 'Finished', value: 2 },
+        { label: 'Archived', value: 3 },
       ],
     },
     TABLE: {
@@ -89,29 +89,50 @@ export const INTERNSHIP_MANAGEMENT_UI = {
 
     MODALS: {
       CREATE: {
-        TITLE: 'Create New Internship Group',
-        TITLE_EDIT: 'Edit Internship Group',
-        SUBTITLE: 'Create a new internship group for this term',
-        SUBTITLE_EDIT: 'Update group information and field',
+        TITLE: 'Create Intern Group',
+        TITLE_EDIT: 'Edit Intern Group',
+        SUBTITLE: 'Groups help you organize interns and assign mentors more effectively.',
+        SUBTITLE_EDIT: 'Update group information and member list.',
         SUBMIT: 'Create Group',
         SUBMIT_EDIT: 'Update Group',
         CANCEL: 'Cancel',
         NAME_LABEL: 'Group Name',
+        NAME_PLACEHOLDER: 'Enter group name (e.g., Project Alpha)',
         NAME_REQUIRED: 'Please enter group name',
-        NAME_PLACEHOLDER: 'Ex: Web Frontend A',
-        TRACK_LABEL: 'Track',
-        TRACK_REQUIRED: 'Please select a track',
-        STUDENTS_LABEL: 'Select Students',
-        STUDENTS_PLACEHOLDER: 'Search and select at least 1 student...',
-        STUDENTS_REQUIRED: 'Internship group must have at least 1 student',
-        TRACK_OPTIONS: {
-          FRONTEND: 'Frontend',
-          BACKEND: 'Backend',
-          MOBILE: 'Mobile',
-          DESIGN: 'UI/UX Design',
-        },
-        BULLET: '\u2022',
         DEFAULT_NAME_PREFIX: 'Group ',
+        DUPLICATE_NAME_WARNING:
+          'A group with this name already exists in this internship term. You can still continue.',
+        MULTI_TERM_ERROR:
+          'The selected students belong to different internship terms. Please select students who are in the same active internship term.',
+        CREATE_SUCCESS: 'Internship group created successfully.',
+        TITLE: 'Create New Group',
+        SUBTITLE: 'Set up a group and assign a mentor to students.',
+        TITLE_EDIT: 'Edit Group',
+        SUBTITLE_EDIT: 'Update group information and members.',
+
+        NAME_LABEL: 'Group Name',
+        NAME_PLACEHOLDER: 'Example: Group 01',
+        NAME_REQUIRED: 'Please enter the group name',
+
+        DESCRIPTION_LABEL: 'Description',
+        DESCRIPTION_PLACEHOLDER: 'Short description about the group...',
+
+        MENTOR_LABEL: 'Mentor',
+        MENTOR_PLACEHOLDER: 'Select a mentor',
+
+        START_DATE_LABEL: 'Start Date',
+        END_DATE_LABEL: 'End Date',
+
+        STUDENTS_LABEL: 'Group Members',
+        STUDENTS_PLACEHOLDER: 'Select students...',
+        STUDENTS_REQUIRED: 'Please select at least one student',
+
+        CANCEL: 'Cancel',
+        SUBMIT: 'Create Group',
+        SUBMIT_EDIT: 'Save Changes',
+
+        DEFAULT_NAME_PREFIX: 'Group ',
+        BULLET: '•',
       },
       ASSIGN: {
         TITLE_ASSIGN: 'Assign Mentor',
@@ -130,7 +151,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       VIEW: {
         TITLE: 'Group Details:',
         DEFAULT_SUBTITLE: 'Internship Group Information',
-        TRACK: 'Track / Field',
         STATUS: 'Status',
         MEMBERS: 'Team Members',
         TERM: 'Term / Semester',
@@ -145,15 +165,19 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     MESSAGES: {
       MENTOR_CHANGED: 'Mentor changed successfully. Reason:',
       ASSIGN_SUCCESS: 'Mentor & Project assigned successfully',
-      DELETE_ERROR_STU:
-        'Cannot delete a group with active students. Please transfer students first.',
-      DELETE_CONFIRM_TITLE: 'Delete Group',
-      DELETE_CONFIRM_TEXT: 'Are you sure you want to delete the group',
-      DELETE_SUCCESS: 'Group disbanded successfully',
+      DELETE_ERROR_HAS_STUDENTS:
+        'Cannot delete a group with students. Please transfer or remove all students first.',
+      DELETE_ERROR_HAS_DATA:
+        'Group already has activity data (Logbooks/Projects/Evaluations), cannot delete. Please use the Archive function to preserve history.',
+      DELETE_CONFIRM_TITLE: 'Delete Intern Group',
+      DELETE_CONFIRM_TEXT: 'Are you sure you want to permanently delete the group',
+      DELETE_SUCCESS: 'Group deleted successfully',
       CREATE_SUCCESS: 'Group created successfully',
-      ARCHIVE_CONFIRM_TITLE: 'Archive Group',
+      UPDATE_SUCCESS: 'Group updated successfully',
+      ARCHIVE_CONFIRM_TITLE: 'Archive Intern Group',
       ARCHIVE_CONFIRM_TEXT: 'Are you sure you want to archive the group',
       ARCHIVE_SUCCESS: 'Group archived successfully',
+      ERROR: 'Action failed. Please try again.',
     },
   },
   INTERNSHIP_LIST: {
@@ -181,9 +205,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       ALL_STATUSES: 'All Statuses',
       STATUS_OPTIONS: [
         { label: 'All Statuses', value: 'ALL' },
-        { label: 'Pending', value: '0' },
-        { label: 'Placed', value: '1' },
-        { label: 'Rejected', value: '3' },
+        { label: 'Pending', value: 1 },
+        { label: 'Placed', value: 2 },
+        { label: 'Rejected', value: 3 },
       ],
       FILTER_BTN: 'Filter',
       ALL_STUDENTS: 'All Students',
@@ -220,7 +244,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     },
     STATUS_LABELS: {
       PENDING: 'Pending',
-      ACCEPTED: 'Accepted',
+      ACCEPTED: 'Placed',
       REJECTED: 'Rejected',
       REVOKED: 'Revoked',
     },
@@ -232,6 +256,11 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       ADD_TO_GROUP: 'Add to Group',
       VIEW_BIO: 'View Full Profile',
       BULK_ACTIONS: 'Bulk Actions',
+    },
+    BADGES: {
+      NO_GROUP: 'No Group',
+      NO_MENTOR: 'No Mentor',
+      NO_PROJECT: 'No Project',
     },
     MODALS: {
       ADD: {
@@ -292,24 +321,28 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         SUBMIT: 'Assign Mentor',
       },
       GROUP_ACTION: {
-        TITLE_ADD: 'Add to Existing Group',
-        TITLE_CHANGE: 'Change Student Group',
-        STUDENT_LABEL: 'Student:',
-        GROUP_LABEL: 'Select Target Group',
-        GROUP_REQUIRED: 'Please select a group',
-        GROUP_PLACEHOLDER: 'Search Group',
-        STUDENTS_SUFFIX: 'students',
-        STUDENTS_SELECTED: 'students selected',
-        REASON_LABEL: 'Reason for change',
-        REASON_REQUIRED: 'Please enter a reason',
-        REASON_PLACEHOLDER: 'Reason for group change...',
-        CANCEL: 'Cancel',
-        SUBMIT_ADD: 'Confirm Addition',
-        SUBMIT_CHANGE: 'Confirm Change',
-        NO_MENTOR: 'No Mentor',
-        CURRENT_GROUP: 'Current Group',
-        SEPARATOR: ' \u2014 ',
+        TITLE_ADD: 'Thêm vào nhóm có sẵn',
+        TITLE_CHANGE: 'Đổi nhóm thực tập',
+        STUDENT_LABEL: 'Sinh viên được chọn:',
+        STUDENTS_SELECTED: 'sinh viên',
+        GROUP_LABEL: 'Chọn nhóm thực tập',
+        GROUP_PLACEHOLDER: 'Tìm và chọn nhóm...',
+        GROUP_REQUIRED: 'Vui lòng chọn nhóm',
+        NO_MENTOR: 'Chưa có mentor',
+        STUDENTS_SUFFIX: 'SV',
+        SEPARATOR: ' | ',
         SPACE: ' ',
+        CURRENT_GROUP: 'Nhóm hiện tại',
+        ONLY_GROUP_ERROR: 'Tất cả sinh viên đã thuộc nhóm này.',
+        SUBMIT_ADD: 'Thêm vào nhóm',
+        SUBMIT_CHANGE: 'Đổi nhóm',
+        CANCEL: 'Hủy',
+        CHANGE_CONFIRM_TITLE: 'Xác nhận đổi nhóm',
+        CHANGE_CONFIRM_CONTENT:
+          'Bạn có chắc muốn đổi nhóm cho {student} từ {oldGroup} sang {newGroup}?',
+        EMPTY_STATE: 'Hiện chưa có nhóm nào trong kỳ này.',
+        EMPTY_SUGGESTION:
+          "Bạn có thể chọn 'Tạo nhóm mới' để tạo nhóm và thêm sinh viên ngay tại đây.",
       },
       DETAIL: {
         TITLE: 'Student Information',
@@ -327,15 +360,16 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
     },
     MESSAGES: {
-      ACCEPT_CONFIRM_TITLE: 'Accept Student',
-      ACCEPT_CONFIRM_CONTENT: 'Are you sure you want to accept student',
-      ACCEPT_CONFIRM_OK: 'Accept',
-      ACCEPT_SUCCESS: 'Student accepted successfully',
-      ADD_SUCCESS: 'Student added successfully',
-      REJECT_SUCCESS: 'Application rejected successfully',
-      ASSIGN_SUCCESS: 'Mentor & Project assigned successfully',
-      GROUP_ADD_SUCCESS: 'Added to group successfully',
-      GROUP_CHANGE_SUCCESS: 'Group changed successfully',
+      ACCEPT_SUCCESS: 'Đã chấp nhận sinh viên vào thực tập.',
+      REJECT_SUCCESS: 'Đã từ chối đơn đăng ký.',
+      ASSIGN_SUCCESS: 'Đã gán học viên cho mentor.',
+      GROUP_ADD_SUCCESS: 'Đã thêm sinh viên vào nhóm.',
+      GROUP_CHANGE_SUCCESS: 'Đã thay đổi nhóm cho sinh viên.',
+      ACCEPT_CONFIRM_TITLE: 'Chấp nhận sinh viên',
+      ACCEPT_CONFIRM_CONTENT: 'Bạn có chắc muốn chấp nhận sinh viên',
+      ACCEPT_CONFIRM_OK: 'Chấp nhận',
+      REJECT_CONFIRM_TITLE: 'Từ chối sinh viên',
+      REJECT_CONFIRM_OK: 'Từ chối',
     },
   },
   UNI_ADMIN: {
@@ -606,6 +640,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
             FULL_NAME: 'Full Name',
             STUDENT_ID: 'Student ID',
             EMAIL: 'Email',
+            PHONE: 'Phone',
+            DOB: 'Date of Birth',
+            MAJOR: 'Major',
             VALIDITY: 'Validity',
           },
           TOOLTIPS: {
@@ -682,6 +719,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           STUDENT_CODE: 'Student Code',
           INTERN_GROUP: 'Intern Group',
           CREATED_BY: 'Created By',
+          CREATE_TIME: 'Create Time',
+          VIOLATION_TIME: 'Violation Time',
           DATE_INFO: 'Date Information',
           DESCRIPTION: 'Description',
           ACTIONS: 'Actions',
@@ -755,6 +794,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         DASH_SEPARATOR: ' \u2014 ',
         LEFT_PAREN: '(',
         RIGHT_PAREN: ')',
+        REPORTER_DEFAULT: 'Reporter',
       },
       LOGS: {
         FETCH_ERROR: 'Fetch violations failed:',
