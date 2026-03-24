@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  CalendarOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
@@ -39,10 +38,13 @@ const GroupTable = memo(function GroupTable({
       {
         title: '#',
         key: 'index',
-        width: 40,
+        width: 80,
         align: 'center',
-        render: (_, __, index) => (page - 1) * pageSize + index + 1,
-        className: 'text-muted font-semibold text-xs',
+        render: (_, __, index) => (
+          <span className="text-muted font-mono text-xs font-bold">
+            {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
+          </span>
+        ),
       },
       {
         title: TABLE.COLUMNS.GROUP_NAME,
@@ -57,27 +59,24 @@ const GroupTable = memo(function GroupTable({
       },
       {
         title: TABLE.COLUMNS.TERM,
-        dataIndex: 'term',
-        key: 'term',
+        key: 'termName',
         width: 140,
-        render: (text) => (
+        render: (_, record) => (
           <div className="flex items-center gap-1.5">
-            <CalendarOutlined className="text-muted text-xs opacity-60" />
             <span className="text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60">
-              {text || TABLE.NOT_ASSIGNED}
+              {record.termName || TABLE.NOT_ASSIGNED}
             </span>
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.MENTOR,
-        dataIndex: 'mentorName',
-        key: 'mentor',
+        key: 'mentorName',
         width: 160,
-        render: (name) => {
-          return name ? (
+        render: (_, record) => {
+          const name = record.mentorName;
+          return name && name !== '-' ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
-              <div className="bg-primary h-1.5 w-1.5 shrink-0 rounded-full" />
               <span className="text-text truncate text-xs font-bold">{name}</span>
             </div>
           ) : (
@@ -89,14 +88,13 @@ const GroupTable = memo(function GroupTable({
       },
       {
         title: TABLE.COLUMNS.MEMBERS,
-        dataIndex: 'memberCount',
         key: 'members',
         width: 120,
         align: 'center',
-        render: (count) => (
+        render: (_, record) => (
           <div className="flex items-center justify-center gap-2">
             <UserOutlined className="text-muted text-xs opacity-60" />
-            <span className="text-muted text-xs font-bold">{count}</span>
+            <span className="text-muted text-xs font-bold">{record.memberCount ?? 0}</span>
           </div>
         ),
       },
@@ -109,8 +107,9 @@ const GroupTable = memo(function GroupTable({
         render: (status) => {
           const variant = GROUP_STATUS_VARIANTS[status] || 'default';
           const label =
-            INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.STATUS_OPTIONS.find((o) => o.value === status)
-              ?.label || '-';
+            INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS.find(
+              (o) => o.value === status
+            )?.label || '-';
           return (
             <Badge variant={variant} size="sm">
               {label}
@@ -119,27 +118,27 @@ const GroupTable = memo(function GroupTable({
         },
       },
       {
-        title: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TABLE.COLUMNS.ACTIONS,
+        title: TABLE.COLUMNS.ACTION,
         key: 'actions',
         width: 60,
         align: 'center',
         render: (_, record) => {
-          // 2 = Archived
-          const isArchived = record.status === 2;
+          const isArchived = record.status === 3;
+          const isActive = record.status === 1;
+
           const items = [
             {
               key: 'view',
-              label: CARD.VIEW_DETAILS,
+              label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.VIEW,
               icon: <EyeOutlined className="text-primary" />,
               onClick: () => onView(record),
             },
-            ...(!isArchived
+            ...(isActive && isTermEditable
               ? [
                   {
                     key: 'edit',
-                    label: CARD.EDIT_GROUP || 'Edit Group',
+                    label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.EDIT,
                     icon: <EditOutlined className="text-primary" />,
-                    disabled: !isTermEditable,
                     onClick: () => onEdit(record),
                   },
                   {
@@ -150,26 +149,24 @@ const GroupTable = memo(function GroupTable({
                     ) : (
                       <UserAddOutlined className="text-primary" />
                     ),
-                    disabled: !isTermEditable,
                     onClick: () => onAssign(record),
                   },
                   {
                     key: 'archive',
-                    label: CARD.ARCHIVE_TOOLTIP,
+                    label: INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.ARCHIVE_TOOLTIP,
                     icon: <InboxOutlined className="text-warning" />,
-                    disabled: !isTermEditable || record.termStatus !== 2,
                     onClick: () => onArchive(record),
+                  },
+                  { type: 'divider' },
+                  {
+                    key: 'delete',
+                    label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.DELETE,
+                    icon: <DeleteOutlined className="text-danger" />,
+                    danger: true,
+                    onClick: () => onDelete(record),
                   },
                 ]
               : []),
-            { type: 'divider' },
-            {
-              key: 'delete',
-              label: CARD.DELETE_TOOLTIP,
-              icon: <DeleteOutlined className="text-danger" />,
-              danger: true,
-              onClick: () => onDelete(record),
-            },
           ];
 
           return (
@@ -179,7 +176,7 @@ const GroupTable = memo(function GroupTable({
                   type="text"
                   size="small"
                   icon={<MoreOutlined />}
-                  className="hover:bg-primary/10 text-muted flex h-8 w-8 items-center justify-center rounded-lg"
+                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
                 />
               </Dropdown>
             </div>

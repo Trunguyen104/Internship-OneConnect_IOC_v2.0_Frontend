@@ -64,7 +64,7 @@ export default function DataTableToolbar({
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
           {searchProps && <Search {...searchProps} />}
           {filterContent && <Filters>{filterContent}</Filters>}
-          {actionProps && <Actions {...actionProps} />}
+          {actionProps && <Actions {...actionProps} className="ml-auto" />}
         </div>
       </div>
     );

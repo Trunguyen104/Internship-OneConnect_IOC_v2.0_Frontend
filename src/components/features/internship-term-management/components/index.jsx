@@ -1,7 +1,7 @@
 'use client';
 
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
+import { Button, Select } from 'antd';
 import React from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
@@ -70,12 +70,15 @@ export default function InternshipTermManagement() {
               suffixIcon={<FilterOutlined className="text-muted/60" />}
             />
           </DataTableToolbar.Filters>
-          <DataTableToolbar.Actions
-            label={TERM_MANAGEMENT.CREATE_BTN}
-            onClick={handleCreateNew}
+
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
-            className="ml-auto"
-          />
+            onClick={handleCreateNew}
+            className="!h-10 !rounded-xl shadow-md ml-auto"
+          >
+            {TERM_MANAGEMENT.CREATE_BTN}
+          </Button>
         </DataTableToolbar>
 
         <TermTable

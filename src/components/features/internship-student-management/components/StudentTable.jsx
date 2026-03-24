@@ -20,8 +20,6 @@ import {
   TERM_STATUS_VARIANTS,
 } from '@/constants/internship-management/internship-management';
 
-import { ENTERPRISE_STUDENT_UI } from '../constants/enterprise-student.constants';
-
 const STATUS_CONFIG = {
   Pending: {
     icon: <MinusCircleFilled className="text-warning" />,
@@ -55,30 +53,30 @@ const StudentTable = memo(function StudentTable({
   onReject,
   onAssign,
   onCreateGroup,
+  onAddToGroup,
   onChangeGroup,
   isTermEditable,
+  hasGroups,
   sortBy,
   sortOrder,
   onSort,
-  selectedRowKeys = [],
-  onSelectRowChange,
+  emptyText,
 }) {
-  const { TABLE, ACTIONS, BADGES, STATUS } = ENTERPRISE_STUDENT_UI;
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectRowChange,
-  };
+  const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
+  const { TABLE, ACTIONS, STATUS_LABELS } = INTERNSHIP_LIST;
 
   const columns = useMemo(
     () => [
       {
         title: '#',
         key: 'index',
-        width: '60px',
+        width: 80,
         align: 'center',
-        render: (_, __, index) => (page - 1) * pageSize + index + 1,
-        className: 'text-muted font-semibold text-xs',
+        render: (_, __, index) => (
+          <span className="text-muted font-mono text-xs font-bold">
+            {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
+          </span>
+        ),
       },
       {
         title: TABLE.COLUMNS.FULL_NAME,
@@ -104,16 +102,6 @@ const StudentTable = memo(function StudentTable({
         ),
       },
       {
-        title: TABLE.COLUMNS.EMAIL,
-        key: 'studentEmail',
-        width: '180px',
-        render: (_, record) => (
-          <span className="text-muted text-xs truncate max-w-[170px] inline-block">
-            {record.studentEmail || '-'}
-          </span>
-        ),
-      },
-      {
         title: TABLE.COLUMNS.STATUS,
         dataIndex: 'status',
         key: 'status',
@@ -121,19 +109,19 @@ const StudentTable = memo(function StudentTable({
         width: '100px',
         align: 'center',
         render: (statusIdx) => {
-          // Backend Enum: 0=Pending, 1=Approved, 3=Rejected
-          let statusText = 'Pending';
-          if (statusIdx === 1) statusText = 'Approved';
-          if (statusIdx === 3) statusText = 'Rejected';
+          const config =
+            statusIdx === 2
+              ? STATUS_CONFIG.Approved
+              : statusIdx === 3
+                ? STATUS_CONFIG.Rejected
+                : STATUS_CONFIG.Pending;
 
-          const config = STATUS_CONFIG[statusText] || STATUS_CONFIG.default;
-          // Map to UI Label
           const uiLabel =
-            statusText === 'Approved'
-              ? STATUS.ACCEPTED
-              : statusText === 'Rejected'
-                ? STATUS.REJECTED
-                : STATUS.PENDING;
+            statusIdx === 2
+              ? STATUS_LABELS.ACCEPTED
+              : statusIdx === 3
+                ? STATUS_LABELS.REJECTED
+                : STATUS_LABELS.PENDING;
 
           return (
             <span
@@ -185,17 +173,18 @@ const StudentTable = memo(function StudentTable({
         key: 'group',
         width: '150px',
         render: (_, record) => {
-          // If approved but no group
-          if (record.status === 1 && !record.groupId) {
+          const isPlaced = record.status === 2;
+
+          if (isPlaced && !record.groupId) {
             return (
               <span
-                className={`${!isTermEditable ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-warning/20'} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
+                className={`${record.termStatus !== 2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-warning/20'} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (isTermEditable) onCreateGroup(record);
+                  if (record.termStatus === 2) onCreateGroup(record);
                 }}
               >
-                {BADGES.NO_GROUP}
+                {INTERNSHIP_LIST.BADGES.NO_GROUP}
               </span>
             );
           }
@@ -213,10 +202,10 @@ const StudentTable = memo(function StudentTable({
                     },
                   ],
                 }}
-                trigger={isTermEditable ? ['click'] : []}
+                trigger={record.termStatus === 2 ? ['click'] : []}
               >
                 <span
-                  className={`${isTermEditable ? 'text-primary cursor-pointer underline-offset-2 hover:underline' : 'text-muted cursor-default'} text-xs font-medium transition-all`}
+                  className={`${record.termStatus === 2 ? 'text-primary cursor-pointer underline-offset-2 hover:underline' : 'text-muted cursor-default'} text-xs font-medium transition-all`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   {record.groupName}
@@ -236,7 +225,7 @@ const StudentTable = memo(function StudentTable({
         ),
       },
       {
-        title: TABLE.COLUMNS.ACTIONS,
+        title: TABLE.COLUMNS.ACTION,
         key: 'actions',
         width: '80px',
         align: 'center',
@@ -247,42 +236,34 @@ const StudentTable = memo(function StudentTable({
           const menuItems = [
             {
               key: 'view',
-              label: ACTIONS.VIEW_DETAIL,
+              label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.VIEW,
               icon: <EyeOutlined />,
               onClick: () => onView(record),
             },
           ];
 
-          if (isApproved) {
+          const isEditable = record.termStatus === 2;
+
+          if (isApproved && isEditable) {
             menuItems.push({
               key: 'assign',
               label: ACTIONS.ASSIGN,
               icon: <UserAddOutlined />,
-              disabled: !isTermEditable,
               onClick: () => onAssign(record),
-            });
-            menuItems.push({
-              key: 'changeGroup',
-              label: ACTIONS.CHANGE_GROUP,
-              icon: <UsergroupAddOutlined />,
-              disabled: !isTermEditable,
-              onClick: () => onChangeGroup(record),
             });
           }
 
-          if (isPending) {
+          if (isPending && isEditable) {
             menuItems.push({
               key: 'accept',
               label: ACTIONS.ACCEPT,
               icon: <CheckCircleFilled className="text-success" />,
-              disabled: !isTermEditable,
               onClick: () => onAccept(record),
             });
             menuItems.push({
               key: 'reject',
               label: ACTIONS.REJECT,
               icon: <CloseCircleFilled className="text-danger" />,
-              disabled: !isTermEditable,
               onClick: () => onReject(record),
             });
           }
@@ -291,10 +272,9 @@ const StudentTable = memo(function StudentTable({
             <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
               <Button
                 type="text"
-                icon={
-                  <MoreOutlined className="text-muted hover:text-primary transition-colors text-lg" />
-                }
-                className="flex items-center justify-center opacity-70 hover:opacity-100"
+                size="small"
+                icon={<MoreOutlined />}
+                className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
               />
             </Dropdown>
           );
@@ -312,8 +292,7 @@ const StudentTable = memo(function StudentTable({
       onChangeGroup,
       isTermEditable,
       ACTIONS,
-      BADGES,
-      STATUS,
+      STATUS_LABELS,
       TABLE.COLUMNS,
     ]
   );
@@ -324,13 +303,13 @@ const StudentTable = memo(function StudentTable({
       data={data}
       loading={loading}
       rowKey="id"
-      rowSelection={rowSelection}
       pagination={false}
       sortBy={sortBy}
       sortOrder={sortOrder}
       onSort={onSort}
       minWidth="800px"
       tableLayout="fixed"
+      emptyText={emptyText}
       className="no-scrollbar mt-2 min-h-0 flex-1"
     />
   );

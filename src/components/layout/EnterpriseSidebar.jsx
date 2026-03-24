@@ -21,12 +21,8 @@ const enterpriseMenu = [
   },
   {
     icon: <SolutionOutlined />,
-    label: 'Internship Students',
-    href: '/internship-student-management',
-  },
-  {
-    label: 'Internship Groups',
-    href: '/internship-group-management',
+    label: 'Internship Management',
+    href: '/internship-management',
   },
   {
     icon: <WarningOutlined />,

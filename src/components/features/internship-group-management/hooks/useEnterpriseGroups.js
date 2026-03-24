@@ -5,7 +5,14 @@ import { useToast } from '@/providers/ToastProvider';
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
-export const useEnterpriseGroups = ({ termId, filters, search, pagination, sort }) => {
+export const useEnterpriseGroups = ({
+  termId,
+  filters,
+  search,
+  pagination,
+  sort,
+  termOptions = [],
+}) => {
   const toast = useToast();
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
@@ -17,11 +24,14 @@ export const useEnterpriseGroups = ({ termId, filters, search, pagination, sort 
     try {
       setLoading(true);
       const params = {
-        termId,
-        pageIndex: pagination.current,
-        pageSize: pagination.pageSize,
-        searchTerm: search,
-        status: filters.status, // 0 = InProgress, 1 = Finished, 2 = Archived
+        TermId: termId,
+        PageIndex: pagination.current,
+        PageSize: pagination.pageSize,
+        Search: search,
+        Status: filters.status, // 0 = InProgress, 1 = Finished, 2 = Archived
+        IncludeArchived: filters.includeArchived,
+        Month: filters.dateFilter ? filters.dateFilter.month() + 1 : undefined,
+        Year: filters.dateFilter ? filters.dateFilter.year() : undefined,
         SortColumn: sort?.column,
         SortOrder: sort?.order,
       };
@@ -30,10 +40,19 @@ export const useEnterpriseGroups = ({ termId, filters, search, pagination, sort 
 
       if (response?.data?.items) {
         setData(
-          response.data.items.map((item) => ({
-            ...item,
-            id: item.id || item.groupId, // Mapping the ID consistently
-          }))
+          response.data.items.map((item) => {
+            const term = termOptions.find(
+              (t) => t.value?.toLowerCase() === item.termId?.toLowerCase()
+            );
+            return {
+              ...item,
+              id: item.internshipId || item.id || item.groupId,
+              name: item.groupName || item.GroupName || item.name,
+              termName: item.termName || item.TermName || term?.label || '-',
+              memberCount: item.numberOfMembers ?? item.NumberOfMembers ?? item.memberCount ?? 0,
+              mentorName: item.mentorName || item.MentorName || '-',
+            };
+          })
         );
         setTotal(response.data.totalCount || 0);
       } else {
@@ -48,7 +67,18 @@ export const useEnterpriseGroups = ({ termId, filters, search, pagination, sort 
     } finally {
       setLoading(false);
     }
-  }, [termId, pagination, search, filters?.status, sort?.column, sort?.order, toast]);
+  }, [
+    termId,
+    pagination,
+    search,
+    filters?.status,
+    filters?.includeArchived,
+    filters?.dateFilter,
+    sort?.column,
+    sort?.order,
+    termOptions,
+    toast,
+  ]);
 
   useEffect(() => {
     fetchGroups();

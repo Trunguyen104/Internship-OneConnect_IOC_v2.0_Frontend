@@ -141,6 +141,7 @@ export default function TermStudentManagement() {
               {MESSAGES.BULK_WITHDRAW.ACTION_LABEL}
               {selectedIds.length > 0 && ` (${selectedIds.length})`}
             </Button>
+
             <Dropdown
               disabled={isClosed}
               trigger={['click']}
@@ -167,7 +168,7 @@ export default function TermStudentManagement() {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                className="!h-10 !rounded-xl shadow-md"
+                className="!h-10 !rounded-xl shadow-md px-4 font-semibold"
               >
                 {ACTIONS.ADD}
               </Button>

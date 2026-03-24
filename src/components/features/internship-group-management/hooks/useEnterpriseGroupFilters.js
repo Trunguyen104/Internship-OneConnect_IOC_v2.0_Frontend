@@ -21,7 +21,9 @@ export const useEnterpriseGroupFilters = () => {
         const terms = res?.data?.terms || [];
 
         if (terms.length > 0) {
-          setTermOptions(terms.map((t) => ({ label: t.termName, value: t.termId })));
+          setTermOptions(
+            terms.map((t) => ({ label: t.termName, value: t.termId, status: t.status }))
+          );
           // Priority to Active term if possible, otherwise first one
           setTermId(terms[0].termId);
         }
@@ -37,9 +39,10 @@ export const useEnterpriseGroupFilters = () => {
   const debouncedSearch = useDebounce(searchValue, 300);
 
   const [filters, setFilters] = useState({
-    status: null, // 0 = InProgress, 1 = Finished, 2 = Archived
+    status: null,
+    includeArchived: false,
+    dateFilter: null, // Month/Year
   });
-
   const [sort, setSort] = useState({
     column: 'CreatedAt',
     order: 'desc',
@@ -58,7 +61,7 @@ export const useEnterpriseGroupFilters = () => {
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters({ status: null });
+    setFilters({ status: null, includeArchived: false, dateFilter: null });
     setSearchValue('');
     setSort({ column: 'CreatedAt', order: 'desc' });
     setPagination(DEFAULT_PAGINATION);

@@ -12,7 +12,11 @@ const cleanPayload = (obj) => {
 
 export const EnterpriseStudentService = {
   async getApplications(params = {}) {
-    const cleanParams = cleanPayload(params);
+    const finalParams = { ...params };
+    if (finalParams.TermId === 'ALL_ACTIVE') {
+      delete finalParams.TermId;
+    }
+    const cleanParams = cleanPayload(finalParams);
     return httpGet(BASE_URL, cleanParams);
   },
 
@@ -43,14 +47,14 @@ export const EnterpriseStudentService = {
     const studentId = item.StudentId || item.studentId;
     const termId = item.TermId || item.termId || item.internshipTermId;
 
-    // Chuẩn hóa status sang số để tránh lỗi so sánh string/number
+    // Align with backend: Pending = 1, Approved = 2, Rejected = 3
     let rawStatus = item.Status !== undefined ? item.Status : item.status;
     if (typeof rawStatus === 'string') {
-      if (rawStatus === 'Pending') rawStatus = 0;
-      else if (rawStatus === 'Approved') rawStatus = 1;
+      if (rawStatus === 'Pending') rawStatus = 1;
+      else if (rawStatus === 'Approved') rawStatus = 2;
       else if (rawStatus === 'Rejected') rawStatus = 3;
     }
-    const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 0;
+    const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 1;
 
     console.log(`[DEBUG] Member ${item.studentFullName || 'N/A'}:`, {
       applicationId,
@@ -78,6 +82,7 @@ export const EnterpriseStudentService = {
       major: item.major || item.Major || '-',
       status,
       appliedAt: item.appliedAt || item.AppliedAt,
+      termStatus: item.termStatus || item.TermStatus || item.statusTerm || 0,
       groupName: item.groupName || item.GroupName,
       mentorName: item.mentorName || item.MentorName,
       projectName: item.projectName || item.ProjectName,
