@@ -25,8 +25,6 @@ async function handler(req, { params }) {
       ? `${API_ROOT}/${pathStr}${searchString}`
       : `${API_ROOT}/v1/${pathStr}${searchString}`;
 
-    console.log(`PROXY TARGET: ${req.method} ${url}`);
-
     const headers = new Headers();
     const contentType = req.headers.get('content-type');
     if (contentType) {
@@ -61,7 +59,6 @@ async function handler(req, { params }) {
     }
 
     const res = await fetch(url, requestOptions);
-    console.log(`PROXY RESPONSE: ${res.status} from ${url}`);
 
     const contentTypeRes = res.headers.get('content-type');
     const contentDisposition = res.headers.get('content-disposition');

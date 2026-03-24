@@ -56,14 +56,6 @@ export const EnterpriseStudentService = {
     }
     const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 1;
 
-    console.log(`[DEBUG] Member ${item.studentFullName || 'N/A'}:`, {
-      applicationId,
-      studentId,
-      termId,
-      status, // 0=Pending, 1=Approved, 3=Rejected
-      rawStatus: item.Status || item.status,
-    });
-
     return {
       ...item,
       id: applicationId,

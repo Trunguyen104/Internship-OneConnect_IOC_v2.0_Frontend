@@ -4,6 +4,7 @@ export const DAILY_REPORT_UI = {
 
   CREATE_BUTTON: 'Create Report',
   LOADING: 'Loading logbooks...',
+  DATE_FORMAT: 'DD/MM/YYYY',
 
   FILTER_STATUS: 'Filter by status',
 
@@ -24,6 +25,13 @@ export const DAILY_REPORT_UI = {
     PUNCTUAL: 'Punctual',
     LATE: 'Late',
     UNKNOWN: 'Unknown',
+  },
+  LOGBOOK_STATUS: {
+    SUBMITTED: 0,
+    APPROVED: 1,
+    NEEDS_REVISION: 2,
+    PUNCTUAL: 4,
+    LATE: 5,
   },
 
   MODAL: {
@@ -63,6 +71,7 @@ export const DAILY_REPORT_UI = {
   EMPTY: {
     NO_PROJECT: 'You have not been assigned to any project.',
     NO_LOGBOOK: 'No logbook found in this group',
+    DESCRIPTION: 'Keep track of your learning journey! Start by adding your first daily report.',
   },
 
   VIEW_MODAL: {

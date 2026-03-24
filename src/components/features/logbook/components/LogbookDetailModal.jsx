@@ -28,7 +28,7 @@ const LogbookDetailModal = memo(function LogbookDetailModal({ visible, record, o
         <div>
           <Text type="secondary">{FORM.REPORT_DATE}</Text>
           <br />
-          <Text strong>{dayjs(record.dateReport).format('DD/MM/YYYY')}</Text>
+          <Text strong>{dayjs(record.dateReport).format(DAILY_REPORT_UI.DATE_FORMAT)}</Text>
         </div>
 
         <div>

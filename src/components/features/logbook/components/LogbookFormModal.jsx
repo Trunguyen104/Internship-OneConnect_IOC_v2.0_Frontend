@@ -48,7 +48,7 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
         <DatePicker
           placeholder={FORM.PLACEHOLDER_DATE}
           className="w-full !cursor-default"
-          format="DD/MM/YYYY"
+          format={DAILY_REPORT_UI.DATE_FORMAT}
           disabledDate={(current) => current && current > dayjs().endOf('day')}
           disabled={!!editingId}
           inputReadOnly={!!editingId}

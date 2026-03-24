@@ -50,7 +50,6 @@ export function useProject(initialProjectId = null) {
         });
         setResources(items);
       } catch (err) {
-        console.error('Load resources error:', err);
         toast.error(PROJECT_MESSAGES.ERROR.LOAD_RESOURCES);
       } finally {
         setLoading(false);
@@ -101,7 +100,6 @@ export function useProject(initialProjectId = null) {
         setProjectInfo(detailRes.data);
       }
     } catch (error) {
-      console.error('Failed to init project', error);
       toast.error(PROJECT_MESSAGES.ERROR.LOAD_PROJECT_FAILED);
     } finally {
       setLoading(false);
@@ -203,7 +201,6 @@ export function useProject(initialProjectId = null) {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
       }
     } catch (err) {
-      console.error('Upload error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
       return false;
     } finally {
@@ -221,7 +218,6 @@ export function useProject(initialProjectId = null) {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.DELETE_FAILED);
       }
     } catch (err) {
-      console.error('Delete error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.DELETE_FAILED);
     }
   };
@@ -262,7 +258,6 @@ export function useProject(initialProjectId = null) {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
       }
     } catch (err) {
-      console.error('Update error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
     }
   };
@@ -279,8 +274,6 @@ export function useProject(initialProjectId = null) {
     }
 
     try {
-      console.log('🚀 Authenticated Proxy Download:', resource.projectResourceId);
-
       const rawBlob = await downloadProjectResource(resource.projectResourceId);
 
       if (!rawBlob || rawBlob.size === 0) {
@@ -303,7 +296,6 @@ export function useProject(initialProjectId = null) {
 
       downloadBlob(rawBlob, defaultFileName);
     } catch (err) {
-      console.error('Download error:', err);
       toast.error(err.message || 'Could not download file.');
     }
   };
