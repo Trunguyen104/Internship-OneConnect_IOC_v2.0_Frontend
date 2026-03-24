@@ -53,7 +53,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
   };
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden>
+    <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden closable={false}>
       <CompoundModal.Header
         icon={<UserOutlined />}
         title={ASSIGN.TITLE}
@@ -69,7 +69,7 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        className="p-6 pt-8"
+        className="px-8 py-6"
         requiredMark={false}
       >
         <Form.Item
@@ -112,10 +112,9 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
 
         <CompoundModal.Footer
           cancelText={ASSIGN.CANCEL}
-          submitText={ASSIGN.SUBMIT}
+          confirmText={ASSIGN.SUBMIT}
           onCancel={onCancel}
-          onSubmit={() => form.submit()}
-          className="mt-8 pt-6"
+          onConfirm={() => form.submit()}
         />
       </Form>
     </CompoundModal>

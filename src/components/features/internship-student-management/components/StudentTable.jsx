@@ -60,6 +60,8 @@ const StudentTable = memo(function StudentTable({
   sortBy,
   sortOrder,
   onSort,
+  selectedRowKeys,
+  onSelectRowChange,
   emptyText,
 }) {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
@@ -178,11 +180,7 @@ const StudentTable = memo(function StudentTable({
           if (isPlaced && !record.groupId) {
             return (
               <span
-                className={`${record.termStatus !== 2 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-warning/20'} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (record.termStatus === 2) onCreateGroup(record);
-                }}
+                className={`${record.termStatus !== 2 ? 'opacity-50' : ''} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
               >
                 {INTERNSHIP_LIST.BADGES.NO_GROUP}
               </span>
@@ -190,27 +188,15 @@ const StudentTable = memo(function StudentTable({
           }
           if (record.groupName) {
             return (
-              <Dropdown
-                menu={{
-                  items: [
-                    {
-                      key: 'change',
-                      label: ACTIONS.CHANGE_GROUP,
-                      icon: <UsergroupAddOutlined />,
-                      disabled: !isTermEditable,
-                      onClick: () => onChangeGroup(record),
-                    },
-                  ],
+              <span
+                className={`${record.termStatus === 2 ? 'text-primary cursor-pointer underline hover:text-primary-hover' : 'text-muted cursor-default'} text-xs font-medium transition-all`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (record.termStatus === 2) onChangeGroup(record);
                 }}
-                trigger={record.termStatus === 2 ? ['click'] : []}
               >
-                <span
-                  className={`${record.termStatus === 2 ? 'text-primary cursor-pointer underline-offset-2 hover:underline' : 'text-muted cursor-default'} text-xs font-medium transition-all`}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {record.groupName}
-                </span>
-              </Dropdown>
+                {record.groupName}
+              </span>
             );
           }
           return <span className="text-muted text-xs">-</span>;
@@ -268,6 +254,15 @@ const StudentTable = memo(function StudentTable({
             });
           }
 
+          if (isApproved && isEditable && !record.groupId) {
+            menuItems.push({
+              key: 'createGroup',
+              label: ACTIONS.CREATE_GROUP,
+              icon: <UsergroupAddOutlined />,
+              onClick: () => onCreateGroup(record),
+            });
+          }
+
           return (
             <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
               <Button
@@ -307,6 +302,10 @@ const StudentTable = memo(function StudentTable({
       sortBy={sortBy}
       sortOrder={sortOrder}
       onSort={onSort}
+      selection={{
+        selectedRowKeys,
+        onChange: onSelectRowChange,
+      }}
       minWidth="800px"
       tableLayout="fixed"
       emptyText={emptyText}

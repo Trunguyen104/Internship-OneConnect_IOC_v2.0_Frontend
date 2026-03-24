@@ -3,12 +3,11 @@ import { httpGet } from '@/services/httpClient';
 const BASE_URL = '/enterprises/me/terms/active';
 
 export const EnterpriseTermService = {
-  async getActiveTerms(universityId) {
-    const params = universityId ? { universityId } : {};
+  async getActiveTerms(params = {}) {
     return httpGet(BASE_URL, params);
   },
   async getAllTerms() {
-    return httpGet(BASE_URL);
+    return httpGet('/terms');
   },
   async getUpcomingTerms() {
     return httpGet('/enterprises/me/terms', { status: 1 });

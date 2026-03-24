@@ -28,7 +28,7 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
   };
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden>
+    <CompoundModal open={open} onCancel={onCancel} width={640} destroyOnHidden closable={false}>
       <CompoundModal.Header
         icon={<PlusCircleOutlined />}
         title={ADD.TITLE}
@@ -39,7 +39,7 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
         form={form}
         layout="vertical"
         onFinish={handleFinish}
-        className="p-6 pt-8"
+        className="px-8 py-6"
         requiredMark={false}
       >
         <Row gutter={24}>
@@ -158,10 +158,9 @@ const AddStudentModal = ({ open, onCancel, onSave }) => {
 
         <CompoundModal.Footer
           cancelText={ADD.CANCEL}
-          submitText={ADD.SUBMIT}
+          confirmText={ADD.SUBMIT}
           onCancel={onCancel}
-          onSubmit={() => form.submit()}
-          className="mt-8 pt-6"
+          onConfirm={() => form.submit()}
         />
       </Form>
     </CompoundModal>

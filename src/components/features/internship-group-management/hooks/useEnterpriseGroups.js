@@ -23,42 +23,58 @@ export const useEnterpriseGroups = ({
 
     try {
       setLoading(true);
-      const params = {
-        TermId: termId,
-        PageIndex: pagination.current,
-        PageSize: pagination.pageSize,
-        Search: search,
-        Status: filters.status, // 0 = InProgress, 1 = Finished, 2 = Archived
-        IncludeArchived: filters.includeArchived,
-        Month: filters.dateFilter ? filters.dateFilter.month() + 1 : undefined,
-        Year: filters.dateFilter ? filters.dateFilter.year() : undefined,
-        SortColumn: sort?.column,
-        SortOrder: sort?.order,
-      };
 
-      const response = await EnterpriseGroupService.getGroups(params);
+      const allTerms = termOptions.filter((t) => t.value !== 'ALL_ACTIVE');
+      if (allTerms.length === 0) {
+        setData([]);
+        setTotal(0);
+        return;
+      }
 
-      if (response?.data?.items) {
-        setData(
-          response.data.items.map((item) => {
-            const term = termOptions.find(
-              (t) => t.value?.toLowerCase() === item.termId?.toLowerCase()
+      // If a specific term is selected (not 'ALL_ACTIVE'), we could use just that.
+      // But based on user request "get hết", we usually are in ALL_ACTIVE mode.
+      const targetTerms = termId === 'ALL_ACTIVE' ? allTerms : [{ value: termId }];
+
+      const fetchPromises = targetTerms.map(async (term) => {
+        const params = {
+          TermId: term.value,
+          PageIndex: 1, // Aggregating everything for now
+          PageSize: 100,
+          Search: search,
+          Status: filters.status,
+          IncludeArchived: filters.includeArchived,
+          Month: filters.dateFilter ? filters.dateFilter.month() + 1 : undefined,
+          Year: filters.dateFilter ? filters.dateFilter.year() : undefined,
+          SortColumn: sort?.column,
+          SortOrder: sort?.order,
+        };
+        try {
+          const response = await EnterpriseGroupService.getGroups(params);
+          const items = response?.data?.items || response?.items || [];
+          return items.map((item) => {
+            const t = termOptions.find(
+              (opt) => opt.value?.toLowerCase() === item.termId?.toLowerCase()
             );
             return {
               ...item,
               id: item.internshipId || item.id || item.groupId,
               name: item.groupName || item.GroupName || item.name,
-              termName: item.termName || item.TermName || term?.label || '-',
+              termName: item.termName || item.TermName || t?.label || term.label || '-',
               memberCount: item.numberOfMembers ?? item.NumberOfMembers ?? item.memberCount ?? 0,
               mentorName: item.mentorName || item.MentorName || '-',
             };
-          })
-        );
-        setTotal(response.data.totalCount || 0);
-      } else {
-        setData([]);
-        setTotal(0);
-      }
+          });
+        } catch (err) {
+          console.error(`Failed to fetch groups for term ${term.value}:`, err);
+          return [];
+        }
+      });
+
+      const results = await Promise.all(fetchPromises);
+      const combinedGroups = results.flat();
+
+      setData(combinedGroups);
+      setTotal(combinedGroups.length);
     } catch (error) {
       console.error('Fetch Enterprise Groups Error:', error);
       toast.error(ENTERPRISE_GROUP_UI.MESSAGES.ERROR);

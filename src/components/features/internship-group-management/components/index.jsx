@@ -79,15 +79,6 @@ export default function GroupManagement() {
           <DataTableToolbar.Filters>
             <div className="flex flex-wrap items-center gap-3">
               <Select
-                placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_TERM}
-                value={termId}
-                onChange={setTermId}
-                className="h-9 min-w-[200px]"
-                options={termOptions}
-                loading={fetchingTerms}
-              />
-
-              <Select
                 allowClear
                 placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_STATUS}
                 value={activeTab === 'ALL' ? undefined : activeTab}

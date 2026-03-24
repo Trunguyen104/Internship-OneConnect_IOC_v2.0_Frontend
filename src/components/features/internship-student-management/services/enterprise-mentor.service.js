@@ -1,6 +1,6 @@
 import { httpGet } from '@/services/httpClient';
 
-const BASE_URL = '/user-management';
+const BASE_URL = '/enterprises/me/mentors';
 const MENTOR_ROLE = 6;
 
 export const EnterpriseMentorService = {

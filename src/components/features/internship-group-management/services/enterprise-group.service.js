@@ -12,7 +12,9 @@ const cleanPayload = (obj) => {
 
 export const EnterpriseGroupService = {
   async getGroups(params = {}) {
-    const cleanParams = cleanPayload(params);
+    const finalParams = { ...params };
+    if (finalParams.TermId === 'ALL_ACTIVE') delete finalParams.TermId;
+    const cleanParams = cleanPayload(finalParams);
     return httpGet(BASE_URL, cleanParams);
   },
 
@@ -45,6 +47,17 @@ export const EnterpriseGroupService = {
 
   async archiveGroup(id) {
     return httpPatch(`${BASE_URL}/${id}/archive`);
+  },
+
+  async getPlacedStudents(params = {}) {
+    const finalParams = { ...params };
+    if (finalParams.TermId === 'ALL_ACTIVE') delete finalParams.TermId;
+    const cleanParams = cleanPayload(finalParams);
+    return httpGet(`${BASE_URL}/placed-students`, cleanParams);
+  },
+
+  async getGroupDashboard(id) {
+    return httpGet(`${BASE_URL}/${id}/dashboard`);
   },
 
   async deleteGroup(id) {

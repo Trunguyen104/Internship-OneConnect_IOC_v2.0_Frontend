@@ -151,21 +151,21 @@ const GroupTable = memo(function GroupTable({
                     ),
                     onClick: () => onAssign(record),
                   },
-                  {
+                  record.memberCount === 0 && {
                     key: 'archive',
                     label: INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.ARCHIVE_TOOLTIP,
                     icon: <InboxOutlined className="text-warning" />,
                     onClick: () => onArchive(record),
                   },
                   { type: 'divider' },
-                  {
+                  record.memberCount === 0 && {
                     key: 'delete',
                     label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.DELETE,
                     icon: <DeleteOutlined className="text-danger" />,
                     danger: true,
                     onClick: () => onDelete(record),
                   },
-                ]
+                ].filter(Boolean)
               : []),
           ];
 
