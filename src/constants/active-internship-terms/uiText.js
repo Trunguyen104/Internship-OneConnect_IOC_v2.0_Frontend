@@ -22,7 +22,7 @@ export const ACTIVE_TERM_UI = {
   },
   PROGRESS: {
     TITLE: 'TERM PROGRESS',
-    DAYS_LEFT: 'days left',
+    DAYS_LEFT: ' days left',
   },
   EMPTY: 'No active internship terms found',
   ERROR: 'An error occurred while loading internship terms',

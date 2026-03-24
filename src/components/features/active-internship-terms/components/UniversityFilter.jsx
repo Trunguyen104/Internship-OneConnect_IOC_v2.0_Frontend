@@ -1,7 +1,7 @@
 import { Select, Typography } from 'antd';
 import React from 'react';
 
-import { ACTIVE_TERM_UI } from '../constants/uiText';
+import { ACTIVE_TERM_UI } from '@/constants/active-internship-terms/uiText';
 
 const { Text } = Typography;
 
