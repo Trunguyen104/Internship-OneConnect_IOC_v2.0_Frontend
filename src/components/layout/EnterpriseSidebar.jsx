@@ -4,7 +4,6 @@ import {
   BankOutlined,
   CalendarOutlined,
   DashboardOutlined,
-  ProjectOutlined,
   SolutionOutlined,
   TeamOutlined,
   WarningOutlined,
