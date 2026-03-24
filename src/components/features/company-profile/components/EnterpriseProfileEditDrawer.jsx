@@ -18,7 +18,7 @@ function normalizeProfileToForm(profile) {
     profile?.taxCode ?? profile?.taxcode ?? profile?.tax_code ?? profile?.taxCODE ?? '';
   return {
     logoUrl: profile?.logoUrl ?? '',
-    backgroundUrl: profile?.backgroundUrl ?? '',
+    backgroundUrl: profile?.backgroundUrl ?? profile?.backgroundUrl1 ?? '',
     name: profile?.name ?? '',
     website: profile?.website ?? '',
     industry: profile?.industry ?? '',

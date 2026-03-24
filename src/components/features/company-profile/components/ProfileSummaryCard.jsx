@@ -33,9 +33,11 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
   const avatarSize = isMobile ? 96 : 124;
   const avatarOverlap = avatarSize * 0.35; // 35% overlap
 
-  const backgroundStyle = profile?.backgroundUrl
+  const bannerUrl = profile?.backgroundUrl ?? profile?.backgroundUrl1;
+
+  const backgroundStyle = bannerUrl
     ? {
-        backgroundImage: `url(${profile.backgroundUrl})`,
+        backgroundImage: `url("${bannerUrl}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }
@@ -55,7 +57,7 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
         className="group/banner relative w-full overflow-hidden transition-all duration-300"
         style={{ height: bannerHeight, ...backgroundStyle }}
       >
-        {!profile?.backgroundUrl && (
+        {!bannerUrl && (
           <div
             className="absolute inset-0 opacity-20"
             style={{
