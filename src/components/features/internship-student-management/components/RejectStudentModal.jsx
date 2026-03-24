@@ -22,7 +22,7 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
   };
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={520} destroyOnHidden>
+    <CompoundModal open={open} onCancel={onCancel} width={480} destroyOnHidden closable={false}>
       <CompoundModal.Header
         icon={<ExclamationCircleOutlined className="text-danger" />}
         title={REJECT.TITLE}
@@ -34,7 +34,7 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
         form={form}
         layout="vertical"
         onFinish={handleFinish}
-        className="p-6 pt-8"
+        className="px-8 py-6"
         requiredMark={false}
       >
         <div className="bg-danger-surface border-danger mb-6 rounded-xl border-l-4 p-4">
@@ -59,11 +59,10 @@ const RejectStudentModal = ({ open, student, onCancel, onConfirm }) => {
 
         <CompoundModal.Footer
           cancelText={REJECT.CANCEL}
-          submitText={REJECT.SUBMIT}
+          confirmText={REJECT.SUBMIT}
           onCancel={onCancel}
-          onSubmit={() => form.submit()}
-          submitDanger
-          className="mt-8 pt-6"
+          onConfirm={() => form.submit()}
+          confirmDanger
         />
       </Form>
     </CompoundModal>

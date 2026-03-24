@@ -127,15 +127,25 @@ export const CreateGroupModal = memo(
     }));
 
     return (
-      <CompoundModal open={open} onCancel={handleCancel} width={520} destroyOnHidden>
+      <CompoundModal
+        open={open}
+        onCancel={handleCancel}
+        width={640}
+        destroyOnHidden
+        closable={false}
+      >
         <CompoundModal.Header
           icon={<TeamOutlined />}
           title={
-            isAddingStudents ? 'Thêm sinh viên vào nhóm' : isEdit ? CREATE.TITLE_EDIT : CREATE.TITLE
+            isAddingStudents
+              ? INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP
+              : isEdit
+                ? CREATE.TITLE_EDIT
+                : CREATE.TITLE
           }
           subtitle={
             isAddingStudents
-              ? 'Chọn sinh viên để thêm vào nhóm'
+              ? INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS.GROUP_ACTION.STUDENT_LABEL
               : isEdit
                 ? CREATE.SUBTITLE_EDIT
                 : CREATE.SUBTITLE
@@ -170,13 +180,13 @@ export const CreateGroupModal = memo(
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          className="p-6 pt-4"
+          className="px-6 py-4"
           requiredMark={false}
         >
-          <div className="mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-3">
             <Form.Item
               label={
-                <span className="text-text text-xs font-bold tracking-wider uppercase">
+                <span className="text-text text-[11px] font-bold tracking-wider uppercase">
                   {CREATE.NAME_LABEL}
                 </span>
               }
@@ -187,62 +197,63 @@ export const CreateGroupModal = memo(
               <Input
                 prefix={<EditOutlined className="text-muted" />}
                 placeholder={CREATE.NAME_PLACEHOLDER}
-                className="bg-surface border-border h-11 rounded-2xl hover:border-primary focus:border-primary transition-all shadow-sm"
+                className="bg-surface border-border h-10 rounded-xl hover:border-primary focus:border-primary transition-all shadow-sm"
               />
             </Form.Item>
-            {!isEdit &&
-              groupNameValue &&
-              existingGroups.some(
-                (g) => g.name?.toLowerCase() === groupNameValue.trim().toLowerCase()
-              ) && (
-                <div className="mt-1 text-[11px] font-medium text-amber-600 flex items-center gap-1.5 px-1 animate-in fade-in slide-in-from-top-1">
-                  <InfoCircleOutlined className="text-[12px]" />
-                  {CREATE.DUPLICATE_NAME_WARNING}
-                </div>
-              )}
+
+            <Form.Item
+              label={
+                <span className="text-text text-[11px] font-bold tracking-wider uppercase">
+                  {CREATE.MENTOR_LABEL}
+                </span>
+              }
+              name="mentorId"
+              className="mb-0"
+            >
+              <Select
+                allowClear
+                showSearch
+                placeholder={CREATE.MENTOR_PLACEHOLDER}
+                className="h-10 w-full rounded-xl"
+                loading={loadingMentors}
+                options={mentorOptions}
+                optionFilterProp="searchValue"
+                suffixIcon={<UserOutlined className="text-muted" />}
+              />
+            </Form.Item>
           </div>
+
+          {!isEdit &&
+            groupNameValue &&
+            existingGroups.some(
+              (g) => g.name?.toLowerCase() === groupNameValue.trim().toLowerCase()
+            ) && (
+              <div className="mb-3 text-[11px] font-medium text-amber-600 flex items-center gap-1.5 px-1 animate-in fade-in slide-in-from-top-1">
+                <InfoCircleOutlined className="text-[12px]" />
+                {CREATE.DUPLICATE_NAME_WARNING}
+              </div>
+            )}
 
           <Form.Item
             label={
-              <span className="text-text text-xs font-bold tracking-wider uppercase">
+              <span className="text-text text-[11px] font-bold tracking-wider uppercase">
                 {CREATE.DESCRIPTION_LABEL}
               </span>
             }
             name="description"
-            className="mb-4"
+            className="mb-3"
           >
             <Input.TextArea
               placeholder={CREATE.DESCRIPTION_PLACEHOLDER}
-              className="bg-surface border-border rounded-2xl hover:border-primary focus:border-primary transition-all shadow-sm py-2"
-              autoSize={{ minRows: 2, maxRows: 3 }}
+              className="bg-surface border-border rounded-xl hover:border-primary focus:border-primary transition-all shadow-sm py-2"
+              autoSize={{ minRows: 1, maxRows: 2 }}
             />
           </Form.Item>
 
-          <Form.Item
-            label={
-              <span className="text-text text-xs font-bold tracking-wider uppercase">
-                {CREATE.MENTOR_LABEL}
-              </span>
-            }
-            name="mentorId"
-            className="mb-4"
-          >
-            <Select
-              allowClear
-              showSearch
-              placeholder={CREATE.MENTOR_PLACEHOLDER}
-              className="h-11 w-full rounded-2xl"
-              loading={loadingMentors}
-              options={mentorOptions}
-              optionFilterProp="searchValue"
-              suffixIcon={<UserOutlined className="text-muted" />}
-            />
-          </Form.Item>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-3">
             <Form.Item
               label={
-                <span className="text-text text-xs font-bold tracking-wider uppercase">
+                <span className="text-text text-[11px] font-bold tracking-wider uppercase">
                   {CREATE.START_DATE_LABEL}
                 </span>
               }
@@ -251,14 +262,14 @@ export const CreateGroupModal = memo(
               className="mb-0"
             >
               <DatePicker
-                className="h-11 w-full rounded-2xl bg-surface border-border shadow-sm"
+                className="h-10 w-full rounded-xl bg-surface border-border shadow-sm text-xs"
                 disabled={isEdit}
               />
             </Form.Item>
 
             <Form.Item
               label={
-                <span className="text-text text-xs font-bold tracking-wider uppercase">
+                <span className="text-text text-[11px] font-bold tracking-wider uppercase">
                   {CREATE.END_DATE_LABEL}
                 </span>
               }
@@ -267,7 +278,7 @@ export const CreateGroupModal = memo(
               className="mb-0"
             >
               <DatePicker
-                className="h-11 w-full rounded-2xl bg-surface border-border shadow-sm"
+                className="h-10 w-full rounded-xl bg-surface border-border shadow-sm text-xs"
                 disabled={isEdit}
               />
             </Form.Item>
@@ -275,18 +286,18 @@ export const CreateGroupModal = memo(
 
           <Form.Item
             label={
-              <span className="text-text text-xs font-bold tracking-wider uppercase">
+              <span className="text-text text-[11px] font-bold tracking-wider uppercase">
                 {CREATE.STUDENTS_LABEL}
               </span>
             }
             name="studentIds"
             rules={[{ required: true, message: CREATE.STUDENTS_REQUIRED }]}
-            className="mb-4"
+            className="mb-3"
           >
             <Select
               mode="multiple"
               placeholder={CREATE.STUDENTS_PLACEHOLDER}
-              className="min-h-11 w-full rounded-2xl"
+              className="min-h-10 w-full rounded-xl"
               loading={loadingStudents}
               options={studentOptions}
               optionFilterProp="searchValue"
@@ -297,10 +308,11 @@ export const CreateGroupModal = memo(
           </Form.Item>
 
           {students.length === 0 && !loadingStudents && !isEdit && (
-            <div className="mb-4 rounded-2xl bg-orange-50/50 p-4 border border-orange-100 flex items-center gap-3">
+            <div className="mb-4 rounded-xl bg-orange-50/50 p-4 border border-orange-100 flex items-center gap-3">
               <InfoCircleOutlined className="text-orange-400 text-lg" />
               <Text className="text-orange-700 text-[13px] leading-relaxed">
-                Hiện chưa có sinh viên nào được **Placed** tại doanh nghiệp trong kỳ này.
+                {INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.FILTERS.EMPTY_TEXT ||
+                  'No students are currently available.'}
               </Text>
             </div>
           )}
@@ -324,7 +336,6 @@ export const CreateGroupModal = memo(
                 return uniqueTerms.size > 1;
               })()
             }
-            className="mt-6 pt-4"
           />
         </Form>
       </CompoundModal>

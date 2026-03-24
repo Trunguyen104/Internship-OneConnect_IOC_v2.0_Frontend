@@ -52,6 +52,8 @@ export const useInternshipManagement = () => {
     pageSize: 10,
   });
 
+  const [sort, setSort] = useState({ column: undefined, order: undefined });
+
   const [rejectModal, setRejectModal] = useState({ open: false, student: null });
   const [assignModal, setAssignModal] = useState({ open: false, student: null });
   const [groupModal, setGroupModal] = useState({ open: false, students: [], type: 'ADD' });
@@ -87,8 +89,8 @@ export const useInternshipManagement = () => {
       try {
         setFetchingTerms(true);
         // Fallback to active terms if all terms endpoint not found
-        const res = await EnterpriseTermService.getActiveTerms();
-        let terms = res?.data?.terms || res?.data || [];
+        const res = await EnterpriseTermService.getAllTerms();
+        let terms = res?.data?.items || res?.data || [];
 
         terms.sort((a, b) => {
           if (a.status === 2 && b.status !== 2) return -1;
@@ -105,11 +107,19 @@ export const useInternshipManagement = () => {
           universityName: t.universityName,
         }));
 
-        setTermOptions(options);
+        const allOption = {
+          label: 'All Terms',
+          value: 'ALL_ACTIVE', // Keep the value for backend compatibility if it's used to trigger "no filter"
+          status: 2,
+        };
 
-        // Auto-select first term if none selected
-        if (!termId && options.length > 0) {
-          setTermId(options[0].value);
+        const finalOptions = [allOption, ...options];
+        console.log('[DEBUG] Setting termOptions:', finalOptions);
+        setTermOptions(finalOptions);
+
+        // Auto-select ALL_ACTIVE by default
+        if (!termId) {
+          setTermId('ALL_ACTIVE');
         }
       } catch (err) {
         console.error('Failed to fetch terms:', err);
@@ -125,64 +135,70 @@ export const useInternshipManagement = () => {
     if (!termId) return;
 
     try {
-      setFetchingStudents(true);
-      const params = {
-        TermId: termId,
-        PageIndex: pagination.current,
-        PageSize: pagination.pageSize,
-        Search: search,
-        Status: statusFilter === 'ALL' ? undefined : statusFilter,
-        HasGroup: groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP',
-        MentorAssigned: assignmentFilter === 'ALL' ? undefined : assignmentFilter === 'ASSIGNED',
-        ProjectAssigned: projectFilter === 'ALL' ? undefined : projectFilter === 'PROJECT_ASSIGNED',
-        Major: majorFilter,
-        UniversityName: universityFilter,
-        Month: dateFilter ? dateFilter.month() + 1 : undefined,
-        Year: dateFilter ? dateFilter.year() : undefined,
-      };
+      const allTerms = termOptions.filter((t) => t.value !== 'ALL_ACTIVE');
+      console.log('[DEBUG] fetchStudents - termId:', termId, 'allTerms:', allTerms.length);
+      if (allTerms.length === 0) {
+        setStudents([]);
+        setTotal(0);
+        return;
+      }
 
-      const res = await EnterpriseStudentService.getApplications(params);
-      const items = res?.data?.items || res?.items || [];
-      const total = res?.data?.totalCount || res?.totalCount || 0;
-      const currentTermStatus = termOptions.find((t) => t.value === termId)?.status || 0;
-      setStudents(
-        items.map((item) => {
-          const mapped = EnterpriseStudentService.mapApplication(item);
-          // Fallback to current term's status if not provided by API
-          if (mapped.termStatus === 0 || mapped.termStatus === undefined) {
-            mapped.termStatus = currentTermStatus;
-          }
-          return mapped;
-        })
-      );
-      setTotal(res?.data?.totalCount || 0);
+      setLoading(true);
 
-      // Set unassigned students for group creation modal
-      setUnassignedStudents(
-        items
-          .filter((i) => !i.groupName && !i.groupId)
-          .map((item) => {
+      const fetchPromises = allTerms.map(async (term) => {
+        const params = {
+          TermId: term.value,
+          PageIndex: 1, // Fetching all for now since we aggregate
+          PageSize: 100,
+          Search: search || undefined,
+          Status: statusFilter === 'ALL' ? undefined : statusFilter,
+          HasGroup: groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP',
+          MentorAssigned: assignmentFilter === 'ALL' ? undefined : assignmentFilter === 'ASSIGNED',
+          ProjectAssigned:
+            projectFilter === 'ALL' ? undefined : projectFilter === 'PROJECT_ASSIGNED',
+          Major: majorFilter || undefined,
+          UniversityName: universityFilter || undefined,
+          Month: dateFilter ? dateFilter.month() + 1 : undefined,
+          Year: dateFilter ? dateFilter.year() : undefined,
+          SortColumn: sort.column,
+          SortOrder: sort.order,
+        };
+        try {
+          const res = await EnterpriseStudentService.getApplications(params);
+          const items = res?.data?.items || res?.items || [];
+          return items.map((item) => {
             const mapped = EnterpriseStudentService.mapApplication(item);
             if (mapped.termStatus === 0 || mapped.termStatus === undefined) {
-              mapped.termStatus = currentTermStatus;
+              mapped.termStatus = term.status || 0;
             }
             return mapped;
-          })
-      );
-      const universities = Array.from(new Set(items.map((i) => i.universityName))).filter(Boolean);
-      setUniversityOptions(universities.map((u) => ({ label: u, value: u })));
+          });
+        } catch (err) {
+          console.error(`Failed to fetch for term ${term.label}:`, err);
+          return [];
+        }
+      });
 
-      try {
-        const groupsRes = await EnterpriseGroupService.getGroups({
-          termId,
-          pageSize: 100,
-        });
-        const groups = groupsRes?.data?.items || groupsRes?.items || [];
-        setExistingGroups(groups);
-        setHasGroups(groups.length > 0);
-      } catch (err) {
-        console.error('Failed to check groups:', err);
-      }
+      const results = await Promise.all(fetchPromises);
+      const combinedStudents = results.flat();
+
+      // Manual sorting if needed, but for now just use the aggregate
+      setStudents(combinedStudents);
+      setTotal(combinedStudents.length);
+
+      // Set unassigned students
+      setUnassignedStudents(combinedStudents.filter((i) => !i.groupName && !i.groupId));
+
+      // Check for groups across all terms
+      const groupPromises = allTerms.map((term) =>
+        EnterpriseGroupService.getGroups({ termId: term.value, pageSize: 100 }).catch(() => ({
+          data: { items: [] },
+        }))
+      );
+      const groupResults = await Promise.all(groupPromises);
+      const allGroups = groupResults.flatMap((res) => res?.data?.items || res?.items || []);
+      setExistingGroups(allGroups);
+      setHasGroups(allGroups.length > 0);
     } catch (err) {
       console.error('Failed to fetch students:', err);
     } finally {
@@ -197,8 +213,8 @@ export const useInternshipManagement = () => {
     groupFilter,
     assignmentFilter,
     dateFilter,
-    universityFilter,
-    majorFilter,
+    sort?.column,
+    sort?.order,
   ]);
 
   useEffect(() => {
@@ -405,8 +421,12 @@ export const useInternshipManagement = () => {
     handleCreateGroup,
     dateFilter,
     setDateFilter,
-    isTermEditable: termId && termOptions.find((t) => t.value === termId)?.status === 2,
+    isTermEditable:
+      termId === 'ALL_ACTIVE' ||
+      (termId && termOptions.find((t) => t.value === termId)?.status === 2),
     hasGroups,
     existingGroups,
+    sort,
+    setSort,
   };
 };

@@ -17,15 +17,27 @@ export const useEnterpriseGroupFilters = () => {
     const fetchTerms = async () => {
       try {
         setFetchingTerms(true);
-        const res = await EnterpriseTermService.getActiveTerms();
-        const terms = res?.data?.terms || [];
+        const res = await EnterpriseTermService.getAllTerms();
+        const terms = res?.data?.items || res?.data || [];
 
         if (terms.length > 0) {
-          setTermOptions(
-            terms.map((t) => ({ label: t.termName, value: t.termId, status: t.status }))
-          );
-          // Priority to Active term if possible, otherwise first one
-          setTermId(terms[0].termId);
+          const options = terms.map((t) => ({
+            label: t.termName,
+            value: t.termId,
+            status: t.status,
+          }));
+
+          const allOption = {
+            label: 'All Terms',
+            value: 'ALL_ACTIVE',
+            status: 2,
+          };
+
+          console.log('[DEBUG] GroupFilters Setting termOptions:', [allOption, ...options]);
+          setTermOptions([allOption, ...options]);
+          setTermId('ALL_ACTIVE');
+        } else {
+          console.warn('[DEBUG] No terms found for groups.');
         }
       } catch (err) {
         console.error('Failed to fetch enterprise active terms:', err);

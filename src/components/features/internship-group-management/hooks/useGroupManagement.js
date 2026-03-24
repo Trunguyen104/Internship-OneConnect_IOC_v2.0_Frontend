@@ -144,7 +144,7 @@ export const useGroupManagement = () => {
         okText: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.SUBMIT,
         type: 'warning',
         onOk: async () => {
-          await archiveGroup(group.id);
+          await archiveGroup(group.id, group.memberCount || 0);
         },
       });
     },
@@ -270,7 +270,8 @@ export const useGroupManagement = () => {
     handleTableChange: (page, filter, sorter) => filters.handleTableChange(page, filter, sorter),
     handlePageSizeChange: (size) => filters.handleTableChange({ current: 1, pageSize: size }),
     isTermEditable:
-      filters.termId && filters.termOptions.find((t) => t.value === filters.termId)?.status === 2,
+      filters.termId === 'ALL_ACTIVE' ||
+      (filters.termId && filters.termOptions.find((t) => t.value === filters.termId)?.status === 2),
     filters: filters.filters,
     handleFilterChange: filters.handleFilterChange,
   };

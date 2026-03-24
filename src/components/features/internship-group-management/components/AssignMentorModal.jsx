@@ -34,7 +34,7 @@ export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
   };
 
   return (
-    <CompoundModal open={open} onCancel={handleCancel} width={560} destroyOnHidden>
+    <CompoundModal open={open} onCancel={handleCancel} width={560} destroyOnHidden closable={false}>
       <CompoundModal.Header
         icon={<UserOutlined />}
         title={isChangingMentor ? ASSIGN.TITLE_CHANGE : ASSIGN.TITLE_ASSIGN}
@@ -50,7 +50,7 @@ export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
         form={form}
         layout="vertical"
         onFinish={handleFinish}
-        className="p-6 pt-8"
+        className="px-8 py-6"
         requiredMark={false}
       >
         <Form.Item
@@ -124,7 +124,6 @@ export const AssignMentorModal = memo(({ open, group, onCancel, onFinish }) => {
           confirmText={ASSIGN.CONFIRM}
           onCancel={handleCancel}
           onConfirm={() => form.submit()}
-          className="mt-8 pt-6"
         />
       </Form>
     </CompoundModal>

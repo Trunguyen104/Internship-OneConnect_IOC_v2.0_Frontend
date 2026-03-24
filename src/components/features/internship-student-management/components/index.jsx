@@ -1,7 +1,6 @@
 'use client';
 
 import { DownOutlined, EditOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -72,6 +71,8 @@ export default function InternshipManagement() {
     isTermEditable,
     hasGroups,
     existingGroups,
+    sort,
+    setSort,
   } = useInternshipManagement();
 
   const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
@@ -81,13 +82,6 @@ export default function InternshipManagement() {
   const isSingleTerm = uniqueTerms.size === 1;
 
   const bulkItems = [
-    isTermEditable && {
-      key: 'createGroup',
-      label: INTERNSHIP_LIST.ACTIONS.CREATE_GROUP,
-      icon: <UsergroupAddOutlined />,
-      disabled: !isSingleTerm || hasGroup || selectedStudents.some((s) => s.status !== 2),
-      onClick: () => setCreateModal({ open: true, students: selectedStudents }),
-    },
     {
       key: 'addToGroup',
       label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
@@ -116,19 +110,6 @@ export default function InternshipManagement() {
 
           <DataTableToolbar.Filters>
             <div className="flex flex-wrap items-center gap-3">
-              <Select
-                showSearch
-                placeholder={INTERNSHIP_LIST.FILTERS.TERM_LABEL}
-                value={termId}
-                onChange={setTermId}
-                className="h-9 min-w-[220px] student-term-select"
-                options={termOptions}
-                loading={fetchingTerms}
-                filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                }
-              />
-
               <StudentFilters
                 statusFilter={statusFilter}
                 setStatusFilter={handleStatusChange}
@@ -170,6 +151,9 @@ export default function InternshipManagement() {
           isTermEditable={isTermEditable}
           hasGroups={hasGroups}
           emptyText="Currently, no students are performing the work."
+          sortBy={sort.column}
+          sortOrder={sort.order}
+          onSort={(key, order) => setSort({ column: key, order })}
           selectedRowKeys={selectedRowKeys}
           onSelectRowChange={setSelectedRowKeys}
           onAccept={handleAcceptStudent}

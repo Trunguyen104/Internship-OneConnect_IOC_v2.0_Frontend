@@ -53,7 +53,7 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
   };
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={500} destroyOnHidden footer={null}>
+    <CompoundModal open={open} onCancel={onCancel} width={560} destroyOnHidden closable={false}>
       <CompoundModal.Header
         icon={<UserOutlined />}
         title={type === 'ADD' ? GROUP_ACTION.TITLE_ADD : GROUP_ACTION.TITLE_CHANGE}
@@ -73,22 +73,23 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
         form={form}
         layout="vertical"
         onFinish={handleFinish}
-        className="p-6 pt-8"
+        className="px-6 py-4"
         requiredMark={false}
       >
         <Form.Item
           label={
-            <span className="text-text text-xs font-bold tracking-wider uppercase">
+            <span className="text-text text-[11px] font-bold tracking-wider uppercase">
               {GROUP_ACTION.GROUP_LABEL}
             </span>
           }
           name="groupId"
           rules={[{ required: true, message: GROUP_ACTION.GROUP_REQUIRED }]}
+          className="mb-3"
         >
           <Select
             showSearch
             placeholder={GROUP_ACTION.GROUP_PLACEHOLDER}
-            className="h-11 w-full rounded-xl"
+            className="h-10 w-full rounded-xl"
             suffixIcon={<SearchOutlined className="text-muted" />}
             loading={fetchingGroups}
             notFoundContent={
@@ -103,15 +104,16 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
             }
             options={activeGroups.map((g) => {
               const isCurrent = currentGroupIds.includes(g.id);
+              // Tên nhóm | Mentor | Số SV hiện tại
               const mentor = g.mentorName || GROUP_ACTION.NO_MENTOR;
-              const count = `${g.memberCount}${GROUP_ACTION.SPACE}${GROUP_ACTION.STUDENTS_SUFFIX}`;
-              const groupLabel = `${g.name}${GROUP_ACTION.SEPARATOR}${mentor}${GROUP_ACTION.SEPARATOR}${count}`;
+              const count = `${g.memberCount} ${GROUP_ACTION.STUDENTS_SUFFIX}`;
+              const groupLabel = `${g.name} | ${mentor} | ${count}`;
               return {
                 label: (
                   <div className="flex justify-between items-center w-full">
-                    <span>{groupLabel}</span>
+                    <span className="text-xs">{groupLabel}</span>
                     {isCurrent && (
-                      <span className="bg-gray-100 text-muted rounded px-2 py-0.5 text-[10px] font-bold uppercase">
+                      <span className="bg-primary/10 text-primary rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                         {GROUP_ACTION.CURRENT_GROUP}
                       </span>
                     )}
@@ -138,11 +140,10 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
 
         <CompoundModal.Footer
           cancelText={GROUP_ACTION.CANCEL}
-          submitText={type === 'ADD' ? GROUP_ACTION.SUBMIT_ADD : GROUP_ACTION.SUBMIT_CHANGE}
+          confirmText={type === 'ADD' ? GROUP_ACTION.SUBMIT_ADD : GROUP_ACTION.SUBMIT_CHANGE}
           onCancel={onCancel}
-          onSubmit={() => form.submit()}
-          className="mt-8 pt-6"
-          submitDisabled={
+          onConfirm={() => form.submit()}
+          confirmDisabled={
             activeGroups.length === 0 ||
             (type === 'CHANGE' && activeGroups.every((g) => currentGroupIds.includes(g.id)))
           }

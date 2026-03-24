@@ -40,11 +40,6 @@ export const ViewGroupModal = memo(
 
     const items = [
       {
-        key: 'track',
-        label: VIEW.TRACK,
-        children: group.track || '-',
-      },
-      {
         key: 'status',
         label: VIEW.STATUS,
         children: (
@@ -64,9 +59,9 @@ export const ViewGroupModal = memo(
         label: VIEW.MENTOR,
         children: (
           <div className="flex flex-col">
-            <Text className="text-[13px] font-bold">{group.mentorName || '-'}</Text>
+            <Text className="text-[11px] font-medium leading-tight">{group.mentorName || '-'}</Text>
             {group.mentorEmail && (
-              <Text className="text-muted text-[10px] opacity-60 font-medium">
+              <Text className="text-muted text-[10px] opacity-60 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
                 {group.mentorEmail}
               </Text>
             )}
@@ -76,7 +71,11 @@ export const ViewGroupModal = memo(
       {
         key: 'project',
         label: VIEW.PROJECT_NAME,
-        children: group.projectName || group.project || '-',
+        children: (
+          <Text className="text-[11px] font-medium leading-tight truncate block max-w-[150px]">
+            {group.projectName || group.project || '-'}
+          </Text>
+        ),
       },
       {
         key: 'description',
@@ -91,10 +90,15 @@ export const ViewGroupModal = memo(
         title: 'Member',
         key: 'member',
         render: (_, s) => (
-          <div className="flex items-center gap-2">
-            <Avatar size="small" src={s.avatar} icon={<UserOutlined />} />
+          <div className="flex items-center gap-2 py-1">
+            <Avatar
+              size="small"
+              src={s.avatar}
+              icon={<UserOutlined />}
+              className="bg-primary/10 text-primary"
+            />
             <div className="flex flex-col leading-tight overflow-hidden">
-              <Text className="text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis">
+              <Text className="text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis uppercase">
                 {s.fullName}
               </Text>
               <Text className="text-muted text-[10px] opacity-60 truncate">{s.email}</Text>
@@ -102,8 +106,20 @@ export const ViewGroupModal = memo(
           </div>
         ),
       },
-      { title: 'Code', dataIndex: 'code', key: 'code', width: 90 },
-      { title: 'School', dataIndex: 'universityName', key: 'universityName', ellipsis: true },
+      {
+        title: 'Code',
+        dataIndex: 'code',
+        key: 'code',
+        width: 100,
+        render: (text) => <Text className="text-[11px] font-bold text-muted/80">{text}</Text>,
+      },
+      {
+        title: 'School',
+        dataIndex: 'universityName',
+        key: 'universityName',
+        ellipsis: true,
+        render: (text) => <Text className="text-[11px] text-muted truncate">{text}</Text>,
+      },
     ];
 
     if (group.status === GROUP_STATUS.ACTIVE) {
@@ -131,41 +147,95 @@ export const ViewGroupModal = memo(
     const isTermArchived = group.status === GROUP_STATUS.ARCHIVED;
     const hasStudents = (group.members || []).length > 0;
 
+    const renderFooterActions = () => {
+      if (isTermArchived) return null;
+
+      return (
+        <div className="flex items-center gap-2">
+          {isTermActive && (
+            <>
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => onEdit(group)}
+                className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 border-primary/20 text-primary hover:bg-primary/5 transition-all"
+              >
+                {ENTERPRISE_GROUP_UI.ACTIONS.EDIT_GROUP}
+              </Button>
+              <Button
+                icon={<PlusOutlined />}
+                onClick={() => onAddStudents(group)}
+                className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 border-primary/20 text-primary hover:bg-primary/5 transition-all"
+              >
+                {ENTERPRISE_GROUP_UI.ACTIONS.ADD_STUDENTS}
+              </Button>
+            </>
+          )}
+
+          {(isTermActive || isTermFinished) && !hasStudents && (
+            <Button
+              icon={<InboxOutlined />}
+              onClick={() => onArchive(group)}
+              className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 border-warning/20 text-warning hover:bg-warning/5 transition-all"
+            >
+              {ENTERPRISE_GROUP_UI.ACTIONS.ARCHIVE_GROUP}
+            </Button>
+          )}
+
+          {isTermActive && !hasStudents && (
+            <Button
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => onDelete(group)}
+              className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 border-danger/20 text-danger hover:bg-danger/5 transition-all"
+            >
+              {ENTERPRISE_GROUP_UI.ACTIONS.DELETE_GROUP}
+            </Button>
+          )}
+        </div>
+      );
+    };
+
     return (
-      <CompoundModal open={open} onCancel={onCancel} width={700} destroyOnHidden footer={null}>
+      <CompoundModal open={open} onCancel={onCancel} width={720} destroyOnHidden closable={false}>
         <CompoundModal.Header
           icon={<TeamOutlined />}
           title={group.name}
           subtitle={group.track || VIEW.DEFAULT_SUBTITLE}
         />
 
-        <div className="px-8 py-6">
+        <CompoundModal.Content className="px-8 py-6 max-h-[60vh] overflow-y-auto mt-2">
           <Descriptions
             items={items}
             column={2}
             size="small"
             bordered={false}
             labelStyle={{
-              width: '100px',
-              color: 'var(--muted)',
-              fontWeight: '600',
+              width: '135px',
+              color: 'var(--text)',
+              fontWeight: 800,
               fontSize: '11px',
               textTransform: 'uppercase',
-              paddingBottom: '8px',
+              paddingBottom: '12px',
+              letterSpacing: '0.01em',
+              whiteSpace: 'nowrap',
             }}
             contentStyle={{
-              color: 'var(--text)',
-              fontWeight: '700',
-              fontSize: '13px',
-              paddingBottom: '8px',
+              color: 'var(--muted)',
+              fontWeight: 500,
+              fontSize: '11px',
+              paddingBottom: '12px',
+              paddingLeft: '8px',
             }}
           />
 
           <div className="mt-6 border-t pt-6">
-            <div className="flex items-center justify-between mb-3">
-              <Text className="text-muted text-[11px] font-bold uppercase tracking-wider">
-                {VIEW.MEMBERS} ({group.memberCount})
-              </Text>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <TeamOutlined className="text-primary text-sm" />
+                <Text className="text-[10px] font-extrabold uppercase tracking-widest text-muted/50">
+                  {VIEW.MEMBERS} ({group.memberCount})
+                </Text>
+              </div>
             </div>
 
             <Table
@@ -179,73 +249,20 @@ export const ViewGroupModal = memo(
               className="group-members-table custom-table-minimal"
             />
           </div>
+        </CompoundModal.Content>
 
-          {/* Action Buttons based on AC-G03 */}
-          {!isTermArchived && (
-            <div className="mt-8 pt-6 border-t flex flex-wrap items-center justify-end gap-3">
-              {isTermActive && (
-                <>
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={() => onEdit(group)}
-                    className="rounded-xl font-bold text-xs flex items-center gap-1.5 px-4 h-10 border-primary/20 text-primary hover:bg-primary/5 transition-all"
-                  >
-                    {ENTERPRISE_GROUP_UI.ACTIONS.EDIT_GROUP}
-                  </Button>
-                  <Button
-                    icon={<PlusOutlined />}
-                    onClick={() => onAddStudents(group)}
-                    className="rounded-xl font-bold text-xs flex items-center gap-1.5 px-4 h-10 border-primary/20 text-primary hover:bg-primary/5 transition-all"
-                  >
-                    {ENTERPRISE_GROUP_UI.ACTIONS.ADD_STUDENTS}
-                  </Button>
-                </>
-              )}
-
-              {/* Archive button: shown for Active, and still shown for Finished if 0 Students (AC-G07 Exception) */}
-              {(isTermActive || isTermFinished) && !hasStudents && (
-                <Button
-                  icon={<InboxOutlined />}
-                  onClick={() => onArchive(group)}
-                  className="rounded-xl font-bold text-xs flex items-center gap-1.5 px-4 h-10 border-warning/20 text-warning hover:bg-warning/5 transition-all"
-                >
-                  {ENTERPRISE_GROUP_UI.ACTIONS.ARCHIVE_GROUP}
-                </Button>
-              )}
-
-              {/* Delete button: Active & 0 students (Requirement AC-G03 says 0 SV and 0 data) */}
-              {isTermActive && !hasStudents && (
-                <Button
-                  icon={<DeleteOutlined />}
-                  danger
-                  onClick={() => onDelete(group)}
-                  className="rounded-xl font-bold text-xs flex items-center gap-1.5 px-4 h-10 border-danger/20 text-danger hover:bg-danger/5 transition-all"
-                >
-                  {ENTERPRISE_GROUP_UI.ACTIONS.DELETE_GROUP}
-                </Button>
-              )}
-
-              <Button
-                onClick={onCancel}
-                className="rounded-xl font-extrabold text-[#747474] text-[12px] uppercase tracking-wider px-6 h-10 bg-surface border-border hover:border-muted transition-all"
-              >
-                {VIEW.CLOSE}
-              </Button>
-            </div>
-          )}
-          {isTermArchived && (
-            <div className="mt-8 pt-6 border-t flex justify-end">
-              <Button
-                onClick={onCancel}
-                className="rounded-xl font-extrabold text-[#747474] text-[12px] uppercase tracking-wider px-6 h-10 bg-surface border-border hover:border-muted transition-all"
-              >
-                {VIEW.CLOSE}
-              </Button>
-            </div>
-          )}
-        </div>
+        <CompoundModal.Footer
+          onCancel={onCancel}
+          confirmText={VIEW.CLOSE}
+          onConfirm={onCancel}
+          showCancel={false}
+        >
+          {renderFooterActions()}
+        </CompoundModal.Footer>
       </CompoundModal>
     );
   }
 );
 ViewGroupModal.displayName = 'ViewGroupModal';
+
+export default ViewGroupModal;
