@@ -100,8 +100,7 @@ export default function LogbookPage() {
           DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
 
         if (res?.statusCode === 409 || res?.status === 409) {
-          errorMsg =
-            'Ngày này đã có báo cáo hoặc bị trùng lặp. Vui lòng kiểm tra lại hoặc xóa báo cáo cũ.';
+          errorMsg = DAILY_REPORT_MESSAGES.ERROR.DUPLICATE_REPORT;
         }
 
         toast.error(errorMsg);
@@ -220,7 +219,7 @@ export default function LogbookPage() {
           ) : data.length === 0 ? (
             <EmptyState
               title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
-              description="Keep track of your learning journey! Start by adding your first daily report."
+              description={DAILY_REPORT_UI.EMPTY.DESCRIPTION}
             />
           ) : (
             <LogbookTable

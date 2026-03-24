@@ -1,4 +1,3 @@
-// import Violation from '@/components/feature/student/Violation';
 import React from 'react';
 
 import ViolationPage from '@/components/features/violation/components/ViolationPage';

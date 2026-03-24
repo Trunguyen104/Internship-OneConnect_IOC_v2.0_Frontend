@@ -20,7 +20,6 @@ const InternshipDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        console.log(INTERNSHIP_UI.MESSAGES.FETCHING_JOURNEY);
 
         const termsResponse = await InternshipGroupService.getMyTerms();
 
@@ -55,7 +54,6 @@ const InternshipDashboard = () => {
 
         setInternships(enrichedInternships);
       } catch (error) {
-        console.error('Dashboard Fetch Error:', error);
         toast.error('Error', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
       } finally {
         setLoading(false);

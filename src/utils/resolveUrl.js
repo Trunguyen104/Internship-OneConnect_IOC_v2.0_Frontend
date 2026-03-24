@@ -25,7 +25,6 @@ export const resolveResourceUrl = (url) => {
 
   // Special handling for Uploads to ensure they use backendRoot
   const resolved = backendRoot + (cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath);
-  console.log('URL RECONSTRUCTION:', { original: url, resolved });
 
   return resolved;
 };

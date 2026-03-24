@@ -1,11 +1,12 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
 import { userService } from '@/components/features/user/services/userService';
+import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useLogbook() {
@@ -35,16 +36,6 @@ export function useLogbook() {
     }, 500);
     return () => clearTimeout(t);
   }, [search]);
-
-  const filteredData = useMemo(() => {
-    if (!debouncedSearch?.trim()) return data;
-    const term = debouncedSearch.toLowerCase().trim();
-    return data.filter((item) => {
-      const studentName = (item.studentName || '').toLowerCase();
-      const summary = (item.summary || '').toLowerCase();
-      return studentName.includes(term) || summary.includes(term);
-    });
-  }, [data, debouncedSearch]);
 
   useEffect(() => {
     if (urlInternshipId && urlInternshipId !== internshipId) {
@@ -76,9 +67,7 @@ export function useLogbook() {
           const firstId = items[0].internshipId || items[0].id;
           setInternshipId(firstId);
         }
-      } catch (err) {
-        console.error('Fetch internshipgroups failed', err);
-      }
+      } catch (err) {}
     };
 
     fetchInternship();
@@ -92,7 +81,7 @@ export function useLogbook() {
           setUserProfile(res.data);
         }
       } catch (err) {
-        console.error('Fetch user profile failed', err);
+        // Silently fail
       }
     };
     fetchProfile();
@@ -130,7 +119,7 @@ export function useLogbook() {
       setData(items);
       setTotal(totalCount);
     } catch (err) {
-      console.error('Fetch logbooks failed', err);
+      // Silently fail
     } finally {
       setLoading(false);
     }
@@ -144,8 +133,7 @@ export function useLogbook() {
     try {
       const res = await LogBookService.delete(id);
       if (res && (res.isSuccess !== false || res.success !== false)) {
-        toast.success('Logbook deleted successfully!');
-
+        toast.success(DAILY_REPORT_MESSAGES.SUCCESS.DELETE);
         if (data.length === 1 && pageNumber > 1) {
           setPageNumber((prev) => prev - 1);
         } else {
@@ -153,19 +141,17 @@ export function useLogbook() {
         }
         return true;
       } else {
-        toast.error(res?.message || 'Failed to delete logbook');
+        toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.DELETE_FAILED);
         return false;
       }
     } catch (error) {
-      console.error('Delete logbook error', error);
-      toast.error('An unexpected error occurred during deletion');
+      toast.error(DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
       return false;
     }
   };
 
   return {
-    data: filteredData,
-    rawItems: data,
+    data,
     loading,
     total,
     pageNumber,

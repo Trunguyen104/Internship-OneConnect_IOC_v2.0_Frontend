@@ -1,4 +1,3 @@
-// // export default httpClient;
 const API_BASE = '/api/proxy';
 
 async function request(path, options = {}) {
@@ -75,7 +74,6 @@ async function request(path, options = {}) {
   return data;
 }
 
-// export const httpGet = (path, options) => request(path, { method: 'GET', ...options });
 export const httpGet = (path, params = {}, options = {}) => {
   // Filter out undefined and null values
   const cleanParams = Object.fromEntries(
@@ -87,7 +85,6 @@ export const httpGet = (path, params = {}, options = {}) => {
 
   return request(url, { method: 'GET', ...options });
 };
-// export const httpDelete = (path, options) => request(path, { method: 'DELETE', ...options });
 export const httpDelete = (path, body, options = {}) =>
   request(path, {
     method: 'DELETE',
