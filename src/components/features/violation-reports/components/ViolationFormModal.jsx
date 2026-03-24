@@ -18,7 +18,6 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
   const [pickerVisible, setPickerVisible] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const studentId = Form.useWatch('studentId', form);
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue({

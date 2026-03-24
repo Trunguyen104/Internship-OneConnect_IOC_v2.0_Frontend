@@ -173,7 +173,7 @@ const DataGrid = memo(function DataGrid({
       page,
       pageSize,
       readOnly,
-      PLACEMENT_LABELS,
+      PLACEMENT_LABELS.UNPLACED,
     ]
   );
 

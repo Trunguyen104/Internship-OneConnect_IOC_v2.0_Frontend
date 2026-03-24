@@ -165,6 +165,7 @@ export const UI_TEXT = {
     CANCEL: 'Cancel',
     TRY_AGAIN: 'Try Again',
     APPLY: 'Apply',
+    DELETE: 'Delete',
   },
   TIPTAP: {
     PLACEHOLDER: 'Enter description...',

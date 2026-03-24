@@ -130,7 +130,7 @@ export default function UserManagementTable({ users = [], loading = false, error
               <TableCell>
                 <span
                   className={[
-                    'inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold tracking-wider uppercase',
+                    'inline-flex items-center rounded-full border px-3 text-[11px] font-semibold tracking-wider uppercase',
                     isRoleActive(u.role || u.Role)
                       ? 'border-[var(--primary-600)]/10 bg-[var(--primary-600)]/10 text-[var(--primary-600)]'
                       : 'border-slate-200/50 bg-slate-100 text-slate-500',

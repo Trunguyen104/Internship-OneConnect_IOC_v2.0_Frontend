@@ -38,7 +38,7 @@ export const DashboardService = {
               ...term,
               totalEnrolled: enrollRes?.data?.totalCount ?? term.totalEnrolled,
             };
-          } catch (e) {
+          } catch {
             return term;
           }
         })
