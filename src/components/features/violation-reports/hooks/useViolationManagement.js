@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
@@ -23,7 +23,6 @@ export const useViolationManagement = () => {
   const {
     searchTerm,
     groupIdFilter,
-    createdByIdFilter,
     dateRange,
     sortConfig,
     pagination,
@@ -36,7 +35,6 @@ export const useViolationManagement = () => {
     setPagination,
     handleSearchChange,
     handleGroupChange,
-    handleCreatedByChange,
     handleDateRangeChange,
     handleTableChange,
     resetFilters,
@@ -63,7 +61,6 @@ export const useViolationManagement = () => {
         PageSize: pagination.pageSize,
         SearchTerm: searchTerm || undefined,
         GroupId: groupIdFilter || undefined,
-        CreatedById: createdByIdFilter || undefined,
         OccurredFrom: dateRange?.[0]?.format(VIOLATION_REPORT.DATE_FORMATS.API),
         OccurredTo: dateRange?.[1]?.format(VIOLATION_REPORT.DATE_FORMATS.API),
         OrderByCreatedAscending: sortConfig.order === 'asc',
@@ -89,7 +86,6 @@ export const useViolationManagement = () => {
     pagination.pageSize,
     searchTerm,
     groupIdFilter,
-    createdByIdFilter,
     dateRange,
     sortConfig,
     toast,
@@ -106,17 +102,14 @@ export const useViolationManagement = () => {
     const fetchInitialData = async () => {
       try {
         setFetchingTerms(true);
-        // Fetch current user
         const userRes = await userService.getMe();
         const userData = userRes?.data || userRes;
         setMe(userData);
 
-        // Fetch groups first
         const groupsRes = await ViolationService.getGroups({ pageSize: 100 });
         const groupsData = groupsRes?.data?.items || groupsRes?.items || [];
         setGroups(groupsData);
 
-        // Extract unique terms from groups
         const termMap = new Map();
         groupsData.forEach((g) => {
           const tId = g.termId || g.internshipTermId;
@@ -181,7 +174,6 @@ export const useViolationManagement = () => {
 
         const detailsRes = await Promise.all(groupDetailPromises);
 
-        // Extract and flatten all members
         const allMembers = [];
         const memberIds = new Set();
 
@@ -256,7 +248,7 @@ export const useViolationManagement = () => {
           openFormModal(normalizedData, true);
         }
       } catch (error) {
-        console.error('GetViolationById failed:', error);
+        console.error(VIOLATION_REPORT.LOGS.GET_BY_ID_ERROR, error);
         toast.error(getErrorDetail(error, VIOLATION_REPORT.DETAILS_ERROR));
       }
     },
@@ -280,46 +272,18 @@ export const useViolationManagement = () => {
     }
   }, [deleteModalState, fetchData, toast, setDeleteModalState, VIOLATION_REPORT]);
 
-  const mentorOptions = useMemo(() => {
-    const mentorMap = new Map();
-
-    // Collect from groups
-    groups.forEach((g) => {
-      if (g.mentorId && (g.mentorName || g.mentorFullName)) {
-        mentorMap.set(g.mentorId, g.mentorName || g.mentorFullName);
-      }
-    });
-
-    // Collect from current data (reports) to ensure all visible reporters are in the filter
-    data.forEach((r) => {
-      if (r.createdBy && r.mentorName) {
-        mentorMap.set(r.createdBy, r.mentorName);
-      }
-    });
-
-    return Array.from(mentorMap.entries()).map(([value, label]) => ({
-      value,
-      label,
-    }));
-  }, [groups, data]);
-
-  const studentOptions = useMemo(() => {
-    return students.map((s) => ({
-      label: `${s.fullName || s.studentFullName} (${s.studentCode})`,
-      value: s.studentId || s.id,
-    }));
-  }, [students]);
+  const studentOptions = (students || []).map((s) => ({
+    label: `${s.fullName || s.studentFullName} (${s.studentCode})`,
+    value: s.studentId || s.id,
+  }));
 
   const handleSaveModal = useCallback(
     async (payload) => {
       setSubmitLoading(true);
-      console.log('handleSaveModal payload:', payload);
-      console.log('handleSaveModal editingRecord:', editingRecord);
       try {
         const id =
           payload.violationReportId || editingRecord?.violationReportId || editingRecord?.id;
         const isUpdate = !!id;
-        console.log('isUpdate:', isUpdate, 'id:', id);
 
         if (isUpdate) {
           await ViolationService.update(id, {
@@ -349,7 +313,6 @@ export const useViolationManagement = () => {
     loading,
     searchTerm,
     groupIdFilter,
-    createdByIdFilter,
     dateRange,
     pagination,
     modalVisible,
@@ -363,7 +326,6 @@ export const useViolationManagement = () => {
     setModalVisible,
     handleSearchChange,
     handleGroupChange,
-    handleCreatedByChange,
     handleDateRangeChange,
     handleTableChange,
     handleCreateNew,
@@ -378,6 +340,5 @@ export const useViolationManagement = () => {
     termOptions,
     fetchingTerms,
     studentOptions,
-    mentorOptions,
   };
 };

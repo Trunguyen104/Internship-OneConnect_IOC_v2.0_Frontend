@@ -1,7 +1,7 @@
 'use client';
 
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
-import { DatePicker, Select } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { DatePicker } from 'antd';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -45,15 +45,11 @@ export default function ViolationManagement() {
     handleRequestDelete,
     handleDelete,
     handleSaveModal,
-    resetFilters,
     termId,
     setTermId,
     termOptions,
     fetchingTerms,
     studentOptions,
-    mentorOptions,
-    createdByIdFilter,
-    handleCreatedByChange,
   } = useViolationManagement();
 
   return (
@@ -68,15 +64,6 @@ export default function ViolationManagement() {
             onChange={(e) => handleSearchChange(e.target.value)}
           />
           <DataTableToolbar.Filters>
-            <Select
-              allowClear
-              placeholder={VIOLATION_REPORT.FILTERS.CREATED_BY}
-              value={createdByIdFilter}
-              onChange={handleCreatedByChange}
-              className="h-9 min-w-[150px]"
-              options={mentorOptions}
-              suffixIcon={<FilterOutlined className="text-muted" />}
-            />
             <RangePicker
               className="h-9 w-60"
               value={dateRange}

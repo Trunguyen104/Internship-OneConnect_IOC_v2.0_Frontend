@@ -85,7 +85,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             <div className="flex items-center gap-2">
               <Input
                 placeholder={FORM.PLACEHOLDERS.STUDENT}
-                className="h-10 flex-1 cursor-default bg-slate-50"
+                className="h-10 flex-1 cursor-default bg-bg"
                 value={
                   selectedStudent
                     ? `${selectedStudent.studentFullName || selectedStudent.fullName} ${VIOLATION_REPORT.COMMON.LEFT_PAREN}${selectedStudent.studentCode || selectedStudent.userCode}${VIOLATION_REPORT.COMMON.RIGHT_PAREN}`
@@ -93,7 +93,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
                 }
                 readOnly
               />
-              {!initialValues && (
+              {!initialValues && !viewOnly && (
                 <Button
                   type="primary"
                   onClick={() => setPickerVisible(true)}
@@ -114,59 +114,96 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             </Form.Item>
           </Form.Item>
 
-          <Form.Item
-            name="occurredDate"
-            label={FORM.INCIDENT_DATE}
-            rules={[
-              { required: true, message: FORM.VALIDATION.DATE_REQUIRED },
-              () => ({
-                validator(_, value) {
-                  if (!value) return Promise.resolve();
-
-                  if (value.isAfter(dayjs().endOf('day'))) {
-                    return Promise.reject(new Error(FORM.VALIDATION.DATE_FUTURE));
-                  }
-
-                  if (selectedStudent?.groupStartDate) {
-                    const startDate = dayjs(selectedStudent.groupStartDate);
-                    if (value.isBefore(startDate, 'day')) {
-                      return Promise.reject(new Error(FORM.VALIDATION.DATE_BEFORE_START));
+          {viewOnly && (
+            <>
+              <div className="grid grid-cols-2 gap-x-4">
+                <Form.Item label={DETAIL.INTERN_GROUP}>
+                  <Input
+                    className="h-10 cursor-default bg-bg"
+                    value={
+                      initialValues?.internshipGroupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE
                     }
-                    if (selectedStudent?.groupEndDate) {
-                      const endDate = dayjs(selectedStudent.groupEndDate);
-                      if (value.isAfter(endDate, 'day')) {
-                        return Promise.reject(new Error(FORM.VALIDATION.DATE_AFTER_END));
+                    readOnly
+                  />
+                </Form.Item>
+                <Form.Item label={DETAIL.CREATED_BY}>
+                  <Input
+                    className="h-10 cursor-default bg-bg"
+                    value={initialValues?.mentorName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+                    readOnly
+                  />
+                </Form.Item>
+              </div>
+            </>
+          )}
+
+          <div className={`${viewOnly ? 'grid grid-cols-2 gap-x-4' : ''}`}>
+            <Form.Item
+              name="occurredDate"
+              label={FORM.INCIDENT_DATE}
+              rules={[
+                { required: true, message: FORM.VALIDATION.DATE_REQUIRED },
+                () => ({
+                  validator(_, value) {
+                    if (!value || viewOnly) return Promise.resolve();
+
+                    if (value.isAfter(dayjs().endOf('day'))) {
+                      return Promise.reject(new Error(FORM.VALIDATION.DATE_FUTURE));
+                    }
+
+                    if (selectedStudent?.groupStartDate) {
+                      const startDate = dayjs(selectedStudent.groupStartDate);
+                      if (value.isBefore(startDate, 'day')) {
+                        return Promise.reject(new Error(FORM.VALIDATION.DATE_BEFORE_START));
+                      }
+                      if (selectedStudent?.groupEndDate) {
+                        const endDate = dayjs(selectedStudent.groupEndDate);
+                        if (value.isAfter(endDate, 'day')) {
+                          return Promise.reject(new Error(FORM.VALIDATION.DATE_AFTER_END));
+                        }
                       }
                     }
+
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+            >
+              <DatePicker
+                className="h-10 w-full"
+                format={VIOLATION_REPORT.DATE_FORMATS.UI}
+                placeholder={FORM.PLACEHOLDERS.INCIDENT_DATE}
+                disabled={viewOnly}
+                disabledDate={(current) => {
+                  if (!current || viewOnly) return false;
+                  const isFuture = current > dayjs().endOf('day');
+
+                  let isBeforeStart = false;
+                  if (selectedStudent?.groupStartDate) {
+                    isBeforeStart = current < dayjs(selectedStudent.groupStartDate).startOf('day');
                   }
 
-                  return Promise.resolve();
-                },
-              }),
-            ]}
-          >
-            <DatePicker
-              className="h-10 w-full"
-              format={VIOLATION_REPORT.DATE_FORMATS.UI}
-              placeholder={FORM.PLACEHOLDERS.INCIDENT_DATE}
-              disabledDate={(current) => {
-                if (!current) return false;
-                const isFuture = current > dayjs().endOf('day');
+                  let isAfterEnd = false;
+                  if (selectedStudent?.groupEndDate) {
+                    isAfterEnd = current > dayjs(selectedStudent.groupEndDate).endOf('day');
+                  }
 
-                let isBeforeStart = false;
-                if (selectedStudent?.groupStartDate) {
-                  isBeforeStart = current < dayjs(selectedStudent.groupStartDate).startOf('day');
-                }
+                  return isFuture || isBeforeStart || isAfterEnd;
+                }}
+              />
+            </Form.Item>
 
-                let isAfterEnd = false;
-                if (selectedStudent?.groupEndDate) {
-                  isAfterEnd = current > dayjs(selectedStudent.groupEndDate).endOf('day');
-                }
-
-                return isFuture || isBeforeStart || isAfterEnd;
-              }}
-            />
-          </Form.Item>
+            {viewOnly && (
+              <Form.Item label={DETAIL.CREATED_TIME}>
+                <DatePicker
+                  className="h-10 w-full"
+                  format={VIOLATION_REPORT.DATE_FORMATS.UI}
+                  value={initialValues?.createdAt ? dayjs(initialValues.createdAt) : undefined}
+                  disabled
+                />
+              </Form.Item>
+            )}
+          </div>
 
           <Form.Item
             name="description"
@@ -177,6 +214,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
               placeholder={FORM.PLACEHOLDERS.DESCRIPTION}
               rows={4}
               className="resize-none"
+              readOnly={viewOnly}
             />
           </Form.Item>
         </Form>
@@ -188,6 +226,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
         loading={loading}
         confirmIcon={!viewOnly && <SaveOutlined />}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SAVE}
+        showCancel={!viewOnly}
       />
       <StudentPickerModal
         visible={pickerVisible}
@@ -202,7 +241,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
 
 const ViolationFormModal = ({ visible, onCancel, ...props }) => {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnClose>
+    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnClose closable={false}>
       {visible && <ViolationFormBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );

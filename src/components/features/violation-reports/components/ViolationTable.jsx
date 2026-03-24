@@ -39,19 +39,6 @@ const ViolationTable = memo(function ViolationTable({
         ),
       },
       {
-        title: TABLE.COLUMNS.INTERN_GROUP,
-        dataIndex: 'internshipGroupName',
-        key: 'internshipGroupName',
-        width: '150px',
-        render: (text) => (
-          <Tooltip title={text}>
-            <span className="text-text truncate text-sm block">
-              {text || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
-            </span>
-          </Tooltip>
-        ),
-      },
-      {
         title: TABLE.COLUMNS.CREATED_BY,
         dataIndex: 'mentorName',
         key: 'mentorName',
@@ -65,35 +52,39 @@ const ViolationTable = memo(function ViolationTable({
         ),
       },
       {
-        title: TABLE.COLUMNS.DATE_INFO,
-        key: 'dateInfo',
-        width: '240px',
-        render: (_, record) => (
-          <div className="flex items-center gap-2 whitespace-nowrap text-xs">
-            <span className="text-text font-bold">
-              {record.occurredDate
-                ? dayjs(record.occurredDate).format(VIOLATION_REPORT.DATE_FORMATS.UI)
-                : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+        title: TABLE.COLUMNS.CREATE_TIME,
+        dataIndex: 'createdAt',
+        key: 'createTime',
+        width: '150px',
+        render: (text, record) => (
+          <Tooltip title={text}>
+            <span className="text-muted text-xs font-medium">
+              {dayjs(record.createdAt).format(VIOLATION_REPORT.DATE_FORMATS.UI)}
             </span>
-            <span className="text-muted opacity-30">{VIOLATION_REPORT.COMMON.DOT}</span>
-            <span className="text-text font-bold">
-              {record.createdAt
-                ? `${dayjs(record.createdAt).format(
-                    VIOLATION_REPORT.DATE_FORMATS.UI
-                  )}${VIOLATION_REPORT.COMMON.DASH_SEPARATOR}${dayjs(record.createdAt).format(VIOLATION_REPORT.DATE_FORMATS.TIME)}`
-                : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+          </Tooltip>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.VIOLATION_TIME,
+        dataIndex: 'violationTime',
+        key: 'violationTime',
+        width: '150px',
+        render: (text, record) => (
+          <Tooltip title={text}>
+            <span className="text-muted text-xs font-medium">
+              {dayjs(record.violationTime).format(VIOLATION_REPORT.DATE_FORMATS.UI)}
             </span>
-          </div>
+          </Tooltip>
         ),
       },
       {
         title: TABLE.COLUMNS.DESCRIPTION,
         dataIndex: 'description',
         key: 'description',
-        width: '180px',
+        width: '200px',
         render: (text) => (
           <Tooltip title={text}>
-            <span className="text-muted line-clamp-1 text-sm">
+            <span className="text-muted text-xs font-medium truncate block">
               {text || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
             </span>
           </Tooltip>

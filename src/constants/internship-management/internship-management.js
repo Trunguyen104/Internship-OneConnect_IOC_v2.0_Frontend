@@ -719,6 +719,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           STUDENT_CODE: 'Student Code',
           INTERN_GROUP: 'Intern Group',
           CREATED_BY: 'Created By',
+          CREATE_TIME: 'Create Time',
+          VIOLATION_TIME: 'Violation Time',
           DATE_INFO: 'Date Information',
           DESCRIPTION: 'Description',
           ACTIONS: 'Actions',
@@ -792,6 +794,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         DASH_SEPARATOR: ' \u2014 ',
         LEFT_PAREN: '(',
         RIGHT_PAREN: ')',
+        REPORTER_DEFAULT: 'Reporter',
       },
       LOGS: {
         FETCH_ERROR: 'Fetch violations failed:',
