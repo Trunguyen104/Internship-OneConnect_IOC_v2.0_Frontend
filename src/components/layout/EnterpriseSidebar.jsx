@@ -46,6 +46,12 @@ const enterpriseMenu = [
     label: 'Staff Management',
     href: '/staff-management',
   },
+
+  {
+    icon: <TeamOutlined />,
+    label: 'Evaluation Management',
+    href: '/evaluation',
+  },
 ];
 
 export default function EnterpriseSidebar() {
