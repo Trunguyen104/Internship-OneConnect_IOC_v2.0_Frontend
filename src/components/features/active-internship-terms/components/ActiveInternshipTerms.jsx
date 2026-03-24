@@ -3,7 +3,8 @@
 import { Empty, Result, Spin } from 'antd';
 import React, { useMemo, useState } from 'react';
 
-import { ACTIVE_TERM_UI } from '../constants/uiText';
+import { ACTIVE_TERM_UI } from '@/constants/active-internship-terms/uiText';
+
 import { useActiveTerms } from '../hooks/useActiveTerms';
 import { TermCard } from './TermCard';
 import { UniversityFilter } from './UniversityFilter';

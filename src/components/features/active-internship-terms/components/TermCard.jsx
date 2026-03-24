@@ -2,7 +2,7 @@ import { BankOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Progress, Tag, Typography } from 'antd';
 import React from 'react';
 
-import { ACTIVE_TERM_UI } from '../constants/uiText';
+import { ACTIVE_TERM_UI } from '@/constants/active-internship-terms/uiText';
 
 const { Title, Text } = Typography;
 
@@ -31,7 +31,7 @@ const TermCardHeader = ({ title, university, status, startDate, endDate }) => (
         <Title level={4} style={{ margin: 0, fontWeight: 800, color: 'var(--color-text)' }}>
           {title}
         </Title>
-        <Tag className="m-0 rounded-lg border border-green-200 bg-green-50 px-3 py-1 text-xs font-bold text-green-600 shadow-sm">
+        <Tag className="m-0 rounded-full border-none bg-green-100! px-3 py-0.5 text-[10px] font-bold text-green-700! shadow-sm">
           {status}
         </Tag>
       </div>
@@ -60,34 +60,39 @@ const TermCardHeader = ({ title, university, status, startDate, endDate }) => (
   </div>
 );
 
-const TermCardDates = ({ daysRemaining, progressPercent }) => (
-  <div className="flex flex-1 flex-col gap-2 border-x border-gray-100 px-12 md:w-1/3">
-    <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-      {'TERM PROGRESS'}
-    </Text>
-    <Progress
-      percent={progressPercent}
-      showInfo={false}
-      strokeColor={{
-        '0%': 'var(--primary-300)',
-        '100%': 'var(--primary-600)',
-      }}
-      railColor="var(--gray-100)"
-      size={{ height: 8 }}
-    />
-    <div className="flex items-center justify-between mt-3">
-      <div className="flex items-baseline gap-1">
-        <Text className="text-3xl font-black text-gray-900">{progressPercent}%</Text>
-      </div>
-      <div className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 border border-red-100 shadow-sm">
-        <ClockCircleOutlined className="text-red-500" />
-        <Text className="text-sm font-bold text-red-600">
-          {daysRemaining} {ACTIVE_TERM_UI.STATUS.DAYS_REMAINING_LABEL || 'days left'}
-        </Text>
+const TermCardDates = ({ daysRemaining, progressPercent }) => {
+  const daysLeftLabel = `${daysRemaining}${ACTIVE_TERM_UI.PROGRESS.DAYS_LEFT}`;
+  const progressLabel = `${progressPercent}%`;
+
+  return (
+    <div className="flex flex-1 flex-col gap-2 border-x border-gray-100 px-12 md:w-1/3">
+      <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+        {ACTIVE_TERM_UI.PROGRESS.TITLE}
+      </Text>
+      <Progress
+        percent={progressPercent}
+        showInfo={false}
+        strokeColor={{
+          '0%': 'var(--primary-300)',
+          '100%': 'var(--primary-600)',
+        }}
+        railColor="var(--gray-100)"
+        size={{ height: 8 }}
+      />
+      <div className="flex items-center justify-between mt-3">
+        <div className="flex items-baseline gap-1">
+          <Title level={2} style={{ margin: 0, fontWeight: 900, color: 'var(--color-text)' }}>
+            {progressLabel}
+          </Title>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-2 border border-red-100 shadow-sm">
+          <ClockCircleOutlined className="text-red-500" />
+          <Text className="text-sm font-bold text-red-600">{daysLeftLabel}</Text>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const TermCardDeadlines = ({ deadlines = [] }) => {
   // If no deadlines, show a placeholder box as requested
@@ -103,7 +108,7 @@ const TermCardDeadlines = ({ deadlines = [] }) => {
   return (
     <div className="flex flex-col gap-3 md:w-1/4">
       <Text className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-        {'IMPORTANT DEADLINES'}
+        {ACTIVE_TERM_UI.DEADLINE.IMPORTANT_TITLE}
       </Text>
       {allDeadlines.map((item, idx) => (
         <div
@@ -120,7 +125,7 @@ const TermCardDeadlines = ({ deadlines = [] }) => {
           </div>
           {item.isUrgent && (
             <Tag color="#fee2e2" className="border-red-200 text-red-600 font-bold text-[10px] m-0">
-              {'URGENT'}
+              {ACTIVE_TERM_UI.DEADLINE.URGENT_TAG}
             </Tag>
           )}
         </div>
