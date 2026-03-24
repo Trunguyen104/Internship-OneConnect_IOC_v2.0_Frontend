@@ -19,8 +19,8 @@ export const USER_STATUS = {
 export const USER_ROLE_LABEL = {
   [USER_ROLE.SUPER_ADMIN]: 'SuperAdmin',
   [USER_ROLE.MODERATOR]: 'Moderator',
-  [USER_ROLE.SCHOOL_ADMIN]: 'SchoolAdmin',
-  [USER_ROLE.ENTERPRISE_ADMIN]: 'EnterpriseAdmin',
+  [USER_ROLE.SCHOOL_ADMIN]: 'Uni Admin',
+  [USER_ROLE.ENTERPRISE_ADMIN]: 'Ent Admin',
   [USER_ROLE.HR]: 'HR',
   [USER_ROLE.MENTOR]: 'Mentor',
   [USER_ROLE.STUDENT]: 'Student',
