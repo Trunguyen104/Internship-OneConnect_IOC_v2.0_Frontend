@@ -1,6 +1,6 @@
 'use client';
 
-import { Empty, Select, Spin } from 'antd';
+import { Empty, Spin } from 'antd';
 import React from 'react';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
@@ -30,50 +30,7 @@ export default function EvaluationContainer() {
 
   return (
     <div className="flex flex-1 flex-col space-y-4">
-      {/* SaaS Filter Bar - Always show if terms exist */}
-      <div className="flex items-center gap-6 rounded-xl bg-white p-4 shadow-sm">
-        {/* Term Select */}
-        <div className="flex items-center gap-3">
-          <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
-            {LABELS.TERM}
-          </span>
-          <Select
-            className="w-52"
-            size="middle"
-            value={selectedTerm?.id}
-            onChange={(val) => setSelectedTerm(terms.find((t) => t.id === val))}
-            options={terms.map((t) => ({
-              label: t.name,
-              value: t.id,
-            }))}
-            placeholder={LABELS.SELECT_TERM_PLACEHOLDER}
-          />
-        </div>
-
-        {/* Group Select */}
-        <div className="flex items-center gap-3 border-l pl-6">
-          <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider">
-            {LABELS.GROUP}
-          </span>
-          <Select
-            className="w-72"
-            size="middle"
-            value={selectedGroup?.internshipId}
-            onChange={(val) => setSelectedGroup(groups.find((g) => g.internshipId === val))}
-            options={groups.map((g) => ({
-              label: g.groupName,
-              value: g.internshipId,
-            }))}
-            placeholder={LABELS.SELECT_GROUP_PLACEHOLDER}
-            disabled={groups.length === 0}
-            loading={loading && groups.length > 0}
-          />
-        </div>
-
-        {loading && <Spin size="small" className="ml-2" />}
-      </div>
-
-      {/* Main Content Area */}
+      {/* Main Content Area - Filters move inside MentorEvaluationPage for better layout integration */}
       <div className="flex-1 min-h-[400px]">
         {loading && groups.length === 0 ? (
           <div className="flex h-64 items-center justify-center">
@@ -93,14 +50,22 @@ export default function EvaluationContainer() {
           </div>
         ) : (
           <MentorEvaluationPage
-            key={`${selectedTerm?.id}-${selectedGroup.internshipId}`}
-            internshipId={selectedGroup.internshipId}
-            groupName={selectedGroup.groupName}
-            termId={selectedGroup.termId}
+            key={`${selectedTerm?.id}-${selectedGroup?.internshipId || selectedGroup?.id}`}
+            internshipId={selectedGroup?.internshipId || selectedGroup?.id}
+            groupName={selectedGroup?.groupName}
+            termId={selectedTerm?.id}
             termDates={{
               startDate: selectedTerm?.startDate,
               endDate: selectedTerm?.endDate,
             }}
+            // Filters
+            terms={terms}
+            selectedTerm={selectedTerm}
+            setSelectedTerm={setSelectedTerm}
+            groups={groups}
+            selectedGroup={selectedGroup}
+            setSelectedGroup={setSelectedGroup}
+            loading={loading}
           />
         )}
       </div>
