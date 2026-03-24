@@ -55,7 +55,8 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
       const initialScores = {};
       grid.students.forEach((student) => {
         initialScores[student.studentId] = {};
-        student.scores?.forEach((s) => {
+        const details = student.details || student.scores || [];
+        details.forEach((s) => {
           initialScores[student.studentId][s.criteriaId] = s.score;
         });
       });
@@ -95,14 +96,19 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
   const handleSubmitBatch = async () => {
     try {
       setSending(true);
-      const evaluationsInput = Object.keys(scores).map((studentId) => ({
-        studentId,
-        note: '',
-        details: Object.keys(scores[studentId]).map((criteriaId) => ({
-          criteriaId,
-          score: scores[studentId][criteriaId] || 0,
-        })),
-      }));
+      const evaluationsInput = Object.keys(scores).map((studentId) => {
+        const student = data.students.find((s) => s.studentId === studentId);
+        const originalDetails = student?.details || student?.scores || [];
+        return {
+          studentId,
+          note: student?.note || student?.generalComment || '',
+          details: Object.keys(scores[studentId]).map((criteriaId) => ({
+            criteriaId,
+            score: scores[studentId][criteriaId] || 0,
+            comment: originalDetails.find((d) => d.criteriaId === criteriaId)?.comment || '',
+          })),
+        };
+      });
 
       await onBatchGrade(cycle.cycleId, { evaluations: evaluationsInput });
       toast.success(MESSAGES.GRADE_SUCCESS);

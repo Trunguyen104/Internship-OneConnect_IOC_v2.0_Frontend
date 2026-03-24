@@ -31,17 +31,24 @@ export default function IndividualGrading({
 
   useEffect(() => {
     if (open && student) {
+      const currentScores =
+        allCriteria?.map((crit) => {
+          const existing =
+            student.details?.find((s) => s.criteriaId === crit.criteriaId) ||
+            student.scores?.find((s) => s.criteriaId === crit.criteriaId);
+          return {
+            criteriaId: crit.criteriaId,
+            score: existing?.score ?? null,
+            comment: existing?.comment || '',
+          };
+        }) || [];
+
       setFormData({
-        generalComment: student.generalComment || '',
-        scores:
-          student.scores?.map((s) => ({
-            criteriaId: s.criteriaId,
-            score: s.score,
-            comment: s.comment || '',
-          })) || [],
+        generalComment: student.note || student.generalComment || '',
+        scores: currentScores,
       });
     }
-  }, [open, student]);
+  }, [open, student, allCriteria]);
 
   const handleScoreChange = (criteriaId, field, value) => {
     setFormData((prev) => ({
@@ -53,11 +60,14 @@ export default function IndividualGrading({
   const handleSave = async (statusOverride = null) => {
     try {
       setLoading(true);
+
+      const validScores = formData.scores.filter((s) => s.score !== null && s.score !== undefined);
+
       await EvaluationService.individualGrade(cycle.cycleId, {
         internshipId,
         studentId: student.studentId,
         generalComment: formData.generalComment,
-        scores: formData.scores,
+        scores: validScores,
       });
 
       if (statusOverride === 'publish') {
@@ -82,12 +92,12 @@ export default function IndividualGrading({
 
   return (
     <CompoundModal
-      title={`${LABELS.DETAILS}: ${student?.fullName}`}
+      title={`${LABELS.DETAIL}: ${student?.fullName}`}
       open={open}
       onCancel={onCancel}
-      className="w-full max-w-4xl"
+      className="w-full max-w-6xl"
       footer={
-        <div className="flex w-full items-center justify-between px-4">
+        <div className="w-full items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-gray-500">{TABLE_COLUMNS.STATUS}:</span>
             {(() => {
@@ -121,18 +131,21 @@ export default function IndividualGrading({
         </div>
       }
     >
-      <div className="space-y-6 py-4">
+      <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-6 py-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {formData.scores.map((s) => {
             const critInfo = getCriteriaInfo(s.criteriaId);
             return (
-              <div key={s.criteriaId} className="space-y-3 rounded-xl border bg-gray-50/50 p-4">
-                <div className="flex items-center justify-between">
-                  <h4 className="w-2/3 truncate text-sm font-bold text-gray-700">
+              <div key={s.criteriaId} className="space-y-3 rounded-xl bg-gray-50/50 p-4">
+                <div className="flex flex-col gap-2">
+                  <h4
+                    className="text-sm font-bold text-gray-700 leading-tight"
+                    title={critInfo.name}
+                  >
                     {critInfo.name}
                   </h4>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-sm text-black font-semibold">
                       {LABELS.MAX_LABEL} {critInfo.maxScore}
                     </span>
                     <InputNumber

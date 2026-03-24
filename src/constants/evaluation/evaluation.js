@@ -69,6 +69,7 @@ export const EVALUATION_UI = {
       'Please select an internship group from the dropdown above to view evaluations.',
     NO_GROUPS: 'No groups found for this term.',
     MAX_LABEL: 'Max:',
+    DETAIL: 'Detail',
   },
 
   BUTTONS: {
