@@ -1,6 +1,6 @@
 'use client';
 
-import { BellOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 
 import { logout } from '@/components/features/auth/services/authService';
 import { clearAuth } from '@/components/features/auth/services/authStorage';
+import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/userService';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -74,9 +75,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center justify-end border-b border-slate-200 bg-gray-50 px-6">
       <div className="flex items-center gap-4">
-        <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300">
-          <BellOutlined className="text-lg text-gray-700" />
-        </button>
+        <NotificationBell />
 
         <Dropdown
           menu={avatarMenu}

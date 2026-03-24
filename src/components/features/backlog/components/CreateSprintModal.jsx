@@ -1,3 +1,4 @@
+'use client';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 import { useCreateSprint } from '../hooks/useCreateSprint';
