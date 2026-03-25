@@ -10,6 +10,7 @@ import {
   UserAddOutlined,
 } from '@ant-design/icons';
 import { Dropdown } from 'antd';
+import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
@@ -46,7 +47,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
-        width: 160,
+        width: 150,
         render: (text, record) => (
           <div
             className="font-semibold text-primary hover:underline cursor-pointer truncate w-[160px]"
@@ -88,6 +89,26 @@ export default function ProjectTable({
         ),
       },
       {
+        title: TABLE.COLUMNS.START_DATE,
+        key: 'startDate',
+        width: 100,
+        render: (_, record) => (
+          <div className="text-gray-600 text-[13px]">
+            {record.startDate ? dayjs(record.startDate).format('DD/MM/YYYY') : '-'}
+          </div>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.END_DATE,
+        key: 'endDate',
+        width: 100,
+        render: (_, record) => (
+          <div className="text-gray-600 text-[13px]">
+            {record.endDate ? dayjs(record.endDate).format('DD/MM/YYYY') : '-'}
+          </div>
+        ),
+      },
+      {
         title: TABLE.COLUMNS.STATUS,
         key: 'status',
         width: 50,
@@ -111,7 +132,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 60,
+        width: 70,
         render: (_, record) => {
           const items = [
             {

@@ -1,10 +1,18 @@
-import { EditOutlined, InfoCircleOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  InfoCircleOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Avatar, DatePicker, Form, Input, Select, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+
+import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 
 const { Text } = Typography;
 
@@ -24,9 +32,11 @@ export const CreateGroupModal = memo(
   }) => {
     const [form] = Form.useForm();
     const { CREATE } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.MODALS;
+    const GROUP_CREATE = ENTERPRISE_GROUP_UI.MODALS.CREATE;
     const isEdit = !!group;
     const groupNameValue = Form.useWatch('groupName', form);
     const selectedStudentIds = Form.useWatch('studentIds', form);
+    const [studentSearch, setStudentSearch] = React.useState('');
 
     useEffect(() => {
       if (open) {
@@ -57,7 +67,7 @@ export const CreateGroupModal = memo(
           });
         }
       }
-    }, [open, isEdit, form]); // Only re-run when modal opens or edit mode changes
+    }, [open, isEdit, form, group]); // Only re-run when modal opens or edit mode changes
 
     const handleCancel = () => {
       onCancel();
@@ -65,14 +75,22 @@ export const CreateGroupModal = memo(
 
     const handleFinish = (values) => {
       const studentIds = values.studentIds || [];
-      const studentWithTerm = combinedStudentList.find(
-        (s) => String(s.id || s.studentId || s.applicationId) === String(studentIds[0])
-      );
-      const termId = values.termId || studentWithTerm?.termId;
+      const firstId = studentIds[0];
+      const studentWithPhase = combinedStudentList.find((s) => {
+        const sid = String(s.studentId || s.id || s.applicationId || s.StudentId);
+        return sid === String(firstId);
+      });
+
+      const phaseId =
+        values.phaseId ||
+        studentWithPhase?.phaseId ||
+        studentWithPhase?.termId ||
+        studentWithPhase?.internshipPhaseId;
 
       const payload = {
         ...values,
-        termId,
+        phaseId,
+        termId: phaseId,
         students: !isEdit
           ? studentIds.map((id) => {
               const studentObj = combinedStudentList.find(
@@ -86,7 +104,10 @@ export const CreateGroupModal = memo(
         startDate: values.startDate?.toISOString(),
         endDate: values.endDate?.toISOString(),
       };
-      delete payload.studentIds;
+
+      if (!isAddingStudents) {
+        delete payload.studentIds;
+      }
 
       onFinish(payload);
       form.resetFields();
@@ -97,7 +118,7 @@ export const CreateGroupModal = memo(
       const sub = m.department || m.email || CREATE.MENTOR_LABEL;
       return {
         label: name, // Compact for selected view
-        value: String(m.id || m.mentorId || m.userId),
+        value: String(m.userId || m.mentorId || m.id || ''),
         searchValue: `${name} ${m.email || ''} ${m.department || ''}`,
         display: (
           <div className="flex items-center gap-2 py-1">
@@ -229,104 +250,123 @@ export const CreateGroupModal = memo(
           className="px-5 py-3"
           requiredMark={false}
         >
-          <div className="grid grid-cols-2 gap-3 mb-2">
-            <Form.Item
-              label={
-                <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                  {CREATE.NAME_LABEL}
-                </span>
-              }
-              name="groupName"
-              rules={[{ required: true, message: CREATE.NAME_REQUIRED }]}
-              className="mb-0"
-            >
-              <Input
-                prefix={<EditOutlined className="text-muted/40 text-[10px]" />}
-                placeholder={CREATE.NAME_PLACEHOLDER}
-                className="bg-slate-50/50 border-slate-100 h-9 rounded-lg hover:border-primary/50 focus:border-primary/50 transition-all text-xs font-semibold"
-              />
-            </Form.Item>
-
-            <Form.Item
-              label={
-                <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-2">
-                  {CREATE.MENTOR_LABEL}
-                </span>
-              }
-              name="mentorId"
-              className="mb-0"
-            >
-              <Select
-                allowClear
-                showSearch
-                placeholder={CREATE.MENTOR_PLACEHOLDER}
-                className="h-9 w-full rounded-lg bg-slate-50/50"
-                loading={loadingMentors}
-                options={mentorOptions}
-                optionLabelProp="label"
-                optionRender={(option) => option.data.display}
-                optionFilterProp="searchValue"
-                suffixIcon={<UserOutlined className="text-muted/40 text-[10px]" />}
-              />
-            </Form.Item>
-          </div>
-
-          {!isEdit &&
-            groupNameValue &&
-            existingGroups.some(
-              (g) => g.name?.toLowerCase() === groupNameValue.trim().toLowerCase()
-            ) && (
-              <div className="mb-3 text-[11px] font-medium text-amber-600 flex items-center gap-1.5 px-1 animate-in fade-in slide-in-from-top-1">
-                <InfoCircleOutlined className="text-[12px]" />
-                {CREATE.DUPLICATE_NAME_WARNING}
+          {isAddingStudents && group && (
+            <div className="mb-4 bg-primary-surface border border-primary/10 rounded-xl px-4 py-3 flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <Text className="text-muted/60 text-[9px] font-bold uppercase tracking-widest leading-none">
+                  {GROUP_CREATE.TARGET_GROUP_LABEL}
+                </Text>
+                <Text className="text-primary text-sm font-black tracking-tight leading-tight">
+                  {group.groupName || group.name}
+                </Text>
               </div>
-            )}
+              <div className="bg-success-surface px-2 py-1 rounded-lg text-success text-[10px] font-bold uppercase tracking-tighter shadow-sm">
+                {GROUP_CREATE.ACTIVE_GROUP_LABEL}
+              </div>
+            </div>
+          )}
+          {!isAddingStudents && (
+            <>
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                <Form.Item
+                  label={
+                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
+                      {CREATE.NAME_LABEL}
+                    </span>
+                  }
+                  name="groupName"
+                  rules={[{ required: true, message: CREATE.NAME_REQUIRED }]}
+                  className="mb-0"
+                >
+                  <Input
+                    prefix={<EditOutlined className="text-muted/40 text-[10px]" />}
+                    placeholder={CREATE.NAME_PLACEHOLDER}
+                    className="bg-slate-50/50 border-slate-100 h-9 rounded-lg hover:border-primary/50 focus:border-primary/50 transition-all text-xs font-semibold"
+                  />
+                </Form.Item>
 
-          <Form.Item
-            label={
-              <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                {CREATE.DESCRIPTION_LABEL}
-              </span>
-            }
-            name="description"
-            className="mb-2"
-          >
-            <Input.TextArea
-              placeholder={CREATE.DESCRIPTION_PLACEHOLDER}
-              className="bg-slate-50/50 border-slate-100 rounded-lg hover:border-primary/50 focus:border-primary/50 transition-all py-1.5 text-xs font-semibold"
-              autoSize={{ minRows: 1, maxRows: 2 }}
-            />
-          </Form.Item>
+                <Form.Item
+                  label={
+                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-2">
+                      {CREATE.MENTOR_LABEL}
+                    </span>
+                  }
+                  name="mentorId"
+                  className="mb-0"
+                >
+                  <Select
+                    allowClear
+                    showSearch
+                    placeholder={CREATE.MENTOR_PLACEHOLDER}
+                    className="h-9 w-full rounded-lg bg-slate-50/50"
+                    loading={loadingMentors}
+                    options={mentorOptions}
+                    optionLabelProp="label"
+                    optionRender={(option) => option.data.display}
+                    optionFilterProp="searchValue"
+                    suffixIcon={<UserOutlined className="text-muted/40 text-[10px]" />}
+                  />
+                </Form.Item>
+              </div>
 
-          <div className="grid grid-cols-2 gap-3 mb-2">
-            <Form.Item
-              label={
-                <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                  {CREATE.START_DATE_LABEL}
-                </span>
-              }
-              name="startDate"
-              rules={[{ required: true, message: CREATE.START_DATE_REQUIRED }]}
-              className="mb-0"
-            >
-              <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
-            </Form.Item>
+              {!isEdit &&
+                groupNameValue &&
+                existingGroups.some(
+                  (g) => g.name?.toLowerCase() === groupNameValue.trim().toLowerCase()
+                ) && (
+                  <div className="mb-3 text-[11px] font-medium text-amber-600 flex items-center gap-1.5 px-1 animate-in fade-in slide-in-from-top-1">
+                    <span className="text-[12px]">!</span>
+                    {CREATE.DUPLICATE_NAME_WARNING}
+                  </div>
+                )}
 
-            <Form.Item
-              label={
-                <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                  {CREATE.END_DATE_LABEL}
-                </span>
-              }
-              name="endDate"
-              rules={[{ required: true, message: CREATE.END_DATE_REQUIRED }]}
-              className="mb-0"
-            >
-              <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
-            </Form.Item>
-          </div>
+              <Form.Item
+                label={
+                  <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
+                    {CREATE.DESCRIPTION_LABEL}
+                  </span>
+                }
+                name="description"
+                className="mb-2"
+              >
+                <Input.TextArea
+                  placeholder={CREATE.DESCRIPTION_PLACEHOLDER}
+                  className="bg-slate-50/50 border-slate-100 rounded-lg hover:border-primary/50 focus:border-primary/50 transition-all py-1.5 text-xs font-semibold"
+                  autoSize={{ minRows: 1, maxRows: 2 }}
+                />
+              </Form.Item>
 
-          {!isEdit && (
+              <div className="grid grid-cols-2 gap-3 mb-2">
+                <Form.Item
+                  label={
+                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
+                      {CREATE.START_DATE_LABEL}
+                    </span>
+                  }
+                  name="startDate"
+                  rules={[{ required: true, message: CREATE.START_DATE_REQUIRED }]}
+                  className="mb-0"
+                >
+                  <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
+                </Form.Item>
+
+                <Form.Item
+                  label={
+                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
+                      {CREATE.END_DATE_LABEL}
+                    </span>
+                  }
+                  name="endDate"
+                  rules={[{ required: true, message: CREATE.END_DATE_REQUIRED }]}
+                  className="mb-0"
+                >
+                  <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
+                </Form.Item>
+              </div>
+            </>
+          )}
+
+          {(isAddingStudents || !isEdit) && (
             <Form.Item
               label={
                 <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
@@ -337,26 +377,116 @@ export const CreateGroupModal = memo(
               rules={[{ required: true, message: CREATE.STUDENTS_REQUIRED }]}
               className="mb-3"
             >
-              <Select
-                mode="multiple"
-                placeholder={CREATE.STUDENTS_PLACEHOLDER}
-                className="min-h-9 w-full rounded-lg bg-slate-50/50 overflow-hidden"
-                loading={loadingStudents}
-                options={studentOptions}
-                optionLabelProp="label"
-                optionRender={(option) => option.data.display}
-                optionFilterProp="searchValue"
-                maxTagCount="responsive"
-                disabled={initialStudents.length > 0 && !isEdit}
-                suffixIcon={<TeamOutlined className="text-muted/40 text-[10px]" />}
-              />
+              {isAddingStudents ? (
+                <div className="flex flex-col gap-3">
+                  <Input
+                    prefix={<SearchOutlined className="text-muted/40 text-[11px]" />}
+                    placeholder="Search by name or code..."
+                    value={studentSearch}
+                    onChange={(e) => setStudentSearch(e.target.value)}
+                    className="h-9 rounded-lg border-slate-100 bg-slate-50/50 text-xs font-semibold"
+                  />
+                  <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 no-scrollbar border border-slate-100 rounded-xl p-2 bg-slate-50/30">
+                    {combinedStudentList
+                      .filter((s) => {
+                        const isAssigned =
+                          s.isAssignedToGroup || !!s.assignedGroupId || !!s.groupId;
+                        if (isAssigned) return false;
+
+                        const name = (
+                          s.studentFullName ||
+                          s.fullName ||
+                          s.name ||
+                          ''
+                        ).toLowerCase();
+                        const code = (s.studentCode || s.code || '').toLowerCase();
+                        const search = studentSearch.toLowerCase();
+                        return name.includes(search) || code.includes(search);
+                      })
+                      .map((s) => {
+                        const id = String(s.studentId || s.id || s.applicationId);
+                        const isSelected = selectedStudentIds?.includes(id);
+                        const fullName =
+                          s.studentFullName || s.fullName || s.name || CREATE.UNKNOWN_STUDENT;
+                        const code = s.studentCode || s.code || CREATE.NO_CODE;
+
+                        return (
+                          <div
+                            key={id}
+                            onClick={() => {
+                              const current = selectedStudentIds || [];
+                              const next = isSelected
+                                ? current.filter((cid) => cid !== id)
+                                : [...current, id];
+                              form.setFieldsValue({ studentIds: next });
+                            }}
+                            className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-primary/5 border-primary/20 shadow-sm'
+                                : 'bg-white border-slate-100 hover:border-primary/30 hover:bg-slate-50'
+                            }`}
+                          >
+                            <div
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
+                                isSelected
+                                  ? 'bg-primary border-primary'
+                                  : 'bg-white border-slate-300'
+                              }`}
+                            >
+                              {isSelected && (
+                                <span className="text-white text-[10px] font-black italic">✓</span>
+                              )}
+                            </div>
+
+                            <Avatar size="small" src={s.avatar} icon={<UserOutlined />} />
+
+                            <div className="flex flex-col leading-tight grow overflow-hidden">
+                              <Text
+                                className={`text-xs font-bold truncate ${isSelected ? 'text-primary' : 'text-text'}`}
+                              >
+                                {fullName}
+                              </Text>
+                              <Text className="text-muted text-[9px] uppercase font-medium opacity-60">
+                                {code} • {s.major || CREATE.NO_MAJOR}
+                              </Text>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    {combinedStudentList.filter(
+                      (s) => !(s.isAssignedToGroup || !!s.assignedGroupId || !!s.groupId)
+                    ).length === 0 && (
+                      <div className="py-8 text-center flex flex-col items-center gap-2">
+                        <TeamOutlined className="text-muted/20 text-3xl" />
+                        <Text className="text-muted/60 text-xs italic">
+                          {CREATE.EMPTY_STUDENTS}
+                        </Text>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <Select
+                  mode="multiple"
+                  placeholder={CREATE.STUDENTS_PLACEHOLDER}
+                  className="min-h-9 w-full rounded-lg bg-slate-50/50 overflow-hidden"
+                  loading={loadingStudents}
+                  options={studentOptions}
+                  optionLabelProp="label"
+                  optionRender={(option) => option.data.display}
+                  optionFilterProp="searchValue"
+                  maxTagCount="responsive"
+                  disabled={initialStudents.length > 0 && !isEdit}
+                  suffixIcon={<TeamOutlined className="text-muted/40 text-[10px]" />}
+                />
+              )}
             </Form.Item>
           )}
 
           {students.length === 0 && !loadingStudents && !isEdit && (
-            <div className="mb-4 rounded-xl bg-orange-50/50 p-4 border border-orange-100 flex items-center gap-3">
-              <InfoCircleOutlined className="text-orange-400 text-lg" />
-              <Text className="text-orange-700 text-[13px] leading-relaxed">
+            <div className="mb-4 rounded-xl bg-warning-surface p-4 border border-warning/20 flex items-center gap-3">
+              <InfoCircleOutlined className="text-warning text-lg" />
+              <Text className="text-warning-text text-[13px] leading-relaxed">
                 {CREATE.EMPTY_STUDENTS}
               </Text>
             </div>
@@ -364,7 +494,13 @@ export const CreateGroupModal = memo(
 
           <CompoundModal.Footer
             cancelText={CREATE.CANCEL}
-            confirmText={isEdit ? CREATE.SUBMIT_EDIT : CREATE.SUBMIT}
+            confirmText={
+              isAddingStudents
+                ? GROUP_CREATE.SUBMIT_ADD
+                : isEdit
+                  ? CREATE.SUBMIT_EDIT
+                  : CREATE.SUBMIT
+            }
             onCancel={handleCancel}
             onConfirm={() => form.submit()}
             confirmDisabled={

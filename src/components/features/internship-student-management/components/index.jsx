@@ -47,8 +47,10 @@ export default function InternshipManagement() {
     handleViewStudent,
     termId,
     setTermId,
-    termOptions,
-    fetchingTerms,
+    phaseId,
+    setPhaseId,
+    phaseOptions,
+    fetchingPhases,
     resetFilters,
     projectFilter,
     setProjectFilter,
@@ -64,32 +66,36 @@ export default function InternshipManagement() {
     handleCreateGroup,
     dateFilter,
     setDateFilter,
-    isTermEditable,
+    mentorFilter,
+    setMentorFilter,
+    isPhaseEditable,
     hasGroups,
     existingGroups,
     sort,
     setSort,
+    mentors,
+    loadingMentors,
   } = useInternshipManagement();
 
   const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
   const hasGroup = selectedStudents.some((s) => !!s.groupId);
 
-  const uniqueTerms = new Set(selectedStudents.map((s) => s.termId));
-  const isSingleTerm = uniqueTerms.size === 1;
+  const uniquePhases = new Set(selectedStudents.map((s) => s.phaseId || s.termId));
+  const isSinglePhase = uniquePhases.size === 1;
 
   const bulkItems = [
     {
       key: 'addToGroup',
       label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
       icon: <UsergroupAddOutlined />,
-      disabled: !isTermEditable || !isSingleTerm,
+      disabled: !isPhaseEditable || !isSinglePhase,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'ADD' }),
     },
     {
       key: 'changeGroup',
       label: INTERNSHIP_LIST.ACTIONS.CHANGE_GROUP,
       icon: <EditOutlined />,
-      disabled: !isTermEditable || !isSingleTerm,
+      disabled: !isPhaseEditable || !isSinglePhase,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'CHANGE' }),
     },
   ].filter(Boolean);
@@ -113,15 +119,8 @@ export default function InternshipManagement() {
                 setDateFilter={setDateFilter}
                 groupFilter={groupFilter}
                 setGroupFilter={setGroupFilter}
-                assignmentFilter={assignmentFilter}
-                setAssignmentFilter={setAssignmentFilter}
-                projectFilter={projectFilter}
-                setProjectFilter={setProjectFilter}
-                universityFilter={universityFilter}
-                setUniversityFilter={setUniversityFilter}
-                majorFilter={majorFilter}
-                setMajorFilter={setMajorFilter}
-                universityOptions={universityOptions}
+                mentorFilter={mentorFilter}
+                setMentorFilter={setMentorFilter}
                 resetFilters={resetFilters}
               />
             </div>
@@ -144,10 +143,10 @@ export default function InternshipManagement() {
           page={pagination.current}
           pageSize={pagination.pageSize}
           loading={loading}
-          isTermEditable={isTermEditable}
+          isPhaseEditable={isPhaseEditable}
           hasGroups={hasGroups}
           emptyText={
-            termOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Upcoming Terms'
+            phaseOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Open Phases'
               ? INTERNSHIP_LIST.TABLE.EMPTY_TEXT_UPCOMING
               : INTERNSHIP_LIST.TABLE.EMPTY_TEXT_ACTIVE
           }
@@ -157,7 +156,6 @@ export default function InternshipManagement() {
           selectedRowKeys={selectedRowKeys}
           onSelectRowChange={setSelectedRowKeys}
           onView={handleViewStudent}
-          onAssign={(student) => setAssignModal({ open: true, student })}
           onCreateGroup={(student) => setCreateModal({ open: true, students: [student] })}
           onAddToGroup={(student) =>
             setGroupModal({ open: true, students: [student], type: 'ADD' })
@@ -207,6 +205,8 @@ export default function InternshipManagement() {
         existingGroups={existingGroups}
         loadingStudents={fetchingStudents}
         initialStudents={createModal.students}
+        mentors={mentors}
+        loadingMentors={loadingMentors}
         onCancel={() => setCreateModal({ open: false, students: [] })}
         onFinish={handleCreateGroup}
       />

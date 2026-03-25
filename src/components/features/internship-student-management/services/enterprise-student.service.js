@@ -19,13 +19,14 @@ export const EnterpriseStudentService = {
 
     const studentIdForPayLoad = personId || applicationId;
 
-    const termId =
+    const phaseId =
+      item.phaseId ||
+      item.PhaseId ||
+      item.internshipPhaseId ||
+      item.internshipPhase?.id ||
+      item.phase?.id ||
       item.termId ||
-      item.TermId ||
-      item.internshipTermId ||
-      item.internshipTerm?.id ||
-      item.term?.id ||
-      item.term?.termId;
+      item.TermId;
 
     let rawStatus = item.status !== undefined ? item.status : item.Status;
     if (typeof rawStatus === 'string') {
@@ -36,15 +37,16 @@ export const EnterpriseStudentService = {
     }
     const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 2;
 
-    let rawTermStatus = item.termStatus || item.TermStatus || item.statusTerm || 0;
-    if (typeof rawTermStatus === 'string') {
-      const s = rawTermStatus.toLowerCase();
-      if (s === 'upcoming') rawTermStatus = 1;
-      else if (s === 'active') rawTermStatus = 2;
-      else if (s === 'ended') rawTermStatus = 3;
-      else if (s === 'closed') rawTermStatus = 4;
+    let rawPhaseStatus =
+      item.phaseStatus || item.PhaseStatus || item.termStatus || item.TermStatus || 0;
+    if (typeof rawPhaseStatus === 'string') {
+      const s = rawPhaseStatus.toLowerCase();
+      if (s === 'draft') rawPhaseStatus = 0;
+      else if (s === 'open') rawPhaseStatus = 1;
+      else if (s === 'inprogress' || s === 'active') rawPhaseStatus = 2;
+      else if (s === 'closed' || s === 'ended') rawPhaseStatus = 3;
     }
-    const termStatus = rawTermStatus !== undefined ? parseInt(rawTermStatus, 10) : 0;
+    const phaseStatus = rawPhaseStatus !== undefined ? parseInt(rawPhaseStatus, 10) : 0;
 
     // 6. Identify Group Association (Improved detection for ADD vs MOVE)
     const groupId =
@@ -63,7 +65,8 @@ export const EnterpriseStudentService = {
       applicationId,
       studentId: studentIdForPayLoad, // Passed to API commands
       personId, // Pure person reference
-      termId,
+      phaseId,
+      termId: phaseId, // Backward compatibility
       studentFullName:
         item.studentName ||
         item.studentFullName ||
@@ -76,7 +79,8 @@ export const EnterpriseStudentService = {
       universityName: item.universityName || item.UniversityName || '-',
       major: item.major || item.Major || '-',
       status,
-      termStatus,
+      phaseStatus,
+      termStatus: phaseStatus, // Backward compatibility
       appliedAt: item.appliedAt || item.AppliedAt,
       groupId,
       isAssignedToGroup: item.isAssignedToGroup !== undefined ? item.isAssignedToGroup : !!groupId,
@@ -90,29 +94,39 @@ export const EnterpriseStudentService = {
       startDate:
         item.startDate ||
         item.internshipStartDate ||
+        item.internshipPhase?.startDate ||
+        item.phase?.startDate ||
         item.internshipTerm?.startDate ||
         item.term?.startDate,
       endDate:
         item.endDate ||
         item.internshipEndDate ||
+        item.internshipPhase?.endDate ||
+        item.phase?.endDate ||
         item.internshipTerm?.endDate ||
         item.term?.endDate,
     };
   },
 
-  async getApplications(params) {
-    return httpGet('/internship-applications', params);
+  async getApplications(params = {}) {
+    const cleanParams = {};
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined && params[key] !== null) {
+        cleanParams[key] = params[key];
+      }
+    });
+    return httpGet('/enterprises/me/applications', cleanParams);
   },
 
-  async getApplicationDetail(applicationId) {
-    return httpGet(`/internship-applications/${applicationId}`);
+  async getApplicationDetail(id) {
+    return httpGet(`/enterprises/me/applications/${id}`);
   },
 
-  async approveApplication(id) {
-    return httpPatch(`/internship-applications/${id}/approve`);
+  async assignMentor(studentId, data) {
+    return httpPatch(`/enterprises/me/students/${studentId}/mentor`, data);
   },
 
-  async rejectApplication(id, data) {
-    return httpPatch(`/internship-applications/${id}/reject`, data);
+  async getMyEnterprise() {
+    return httpGet('/enterprises/mine');
   },
 };

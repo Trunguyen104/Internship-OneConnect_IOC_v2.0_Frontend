@@ -26,43 +26,50 @@ export default function BaseSidebar({
   return (
     <aside
       className={`sticky top-0 hidden h-screen flex-col border-r border-slate-200 bg-gray-50 transition-all duration-300 ease-in-out md:flex ${
-        isSidebarCollapsed ? 'w-0 overflow-hidden border-r-0' : 'w-[15.1rem]'
+        isSidebarCollapsed ? 'w-20' : 'w-[15.1rem]'
       } ${className}`}
     >
       <div
-        className={`flex justify-center px-14 py-6 transition-opacity duration-300 ${isSidebarCollapsed ? 'opacity-0' : 'opacity-100'}`}
+        className={`flex justify-center px-4 py-6 transition-all duration-300 ${
+          isSidebarCollapsed ? 'opacity-0 h-0 py-0 overflow-hidden' : 'px-14 opacity-100'
+        }`}
       >
-        <Image src="/assets/images/logo.svg" alt="IOC Logo" width={120} height={40} />
+        {!isSidebarCollapsed && (
+          <Image src="/assets/images/logo.svg" alt="IOC Logo" width={120} height={40} />
+        )}
       </div>
 
-      <div
-        className={`flex flex-col flex-1 transition-opacity duration-200 ${isSidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-      >
+      <div className="flex flex-1 flex-col transition-all duration-300">
         {backButton && (
           <Link
             href={backButton.href}
-            className={`mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold transition-colors ${
-              backButton.className || 'text-primary hover:text-primary-hover'
-            }`}
+            className={`mx-auto mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold transition-all ${
+              isSidebarCollapsed ? 'px-0 justify-center' : 'mx-5'
+            } ${backButton.className || 'text-primary hover:text-primary-hover'}`}
           >
-            {backButton.icon || <ArrowLeftOutlined />}
-            {backButton.label}
+            <span className="text-lg">{backButton.icon || <ArrowLeftOutlined />}</span>
+            {!isSidebarCollapsed && backButton.label}
           </Link>
         )}
 
-        <nav className="flex-1 space-y-1">
+        <nav className={`flex-1 space-y-1 ${isSidebarCollapsed ? 'px-2' : 'px-3'}`}>
           {menus.map((item) => {
             const isActive = isItemActive(item.href);
 
             return (
-              <Link key={item.href} href={item.href} className="block px-3">
+              <Link key={item.href} href={item.href} className="block">
                 <div
-                  className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                  className={`flex items-center rounded-xl py-2 text-sm font-semibold transition-all ${
+                    isSidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'
+                  } ${
                     isActive ? 'bg-primary-surface text-primary' : 'text-slate-600 hover:bg-blue-50'
                   }`}
+                  title={isSidebarCollapsed ? item.label : ''}
                 >
-                  <span className="text-lg">{item.icon}</span>
-                  {item.label}
+                  <span className="text-xl leading-none flex items-center justify-center">
+                    {item.icon}
+                  </span>
+                  {!isSidebarCollapsed && <span className="truncate flex-1">{item.label}</span>}
                 </div>
               </Link>
             );

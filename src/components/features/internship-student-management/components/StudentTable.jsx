@@ -6,7 +6,6 @@ import {
   EyeOutlined,
   MinusCircleFilled,
   MoreOutlined,
-  UserAddOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
@@ -15,10 +14,7 @@ import React, { memo, useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
-import {
-  INTERNSHIP_MANAGEMENT_UI,
-  TERM_STATUS_VARIANTS,
-} from '@/constants/internship-management/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const STATUS_CONFIG = {
   Pending: {
@@ -53,7 +49,7 @@ const StudentTable = memo(function StudentTable({
   onCreateGroup,
   onAddToGroup,
   onChangeGroup,
-  isTermEditable,
+  isPhaseEditable,
   hasGroups,
   sortBy,
   sortOrder,
@@ -81,7 +77,8 @@ const StudentTable = memo(function StudentTable({
       {
         title: TABLE.COLUMNS.FULL_NAME,
         key: 'studentFullName',
-        sortKey: 'studentFullName',
+        sortKey: 'FullName',
+        sorter: true,
         width: '170px',
         render: (_, record) => (
           <div className="flex flex-col">
@@ -102,8 +99,7 @@ const StudentTable = memo(function StudentTable({
         title: TABLE.COLUMNS.STATUS,
         dataIndex: 'status',
         key: 'status',
-        sortKey: 'status',
-        width: '100px',
+        width: '140px', // Adjusted width
         align: 'center',
         render: (statusIdx) => {
           const config =
@@ -130,17 +126,18 @@ const StudentTable = memo(function StudentTable({
         },
       },
       {
-        title: TABLE.COLUMNS.TERM_STATUS,
-        key: 'termStatus',
-        width: '110px',
+        title: TABLE.COLUMNS.PHASE_STATUS,
+        key: 'phaseStatus',
+        width: '140px', // Adjusted width
         align: 'center',
         render: (_, record) => {
-          const status = record.termStatus;
-          const variant = TERM_STATUS_VARIANTS[status] || 'default';
+          const status = record.phaseStatus !== undefined ? record.phaseStatus : record.termStatus;
+          const variant =
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_VARIANTS[status] || 'default';
           const label =
             INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || '-';
           return (
-            <Badge variant={variant} size="sm">
+            <Badge variant={variant || 'default'} size="sm">
               {label}
             </Badge>
           );
@@ -149,7 +146,7 @@ const StudentTable = memo(function StudentTable({
       {
         title: TABLE.COLUMNS.INTERNSHIP_PERIOD,
         key: 'period',
-        width: '160px',
+        width: '220px', // Adjusted width
         align: 'center',
         render: (_, record) => {
           if (!record.startDate || !record.endDate)
@@ -168,10 +165,13 @@ const StudentTable = memo(function StudentTable({
       {
         title: TABLE.COLUMNS.GROUP,
         key: 'group',
+        sortKey: 'GroupName',
+        sorter: true,
         width: '150px',
         render: (_, record) => {
           const isPlaced = record.status === 2;
-          const isEditable = record.termStatus === 2;
+          const isEditable =
+            [1, 2].includes(record.phaseStatus) || [1, 2].includes(record.termStatus);
 
           if (isPlaced && !record.groupId) {
             return (
@@ -223,16 +223,10 @@ const StudentTable = memo(function StudentTable({
             },
           ];
 
-          const isEditable = record.termStatus === 2;
+          const isEditable =
+            [1, 2].includes(record.phaseStatus) || [1, 2].includes(record.termStatus);
 
           if (isApproved && isEditable) {
-            menuItems.push({
-              key: 'assign',
-              label: ACTIONS.ASSIGN,
-              icon: <UserAddOutlined />,
-              onClick: () => onAssign(record),
-            });
-
             if (!record.groupId) {
               menuItems.push({
                 key: 'createGroup',
@@ -252,7 +246,7 @@ const StudentTable = memo(function StudentTable({
             } else {
               menuItems.push({
                 key: 'changeGroup',
-                label: ACTIONS.CHANGE_GROUP || 'Đổi nhóm',
+                label: ACTIONS.CHANGE_GROUP,
                 icon: <UsergroupAddOutlined />,
                 onClick: () => onChangeGroup(record),
               });
@@ -276,11 +270,10 @@ const StudentTable = memo(function StudentTable({
       page,
       pageSize,
       onView,
-      onAssign,
       onCreateGroup,
       onAddToGroup,
       onChangeGroup,
-      isTermEditable,
+      isPhaseEditable,
       hasGroups,
       ACTIONS,
       STATUS_LABELS,

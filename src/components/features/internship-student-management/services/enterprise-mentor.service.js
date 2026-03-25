@@ -7,10 +7,10 @@ export const EnterpriseMentorService = {
   async getMentors(params = {}) {
     // Aligned with user-management API
     return httpGet(BASE_URL, {
+      Role: MENTOR_ROLE, // Default to 6
+      PageNumber: 1,
+      PageSize: 100,
       ...params,
-      Role: MENTOR_ROLE,
-      PageNumber: params.PageNumber || 1,
-      PageSize: params.PageSize || 100,
     });
   },
 };

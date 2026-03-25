@@ -1,16 +1,21 @@
-export const TERM_STATUS = {
-  UPCOMING: 1,
-  ACTIVE: 2,
-  ENDED: 3,
-  CLOSED: 4,
+export const PHASE_STATUS = {
+  DRAFT: 0,
+  OPEN: 1,
+  IN_PROGRESS: 2,
+  CLOSED: 3,
 };
 
-export const TERM_STATUS_VARIANTS = {
-  [TERM_STATUS.UPCOMING]: 'info',
-  [TERM_STATUS.ACTIVE]: 'success',
-  [TERM_STATUS.ENDED]: 'warning',
-  [TERM_STATUS.CLOSED]: 'default',
+// Keep TERM_STATUS for backward compatibility if needed, but point to PHASE_STATUS
+export const TERM_STATUS = PHASE_STATUS;
+
+export const PHASE_STATUS_VARIANTS = {
+  [PHASE_STATUS.DRAFT]: 'default',
+  [PHASE_STATUS.OPEN]: 'info',
+  [PHASE_STATUS.IN_PROGRESS]: 'success',
+  [PHASE_STATUS.CLOSED]: 'warning',
 };
+
+export const TERM_STATUS_VARIANTS = PHASE_STATUS_VARIANTS;
 
 export const ENROLLMENT_STATUS = {
   ACTIVE: 1,
@@ -46,9 +51,11 @@ export const PROJECT_STATUS_VARIANTS = {
   [PROJECT_STATUS.COMPLETED]: 'success',
 };
 
-export const TERM_STATUS_MAP = Object.fromEntries(
-  Object.entries(TERM_STATUS).map(([k, v]) => [v, k])
+export const PHASE_STATUS_MAP = Object.fromEntries(
+  Object.entries(PHASE_STATUS).map(([k, v]) => [v, k])
 );
+
+export const TERM_STATUS_MAP = PHASE_STATUS_MAP;
 
 export const INTERNSHIP_MANAGEMENT_UI = {
   GROUP_MANAGEMENT: {
@@ -67,8 +74,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     FILTERS: {
       SEARCH_PLACEHOLDER: 'Search groups...',
       STATUS_FILTER: 'Status',
-      SELECT_TERM: 'Select Term',
-      SELECT_STATUS: 'Select Status',
+      SELECT_PHASE: 'Chọn Giai đoạn',
+      SELECT_TERM: 'Chọn Kỳ',
+      SELECT_STATUS: 'Chọn Trạng thái',
       DATE_FILTER_PLACEHOLDER: 'Month/Year',
       INCLUDE_ARCHIVED: 'Archived',
       STATUS_OPTIONS: [
@@ -87,7 +95,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     TABLE: {
       COLUMNS: {
         GROUP_NAME: 'GROUP NAME',
-        TERM: 'TERM',
+        PHASE: 'PHASE',
         MENTOR: 'MENTOR',
         MEMBERS: 'MEMBERS',
         STATUS: 'STATUS',
@@ -197,7 +205,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         EMAIL: 'EMAIL',
         MAJOR: 'MAJOR',
         STATUS: 'STATUS',
-        TERM_STATUS: 'PERIOD',
+        PHASE_STATUS: 'PHASE STATUS',
         INTERNSHIP_PERIOD: 'INTERNSHIP PERIOD',
         GROUP: 'GROUP',
         MENTOR: 'MENTOR',
@@ -246,7 +254,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         { label: 'With Project', value: 'PROJECT_ASSIGNED' },
         { label: 'No Project', value: 'PROJECT_UNASSIGNED' },
       ],
-      TERM_LABEL: 'Internship Term',
+      PHASE_LABEL: 'Internship Phase',
       UNIVERSITY_LABEL: 'University',
       MAJOR_LABEL: 'Major',
     },
@@ -398,21 +406,31 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
       },
       STATUS_OPTIONS: [
-        { value: 1, label: 'Upcoming' },
-        { value: 2, label: 'Active' },
-        { value: 3, label: 'Ended' },
-        { value: 4, label: 'Closed' },
+        { value: 0, label: 'Draft' },
+        { value: 1, label: 'Open' },
+        { value: 2, label: 'In Progress' },
+        { value: 3, label: 'Closed' },
       ],
       STATUS_LABELS: {
-        1: 'Upcoming',
-        2: 'Active',
-        3: 'Ended',
-        4: 'Closed',
-        Upcoming: 'Upcoming',
-        Active: 'Active',
-        Ended: 'Ended',
+        0: 'Draft',
+        1: 'Open',
+        2: 'In Progress',
+        3: 'Closed',
+        Draft: 'Draft',
+        Open: 'Open',
+        InProgress: 'In Progress',
         Closed: 'Closed',
         STALE: 'Stale / Unknown',
+      },
+      STATUS_VARIANTS: {
+        0: 'default',
+        1: 'info',
+        2: 'success',
+        3: 'warning',
+        Draft: 'default',
+        Open: 'info',
+        InProgress: 'success',
+        Closed: 'warning',
       },
       ACTIONS: {
         CLOSE: 'Close Term',
@@ -484,224 +502,225 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         CLOSE_DEFAULT_REASON: 'Term closed by Admin',
       },
     },
-    DASHBOARD: {
-      TITLE: 'University Dashboard',
-      METRICS: {
-        TOTAL_STUDENTS: 'Total Students',
-        TOTAL_TERMS: 'Total Terms',
-        INTERNSHIP_GROUPS: 'Internship Groups',
-        ENROLLED: 'Enrolled',
-        TOTAL: 'Cumulative',
-        COORDINATED: 'Coordinated',
-      },
-      ANALYTICS: {
-        TITLE: 'Term Lifecycle Status',
-        ENDED: 'Ended Terms',
-        UPCOMING: 'Upcoming Terms',
-        ACTIVE: 'Active Terms',
-        CLOSED: 'Closed Terms',
-      },
-      RECENT_TERMS: {
-        TITLE: 'Recent Internship Terms',
-        SUBTITLE: 'Internship Program',
-        START_DATE: 'Start Date',
-        START_MONTH_FORMAT: 'MMM YYYY',
-        VIEW_ALL_BTN: 'View All',
-        EMPTY_TEXT: 'No recent terms found.',
-        TABLE: {
-          COLUMNS: {
-            NAME: 'TERM NAME',
-            DURATION: 'DURATION',
-            STATUS: 'STATUS',
-          },
-        },
-      },
-      MESSAGES: {
-        GENERATING_STATS: 'Generating system analytics...',
-        GENERATE_SUCCESS: 'Analytics report generated successfully!',
-      },
+    PHASE_MANAGEMENT: null,
+  },
+  DASHBOARD: {
+    TITLE: 'University Dashboard',
+    METRICS: {
+      TOTAL_STUDENTS: 'Total Students',
+      TOTAL_TERMS: 'Total Terms',
+      INTERNSHIP_GROUPS: 'Internship Groups',
+      ENROLLED: 'Enrolled',
+      TOTAL: 'Cumulative',
+      COORDINATED: 'Coordinated',
     },
-    ENROLLMENT_MANAGEMENT: {
-      TITLE: 'Student Enrollment Management',
-      SEARCH_PLACEHOLDER: 'Search by name or student ID...',
-      STATUS_FILTER: 'Status: All',
-      MAJOR_FILTER: 'Major: All',
-      STATUS_OPTIONS: [
-        { label: 'Placed', value: 'PLACED' },
-        { label: 'Unplaced', value: 'UNPLACED' },
-        { label: 'Withdrawn', value: 'WITHDRAWN' },
-      ],
-      STATUS_LABELS: {
-        ACTIVE: 'Active',
-        PLACED: 'Placed',
-        UNPLACED: 'Unplaced',
-        WITHDRAWN: 'Withdrawn',
-      },
-      PLACEMENT_LABELS: {
-        PLACED: 'Placed',
-        UNPLACED: 'Unplaced',
-      },
-      SEARCH: {
-        PLACEHOLDER: 'Search by name, email or major...',
-        TERM_PLACEHOLDER: 'Select Internship Term',
-      },
-      ACTIONS: {
-        ADD: 'Add Student',
-        IMPORT: 'Import from Excel',
-        EDIT: 'Edit',
-        DELETE: 'Withdraw',
-        VIEW: 'View Details',
-        RECOVER: 'Re-enroll',
-      },
+    ANALYTICS: {
+      TITLE: 'Term Lifecycle Status',
+      ENDED: 'Ended Terms',
+      UPCOMING: 'Upcoming Terms',
+      ACTIVE: 'Active Terms',
+      CLOSED: 'Closed Terms',
+    },
+    RECENT_TERMS: {
+      TITLE: 'Recent Internship Terms',
+      SUBTITLE: 'Internship Program',
+      START_DATE: 'Start Date',
+      START_MONTH_FORMAT: 'MMM YYYY',
+      VIEW_ALL_BTN: 'View All',
+      EMPTY_TEXT: 'No recent terms found.',
       TABLE: {
         COLUMNS: {
-          FULL_NAME: 'FULL NAME',
-          STUDENT_ID: 'STUDENT ID',
-          EMAIL: 'EMAIL',
-          MAJOR: 'MAJOR',
-          PLACEMENT: 'PLACEMENT',
+          NAME: 'TERM NAME',
+          DURATION: 'DURATION',
           STATUS: 'STATUS',
-          ACTIONS: 'ACTIONS',
+        },
+      },
+    },
+    MESSAGES: {
+      GENERATING_STATS: 'Generating system analytics...',
+      GENERATE_SUCCESS: 'Analytics report generated successfully!',
+    },
+  },
+  ENROLLMENT_MANAGEMENT: {
+    TITLE: 'Student Enrollment Management',
+    SEARCH_PLACEHOLDER: 'Search by name or student ID...',
+    STATUS_FILTER: 'Status: All',
+    MAJOR_FILTER: 'Major: All',
+    STATUS_OPTIONS: [
+      { label: 'Placed', value: 'PLACED' },
+      { label: 'Unplaced', value: 'UNPLACED' },
+      { label: 'Withdrawn', value: 'WITHDRAWN' },
+    ],
+    STATUS_LABELS: {
+      ACTIVE: 'Active',
+      PLACED: 'Placed',
+      UNPLACED: 'Unplaced',
+      WITHDRAWN: 'Withdrawn',
+    },
+    PLACEMENT_LABELS: {
+      PLACED: 'Placed',
+      UNPLACED: 'Unplaced',
+    },
+    SEARCH: {
+      PLACEHOLDER: 'Search by name, email or major...',
+      TERM_PLACEHOLDER: 'Select Internship Term',
+    },
+    ACTIONS: {
+      ADD: 'Add Student',
+      IMPORT: 'Import from Excel',
+      EDIT: 'Edit',
+      DELETE: 'Withdraw',
+      VIEW: 'View Details',
+      RECOVER: 'Re-enroll',
+    },
+    TABLE: {
+      COLUMNS: {
+        FULL_NAME: 'FULL NAME',
+        STUDENT_ID: 'STUDENT ID',
+        EMAIL: 'EMAIL',
+        MAJOR: 'MAJOR',
+        PLACEMENT: 'PLACEMENT',
+        STATUS: 'STATUS',
+        ACTIONS: 'ACTIONS',
+        VALIDITY: 'Validity',
+      },
+    },
+    MODALS: {
+      ADD_EDIT: {
+        TITLE_ADD: 'Add New Student',
+        SUBTITLE_ADD: 'Add a new student to the internship enrollment list',
+        TITLE_EDIT: 'Update Student Information',
+        SUBTITLE_EDIT: 'Update detailed information for student',
+        TITLE_VIEW: 'Student Details',
+        SUBTITLE_VIEW: 'View detailed information and internship status',
+
+        SECTION_PERSONAL: 'Personal Information',
+        SECTION_PLACEMENT: 'Placement Settings',
+
+        NAME_LABEL: 'Full Name',
+        NAME_PLACEHOLDER: 'Ex: John Doe',
+        NAME_REQUIRED: 'Please enter full name',
+
+        ID_LABEL: 'Student ID',
+        ID_PLACEHOLDER: 'Ex: ST2024001',
+        ID_REQUIRED: 'Please enter student ID',
+        ID_EDIT_INFO: 'Student ID cannot be changed once enrolled.',
+
+        EMAIL_LABEL: 'Student Email',
+        EMAIL_PLACEHOLDER: 'Ex: student@university.edu',
+        EMAIL_REQUIRED: 'Please enter student email',
+        EMAIL_INVALID: 'Invalid email address',
+
+        MAJOR_LABEL: 'Major',
+        MAJOR_PLACEHOLDER: 'Ex: Software Engineering',
+        MAJOR_REQUIRED: 'Please enter major',
+
+        PHONE_LABEL: 'Phone Number',
+        PHONE_PLACEHOLDER: 'Ex: 0901234567',
+        DOB_LABEL: 'Date of Birth',
+        ENROLL_DATE_LABEL: 'Enrollment Date',
+        NOTE_LABEL: 'Enrollment Note',
+        NOTE_PLACEHOLDER: 'Enter any notes about this enrollment...',
+        VALIDATION: {
+          ENTERPRISE_REQUIRED: 'Please select an enterprise for placed students',
+        },
+
+        STATUS_LABEL: 'Current Status',
+        ENTERPRISE_LABEL: 'Assigned Enterprise',
+        ENTERPRISE_PLACEHOLDER: 'Not assigned yet',
+
+        CANCEL: 'Cancel',
+        SUBMIT_ADD: 'Add Student',
+        SUBMIT_EDIT: 'Update',
+        CLOSE: 'Close',
+
+        TABS: {
+          GENERAL: 'General',
+          PLACEMENT: 'Placement',
+          FEEDBACK: 'Feedback',
+        },
+        FEEDBACK_EMPTY: {
+          TITLE: 'No Feedback Records',
+          SUBTITLE: 'Evaluations will appear here later',
+        },
+        PHASE_TEXT: {
+          PREFIX: 'This student is currently in the',
+          SUFFIX:
+            'phase. Business details and evaluations will be updated as the internship progresses.',
+        },
+      },
+      IMPORT: {
+        TITLE: 'Import Student List',
+        SUBTITLE: 'Upload student list to enroll them in the internship term',
+        DRAG_TEXT: 'Drag & drop file here or click to select',
+        HINT_TEXT: 'Supports .xls, .xlsx files. Max size 10MB.',
+        PREPARATION_TITLE: 'Step 1: Preparation',
+        PREPARATION_HINT: 'Use our template for best results',
+        DOWNLOAD_TEMPLATE: 'Download template',
+        PREVIEW_TITLE: 'Data Preview',
+        VALID_TAG: 'Valid',
+        INVALID_TAG: 'Error',
+        CANCEL: 'Cancel',
+        SUBMIT: 'Start Import',
+        TOOLTIP_VALID: 'Valid student data',
+
+        PREVIEW_COLUMNS: {
+          FULL_NAME: 'Full Name',
+          STUDENT_ID: 'Student ID',
+          EMAIL: 'Email',
+          PHONE: 'Phone',
+          DOB: 'Date of Birth',
+          MAJOR: 'Major',
           VALIDITY: 'Validity',
         },
+        TOOLTIPS: {
+          VALID: 'Valid Data',
+          ERROR: 'Data Error',
+        },
+        ERRORS: {
+          MISSING_ID: 'Missing Student ID',
+        },
+        VALIDATION: {
+          FILE_SIZE_LIMIT: 'File must be smaller than 5MB!',
+        },
+        TEMPLATE_FILENAME: 'student_import_template.xlsx',
       },
-      MODALS: {
-        ADD_EDIT: {
-          TITLE_ADD: 'Add New Student',
-          SUBTITLE_ADD: 'Add a new student to the internship enrollment list',
-          TITLE_EDIT: 'Update Student Information',
-          SUBTITLE_EDIT: 'Update detailed information for student',
-          TITLE_VIEW: 'Student Details',
-          SUBTITLE_VIEW: 'View detailed information and internship status',
-
-          SECTION_PERSONAL: 'Personal Information',
-          SECTION_PLACEMENT: 'Placement Settings',
-
-          NAME_LABEL: 'Full Name',
-          NAME_PLACEHOLDER: 'Ex: John Doe',
-          NAME_REQUIRED: 'Please enter full name',
-
-          ID_LABEL: 'Student ID',
-          ID_PLACEHOLDER: 'Ex: ST2024001',
-          ID_REQUIRED: 'Please enter student ID',
-          ID_EDIT_INFO: 'Student ID cannot be changed once enrolled.',
-
-          EMAIL_LABEL: 'Student Email',
-          EMAIL_PLACEHOLDER: 'Ex: student@university.edu',
-          EMAIL_REQUIRED: 'Please enter student email',
-          EMAIL_INVALID: 'Invalid email address',
-
-          MAJOR_LABEL: 'Major',
-          MAJOR_PLACEHOLDER: 'Ex: Software Engineering',
-          MAJOR_REQUIRED: 'Please enter major',
-
-          PHONE_LABEL: 'Phone Number',
-          PHONE_PLACEHOLDER: 'Ex: 0901234567',
-          DOB_LABEL: 'Date of Birth',
-          ENROLL_DATE_LABEL: 'Enrollment Date',
-          NOTE_LABEL: 'Enrollment Note',
-          NOTE_PLACEHOLDER: 'Enter any notes about this enrollment...',
-          VALIDATION: {
-            ENTERPRISE_REQUIRED: 'Please select an enterprise for placed students',
-          },
-
-          STATUS_LABEL: 'Current Status',
-          ENTERPRISE_LABEL: 'Assigned Enterprise',
-          ENTERPRISE_PLACEHOLDER: 'Not assigned yet',
-
-          CANCEL: 'Cancel',
-          SUBMIT_ADD: 'Add Student',
-          SUBMIT_EDIT: 'Update',
-          CLOSE: 'Close',
-
-          TABS: {
-            GENERAL: 'General',
-            PLACEMENT: 'Placement',
-            FEEDBACK: 'Feedback',
-          },
-          FEEDBACK_EMPTY: {
-            TITLE: 'No Feedback Records',
-            SUBTITLE: 'Evaluations will appear here later',
-          },
-          PHASE_TEXT: {
-            PREFIX: 'This student is currently in the',
-            SUFFIX:
-              'phase. Business details and evaluations will be updated as the internship progresses.',
-          },
-        },
-        IMPORT: {
-          TITLE: 'Import Student List',
-          SUBTITLE: 'Upload student list to enroll them in the internship term',
-          DRAG_TEXT: 'Drag & drop file here or click to select',
-          HINT_TEXT: 'Supports .xls, .xlsx files. Max size 10MB.',
-          PREPARATION_TITLE: 'Step 1: Preparation',
-          PREPARATION_HINT: 'Use our template for best results',
-          DOWNLOAD_TEMPLATE: 'Download template',
-          PREVIEW_TITLE: 'Data Preview',
-          VALID_TAG: 'Valid',
-          INVALID_TAG: 'Error',
-          CANCEL: 'Cancel',
-          SUBMIT: 'Start Import',
-          TOOLTIP_VALID: 'Valid student data',
-
-          PREVIEW_COLUMNS: {
-            FULL_NAME: 'Full Name',
-            STUDENT_ID: 'Student ID',
-            EMAIL: 'Email',
-            PHONE: 'Phone',
-            DOB: 'Date of Birth',
-            MAJOR: 'Major',
-            VALIDITY: 'Validity',
-          },
-          TOOLTIPS: {
-            VALID: 'Valid Data',
-            ERROR: 'Data Error',
-          },
-          ERRORS: {
-            MISSING_ID: 'Missing Student ID',
-          },
-          VALIDATION: {
-            FILE_SIZE_LIMIT: 'File must be smaller than 5MB!',
-          },
-          TEMPLATE_FILENAME: 'student_import_template.xlsx',
-        },
-      },
-      MESSAGES: {
-        IMPORT_SUCCESS: 'Student list imported successfully',
-        IMPORT_ERROR: 'Failed to import student data',
-        IMPORT_BULK_SUCCESS: 'Successfully imported {count} students',
-        ADD_SUCCESS: 'Student added successfully',
-        ADD_ERROR: 'Failed to add student',
-        UPDATE_SUCCESS: 'Information updated successfully',
-        UPDATE_ERROR: 'Failed to update student',
-        DELETE_CONFIRM_TITLE: 'Delete Student From This Term',
-        DELETE_CONFIRM_TEXT:
-          'Are you sure you want to delete student "{name}" from this internship term? This action cannot be undone.',
-        DELETE_SUCCESS: 'Student deleted successfully',
-        DELETE_ERROR: 'Failed to delete student',
-        LOAD_ERROR: 'Failed to load students',
-        RESTORE_SUCCESS: 'Student re-enrolled successfully',
-        RESTORE_ERROR: 'Failed to re-enroll student',
-        DOWNLOAD_TEMPLATE_ERROR: 'Failed to download template',
-        DETAIL_LOAD_ERROR: 'Failed to load student details',
-        BULK_WITHDRAW_SUCCESS: 'Successfully withdrawn selected students',
-        WITHDRAW_PLACED_ERROR:
-          'Cannot withdraw a student who is already PLACED. Please cancel their placement first.',
-        BULK_WITHDRAW_PLACED_ERROR:
-          '{count} student(s) are already PLACED. Please cancel their placement before withdrawing.',
-        BULK_WITHDRAW: {
-          CONFIRM_ALL_UNPLACED:
-            'Are you sure you want to withdraw {count} students from this internship term?',
-          CONFIRM_MIXED:
-            '{placedCount} placed students will be skipped. Are you sure you want to withdraw the remaining {unplacedCount} students?',
-          SUCCESS_ALL_UNPLACED: 'Successfully withdrawn {count} students',
-          SUCCESS_MIXED:
-            'Successfully withdrawn {unplacedCount} students. {placedCount} placed students were skipped.',
-          ERROR_ALL_PLACED:
-            'All selected students are placed and cannot be withdrawn. Please cancel placement first.',
-          ERROR_GENERIC: 'An error occurred, please try again',
-          ACTION_LABEL: 'Withdraw students',
-        },
+    },
+    MESSAGES: {
+      IMPORT_SUCCESS: 'Student list imported successfully',
+      IMPORT_ERROR: 'Failed to import student data',
+      IMPORT_BULK_SUCCESS: 'Successfully imported {count} students',
+      ADD_SUCCESS: 'Student added successfully',
+      ADD_ERROR: 'Failed to add student',
+      UPDATE_SUCCESS: 'Information updated successfully',
+      UPDATE_ERROR: 'Failed to update student',
+      DELETE_CONFIRM_TITLE: 'Delete Student From This Term',
+      DELETE_CONFIRM_TEXT:
+        'Are you sure you want to delete student "{name}" from this internship term? This action cannot be undone.',
+      DELETE_SUCCESS: 'Student deleted successfully',
+      DELETE_ERROR: 'Failed to delete student',
+      LOAD_ERROR: 'Failed to load students',
+      RESTORE_SUCCESS: 'Student re-enrolled successfully',
+      RESTORE_ERROR: 'Failed to re-enroll student',
+      DOWNLOAD_TEMPLATE_ERROR: 'Failed to download template',
+      DETAIL_LOAD_ERROR: 'Failed to load student details',
+      BULK_WITHDRAW_SUCCESS: 'Successfully withdrawn selected students',
+      WITHDRAW_PLACED_ERROR:
+        'Cannot withdraw a student who is already PLACED. Please cancel their placement first.',
+      BULK_WITHDRAW_PLACED_ERROR:
+        '{count} student(s) are already PLACED. Please cancel their placement before withdrawing.',
+      BULK_WITHDRAW: {
+        CONFIRM_ALL_UNPLACED:
+          'Are you sure you want to withdraw {count} students from this internship term?',
+        CONFIRM_MIXED:
+          '{placedCount} placed students will be skipped. Are you sure you want to withdraw the remaining {unplacedCount} students?',
+        SUCCESS_ALL_UNPLACED: 'Successfully withdrawn {count} students',
+        SUCCESS_MIXED:
+          'Successfully withdrawn {unplacedCount} students. {placedCount} placed students were skipped.',
+        ERROR_ALL_PLACED:
+          'All selected students are placed and cannot be withdrawn. Please cancel placement first.',
+        ERROR_GENERIC: 'An error occurred, please try again',
+        ACTION_LABEL: 'Withdraw students',
       },
     },
   },
@@ -829,6 +848,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       TABS: {
         DETAILS: 'Project Details',
         STUDENTS: 'Assigned Students',
+        GROUPS: 'Assign Group',
       },
 
       TABLE: {
@@ -839,6 +859,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           GROUP: 'INTERN GROUP',
           FIELD: 'FIELD',
           TEMPLATE: 'TEMPLATE',
+          START_DATE: 'START DATE',
+          END_DATE: 'END DATE',
           TIMELINE: 'TIMELINE',
           STATUS: 'STATUS',
           ACTIONS: 'ACTIONS',
@@ -850,6 +872,12 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         STATUS: 'Status',
         ALL_GROUPS: 'All Groups',
         ALL_STATUSES: 'All Statuses',
+      },
+
+      STUDENT_STATUS: {
+        ASSIGNED: 'Assigned',
+        COMPLETED: 'Completed',
+        REMOVED: 'Removed',
       },
 
       MODALS: {
@@ -894,24 +922,36 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           SEARCH: 'Search students...',
           SELECTED: 'selected',
           CANCEL: 'Cancel',
-          CONFIRM: 'Assign',
+          CONFIRM: 'Assign Project',
           UNASSIGN_TITLE: 'Confirm Un-assign',
           UNASSIGN_CONTENT: 'Are you sure you want to remove this student from the project?',
+          COLUMNS: {
+            STU_NAME: 'FULL NAME',
+            STU_UNI: 'UNIVERSITY',
+            STU_EMAIL: 'EMAIL',
+            ASSIGNED_DATE: 'ASSIGNED DATE',
+            STATUS: 'STATUS',
+            ACTIONS: 'ACTIONS',
+          },
         },
       },
 
       MESSAGES: {
         SAVE_DRAFT_SUCCESS: 'Project draft saved successfully.',
-        PUBLISH_SUCCESS: 'Project has been published.',
+        PUBLISH_SUCCESS: 'Project has been published successfully.',
         COMPLETE_SUCCESS: 'Project marked as completed.',
+        COMPLETE_CONFIRM: 'Project will be marked as completed. Are you sure?',
         UPDATE_SUCCESS: 'Project updated successfully.',
         DELETE_SUCCESS: 'Project deleted successfully.',
         ASSIGN_SUCCESS: 'Successfully assigned {count} students to project.',
         UNASSIGN_SUCCESS: 'Student removed from project.',
+        EDIT_WARNING:
+          'Project has {count} students assigned. Changes may affect progress. Are you sure?',
         ERROR_ARCHIVED_GROUP: 'Cannot publish project for an archived group.',
-        ERROR_ASSIGNED_STU: 'Project has students assigned, un-assign them first before deleting.',
+        ERROR_ASSIGNED_STU:
+          'Project has students assigned and cannot be deleted. Please un-assign them before deleting.',
         WARNING_COMPLETE_STU:
-          "There are {count} students who haven't completed their assignment. Mark as complete anyway?",
+          'There are {count} students who haven’t completed the project. The project can still be marked as completed.',
       },
     },
   },

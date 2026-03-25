@@ -5,14 +5,14 @@ import { useToast } from '@/providers/ToastProvider';
 import { ENTERPRISE_STUDENT_UI } from '../constants/enterprise-student.constants';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
 
-export const useEnterpriseStudents = ({ termId, filters, search, pagination, sort }) => {
+export const useEnterpriseStudents = ({ phaseId, filters, search, pagination, sort }) => {
   const toast = useToast();
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const fetchStudents = useCallback(async () => {
-    if (!termId) return;
+    if (!phaseId) return;
 
     try {
       setLoading(true);
@@ -23,9 +23,8 @@ export const useEnterpriseStudents = ({ termId, filters, search, pagination, sor
         Search: search || undefined,
         Status:
           filters.status !== undefined ? (filters.status === 'ALL' ? null : filters.status) : null,
-        // camelCase just in case
-        termId,
-        TermId: termId,
+        PhaseId: phaseId,
+        TermId: phaseId, // Backward compatibility
         pageIndex: pagination.current,
         pageSize: pagination.pageSize,
         searchTerm: search || undefined,
@@ -53,7 +52,7 @@ export const useEnterpriseStudents = ({ termId, filters, search, pagination, sor
       setLoading(false);
     }
   }, [
-    termId,
+    phaseId,
     pagination,
     search,
     filters?.status,

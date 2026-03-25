@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -6,8 +7,8 @@ import { useToast } from '@/providers/ToastProvider';
 import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
 import { userService } from '../../user/services/userService';
 import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
+import { EnterprisePhaseService } from '../services/enterprise-phase.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
-import { EnterpriseTermService } from '../services/enterprise-term.service';
 
 export const useInternshipManagement = () => {
   const toast = useToast();
@@ -16,9 +17,9 @@ export const useInternshipManagement = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
-  const [termId, setTermId] = useState(null);
-  const [termOptions, setTermOptions] = useState([]);
-  const [fetchingTerms, setFetchingTerms] = useState(false);
+  const [phaseId, setPhaseId] = useState(null);
+  const [phaseOptions, setPhaseOptions] = useState([]);
+  const [fetchingPhases, setFetchingPhases] = useState(false);
   const [hasGroups, setHasGroups] = useState(false);
   const [existingGroups, setExistingGroups] = useState([]);
   const [enterpriseId, setEnterpriseId] = useState(null);
@@ -39,11 +40,8 @@ export const useInternshipManagement = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(2); // Default to Placed (Approved = 2)
   const [groupFilter, setGroupFilter] = useState('ALL');
-  const [assignmentFilter, setAssignmentFilter] = useState('ALL');
-  const [projectFilter, setProjectFilter] = useState('ALL');
+  const [mentorFilter, setMentorFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState(null); // Month/Year filter
-  const [universityFilter, setUniversityFilter] = useState(undefined);
-  const [majorFilter, setMajorFilter] = useState(undefined);
   const [universityOptions, setUniversityOptions] = useState([]);
 
   const [pagination, setPagination] = useState({
@@ -51,7 +49,7 @@ export const useInternshipManagement = () => {
     pageSize: 10,
   });
 
-  const [sort, setSort] = useState({ column: undefined, order: undefined });
+  const [sort, setSort] = useState({ column: 'FullName', order: 'Asc' });
 
   const [rejectModal, setRejectModal] = useState({ open: false, student: null });
   const [assignModal, setAssignModal] = useState({ open: false, student: null });
@@ -68,9 +66,27 @@ export const useInternshipManagement = () => {
   const fetchMentors = useCallback(async () => {
     try {
       setLoadingMentors(true);
-      const res = await EnterpriseMentorService.getMentors({ PageSize: 100 });
-      const items = res?.data?.items || res?.data || res?.items || [];
-      setMentors(items);
+      // Fetch multiple roles that can act as mentors (4: Admin, 5: HR, 6: Mentor)
+      const roles = [4, 5, 6];
+      // Use allSettled so if one role (e.g. role 4) is forbidden, we still get others
+      const results = await Promise.allSettled(
+        roles.map((r) => EnterpriseMentorService.getMentors({ Role: r, PageSize: 100 }))
+      );
+
+      const allItems = results
+        .filter((r) => r.status === 'fulfilled')
+        .flatMap((r) => {
+          const res = r.value;
+          const data = res?.data || res;
+          return data?.items || data?.Items || (Array.isArray(data) ? data : []);
+        });
+
+      // Remove duplicates based on userId
+      const uniqueItems = Array.from(
+        new Map(allItems.map((item) => [item?.userId || item?.UserId || item?.id, item])).values()
+      ).filter(Boolean);
+
+      setMentors(uniqueItems);
     } catch (err) {
       toast.error('Không thể tải danh sách Mentor');
       setMentors([]);
@@ -84,191 +100,196 @@ export const useInternshipManagement = () => {
   }, [fetchMentors]);
 
   useEffect(() => {
-    const fetchTerms = async () => {
+    const fetchPhases = async () => {
       try {
-        setFetchingTerms(true);
-        const res = await EnterpriseTermService.getAllTerms();
-        const terms = res?.data?.items || res?.data || [];
+        setFetchingPhases(true);
+        const res = await EnterprisePhaseService.getPhases();
+        const phases = res?.data?.items || res?.data || [];
 
-        // AC-S01: Default filter is "All Active Terms"
-        // Fallback: If no Active terms, show "Upcoming" terms
-        const activeTerms = terms.filter((t) => t.status === 2);
-        const upcomingTerms = terms
-          .filter((t) => t.status === 1)
+        const openPhases = phases
+          .filter((p) => p.status === 1)
           .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-        let termsToShow = activeTerms;
-        let defaultLabel = 'All Active Terms';
+        let phasesToShow = openPhases;
+        let defaultLabel = 'All Open Phases';
 
-        if (activeTerms.length === 0 && upcomingTerms.length > 0) {
-          const earliestDate = upcomingTerms[0].startDate;
-          termsToShow = upcomingTerms.filter((t) => t.startDate === earliestDate);
-          defaultLabel = 'All Upcoming Terms';
-        }
-
-        const options = terms.map((t) => ({
-          label: t.termName || t.name,
-          value: t.termId,
-          status: t.status,
-          termName: t.termName || t.name,
-          universityName: t.universityName,
-          startDate: t.startDate,
-          endDate: t.endDate,
+        const options = openPhases.map((p) => ({
+          label: p.phaseName || p.name || p.termName,
+          value: p.phaseId || p.id || p.termId,
+          status: p.status,
+          phaseName: p.phaseName || p.name || p.termName,
+          universityName: p.universityName,
+          startDate: p.startDate,
+          endDate: p.endDate,
         }));
 
         const allOption = {
           label: defaultLabel,
           value: 'ALL_VISIBLE',
-          status: termsToShow.length > 0 ? termsToShow[0].status : 2,
-          termIds: termsToShow.map((t) => t.termId),
+          status: 1,
+          phaseIds: options.map((p) => p.value),
         };
 
-        setTermOptions([allOption, ...options]);
+        setPhaseOptions([allOption, ...options]);
 
-        // Populate University Options from terms
+        // Populate University Options from phases
         const uniqueUniversities = Array.from(
-          new Set(terms.map((t) => t.universityName).filter(Boolean))
+          new Set(phases.map((p) => p.universityName).filter(Boolean))
         );
         setUniversityOptions(uniqueUniversities.map((name) => ({ label: name, value: name })));
-        if (!termId) {
-          setTermId('ALL_VISIBLE');
+        if (!phaseId) {
+          setPhaseId('ALL_VISIBLE');
         }
       } catch (err) {
         // Error handled silently
       } finally {
-        setFetchingTerms(false);
+        setFetchingPhases(false);
       }
     };
-    fetchTerms();
-  }, [termId]);
+    fetchPhases();
+  }, [phaseId]);
 
   const fetchStudents = useCallback(async () => {
-    if (!termId || termOptions.length === 0) return;
+    if (!phaseId && phaseOptions.length > 0) return;
 
     try {
-      const selectedOption = termOptions.find((o) => o.value === termId);
-      const termIdsToFetch = selectedOption?.termIds || (termId === 'ALL_VISIBLE' ? [] : [termId]);
-
-      if (
-        termId === 'ALL_VISIBLE' &&
-        (!selectedOption?.termIds || selectedOption.termIds.length === 0)
-      ) {
-        setStudents([]);
-        setTotal(0);
-        return;
-      }
-
       setLoading(true);
 
-      const fetchPromises = termIdsToFetch.map(async (id) => {
-        const term = termOptions.find((t) => t.value === id);
-        const params = {
-          TermId: id,
-          PageIndex: 1,
-          PageSize: 100,
-          SearchTerm: search || undefined,
-          IsAssignedToGroup:
-            groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP' ? true : false,
-          Major: majorFilter || undefined,
-          UniversityName: universityFilter || undefined,
+      const isAllVisible = phaseId === 'ALL_VISIBLE' || !phaseId;
+
+      const params = {
+        PhaseId: isAllVisible ? undefined : phaseId,
+        TermId: isAllVisible ? undefined : phaseId, // Backward compatibility for backend
+        PageIndex: pagination.current,
+        PageSize: pagination.pageSize,
+        SearchTerm: search || undefined,
+        IsAssignedToGroup:
+          groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP' ? true : false,
+        Status: statusFilter === 'ALL' ? undefined : statusFilter,
+        IsAssignedToMentor:
+          mentorFilter === 'ALL' ? undefined : mentorFilter === 'HAS_MENTOR' ? true : false,
+        MonthYear: dateFilter ? dayjs(dateFilter).format('YYYY-MM') : undefined,
+        sortBy: sort?.column || 'AppliedAt',
+        sortOrder: sort?.order || 'Desc',
+      };
+
+      let items = [];
+      let totalCount = 0;
+
+      const openPhaseIds = new Set(
+        phaseOptions
+          .filter((p) => p.status === 1 && p.value !== 'ALL_VISIBLE')
+          .map((p) => String(p.value).toLowerCase())
+      );
+
+      if (statusFilter === 2) {
+        const res = await EnterpriseGroupService.getPlacedStudents(params);
+        items = res?.data?.items || res?.items || [];
+        totalCount = res?.data?.totalCount || res?.totalCount || items.length;
+      } else {
+        const appParams = {
+          ...params,
+          Search: search || undefined,
+          campusId: universityFilter || undefined,
         };
+        const res = await EnterpriseStudentService.getApplications(appParams);
+        items = res?.data?.items || res?.items || [];
+        totalCount = res?.data?.totalCount || res?.totalCount || items.length;
+      }
 
-        try {
-          let items = [];
-          if (statusFilter === 2) {
-            // AC-S01: Use Placed Students endpoint for status 2
-            const res = await EnterpriseGroupService.getPlacedStudents(params);
-            const placedItems = res?.data?.items || res?.items || [];
+      // Filter items to only show those in Open phases if ALL_VISIBLE is selected
+      if (isAllVisible) {
+        items = items.filter((item) => {
+          const itemPid = String(item.phaseId || item.termId || '').toLowerCase();
+          return openPhaseIds.has(itemPid);
+        });
+        totalCount = items.length;
+      }
 
-            // CRITICAL: Placed Students endpoint lacks ApplicationId.
-            // We fetch the full applications for this term to merge the ApplicationIds.
-            try {
-              const appRes = await EnterpriseStudentService.getApplications({
-                TermId: id,
-                PageSize: 100,
-                Status: 2, // Only Placed
-              });
-              const appItems = appRes?.data?.items || appRes?.items || [];
-
-              items = placedItems.map((pi) => {
-                const app = appItems.find(
-                  (a) => String(a.studentId || a.StudentId) === String(pi.studentId || pi.StudentId)
-                );
-                return {
-                  ...pi,
-                  applicationId: app?.applicationId || app?.id || app?.StudentTermId,
-                };
-              });
-            } catch (mergeErr) {
-              items = placedItems;
-            }
-          } else {
-            const appParams = {
-              ...params,
-              Search: search || undefined,
-              Status: statusFilter === 'ALL' ? undefined : statusFilter,
-              campusId: universityFilter || undefined, // Bridge UniversityName to CampusId name used in service
-            };
-            const res = await EnterpriseStudentService.getApplications(appParams);
-            items = res?.data?.items || res?.items || [];
-          }
-
-          return items.map((item) => {
-            const mapped = EnterpriseStudentService.mapApplication(item);
-            if (mapped.termStatus === 0 || mapped.termStatus === undefined) {
-              mapped.termStatus = term?.status || selectedOption?.status || 0;
-            }
-            if (!mapped.startDate || !mapped.endDate) {
-              mapped.startDate = term?.startDate || selectedOption?.startDate;
-              mapped.endDate = term?.endDate || selectedOption?.endDate;
-            }
-            // CRITICAL: DO NOT overwrite mapped.studentId here.
-            // The mapper (EnterpriseStudentService) decides the correct ID strategy
-            // (ApplicationId vs UserId) based on project requirements.
-            return mapped;
-          });
-        } catch (err) {
-          return [];
+      const mappedStudents = items.map((item) => {
+        const mapped = EnterpriseStudentService.mapApplication(item);
+        if (mapped.phaseStatus === 0 || mapped.phaseStatus === undefined) {
+          const studentPhase = phaseOptions.find((o) => o.value === mapped.phaseId);
+          mapped.phaseStatus = studentPhase?.status || 2;
         }
+        if (!mapped.startDate || !mapped.endDate) {
+          const studentPhase = phaseOptions.find((o) => o.value === mapped.phaseId);
+          mapped.startDate = studentPhase?.startDate;
+          mapped.endDate = studentPhase?.endDate;
+        }
+        return mapped;
       });
 
-      const results = await Promise.all(fetchPromises);
-      const combinedStudents = results.flat();
+      // AC-S04: Local Sorting Fallback (ensures sorting works even if API ignores params)
+      if (sort?.column) {
+        mappedStudents.sort((a, b) => {
+          let valA, valB;
 
-      // Manual sorting if needed, but for now just use the aggregate
-      setStudents(combinedStudents);
-      setTotal(combinedStudents.length);
+          if (sort.column === 'FullName') {
+            const getSortableName = (fullName) => {
+              const nameParts = (fullName || '').trim().split(' ');
+              const firstName = nameParts.pop() || '';
+              const restOfName = nameParts.join(' ');
+              return { firstName, restOfName };
+            };
 
-      // Set unassigned students
-      setUnassignedStudents(combinedStudents.filter((i) => !i.groupName && !i.groupId));
+            const nameA = getSortableName(a.studentFullName);
+            const nameB = getSortableName(b.studentFullName);
 
-      // Check for groups across the fetched terms
-      const groupPromises = termIdsToFetch.map((id) =>
-        EnterpriseGroupService.getGroups({ termId: id, pageSize: 100 }).catch(() => ({
-          data: { items: [] },
-        }))
-      );
-      const groupResults = await Promise.all(groupPromises);
-      const allGroups = groupResults.flatMap((res) => res?.data?.items || res?.items || []);
+            // Compare by First Name first
+            const firstCompare = nameA.firstName.localeCompare(nameB.firstName, 'vi', {
+              sensitivity: 'base',
+            });
+            if (firstCompare !== 0) return sort.order === 'Asc' ? firstCompare : -firstCompare;
+
+            // If First Names are same, compare by rest of name
+            return sort.order === 'Asc'
+              ? nameA.restOfName.localeCompare(nameB.restOfName, 'vi', { sensitivity: 'base' })
+              : -nameA.restOfName.localeCompare(nameB.restOfName, 'vi', { sensitivity: 'base' });
+          } else if (sort.column === 'GroupName') {
+            valA = (a.groupName || '').toLowerCase();
+            valB = (b.groupName || '').toLowerCase();
+          } else {
+            // Support any other column keys
+            valA = (a[sort.column] || '').toString().toLowerCase();
+            valB = (b[sort.column] || '').toString().toLowerCase();
+          }
+
+          if (valA < valB) return sort.order === 'Asc' ? -1 : 1;
+          if (valA > valB) return sort.order === 'Asc' ? 1 : -1;
+          return 0;
+        });
+      }
+
+      setStudents(mappedStudents);
+      setTotal(totalCount);
+      setUnassignedStudents(mappedStudents.filter((i) => !i.groupName && !i.groupId));
+      // Fetch groups for the selected context
+      const groupParams = {
+        phaseId: isAllVisible ? undefined : phaseId,
+        termId: isAllVisible ? undefined : phaseId,
+        pageSize: 100,
+      };
+      const groupRes = await EnterpriseGroupService.getGroups(groupParams).catch(() => ({
+        data: { items: [] },
+      }));
+      const allGroups = groupRes?.data?.items || groupRes?.items || [];
       setExistingGroups(allGroups);
-      setHasGroups(allGroups.some((g) => g.status === 1)); // Count Active groups
+      setHasGroups(allGroups.some((g) => g.status === 1));
     } catch (err) {
-      // Silent
     } finally {
       setLoading(false);
     }
   }, [
-    termId,
-    termOptions,
+    phaseId,
+    phaseOptions,
     search,
     statusFilter,
     groupFilter,
-    majorFilter,
-    universityFilter,
     pagination.current,
     pagination.pageSize,
-    assignmentFilter,
     dateFilter,
+    mentorFilter,
     sort?.column,
     sort?.order,
   ]);
@@ -435,22 +456,23 @@ export const useInternshipManagement = () => {
     async (payload) => {
       // payload.students is passed from the modal context
       const selectedStudents = createModal.students || [];
-      const termIds = new Set(selectedStudents.map((s) => s.termId).filter(Boolean));
+      const phaseIds = new Set(selectedStudents.map((s) => s.phaseId || s.termId).filter(Boolean));
 
-      if (termIds.size > 1) {
+      if (phaseIds.size > 1) {
         toast.error(
-          'Sinh viên được chọn thuộc nhiều kỳ thực tập khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một kỳ thực tập.'
+          'Sinh viên được chọn thuộc nhiều giai đoạn khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một giai đoạn.'
         );
         return;
       }
 
       const firstStudent = selectedStudents[0];
-      const targetTermId = firstStudent?.termId || termId;
+      const targetPhaseId = firstStudent?.phaseId || firstStudent?.termId || phaseId;
 
       try {
         await EnterpriseGroupService.createGroup({
           ...payload,
-          termId: targetTermId,
+          phaseId: targetPhaseId,
+          termId: targetPhaseId, // Keep termId key for backend compatibility if needed
           enterpriseId: enterpriseId,
         });
         toast.success('Group created successfully');
@@ -464,18 +486,15 @@ export const useInternshipManagement = () => {
         toast.error(errorMsg);
       }
     },
-    [termId, fetchStudents, toast, createModal.students]
+    [phaseId, fetchStudents, toast, createModal.students, enterpriseId]
   );
 
   const resetFilters = () => {
     setSearch('');
     setStatusFilter(2);
     setGroupFilter('ALL');
-    setAssignmentFilter('ALL');
-    setProjectFilter('ALL');
     setDateFilter(null);
-    setUniversityFilter(undefined);
-    setMajorFilter(undefined);
+    setMentorFilter('ALL');
     setPagination({ current: 1, pageSize: 10 });
   };
 
@@ -484,8 +503,6 @@ export const useInternshipManagement = () => {
     statusFilter,
     groupFilter,
     setGroupFilter,
-    assignmentFilter,
-    setAssignmentFilter,
     pagination,
     filteredData,
     total,
@@ -505,18 +522,11 @@ export const useInternshipManagement = () => {
     handleGroupSubmit,
     handleAssignMentor,
     handleViewStudent,
-    termId,
-    setTermId,
-    termOptions,
-    fetchingTerms,
+    phaseId,
+    setPhaseId,
+    phaseOptions,
+    fetchingPhases,
     resetFilters,
-    projectFilter,
-    setProjectFilter,
-    universityFilter,
-    setUniversityFilter,
-    majorFilter,
-    setMajorFilter,
-    universityOptions,
     setCreateModal,
     createModal,
     unassignedStudents,
@@ -526,9 +536,11 @@ export const useInternshipManagement = () => {
     handleCreateGroup,
     dateFilter,
     setDateFilter,
-    isTermEditable:
-      termId === 'ALL_ACTIVE' ||
-      (termId && termOptions.find((t) => t.value === termId)?.status === 2),
+    mentorFilter,
+    setMentorFilter,
+    isPhaseEditable:
+      phaseId === 'ALL_VISIBLE' ||
+      (phaseId && phaseOptions.find((p) => p.value === phaseId)?.status === 2),
     hasGroups,
     existingGroups,
     sort,

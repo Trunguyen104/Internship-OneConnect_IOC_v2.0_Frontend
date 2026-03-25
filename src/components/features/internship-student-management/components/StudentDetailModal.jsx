@@ -1,7 +1,7 @@
 'use client';
 
 import { HistoryOutlined, UserOutlined } from '@ant-design/icons';
-import { Empty, Typography } from 'antd';
+import { Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
@@ -143,53 +143,6 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
                 {student.projectName || student.track || '-'}
               </div>
             </div>
-          </div>
-
-          {/* Section: Change History */}
-          <div className="mt-1 mb-2 flex items-center gap-2 opacity-30">
-            <HistoryOutlined className="text-[10px]" />
-            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
-              Change History
-            </span>
-          </div>
-          <div
-            className={`mt-2 rounded-lg border border-dashed border-slate-200 bg-slate-50/20 flex flex-col ${!student.changeHistory || student.changeHistory.length === 0 ? 'items-center justify-center p-4' : 'p-3'}`}
-          >
-            {student.changeHistory && student.changeHistory.length > 0 ? (
-              <div className="flex flex-col gap-3 max-h-[150px] overflow-y-auto pr-1 no-scrollbar">
-                {student.changeHistory.map((item, idx) => (
-                  <div key={item.id || idx} className="flex gap-2 relative">
-                    {idx !== student.changeHistory.length - 1 && (
-                      <div className="absolute left-[5px] top-[14px] bottom-[-14px] w-[1px] bg-slate-200" />
-                    )}
-                    <div className="mt-1.5 h-[11px] w-[11px] flex-shrink-0 rounded-full border-2 border-primary bg-white z-10" />
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[10px] font-bold text-slate-800 leading-tight">
-                        {item.action}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] text-muted/60 font-medium italic">
-                          {item.timestamp}
-                        </span>
-                        <span className="text-[9px] text-muted/40 font-bold uppercase tracking-tighter">
-                          By {item.performer}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={
-                  <span className="text-[9px] uppercase font-bold text-muted/30 tracking-tight italic">
-                    No change history available
-                  </span>
-                }
-                className="my-0 scale-75 opacity-40"
-              />
-            )}
           </div>
         </div>
       </CompoundModal.Content>

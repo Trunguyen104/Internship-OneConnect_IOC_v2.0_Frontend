@@ -1,58 +1,35 @@
 'use client';
 
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
-import { Form, Select, Spin } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Form, Select } from 'antd';
+import React, { useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import { useEnterpriseGroups } from '../../internship-group-management/hooks/useEnterpriseGroups';
-import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
 
 const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) => {
   const [form] = Form.useForm();
   const { GROUP_ACTION } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
-  const [mentors, setMentors] = useState([]);
-  const [loadingMentors, setLoadingMentors] = useState(false);
 
   useEffect(() => {
     if (open) {
       form.resetFields();
       if (type === 'CHANGE' && students.length > 0) {
         form.setFieldsValue({
-          mentorId: students[0].mentorId,
           projectName: students[0].projectName,
         });
       }
-      fetchMentors();
     }
   }, [open]); // Narrow dependency to prevent resetting on every student prop change
-
-  const fetchMentors = async () => {
-    try {
-      setLoadingMentors(true);
-      const res = await EnterpriseMentorService.getMentors();
-      const items = res?.data?.items || res?.items || res?.data || [];
-      setMentors(
-        (Array.isArray(items) ? items : []).map((m) => ({
-          label: `${m.fullName || m.name || ''} (${m.email || ''})`,
-          value: String(m.id || m.mentorId || m.userId),
-        }))
-      );
-    } catch (err) {
-      // Silent error
-    } finally {
-      setLoadingMentors(false);
-    }
-  };
 
   const groupFilters = React.useMemo(() => ({ status: undefined, includeArchived: true }), []);
   const groupPagination = React.useMemo(() => ({ current: 1, pageSize: 100 }), []);
 
   const { data: activeGroups, loading: fetchingGroups } = useEnterpriseGroups({
-    termId: students[0]?.termId, // Use the first student's termId, mock will fall back if undefined
+    phaseId: 'ALL_VISIBLE',
     filters: groupFilters,
     pagination: groupPagination,
     search: '',
@@ -190,31 +167,7 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
             )}
         </Form.Item>
 
-        {type === 'CHANGE' && (
-          <div className="animate-in fade-in slide-in-from-bottom-1 duration-500">
-            <Form.Item
-              label={
-                <span className="text-text text-[11px] font-bold tracking-wider uppercase">
-                  {INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS.ASSIGN.MENTOR_LABEL}
-                </span>
-              }
-              name="mentorId"
-              className="mb-3"
-            >
-              <Select
-                placeholder={
-                  INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS.ASSIGN.MENTOR_PLACEHOLDER
-                }
-                className="h-10 w-full rounded-xl"
-                loading={loadingMentors}
-                options={mentors}
-                showSearch
-                optionFilterProp="label"
-                notFoundContent={loadingMentors ? <Spin size="small" /> : null}
-              />
-            </Form.Item>
-          </div>
-        )}
+        {/* Mentor selection removed for Change Group as per user request */}
 
         <CompoundModal.Footer
           cancelText={GROUP_ACTION.CANCEL}

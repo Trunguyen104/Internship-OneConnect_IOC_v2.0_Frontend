@@ -36,13 +36,8 @@ export const useEnterpriseGroupActions = (onSuccess) => {
   const updateGroup = (id, data) =>
     handleAction(() => EnterpriseGroupService.updateGroup(id, data), MESSAGES.UPDATE_SUCCESS);
 
-  const archiveGroup = (id, memberCount) => {
-    if (memberCount > 0) {
-      toast.error(MESSAGES.DELETE_ERROR_HAS_STUDENTS);
-      return false;
-    }
-    return handleAction(() => EnterpriseGroupService.archiveGroup(id), MESSAGES.ARCHIVE_SUCCESS);
-  };
+  const archiveGroup = (id) =>
+    handleAction(() => EnterpriseGroupService.archiveGroup(id), MESSAGES.ARCHIVE_SUCCESS);
 
   const moveStudents = (data) =>
     handleAction(() => EnterpriseGroupService.moveStudents(data), MESSAGES.UPDATE_SUCCESS);
@@ -59,12 +54,7 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       MESSAGES.REMOVE_STUDENT_SUCCESS
     );
 
-  const deleteGroup = async (id, memberCount) => {
-    if (memberCount > 0) {
-      toast.error(MESSAGES.DELETE_ERROR_HAS_STUDENTS);
-      return false;
-    }
-
+  const deleteGroup = async (id) => {
     try {
       setLoading(true);
       await EnterpriseGroupService.deleteGroup(id);

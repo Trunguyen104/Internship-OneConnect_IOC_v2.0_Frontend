@@ -41,6 +41,7 @@ export const ENTERPRISE_GROUP_UI = {
     VIEW_DETAIL: 'View Group Details',
     EDIT_GROUP: 'Edit Group',
     ADD_STUDENTS: 'Add Students',
+    ADD_TO_GROUP: 'Add Students',
     REMOVE_STUDENT: 'Remove Student',
     ARCHIVE_GROUP: 'Archive Group',
     DELETE_GROUP: 'Delete Group',
@@ -55,6 +56,10 @@ export const ENTERPRISE_GROUP_UI = {
     CREATE: {
       TITLE: 'Create New Internship Group',
       SUBMIT: 'Create Group',
+      SUBMIT_EDIT: 'Save Changes',
+      SUBMIT_ADD: 'Add Students',
+      TARGET_GROUP_LABEL: 'Target Group',
+      ACTIVE_GROUP_LABEL: 'Active',
     },
     EDIT: {
       TITLE: 'Edit Group Information',
@@ -62,8 +67,7 @@ export const ENTERPRISE_GROUP_UI = {
     },
     DELETE: {
       TITLE: 'Delete Group',
-      CONTENT:
-        'Are you sure you want to delete this group? This action cannot be undone and can only be performed if the group has no students.',
+      CONTENT: 'Are you sure you want to delete this group? This action cannot be undone.',
       SUBMIT: 'Confirm Delete',
     },
     ARCHIVE: {
@@ -96,6 +100,8 @@ export const ENTERPRISE_GROUP_UI = {
         FULL_NAME: 'Full name',
         EMAIL: 'Email',
         SCHOOL: 'School',
+        ACTION: 'Actions',
+        ADD_STUDENT: 'Add Student',
       },
     },
   },
@@ -108,6 +114,10 @@ export const ENTERPRISE_GROUP_UI = {
     REMOVE_STUDENT_SUCCESS: 'Student removed from group.',
     LOAD_ERROR: 'Could not load group information.',
     ERROR: 'An error occurred. Please try again later.',
+    DELETE_ERROR_HAS_DATA:
+      'Nhóm đã có dữ liệu làm việc (tasks/violations). Vui lòng sử dụng tính năng Lưu trữ (Archive) thay vì Xóa để bảo toàn lịch sử.',
+    DELETE_CONFIRM_HAS_STUDENTS:
+      "Nhóm có sinh viên. Khi xóa, sinh viên sẽ tự động được đưa về danh sách 'Chưa có nhóm'. Bạn có chắc chắn muốn xóa?",
   },
 };
 
