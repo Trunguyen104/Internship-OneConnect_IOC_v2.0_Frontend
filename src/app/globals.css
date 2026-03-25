@@ -179,7 +179,7 @@ body {
 .ProseMirror blockquote {
   border-left: 3px solid var(--color-border);
   padding-left: 0.75rem;
-  color: #667085;
+    color: var(--color-muted);
   margin: 0.75rem 0;
 }
 

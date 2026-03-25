@@ -13,10 +13,16 @@ async function request(path, options = {}) {
   // Token is now handled server-side in the proxy route via HttpOnly cookies.
   // We do NOT attach it here to prevent XSS/Token Leakage.
 
-  const res = await fetch(`${API_BASE}${path}`, {
+  const fetchOptions = {
     ...options,
     headers,
-  });
+  };
+  if (!Object.prototype.hasOwnProperty.call(fetchOptions, 'cache')) {
+    // Avoid stale reads after CRUD due to browser/Next fetch caching.
+    fetchOptions.cache = 'no-store';
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, fetchOptions);
 
   const contentType = res.headers.get('content-type');
   let data = null;
@@ -40,10 +46,7 @@ async function request(path, options = {}) {
 
         if (refreshRes.ok) {
           // Retry logic without client-side token attachment
-          const retryRes = await fetch(`${API_BASE}${path}`, {
-            ...options,
-            headers,
-          });
+          const retryRes = await fetch(`${API_BASE}${path}`, fetchOptions);
 
           if (!retryRes.ok) {
             const errorData = await retryRes.text();

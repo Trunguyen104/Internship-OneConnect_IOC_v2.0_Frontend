@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 import { CONFIG } from '@/constants/common/config';
 import { resolveApiRoot } from '@/lib/server/backend-url';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const API_ROOT = resolveApiRoot();
 
 async function handler(req, { params }) {
@@ -68,7 +71,12 @@ async function handler(req, { params }) {
       console.error(`PROXY BACKEND ERROR: ${res.status} - ${errorText}`);
       return new NextResponse(errorText, {
         status: res.status,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
       });
     }
 
@@ -76,6 +84,9 @@ async function handler(req, { params }) {
     const responseHeaders = new Headers();
     if (contentTypeRes) responseHeaders.set('Content-Type', contentTypeRes);
     if (contentDisposition) responseHeaders.set('Content-Disposition', contentDisposition);
+    responseHeaders.set('Cache-Control', 'no-store, max-age=0');
+    responseHeaders.set('Pragma', 'no-cache');
+    responseHeaders.set('Expires', '0');
 
     return new NextResponse(res.body, {
       status: res.status,
@@ -85,7 +96,12 @@ async function handler(req, { params }) {
     console.error(`PROXY EXCEPTION: ${error.message}`);
     return new NextResponse(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
     });
   }
 }
