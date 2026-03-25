@@ -7,7 +7,6 @@ import {
   SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import BellOutlined from '@ant-design/icons/BellOutlined';
 import { Avatar, Dropdown } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
