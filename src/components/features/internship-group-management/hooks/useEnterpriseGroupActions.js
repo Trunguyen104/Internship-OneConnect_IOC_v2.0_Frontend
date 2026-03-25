@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 import { getErrorDetail } from '@/utils/errorUtils';
 
@@ -17,9 +18,11 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       await actionFn();
       toast.success(successMessage);
       if (onSuccess) onSuccess();
+      window.dispatchEvent(
+        new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
+      );
       return true;
     } catch (error) {
-      console.error('Group Action Error:', error);
       toast.error(getErrorDetail(error, MESSAGES.ERROR));
       return false;
     } finally {
@@ -67,9 +70,11 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       await EnterpriseGroupService.deleteGroup(id);
       toast.success(MESSAGES.DELETE_SUCCESS);
       if (onSuccess) onSuccess();
+      window.dispatchEvent(
+        new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
+      );
       return true;
     } catch (error) {
-      console.error('Delete Group Error:', error);
       // AC-G09: If group has data, suggest Archive
       const errorMsg = error?.message || '';
       if (

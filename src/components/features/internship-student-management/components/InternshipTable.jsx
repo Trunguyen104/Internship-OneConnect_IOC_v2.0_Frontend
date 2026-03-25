@@ -14,7 +14,6 @@ import React, { memo, useMemo } from 'react';
 import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
 import StatusTag from './StatusTag';
 
 const InternshipTable = memo(function InternshipTable({
@@ -87,12 +86,11 @@ const InternshipTable = memo(function InternshipTable({
         dataIndex: 'groupId',
         key: 'group',
         width: 120,
-        render: (id) => {
-          const group = MOCK_GROUPS.find((g) => g.id === id);
-          return group ? (
+        render: (_, record) => {
+          return record.groupName ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <TeamOutlined className="text-primary text-xs opacity-60" />
-              <span className="text-text truncate text-xs font-bold">{group.name}</span>
+              <span className="text-text truncate text-xs font-bold">{record.groupName}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -106,12 +104,11 @@ const InternshipTable = memo(function InternshipTable({
         dataIndex: 'mentorId',
         key: 'mentor',
         width: 120,
-        render: (id) => {
-          const mentor = MOCK_MENTORS.find((m) => m.id === id);
-          return mentor ? (
+        render: (_, record) => {
+          return record.mentorName ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
               <div className="bg-primary-hover h-1.5 w-1.5 shrink-0 rounded-full" />
-              <span className="text-text truncate text-xs font-bold">{mentor.name}</span>
+              <span className="text-text truncate text-xs font-bold">{record.mentorName}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -159,7 +156,7 @@ const InternshipTable = memo(function InternshipTable({
             },
             {
               key: 'group',
-              label: ACTIONS.ADD_TO_GROUP,
+              label: record.groupId ? ACTIONS.CHANGE_GROUP : ACTIONS.ADD_TO_GROUP,
               icon: <TeamOutlined className="text-primary" />,
               onClick: () => onGroup(record),
             },

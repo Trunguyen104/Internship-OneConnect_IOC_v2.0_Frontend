@@ -15,19 +15,19 @@ export const INTERNSHIP_UI = {
     COMING_SOON_DESC: 'Detailed training plan view is currently under development.',
     NO_DATA: 'No internship placement found',
     FALLBACK_CYCLE: 'Internship Cycle',
-    UNPLACED_WARNING: 'CHƯA ĐƯỢC XẾP DOANH NGHIỆP',
-    PLACED_SUCCESS: 'Đã xếp doanh nghiệp',
-    NO_GROUP: 'Chưa có nhóm thực tập',
-    UPDATE_PENDING: 'Đang cập nhật',
-    NOT_AVAILABLE: 'Chưa có',
+    UNPLACED_WARNING: 'NOT YET PLACED',
+    PLACED_SUCCESS: 'Placed',
+    NO_GROUP: 'No Internship Group',
+    UPDATE_PENDING: 'Updating...',
+    NOT_AVAILABLE: 'N/A',
   },
 
   MESSAGES: {
     ERROR_FETCH: 'An unexpected error occurred while loading the dashboard data.',
     FETCHING_JOURNEY: '--- InternshipDashboard (Direct Cycle Mapping) ---',
-    APPLY_PROMPT: 'Hãy apply vào các vị trí tuyển dụng để tìm công ty thực tập',
-    VIEW_JOB_POSTINGS: 'Xem Job Postings',
+    APPLY_PROMPT: 'Please apply for positions to find an internship company',
+    VIEW_JOB_POSTINGS: 'View Job Postings',
     UNPLACED_ACTIVE_ALERT:
-      'Bạn chưa có công ty thực tập, vui lòng liên hệ Uni Admin để được hỗ trợ.',
+      'You have not been placed in a company, please contact Uni Admin for support.',
   },
 };

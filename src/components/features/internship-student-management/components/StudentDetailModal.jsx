@@ -1,7 +1,7 @@
 'use client';
 
 import { HistoryOutlined, UserOutlined } from '@ant-design/icons';
-import { Descriptions, Divider, Empty, Typography } from 'antd';
+import { Empty, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
@@ -33,106 +33,163 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
         subtitle={student.studentCode}
       />
 
-      <CompoundModal.Content className="px-8 py-6 max-h-[60vh] overflow-y-auto">
-        <div className="flex flex-col gap-6">
-          {/* Section: Personal Information */}
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <UserOutlined className="text-primary text-sm" />
-              <Text className="text-[11px] font-extrabold uppercase tracking-widest text-muted/60">
-                Personal Information
-              </Text>
-            </div>
-            <Descriptions
-              column={1}
-              size="small"
-              bordered={false}
-              labelStyle={{
-                color: 'var(--text)',
-                fontWeight: 800,
-                fontSize: '12px',
-                textTransform: 'uppercase',
-                width: '140px',
-                whiteSpace: 'nowrap',
-              }}
-              contentStyle={{ fontWeight: 500, fontSize: '11px', color: 'var(--muted)' }}
-            >
-              <Descriptions.Item label={DETAIL.UNIVERSITY}>
-                {student.universityName || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.EMAIL}>
-                {student.studentEmail || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.PHONE}>
-                {student.phone || '098-XXX-XXXX'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.DOB}>
-                {student.dob ? dayjs(student.dob).format('DD/MM/YYYY') : '-'}
-              </Descriptions.Item>
-            </Descriptions>
+      <CompoundModal.Content className="px-5 py-2 max-h-[60vh] overflow-y-auto no-scrollbar cursor-default">
+        <div className="flex flex-col gap-1">
+          <div className="mb-2 flex items-center gap-2 opacity-50">
+            <UserOutlined className="text-primary text-[10px]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+              Personal Information
+            </span>
           </div>
 
-          <Divider className="my-0 opacity-20" />
+          <div className="grid grid-cols-2 gap-x-3">
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1 line-clamp-1">
+                {DETAIL.UNIVERSITY}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.universityName || '-'}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1 line-clamp-1">
+                {DETAIL.EMAIL}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center truncate">
+                {student.studentEmail || '-'}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-3">
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.PHONE}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.phone || '098-XXX-XXXX'}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.DOB}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.dob ? dayjs(student.dob).format('DD/MM/YYYY') : '-'}
+              </div>
+            </div>
+          </div>
 
           {/* Section: Internship Information */}
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <HistoryOutlined className="text-primary text-sm" />
-              <Text className="text-[11px] font-extrabold uppercase tracking-widest text-muted/60">
-                Internship Details
-              </Text>
-            </div>
-            <Descriptions
-              column={1}
-              size="small"
-              bordered={false}
-              labelStyle={{
-                color: 'var(--text)',
-                fontWeight: 800,
-                fontSize: '12px',
-                textTransform: 'uppercase',
-                width: '140px',
-                whiteSpace: 'nowrap',
-              }}
-              contentStyle={{ fontWeight: 500, fontSize: '11px', color: 'var(--muted)' }}
-            >
-              <Descriptions.Item label={DETAIL.STATUS}>
-                <StatusTag status={displayStatus} />
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.PLACEMENT_DATE}>
-                {student.appliedAt ? dayjs(student.appliedAt).format('DD/MM/YYYY') : '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.MAJOR}>{student.major || '-'}</Descriptions.Item>
-              <Descriptions.Item label={DETAIL.GROUP}>{student.groupName || '-'}</Descriptions.Item>
-              <Descriptions.Item label={DETAIL.MENTOR}>
-                {student.mentorName || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.PROJECT}>
-                {student.projectName || student.track || '-'}
-              </Descriptions.Item>
-            </Descriptions>
+          <div className="mt-1 mb-2 flex items-center gap-2 opacity-50">
+            <HistoryOutlined className="text-primary text-[10px]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+              Internship Details
+            </span>
           </div>
 
-          <Divider className="my-0 opacity-20" />
-
-          {/* Section: Change History (AC-S05) */}
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <HistoryOutlined className="text-primary text-sm" />
-              <Text className="text-[11px] font-extrabold uppercase tracking-widest text-muted/60">
-                Change History
-              </Text>
+          <div className="grid grid-cols-2 gap-x-3">
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.STATUS}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                <StatusTag status={displayStatus} />
+              </div>
             </div>
-            <div className="rounded-xl border border-dashed border-border p-3 bg-bg/30">
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1 line-clamp-1">
+                {DETAIL.PLACEMENT_DATE}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.appliedAt ? dayjs(student.appliedAt).format('DD/MM/YYYY') : '-'}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-3">
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.MAJOR}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.major || '-'}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.GROUP}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.groupName || '-'}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-3">
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.MENTOR}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.mentorName || '-'}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 mb-2">
+              <span className="text-[10px] font-bold text-muted/60 uppercase ml-1">
+                {DETAIL.PROJECT}
+              </span>
+              <div className="bg-slate-50 border border-slate-100 rounded-lg px-3 py-1.5 text-xs font-semibold text-text min-h-[32px] flex items-center">
+                {student.projectName || student.track || '-'}
+              </div>
+            </div>
+          </div>
+
+          {/* Section: Change History */}
+          <div className="mt-1 mb-2 flex items-center gap-2 opacity-30">
+            <HistoryOutlined className="text-[10px]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+              Change History
+            </span>
+          </div>
+          <div
+            className={`mt-2 rounded-lg border border-dashed border-slate-200 bg-slate-50/20 flex flex-col ${!student.changeHistory || student.changeHistory.length === 0 ? 'items-center justify-center p-4' : 'p-3'}`}
+          >
+            {student.changeHistory && student.changeHistory.length > 0 ? (
+              <div className="flex flex-col gap-3 max-h-[150px] overflow-y-auto pr-1 no-scrollbar">
+                {student.changeHistory.map((item, idx) => (
+                  <div key={item.id || idx} className="flex gap-2 relative">
+                    {idx !== student.changeHistory.length - 1 && (
+                      <div className="absolute left-[5px] top-[14px] bottom-[-14px] w-[1px] bg-slate-200" />
+                    )}
+                    <div className="mt-1.5 h-[11px] w-[11px] flex-shrink-0 rounded-full border-2 border-primary bg-white z-10" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[10px] font-bold text-slate-800 leading-tight">
+                        {item.action}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] text-muted/60 font-medium italic">
+                          {item.timestamp}
+                        </span>
+                        <span className="text-[9px] text-muted/40 font-bold uppercase tracking-tighter">
+                          By {item.performer}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description={
-                  <span className="text-[10px] uppercase font-bold text-muted/40 tracking-tighter italic">
-                    History recording disabled
+                  <span className="text-[9px] uppercase font-bold text-muted/30 tracking-tight italic">
+                    No change history available
                   </span>
                 }
+                className="my-0 scale-75 opacity-40"
               />
-            </div>
+            )}
           </div>
         </div>
       </CompoundModal.Content>

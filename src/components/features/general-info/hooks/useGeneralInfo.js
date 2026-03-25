@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import { ProjectService } from '@/components/features/project/services/projectService';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import { useToast } from '@/providers/ToastProvider';
@@ -49,47 +50,79 @@ export function useGeneralInfo(initialId = null) {
           return;
         }
 
-        const internshipId = data.internshipId || data.id;
-        const termId = data.termId || data.term?.termId;
-
-        const [termRes, projectRes] = await Promise.all([
-          termId ? InternshipGroupService.getTermById(termId) : Promise.resolve(null),
-          internshipId ? ProjectService.getByInternshipGroup(internshipId) : Promise.resolve(null),
-        ]);
-
-        const termData = termRes?.data || termRes;
-        const projectData =
-          projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
-
-        setInfo({
+        // Set basic info first so the UI shows something
+        const baseInfo = {
           ...data,
           groupName: data.groupName || data.name,
-          internshipTermName: termData?.name || data.internshipTermName || data.term?.name,
-          enterpriseName: data.enterpriseName || data.enterprise?.name || data.company,
-          schoolName: data.schoolName || data.school?.name || data.school,
+          internshipTermName:
+            data.internshipTermName || data.term?.name || GENERAL_INFO_UI.VALUES.NA,
+          enterpriseName:
+            data.enterpriseName ||
+            data.enterprise?.name ||
+            data.company ||
+            GENERAL_INFO_UI.VALUES.NA,
+          schoolName:
+            data.schoolName || data.school?.name || data.school || GENERAL_INFO_UI.VALUES.NA,
           mentorName: data.mentorName || data.mentors?.[0]?.fullName || data.mentor,
-          totalStudents: data.numberOfMembers || data.studentCount || data.members?.length,
+          mentorEmail: data.mentorEmail || data.mentors?.[0]?.email || '',
+          totalStudents: data.numberOfMembers || data.studentCount || data.members?.length || 0,
           totalMentors:
             data.totalMentors || data.mentors?.length || (data.mentorName || data.mentor ? 1 : 0),
-          project: projectData
-            ? {
-                id: projectData.projectId || projectData.id,
-                name: projectData.projectName || projectData.name,
-              }
-            : data.project,
-          projectDescription:
-            projectData?.description ||
-            data.project?.description ||
-            data.description ||
-            GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC,
+          members: (data.members || data.students || data.items || []).map((s) => ({
+            id: s.studentId || s.id || s.applicationId,
+            fullName: s.studentFullName || s.fullName || s.name || 'Unknown',
+            code: s.studentCode || s.code || '-',
+            email: s.email || '-',
+            avatar: s.avatar,
+            universityName: s.universityName || s.schoolName || s.university || '-',
+          })),
           displayCreatedAt: data.createdAt
             ? new Date(data.createdAt).toLocaleDateString('en-GB')
             : GENERAL_INFO_UI.VALUES.NA,
           displayUpdatedAt: data.updatedAt
             ? `${GENERAL_INFO_UI.VALUES.UPDATED_ON} ${new Date(data.updatedAt).toLocaleDateString('en-GB')}`
             : data.updatedText || '',
-        });
-      } catch {
+        };
+
+        setInfo(baseInfo);
+
+        // Try to enrich with Term and Project data
+        try {
+          const internshipId = data.internshipId || data.id;
+          const termId = data.termId || data.term?.termId || data.term?.id;
+
+          const [termRes, projectRes] = await Promise.all([
+            termId ? TermService.getById(termId) : Promise.resolve(null),
+            internshipId
+              ? ProjectService.getByInternshipGroup(internshipId)
+              : Promise.resolve(null),
+          ]);
+
+          const termData = termRes?.data || termRes;
+          const projectData =
+            projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
+
+          setInfo((prev) => ({
+            ...prev,
+            internshipTermName: termData?.name || prev.internshipTermName,
+            project: projectData
+              ? {
+                  id: projectData.projectId || projectData.id,
+                  name: projectData.projectName || projectData.name,
+                }
+              : prev.project,
+            projectDescription:
+              projectData?.description ||
+              data.project?.description ||
+              data.description ||
+              GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC,
+          }));
+        } catch (enrichErr) {
+          console.warn('Enrichment failed:', enrichErr);
+          // If enrichment fails, we already have the base info, so don't throw
+        }
+      } catch (err) {
+        console.error('Fetch general data failed:', err);
         toast.error(GENERAL_INFO_UI.MESSAGES.FETCH_ERROR);
       } finally {
         setLoading(false);

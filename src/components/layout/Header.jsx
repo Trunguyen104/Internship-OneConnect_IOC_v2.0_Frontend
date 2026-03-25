@@ -1,6 +1,13 @@
 'use client';
 
-import { BellOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  BellOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  SettingOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -10,6 +17,7 @@ import { logout } from '@/components/features/auth/services/authService';
 import { clearAuth } from '@/components/features/auth/services/authStorage';
 import { userService } from '@/components/features/user/services/userService';
 import { useToast } from '@/providers/ToastProvider';
+import { useLayoutStore } from '@/store/useLayoutStore';
 
 export default function Header() {
   const [userInfo, setUserInfo] = useState(null);
@@ -17,6 +25,7 @@ export default function Header() {
   const params = useParams();
   const internshipGroupId = params?.internshipGroupId;
   const toast = useToast();
+  const { isSidebarCollapsed } = useLayoutStore();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -71,8 +80,25 @@ export default function Header() {
       if (key === 'logout') handleLogout();
     },
   };
+
   return (
-    <header className="sticky top-0 z-50 flex h-16 items-center justify-end border-b border-slate-200 bg-gray-50 px-6">
+    <header
+      className={`sticky top-0 z-50 flex h-16 items-center justify-between border-b border-slate-200 bg-gray-50 transition-all duration-300 ${isSidebarCollapsed ? 'px-12 2xl:px-16' : 'px-6'}`}
+    >
+      <div className="flex items-center">
+        <button
+          onClick={() => useLayoutStore.toggleSidebar()}
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+          title={isSidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
+        >
+          {isSidebarCollapsed ? (
+            <MenuUnfoldOutlined className="text-xl" />
+          ) : (
+            <MenuFoldOutlined className="text-xl" />
+          )}
+        </button>
+      </div>
+
       <div className="flex items-center gap-4">
         <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300">
           <BellOutlined className="text-lg text-gray-700" />

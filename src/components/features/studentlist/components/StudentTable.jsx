@@ -95,6 +95,7 @@ export default function StudentTable({ data, loading, onDelete }) {
         data={data}
         loading={loading}
         emptyText={STUDENT_LIST_UI.EMPTY.NO_MEMBERS}
+        size="small"
         rowKey="studentId"
       />
     </div>

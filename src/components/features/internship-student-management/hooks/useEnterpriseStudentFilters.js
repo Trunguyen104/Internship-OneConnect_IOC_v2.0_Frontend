@@ -35,7 +35,7 @@ export const useEnterpriseStudentFilters = () => {
         const unis = uniRes?.data?.items || [];
         setUniversityOptions(unis.map((u) => ({ label: u.name, value: u.id || u.universityId })));
       } catch (err) {
-        console.error('Failed to fetch filter data:', err);
+        // Silent error
       } finally {
         setFetchingTerms(false);
       }

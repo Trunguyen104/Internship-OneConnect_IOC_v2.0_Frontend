@@ -10,9 +10,8 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 
 import CreateGroupModal from '../../internship-group-management/components/CreateGroupModal';
 import { useInternshipManagement } from '../hooks/useInternshipManagement';
-import AssignMentorModal from './AssignMentorModal';
+// import AssignMentorModal from './AssignMentorModal';
 import GroupActionModal from './GroupActionModal';
-import RejectStudentModal from './RejectStudentModal';
 import StudentDetailModal from './StudentDetailModal';
 import StudentFilters from './StudentFilters';
 import StudentTable from './StudentTable';
@@ -31,12 +30,10 @@ export default function InternshipManagement() {
     filteredData,
     total,
     loading,
-    rejectModal,
     groupModal,
     detailModal,
     assignModal,
     selectedRowKeys,
-    setRejectModal,
     setGroupModal,
     setDetailModal,
     setAssignModal,
@@ -45,10 +42,9 @@ export default function InternshipManagement() {
     handleStatusChange,
     handleTableChange,
     handlePageSizeChange,
-    handleAcceptStudent,
-    handleRejectStudent,
     handleGroupSubmit,
     handleAssignMentor,
+    handleViewStudent,
     termId,
     setTermId,
     termOptions,
@@ -131,16 +127,16 @@ export default function InternshipManagement() {
             </div>
           </DataTableToolbar.Filters>
 
-          <DataTableToolbar.Actions className="ml-auto">
-            {selectedRowKeys.length > 0 && bulkItems.length > 0 && (
+          {selectedRowKeys.length > 0 && bulkItems.length > 0 && (
+            <DataTableToolbar.Actions className="ml-auto">
               <DataTableToolbar.Actions
                 label={INTERNSHIP_LIST.ACTIONS.BULK_ACTIONS || 'Bulk Actions'}
                 icon={<DownOutlined />}
                 menu={{ items: bulkItems }}
                 className="bg-slate-800 hover:bg-slate-900"
               />
-            )}
-          </DataTableToolbar.Actions>
+            </DataTableToolbar.Actions>
+          )}
         </DataTableToolbar>
 
         <StudentTable
@@ -150,15 +146,17 @@ export default function InternshipManagement() {
           loading={loading}
           isTermEditable={isTermEditable}
           hasGroups={hasGroups}
-          emptyText="Currently, no students are performing the work."
+          emptyText={
+            termOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Upcoming Terms'
+              ? INTERNSHIP_LIST.TABLE.EMPTY_TEXT_UPCOMING
+              : INTERNSHIP_LIST.TABLE.EMPTY_TEXT_ACTIVE
+          }
           sortBy={sort.column}
           sortOrder={sort.order}
           onSort={(key, order) => setSort({ column: key, order })}
           selectedRowKeys={selectedRowKeys}
           onSelectRowChange={setSelectedRowKeys}
-          onAccept={handleAcceptStudent}
-          onReject={(student) => setRejectModal({ open: true, student, reason: '' })}
-          onView={(student) => setDetailModal({ open: true, student })}
+          onView={handleViewStudent}
           onAssign={(student) => setAssignModal({ open: true, student })}
           onCreateGroup={(student) => setCreateModal({ open: true, students: [student] })}
           onAddToGroup={(student) =>
@@ -182,25 +180,18 @@ export default function InternshipManagement() {
         )}
       </Card>
 
-      <RejectStudentModal
-        open={rejectModal.open}
-        student={rejectModal.student}
-        onCancel={() => setRejectModal({ open: false, student: null, reason: '' })}
-        onConfirm={handleRejectStudent}
-      />
-
       <StudentDetailModal
         open={detailModal.open}
         student={detailModal.student}
         onCancel={() => setDetailModal({ open: false, student: null })}
       />
 
-      <AssignMentorModal
+      {/* <AssignMentorModal
         open={assignModal.open}
         student={assignModal.student}
         onCancel={() => setAssignModal({ open: false, student: null })}
         onConfirm={handleAssignMentor}
-      />
+      /> */}
 
       <GroupActionModal
         open={groupModal.open}

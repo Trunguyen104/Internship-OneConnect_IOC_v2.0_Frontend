@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
+
+const DEFAULT_TERMS = [];
 
 export const useEnterpriseGroups = ({
   termId,
@@ -11,7 +14,7 @@ export const useEnterpriseGroups = ({
   search,
   pagination,
   sort,
-  termOptions = [],
+  termOptions = DEFAULT_TERMS,
 }) => {
   const toast = useToast();
   const [data, setData] = useState([]);
@@ -24,21 +27,30 @@ export const useEnterpriseGroups = ({
     try {
       setLoading(true);
 
-      const allTerms = termOptions.filter((t) => t.value !== 'ALL_ACTIVE');
-      if (allTerms.length === 0) {
+      const isBulkTerm = termId === 'ALL_ACTIVE' || termId === 'ALL_VISIBLE';
+      const allTerms = termOptions.filter(
+        (t) => t.value !== 'ALL_ACTIVE' && t.value !== 'ALL_VISIBLE'
+      );
+
+      if (isBulkTerm && allTerms.length === 0) {
         setData([]);
         setTotal(0);
         return;
       }
 
-      // If a specific term is selected (not 'ALL_ACTIVE'), we could use just that.
-      // But based on user request "get hết", we usually are in ALL_ACTIVE mode.
-      const targetTerms = termId === 'ALL_ACTIVE' ? allTerms : [{ value: termId }];
+      const targetTerms = isBulkTerm
+        ? allTerms
+        : [
+            {
+              value: termId,
+              label: termOptions.find((t) => t.value === termId)?.label || 'Selected Term',
+            },
+          ];
 
       const fetchPromises = targetTerms.map(async (term) => {
         const params = {
           TermId: term.value,
-          PageIndex: 1, // Aggregating everything for now
+          PageIndex: 1,
           PageSize: 100,
           Search: search,
           Status: filters.status,
@@ -52,20 +64,34 @@ export const useEnterpriseGroups = ({
           const response = await EnterpriseGroupService.getGroups(params);
           const items = response?.data?.items || response?.items || [];
           return items.map((item) => {
+            const itemTermId =
+              item.termId ||
+              item.internshipTermId ||
+              item.TermId ||
+              item.term?.termId ||
+              item.term?.id;
             const t = termOptions.find(
-              (opt) => opt.value?.toLowerCase() === item.termId?.toLowerCase()
+              (opt) => opt.value?.toLowerCase() === itemTermId?.toLowerCase()
             );
             return {
               ...item,
-              id: item.internshipId || item.id || item.groupId,
-              name: item.groupName || item.GroupName || item.name,
-              termName: item.termName || item.TermName || t?.label || term.label || '-',
+              id: item.internshipId || item.id || item.groupId || item.internshipGroupId,
+              name: item.groupName || item.GroupName || item.name || item.Name,
+              termName:
+                item.termName ||
+                item.internshipTermName ||
+                item.term?.name ||
+                item.term?.Name ||
+                item.TermName ||
+                t?.label ||
+                term.label ||
+                '-',
               memberCount: item.numberOfMembers ?? item.NumberOfMembers ?? item.memberCount ?? 0,
-              mentorName: item.mentorName || item.MentorName || '-',
+              mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
             };
           });
         } catch (err) {
-          console.error(`Failed to fetch groups for term ${term.value}:`, err);
+          // Silent error
           return [];
         }
       });
@@ -76,7 +102,7 @@ export const useEnterpriseGroups = ({
       setData(combinedGroups);
       setTotal(combinedGroups.length);
     } catch (error) {
-      console.error('Fetch Enterprise Groups Error:', error);
+      // Silent error
       toast.error(ENTERPRISE_GROUP_UI.MESSAGES.ERROR);
       setData([]);
       setTotal(0);
@@ -85,11 +111,12 @@ export const useEnterpriseGroups = ({
     }
   }, [
     termId,
-    pagination,
+    pagination?.current,
+    pagination?.pageSize,
     search,
     filters?.status,
     filters?.includeArchived,
-    filters?.dateFilter,
+    JSON.stringify(filters?.dateFilter), // Use stringified date to avoid object reference issues
     sort?.column,
     sort?.order,
     termOptions,
@@ -98,6 +125,18 @@ export const useEnterpriseGroups = ({
 
   useEffect(() => {
     fetchGroups();
+  }, [fetchGroups]);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchGroups();
+    };
+    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    return () =>
+      window.removeEventListener(
+        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
+        handleRefresh
+      );
   }, [fetchGroups]);
 
   return {
