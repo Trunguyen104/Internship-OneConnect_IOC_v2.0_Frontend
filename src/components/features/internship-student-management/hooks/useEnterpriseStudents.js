@@ -46,7 +46,6 @@ export const useEnterpriseStudents = ({ termId, filters, search, pagination, sor
         setTotal(0);
       }
     } catch (error) {
-      console.error('Fetch Enterprise Students Error:', error);
       toast.error(ENTERPRISE_STUDENT_UI.MESSAGES.LOAD_ERROR);
       setData([]);
       setTotal(0);

@@ -22,8 +22,8 @@ export const useEnterpriseGroupFilters = () => {
 
         if (terms.length > 0) {
           const options = terms.map((t) => ({
-            label: t.termName,
-            value: t.termId,
+            label: t.name || t.termName || t.TermName || 'Unnamed Term',
+            value: t.termId || t.id || t.internshipTermId,
             status: t.status,
           }));
 
@@ -33,14 +33,11 @@ export const useEnterpriseGroupFilters = () => {
             status: 2,
           };
 
-          console.log('[DEBUG] GroupFilters Setting termOptions:', [allOption, ...options]);
           setTermOptions([allOption, ...options]);
           setTermId('ALL_ACTIVE');
-        } else {
-          console.warn('[DEBUG] No terms found for groups.');
         }
       } catch (err) {
-        console.error('Failed to fetch enterprise active terms:', err);
+        // Error handled silently or via toast if needed
       } finally {
         setFetchingTerms(false);
       }

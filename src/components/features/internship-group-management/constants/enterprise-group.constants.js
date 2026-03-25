@@ -28,9 +28,14 @@ export const ENTERPRISE_GROUP_UI = {
     ARCHIVE_TOOLTIP: 'Archive Group',
   },
   STATUS: {
-    IN_PROGRESS: 'Active',
-    FINISHED: 'Finished', // Can't add/remove
-    ARCHIVED: 'Archived', // Read only
+    ACTIVE: 1,
+    FINISHED: 2,
+    ARCHIVED: 3,
+    LABELS: {
+      1: 'Active',
+      2: 'Finished',
+      3: 'Archived',
+    },
   },
   ACTIONS: {
     VIEW_DETAIL: 'View Group Details',
@@ -39,64 +44,75 @@ export const ENTERPRISE_GROUP_UI = {
     REMOVE_STUDENT: 'Remove Student',
     ARCHIVE_GROUP: 'Archive Group',
     DELETE_GROUP: 'Delete Group',
-    CREATE_GROUP: 'Create New Group',
+    CREATE_GROUP: 'Create Group',
+    BACK_TO_LIST: 'Back to List',
   },
   FILTERS: {
     STATUS: 'Status',
-    TERM: 'Term',
+    TERM: 'Internship Term',
   },
   MODALS: {
     CREATE: {
-      TITLE: 'Create Internship Group',
+      TITLE: 'Create New Internship Group',
       SUBMIT: 'Create Group',
     },
     EDIT: {
-      TITLE: 'Edit Group Details',
+      TITLE: 'Edit Group Information',
       SUBMIT: 'Save Changes',
     },
     DELETE: {
       TITLE: 'Delete Group',
       CONTENT:
-        'Are you sure you want to delete this group? This action cannot be undone and can only be performed if the group has no students and no internship data.',
+        'Are you sure you want to delete this group? This action cannot be undone and can only be performed if the group has no students.',
       SUBMIT: 'Confirm Delete',
     },
     ARCHIVE: {
       TITLE: 'Archive Group',
       CONTENT:
-        'Are you sure you want to archive this group? The group will no longer be displayed in the default list, but the data will be retained for reference.',
+        'Are you sure you want to archive this group? It will no longer appear in the default list but data will be kept for reference.',
       SUBMIT: 'Confirm Archive',
     },
     VIEW: {
-      DEFAULT_SUBTITLE: 'Internship Group Details',
-      TRACK: 'TRACK/DOMAIN',
+      TITLE: 'OVERVIEW',
+      DEFAULT_SUBTITLE: 'Internship Group Information',
+      GROUP_NAME: 'GROUP NAME',
+      TRACK: 'DOMAIN/TRACK',
       NOT_ASSIGNED: 'Not Assigned',
       STATUS: 'STATUS',
-      TERM: 'SEMESTER TERM',
+      TERM: 'INTERNSHIP TERM',
       TOTAL_MEMBERS: 'TOTAL MEMBERS',
       STUDENTS_SUFFIX: 'Students',
       MENTOR: 'ASSIGNED MENTOR',
-      PROJECT_NAME: 'PROJECT/CLIENT',
-      MEMBERS: 'GROUP MEMBERS',
+      PROJECT_NAME: 'PROJECT/ASSIGNMENT',
+      ENTERPRISE: 'ENTERPRISE',
+      TIMELINE: 'TIMELINE/ROADMAP',
+      HISTORY: 'RECORD HISTORY',
+      CREATED_AT: 'Created at:',
+      MEMBERS: 'STUDENT LIST',
+      DESCRIPTION: 'DESCRIPTION/NOTES',
       CLOSE: 'Close',
+      TABLE: {
+        CODE: 'Student ID',
+        FULL_NAME: 'Full name',
+        EMAIL: 'Email',
+        SCHOOL: 'School',
+      },
     },
   },
   MESSAGES: {
     CREATE_SUCCESS: 'Group created successfully.',
-    UPDATE_SUCCESS: 'Group updated successfully.',
+    UPDATE_SUCCESS: 'Information updated successfully.',
     DELETE_SUCCESS: 'Group deleted successfully.',
     ARCHIVE_SUCCESS: 'Group archived successfully.',
-    ADD_STUDENT_SUCCESS: 'Student added successfully.',
-    REMOVE_STUDENT_SUCCESS: 'Student removed successfully.',
-    DELETE_ERROR_HAS_STUDENTS:
-      'Cannot delete this group because it still contains students. Please remove them or archive the group.',
-    DELETE_ERROR_HAS_DATA:
-      'This group already contains internship data (logbook, evaluations, etc.). Consider archiving it instead of deleting to keep the history.',
-    ERROR: 'Something went wrong. Please try again later.',
+    ADD_STUDENT_SUCCESS: 'Student added to group.',
+    REMOVE_STUDENT_SUCCESS: 'Student removed from group.',
+    LOAD_ERROR: 'Could not load group information.',
+    ERROR: 'An error occurred. Please try again later.',
   },
 };
 
 export const GROUP_STATUS_MAP = {
-  0: 'InProgress',
-  1: 'Finished',
-  2: 'Archived',
+  1: 'Active',
+  2: 'Finished',
+  3: 'Archived',
 };

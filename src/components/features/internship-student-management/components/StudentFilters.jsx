@@ -7,7 +7,7 @@ import {
   PlusOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
-import { Button, DatePicker, Divider, Popover, Select, Tag, Typography } from 'antd';
+import { Button, DatePicker, Divider, Popover, Select, Typography } from 'antd';
 import React, { useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -249,14 +249,6 @@ export const StudentFilters = ({
       >
         <FilterOutlined />
         <span>{INTERNSHIP_LIST.FILTERS.FILTER_TITLE}</span>
-        {activeFiltersCount > 0 && (
-          <Tag
-            color="error"
-            className="mr-0 rounded-full border-none px-1.5 min-w-[22px] text-center font-bold text-[11px] leading-5"
-          >
-            {activeFiltersCount}
-          </Tag>
-        )}
         <DownOutlined
           className={`ml-1 text-[9px] transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
         />

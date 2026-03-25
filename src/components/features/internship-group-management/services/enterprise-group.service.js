@@ -3,19 +3,19 @@ import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/ht
 const BASE_URL = '/internship-groups';
 
 const cleanPayload = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
   const newObj = { ...obj };
   Object.keys(newObj).forEach((key) => {
-    if (newObj[key] === undefined || newObj[key] === '' || newObj[key] === null) delete newObj[key];
+    if (newObj[key] === undefined || newObj[key] === '' || newObj[key] === null) {
+      delete newObj[key];
+    }
   });
   return newObj;
 };
 
 export const EnterpriseGroupService = {
   async getGroups(params = {}) {
-    const finalParams = { ...params };
-    if (finalParams.TermId === 'ALL_ACTIVE') delete finalParams.TermId;
-    const cleanParams = cleanPayload(finalParams);
-    return httpGet(BASE_URL, cleanParams);
+    return httpGet(BASE_URL, cleanPayload({ ...params }));
   },
 
   async getGroupDetail(id) {
@@ -31,18 +31,38 @@ export const EnterpriseGroupService = {
   },
 
   async moveStudents(data) {
-    // Expected payload: MoveStudentsBetweenGroupsCommand { fromGroupId, toGroupId, studentIds }
-    return httpPost(`${BASE_URL}/move-students`, data);
+    const payload = {
+      studentIds: data.studentIds,
+      fromGroupId: data.fromGroupId,
+      toGroupId: data.toGroupId,
+    };
+    return httpPost(`${BASE_URL}/move-students`, cleanPayload(payload));
   },
 
   async addStudents(id, students) {
-    // Expected payload: AddStudentsToGroupCommand { internshipId, students: [{ studentId, role }] }
-    return httpPost(`${BASE_URL}/students`, { internshipId: id, students });
+    const formattedStudents = (students || []).map((s) => {
+      const roleValue = s.Role || s.role;
+      const roleInt = roleValue === 'Leader' || roleValue === 2 ? 2 : 1;
+
+      return {
+        studentId: s.StudentId || s.studentId,
+        role: roleInt,
+      };
+    });
+
+    const payload = {
+      internshipId: id,
+      students: formattedStudents,
+    };
+    return httpPost(`${BASE_URL}/students`, cleanPayload(payload));
   },
 
   async removeStudents(id, studentIds) {
-    // Expected payload: RemoveStudentsFromGroupCommand { internshipId, studentIds: [guid1, guid2] }
-    return httpDelete(`${BASE_URL}/students`, { internshipId: id, studentIds });
+    const payload = {
+      internshipId: id,
+      studentIds: studentIds,
+    };
+    return httpDelete(`${BASE_URL}/students`, payload);
   },
 
   async archiveGroup(id) {
@@ -50,10 +70,7 @@ export const EnterpriseGroupService = {
   },
 
   async getPlacedStudents(params = {}) {
-    const finalParams = { ...params };
-    if (finalParams.TermId === 'ALL_ACTIVE') delete finalParams.TermId;
-    const cleanParams = cleanPayload(finalParams);
-    return httpGet(`${BASE_URL}/placed-students`, cleanParams);
+    return httpGet(`${BASE_URL}/placed-students`, cleanPayload({ ...params }));
   },
 
   async getGroupDashboard(id) {

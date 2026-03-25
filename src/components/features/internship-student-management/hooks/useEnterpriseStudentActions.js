@@ -17,7 +17,6 @@ export const useEnterpriseStudentActions = (onSuccess) => {
       toast.success(ENTERPRISE_STUDENT_UI.MESSAGES.ACCEPT_SUCCESS);
       if (onSuccess) onSuccess();
     } catch (error) {
-      console.error('Accept Application Error:', error);
       toast.error(getErrorDetail(error, ENTERPRISE_STUDENT_UI.MESSAGES.ACCEPT_ERROR));
     } finally {
       setLoading(false);
@@ -36,7 +35,6 @@ export const useEnterpriseStudentActions = (onSuccess) => {
       toast.success(ENTERPRISE_STUDENT_UI.MESSAGES.REJECT_SUCCESS);
       if (onSuccess) onSuccess();
     } catch (error) {
-      console.error('Reject Application Error:', error);
       toast.error(getErrorDetail(error, ENTERPRISE_STUDENT_UI.MESSAGES.REJECT_ERROR));
     } finally {
       setLoading(false);

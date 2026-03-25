@@ -24,7 +24,6 @@ export default function ViolationManagement() {
     data,
     loading,
     searchTerm,
-    groupIdFilter,
     dateRange,
     pagination,
     modalVisible,
@@ -36,7 +35,6 @@ export default function ViolationManagement() {
     groups,
     setModalVisible,
     handleSearchChange,
-    handleGroupChange,
     handleDateRangeChange,
     handleTableChange,
     handleCreateNew,
@@ -45,11 +43,7 @@ export default function ViolationManagement() {
     handleRequestDelete,
     handleDelete,
     handleSaveModal,
-    termId,
-    setTermId,
-    termOptions,
-    fetchingTerms,
-    studentOptions,
+    isMentor,
   } = useViolationManagement();
 
   return (
@@ -71,12 +65,14 @@ export default function ViolationManagement() {
               placeholder={[VIOLATION_REPORT.FILTERS.START_DATE, VIOLATION_REPORT.FILTERS.END_DATE]}
             />
           </DataTableToolbar.Filters>
-          <DataTableToolbar.Actions
-            label={VIOLATION_REPORT.CREATE_BUTTON}
-            onClick={handleCreateNew}
-            icon={<PlusOutlined />}
-            className="ml-auto"
-          />
+          {isMentor && (
+            <DataTableToolbar.Actions
+              label={VIOLATION_REPORT.CREATE_BUTTON}
+              onClick={handleCreateNew}
+              icon={<PlusOutlined />}
+              className="ml-auto"
+            />
+          )}
         </DataTableToolbar>
 
         <ViolationTable
@@ -87,6 +83,7 @@ export default function ViolationManagement() {
           onEdit={handleEdit}
           onView={handleView}
           onRequestDelete={handleRequestDelete}
+          isMentor={isMentor}
         />
 
         {data.length > 0 && (

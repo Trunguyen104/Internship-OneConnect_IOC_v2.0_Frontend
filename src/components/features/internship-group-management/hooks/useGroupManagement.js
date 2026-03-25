@@ -1,8 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
 import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
@@ -14,6 +17,7 @@ import { useEnterpriseGroups } from '../hooks/useEnterpriseGroups';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
 export const useGroupManagement = () => {
+  const toast = useToast();
   const filters = useEnterpriseGroupFilters();
   const [enterpriseId, setEnterpriseId] = useState(null);
 
@@ -24,7 +28,7 @@ export const useGroupManagement = () => {
         const data = res?.data || res;
         setEnterpriseId(data?.enterpriseId || data?.enterprise_id || data?.enterpriseID);
       } catch (err) {
-        console.error('Failed to fetch user info:', err);
+        // Silent error
       }
     };
     fetchMe();
@@ -48,18 +52,32 @@ export const useGroupManagement = () => {
       setLoadingMentors(true);
       const res = await EnterpriseMentorService.getMentors({ PageSize: 100 });
       const items = res?.data?.items || res?.data || res?.items || [];
-      setMentors(items);
+      console.log('Fetched mentors:', items);
+      setMentors(Array.isArray(items) ? items : []);
     } catch (err) {
-      console.error('Failed to fetch mentors:', err);
+      console.error('Fetch mentors failed:', err);
       setMentors([]);
     } finally {
       setLoadingMentors(false);
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchMentors();
   }, [fetchMentors]);
+
+  // Listen for global group refresh events
+  useEffect(() => {
+    const handleRefresh = () => {
+      refetch();
+    };
+    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    return () =>
+      window.removeEventListener(
+        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
+        handleRefresh
+      );
+  }, [refetch]);
 
   const {
     createGroup,
@@ -72,34 +90,50 @@ export const useGroupManagement = () => {
   } = useEnterpriseGroupActions(refetch);
 
   const [assignModal, setAssignModal] = useState({ open: false, group: null });
-  const [viewModal, setViewModal] = useState({ open: false, group: null, loading: false });
   const [createModal, setCreateModal] = useState({ open: false, group: null });
   const [editModal, setEditModal] = useState({ open: false, group: null });
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [fetchingStudents, setFetchingStudents] = useState(false);
+  const [selectedGroupDetail, setSelectedGroupDetail] = useState(null);
+  const router = useRouter();
+
+  const handleViewGroup = useCallback((group) => {
+    setSelectedGroupDetail(group);
+  }, []);
 
   const fetchUnassignedStudents = useCallback(async () => {
-    if (!filters.termId) return;
+    let targetTermId = filters.termId;
+
+    // If 'ALL_ACTIVE', try to find the first real term GUID from options
+    if (targetTermId === 'ALL_ACTIVE' && filters.termOptions.length > 1) {
+      // Find the first option that isn't 'ALL_ACTIVE'
+      const firstRealTerm = filters.termOptions.find((o) => o.value !== 'ALL_ACTIVE');
+      if (firstRealTerm) targetTermId = firstRealTerm.value;
+    }
+
+    if (!targetTermId || targetTermId === 'ALL_ACTIVE') return;
+
     try {
       setFetchingStudents(true);
-      const res = await EnterpriseStudentService.getApplications({
-        TermId: filters.termId,
-        Status: 2, // Approved (Placed)
+      const res = await EnterpriseGroupService.getPlacedStudents({
+        TermId: targetTermId,
         PageIndex: 1,
         PageSize: 100,
       });
-      const items = res?.data?.items || [];
-      // Filter for approved students without a group
-      const unassigned = items
-        .filter((s) => s.status === 2 && !s.groupId)
-        .map(EnterpriseStudentService.mapApplication);
+      const items = res?.data?.items || res.items || [];
+      console.log('Fetched placed students:', items);
+
+      const mappedItems = items.map(EnterpriseStudentService.mapApplication);
+      const unassigned = mappedItems.filter((s) => !s.groupId);
+
+      console.log('Unassigned students after filter:', unassigned);
       setUnassignedStudents(unassigned);
     } catch (err) {
-      console.error('Failed to fetch unassigned students:', err);
+      console.error('Fetch unassigned failed:', err);
     } finally {
       setFetchingStudents(false);
     }
-  }, [filters.termId]);
+  }, [filters.termId, filters.termOptions]);
 
   useEffect(() => {
     if (createModal.open || editModal.open) {
@@ -153,90 +187,99 @@ export const useGroupManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (payload) => {
+      let targetTermId = filters.termId;
+      if (targetTermId === 'ALL_ACTIVE' && filters.termOptions.length > 1) {
+        const firstRealTerm = filters.termOptions.find((o) => o.value !== 'ALL_ACTIVE');
+        if (firstRealTerm) targetTermId = firstRealTerm.value;
+      }
+
       await createGroup({
         ...payload,
-        termId: filters.termId,
+        termId: targetTermId,
         enterpriseId: enterpriseId,
       });
       setCreateModal({ open: false, group: null });
     },
-    [createGroup, filters.termId, enterpriseId]
+    [createGroup, filters.termId, filters.termOptions, enterpriseId]
   );
 
   const handleUpdateGroup = useCallback(
     async (values) => {
       const { group } = editModal;
       if (!group) return;
-      await updateGroup(group.id, {
-        ...values,
-        termId: filters.termId,
-      });
-      setEditModal({ open: false, group: null });
+
+      const groupId = group.id || group.groupId;
+
+      try {
+        // 1. Sync students ONLY if they were provided in the payload (not hidden in UI)
+        if (values.students !== undefined) {
+          const newStudents = values.students || [];
+          const oldMembers = group.members || [];
+
+          const newIds = new Set(newStudents.map((s) => String(s.studentId)));
+          const oldIds = new Set(
+            oldMembers.map((m) => String(m.studentId || m.id || m.applicationId))
+          );
+
+          const toAdd = newStudents.filter((s) => !oldIds.has(String(s.studentId)));
+          const toRemove = oldMembers
+            .filter((m) => !newIds.has(String(m.studentId || m.id || m.applicationId)))
+            .map((m) => m.studentId || m.id || m.applicationId);
+
+          if (toRemove.length > 0) {
+            await EnterpriseGroupService.removeStudents(groupId, toRemove);
+          }
+          if (toAdd.length > 0) {
+            await EnterpriseGroupService.addStudents(groupId, toAdd);
+          }
+        }
+
+        // 2. Update group basic info
+        await updateGroup(groupId, {
+          name: values.groupName,
+          description: values.description,
+          mentorId: values.mentorId,
+          startDate: values.startDate,
+          endDate: values.endDate,
+          termId: filters.termId === 'ALL_ACTIVE' ? group.termId : filters.termId,
+        });
+
+        setEditModal({ open: false, group: null });
+      } catch (err) {
+        // Error already handled by useEnterpriseGroupActions toast
+      }
     },
-    [editModal, updateGroup, filters.termId]
+    [editModal, updateGroup, filters.termId, filters.termOptions]
   );
-
-  const handleViewGroup = useCallback(async (group) => {
-    try {
-      setViewModal({ open: true, group, loading: true });
-      const res = await EnterpriseGroupService.getGroupDetail(group.id);
-      const detailedGroup = res?.data || res;
-
-      // Map members data to ensure it matches ViewGroupModal expectations
-      const members = (detailedGroup.members || detailedGroup.students || []).map((s) => ({
-        id: s.studentId || s.id || s.applicationId,
-        fullName: s.studentFullName || s.fullName || s.name || 'Unknown',
-        code: s.studentCode || s.code || '-',
-        email: s.email || '-',
-        avatar: s.avatar,
-        universityName: s.universityName || s.schoolName || s.university || '-',
-      }));
-
-      setViewModal({
-        open: true,
-        group: {
-          ...group,
-          ...detailedGroup,
-          description: detailedGroup.description || detailedGroup.Description || '-',
-          mentorEmail: detailedGroup.mentorEmail || detailedGroup.MentorEmail || '',
-          members,
-        },
-        loading: false,
-      });
-    } catch (err) {
-      console.error('Failed to fetch group details:', err);
-      setViewModal({ open: true, group, loading: false });
-    }
-  }, []);
 
   const handleRemoveStudentFromGroup = useCallback(
     async (groupId, studentId) => {
       try {
+        const { MODALS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
         showDeleteConfirm({
-          title: 'Delete Student',
+          title: MODALS.GROUP_ACTION.REMOVE_STUDENT_TITLE || 'Remove Student',
           content:
-            'Are you sure you want to remove this student from the group? This action will only remove the student from the group, it will not change the Placed status.',
-          okText: 'Delete',
+            MODALS.GROUP_ACTION.REMOVE_STUDENT_CONTENT ||
+            'Are you sure you want to remove this student from the group?',
+          okText: MODALS.GROUP_ACTION.REMOVE_CONFIRM || 'Remove',
           onOk: async () => {
             const success = await removeStudents(groupId, [studentId]);
             if (success) {
-              // Refresh group detail if modal is open
-              if (viewModal.open && viewModal.group?.id === groupId) {
-                handleViewGroup(viewModal.group);
+              if (selectedGroupDetail?.id === groupId) {
+                handleViewGroup(selectedGroupDetail);
               }
             }
           },
         });
       } catch (err) {
-        console.error('Failed to remove student:', err);
+        toast.error('Failed to remove student');
       }
     },
-    [removeStudents, viewModal.open, viewModal.group, handleViewGroup]
+    [removeStudents, selectedGroupDetail, handleViewGroup, toast]
   );
 
   return {
     filteredGroups: data,
-    existingGroups: data,
     activeTab: filters.filters.status !== null ? filters.filters.status : 'ALL',
     setActiveTab: (val) => filters.handleFilterChange('status', val === 'ALL' ? null : val),
     search: filters.searchValue,
@@ -245,8 +288,6 @@ export const useGroupManagement = () => {
     loading: loading || actionLoading,
     assignModal,
     setAssignModal,
-    viewModal,
-    setViewModal: (val) => setViewModal(val),
     handleViewGroup,
     createModal,
     setCreateModal,
@@ -274,5 +315,7 @@ export const useGroupManagement = () => {
       (filters.termId && filters.termOptions.find((t) => t.value === filters.termId)?.status === 2),
     filters: filters.filters,
     handleFilterChange: filters.handleFilterChange,
+    selectedGroupDetail,
+    setSelectedGroupDetail,
   };
 };

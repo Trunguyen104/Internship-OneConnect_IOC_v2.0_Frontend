@@ -1,7 +1,7 @@
 'use client';
 
-import { ProjectOutlined, UserOutlined } from '@ant-design/icons';
-import { Form, Input, Select, Spin } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
+import { Form, Select, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
@@ -26,21 +26,21 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
       }
       fetchMentors();
     }
-  }, [open, student, form]);
+  }, [open]);
 
   const fetchMentors = async () => {
     try {
       setLoading(true);
       const res = await EnterpriseMentorService.getMentors();
-      const items = res?.data || [];
+      const items = res?.data?.items || res?.items || res?.data || [];
       setMentors(
-        items.map((m) => ({
-          label: `${m.fullName} (${m.email})`,
-          value: m.id || m.mentorId,
+        (Array.isArray(items) ? items : []).map((m) => ({
+          label: `${m.fullName || m.name || ''} (${m.email || ''})`,
+          value: String(m.id || m.mentorId || m.userId),
         }))
       );
     } catch (err) {
-      console.error('Failed to fetch mentors:', err);
+      // Silent error
     } finally {
       setLoading(false);
     }
@@ -82,31 +82,13 @@ const AssignMentorModal = ({ open, student, onCancel, onConfirm }) => {
           rules={[{ required: true, message: ASSIGN.MENTOR_REQUIRED }]}
         >
           <Select
-            showSearch
             placeholder={ASSIGN.MENTOR_PLACEHOLDER}
             className="h-11 w-full rounded-xl"
             loading={loading}
             options={mentors}
-            filterOption={(input, option) =>
-              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-            }
+            showSearch
+            optionFilterProp="label"
             notFoundContent={loading ? <Spin size="small" /> : null}
-          />
-        </Form.Item>
-
-        <Form.Item
-          label={
-            <span className="text-text text-xs font-bold tracking-wider uppercase">
-              {ASSIGN.PROJECT_LABEL}
-            </span>
-          }
-          name="projectName"
-          rules={[{ required: true, message: ASSIGN.PROJECT_REQUIRED }]}
-        >
-          <Input
-            prefix={<ProjectOutlined className="text-muted" />}
-            placeholder={ASSIGN.PROJECT_PLACEHOLDER}
-            className="bg-surface border-border h-11 rounded-xl"
           />
         </Form.Item>
 

@@ -14,6 +14,7 @@ const ViolationTable = memo(function ViolationTable({
   onEdit,
   onView,
   onRequestDelete,
+  isMentor = false,
 }) {
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { TABLE } = VIOLATION_REPORT;
@@ -119,7 +120,14 @@ const ViolationTable = memo(function ViolationTable({
               danger: true,
               onClick: () => onRequestDelete(record),
             },
-          ];
+          ].filter((item) => {
+            if (
+              !isMentor &&
+              (item.key === 'edit' || item.key === 'delete' || item.type === 'divider')
+            )
+              return false;
+            return true;
+          });
 
           return (
             <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
@@ -136,7 +144,7 @@ const ViolationTable = memo(function ViolationTable({
         },
       },
     ],
-    [page, pageSize, TABLE, onEdit, onView, onRequestDelete]
+    [page, pageSize, TABLE, onEdit, onView, onRequestDelete, isMentor]
   );
 
   return (

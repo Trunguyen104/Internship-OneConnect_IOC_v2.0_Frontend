@@ -20,7 +20,14 @@ export default function DataTable({
   sortOrder,
   onSort,
   rowSelection,
+  size = 'middle', // small, middle, large
 }) {
+  const isSmall = size === 'small';
+  const isLarge = size === 'large';
+
+  const headerPadding = isSmall ? 'py-3' : isLarge ? 'py-6' : 'py-5';
+  const rowHeight = isSmall ? 'h-[48px]' : isLarge ? 'h-[80px]' : 'h-[64px]';
+  const cellPadding = isSmall ? 'py-2' : isLarge ? 'py-5' : 'py-3.5';
   const handleSort = (columnKey) => {
     if (!onSort || !columnKey) return;
 
@@ -141,7 +148,7 @@ export default function DataTable({
                     key={col.key || col.title || index}
                     style={{ width: col.width }}
                     onClick={() => canSort && handleSort(col.sortKey)}
-                    className={`text-muted px-6 py-5 text-xs font-semibold tracking-wider uppercase whitespace-nowrap ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${col.className || ''} ${canSort ? 'cursor-pointer hover:text-primary transition-colors' : ''} `}
+                    className={`text-muted px-6 ${headerPadding} text-xs font-semibold tracking-wider uppercase whitespace-nowrap ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${col.className || ''} ${canSort ? 'cursor-pointer hover:text-primary transition-colors' : ''} `}
                   >
                     <div
                       className={`flex items-center gap-1 ${col.align === 'center' ? 'justify-center' : col.align === 'right' ? 'justify-end' : 'justify-start'}`}
@@ -173,7 +180,7 @@ export default function DataTable({
                 <tr
                   key={key}
                   onClick={() => !disabled && onRowClick?.(record)}
-                  className={`h-[72px] transition-all duration-200 ${
+                  className={`${rowHeight} transition-all duration-200 ${
                     isSelected
                       ? 'bg-primary/5 border-l-2 border-l-primary shadow-sm'
                       : 'hover:bg-bg/80'
@@ -203,7 +210,7 @@ export default function DataTable({
                   {columns.map((col, colIndex) => (
                     <td
                       key={col.key || col.title || colIndex}
-                      className={`px-6 py-4 align-middle text-sm transition-all ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${col.className || ''} `}
+                      className={`px-6 ${cellPadding} align-middle text-sm transition-all ${col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left'} ${col.className || ''} `}
                     >
                       {col.render ? col.render(record[col.key], record, index) : record[col.key]}
                     </td>
