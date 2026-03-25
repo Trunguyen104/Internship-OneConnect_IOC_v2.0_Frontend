@@ -16,7 +16,8 @@ import { useUniAdminDashboard } from '../services/useUniAdminDashboard.service';
 import MetricCard from './MetricCard';
 import RecentTerms from './RecentTerms';
 
-const { DASHBOARD } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+// const { DASHBOARD } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+const DASHBOARD = INTERNSHIP_MANAGEMENT_UI?.UNI_ADMIN?.DASHBOARD || {};
 
 export default function UniAdminDashboard() {
   const { loading, stats, recentTerms } = useUniAdminDashboard();
