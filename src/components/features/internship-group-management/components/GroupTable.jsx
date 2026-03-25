@@ -6,7 +6,6 @@ import {
   EyeOutlined,
   InboxOutlined,
   MoreOutlined,
-  UsergroupAddOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
@@ -135,12 +134,6 @@ const GroupTable = memo(function GroupTable({
             },
             ...(isActive && isPhaseEditable
               ? [
-                  {
-                    key: 'add-students',
-                    label: ACTIONS.ADD_TO_GROUP,
-                    icon: <UsergroupAddOutlined className="text-primary" />,
-                    onClick: () => onAddStudents(record),
-                  },
                   {
                     key: 'edit',
                     label: ACTIONS.EDIT_GROUP,

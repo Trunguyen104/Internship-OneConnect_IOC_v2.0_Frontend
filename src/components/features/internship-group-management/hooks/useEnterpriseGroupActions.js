@@ -65,7 +65,6 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       );
       return true;
     } catch (error) {
-      // AC-G09: If group has data, suggest Archive
       const errorMsg = error?.message || '';
       if (
         error?.status === 400 ||

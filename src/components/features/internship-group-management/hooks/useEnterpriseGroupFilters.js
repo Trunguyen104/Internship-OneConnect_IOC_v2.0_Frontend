@@ -28,7 +28,7 @@ export const useEnterpriseGroupFilters = () => {
           }));
 
           const allOption = {
-            label: 'Tất cả Giai đoạn',
+            label: 'All Phases',
             value: 'ALL_VISIBLE',
             status: undefined, // Show all
           };

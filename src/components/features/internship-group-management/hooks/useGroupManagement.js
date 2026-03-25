@@ -70,10 +70,8 @@ export const useGroupManagement = () => {
         new Map(allItems.map((item) => [item?.userId || item?.UserId || item?.id, item])).values()
       ).filter(Boolean);
 
-      console.log('Fetched mentors for groups (merged/resilient):', uniqueItems);
       setMentors(uniqueItems);
     } catch (err) {
-      console.error('Fetch mentors failed:', err);
       setMentors([]);
     } finally {
       setLoadingMentors(false);
@@ -101,7 +99,6 @@ export const useGroupManagement = () => {
     createGroup,
     updateGroup,
     archiveGroup,
-    moveStudents,
     removeStudents,
     addStudents: addGroupStudents,
     deleteGroup,
