@@ -35,29 +35,59 @@ export default function UniAdminDashboard() {
 
       {/* Metrics Row - Modern Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <MetricCard
-          title={DASHBOARD.METRICS.TOTAL_STUDENTS}
+        {/* <MetricCard
+          // title={DASHBOARD.METRICS.TOTAL_STUDENTS}
+          title={DASHBOARD?.METRICS?.TOTAL_STUDENTS}
           value={stats.totalStudents}
           icon={<TeamOutlined />}
           color="var(--color-info)"
           loading={loading}
-          suffix={DASHBOARD.METRICS.ENROLLED}
+          // suffix={DASHBOARD.METRICS.ENROLLED}
+          suffix={DASHBOARD?.METRICS?.ENROLLED}
         />
         <MetricCard
-          title={DASHBOARD.METRICS.TOTAL_TERMS}
+          // title={DASHBOARD.METRICS.TOTAL_TERMS}
+          title={DASHBOARD?.METRICS?.TOTAL_TERMS}
           value={stats.totalTerms}
           icon={<CalendarOutlined />}
           color="var(--color-success)"
           loading={loading}
-          suffix={DASHBOARD.METRICS.TOTAL}
+          suffix={DASHBOARD?.METRICS?.TOTAL}
         />
         <MetricCard
-          title={DASHBOARD.METRICS.INTERNSHIP_GROUPS}
+          // title={DASHBOARD.METRICS.INTERNSHIP_GROUPS}
+          title={DASHBOARD?.METRICS?.INTERNSHIP_GROUPS}
           value={stats.totalGroups}
           icon={<AppstoreOutlined />}
           color="var(--color-warning)"
           loading={loading}
           suffix={DASHBOARD.METRICS.COORDINATED}
+        /> */}
+        <MetricCard
+          title={DASHBOARD?.METRICS?.TOTAL_STUDENTS}
+          value={stats?.totalStudents}
+          icon={<TeamOutlined />}
+          color="var(--color-info)"
+          loading={loading}
+          suffix={DASHBOARD?.METRICS?.ENROLLED}
+        />
+
+        <MetricCard
+          title={DASHBOARD?.METRICS?.TOTAL_TERMS}
+          value={stats?.totalTerms}
+          icon={<CalendarOutlined />}
+          color="var(--color-success)"
+          loading={loading}
+          suffix={DASHBOARD?.METRICS?.TOTAL}
+        />
+
+        <MetricCard
+          title={DASHBOARD?.METRICS?.INTERNSHIP_GROUPS}
+          value={stats?.totalGroups}
+          icon={<AppstoreOutlined />}
+          color="var(--color-warning)"
+          loading={loading}
+          suffix={DASHBOARD?.METRICS?.COORDINATED}
         />
       </div>
 
