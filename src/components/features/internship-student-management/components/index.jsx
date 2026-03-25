@@ -1,6 +1,11 @@
 'use client';
 
-import { DownOutlined, EditOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+  UsergroupAddOutlined,
+} from '@ant-design/icons';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -12,11 +17,14 @@ import CreateGroupModal from '../../internship-group-management/components/Creat
 import { useInternshipManagement } from '../hooks/useInternshipManagement';
 // import AssignMentorModal from './AssignMentorModal';
 import GroupActionModal from './GroupActionModal';
+import PhaseDetailModal from './PhaseDetailModal';
 import StudentDetailModal from './StudentDetailModal';
 import StudentFilters from './StudentFilters';
 import StudentTable from './StudentTable';
 
 export default function InternshipManagement() {
+  const [phaseDetailModal, setPhaseDetailModal] = React.useState({ open: false, phase: null });
+
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
 
   const {
@@ -47,8 +55,10 @@ export default function InternshipManagement() {
     handleViewStudent,
     termId,
     setTermId,
-    termOptions,
-    fetchingTerms,
+    phaseId,
+    setPhaseId,
+    phaseOptions,
+    fetchingPhases,
     resetFilters,
     projectFilter,
     setProjectFilter,
@@ -64,35 +74,64 @@ export default function InternshipManagement() {
     handleCreateGroup,
     dateFilter,
     setDateFilter,
-    isTermEditable,
+    mentorFilter,
+    setMentorFilter,
+    isPhaseEditable,
     hasGroups,
     existingGroups,
     sort,
     setSort,
+    mentors,
+    loadingMentors,
   } = useInternshipManagement();
+
+  const handleViewPhaseDetail = React.useCallback(() => {
+    const { PHASE_DETAIL } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
+    if (!phaseId || phaseId === 'ALL_VISIBLE') return;
+    const found = phaseOptions.find((p) => p.value === phaseId);
+    if (!found) return;
+    setPhaseDetailModal({
+      open: true,
+      phase: {
+        phaseId: found.value,
+        name: found.phaseName || found.label,
+        enterpriseName: found.enterpriseName,
+        startDate: found.startDate,
+        endDate: found.endDate,
+        status: found.status,
+        maxStudents: found.maxStudents,
+        description: found.description,
+        groupCount: found.groupCount,
+      },
+    });
+  }, [phaseId, phaseOptions]);
 
   const selectedStudents = filteredData.filter((s) => selectedRowKeys.includes(s.id));
   const hasGroup = selectedStudents.some((s) => !!s.groupId);
 
-  const uniqueTerms = new Set(selectedStudents.map((s) => s.termId));
-  const isSingleTerm = uniqueTerms.size === 1;
+  const uniquePhases = new Set(selectedStudents.map((s) => s.phaseId || s.termId));
+  const isSinglePhase = uniquePhases.size === 1;
 
   const bulkItems = [
     {
       key: 'addToGroup',
       label: INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP,
       icon: <UsergroupAddOutlined />,
-      disabled: !isTermEditable || !isSingleTerm,
+      disabled: !isPhaseEditable || !isSinglePhase,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'ADD' }),
     },
     {
       key: 'changeGroup',
       label: INTERNSHIP_LIST.ACTIONS.CHANGE_GROUP,
       icon: <EditOutlined />,
-      disabled: !isTermEditable || !isSingleTerm,
+      disabled: !isPhaseEditable || !isSinglePhase,
       onClick: () => setGroupModal({ open: true, students: selectedStudents, type: 'CHANGE' }),
     },
   ].filter(Boolean);
+
+  const { PHASE_DETAIL } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
+  const selectedPhase =
+    phaseId && phaseId !== 'ALL_VISIBLE' ? phaseOptions.find((p) => p.value === phaseId) : null;
 
   return (
     <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
@@ -113,15 +152,8 @@ export default function InternshipManagement() {
                 setDateFilter={setDateFilter}
                 groupFilter={groupFilter}
                 setGroupFilter={setGroupFilter}
-                assignmentFilter={assignmentFilter}
-                setAssignmentFilter={setAssignmentFilter}
-                projectFilter={projectFilter}
-                setProjectFilter={setProjectFilter}
-                universityFilter={universityFilter}
-                setUniversityFilter={setUniversityFilter}
-                majorFilter={majorFilter}
-                setMajorFilter={setMajorFilter}
-                universityOptions={universityOptions}
+                mentorFilter={mentorFilter}
+                setMentorFilter={setMentorFilter}
                 resetFilters={resetFilters}
               />
             </div>
@@ -139,15 +171,28 @@ export default function InternshipManagement() {
           )}
         </DataTableToolbar>
 
+        {selectedPhase && (
+          <div className="flex items-center gap-2 mb-1">
+            <button
+              type="button"
+              onClick={handleViewPhaseDetail}
+              className="flex items-center gap-1.5 text-[11px] text-primary/70 hover:text-primary font-semibold transition-colors cursor-pointer bg-transparent border-0 p-0"
+            >
+              <InfoCircleOutlined className="text-[11px]" />
+              {PHASE_DETAIL.VIEW_PHASE_DETAIL}
+            </button>
+          </div>
+        )}
+
         <StudentTable
           data={filteredData}
           page={pagination.current}
           pageSize={pagination.pageSize}
           loading={loading}
-          isTermEditable={isTermEditable}
+          isPhaseEditable={isPhaseEditable}
           hasGroups={hasGroups}
           emptyText={
-            termOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Upcoming Terms'
+            phaseOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Open Phases'
               ? INTERNSHIP_LIST.TABLE.EMPTY_TEXT_UPCOMING
               : INTERNSHIP_LIST.TABLE.EMPTY_TEXT_ACTIVE
           }
@@ -157,7 +202,6 @@ export default function InternshipManagement() {
           selectedRowKeys={selectedRowKeys}
           onSelectRowChange={setSelectedRowKeys}
           onView={handleViewStudent}
-          onAssign={(student) => setAssignModal({ open: true, student })}
           onCreateGroup={(student) => setCreateModal({ open: true, students: [student] })}
           onAddToGroup={(student) =>
             setGroupModal({ open: true, students: [student], type: 'ADD' })
@@ -186,6 +230,12 @@ export default function InternshipManagement() {
         onCancel={() => setDetailModal({ open: false, student: null })}
       />
 
+      <PhaseDetailModal
+        open={phaseDetailModal.open}
+        phase={phaseDetailModal.phase}
+        onCancel={() => setPhaseDetailModal({ open: false, phase: null })}
+      />
+
       {/* <AssignMentorModal
         open={assignModal.open}
         student={assignModal.student}
@@ -207,6 +257,8 @@ export default function InternshipManagement() {
         existingGroups={existingGroups}
         loadingStudents={fetchingStudents}
         initialStudents={createModal.students}
+        mentors={mentors}
+        loadingMentors={loadingMentors}
         onCancel={() => setCreateModal({ open: false, students: [] })}
         onFinish={handleCreateGroup}
       />

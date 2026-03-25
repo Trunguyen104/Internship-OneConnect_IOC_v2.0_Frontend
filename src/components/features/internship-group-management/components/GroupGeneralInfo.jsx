@@ -10,6 +10,7 @@ import {
   MailOutlined,
   ProjectOutlined,
   TeamOutlined,
+  UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Button, Empty, Spin, Table, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ export default function GroupGeneralInfo({
   groupId = null,
   onBack = null,
   onRemoveStudent = null,
+  onAddStudent = null,
 }) {
   const { info, loading } = useGroupDetail(groupId);
   const router = useRouter();
@@ -219,9 +221,18 @@ export default function GroupGeneralInfo({
               {VIEW.MEMBERS}
             </h3>
           </div>
-          <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
-            {info.members?.length || 0} {VIEW.STUDENTS_SUFFIX}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
+              {info.members?.length || 0} {VIEW.STUDENTS_SUFFIX}
+            </span>
+            <button
+              onClick={onAddStudent}
+              className="bg-primary hover:bg-primary-hover flex h-8 shrink-0 items-center gap-2 rounded-full px-5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all active:scale-95 cursor-pointer border-none outline-none"
+            >
+              <UsergroupAddOutlined className="text-sm" />
+              {VIEW.TABLE.ADD_STUDENT}
+            </button>
+          </div>
         </div>
 
         <Table

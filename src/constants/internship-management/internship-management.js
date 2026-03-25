@@ -1,16 +1,21 @@
-export const TERM_STATUS = {
-  UPCOMING: 1,
-  ACTIVE: 2,
-  ENDED: 3,
-  CLOSED: 4,
+export const PHASE_STATUS = {
+  DRAFT: 0,
+  OPEN: 1,
+  IN_PROGRESS: 2,
+  CLOSED: 3,
 };
 
-export const TERM_STATUS_VARIANTS = {
-  [TERM_STATUS.UPCOMING]: 'info',
-  [TERM_STATUS.ACTIVE]: 'success',
-  [TERM_STATUS.ENDED]: 'warning',
-  [TERM_STATUS.CLOSED]: 'default',
+// Keep TERM_STATUS for backward compatibility if needed, but point to PHASE_STATUS
+export const TERM_STATUS = PHASE_STATUS;
+
+export const PHASE_STATUS_VARIANTS = {
+  [PHASE_STATUS.DRAFT]: 'default',
+  [PHASE_STATUS.OPEN]: 'info',
+  [PHASE_STATUS.IN_PROGRESS]: 'success',
+  [PHASE_STATUS.CLOSED]: 'warning',
 };
+
+export const TERM_STATUS_VARIANTS = PHASE_STATUS_VARIANTS;
 
 export const ENROLLMENT_STATUS = {
   ACTIVE: 1,
@@ -46,9 +51,11 @@ export const PROJECT_STATUS_VARIANTS = {
   [PROJECT_STATUS.COMPLETED]: 'success',
 };
 
-export const TERM_STATUS_MAP = Object.fromEntries(
-  Object.entries(TERM_STATUS).map(([k, v]) => [v, k])
+export const PHASE_STATUS_MAP = Object.fromEntries(
+  Object.entries(PHASE_STATUS).map(([k, v]) => [v, k])
 );
+
+export const TERM_STATUS_MAP = PHASE_STATUS_MAP;
 
 export const INTERNSHIP_MANAGEMENT_UI = {
   GROUP_MANAGEMENT: {
@@ -67,8 +74,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     FILTERS: {
       SEARCH_PLACEHOLDER: 'Search groups...',
       STATUS_FILTER: 'Status',
-      SELECT_TERM: 'Select Term',
-      SELECT_STATUS: 'Select Status',
+      SELECT_PHASE: 'Chọn Giai đoạn',
+      SELECT_TERM: 'Chọn Kỳ',
+      SELECT_STATUS: 'Chọn Trạng thái',
       DATE_FILTER_PLACEHOLDER: 'Month/Year',
       INCLUDE_ARCHIVED: 'Archived',
       STATUS_OPTIONS: [
@@ -87,7 +95,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     TABLE: {
       COLUMNS: {
         GROUP_NAME: 'GROUP NAME',
-        TERM: 'TERM',
+        PHASE: 'PHASE',
         MENTOR: 'MENTOR',
         MEMBERS: 'MEMBERS',
         STATUS: 'STATUS',
@@ -183,6 +191,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       EDIT_GROUP: 'Edit Group',
       ARCHIVE_GROUP: 'Archive Group',
       DELETE_GROUP: 'Delete Group',
+      ADD_TO_GROUP: 'Add Students',
     },
   },
 
@@ -197,7 +206,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         EMAIL: 'EMAIL',
         MAJOR: 'MAJOR',
         STATUS: 'STATUS',
-        TERM_STATUS: 'PERIOD',
+        PHASE_STATUS: 'PHASE STATUS',
         INTERNSHIP_PERIOD: 'INTERNSHIP PERIOD',
         GROUP: 'GROUP',
         MENTOR: 'MENTOR',
@@ -246,7 +255,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         { label: 'With Project', value: 'PROJECT_ASSIGNED' },
         { label: 'No Project', value: 'PROJECT_UNASSIGNED' },
       ],
-      TERM_LABEL: 'Internship Term',
+      PHASE_LABEL: 'Internship Phase',
       UNIVERSITY_LABEL: 'University',
       MAJOR_LABEL: 'Major',
     },
@@ -330,41 +339,62 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         SUBMIT: 'Assign Mentor',
       },
       GROUP_ACTION: {
-        TITLE_ADD: 'Thêm vào nhóm thực tập',
-        TITLE_CHANGE: 'Thay đổi nhóm thực tập',
-        STUDENT_LABEL: 'Sinh viên đã chọn:',
-        STUDENTS_SELECTED: 'sinh viên',
-        GROUP_LABEL: 'CHỌN NHÓM THỰC TẬP MỚI',
-        GROUP_PLACEHOLDER: 'Tìm kiếm và chọn nhóm...',
-        GROUP_REQUIRED: 'Vui lòng chọn một nhóm',
-        NO_MENTOR: 'Chưa có Mentor',
-        STUDENTS_SUFFIX: 'SV',
+        TITLE_ADD: 'Add to internship group',
+        TITLE_CHANGE: 'Change internship group',
+        STUDENT_LABEL: 'Selected students:',
+        STUDENTS_SELECTED: 'students',
+        GROUP_LABEL: 'SELECT NEW INTERNSHIP GROUP',
+        GROUP_PLACEHOLDER: 'Search and select group...',
+        GROUP_REQUIRED: 'Please select a group',
+        NO_MENTOR: 'No Mentor assigned',
+        STUDENTS_SUFFIX: 'Std',
         BULLET: '•',
         SEPARATOR: ' | ',
         SPACE: ' ',
-        CURRENT_GROUP: 'Nhóm hiện tại',
-        ONLY_GROUP_ERROR: 'Đây là nhóm duy nhất, không có nhóm nào khác.',
-        SUBMIT_ADD: 'Thêm vào nhóm',
-        SUBMIT_CHANGE: 'Xác nhận chuyển',
-        CANCEL: 'Hủy bỏ',
-        CHANGE_CONFIRM_TITLE: 'Xác nhận chuyển nhóm',
-        CHANGE_CONFIRM_CONTENT: 'Chuyển {student} từ {oldGroup} sang {newGroup}?',
-        EMPTY_STATE: 'Không tìm thấy nhóm nào trong kỳ này.',
-        EMPTY_SUGGESTION: "Bạn có thể chọn 'Tạo nhóm mới' để bắt đầu thêm sinh viên ngay.",
+        CURRENT_GROUP: 'Current group',
+        ONLY_GROUP_ERROR: 'This is the only group available.',
+        SUBMIT_ADD: 'Add to group',
+        SUBMIT_CHANGE: 'Confirm transfer',
+        CANCEL: 'Cancel',
+        CHANGE_CONFIRM_TITLE: 'Confirm group transfer',
+        CHANGE_CONFIRM_CONTENT: 'Transfer {student} from {oldGroup} to {newGroup}?',
+        EMPTY_STATE: 'No groups found for this term.',
+        EMPTY_SUGGESTION: "You can select 'Create new group' to start adding students.",
       },
       DETAIL: {
         TITLE: 'Student Information',
+        SECTION_PERSONAL: 'Personal Information',
+        SECTION_INTERNSHIP: 'Internship Details',
         UNIVERSITY: 'University',
         MAJOR: 'Major / Field',
         STATUS: 'Status',
         EMAIL: 'Email Address',
         PHONE: 'Phone Number',
         DOB: 'Date of Birth',
+        PHASE: 'Internship Phase',
         GROUP: 'Group',
         MENTOR: 'Mentor',
         PROJECT: 'Project',
         PLACEMENT_DATE: 'Placement Date',
         CLOSE: 'Close',
+      },
+      PHASE_DETAIL: {
+        TITLE: 'Internship Phase Details',
+        ENTERPRISE: 'Enterprise',
+        START_DATE: 'Start Date',
+        END_DATE: 'End Date',
+        MAX_STUDENTS: 'Max Students',
+        GROUP_COUNT: 'Total Groups',
+        SECTION_SCHEDULE: 'Schedule & Capacity',
+        SECTION_STATS: 'Statistics',
+        SECTION_DESCRIPTION: 'Description',
+        STATUS_OPEN: 'Open',
+        STATUS_IN_PROGRESS: 'In Progress',
+        STATUS_CLOSED: 'Closed',
+        STATUS_DRAFT: 'Draft',
+        STATUS_UNKNOWN: 'Unknown',
+        CLOSE: 'Close',
+        VIEW_PHASE_DETAIL: 'View Phase Detail',
       },
     },
     MESSAGES: {
@@ -398,21 +428,31 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
       },
       STATUS_OPTIONS: [
-        { value: 1, label: 'Upcoming' },
-        { value: 2, label: 'Active' },
-        { value: 3, label: 'Ended' },
-        { value: 4, label: 'Closed' },
+        { value: 0, label: 'Draft' },
+        { value: 1, label: 'Open' },
+        { value: 2, label: 'In Progress' },
+        { value: 3, label: 'Closed' },
       ],
       STATUS_LABELS: {
-        1: 'Upcoming',
-        2: 'Active',
-        3: 'Ended',
-        4: 'Closed',
-        Upcoming: 'Upcoming',
-        Active: 'Active',
-        Ended: 'Ended',
+        0: 'Draft',
+        1: 'Open',
+        2: 'In Progress',
+        3: 'Closed',
+        Draft: 'Draft',
+        Open: 'Open',
+        InProgress: 'In Progress',
         Closed: 'Closed',
         STALE: 'Stale / Unknown',
+      },
+      STATUS_VARIANTS: {
+        0: 'default',
+        1: 'info',
+        2: 'success',
+        3: 'warning',
+        Draft: 'default',
+        Open: 'info',
+        InProgress: 'success',
+        Closed: 'warning',
       },
       ACTIONS: {
         CLOSE: 'Close Term',
@@ -484,43 +524,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         CLOSE_DEFAULT_REASON: 'Term closed by Admin',
       },
     },
-    DASHBOARD: {
-      TITLE: 'University Dashboard',
-      METRICS: {
-        TOTAL_STUDENTS: 'Total Students',
-        TOTAL_TERMS: 'Total Terms',
-        INTERNSHIP_GROUPS: 'Internship Groups',
-        ENROLLED: 'Enrolled',
-        TOTAL: 'Cumulative',
-        COORDINATED: 'Coordinated',
-      },
-      ANALYTICS: {
-        TITLE: 'Term Lifecycle Status',
-        ENDED: 'Ended Terms',
-        UPCOMING: 'Upcoming Terms',
-        ACTIVE: 'Active Terms',
-        CLOSED: 'Closed Terms',
-      },
-      RECENT_TERMS: {
-        TITLE: 'Recent Internship Terms',
-        SUBTITLE: 'Internship Program',
-        START_DATE: 'Start Date',
-        START_MONTH_FORMAT: 'MMM YYYY',
-        VIEW_ALL_BTN: 'View All',
-        EMPTY_TEXT: 'No recent terms found.',
-        TABLE: {
-          COLUMNS: {
-            NAME: 'TERM NAME',
-            DURATION: 'DURATION',
-            STATUS: 'STATUS',
-          },
-        },
-      },
-      MESSAGES: {
-        GENERATING_STATS: 'Generating system analytics...',
-        GENERATE_SUCCESS: 'Analytics report generated successfully!',
-      },
-    },
+    PHASE_MANAGEMENT: null,
     ENROLLMENT_MANAGEMENT: {
       TITLE: 'Student Enrollment Management',
       SEARCH_PLACEHOLDER: 'Search by name or student ID...',
@@ -704,7 +708,45 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
       },
     },
+    DASHBOARD: {
+      TITLE: 'University Dashboard',
+      METRICS: {
+        TOTAL_STUDENTS: 'Total Students',
+        TOTAL_TERMS: 'Total Terms',
+        INTERNSHIP_GROUPS: 'Internship Groups',
+        ENROLLED: 'Enrolled',
+        TOTAL: 'Cumulative',
+        COORDINATED: 'Coordinated',
+      },
+      ANALYTICS: {
+        TITLE: 'Term Lifecycle Status',
+        ENDED: 'Ended Terms',
+        UPCOMING: 'Upcoming Terms',
+        ACTIVE: 'Active Terms',
+        CLOSED: 'Closed Terms',
+      },
+      RECENT_TERMS: {
+        TITLE: 'Recent Internship Terms',
+        SUBTITLE: 'Internship Program',
+        START_DATE: 'Start Date',
+        START_MONTH_FORMAT: 'MMM YYYY',
+        VIEW_ALL_BTN: 'View All',
+        EMPTY_TEXT: 'No recent terms found.',
+        TABLE: {
+          COLUMNS: {
+            NAME: 'TERM NAME',
+            DURATION: 'DURATION',
+            STATUS: 'STATUS',
+          },
+        },
+      },
+      MESSAGES: {
+        GENERATING_STATS: 'Generating system analytics...',
+        GENERATE_SUCCESS: 'Analytics report generated successfully!',
+      },
+    },
   },
+
   ENTERPRISE: {
     VIOLATION_REPORT: {
       TITLE: 'Violation Reports',
@@ -829,6 +871,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       TABS: {
         DETAILS: 'Project Details',
         STUDENTS: 'Assigned Students',
+        GROUPS: 'Assign Group',
       },
 
       TABLE: {
@@ -839,6 +882,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           GROUP: 'INTERN GROUP',
           FIELD: 'FIELD',
           TEMPLATE: 'TEMPLATE',
+          START_DATE: 'START DATE',
+          END_DATE: 'END DATE',
           TIMELINE: 'TIMELINE',
           STATUS: 'STATUS',
           ACTIONS: 'ACTIONS',
@@ -850,6 +895,12 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         STATUS: 'Status',
         ALL_GROUPS: 'All Groups',
         ALL_STATUSES: 'All Statuses',
+      },
+
+      STUDENT_STATUS: {
+        ASSIGNED: 'Assigned',
+        COMPLETED: 'Completed',
+        REMOVED: 'Removed',
       },
 
       MODALS: {
@@ -894,24 +945,36 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           SEARCH: 'Search students...',
           SELECTED: 'selected',
           CANCEL: 'Cancel',
-          CONFIRM: 'Assign',
+          CONFIRM: 'Assign Project',
           UNASSIGN_TITLE: 'Confirm Un-assign',
           UNASSIGN_CONTENT: 'Are you sure you want to remove this student from the project?',
+          COLUMNS: {
+            STU_NAME: 'FULL NAME',
+            STU_UNI: 'UNIVERSITY',
+            STU_EMAIL: 'EMAIL',
+            ASSIGNED_DATE: 'ASSIGNED DATE',
+            STATUS: 'STATUS',
+            ACTIONS: 'ACTIONS',
+          },
         },
       },
 
       MESSAGES: {
         SAVE_DRAFT_SUCCESS: 'Project draft saved successfully.',
-        PUBLISH_SUCCESS: 'Project has been published.',
+        PUBLISH_SUCCESS: 'Project has been published successfully.',
         COMPLETE_SUCCESS: 'Project marked as completed.',
+        COMPLETE_CONFIRM: 'Project will be marked as completed. Are you sure?',
         UPDATE_SUCCESS: 'Project updated successfully.',
         DELETE_SUCCESS: 'Project deleted successfully.',
         ASSIGN_SUCCESS: 'Successfully assigned {count} students to project.',
         UNASSIGN_SUCCESS: 'Student removed from project.',
+        EDIT_WARNING:
+          'Project has {count} students assigned. Changes may affect progress. Are you sure?',
         ERROR_ARCHIVED_GROUP: 'Cannot publish project for an archived group.',
-        ERROR_ASSIGNED_STU: 'Project has students assigned, un-assign them first before deleting.',
+        ERROR_ASSIGNED_STU:
+          'Project has students assigned and cannot be deleted. Please un-assign them before deleting.',
         WARNING_COMPLETE_STU:
-          "There are {count} students who haven't completed their assignment. Mark as complete anyway?",
+          'There are {count} students who haven’t completed the project. The project can still be marked as completed.',
       },
     },
   },

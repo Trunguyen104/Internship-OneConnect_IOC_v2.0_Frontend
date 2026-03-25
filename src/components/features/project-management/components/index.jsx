@@ -11,7 +11,7 @@ import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import { useProjectManagement } from '../hooks/useProjectManagement';
-import AssignStudentModal from './AssignStudentModal';
+import ProjectDetailDrawer from './ProjectDetailDrawer';
 import ProjectFormModal from './ProjectFormModal';
 import ProjectTable from './ProjectTable';
 
@@ -31,13 +31,13 @@ export default function ProjectManagement() {
     handleTableChange,
     handlePageSizeChange,
     modalVisible,
-    assignmentModalVisible,
+    detailDrawerVisible,
     editingRecord,
     submitLoading,
     viewOnly,
     groups,
     setModalVisible,
-    setAssignmentModalVisible,
+    setDetailDrawerVisible,
     handleSearchChange,
     handleGroupFilterChange,
     handleStatusFilterChange,
@@ -49,6 +49,7 @@ export default function ProjectManagement() {
     handlePublishProject,
     handleCompleteProject,
     handleDeleteProject,
+    fetchData,
   } = useProjectManagement();
 
   return (
@@ -103,7 +104,7 @@ export default function ProjectManagement() {
           onChange={handleTableChange}
           onEdit={handleEdit}
           onView={handleView}
-          onAssign={handleAssign}
+          onAssign={handleView}
           onPublish={handlePublishProject}
           onComplete={handleCompleteProject}
           onDelete={handleDeleteProject}
@@ -133,10 +134,12 @@ export default function ProjectManagement() {
         groups={groups}
       />
 
-      <AssignStudentModal
-        visible={assignmentModalVisible}
-        onCancel={() => setAssignmentModalVisible(false)}
+      <ProjectDetailDrawer
+        visible={detailDrawerVisible}
+        onClose={() => setDetailDrawerVisible(false)}
         project={editingRecord}
+        groups={groups}
+        onRefresh={fetchData}
       />
     </section>
   );

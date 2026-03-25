@@ -40,18 +40,24 @@ export const EnterpriseGroupService = {
   },
 
   async addStudents(id, students) {
+    const studentIds = [];
     const formattedStudents = (students || []).map((s) => {
-      const roleValue = s.Role || s.role;
+      // Handle both string IDs and object {studentId, role}
+      const isObject = typeof s === 'object' && s !== null;
+      const studentId = isObject ? s.studentId || s.StudentId || s.id : s;
+      const roleValue = isObject ? s.role || s.Role : 1;
       const roleInt = roleValue === 'Leader' || roleValue === 2 ? 2 : 1;
 
+      studentIds.push(studentId);
       return {
-        studentId: s.StudentId || s.studentId,
+        studentId: studentId,
         role: roleInt,
       };
     });
 
     const payload = {
       internshipId: id,
+      studentIds,
       students: formattedStudents,
     };
     return httpPost(`${BASE_URL}/students`, cleanPayload(payload));

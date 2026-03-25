@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { universityService } from '@/services/university.service';
 
-import { TermService } from '../../internship-term-management/services/term.service';
+import { EnterprisePhaseService } from '../../internship-student-management/services/enterprise-phase.service';
 import { useDebounce } from './useDebounce';
 
 const DEFAULT_PAGINATION = {
@@ -11,23 +11,25 @@ const DEFAULT_PAGINATION = {
 };
 
 export const useEnterpriseStudentFilters = () => {
-  const [termId, setTermId] = useState(null);
-  const [termOptions, setTermOptions] = useState([]);
-  const [fetchingTerms, setFetchingTerms] = useState(false);
+  const [phaseId, setPhaseId] = useState(null);
+  const [phaseOptions, setPhaseOptions] = useState([]);
+  const [fetchingPhases, setFetchingPhases] = useState(false);
   const [universityOptions, setUniversityOptions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      setFetchingTerms(true);
+      setFetchingPhases(true);
       try {
-        // Fetch Terms
-        const termRes = await TermService.getAll({ PageNumber: 1, PageSize: 100 });
-        const terms = termRes?.data?.items || [];
-        if (terms.length > 0) {
-          setTermOptions(terms.map((t) => ({ label: t.name, value: t.termId || t.id })));
-          // Backend Status: 1=Upcoming, 2=Active, 4=Ended/Closed (based on user swagger)
-          const activeTerm = terms.find((t) => t.status === 2 || t.status === 'Active') || terms[0];
-          setTermId(activeTerm.termId || activeTerm.id);
+        // Fetch Phases
+        const phaseRes = await EnterprisePhaseService.getPhases();
+        const phases = phaseRes?.data?.items || [];
+        if (phases.length > 0) {
+          setPhaseOptions(
+            phases.map((p) => ({ label: p.phaseName || p.name, value: p.phaseId || p.id }))
+          );
+          // Backend Status: 0=Draft, 1=Open, 2=InProgress, 3=Closed
+          const activePhase = phases.find((p) => p.status === 2) || phases[0];
+          setPhaseId(activePhase.phaseId || activePhase.id);
         }
 
         // Fetch Universities
@@ -37,7 +39,7 @@ export const useEnterpriseStudentFilters = () => {
       } catch (err) {
         // Silent error
       } finally {
-        setFetchingTerms(false);
+        setFetchingPhases(false);
       }
     };
     fetchData();
@@ -104,8 +106,8 @@ export const useEnterpriseStudentFilters = () => {
   }, []);
 
   return {
-    termId,
-    setTermId,
+    phaseId,
+    setPhaseId,
     searchValue,
     debouncedSearch,
     handleSearch,
@@ -115,8 +117,8 @@ export const useEnterpriseStudentFilters = () => {
     sort,
     pagination,
     handleTableChange,
-    termOptions,
-    fetchingTerms,
+    phaseOptions,
+    fetchingPhases,
     universityOptions,
   };
 };

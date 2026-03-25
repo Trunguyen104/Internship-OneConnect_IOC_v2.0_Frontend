@@ -28,7 +28,7 @@ const GroupTable = memo(function GroupTable({
   onArchive,
   onView,
   onEdit,
-  isTermEditable,
+  isPhaseEditable,
 }) {
   const { TABLE, CARD } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
 
@@ -57,13 +57,13 @@ const GroupTable = memo(function GroupTable({
         ),
       },
       {
-        title: TABLE.COLUMNS.TERM,
-        key: 'termName',
-        width: 140,
+        title: TABLE.COLUMNS.PHASE,
+        key: 'phaseName',
+        width: 160,
         render: (_, record) => (
           <div className="flex items-center gap-1.5">
             <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
-              {record.termName || TABLE.NOT_ASSIGNED}
+              {record.phaseName || record.phase?.name || record.termName || TABLE.NOT_ASSIGNED}
             </span>
           </div>
         ),
@@ -132,7 +132,7 @@ const GroupTable = memo(function GroupTable({
               icon: <EyeOutlined className="text-primary" />,
               onClick: () => onView(record),
             },
-            ...(isActive && isTermEditable
+            ...(isActive && isPhaseEditable
               ? [
                   {
                     key: 'edit',
@@ -140,14 +140,14 @@ const GroupTable = memo(function GroupTable({
                     icon: <EditOutlined className="text-primary" />,
                     onClick: () => onEdit(record),
                   },
-                  record.memberCount === 0 && {
+                  {
                     key: 'archive',
                     label: ACTIONS.ARCHIVE_GROUP,
                     icon: <InboxOutlined className="text-warning" />,
                     onClick: () => onArchive(record),
                   },
                   { type: 'divider' },
-                  record.memberCount === 0 && {
+                  {
                     key: 'delete',
                     label: ACTIONS.DELETE_GROUP,
                     icon: <DeleteOutlined className="text-danger" />,
@@ -173,7 +173,7 @@ const GroupTable = memo(function GroupTable({
         },
       },
     ],
-    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, isTermEditable, TABLE, CARD]
+    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, isPhaseEditable, TABLE, CARD]
   );
 
   return (

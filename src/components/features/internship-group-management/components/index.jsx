@@ -21,13 +21,11 @@ export default function GroupManagement({ onDetailMode }) {
     setActiveTab,
     search,
     setSearch,
-    assignModal,
     setAssignModal,
     createModal,
     setCreateModal,
     editModal,
     setEditModal,
-    handleAssignSubmit,
     handleDeleteGroup,
     handleArchiveGroup,
     handleCreateGroup,
@@ -40,13 +38,9 @@ export default function GroupManagement({ onDetailMode }) {
     filteredGroups,
     total,
     loading,
-    termId,
-    setTermId,
-    termOptions,
-    fetchingTerms,
     unassignedStudents,
     fetchingStudents,
-    isTermEditable,
+    isPhaseEditable,
     filters,
     handleFilterChange,
     selectedGroupDetail,
@@ -85,6 +79,7 @@ export default function GroupManagement({ onDetailMode }) {
             groupId={selectedGroupDetail.id}
             onBack={() => setSelectedGroupDetail(null)}
             onRemoveStudent={handleRemoveStudentFromGroup}
+            onAddStudent={() => onAddStudents(selectedGroupDetail)}
           />
         ) : (
           <>
@@ -97,16 +92,6 @@ export default function GroupManagement({ onDetailMode }) {
 
               <DataTableToolbar.Filters>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Select
-                    loading={fetchingTerms}
-                    placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_TERM}
-                    value={termId}
-                    onChange={setTermId}
-                    className="h-9 min-w-[180px]"
-                    options={termOptions}
-                    suffixIcon={<FilterOutlined className="text-muted" />}
-                  />
-
                   <Select
                     allowClear
                     placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_STATUS}
@@ -140,7 +125,7 @@ export default function GroupManagement({ onDetailMode }) {
                 </div>
               </DataTableToolbar.Filters>
 
-              {isTermEditable && (
+              {isPhaseEditable && (
                 <DataTableToolbar.Actions
                   label={GROUP_MANAGEMENT.CREATE_BTN}
                   onClick={() => setCreateModal({ open: true, group: null })}
@@ -155,12 +140,13 @@ export default function GroupManagement({ onDetailMode }) {
               loading={loading}
               page={pagination.current}
               pageSize={pagination.pageSize}
-              isTermEditable={isTermEditable}
+              isPhaseEditable={isPhaseEditable}
               onAssign={setAssignModal}
               onDelete={handleDeleteGroup}
               onArchive={handleArchiveGroup}
               onView={onViewDetailed}
               onEdit={onEditGroup}
+              onAddStudents={onAddStudents}
             />
 
             {total > 0 && (

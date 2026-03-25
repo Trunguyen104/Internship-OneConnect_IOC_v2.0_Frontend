@@ -21,74 +21,56 @@ export const StudentFilters = ({
   setDateFilter,
   groupFilter,
   setGroupFilter,
-  assignmentFilter,
-  setAssignmentFilter,
-  projectFilter,
-  setProjectFilter,
-  universityFilter,
-  setUniversityFilter,
-  majorFilter,
-  setMajorFilter,
-  universityOptions,
+  mentorFilter,
+  setMentorFilter,
   resetFilters,
 }) => {
   const [open, setOpen] = useState(false);
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
 
   const FILTER_CONFIG = {
+    date: {
+      label: 'Month / Year (Placed)',
+      value: dateFilter,
+      onChange: setDateFilter,
+    },
     status: {
-      label: INTERNSHIP_LIST.FILTERS.STATUS_FILTER,
-      options: INTERNSHIP_LIST.FILTERS.STATUS_OPTIONS.filter((o) => o.value !== 'ALL'),
+      label: 'Placed Status',
+      options: [
+        { label: 'Pending', value: 1 },
+        { label: 'Accepted', value: 2 },
+        { label: 'Rejected', value: 3 },
+      ],
       value: statusFilter === 'ALL' ? undefined : statusFilter,
       onChange: setStatusFilter,
     },
     group: {
-      label: INTERNSHIP_LIST.FILTERS.GROUP_FILTER,
-      options: INTERNSHIP_LIST.FILTERS.GROUP_OPTIONS.filter((o) => o.value !== 'ALL'),
+      label: 'Group Status',
+      options: [
+        { label: 'Has Group', value: 'HAS_GROUP' },
+        { label: 'No Group', value: 'NO_GROUP' },
+      ],
       value: groupFilter === 'ALL' ? undefined : groupFilter,
       onChange: setGroupFilter,
     },
-    assignment: {
-      label: INTERNSHIP_LIST.FILTERS.ASSIGNMENT_FILTER,
-      options: INTERNSHIP_LIST.FILTERS.ASSIGNMENT_OPTIONS.filter((o) => o.value !== 'ALL'),
-      value: assignmentFilter === 'ALL' ? undefined : assignmentFilter,
-      onChange: setAssignmentFilter,
-    },
-    project: {
-      label: INTERNSHIP_LIST.FILTERS.PROJECT_STATUS,
-      options: INTERNSHIP_LIST.FILTERS.PROJECT_OPTIONS,
-      value: projectFilter === 'ALL' ? undefined : projectFilter,
-      onChange: setProjectFilter,
-    },
-    university: {
-      label: INTERNSHIP_LIST.FILTERS.UNIVERSITY_LABEL,
-      options: universityOptions,
-      value: universityFilter,
-      onChange: setUniversityFilter,
-    },
-    major: {
-      label: INTERNSHIP_LIST.FILTERS.MAJOR_LABEL,
-      options: INTERNSHIP_LIST.MODALS.ADD.MAJOR_OPTIONS,
-      value: majorFilter,
-      onChange: setMajorFilter,
-    },
-    date: {
-      label: INTERNSHIP_LIST.FILTERS.DATE_FILTER_PLACEHOLDER,
-      value: dateFilter,
-      onChange: setDateFilter,
+    mentor: {
+      label: 'Mentor Assignment',
+      options: [
+        { label: 'Assigned', value: 'HAS_MENTOR' },
+        { label: 'Unassigned', value: 'NO_MENTOR' },
+      ],
+      value: mentorFilter === 'ALL' ? undefined : mentorFilter,
+      onChange: setMentorFilter,
     },
   };
 
   const [rows, setRows] = useState(() => {
     const active = [];
+    if (dateFilter) active.push({ id: 'date', type: 'date' });
     if (statusFilter !== 'ALL' && statusFilter !== undefined)
       active.push({ id: 'status', type: 'status' });
     if (groupFilter !== 'ALL') active.push({ id: 'group', type: 'group' });
-    if (assignmentFilter !== 'ALL') active.push({ id: 'assignment', type: 'assignment' });
-    if (projectFilter !== 'ALL') active.push({ id: 'project', type: 'project' });
-    if (universityFilter) active.push({ id: 'university', type: 'university' });
-    if (majorFilter) active.push({ id: 'major', type: 'major' });
-    if (dateFilter) active.push({ id: 'date', type: 'date' });
+    if (mentorFilter !== 'ALL') active.push({ id: 'mentor', type: 'mentor' });
 
     return active.length > 0 ? active : [{ id: Date.now(), type: null }];
   });
@@ -101,7 +83,7 @@ export const StudentFilters = ({
     setRows(rows.filter((r) => r.id !== id));
     if (type && FILTER_CONFIG[type]) {
       const { onChange } = FILTER_CONFIG[type];
-      if (['status', 'group', 'assignment', 'project'].includes(type)) onChange('ALL');
+      if (['status', 'group', 'mentor'].includes(type)) onChange('ALL');
       else onChange(undefined);
     }
   };
@@ -116,18 +98,15 @@ export const StudentFilters = ({
   };
 
   const activeFiltersCount = [
+    dateFilter !== undefined && dateFilter !== null,
     statusFilter !== 'ALL' && statusFilter !== undefined,
     groupFilter !== 'ALL',
-    assignmentFilter !== 'ALL',
-    projectFilter !== 'ALL',
-    universityFilter !== undefined && universityFilter !== null,
-    majorFilter !== undefined && majorFilter !== null,
-    dateFilter !== undefined && dateFilter !== null,
+    mentorFilter !== 'ALL',
   ].filter(Boolean).length;
 
   const content = (
-    <div className="w-[520px] p-4">
-      <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
+    <div className="w-[400px] p-2">
+      <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-1.5">
         <div className="flex items-center gap-2">
           <FilterOutlined className="text-primary text-xs" />
           <Text strong className="text-slate-700 tracking-tight text-xs uppercase">
@@ -145,7 +124,7 @@ export const StudentFilters = ({
         </Button>
       </div>
 
-      <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+      <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
         {rows.map((row) => (
           <div
             key={row.id}
@@ -155,7 +134,7 @@ export const StudentFilters = ({
               placeholder={INTERNSHIP_LIST.FILTERS.SELECT_FIELD}
               value={row.type}
               onChange={(val) => updateRowType(row.id, val)}
-              className="w-[160px] student-filter-field"
+              className="w-[140px] student-filter-field"
               options={Object.keys(FILTER_CONFIG).map((key) => ({
                 label: FILTER_CONFIG[key].label,
                 value: key,
@@ -163,7 +142,7 @@ export const StudentFilters = ({
               }))}
             />
 
-            <Text className="text-slate-400 text-[10px] px-0.5">
+            <Text className="text-slate-400 text-[10px] px-0.5 whitespace-nowrap">
               {INTERNSHIP_LIST.FILTERS.EQUAL_TO}
             </Text>
 
@@ -187,7 +166,7 @@ export const StudentFilters = ({
                 disabled={!row.type}
                 className="flex-1 student-filter-value"
                 options={row.type ? FILTER_CONFIG[row.type].options : []}
-                loading={row.type === 'term' && fetchingTerms}
+                loading={row.type === 'phase' && fetchingPhases}
                 allowClear
               />
             )}
@@ -205,7 +184,7 @@ export const StudentFilters = ({
         ))}
       </div>
 
-      <Divider className="my-3" />
+      <Divider className="my-1.5" />
 
       <div className="flex justify-between items-center">
         <Button
