@@ -1,7 +1,9 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Empty, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import React, { memo } from 'react';
 
+import { Button } from '@/components/ui/button';
+import DataTable from '@/components/ui/datatable';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 
@@ -13,108 +15,96 @@ const StakeholderList = memo(function StakeholderList({
   onEdit,
   onDelete,
 }) {
+  const columns = [
+    {
+      title: STAKEHOLDER_UI.TABLE_NO,
+      key: 'no',
+      width: '80px',
+      render: (_, __, index) => (
+        <span className="text-muted text-[13px] font-semibold">
+          {(page - 1) * pageSize + index + 1}
+        </span>
+      ),
+    },
+    {
+      title: STAKEHOLDER_UI.FIELD_NAME,
+      key: 'name',
+      width: '300px',
+      render: (_, record) => (
+        <div className="flex flex-col">
+          <span className="text-text text-[15px] font-bold">{record.name}</span>
+          {record.description && (
+            <span className="text-muted mt-0.5 line-clamp-1 text-[13px] font-medium opacity-60">
+              {record.description}
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      title: STAKEHOLDER_UI.FIELD_ROLE,
+      key: 'role',
+      render: (role) => (
+        <span className="text-primary text-[11px] font-black uppercase tracking-wider bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/10">
+          {role || STAKEHOLDER_UI.NO_ROLE}
+        </span>
+      ),
+    },
+    {
+      title: STAKEHOLDER_UI.FIELD_EMAIL,
+      key: 'email',
+      render: (email) => <span className="text-text text-sm font-medium">{email}</span>,
+    },
+    {
+      title: STAKEHOLDER_UI.FIELD_PHONE,
+      key: 'phoneNumber',
+      width: '180px',
+      render: (phone) => <span className="text-text text-sm font-medium">{phone || '—'}</span>,
+    },
+    {
+      title: STAKEHOLDER_UI.ACTIONS,
+      key: 'action',
+      align: 'right',
+      render: (_, record) => (
+        <div className="flex items-center justify-end gap-1 px-2">
+          <Tooltip title={STAKEHOLDER_UI.EDIT_BUTTON}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(record)}
+              className="size-9 rounded-xl text-muted/60 transition-all hover:bg-primary/5 hover:text-primary active:scale-90"
+            >
+              <EditOutlined className="size-4" />
+            </Button>
+          </Tooltip>
+          <Tooltip title={STAKEHOLDER_UI.DELETE_BUTTON}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                showDeleteConfirm({
+                  title: STAKEHOLDER_UI.DELETE_TITLE,
+                  content: STAKEHOLDER_UI.DELETE_CONFIRM,
+                  onOk: () => onDelete(record.id),
+                })
+              }
+              className="size-9 rounded-xl text-muted/40 transition-all hover:bg-rose-50 hover:text-rose-500 active:scale-90"
+            >
+              <DeleteOutlined className="size-4" />
+            </Button>
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="border-muted h-8 w-8 animate-spin rounded-full border-t-2 border-r-2 border-r-transparent"></div>
-        </div>
-      ) : !stakeholders || stakeholders.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center py-12">
-          <Empty description={STAKEHOLDER_UI.EMPTY_TITLE} />
-        </div>
-      ) : (
-        <div className="mt-5 flex min-h-0 flex-1 flex-col">
-          <div className="flex-1 overflow-auto">
-            <table className="w-full min-w-[1000px] table-fixed border-collapse text-left">
-              <thead className="border-border bg-bg sticky top-0 z-10 border-b">
-                <tr>
-                  <th className="text-muted w-[60px] px-6 py-5 text-xs font-semibold">
-                    {STAKEHOLDER_UI.TABLE_NO}
-                  </th>
-                  <th className="text-muted w-[300px] px-6 py-5 text-xs font-semibold">
-                    {STAKEHOLDER_UI.FIELD_NAME}
-                  </th>
-                  <th className="text-muted px-6 py-5 text-xs font-semibold">
-                    {STAKEHOLDER_UI.FIELD_ROLE}
-                  </th>
-                  <th className="text-muted px-6 py-5 text-xs font-semibold">
-                    {STAKEHOLDER_UI.FIELD_EMAIL}
-                  </th>
-                  <th className="text-muted w-[180px] px-6 py-5 text-xs font-semibold">
-                    {STAKEHOLDER_UI.FIELD_PHONE}
-                  </th>
-                  <th className="text-muted px-6 py-5 text-right text-xs font-semibold">
-                    {STAKEHOLDER_UI.ACTIONS}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-border/50 divide-y">
-                {stakeholders.map((record, index) => (
-                  <tr key={record.id} className="hover:bg-bg/80 h-[72px] transition-colors">
-                    <td className="px-6 py-4">
-                      <span className="text-muted text-xs text-[13px] font-semibold">
-                        {(page - 1) * pageSize + index + 1}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-text text-[15px] font-bold">{record.name}</span>
-                        {record.description && (
-                          <span className="text-muted mt-0.5 line-clamp-1 text-[13px]">
-                            {record.description}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-primary text-[11px] font-bold">
-                        {record.role || STAKEHOLDER_UI.NO_ROLE}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-text text-sm font-medium">{record.email}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-text text-sm font-medium">
-                        {record.phoneNumber || '—'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Tooltip title={STAKEHOLDER_UI.EDIT_BUTTON}>
-                          <Button
-                            type="text"
-                            icon={<EditOutlined />}
-                            onClick={() => onEdit(record)}
-                            className="text-muted hover:bg-primary-surface hover:text-primary flex size-9 items-center justify-center rounded-xl p-0 transition-all"
-                          />
-                        </Tooltip>
-                        <Tooltip title={STAKEHOLDER_UI.DELETE_BUTTON}>
-                          <Button
-                            type="text"
-                            danger
-                            icon={<DeleteOutlined />}
-                            onClick={() =>
-                              showDeleteConfirm({
-                                title: STAKEHOLDER_UI.DELETE_TITLE,
-                                content: STAKEHOLDER_UI.DELETE_CONFIRM,
-                                onOk: () => onDelete(record.id),
-                              })
-                            }
-                            className="hover:bg-danger-surface flex size-9 items-center justify-center rounded-xl p-0 transition-all"
-                          />
-                        </Tooltip>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
+    <DataTable
+      columns={columns}
+      data={stakeholders}
+      loading={loading}
+      emptyText={STAKEHOLDER_UI.EMPTY_TITLE}
+    />
   );
 });
 

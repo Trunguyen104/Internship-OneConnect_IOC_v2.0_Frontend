@@ -1,4 +1,5 @@
 'use client';
+
 import {
   closestCorners,
   DndContext,
@@ -7,6 +8,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import React from 'react';
 
 import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
@@ -48,12 +50,14 @@ export default function Board() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <StudentTabs />
         {activeSprint && (
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
-            width="w-full max-w-sm"
-          />
+          <div className="ml-auto">
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
+              width="w-[320px]"
+            />
+          </div>
         )}
       </div>
 
@@ -88,17 +92,19 @@ export default function Board() {
         </DndContext>
       )}
 
-      <UpdateTaskModal
-        open={openUpdateTask}
-        epics={epics}
-        sprints={sprints}
-        initialData={selectedTask}
-        onClose={() => {
-          setOpenUpdateTask(false);
-          setSelectedTask(null);
-        }}
-        onSubmit={handleUpdateSubmit}
-      />
+      {openUpdateTask && (
+        <UpdateTaskModal
+          open={openUpdateTask}
+          epics={epics}
+          sprints={sprints}
+          initialData={selectedTask}
+          onClose={() => {
+            setOpenUpdateTask(false);
+            setSelectedTask(null);
+          }}
+          onSubmit={handleUpdateSubmit}
+        />
+      )}
     </div>
   );
 }

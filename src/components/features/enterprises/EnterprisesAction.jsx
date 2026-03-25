@@ -1,6 +1,7 @@
 'use client';
 
-import { Tooltip } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
 import { Edit3, ExternalLink, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -34,43 +35,83 @@ export default function EnterprisesAction({ enterprise }) {
     }
   };
 
+  const menuItems = [
+    ...(enterprise.website
+      ? [
+          {
+            key: 'website',
+            label: (
+              <div className="flex items-center gap-3 py-1 pr-4">
+                <div className="rounded-lg bg-blue-50 p-2">
+                  <ExternalLink className="size-4 text-blue-600" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-slate-700">Open Website</span>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
+                    Official Page
+                  </span>
+                </div>
+              </div>
+            ),
+            onClick: () => window.open(enterprise.website, '_blank'),
+          },
+        ]
+      : []),
+    {
+      key: 'edit',
+      label: (
+        <div className="flex items-center gap-3 py-1 pr-4">
+          <div className="rounded-lg bg-amber-50 p-2">
+            <Edit3 className="size-4 text-amber-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-slate-700">Edit Profile</span>
+            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
+              Update Information
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: () => setOpenEdit(true),
+    },
+    { type: 'divider' },
+    {
+      key: 'delete',
+      danger: true,
+      label: (
+        <div className="flex items-center gap-3 py-1 pr-4">
+          <div className="rounded-lg bg-rose-50 p-2">
+            <Trash2 className="size-4 text-rose-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-rose-600">Delete</span>
+            <span className="text-[10px] font-medium text-rose-400 uppercase tracking-wider">
+              Irreversible Action
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: handleDelete,
+    },
+  ];
+
   return (
-    <div className="flex items-center justify-end gap-1.5">
-      {enterprise.website && (
-        <Tooltip title="Open website">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hover:text-primary h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-slate-100"
-            onClick={() => window.open(enterprise.website, '_blank')}
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
-        </Tooltip>
-      )}
-
-      <Tooltip title="Edit profile">
+    <>
+      <Dropdown
+        menu={{ items: menuItems }}
+        trigger={['click']}
+        placement="bottomRight"
+        classNames={{ root: 'premium-dropdown' }}
+      >
         <Button
           variant="ghost"
           size="icon"
-          className="hover:text-primary h-10 w-10 rounded-full text-slate-500 transition-all hover:bg-slate-100"
-          onClick={() => setOpenEdit(true)}
-        >
-          <Edit3 className="h-4 w-4" />
-        </Button>
-      </Tooltip>
-
-      <Tooltip title="Delete enterprise">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-10 w-10 rounded-full text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
-          onClick={handleDelete}
+          className="h-9 w-9 rounded-xl text-slate-400 hover:bg-white hover:shadow-lg transition-all active:scale-95 border border-transparent hover:border-slate-100"
           disabled={loading}
         >
-          <Trash2 className="h-4 w-4" />
+          <EllipsisOutlined className="rotate-90 text-[20px] text-slate-600" />
         </Button>
-      </Tooltip>
+      </Dropdown>
 
       {openEdit && (
         <EnterprisesDialog
@@ -80,6 +121,6 @@ export default function EnterprisesAction({ enterprise }) {
           controlled
         />
       )}
-    </div>
+    </>
   );
 }

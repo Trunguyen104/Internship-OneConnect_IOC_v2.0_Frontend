@@ -84,13 +84,15 @@ const InternshipDashboard = () => {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 px-6 py-12">
-      <header className="mb-10">
-        <h1 className="text-text text-3xl font-black tracking-tight">
+    <div className="mx-auto max-w-5xl space-y-12 px-6 py-16">
+      <header className="mb-12">
+        <h1 className="text-text text-4xl font-black tracking-tight sm:text-5xl">
           {INTERNSHIP_UI.TITLE.replace(INTERNSHIP_UI.JOURNEY_HIGHLIGHT, '')}
           <span className="text-primary italic">{INTERNSHIP_UI.JOURNEY_HIGHLIGHT}</span>
         </h1>
-        <p className="text-muted mt-2 font-medium">{INTERNSHIP_UI.SUBTITLE}</p>
+        <p className="text-muted mt-4 text-lg font-medium leading-relaxed">
+          {INTERNSHIP_UI.SUBTITLE}
+        </p>
       </header>
 
       <div className="flex flex-col gap-8">

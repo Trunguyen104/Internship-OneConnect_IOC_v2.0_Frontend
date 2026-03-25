@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 export default function BaseSidebar({
   menus = [],
   backButton,
-  activeStrategy = 'exact',
+  activeStrategy = 'prefix',
   className = '',
 }) {
   const pathname = usePathname();
@@ -22,42 +22,66 @@ export default function BaseSidebar({
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen w-[15.1rem] flex-col border-r border-slate-200 bg-gray-50 md:flex ${className}`}
+      className={`sticky top-0 hidden h-screen w-64 flex-col border-r border-gray-100 bg-white/80 backdrop-blur-xl md:flex ${className}`}
     >
-      <div className="flex justify-center px-14 py-6">
-        <Image src="/assets/images/logo.svg" alt="IOC Logo" width={120} height={40} />
+      <div className="flex flex-col items-center px-8 py-6">
+        <Image
+          src="/assets/images/logo.svg"
+          alt="IOC Logo"
+          width={120}
+          height={42}
+          className="transition-transform hover:scale-105"
+        />
       </div>
 
-      {backButton && (
-        <Link
-          href={backButton.href}
-          className={`mx-5 mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold transition-colors ${
-            backButton.className || 'text-primary hover:text-primary-hover'
-          }`}
-        >
-          {backButton.icon || <ArrowLeftOutlined />}
-          {backButton.label}
-        </Link>
-      )}
+      <div className="mt-2 flex flex-1 flex-col px-4">
+        {backButton && (
+          <Link
+            href={backButton.href}
+            className={`group mx-2 mb-4 flex items-center gap-3 rounded-xl bg-gray-50/50 p-3 text-sm font-black transition-all hover:bg-white hover:shadow-sm ${
+              backButton.className || 'text-primary'
+            }`}
+          >
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm transition-transform group-hover:-translate-x-1">
+              {backButton.icon || <ArrowLeftOutlined className="text-[10px]" />}
+            </div>
+            {backButton.label}
+          </Link>
+        )}
 
-      <nav className="flex-1 space-y-1">
-        {menus.map((item) => {
-          const isActive = isItemActive(item.href);
+        <nav className="space-y-1">
+          {menus.map((item) => {
+            const isActive = isItemActive(item.href);
 
-          return (
-            <Link key={item.href} href={item.href} className="block px-3">
-              <div
-                className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                  isActive ? 'bg-primary-surface text-primary' : 'text-slate-600 hover:bg-blue-50'
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                {item.label}
-              </div>
-            </Link>
-          );
-        })}
-      </nav>
+            return (
+              <Link key={item.href} href={item.href} className="block">
+                <div
+                  className={`group relative flex items-center gap-4 rounded-xl px-4 py-2.5 text-sm font-black tracking-tight transition-all duration-300 ${
+                    isActive
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.01]'
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <span
+                    className={`text-lg transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="flex-1">{item.label}</span>
+
+                  {isActive && (
+                    <div className="absolute right-3 h-1.5 w-1.5 rounded-full bg-white/80 shadow-sm" />
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="p-4 text-center">
+        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Portal v2.0</p>
+      </div>
     </aside>
   );
 }

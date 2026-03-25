@@ -1,14 +1,14 @@
-'use client';
-
+import { Spin } from 'antd';
 import { useCallback, useEffect } from 'react';
 
+import PageLayout from '@/components/ui/pagelayout';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useEnterpriseProfile } from '../hooks/useEnterpriseProfile';
 import { EnterpriseProfile } from './EnterpriseProfile';
 import EnterpriseProfileEditDrawer from './EnterpriseProfileEditDrawer';
-import { ProfileEmpty, ProfileLoading } from './ProfileEmpty';
+import { ProfileEmpty } from './ProfileEmpty';
 
 export default function EnterpriseProfileContainer() {
   const toast = useToast();
@@ -72,24 +72,42 @@ export default function EnterpriseProfileContainer() {
     [toast, profile, saveProfile]
   );
 
-  if (loading) return <ProfileLoading />;
-  if (!profile) return <ProfileEmpty onRetry={handleRetry} />;
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="flex flex-1 items-center justify-center p-20">
+          <Spin size="large" description="Loading profile..." />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <PageLayout>
+        <ProfileEmpty onRetry={handleRetry} />
+      </PageLayout>
+    );
+  }
 
   return (
-    <>
-      <EnterpriseProfile
-        profile={profile}
-        onEdit={canEdit ? openEdit : null}
-        onLogoChange={canEdit ? handleLogoChange : null}
-        onBannerChange={canEdit ? handleBannerChange : null}
-      />
-      <EnterpriseProfileEditDrawer
-        open={isEditOpen}
-        saving={saving}
-        profile={profile}
-        onClose={closeEdit}
-        onSave={handleSave}
-      />
-    </>
+    <PageLayout>
+      <PageLayout.Header title={ENTERPRISE_PROFILE_UI.TITLE} />
+      <PageLayout.Content>
+        <EnterpriseProfile
+          profile={profile}
+          onEdit={canEdit ? openEdit : null}
+          onLogoChange={canEdit ? handleLogoChange : null}
+          onBannerChange={canEdit ? handleBannerChange : null}
+        />
+        <EnterpriseProfileEditDrawer
+          open={isEditOpen}
+          saving={saving}
+          profile={profile}
+          onClose={closeEdit}
+          onSave={handleSave}
+        />
+      </PageLayout.Content>
+    </PageLayout>
   );
 }

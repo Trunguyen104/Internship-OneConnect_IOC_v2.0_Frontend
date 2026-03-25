@@ -1,25 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import AvatarUploader from '@/components/ui/avataruploader';
-import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import Select from '@/components/ui/select';
 import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
@@ -141,146 +127,168 @@ export default function UserManagementUpdateModal({ open, userId, onToggle }) {
   };
 
   return (
-    <Sheet open={open} onOpenChange={onToggle}>
-      <SheetContent className="flex flex-col p-4 sm:max-w-[560px]">
-        <form onSubmit={doUpdate} className="flex min-h-0 flex-1 flex-col">
-          <SheetHeader className="mt-2 text-center">
-            <SheetTitle className="text-3xl">{UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE}</SheetTitle>
-            <SheetDescription>{UI_TEXT.USER_MANAGEMENT.UPDATE_INFO}</SheetDescription>
-          </SheetHeader>
+    <CompoundModal open={open} onCancel={() => onToggle?.(false)} width={560}>
+      <CompoundModal.Header
+        title={UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE}
+        subtitle={UI_TEXT.USER_MANAGEMENT.UPDATE_INFO}
+      />
 
-          <FieldGroup className="mt-4 min-h-0 flex-1 gap-4 overflow-y-auto pb-8">
-            <Field>
-              <FieldLabel htmlFor="fullName">{UI_TEXT.USER_MANAGEMENT.FULL_NAME_LABEL}</FieldLabel>
+      <CompoundModal.Content className="mt-4 overflow-y-auto pb-8">
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="space-y-2 md:col-span-2">
+              <label
+                htmlFor="fullName"
+                className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+              >
+                {UI_TEXT.USER_MANAGEMENT.FULL_NAME_LABEL}
+              </label>
               <Input
                 id="fullName"
                 value={editForm.fullName}
                 onChange={(e) => setEditForm((p) => ({ ...p, fullName: e.target.value }))}
                 error={errors.fullName}
+                className="rounded-2xl border-gray-100 h-12"
               />
-            </Field>
+            </div>
 
-            <Field>
-              <FieldLabel htmlFor="phoneNumber">
+            <div className="space-y-2">
+              <label
+                htmlFor="phoneNumber"
+                className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+              >
                 {UI_TEXT.USER_MANAGEMENT.PHONE_OPTIONAL}
-              </FieldLabel>
+              </label>
               <Input
                 id="phoneNumber"
                 value={editForm.phoneNumber}
                 onChange={(e) => setEditForm((p) => ({ ...p, phoneNumber: e.target.value }))}
+                className="rounded-2xl border-gray-100 h-12"
               />
-            </Field>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Field>
-                <FieldLabel>{UI_TEXT.USER_MANAGEMENT.STATUS}</FieldLabel>
-                <Select
-                  value={editForm.status}
-                  labels={USER_STATUS_LABEL}
-                  onValueChange={(v) => setEditForm((p) => ({ ...p, status: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={UI_TEXT.USER_MANAGEMENT.STATUS} />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="">{UI_TEXT.COMMON.MINUS}</SelectItem>
-                    {Object.values(USER_STATUS).map((v) => (
-                      <SelectItem key={String(v)} value={String(v)}>
-                        {USER_STATUS_LABEL[v] || String(v)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-
-              <Field>
-                <FieldLabel>{UI_TEXT.USER_MANAGEMENT.GENDER}</FieldLabel>
-                <Select
-                  value={editForm.gender}
-                  onValueChange={(v) => setEditForm((p) => ({ ...p, gender: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={UI_TEXT.USER_MANAGEMENT.GENDER} />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="">{UI_TEXT.COMMON.MINUS}</SelectItem>
-                    <SelectItem value="1">{UI_TEXT.USER_MANAGEMENT.MALE}</SelectItem>
-                    <SelectItem value="2">{UI_TEXT.USER_MANAGEMENT.FEMALE}</SelectItem>
-                    <SelectItem value="3">{UI_TEXT.USER_MANAGEMENT.OTHER}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
             </div>
 
-            <Field>
-              <FieldLabel htmlFor="dateOfBirth">{UI_TEXT.USER_MANAGEMENT.DOB_LABEL}</FieldLabel>
+            <div className="space-y-2">
+              <label className="text-[11px] font-black uppercase tracking-widest text-muted/60">
+                {UI_TEXT.USER_MANAGEMENT.STATUS}
+              </label>
+              <Select
+                value={editForm.status}
+                onChange={(v) => setEditForm((p) => ({ ...p, status: v }))}
+                options={[
+                  { label: UI_TEXT.COMMON.MINUS, value: '' },
+                  ...Object.values(USER_STATUS).map((v) => ({
+                    label: USER_STATUS_LABEL[v] || String(v),
+                    value: String(v),
+                  })),
+                ]}
+                className="!h-12 !rounded-2xl !border-gray-100"
+                placeholder={UI_TEXT.USER_MANAGEMENT.STATUS}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-black uppercase tracking-widest text-muted/60">
+                {UI_TEXT.USER_MANAGEMENT.GENDER}
+              </label>
+              <Select
+                value={editForm.gender}
+                onChange={(v) => setEditForm((p) => ({ ...p, gender: v }))}
+                options={[
+                  { label: UI_TEXT.COMMON.MINUS, value: '' },
+                  { label: UI_TEXT.USER_MANAGEMENT.MALE, value: '1' },
+                  { label: UI_TEXT.USER_MANAGEMENT.FEMALE, value: '2' },
+                  { label: UI_TEXT.USER_MANAGEMENT.OTHER, value: '3' },
+                ]}
+                className="!h-12 !rounded-2xl !border-gray-100"
+                placeholder={UI_TEXT.USER_MANAGEMENT.GENDER}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="dateOfBirth"
+                className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+              >
+                {UI_TEXT.USER_MANAGEMENT.DOB_LABEL}
+              </label>
               <Input
                 id="dateOfBirth"
                 type="date"
                 value={editForm.dateOfBirth}
                 onChange={(e) => setEditForm((p) => ({ ...p, dateOfBirth: e.target.value }))}
                 error={errors.dateOfBirth}
+                className="rounded-2xl border-gray-100 h-12"
               />
-            </Field>
-
-            <Field className="flex flex-col items-center py-4">
-              <AvatarUploader
-                value={editForm.avatarUrl}
-                fullName={editForm.fullName}
-                onChange={(file) => setEditForm((p) => ({ ...p, avatarUrl: file }))}
-              />
-              <span className="mt-2 text-xs text-slate-500">
-                {UI_TEXT.USER_MANAGEMENT.AVATAR_LABEL}
-              </span>
-            </Field>
-
-            {detail?.role === USER_ROLE.STUDENT ? (
-              <>
-                <Field>
-                  <FieldLabel htmlFor="studentClass">
-                    {UI_TEXT.USER_MANAGEMENT.CLASS_LABEL}
-                  </FieldLabel>
-                  <Input
-                    id="studentClass"
-                    value={editForm.studentClass}
-                    onChange={(e) => setEditForm((p) => ({ ...p, studentClass: e.target.value }))}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="studentMajor">
-                    {UI_TEXT.USER_MANAGEMENT.MAJOR_LABEL}
-                  </FieldLabel>
-                  <Input
-                    id="studentMajor"
-                    value={editForm.studentMajor}
-                    onChange={(e) => setEditForm((p) => ({ ...p, studentMajor: e.target.value }))}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="studentGpa">{UI_TEXT.USER_MANAGEMENT.GPA_LABEL}</FieldLabel>
-                  <Input
-                    id="studentGpa"
-                    value={editForm.studentGpa}
-                    onChange={(e) => setEditForm((p) => ({ ...p, studentGpa: e.target.value }))}
-                    error={errors.studentGpa}
-                  />
-                </Field>
-              </>
-            ) : null}
-          </FieldGroup>
-
-          <div className="mt-auto border-t border-slate-100 pt-4">
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <Button type="button" variant="outline" onClick={() => onToggle?.(false)}>
-                {UI_TEXT.BUTTON.CLOSE}
-              </Button>
-              <Button type="submit" disabled={busy}>
-                {UI_TEXT.BUTTON.SAVE_CHANGES}
-              </Button>
             </div>
           </div>
-        </form>
-      </SheetContent>
-    </Sheet>
+
+          <div className="flex flex-col items-center gap-3 py-6 border-y border-gray-50 bg-gray-50/30 rounded-3xl">
+            <AvatarUploader
+              value={editForm.avatarUrl}
+              fullName={editForm.fullName}
+              onChange={(file) => setEditForm((p) => ({ ...p, avatarUrl: file }))}
+            />
+            <span className="text-[11px] font-black uppercase tracking-widest text-muted/40">
+              {UI_TEXT.USER_MANAGEMENT.AVATAR_LABEL}
+            </span>
+          </div>
+
+          {detail?.role === USER_ROLE.STUDENT && (
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div className="space-y-2">
+                <label
+                  htmlFor="studentClass"
+                  className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+                >
+                  {UI_TEXT.USER_MANAGEMENT.CLASS_LABEL}
+                </label>
+                <Input
+                  id="studentClass"
+                  value={editForm.studentClass}
+                  onChange={(e) => setEditForm((p) => ({ ...p, studentClass: e.target.value }))}
+                  className="rounded-2xl border-gray-100 h-12"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="studentMajor"
+                  className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+                >
+                  {UI_TEXT.USER_MANAGEMENT.MAJOR_LABEL}
+                </label>
+                <Input
+                  id="studentMajor"
+                  value={editForm.studentMajor}
+                  onChange={(e) => setEditForm((p) => ({ ...p, studentMajor: e.target.value }))}
+                  className="rounded-2xl border-gray-100 h-12"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="studentGpa"
+                  className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+                >
+                  {UI_TEXT.USER_MANAGEMENT.GPA_LABEL}
+                </label>
+                <Input
+                  id="studentGpa"
+                  value={editForm.studentGpa}
+                  onChange={(e) => setEditForm((p) => ({ ...p, studentGpa: e.target.value }))}
+                  error={errors.studentGpa}
+                  className="rounded-2xl border-gray-100 h-12"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </CompoundModal.Content>
+
+      <CompoundModal.Footer
+        onCancel={() => onToggle?.(false)}
+        onConfirm={doUpdate}
+        confirmText={UI_TEXT.BUTTON.SAVE_CHANGES}
+        loading={busy}
+      />
+    </CompoundModal>
   );
 }

@@ -111,7 +111,7 @@ const Footer = ({
         onClick={finalOnConfirm}
         icon={finalIcon}
         disabled={finalDisabled}
-        className={`h-9 min-w-[90px] rounded-xl px-4 text-[11px] font-bold shadow-sm transition-all ${
+        className={`h-9 min-w-[90px] rounded-xl px-4 text-[11px] font-bold shadow-sm transition-all focus:shadow-none focus-visible:outline-none ${
           !finalDanger ? 'bg-primary hover:bg-primary-hover border-none' : ''
         }`}
       >

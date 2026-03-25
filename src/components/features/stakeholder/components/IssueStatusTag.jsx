@@ -1,41 +1,46 @@
 'use client';
 
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, ClockCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { Tag } from 'antd';
 import React, { memo } from 'react';
 
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
 import { ISSUE_STATUS } from '../constants/issueStatus';
 
-const ISSUE_STATUS_MAP = {
+const STATUS_CONFIG = {
   [ISSUE_STATUS.OPEN]: {
     label: ISSUE_UI.STATUS.OPEN,
-    color: 'text-info',
+    className: 'border-blue-200 bg-blue-50 text-blue-600',
+    icon: <ClockCircleOutlined className="animate-pulse" />,
   },
   [ISSUE_STATUS.IN_PROGRESS]: {
     label: ISSUE_UI.STATUS.PROCESSING,
-    color: 'text-warning',
+    className: 'border-amber-200 bg-amber-50 text-amber-600',
+    icon: <SyncOutlined spin />,
   },
   [ISSUE_STATUS.RESOLVED]: {
     label: ISSUE_UI.STATUS.RESOLVED,
-    color: 'text-success',
+    className: 'border-emerald-200 bg-emerald-50 text-emerald-600',
     icon: <CheckCircleOutlined />,
   },
   [ISSUE_STATUS.CLOSED]: {
     label: ISSUE_UI.STATUS.CLOSED,
-    color: 'text-muted',
-    icon: <CloseCircleOutlined />,
+    className: 'border-gray-200 bg-gray-50 text-gray-500',
+    icon: <CheckCircleOutlined />,
   },
 };
 
 const IssueStatusTag = memo(function IssueStatusTag({ status }) {
-  const config = ISSUE_STATUS_MAP[status] || ISSUE_STATUS_MAP[ISSUE_STATUS.IN_PROGRESS];
+  const config = STATUS_CONFIG[status] || STATUS_CONFIG[ISSUE_STATUS.OPEN];
 
   return (
-    <span className={`flex w-fit items-center gap-1.5 text-xs font-semibold ${config.color}`}>
-      {config.icon}
+    <Tag
+      icon={config.icon}
+      className={`flex w-fit items-center gap-1.5 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider !rounded-lg border shadow-sm ${config.className}`}
+    >
       {config.label}
-    </span>
+    </Tag>
   );
 });
 

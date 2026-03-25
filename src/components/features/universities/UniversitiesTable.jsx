@@ -1,96 +1,84 @@
-import { EmptyState } from '@/components/ui/emptystate';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import React, { useMemo } from 'react';
+
+import DataTable from '@/components/ui/datatable';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import UniversitiesAction from './UniversitiesAction';
 
 export default function UniversitiesTable({ universities = [], loading = false }) {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="pl-8">{UI_TEXT.USER_MANAGEMENT.CODE}</TableHead>
-          <TableHead>{UI_TEXT.UNIVERSITIES.UNIVERSITY}</TableHead>
-          <TableHead className="hidden lg:table-cell">{UI_TEXT.UNIVERSITIES.ADDRESS}</TableHead>
-          <TableHead className="pr-8 text-right">{UI_TEXT.COMMON.ACTION}</TableHead>
-        </TableRow>
-      </TableHeader>
-
-      <TableBody>
-        {loading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <TableRow key={i} className="h-[72px] border-slate-50">
-              <TableCell className="w-24 pl-8">
-                <Skeleton className="h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Skeleton className="size-8 rounded-lg" />
-                  <Skeleton className="h-4 w-40" />
-                </div>
-              </TableCell>
-              <TableCell className="hidden lg:table-cell">
-                <Skeleton className="h-4 w-64" />
-              </TableCell>
-              <TableCell className="pr-8 text-right">
-                <Skeleton className="ml-auto h-8 w-8 rounded-lg" />
-              </TableCell>
-            </TableRow>
-          ))
-        ) : universities.length === 0 ? (
-          <TableRow>
-            <TableCell colSpan={4} className="p-0">
-              <EmptyState
-                title="No universities found"
-                description="We couldn't find any educational institutions matching your search."
-              />
-            </TableCell>
-          </TableRow>
-        ) : (
-          universities.map((uni) => (
-            <TableRow
-              key={uni.universityId}
-              className="group h-[72px] border-slate-50 transition-all duration-200 hover:bg-slate-50/80"
-            >
-              <TableCell className="pl-8 text-[13px] font-medium text-slate-400">
-                <span className="rounded bg-slate-100 px-2 py-0.5 text-xs font-semibold">
-                  {uni.code}
+  const columns = useMemo(
+    () => [
+      {
+        title: UI_TEXT.USER_MANAGEMENT.CODE,
+        key: 'code',
+        width: '140px',
+        render: (code) => (
+          <span className="text-xs font-black uppercase tracking-widest text-muted/60">
+            {code || UI_TEXT.COMMON.MINUS}
+          </span>
+        ),
+      },
+      {
+        title: UI_TEXT.UNIVERSITIES.UNIVERSITY,
+        key: 'name',
+        render: (name, record) => (
+          <div className="flex items-center gap-5">
+            <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-[20px] border border-gray-100 bg-white shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:shadow-md group-hover:rotate-3">
+              {record.logoUrl ? (
+                <img src={record.logoUrl} alt={name} className="h-full w-full object-contain p-2" />
+              ) : (
+                <span className="text-[13px] font-black tracking-tighter text-primary/40">
+                  {name
+                    ?.split(' ')
+                    .filter(Boolean)
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)}
                 </span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  {uni.logoUrl && (
-                    <img
-                      src={uni.logoUrl}
-                      alt={uni.name}
-                      className="h-8 w-8 rounded-lg border border-slate-100 bg-slate-50 object-contain p-1"
-                    />
-                  )}
-                  <span className="text-[15px] leading-tight font-bold text-slate-800">
-                    {uni.name}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="hidden max-w-md truncate text-[14px] font-medium text-slate-600 lg:table-cell">
-                {uni.address}
-              </TableCell>
-              <TableCell className="pr-8 text-right">
-                <div className="flex justify-end transition-opacity duration-200 group-hover:opacity-100 sm:opacity-0">
-                  <UniversitiesAction university={uni} />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
-        )}
-      </TableBody>
-    </Table>
+              )}
+            </div>
+            <span className="text-[15px] leading-tight font-black tracking-tight text-text transition-colors group-hover:text-primary">
+              {name || UI_TEXT.COMMON.MINUS}
+            </span>
+          </div>
+        ),
+      },
+      {
+        title: UI_TEXT.UNIVERSITIES.ADDRESS,
+        key: 'address',
+        className: 'hidden lg:table-cell',
+        render: (address) => (
+          <span className="text-text/60 text-[13px] font-bold transition-colors group-hover:text-text line-clamp-1">
+            {address || UI_TEXT.COMMON.MINUS}
+          </span>
+        ),
+      },
+      {
+        title: UI_TEXT.COMMON.ACTION,
+        key: 'action',
+        align: 'right',
+        render: (_, record) => (
+          <div className="flex justify-end">
+            <UniversitiesAction university={record} />
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="flex flex-1 flex-col min-h-0">
+      <DataTable
+        columns={columns}
+        data={universities}
+        loading={loading}
+        rowKey={(record) => record.universityId}
+        emptyText={UI_TEXT.UNIVERSITIES.NOT_FOUND || 'No universities found'}
+        minWidth="auto"
+        className="premium-table mt-0"
+      />
+    </div>
   );
 }

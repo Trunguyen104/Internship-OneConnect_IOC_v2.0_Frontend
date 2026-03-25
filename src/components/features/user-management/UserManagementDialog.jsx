@@ -4,13 +4,7 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import UserManagementForm from './UserManagementForm';
@@ -36,18 +30,16 @@ export default function UserManagementDialog({
         </Button>
       ) : null}
 
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className="flex flex-col p-4 sm:max-w-[560px]">
-          <SheetHeader className="mt-2 text-center">
-            <SheetTitle className="text-3xl">{UI_TEXT.USER_MANAGEMENT.ADD}</SheetTitle>
-            <SheetDescription>{UI_TEXT.USER_MANAGEMENT.CREATE_DESCRIPTION}</SheetDescription>
-          </SheetHeader>
+      <CompoundModal open={open} onCancel={() => setOpen(false)} width={560}>
+        <CompoundModal.Header
+          title={UI_TEXT.USER_MANAGEMENT.ADD}
+          subtitle={UI_TEXT.USER_MANAGEMENT.CREATE_DESCRIPTION}
+        />
 
-          <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-8">
-            <UserManagementForm onSuccess={() => setOpen(false)} onCancel={() => setOpen(false)} />
-          </div>
-        </SheetContent>
-      </Sheet>
+        <CompoundModal.Content className="mt-4 overflow-y-auto pb-8">
+          <UserManagementForm onSuccess={() => setOpen(false)} onCancel={() => setOpen(false)} />
+        </CompoundModal.Content>
+      </CompoundModal>
     </>
   );
 }

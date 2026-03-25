@@ -1,12 +1,7 @@
 'use client';
 
-import { Empty } from 'antd';
-import React from 'react';
-
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import { EmptyState } from '@/components/ui/atoms';
+import PageLayout from '@/components/ui/pagelayout';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 
 import { useStudentList } from '../hooks/useStudentList';
@@ -24,6 +19,7 @@ export default function StudentListPage() {
     page,
     setPage,
     pageSize,
+    setPageSize,
     total,
     totalPages,
     paginatedMembers,
@@ -32,15 +28,15 @@ export default function StudentListPage() {
   const showNoGroup = !internshipId && !currentId && !loading && !groupDetail;
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={STUDENT_LIST_UI.PAGE_TITLE} />
+    <PageLayout>
+      <PageLayout.Header title={STUDENT_LIST_UI.PAGE_TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
+      <PageLayout.Card>
         {showNoGroup ? (
-          <div className="flex flex-1 items-center justify-center py-12">
-            <Empty
+          <div className="flex flex-1 items-center justify-center">
+            <EmptyState
               description={
-                <span className="text-muted font-medium">
+                <span className="text-gray-400 font-medium">
                   {STUDENT_LIST_UI.EMPTY.NO_GROUP}
                   <br />
                   {STUDENT_LIST_UI.EMPTY.NOT_ASSIGNED}
@@ -49,9 +45,8 @@ export default function StudentListPage() {
             />
           </div>
         ) : (
-          <>
-            <DataTableToolbar
-              className="mb-5 !border-0 !p-0"
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <PageLayout.Toolbar
               searchProps={{
                 placeholder: STUDENT_LIST_UI.SEARCH.PLACEHOLDER,
                 value: searchText,
@@ -59,30 +54,30 @@ export default function StudentListPage() {
               }}
             />
 
-            <StudentTable
-              data={paginatedMembers}
-              loading={loading}
-              onDelete={handleDeleteStudent}
-            />
+            <PageLayout.Content>
+              <StudentTable
+                data={paginatedMembers}
+                loading={loading}
+                onDelete={handleDeleteStudent}
+              />
+            </PageLayout.Content>
 
             {!showNoGroup && total > 0 && (
-              <div className="border-border/50 mt-6 border-t pt-6">
-                <Pagination
-                  total={total}
-                  page={page}
-                  pageSize={pageSize}
-                  totalPages={totalPages}
-                  onPageChange={setPage}
-                  onPageSizeChange={(size) => {
-                    setPageSize(size);
-                    setPage(1);
-                  }}
-                />
-              </div>
+              <PageLayout.Pagination
+                total={total}
+                page={page}
+                pageSize={pageSize}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                onPageSizeChange={(size) => {
+                  setPageSize(size);
+                  setPage(1);
+                }}
+              />
             )}
-          </>
+          </div>
         )}
-      </Card>
-    </section>
+      </PageLayout.Card>
+    </PageLayout>
   );
 }

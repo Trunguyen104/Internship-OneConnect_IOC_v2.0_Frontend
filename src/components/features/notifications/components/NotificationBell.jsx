@@ -107,7 +107,7 @@ const NotificationBell = () => {
       open={open}
       onOpenChange={handleOpenChange}
       placement="bottomRight"
-      overlayClassName="ant-popover-notification"
+      classNames={{ root: 'ant-popover-notification' }}
       arrow={false}
       styles={{ body: { padding: 0 } }}
     >

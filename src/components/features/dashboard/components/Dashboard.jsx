@@ -1,10 +1,12 @@
 'use client';
+
 import { AlertCircle, CheckCircle2, Clock, Download, LayoutList } from 'lucide-react';
 import React from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import StudentTabs from '@/components/layout/StudentTabs';
 import { ErrorBox, Loading, StatCard } from '@/components/ui/atoms';
+import { Button } from '@/components/ui/button';
 import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 import { useDashboard } from '../hooks/useDashboard';
@@ -28,13 +30,14 @@ export default function DashboardPage({ internshipGroupId }) {
       {/* Top actions */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <StudentTabs />
-        <button
-          className="border-primary/20 bg-primary-surface text-primary hover:bg-primary-surface/80 flex shrink-0 items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium shadow-sm transition-colors"
-          role="button"
+        <Button
+          onClick={() => {}} // Handle export
+          className="h-11 rounded-full px-6 flex items-center gap-2 bg-primary-surface text-primary border-primary/20 hover:bg-primary-surface/80"
+          variant="outline"
         >
           <Download className="h-4 w-4" />
           {DASHBOARD_UI.EXPORT_CSV}
-        </button>
+        </Button>
       </div>
 
       {/* Summary cards */}

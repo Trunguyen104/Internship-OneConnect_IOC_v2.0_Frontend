@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { ErrorState } from '@/components/ui/errorstate';
 import PageLayout from '@/components/ui/pagelayout';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import UniversitiesDialog from './UniversitiesDialog';
 import UniversitiesTable from './UniversitiesTable';
@@ -28,26 +29,31 @@ export default function UniversitiesPage() {
   return (
     <PageLayout>
       <PageLayout.Header
-        title="University Management"
-        description="Manage educational institutions, their codes, and headquarters information."
+        title={UI_TEXT.UNIVERSITIES.TITLE || 'University Management'}
+        subtitle={
+          UI_TEXT.UNIVERSITIES.DESCRIPTION ||
+          'Manage educational institutions, their codes, and headquarters information.'
+        }
       />
 
-      <PageLayout.Card>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
         <PageLayout.Toolbar
           searchProps={{
-            placeholder: 'Search by university name or code...',
+            placeholder:
+              UI_TEXT.UNIVERSITIES.SEARCH_PLACEHOLDER || 'Search by university name or code...',
             value: search,
             onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
           }}
           actionProps={{
-            label: 'Add University',
+            label: UI_TEXT.UNIVERSITIES.CREATE,
             onClick: () => setIsDialogOpen(true),
           }}
         />
 
-        <PageLayout.Content>
+        <PageLayout.Content className="px-0">
           {error ? (
-            <div className="py-20">
+            <div className="py-20 flex items-center justify-center">
               <ErrorState error={error} onRetry={refresh} className="mx-auto" />
             </div>
           ) : (
@@ -56,13 +62,20 @@ export default function UniversitiesPage() {
         </PageLayout.Content>
 
         {total > 0 && (
-          <PageLayout.Pagination
-            total={total}
-            page={pageNumber}
-            pageSize={pageSize}
-            onPageChange={setPageNumber}
-            onPageSizeChange={setPageSize}
-          />
+          <div className="mt-4 border-t border-gray-100 pt-8 flex items-center justify-between">
+            <span className="text-[13px] font-bold text-muted/40 tracking-tight uppercase">
+              {UI_TEXT.COMMON.TOTAL || 'Total records'}:{' '}
+              <span className="text-text font-black">{total}</span>
+            </span>
+            <PageLayout.Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
+            />
+          </div>
         )}
       </PageLayout.Card>
 

@@ -14,23 +14,36 @@ import IndividualGrading from './IndividualGrading';
 
 const GRADING_GRID_CSS = `
   .grading-grid .ant-table-thead > tr > th {
-    background: #f9fafb !important;
-    color: #6b7280;
-    font-size: 11px;
+    background: transparent !important;
+    color: #94a3b8;
+    font-size: 10px;
     text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 0.025em;
-    border-bottom: 1px solid #f3f4f6 !important;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    padding: 16px 12px !important;
+    border-bottom: 2px solid #f8fafc !important;
   }
-  .grading-grid .ant-table-cell {
-    padding: 8px 12px !important;
+  .grading-grid .ant-table-tbody > tr > td {
+    padding: 12px !important;
+    border-bottom: 1px solid #f8fafc !important;
+    transition: all 0.3s ease;
+  }
+  .grading-grid .ant-table-row:hover > td {
+    background: #f8fafc/50 !important;
   }
   .grading-grid .ant-input-number {
-    transition: all 0.2s;
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.3s;
+  }
+  .grading-grid .ant-input-number:hover {
+    background: #f1f5f9;
   }
   .grading-grid .ant-input-number-focused {
-    box-shadow: none !important;
-    border-bottom: 1px solid #d52020 !important;
+    background: white !important;
+    border-color: #d52020 !important;
+    box-shadow: 0 4px 12px rgba(213, 32, 32, 0.1) !important;
   }
 `;
 
@@ -123,16 +136,23 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
 
   if (loading)
     return (
-      <div className="p-8">
+      <div className="p-12">
         <SkeletonTable rows={10} columns={6} />
       </div>
     );
 
   if (data.criteria.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-32">
-        <Empty description={LABELS.NO_CRITERIA} />
-        <p className="text-sm text-gray-500">{LABELS.BATCH_GRADING_SUBTITLE}</p>
+      <div className="flex flex-col items-center justify-center gap-6 py-40 bg-gray-50/30 rounded-[32px] m-4 border border-dashed border-gray-200">
+        <div className="bg-white p-8 rounded-[32px] shadow-sm ring-8 ring-gray-100/50 transition-transform hover:scale-105">
+          <Empty description={false} />
+        </div>
+        <div className="text-center">
+          <h4 className="text-xl font-black text-text mb-2 tracking-tight">{LABELS.NO_CRITERIA}</h4>
+          <p className="text-sm font-bold text-muted/50 tracking-tight uppercase tracking-widest">
+            {LABELS.BATCH_GRADING_SUBTITLE}
+          </p>
+        </div>
       </div>
     );
   }
@@ -142,15 +162,17 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
       title: LABELS.STUDENT_NAME,
       key: 'student',
       fixed: 'left',
-      width: 250,
+      width: 280,
       render: (_, student) => (
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xs">
+        <div className="flex items-center gap-4">
+          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[18px] border border-gray-100 bg-white text-primary shadow-sm font-black text-xs transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
             {student.fullName?.charAt(0)}
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-gray-800 text-sm">{student.fullName}</span>
-            <span className="text-[10px] text-gray-400 font-medium tracking-wider">
+          <div className="flex flex-col gap-0.5">
+            <span className="font-black text-text tracking-tight text-sm leading-tight transition-colors group-hover:text-primary">
+              {student.fullName}
+            </span>
+            <span className="text-[10px] text-muted/50 font-black uppercase tracking-widest">
               {student.studentCode}
             </span>
           </div>
@@ -159,28 +181,31 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
     },
     ...data.criteria.map((crit) => ({
       title: (
-        <div className="flex flex-col items-center py-1">
-          <span className="w-24 truncate text-center text-xs font-bold">{crit.name}</span>
-          <span className="text-[9px] text-gray-400 font-medium uppercase">
+        <div className="flex flex-col items-center py-2">
+          <span className="w-24 truncate text-center text-[11px] font-black tracking-tight text-text leading-tight">
+            {crit.name}
+          </span>
+          <span className="text-[9px] text-muted/40 font-black uppercase tracking-widest mt-1">
             {LABELS.MAX_LABEL} {crit.maxScore}
           </span>
         </div>
       ),
       key: crit.criteriaId,
       align: 'center',
-      width: 110,
+      width: 120,
       render: (_, student) => (
-        <div className="group relative px-2">
+        <div className="px-2">
           <InputNumber
             min={0}
             max={crit.maxScore}
             precision={1}
+            placeholder="0.0"
             value={scores[student.studentId]?.[crit.criteriaId]}
             onChange={(val) => handleScoreChange(student.studentId, crit.criteriaId, val)}
-            className={`w-full text-center transition-all border-none bg-transparent hover:bg-white focus:bg-white focus:shadow-sm ${
+            className={`w-full text-center font-black text-sm h-11 rounded-2xl border-2! border-slate-100! bg-slate-50/50 hover:bg-white hover:border-primary/20! focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary/30! transition-all [&_.ant-input-number-input]:text-center [&_.ant-input-number-input]:h-11 [&_.ant-input-number-input]:font-black ${
               scores[student.studentId]?.[crit.criteriaId] > crit.maxScore
-                ? 'text-red-600 font-bold'
-                : ''
+                ? 'text-rose-600'
+                : 'text-text'
             }`}
             controls={false}
           />
@@ -188,91 +213,105 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
       ),
     })),
     {
-      title: TABLE_COLUMNS.TOTAL_SCORE,
+      title: <span className="text-primary tracking-widest">{TABLE_COLUMNS.TOTAL_SCORE}</span>,
       key: 'totalScore',
-      width: 100,
+      width: 120,
       align: 'center',
       render: (_, student) => (
-        <span className="text-primary font-black text-base">{student.totalScore || '0'}</span>
+        <div className="flex flex-col items-center">
+          <span className="text-primary font-black text-lg tracking-tighter leading-none">
+            {student.totalScore || '0'}
+          </span>
+          <span className="text-[9px] font-black text-primary/30 uppercase tracking-[0.2em] mt-1">
+            Points
+          </span>
+        </div>
       ),
     },
     {
       title: '',
       key: 'actions',
       fixed: 'right',
-      width: 60,
+      width: 80,
       align: 'center',
       render: (_, student) => (
         <Button
           variant="ghost"
-          size="sm"
+          size="icon"
           onClick={() => setSelectedStudent(student)}
-          className="hover:bg-primary/5 text-gray-400 hover:text-primary"
+          className="h-10 w-10 rounded-2xl text-muted/40 transition-all hover:bg-white hover:shadow-xl hover:text-primary hover:border-gray-100 border border-transparent active:scale-95"
         >
-          <EyeOutlined />
+          <EyeOutlined className="text-lg" />
         </Button>
       ),
     },
   ];
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-white">
+    <div className="flex flex-1 flex-col overflow-hidden bg-white/50">
       {/* SaaS Toolbar */}
-      <div className="border-b bg-gray-50/50 px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight">
+      <div className="bg-gray-50/30 backdrop-blur-md px-8 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100">
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-[10px] font-black text-muted/50 uppercase tracking-[0.2em] leading-none">
               {TABLE_COLUMNS.GRADING_BOARD}
             </h3>
-            <span className="text-[12px] text-black font-bold uppercase">
-              {LABELS.TOTAL_STUDENT} : {data.students.length}
-            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-text tracking-tighter leading-none">
+                {data.students.length}
+              </span>
+              <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest">
+                {LABELS.TOTAL_STUDENT}
+              </span>
+            </div>
           </div>
 
           {hasChanges && (
-            <div className="flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 border border-orange-100">
-              <div className="h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />
-              <span className="text-[10px] font-bold text-orange-700 uppercase">
+            <div className="flex items-center gap-3 rounded-[20px] bg-amber-50 px-5 py-2.5 border border-amber-100/50 shadow-sm animate-in slide-in-from-left-4 transition-all duration-500">
+              <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse ring-4 ring-amber-500/20" />
+              <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest">
                 {MESSAGES.UNSAVED_CHANGES}
               </span>
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {hasChanges && (
             <Button
-              variant="ghost"
-              size="sm"
+              variant="outline"
+              size="lg"
               onClick={handleCancelEdits}
-              className="text-xs font-bold text-gray-500"
+              className="rounded-full px-8 h-12 text-[11px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95"
             >
               {BUTTONS.CANCEL}
             </Button>
           )}
           <Button
             variant="primary"
-            size="sm"
+            size="lg"
             onClick={handleSubmitBatch}
             loading={sending}
             disabled={(!hasChanges && !sending) || !isTermOngoing || cycle.status !== 1}
-            className="flex items-center gap-2 shadow-sm"
+            className="rounded-full px-10 h-12 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
           >
-            <SaveOutlined /> {BUTTONS.SAVE_ALL}
+            <SaveOutlined className="text-lg" /> {BUTTONS.SAVE_ALL}
           </Button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden p-4">
-        <Table
-          columns={columns}
-          dataSource={data.students}
-          rowKey="studentId"
-          pagination={false}
-          size="middle"
-          scroll={{ x: 'max-content', y: 'calc(100vh - 430px)' }}
-          className="grading-grid rounded-xl overflow-hidden"
-        />
+      <div className="flex-1 overflow-hidden p-8">
+        <div className="rounded-[32px] border border-gray-100 bg-white shadow-sm overflow-hidden h-full">
+          <Table
+            columns={columns}
+            dataSource={data.students}
+            rowKey="studentId"
+            pagination={false}
+            size="middle"
+            scroll={{ x: 'max-content', y: 'calc(100vh - 480px)' }}
+            className="grading-grid"
+          />
+        </div>
       </div>
 
       {selectedStudent && (

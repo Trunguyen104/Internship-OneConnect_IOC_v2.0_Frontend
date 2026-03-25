@@ -1,12 +1,13 @@
 'use client';
 
-import { FilterOutlined } from '@ant-design/icons';
+import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 
 import { LogBookService } from '@/components/features/logbook/services/logBook.service';
-import { EmptyState } from '@/components/ui/emptystate';
+import { EmptyState } from '@/components/ui/atoms';
+import { Button } from '@/components/ui/button';
 import PageLayout from '@/components/ui/pagelayout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
@@ -170,81 +171,97 @@ export default function LogbookPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} />
+      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} description={DAILY_REPORT_UI.DESCRIPTION} />
 
       <PageLayout.Card>
-        <PageLayout.Toolbar
-          searchProps={{
-            placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
-            value: search,
-            onChange: (e) => setSearch(e.target.value),
-          }}
-          filterContent={
-            <Select
-              allowClear
-              placeholder={DAILY_REPORT_UI.FILTER_STATUS}
-              value={statusFilter}
-              onChange={(val) => {
-                setStatusFilter(val);
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between px-2">
+            <PageLayout.Toolbar
+              className="!p-0 !border-0 flex-1"
+              searchProps={{
+                placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
+                value: search,
+                onChange: (e) => setSearch(e.target.value),
+              }}
+              leftContent={
+                <Select
+                  allowClear
+                  placeholder={DAILY_REPORT_UI.FILTER_STATUS}
+                  value={statusFilter}
+                  onChange={(val) => {
+                    setStatusFilter(val);
+                    setPageNumber(1);
+                  }}
+                  className="w-full md:w-64 h-11"
+                  rootClassName="premium-select"
+                  suffixIcon={<FilterOutlined className="text-primary" />}
+                  options={[
+                    { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
+                    { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                    { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+                  ]}
+                />
+              }
+            />
+            <Button
+              variant="primary"
+              onClick={() => openFormModal()}
+              className="h-11 rounded-full px-8 font-black uppercase tracking-widest text-[11px] flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all w-full lg:w-auto justify-center"
+            >
+              <PlusOutlined /> {DAILY_REPORT_UI.CREATE_BUTTON}
+            </Button>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <PageLayout.Content>
+              {loading && data.length === 0 ? (
+                <div className="space-y-6">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-gray-50 flex h-20 animate-pulse items-center gap-6 rounded-2xl px-6"
+                    >
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-4 flex-1" />
+                      <Skeleton className="h-8 w-24 rounded-full" />
+                      <Skeleton className="h-9 w-20 rounded-xl" />
+                    </div>
+                  ))}
+                </div>
+              ) : data.length === 0 ? (
+                <div className="flex min-h-[400px] flex-col items-center justify-center">
+                  <EmptyState
+                    title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
+                    description={DAILY_REPORT_UI.EMPTY.DESCRIPTION}
+                  />
+                </div>
+              ) : (
+                <LogbookTable
+                  data={data}
+                  loading={loading}
+                  userProfile={userProfile}
+                  onView={openDetailModal}
+                  onEdit={openFormModal}
+                  onDelete={handleDelete}
+                />
+              )}
+            </PageLayout.Content>
+          </div>
+
+          {!loading && total > 0 && (
+            <PageLayout.Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
                 setPageNumber(1);
               }}
-              className="w-56 shadow-sm"
-              rootClassName="custom-select-premium"
-              suffixIcon={<FilterOutlined className="text-muted" />}
-              options={[
-                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
-              ]}
-            />
-          }
-          actionProps={{
-            label: DAILY_REPORT_UI.CREATE_BUTTON,
-            onClick: () => openFormModal(),
-          }}
-        />
-
-        <PageLayout.Content>
-          {loading && data.length === 0 ? (
-            <div className="space-y-4 px-6 py-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex h-[72px] items-center gap-4 border-b border-slate-50">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-4 flex-1" />
-                  <Skeleton className="h-6 w-16 rounded-full" />
-                  <Skeleton className="h-8 w-16 rounded-lg" />
-                </div>
-              ))}
-            </div>
-          ) : data.length === 0 ? (
-            <EmptyState
-              title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
-              description={DAILY_REPORT_UI.EMPTY.DESCRIPTION}
-            />
-          ) : (
-            <LogbookTable
-              data={data}
-              loading={loading}
-              userProfile={userProfile}
-              onView={openDetailModal}
-              onEdit={openFormModal}
-              onDelete={handleDelete}
             />
           )}
-        </PageLayout.Content>
-
-        {total > 0 && (
-          <PageLayout.Pagination
-            total={total}
-            page={pageNumber}
-            pageSize={pageSize}
-            onPageChange={setPageNumber}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
-              setPageNumber(1);
-            }}
-          />
-        )}
+        </div>
       </PageLayout.Card>
 
       <LogbookFormModal

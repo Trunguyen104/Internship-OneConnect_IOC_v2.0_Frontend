@@ -1,8 +1,11 @@
+'use client';
+
 import { useDraggable } from '@dnd-kit/core';
 import { GripVertical, MoreVertical, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { Dropdown } from '@/components/ui/dropdown';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS } from '@/constants/common/enums';
 
@@ -32,19 +35,6 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: it.workItemId || it.id,
   });
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const style = transform
     ? {
@@ -125,7 +115,7 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
           )}
         </div>
 
-        <div className="text-muted w-24 shrink-0 text-center text-[13px] font-medium">
+        <div className="text-muted w-24 shrink-0 text-center text-[13px] font-medium text-gray-500">
           {it.dueDate ? new Date(it.dueDate).toLocaleDateString('vi-VN') : '-'}
         </div>
 
@@ -161,26 +151,18 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
       </div>
 
       <div className="flex w-8 shrink-0 justify-center text-gray-400 opacity-50 transition-opacity hover:opacity-100">
-        <div ref={menuRef} className="relative">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsMenuOpen((v) => !v);
-            }}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100"
-            aria-label="Work item actions"
-          >
-            <MoreVertical className="h-4 w-4" />
-          </button>
-
-          {isMenuOpen ? (
-            <div className="absolute top-full right-0 z-50 mt-1 w-40 rounded-xl border border-gray-200 bg-white p-1 shadow-lg">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsMenuOpen(false);
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: 'delete',
+                label: (
+                  <div className="flex items-center gap-2 py-1 text-primary font-semibold">
+                    <Trash2 className="h-4 w-4" />
+                    <span>{BACKLOG_UI.DELETE || 'Delete'}</span>
+                  </div>
+                ),
+                onClick: () => {
                   showDeleteConfirm({
                     title: 'Delete Work Item',
                     content:
@@ -189,15 +171,20 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
                     okText: BACKLOG_UI.DELETE || 'Delete',
                     cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                   });
-                }}
-                className="text-danger flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-red-50"
-              >
-                <Trash2 className="text-danger h-4 w-4" />
-                {BACKLOG_UI.DELETE || 'Delete'}
-              </button>
-            </div>
-          ) : null}
-        </div>
+                },
+              },
+            ],
+          }}
+        >
+          <button
+            type="button"
+            onClick={(e) => e.stopPropagation()}
+            className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100"
+            aria-label="Work item actions"
+          >
+            <MoreVertical className="h-4 w-4" />
+          </button>
+        </Dropdown>
       </div>
     </div>
   );
@@ -208,7 +195,7 @@ export function ColumnHeaders() {
     <div className="mb-2 flex items-center justify-between rounded-lg border-b border-gray-100/50 bg-gray-50/80 px-2 py-2">
       <div className="mr-2 w-8 shrink-0" />
 
-      <div className="flex flex-1 items-center">
+      <div className="flex flex-1 items-center text-gray-500">
         <div className="text-muted w-20 shrink-0 pl-1 text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
           {BACKLOG_UI.ISSUE || 'Issue'}
         </div>

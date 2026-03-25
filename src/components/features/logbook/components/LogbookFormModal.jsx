@@ -1,20 +1,29 @@
 'use client';
 
 import { EditOutlined, PlusCircleOutlined, SendOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input, Modal, Space } from 'antd';
+import { DatePicker, Form, Input } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo } from 'react';
 
+import { Button } from '@/components/ui/button';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
 const { TextArea } = Input;
 
-const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initialValues }) => {
-  const { FORM } = DAILY_REPORT_UI;
+const LogbookFormModal = memo(function LogbookFormModal({
+  visible,
+  editingId,
+  onSubmit,
+  onCancel,
+  submitting,
+  initialValues,
+}) {
+  const { FORM, MODAL } = DAILY_REPORT_UI;
   const [form] = Form.useForm();
 
   React.useEffect(() => {
-    if (initialValues) {
+    if (initialValues && visible) {
       const reportDate =
         initialValues.dateReport ||
         initialValues.reportDate ||
@@ -27,121 +36,129 @@ const LogbookFormContent = ({ editingId, onSubmit, onCancel, submitting, initial
         issue: initialValues.issue,
         plan: initialValues.plan,
       });
-    } else {
+    } else if (visible) {
       form.resetFields();
     }
-  }, [initialValues, form]);
+  }, [initialValues, form, visible]);
+
+  const handleCancel = () => {
+    form.resetFields();
+    onCancel();
+  };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={onSubmit}
-      className="mt-4"
-      requiredMark="optional"
-    >
-      <Form.Item
-        label={FORM.REPORT_DATE}
-        name="dateReport"
-        rules={[{ required: true, message: FORM.VALIDATION.DATE_REQUIRED }]}
-      >
-        <DatePicker
-          placeholder={FORM.PLACEHOLDER_DATE}
-          className="w-full !cursor-default"
-          format={DAILY_REPORT_UI.DATE_FORMAT}
-          disabledDate={(current) => current && current > dayjs().endOf('day')}
-          disabled={!!editingId}
-          inputReadOnly={!!editingId}
-        />
-      </Form.Item>
-
-      <Form.Item
-        label={FORM.SUMMARY}
-        name="summary"
-        rules={[
-          { required: true, message: FORM.VALIDATION.SUMMARY_REQUIRED },
-          { min: 10, message: FORM.VALIDATION.SUMMARY_MIN },
-          { max: 200, message: FORM.VALIDATION.SUMMARY_MAX },
-        ]}
-      >
-        <TextArea rows={4} placeholder={FORM.PLACEHOLDER_SUMMARY} />
-      </Form.Item>
-
-      <Form.Item
-        label={FORM.ISSUE}
-        name="issue"
-        rules={[{ max: 200, message: FORM.VALIDATION.ISSUE_MAX }]}
-      >
-        <TextArea rows={2} placeholder={FORM.PLACEHOLDER_ISSUE} />
-      </Form.Item>
-
-      <Form.Item
-        label={FORM.PLAN}
-        name="plan"
-        rules={[
-          { required: true, message: FORM.VALIDATION.PLAN_REQUIRED },
-          { max: 200, message: FORM.VALIDATION.PLAN_MAX },
-        ]}
-      >
-        <TextArea rows={3} placeholder={FORM.PLACEHOLDER_PLAN} />
-      </Form.Item>
-
-      <div className="mt-6 flex justify-end gap-3">
-        <Button
-          onClick={() => {
-            form.resetFields();
-            onCancel();
-          }}
-        >
-          {DAILY_REPORT_UI.MODAL.CANCEL}
-        </Button>
-        <Button type="primary" htmlType="submit" loading={submitting} icon={<SendOutlined />}>
-          {editingId ? DAILY_REPORT_UI.MODAL.SAVE : DAILY_REPORT_UI.MODAL.SUBMIT}
-        </Button>
-      </div>
-    </Form>
-  );
-};
-
-const LogbookFormModal = memo(function LogbookFormModal({
-  visible,
-  editingId,
-  onSubmit,
-  onCancel,
-  submitting,
-  initialValues,
-}) {
-  const { MODAL } = DAILY_REPORT_UI;
-
-  return (
-    <Modal
+    <CompoundModal
       open={visible}
-      onCancel={onCancel}
-      footer={null}
-      width={520}
-      centered
-      destroyOnHidden
-      title={
-        <Space className="mb-2">
-          {editingId ? (
-            <EditOutlined className="text-primary" />
-          ) : (
-            <PlusCircleOutlined className="text-primary" />
-          )}
-          <span>{editingId ? MODAL.EDIT_TITLE : MODAL.CREATE_TITLE}</span>
-        </Space>
-      }
+      onCancel={handleCancel}
+      width={600}
+      title={editingId ? MODAL.EDIT_TITLE : MODAL.CREATE_TITLE}
+      description={editingId ? MODAL.EDIT_DESC : MODAL.CREATE_DESC}
+      icon={editingId ? <EditOutlined /> : <PlusCircleOutlined />}
     >
-      {visible && (
-        <LogbookFormContent
-          editingId={editingId}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          submitting={submitting}
-          initialValues={initialValues}
-        />
-      )}
-    </Modal>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onSubmit}
+        className="mt-2 space-y-6"
+        requiredMark="optional"
+      >
+        <div className="grid grid-cols-1 gap-6">
+          <Form.Item
+            label={
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+                {FORM.REPORT_DATE}
+              </span>
+            }
+            name="dateReport"
+            rules={[{ required: true, message: FORM.VALIDATION.DATE_REQUIRED }]}
+          >
+            <DatePicker
+              placeholder={FORM.PLACEHOLDER_DATE}
+              className="h-12 w-full rounded-2xl border-gray-100 font-bold hover:border-primary focus:border-primary transition-all shadow-sm"
+              format={DAILY_REPORT_UI.DATE_FORMAT}
+              disabledDate={(current) => current && current > dayjs().endOf('day')}
+              disabled={!!editingId}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label={
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+                {FORM.SUMMARY}
+              </span>
+            }
+            name="summary"
+            rules={[
+              { required: true, message: FORM.VALIDATION.SUMMARY_REQUIRED },
+              { min: 10, message: FORM.VALIDATION.SUMMARY_MIN },
+              { max: 500, message: FORM.VALIDATION.SUMMARY_MAX },
+            ]}
+          >
+            <TextArea
+              rows={4}
+              placeholder={FORM.PLACEHOLDER_SUMMARY}
+              className="rounded-2xl border-gray-100 font-bold p-4 shadow-sm transition-all hover:border-primary focus:border-primary"
+            />
+          </Form.Item>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Form.Item
+              label={
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+                  {FORM.ISSUE}
+                </span>
+              }
+              name="issue"
+              rules={[{ max: 500, message: FORM.VALIDATION.ISSUE_MAX }]}
+            >
+              <TextArea
+                rows={3}
+                placeholder={FORM.PLACEHOLDER_ISSUE}
+                className="rounded-2xl border-gray-100 font-bold p-4 shadow-sm transition-all hover:border-primary focus:border-primary"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+                  {FORM.PLAN}
+                </span>
+              }
+              name="plan"
+              rules={[
+                { required: true, message: FORM.VALIDATION.PLAN_REQUIRED },
+                { max: 500, message: FORM.VALIDATION.PLAN_MAX },
+              ]}
+            >
+              <TextArea
+                rows={3}
+                placeholder={FORM.PLACEHOLDER_PLAN}
+                className="rounded-2xl border-gray-100 font-bold p-4 shadow-sm transition-all hover:border-primary focus:border-primary"
+              />
+            </Form.Item>
+          </div>
+        </div>
+
+        <div className="mt-10 flex justify-end gap-3 pt-6 border-t border-gray-50">
+          <Button
+            variant="ghost"
+            onClick={handleCancel}
+            className="px-8 h-12 rounded-full font-black uppercase tracking-widest text-[11px] hover:bg-gray-100 transition-all"
+          >
+            {DAILY_REPORT_UI.MODAL.CANCEL}
+          </Button>
+          <Button
+            variant="primary"
+            type="submit"
+            loading={submitting}
+            className="rounded-full h-12 px-10 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+          >
+            <SendOutlined className="text-xs" />
+            {editingId ? DAILY_REPORT_UI.MODAL.SAVE : DAILY_REPORT_UI.MODAL.SUBMIT}
+          </Button>
+        </div>
+      </Form>
+    </CompoundModal>
   );
 });
 
