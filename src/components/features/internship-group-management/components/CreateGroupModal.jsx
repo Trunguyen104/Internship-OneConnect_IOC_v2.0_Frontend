@@ -309,17 +309,6 @@ export const CreateGroupModal = memo(
                 </Form.Item>
               </div>
 
-              {!isEdit &&
-                groupNameValue &&
-                existingGroups.some(
-                  (g) => g.name?.toLowerCase() === groupNameValue.trim().toLowerCase()
-                ) && (
-                  <div className="mb-3 text-[11px] font-medium text-amber-600 flex items-center gap-1.5 px-1 animate-in fade-in slide-in-from-top-1">
-                    <span className="text-[12px]">!</span>
-                    {CREATE.DUPLICATE_NAME_WARNING}
-                  </div>
-                )}
-
               <Form.Item
                 label={
                   <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">

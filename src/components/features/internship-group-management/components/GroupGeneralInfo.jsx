@@ -225,15 +225,13 @@ export default function GroupGeneralInfo({
             <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
               {info.members?.length || 0} {VIEW.STUDENTS_SUFFIX}
             </span>
-            <Button
-              type="primary"
-              size="small"
-              icon={<UsergroupAddOutlined />}
+            <button
               onClick={onAddStudent}
-              className="text-[10px] font-bold uppercase tracking-wider h-7 rounded-lg shadow-sm"
+              className="bg-primary hover:bg-primary-hover flex h-8 shrink-0 items-center gap-2 rounded-full px-5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all active:scale-95 cursor-pointer border-none outline-none"
             >
+              <UsergroupAddOutlined className="text-sm" />
               {VIEW.TABLE.ADD_STUDENT}
-            </Button>
+            </button>
           </div>
         </div>
 

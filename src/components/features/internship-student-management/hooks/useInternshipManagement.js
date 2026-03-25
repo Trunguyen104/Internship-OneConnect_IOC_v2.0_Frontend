@@ -119,8 +119,12 @@ export const useInternshipManagement = () => {
           status: p.status,
           phaseName: p.phaseName || p.name || p.termName,
           universityName: p.universityName,
+          enterpriseName: p.enterpriseName,
           startDate: p.startDate,
           endDate: p.endDate,
+          maxStudents: p.maxStudents,
+          description: p.description,
+          groupCount: p.groupCount,
         }));
 
         const allOption = {

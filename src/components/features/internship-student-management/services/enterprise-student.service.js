@@ -75,6 +75,7 @@ export const EnterpriseStudentService = {
         item.FullName ||
         item.name ||
         'Sinh viên chưa rõ',
+      studentEmail: item.studentEmail || item.StudentEmail || item.email || item.Email,
       studentCode,
       universityName: item.universityName || item.UniversityName || '-',
       major: item.major || item.Major || '-',
@@ -91,6 +92,12 @@ export const EnterpriseStudentService = {
           ? String(item.mentorId || item.MentorId || item.mentor?.id || item.mentor?.mentorId)
           : undefined,
       projectName: item.projectName || item.ProjectName,
+      phaseName:
+        item.phaseName ||
+        item.PhaseName ||
+        item.internshipPhase?.name ||
+        item.phase?.name ||
+        item.termName,
       startDate:
         item.startDate ||
         item.internshipStartDate ||

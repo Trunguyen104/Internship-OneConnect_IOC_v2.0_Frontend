@@ -1,12 +1,12 @@
 'use client';
 
 import {
+  ApartmentOutlined,
   BankOutlined,
   CalendarOutlined,
   HistoryOutlined,
   MailOutlined,
   PhoneOutlined,
-  ProjectOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -52,14 +52,6 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
   const statusMap = { 1: 'PENDING', 2: 'ACCEPTED', 3: 'REJECTED' };
   const displayStatus = statusMap[student.status] || 'PENDING';
 
-  const initials = (student.studentFullName || '')
-    .trim()
-    .split(' ')
-    .slice(-2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase();
-
   return (
     <CompoundModal open={open} onCancel={onCancel} width={540} destroyOnHidden closable={false}>
       <div className="flex flex-col items-center gap-3 pt-8 pb-5 px-6 bg-gradient-to-b from-primary-surface via-primary-surface/30 to-transparent rounded-t-3xl">
@@ -83,7 +75,7 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
         <div className="flex flex-col gap-5">
           {/* Personal Information */}
           <div>
-            <SectionTitle icon={<UserOutlined />} label="Personal Information" />
+            <SectionTitle icon={<UserOutlined />} label={DETAIL.SECTION_PERSONAL} />
             <div className="grid grid-cols-2 gap-3">
               <InfoRow
                 icon={<BankOutlined />}
@@ -116,30 +108,26 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
 
           {/* Internship Details */}
           <div>
-            <SectionTitle icon={<HistoryOutlined />} label="Internship Details" />
+            <SectionTitle icon={<HistoryOutlined />} label={DETAIL.SECTION_INTERNSHIP} />
             <div className="grid grid-cols-2 gap-3">
+              <InfoRow
+                icon={<ApartmentOutlined />}
+                label={DETAIL.PHASE}
+                value={student.phaseName}
+              />
               <InfoRow icon={<TeamOutlined />} label={DETAIL.GROUP} value={student.groupName} />
+              <InfoRow icon={<UserOutlined />} label={DETAIL.MENTOR} value={student.mentorName} />
               <InfoRow
                 icon={<CalendarOutlined />}
                 label={DETAIL.PLACEMENT_DATE}
                 value={student.appliedAt ? dayjs(student.appliedAt).format('DD/MM/YYYY') : null}
-              />
-              <InfoRow icon={<UserOutlined />} label={DETAIL.MENTOR} value={student.mentorName} />
-              <InfoRow
-                icon={<ProjectOutlined />}
-                label={DETAIL.PROJECT}
-                value={student.projectName || student.track}
               />
             </div>
           </div>
         </div>
       </CompoundModal.Content>
 
-      <CompoundModal.Footer
-        confirmText={INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.MODALS.VIEW.CLOSE}
-        onConfirm={onCancel}
-        showCancel={false}
-      />
+      <CompoundModal.Footer confirmText={DETAIL.CLOSE} onConfirm={onCancel} showCancel={false} />
     </CompoundModal>
   );
 };
