@@ -22,7 +22,11 @@ const CompoundModal = ({
       width={width}
       destroyOnHidden={destroyOnClose}
       footer={null}
-      closeIcon={<CloseOutlined className="text-muted hover:text-text transition-colors" />}
+      closeIcon={
+        <div className="mt-1">
+          <CloseOutlined className="text-muted hover:text-text transition-colors" />
+        </div>
+      }
       className="premium-modal"
       {...props}
     >

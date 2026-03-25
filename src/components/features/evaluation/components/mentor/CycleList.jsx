@@ -3,9 +3,11 @@
 import {
   DeleteOutlined,
   EditOutlined,
+  MoreOutlined,
   SettingOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
+import { Dropdown } from 'antd';
 import React, { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
@@ -32,22 +34,30 @@ export default function CycleList({
     {
       title: TABLE_COLUMNS.CYCLE,
       key: 'name',
-      render: (text) => <span className="font-bold">{text}</span>,
+      width: '160px',
+      render: (text) => (
+        <span className="block truncate font-bold" title={text}>
+          {text}
+        </span>
+      ),
     },
     {
       title: TABLE_COLUMNS.START_DATE,
       key: 'startDate',
+      width: '120px',
       render: (text) => new Date(text).toLocaleDateString('en-GB'),
     },
     {
       title: TABLE_COLUMNS.END_DATE,
       key: 'endDate',
+      width: '120px',
       render: (text) => new Date(text).toLocaleDateString('en-GB'),
     },
     {
       title: TABLE_COLUMNS.STATUS,
       key: 'status',
       align: 'center',
+      width: '120px',
       render: (status) => {
         const labels = [STATUS.UPCOMING, STATUS.ONGOING, STATUS.COMPLETED];
         const variants = ['blue', 'green', 'gray'];
@@ -59,11 +69,12 @@ export default function CycleList({
       },
     },
     {
-      title: TABLE_COLUMNS.ACTIONS,
-      key: 'actions',
-      align: 'right',
+      title: TABLE_COLUMNS.MANAGEMENT,
+      key: 'management',
+      align: 'center',
+      width: '220px',
       render: (_, record) => (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-center gap-2">
           <Button
             variant="primary"
             size="sm"
@@ -84,20 +95,50 @@ export default function CycleList({
           >
             <SettingOutlined /> {BUTTONS.CRITERIA}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(record)} disabled={isTermPast}>
-            <EditOutlined />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(record.cycleId)}
-            disabled={isTermPast}
-            className="text-red-500 hover:text-red-700"
-          >
-            <DeleteOutlined />
-          </Button>
         </div>
       ),
+    },
+    {
+      title: TABLE_COLUMNS.ACTIONS,
+      key: 'actions',
+      align: 'right',
+      width: '60px',
+      render: (_, record) => {
+        const menuItems = [
+          {
+            key: 'edit',
+            label: 'Edit',
+            icon: <EditOutlined className="text-blue-500" />,
+            disabled: isTermPast,
+            onClick: () => onEdit(record),
+          },
+          {
+            key: 'delete',
+            label: 'Delete',
+            icon: <DeleteOutlined className="text-red-500" />,
+            danger: true,
+            disabled: isTermPast,
+            onClick: () => onDelete(record.cycleId),
+          },
+        ];
+
+        return (
+          <Dropdown
+            menu={{ items: menuItems }}
+            trigger={['click']}
+            placement="bottomRight"
+            arrow={{ pointAtCenter: true }}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 rounded-full p-0 transition-all hover:bg-slate-100"
+            >
+              <MoreOutlined className="text-muted text-lg" />
+            </Button>
+          </Dropdown>
+        );
+      },
     },
   ];
 

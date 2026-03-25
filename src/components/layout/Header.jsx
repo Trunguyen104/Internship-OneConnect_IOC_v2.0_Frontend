@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 
 import { logout } from '@/components/features/auth/services/authService';
 import { clearAuth } from '@/components/features/auth/services/authStorage';
+import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/userService';
 import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
@@ -100,9 +101,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300">
-          <BellOutlined className="text-lg text-gray-700" />
-        </button>
+        <NotificationBell />
 
         <Dropdown
           menu={avatarMenu}

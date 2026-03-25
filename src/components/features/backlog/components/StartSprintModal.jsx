@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 function FieldLabel({ required, children }) {
   return (
