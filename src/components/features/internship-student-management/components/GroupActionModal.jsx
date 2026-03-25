@@ -15,13 +15,23 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
   const { GROUP_ACTION } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS;
 
   useEffect(() => {
-    if (open) form.resetFields();
-  }, [open, form]);
+    if (open) {
+      form.resetFields();
+      if (type === 'CHANGE' && students.length > 0) {
+        form.setFieldsValue({
+          projectName: students[0].projectName,
+        });
+      }
+    }
+  }, [open]); // Narrow dependency to prevent resetting on every student prop change
+
+  const groupFilters = React.useMemo(() => ({ status: undefined, includeArchived: true }), []);
+  const groupPagination = React.useMemo(() => ({ current: 1, pageSize: 100 }), []);
 
   const { data: activeGroups, loading: fetchingGroups } = useEnterpriseGroups({
-    termId: students[0]?.termId, // Use the first student's termId, mock will fall back if undefined
-    filters: { status: 1 }, // Changed from 0 to 1 based on backend validation error
-    pagination: { current: 1, pageSize: 100 }, // Fetch a large chunk for dropdown
+    phaseId: 'ALL_VISIBLE',
+    filters: groupFilters,
+    pagination: groupPagination,
     search: '',
   });
 
@@ -41,8 +51,14 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
       showDeleteConfirm({
         title: GROUP_ACTION.CHANGE_CONFIRM_TITLE,
         content: GROUP_ACTION.CHANGE_CONFIRM_CONTENT.replace('{student}', studentNames)
-          .replace('{oldGroup}', oldGroupNames || 'N/A')
-          .replace('{newGroup}', newGroup?.name || 'New Group'),
+          .replace(
+            '{oldGroup}',
+            oldGroupNames || INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.TABLE.NOT_ASSIGNED
+          )
+          .replace(
+            '{newGroup}',
+            newGroup?.name || INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.TABLE.NOT_ASSIGNED
+          ),
         okText: GROUP_ACTION.SUBMIT_CHANGE,
         type: 'warning',
         onOk: () => onConfirm(values),
@@ -104,16 +120,28 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
             }
             options={activeGroups.map((g) => {
               const isCurrent = currentGroupIds.includes(g.id);
-              // Tên nhóm | Mentor | Số SV hiện tại
               const mentor = g.mentorName || GROUP_ACTION.NO_MENTOR;
               const count = `${g.memberCount} ${GROUP_ACTION.STUDENTS_SUFFIX}`;
-              const groupLabel = `${g.name} | ${mentor} | ${count}`;
+
               return {
                 label: (
-                  <div className="flex justify-between items-center w-full">
-                    <span className="text-xs">{groupLabel}</span>
+                  <div
+                    className={`flex justify-between items-center w-full px-1 py-0.5 rounded ${isCurrent ? 'bg-primary/5' : ''}`}
+                  >
+                    <div className="flex flex-col gap-0.5 overflow-hidden">
+                      <span
+                        className={`text-xs font-bold leading-none ${isCurrent ? 'text-primary' : 'text-text'}`}
+                      >
+                        {g.name}
+                      </span>
+                      <span className="text-[10px] text-muted/60 font-medium truncate">
+                        {mentor}
+                        {GROUP_ACTION.SEPARATOR}
+                        {count}
+                      </span>
+                    </div>
                     {isCurrent && (
-                      <span className="bg-primary/10 text-primary rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                      <span className="bg-primary text-white rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-tighter whitespace-nowrap ml-2">
                         {GROUP_ACTION.CURRENT_GROUP}
                       </span>
                     )}
@@ -132,11 +160,14 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
           {type === 'CHANGE' &&
             activeGroups.length > 0 &&
             activeGroups.every((g) => currentGroupIds.includes(g.id)) && (
-              <div className="mt-2 text-[11px] font-medium text-danger">
-                {GROUP_ACTION.ONLY_GROUP_ERROR}
+              <div className="mt-2 text-[11px] font-medium text-amber-600 bg-amber-50 p-3 rounded-xl border border-amber-200/50 shadow-sm flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                <span className="mt-0.5 opacity-70">{GROUP_ACTION.BULLET}</span>
+                <span className="italic leading-relaxed">{GROUP_ACTION.ONLY_GROUP_ERROR}</span>
               </div>
             )}
         </Form.Item>
+
+        {/* Mentor selection removed for Change Group as per user request */}
 
         <CompoundModal.Footer
           cancelText={GROUP_ACTION.CANCEL}

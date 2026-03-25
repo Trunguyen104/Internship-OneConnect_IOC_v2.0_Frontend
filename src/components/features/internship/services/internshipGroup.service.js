@@ -11,9 +11,14 @@ export const InternshipGroupService = {
     return httpGet(`/mine${query ? `?${query}` : ''}`);
   },
 
+  getMyPhases(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return httpGet(`/mine/internship-phases${query ? `?${query}` : ''}`);
+  },
+
   getMyTerms(params = {}) {
     const query = new URLSearchParams(params).toString();
-    return httpGet(`/mine/internship-terms${query ? `?${query}` : ''}`);
+    return httpGet(`/mine/terms${query ? `?${query}` : ''}`);
   },
 
   getById(id) {

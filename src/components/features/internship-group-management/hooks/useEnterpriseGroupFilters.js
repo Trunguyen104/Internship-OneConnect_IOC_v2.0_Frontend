@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { EnterpriseTermService } from '../../internship-student-management/services/enterprise-term.service';
+import { EnterprisePhaseService } from '../../internship-student-management/services/enterprise-phase.service';
 import { useDebounce } from './useDebounce';
 
 const DEFAULT_PAGINATION = {
@@ -9,43 +9,40 @@ const DEFAULT_PAGINATION = {
 };
 
 export const useEnterpriseGroupFilters = () => {
-  const [termId, setTermId] = useState(null);
-  const [termOptions, setTermOptions] = useState([]);
-  const [fetchingTerms, setFetchingTerms] = useState(false);
+  const [phaseId, setPhaseId] = useState(null);
+  const [phaseOptions, setPhaseOptions] = useState([]);
+  const [fetchingPhases, setFetchingPhases] = useState(false);
 
   useEffect(() => {
-    const fetchTerms = async () => {
+    const fetchPhases = async () => {
       try {
-        setFetchingTerms(true);
-        const res = await EnterpriseTermService.getAllTerms();
-        const terms = res?.data?.items || res?.data || [];
+        setFetchingPhases(true);
+        const res = await EnterprisePhaseService.getPhases();
+        const phases = res?.data?.items || res?.data || [];
 
-        if (terms.length > 0) {
-          const options = terms.map((t) => ({
-            label: t.termName,
-            value: t.termId,
-            status: t.status,
+        if (phases.length > 0) {
+          const options = phases.map((p) => ({
+            label: p.name || p.phaseName || 'Unnamed Phase',
+            value: p.id || p.phaseId,
+            status: p.status,
           }));
 
           const allOption = {
-            label: 'All Terms',
-            value: 'ALL_ACTIVE',
-            status: 2,
+            label: 'All Phases',
+            value: 'ALL_VISIBLE',
+            status: undefined, // Show all
           };
 
-          console.log('[DEBUG] GroupFilters Setting termOptions:', [allOption, ...options]);
-          setTermOptions([allOption, ...options]);
-          setTermId('ALL_ACTIVE');
-        } else {
-          console.warn('[DEBUG] No terms found for groups.');
+          setPhaseOptions([allOption, ...options]);
+          setPhaseId('ALL_VISIBLE');
         }
       } catch (err) {
-        console.error('Failed to fetch enterprise active terms:', err);
+        // Error handled silently
       } finally {
-        setFetchingTerms(false);
+        setFetchingPhases(false);
       }
     };
-    fetchTerms();
+    fetchPhases();
   }, []);
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 300);
@@ -96,8 +93,8 @@ export const useEnterpriseGroupFilters = () => {
   }, []);
 
   return {
-    termId,
-    setTermId,
+    phaseId,
+    setPhaseId,
     searchValue,
     debouncedSearch,
     handleSearch,
@@ -107,7 +104,7 @@ export const useEnterpriseGroupFilters = () => {
     sort,
     pagination,
     handleTableChange,
-    termOptions,
-    fetchingTerms,
+    phaseOptions,
+    fetchingPhases,
   };
 };

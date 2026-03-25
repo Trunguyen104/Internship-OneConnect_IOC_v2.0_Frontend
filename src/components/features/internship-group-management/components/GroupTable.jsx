@@ -6,7 +6,6 @@ import {
   EyeOutlined,
   InboxOutlined,
   MoreOutlined,
-  UserAddOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
@@ -29,7 +28,7 @@ const GroupTable = memo(function GroupTable({
   onArchive,
   onView,
   onEdit,
-  isTermEditable,
+  isPhaseEditable,
 }) {
   const { TABLE, CARD } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
 
@@ -50,21 +49,21 @@ const GroupTable = memo(function GroupTable({
         title: TABLE.COLUMNS.GROUP_NAME,
         dataIndex: 'name',
         key: 'name',
-        width: 180,
+        width: 250,
         render: (text) => (
-          <span className="text-text truncate text-sm font-bold capitalize">
+          <span className="text-text block truncate text-sm font-bold capitalize">
             {text || TABLE.NOT_ASSIGNED}
           </span>
         ),
       },
       {
-        title: TABLE.COLUMNS.TERM,
-        key: 'termName',
-        width: 140,
+        title: TABLE.COLUMNS.PHASE,
+        key: 'phaseName',
+        width: 160,
         render: (_, record) => (
           <div className="flex items-center gap-1.5">
-            <span className="text-muted truncate text-[11px] font-medium tracking-wider uppercase opacity-60">
-              {record.termName || TABLE.NOT_ASSIGNED}
+            <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
+              {record.phaseName || record.phase?.name || record.termName || TABLE.NOT_ASSIGNED}
             </span>
           </div>
         ),
@@ -107,9 +106,8 @@ const GroupTable = memo(function GroupTable({
         render: (status) => {
           const variant = GROUP_STATUS_VARIANTS[status] || 'default';
           const label =
-            INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS.find(
-              (o) => o.value === status
-            )?.label || '-';
+            INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.STATUS.LABELS[status] || status || '-';
+
           return (
             <Badge variant={variant} size="sm">
               {label}
@@ -125,42 +123,33 @@ const GroupTable = memo(function GroupTable({
         render: (_, record) => {
           const isArchived = record.status === 3;
           const isActive = record.status === 1;
+          const { ACTIONS } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
 
           const items = [
             {
               key: 'view',
-              label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.VIEW,
+              label: ACTIONS.VIEW_DETAIL,
               icon: <EyeOutlined className="text-primary" />,
               onClick: () => onView(record),
             },
-            ...(isActive && isTermEditable
+            ...(isActive && isPhaseEditable
               ? [
                   {
                     key: 'edit',
-                    label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.EDIT,
+                    label: ACTIONS.EDIT_GROUP,
                     icon: <EditOutlined className="text-primary" />,
                     onClick: () => onEdit(record),
                   },
                   {
-                    key: 'assign',
-                    label: record.mentorId ? CARD.CHANGE_MENTOR : CARD.ASSIGN_MENTOR,
-                    icon: record.mentorId ? (
-                      <UserOutlined className="text-primary" />
-                    ) : (
-                      <UserAddOutlined className="text-primary" />
-                    ),
-                    onClick: () => onAssign(record),
-                  },
-                  record.memberCount === 0 && {
                     key: 'archive',
-                    label: INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.ARCHIVE_TOOLTIP,
+                    label: ACTIONS.ARCHIVE_GROUP,
                     icon: <InboxOutlined className="text-warning" />,
                     onClick: () => onArchive(record),
                   },
                   { type: 'divider' },
-                  record.memberCount === 0 && {
+                  {
                     key: 'delete',
-                    label: INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.ACTIONS.DELETE,
+                    label: ACTIONS.DELETE_GROUP,
                     icon: <DeleteOutlined className="text-danger" />,
                     danger: true,
                     onClick: () => onDelete(record),
@@ -184,7 +173,7 @@ const GroupTable = memo(function GroupTable({
         },
       },
     ],
-    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, isTermEditable, TABLE, CARD]
+    [page, pageSize, onAssign, onDelete, onArchive, onView, onEdit, isPhaseEditable, TABLE, CARD]
   );
 
   return (
@@ -195,6 +184,7 @@ const GroupTable = memo(function GroupTable({
       rowKey="id"
       minWidth="780px"
       tableLayout="fixed"
+      size="small"
       className="no-scrollbar mt-2 min-h-0 flex-1"
     />
   );

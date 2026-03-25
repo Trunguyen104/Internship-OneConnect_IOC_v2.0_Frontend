@@ -1,14 +1,14 @@
+import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 
-import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
 import { userService } from '../../user/services/userService';
 import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
+import { EnterprisePhaseService } from '../services/enterprise-phase.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
-import { EnterpriseTermService } from '../services/enterprise-term.service';
 
 export const useInternshipManagement = () => {
   const toast = useToast();
@@ -17,9 +17,9 @@ export const useInternshipManagement = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
-  const [termId, setTermId] = useState(null);
-  const [termOptions, setTermOptions] = useState([]);
-  const [fetchingTerms, setFetchingTerms] = useState(false);
+  const [phaseId, setPhaseId] = useState(null);
+  const [phaseOptions, setPhaseOptions] = useState([]);
+  const [fetchingPhases, setFetchingPhases] = useState(false);
   const [hasGroups, setHasGroups] = useState(false);
   const [existingGroups, setExistingGroups] = useState([]);
   const [enterpriseId, setEnterpriseId] = useState(null);
@@ -31,7 +31,7 @@ export const useInternshipManagement = () => {
         const data = res?.data || res;
         setEnterpriseId(data?.enterpriseId || data?.enterprise_id || data?.enterpriseID);
       } catch (err) {
-        console.error('Failed to fetch user info:', err);
+        // Error handled silently
       }
     };
     fetchMe();
@@ -40,11 +40,8 @@ export const useInternshipManagement = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(2); // Default to Placed (Approved = 2)
   const [groupFilter, setGroupFilter] = useState('ALL');
-  const [assignmentFilter, setAssignmentFilter] = useState('ALL');
-  const [projectFilter, setProjectFilter] = useState('ALL');
+  const [mentorFilter, setMentorFilter] = useState('ALL');
   const [dateFilter, setDateFilter] = useState(null); // Month/Year filter
-  const [universityFilter, setUniversityFilter] = useState(undefined);
-  const [majorFilter, setMajorFilter] = useState(undefined);
   const [universityOptions, setUniversityOptions] = useState([]);
 
   const [pagination, setPagination] = useState({
@@ -52,7 +49,7 @@ export const useInternshipManagement = () => {
     pageSize: 10,
   });
 
-  const [sort, setSort] = useState({ column: undefined, order: undefined });
+  const [sort, setSort] = useState({ column: 'FullName', order: 'Asc' });
 
   const [rejectModal, setRejectModal] = useState({ open: false, student: null });
   const [assignModal, setAssignModal] = useState({ open: false, student: null });
@@ -69,11 +66,29 @@ export const useInternshipManagement = () => {
   const fetchMentors = useCallback(async () => {
     try {
       setLoadingMentors(true);
-      const res = await EnterpriseMentorService.getMentors({ PageSize: 100 });
-      const items = res?.data?.items || res?.data || res?.items || [];
-      setMentors(items);
+      // Fetch multiple roles that can act as mentors (4: Admin, 5: HR, 6: Mentor)
+      const roles = [4, 5, 6];
+      // Use allSettled so if one role (e.g. role 4) is forbidden, we still get others
+      const results = await Promise.allSettled(
+        roles.map((r) => EnterpriseMentorService.getMentors({ Role: r, PageSize: 100 }))
+      );
+
+      const allItems = results
+        .filter((r) => r.status === 'fulfilled')
+        .flatMap((r) => {
+          const res = r.value;
+          const data = res?.data || res;
+          return data?.items || data?.Items || (Array.isArray(data) ? data : []);
+        });
+
+      // Remove duplicates based on userId
+      const uniqueItems = Array.from(
+        new Map(allItems.map((item) => [item?.userId || item?.UserId || item?.id, item])).values()
+      ).filter(Boolean);
+
+      setMentors(uniqueItems);
     } catch (err) {
-      console.error('Failed to fetch mentors:', err);
+      toast.error('Không thể tải danh sách Mentor');
       setMentors([]);
     } finally {
       setLoadingMentors(false);
@@ -85,137 +100,216 @@ export const useInternshipManagement = () => {
   }, [fetchMentors]);
 
   useEffect(() => {
-    const fetchTerms = async () => {
+    const fetchPhases = async () => {
       try {
-        setFetchingTerms(true);
-        // Fallback to active terms if all terms endpoint not found
-        const res = await EnterpriseTermService.getAllTerms();
-        let terms = res?.data?.items || res?.data || [];
+        setFetchingPhases(true);
+        const res = await EnterprisePhaseService.getPhases();
+        const phases = res?.data?.items || res?.data || [];
 
-        terms.sort((a, b) => {
-          if (a.status === 2 && b.status !== 2) return -1;
-          if (a.status !== 2 && b.status === 2) return 1;
-          return new Date(b.startDate) - new Date(a.startDate);
-        });
+        const openPhases = phases
+          .filter((p) => p.status === 1)
+          .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-        const { STATUS_LABELS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT;
-        const options = terms.map((t) => ({
-          label: t.termName,
-          value: t.termId,
-          status: t.status,
-          termName: t.termName,
-          universityName: t.universityName,
+        let phasesToShow = openPhases;
+        let defaultLabel = 'All Open Phases';
+
+        const options = openPhases.map((p) => ({
+          label: p.phaseName || p.name || p.termName,
+          value: p.phaseId || p.id || p.termId,
+          status: p.status,
+          phaseName: p.phaseName || p.name || p.termName,
+          universityName: p.universityName,
+          enterpriseName: p.enterpriseName,
+          startDate: p.startDate,
+          endDate: p.endDate,
+          maxStudents: p.maxStudents,
+          description: p.description,
+          groupCount: p.groupCount,
         }));
 
         const allOption = {
-          label: 'All Terms',
-          value: 'ALL_ACTIVE', // Keep the value for backend compatibility if it's used to trigger "no filter"
-          status: 2,
+          label: defaultLabel,
+          value: 'ALL_VISIBLE',
+          status: 1,
+          phaseIds: options.map((p) => p.value),
         };
 
-        const finalOptions = [allOption, ...options];
-        console.log('[DEBUG] Setting termOptions:', finalOptions);
-        setTermOptions(finalOptions);
+        setPhaseOptions([allOption, ...options]);
 
-        // Auto-select ALL_ACTIVE by default
-        if (!termId) {
-          setTermId('ALL_ACTIVE');
+        // Populate University Options from phases
+        const uniqueUniversities = Array.from(
+          new Set(phases.map((p) => p.universityName).filter(Boolean))
+        );
+        setUniversityOptions(uniqueUniversities.map((name) => ({ label: name, value: name })));
+        if (!phaseId) {
+          setPhaseId('ALL_VISIBLE');
         }
       } catch (err) {
-        console.error('Failed to fetch terms:', err);
+        // Error handled silently
       } finally {
-        setFetchingTerms(false);
+        setFetchingPhases(false);
       }
     };
-    fetchTerms();
-  }, [termId]);
+    fetchPhases();
+  }, [phaseId]);
 
-  // Fetch Applications (Students)
   const fetchStudents = useCallback(async () => {
-    if (!termId) return;
+    if (!phaseId && phaseOptions.length > 0) return;
 
     try {
-      const allTerms = termOptions.filter((t) => t.value !== 'ALL_ACTIVE');
-      console.log('[DEBUG] fetchStudents - termId:', termId, 'allTerms:', allTerms.length);
-      if (allTerms.length === 0) {
-        setStudents([]);
-        setTotal(0);
-        return;
-      }
-
       setLoading(true);
 
-      const fetchPromises = allTerms.map(async (term) => {
-        const params = {
-          TermId: term.value,
-          PageIndex: 1, // Fetching all for now since we aggregate
-          PageSize: 100,
+      const isAllVisible = phaseId === 'ALL_VISIBLE' || !phaseId;
+
+      const params = {
+        PhaseId: isAllVisible ? undefined : phaseId,
+        TermId: isAllVisible ? undefined : phaseId, // Backward compatibility for backend
+        PageIndex: pagination.current,
+        PageSize: pagination.pageSize,
+        SearchTerm: search || undefined,
+        IsAssignedToGroup:
+          groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP' ? true : false,
+        Status: statusFilter === 'ALL' ? undefined : statusFilter,
+        IsAssignedToMentor:
+          mentorFilter === 'ALL' ? undefined : mentorFilter === 'HAS_MENTOR' ? true : false,
+        MonthYear: dateFilter ? dayjs(dateFilter).format('YYYY-MM') : undefined,
+        sortBy: sort?.column || 'AppliedAt',
+        sortOrder: sort?.order || 'Desc',
+      };
+
+      let items = [];
+      let totalCount = 0;
+
+      const openPhaseIds = new Set(
+        phaseOptions
+          .filter((p) => p.status === 1 && p.value !== 'ALL_VISIBLE')
+          .map((p) => String(p.value).toLowerCase())
+      );
+
+      if (statusFilter === 2) {
+        const res = await EnterpriseGroupService.getPlacedStudents(params);
+        items = res?.data?.items || res?.items || [];
+        totalCount = res?.data?.totalCount || res?.totalCount || items.length;
+      } else {
+        const appParams = {
+          ...params,
           Search: search || undefined,
-          Status: statusFilter === 'ALL' ? undefined : statusFilter,
-          HasGroup: groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP',
-          MentorAssigned: assignmentFilter === 'ALL' ? undefined : assignmentFilter === 'ASSIGNED',
-          ProjectAssigned:
-            projectFilter === 'ALL' ? undefined : projectFilter === 'PROJECT_ASSIGNED',
-          Major: majorFilter || undefined,
-          UniversityName: universityFilter || undefined,
-          Month: dateFilter ? dateFilter.month() + 1 : undefined,
-          Year: dateFilter ? dateFilter.year() : undefined,
-          SortColumn: sort.column,
-          SortOrder: sort.order,
+          campusId: universityFilter || undefined,
         };
-        try {
-          const res = await EnterpriseStudentService.getApplications(params);
-          const items = res?.data?.items || res?.items || [];
-          return items.map((item) => {
-            const mapped = EnterpriseStudentService.mapApplication(item);
-            if (mapped.termStatus === 0 || mapped.termStatus === undefined) {
-              mapped.termStatus = term.status || 0;
-            }
-            return mapped;
-          });
-        } catch (err) {
-          console.error(`Failed to fetch for term ${term.label}:`, err);
-          return [];
+        const res = await EnterpriseStudentService.getApplications(appParams);
+        items = res?.data?.items || res?.items || [];
+        totalCount = res?.data?.totalCount || res?.totalCount || items.length;
+      }
+
+      // Filter items to only show those in Open phases if ALL_VISIBLE is selected
+      if (isAllVisible) {
+        items = items.filter((item) => {
+          const itemPid = String(item.phaseId || item.termId || '').toLowerCase();
+          return openPhaseIds.has(itemPid);
+        });
+        totalCount = items.length;
+      }
+
+      const mappedStudents = items.map((item) => {
+        const mapped = EnterpriseStudentService.mapApplication(item);
+        if (mapped.phaseStatus === 0 || mapped.phaseStatus === undefined) {
+          const studentPhase = phaseOptions.find((o) => o.value === mapped.phaseId);
+          mapped.phaseStatus = studentPhase?.status || 2;
         }
+        if (!mapped.startDate || !mapped.endDate) {
+          const studentPhase = phaseOptions.find((o) => o.value === mapped.phaseId);
+          mapped.startDate = studentPhase?.startDate;
+          mapped.endDate = studentPhase?.endDate;
+        }
+        return mapped;
       });
 
-      const results = await Promise.all(fetchPromises);
-      const combinedStudents = results.flat();
+      // AC-S04: Local Sorting Fallback (ensures sorting works even if API ignores params)
+      if (sort?.column) {
+        mappedStudents.sort((a, b) => {
+          let valA, valB;
 
-      // Manual sorting if needed, but for now just use the aggregate
-      setStudents(combinedStudents);
-      setTotal(combinedStudents.length);
+          if (sort.column === 'FullName') {
+            const getSortableName = (fullName) => {
+              const nameParts = (fullName || '').trim().split(' ');
+              const firstName = nameParts.pop() || '';
+              const restOfName = nameParts.join(' ');
+              return { firstName, restOfName };
+            };
 
-      // Set unassigned students
-      setUnassignedStudents(combinedStudents.filter((i) => !i.groupName && !i.groupId));
+            const nameA = getSortableName(a.studentFullName);
+            const nameB = getSortableName(b.studentFullName);
 
-      // Check for groups across all terms
-      const groupPromises = allTerms.map((term) =>
-        EnterpriseGroupService.getGroups({ termId: term.value, pageSize: 100 }).catch(() => ({
-          data: { items: [] },
-        }))
-      );
-      const groupResults = await Promise.all(groupPromises);
-      const allGroups = groupResults.flatMap((res) => res?.data?.items || res?.items || []);
+            // Compare by First Name first
+            const firstCompare = nameA.firstName.localeCompare(nameB.firstName, 'vi', {
+              sensitivity: 'base',
+            });
+            if (firstCompare !== 0) return sort.order === 'Asc' ? firstCompare : -firstCompare;
+
+            // If First Names are same, compare by rest of name
+            return sort.order === 'Asc'
+              ? nameA.restOfName.localeCompare(nameB.restOfName, 'vi', { sensitivity: 'base' })
+              : -nameA.restOfName.localeCompare(nameB.restOfName, 'vi', { sensitivity: 'base' });
+          } else if (sort.column === 'GroupName') {
+            valA = (a.groupName || '').toLowerCase();
+            valB = (b.groupName || '').toLowerCase();
+          } else {
+            // Support any other column keys
+            valA = (a[sort.column] || '').toString().toLowerCase();
+            valB = (b[sort.column] || '').toString().toLowerCase();
+          }
+
+          if (valA < valB) return sort.order === 'Asc' ? -1 : 1;
+          if (valA > valB) return sort.order === 'Asc' ? 1 : -1;
+          return 0;
+        });
+      }
+
+      setStudents(mappedStudents);
+      setTotal(totalCount);
+      setUnassignedStudents(mappedStudents.filter((i) => !i.groupName && !i.groupId));
+      // Fetch groups for the selected context
+      const groupParams = {
+        phaseId: isAllVisible ? undefined : phaseId,
+        termId: isAllVisible ? undefined : phaseId,
+        pageSize: 100,
+      };
+      const groupRes = await EnterpriseGroupService.getGroups(groupParams).catch(() => ({
+        data: { items: [] },
+      }));
+      const allGroups = groupRes?.data?.items || groupRes?.items || [];
       setExistingGroups(allGroups);
-      setHasGroups(allGroups.length > 0);
+      setHasGroups(allGroups.some((g) => g.status === 1));
     } catch (err) {
-      console.error('Failed to fetch students:', err);
     } finally {
       setLoading(false);
     }
   }, [
-    termId,
-    pagination.current,
-    pagination.pageSize,
+    phaseId,
+    phaseOptions,
     search,
     statusFilter,
     groupFilter,
-    assignmentFilter,
+    pagination.current,
+    pagination.pageSize,
     dateFilter,
+    mentorFilter,
     sort?.column,
     sort?.order,
   ]);
+
+  // Listen for global group refresh events
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchStudents();
+    };
+    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    return () =>
+      window.removeEventListener(
+        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
+        handleRefresh
+      );
+  }, [fetchStudents]);
 
   useEffect(() => {
     fetchStudents();
@@ -236,45 +330,39 @@ export const useInternshipManagement = () => {
     setPagination((prev) => ({ ...prev, current: page }));
   }, []);
 
+  const handleViewStudent = useCallback(async (student) => {
+    if (!student?.applicationId) {
+      setDetailModal({ open: true, student });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await EnterpriseStudentService.getApplicationDetail(student.applicationId);
+      const fullData = res?.data || res;
+      // Merge full data with existing mapped record
+      setDetailModal({
+        open: true,
+        student: {
+          ...student,
+          ...fullData,
+          // Re-map fields that might have different names in the detail response
+          studentEmail: fullData.email || student.studentEmail,
+          phone: fullData.phone || student.phone,
+          dob: fullData.dob || student.dob,
+        },
+      });
+    } catch (err) {
+      // Fallback: show existing data if fetch fails
+      setDetailModal({ open: true, student });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const handlePageSizeChange = useCallback((size) => {
     setPagination({ current: 1, pageSize: size });
   }, []);
-
-  const handleAcceptStudent = useCallback(
-    async (student) => {
-      if (!student) return;
-      showDeleteConfirm({
-        title: MESSAGES.ACCEPT_CONFIRM_TITLE,
-        content: `${MESSAGES.ACCEPT_CONFIRM_CONTENT} ${student.studentFullName}?`,
-        okText: MESSAGES.ACCEPT_CONFIRM_OK,
-        type: 'warning',
-        onOk: async () => {
-          try {
-            await EnterpriseStudentService.acceptApplication(student.id);
-            toast.success(MESSAGES.ACCEPT_SUCCESS);
-            fetchStudents();
-          } catch (err) {
-            toast.error('Failed to accept student');
-          }
-        },
-      });
-    },
-    [toast, MESSAGES, fetchStudents]
-  );
-
-  const handleRejectStudent = useCallback(
-    async (studentId, reason) => {
-      try {
-        await EnterpriseStudentService.rejectApplication(studentId, reason);
-        setRejectModal({ open: false, student: null });
-        toast.warning(MESSAGES.REJECT_SUCCESS);
-        fetchStudents();
-      } catch (err) {
-        toast.error('Failed to reject application');
-      }
-    },
-    [toast, MESSAGES, fetchStudents]
-  );
 
   const handleAssignMentor = useCallback(
     async (studentId, values) => {
@@ -296,31 +384,73 @@ export const useInternshipManagement = () => {
       if (!students?.length) return;
 
       try {
-        if (type === 'ADD') {
-          await EnterpriseGroupService.addStudents(
-            values.groupId,
-            students.map((s) => ({ studentId: s.studentId, role: 1 }))
-          );
-          toast.success(`Đã thêm ${students.length} sinh viên vào nhóm.`);
-        } else if (type === 'CHANGE') {
-          await EnterpriseGroupService.moveStudents({
-            fromGroupId: students[0].groupId,
-            toGroupId: values.groupId,
-            studentIds: students.map((s) => s.studentId),
-          });
-          toast.success(MESSAGES.GROUP_CHANGE_SUCCESS);
+        // Partition students by their current source group for precise API calls
+        const sourceGroups = students.reduce((acc, s) => {
+          const gid = s.groupId || 'NO_GROUP';
+          if (!acc[gid]) acc[gid] = [];
+          acc[gid].push(s); // Store the whole object for reliable ID access
+          return acc;
+        }, {});
+
+        for (const [sourceGroupId, groupStudents] of Object.entries(sourceGroups)) {
+          const isNoGroup = sourceGroupId === 'NO_GROUP';
+          const personIds = groupStudents.map((s) => s.studentId);
+
+          // CRITICAL: If type is 'CHANGE', we MUST prefer the Move API for all students who already have a group.
+          // Fallback only to Add API if they are truly unassigned.
+          if (type === 'ADD' || (isNoGroup && type !== 'CHANGE')) {
+            await EnterpriseGroupService.addStudents(
+              values.groupId,
+              groupStudents.map((s) => ({
+                studentId: s.studentId,
+                role: 1,
+              }))
+            );
+          } else {
+            // "CHANGE" or "MOVE" operation
+            // Ensure we don't move to the SAME group
+            if (sourceGroupId === values.groupId) {
+              continue;
+            }
+
+            await EnterpriseGroupService.moveStudents({
+              fromGroupId: isNoGroup ? undefined : sourceGroupId, // Use correct ID if coming from a group
+              toGroupId: values.groupId,
+              studentIds: personIds,
+            });
+
+            if (values.mentorId) {
+              const assignPromises = personIds.map((stId) =>
+                EnterpriseStudentService.assignMentor(stId, {
+                  mentorId: values.mentorId,
+                })
+              );
+              await Promise.all(assignPromises);
+            }
+          }
         }
-        setGroupModal({ open: false, students: [], type: 'ADD' });
-        fetchStudents();
+
+        toast.success(
+          type === 'ADD' ? `Đã thêm ${students.length} sinh viên.` : MESSAGES.GROUP_CHANGE_SUCCESS
+        );
       } catch (err) {
-        const errorMsg = err?.response?.data?.message || err?.message || '';
-        // AC-G05: Handle race condition where student already in another group
-        if (errorMsg.includes('already in another group') || err?.response?.status === 400) {
-          // If possible, extract student name from error or just show the error message
-          toast.error(errorMsg || 'Sinh viên đã thuộc một nhóm khác trong kỳ này, không thể thêm.');
+        // RESILIENCY: Force Refresh on backend errors as data might have partially updated
+        if (err.status === 400 || err.status === 500) {
+          const errorMsg =
+            err?.response?.data?.message ||
+            err?.message ||
+            'Sinh viên đã có nhóm khác hoặc dữ liệu không đồng bộ.';
+          toast.warning(errorMsg);
         } else {
           toast.error('Failed to update group');
+          throw err;
         }
+      } finally {
+        setGroupModal({ open: false, students: [], type: 'ADD' });
+        fetchStudents();
+        window.dispatchEvent(
+          new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
+        );
       }
     },
     [groupModal, toast, MESSAGES, fetchStudents]
@@ -330,44 +460,45 @@ export const useInternshipManagement = () => {
     async (payload) => {
       // payload.students is passed from the modal context
       const selectedStudents = createModal.students || [];
-      const termIds = new Set(selectedStudents.map((s) => s.termId).filter(Boolean));
+      const phaseIds = new Set(selectedStudents.map((s) => s.phaseId || s.termId).filter(Boolean));
 
-      if (termIds.size > 1) {
+      if (phaseIds.size > 1) {
         toast.error(
-          'Sinh viên được chọn thuộc nhiều kỳ thực tập khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một kỳ thực tập.'
+          'Sinh viên được chọn thuộc nhiều giai đoạn khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một giai đoạn.'
         );
         return;
       }
 
       const firstStudent = selectedStudents[0];
-      const targetTermId = firstStudent?.termId || termId;
+      const targetPhaseId = firstStudent?.phaseId || firstStudent?.termId || phaseId;
 
       try {
         await EnterpriseGroupService.createGroup({
           ...payload,
-          termId: targetTermId,
+          phaseId: targetPhaseId,
+          termId: targetPhaseId, // Keep termId key for backend compatibility if needed
           enterpriseId: enterpriseId,
         });
         toast.success('Group created successfully');
         setCreateModal({ open: false, students: [] });
         fetchStudents();
+        window.dispatchEvent(
+          new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
+        );
       } catch (err) {
         const errorMsg = err?.response?.data?.message || err?.message || 'Failed to create group';
         toast.error(errorMsg);
       }
     },
-    [termId, fetchStudents, toast, createModal.students]
+    [phaseId, fetchStudents, toast, createModal.students, enterpriseId]
   );
 
   const resetFilters = () => {
     setSearch('');
     setStatusFilter(2);
     setGroupFilter('ALL');
-    setAssignmentFilter('ALL');
-    setProjectFilter('ALL');
     setDateFilter(null);
-    setUniversityFilter(undefined);
-    setMajorFilter(undefined);
+    setMentorFilter('ALL');
     setPagination({ current: 1, pageSize: 10 });
   };
 
@@ -376,18 +507,14 @@ export const useInternshipManagement = () => {
     statusFilter,
     groupFilter,
     setGroupFilter,
-    assignmentFilter,
-    setAssignmentFilter,
     pagination,
     filteredData,
     total,
     loading,
-    rejectModal,
     groupModal,
     detailModal,
     assignModal,
     selectedRowKeys,
-    setRejectModal,
     setGroupModal,
     setDetailModal,
     setAssignModal,
@@ -396,22 +523,14 @@ export const useInternshipManagement = () => {
     handleStatusChange,
     handleTableChange,
     handlePageSizeChange,
-    handleAcceptStudent,
-    handleRejectStudent,
     handleGroupSubmit,
     handleAssignMentor,
-    termId,
-    setTermId,
-    termOptions,
-    fetchingTerms,
+    handleViewStudent,
+    phaseId,
+    setPhaseId,
+    phaseOptions,
+    fetchingPhases,
     resetFilters,
-    projectFilter,
-    setProjectFilter,
-    universityFilter,
-    setUniversityFilter,
-    majorFilter,
-    setMajorFilter,
-    universityOptions,
     setCreateModal,
     createModal,
     unassignedStudents,
@@ -421,9 +540,11 @@ export const useInternshipManagement = () => {
     handleCreateGroup,
     dateFilter,
     setDateFilter,
-    isTermEditable:
-      termId === 'ALL_ACTIVE' ||
-      (termId && termOptions.find((t) => t.value === termId)?.status === 2),
+    mentorFilter,
+    setMentorFilter,
+    isPhaseEditable:
+      phaseId === 'ALL_VISIBLE' ||
+      (phaseId && phaseOptions.find((p) => p.value === phaseId)?.status === 2),
     hasGroups,
     existingGroups,
     sort,

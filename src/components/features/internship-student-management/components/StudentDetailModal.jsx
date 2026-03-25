@@ -1,7 +1,16 @@
 'use client';
 
-import { HistoryOutlined, UserOutlined } from '@ant-design/icons';
-import { Descriptions, Divider, Empty, Typography } from 'antd';
+import {
+  ApartmentOutlined,
+  BankOutlined,
+  CalendarOutlined,
+  HistoryOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import { Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
@@ -12,136 +21,113 @@ import StatusTag from './StatusTag';
 
 const { Text } = Typography;
 
+const InfoRow = ({ icon, label, value }) => (
+  <div className="flex flex-col gap-1">
+    <span className="text-[10px] font-bold text-muted/50 uppercase tracking-widest flex items-center gap-1">
+      {React.cloneElement(icon, { className: 'text-[9px] text-muted/40' })}
+      {label}
+    </span>
+    <div className="bg-bg border border-border rounded-xl px-3 py-2 text-sm font-medium text-text min-h-[36px] flex items-center">
+      {value || <span className="text-muted/30 text-xs">—</span>}
+    </div>
+  </div>
+);
+
+const SectionTitle = ({ icon, label }) => (
+  <div className="flex items-center gap-2 mb-3">
+    <div className="w-5 h-5 rounded-md bg-primary-surface flex items-center justify-center flex-shrink-0">
+      {React.cloneElement(icon, { className: 'text-primary text-[9px]' })}
+    </div>
+    <span className="text-[10px] font-black uppercase tracking-widest text-muted/50">{label}</span>
+    <div className="flex-1 h-px bg-border" />
+  </div>
+);
+
 const StudentDetailModal = ({ open, student, onCancel }) => {
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
   const { DETAIL } = INTERNSHIP_LIST.MODALS;
 
   if (!student) return null;
 
-  const statusMap = {
-    1: 'PENDING',
-    2: 'ACCEPTED',
-    3: 'REJECTED',
-  };
+  const statusMap = { 1: 'PENDING', 2: 'ACCEPTED', 3: 'REJECTED' };
   const displayStatus = statusMap[student.status] || 'PENDING';
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={600} destroyOnHidden closable={false}>
-      <CompoundModal.Header
-        icon={<UserOutlined />}
-        title={student.studentFullName}
-        subtitle={student.studentCode}
-      />
+    <CompoundModal open={open} onCancel={onCancel} width={540} destroyOnHidden closable={false}>
+      <div className="flex flex-col items-center gap-3 pt-8 pb-5 px-6 bg-gradient-to-b from-primary-surface via-primary-surface/30 to-transparent rounded-t-3xl">
+        <div className="text-center leading-tight">
+          <Text className="block text-[15px] font-black text-text tracking-tight">
+            {student.studentFullName}
+          </Text>
+          <Text className="block text-[11px] text-muted/60 font-semibold mt-0.5">
+            {student.studentCode}
+            {student.major ? <span className="text-muted/30 mx-1">·</span> : null}
+            {student.major}
+          </Text>
+        </div>
 
-      <CompoundModal.Content className="px-8 py-6 max-h-[60vh] overflow-y-auto">
-        <div className="flex flex-col gap-6">
-          {/* Section: Personal Information */}
+        <div className="flex items-center gap-2">
+          <StatusTag status={displayStatus} />
+        </div>
+      </div>
+
+      <CompoundModal.Content className="px-5 pt-4 pb-2 max-h-[52vh] overflow-y-auto no-scrollbar cursor-default">
+        <div className="flex flex-col gap-5">
+          {/* Personal Information */}
           <div>
-            <div className="mb-4 flex items-center gap-2">
-              <UserOutlined className="text-primary text-sm" />
-              <Text className="text-[11px] font-extrabold uppercase tracking-widest text-muted/60">
-                Personal Information
-              </Text>
-            </div>
-            <Descriptions
-              column={1}
-              size="small"
-              bordered={false}
-              labelStyle={{
-                color: 'var(--text)',
-                fontWeight: 800,
-                fontSize: '12px',
-                textTransform: 'uppercase',
-                width: '140px',
-                whiteSpace: 'nowrap',
-              }}
-              contentStyle={{ fontWeight: 500, fontSize: '11px', color: 'var(--muted)' }}
-            >
-              <Descriptions.Item label={DETAIL.UNIVERSITY}>
-                {student.universityName || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.EMAIL}>
-                {student.studentEmail || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.PHONE}>
-                {student.phone || '098-XXX-XXXX'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.DOB}>
-                {student.dob ? dayjs(student.dob).format('DD/MM/YYYY') : '-'}
-              </Descriptions.Item>
-            </Descriptions>
-          </div>
-
-          <Divider className="my-0 opacity-20" />
-
-          {/* Section: Internship Information */}
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <HistoryOutlined className="text-primary text-sm" />
-              <Text className="text-[11px] font-extrabold uppercase tracking-widest text-muted/60">
-                Internship Details
-              </Text>
-            </div>
-            <Descriptions
-              column={1}
-              size="small"
-              bordered={false}
-              labelStyle={{
-                color: 'var(--text)',
-                fontWeight: 800,
-                fontSize: '12px',
-                textTransform: 'uppercase',
-                width: '140px',
-                whiteSpace: 'nowrap',
-              }}
-              contentStyle={{ fontWeight: 500, fontSize: '11px', color: 'var(--muted)' }}
-            >
-              <Descriptions.Item label={DETAIL.STATUS}>
-                <StatusTag status={displayStatus} />
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.PLACEMENT_DATE}>
-                {student.appliedAt ? dayjs(student.appliedAt).format('DD/MM/YYYY') : '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.MAJOR}>{student.major || '-'}</Descriptions.Item>
-              <Descriptions.Item label={DETAIL.GROUP}>{student.groupName || '-'}</Descriptions.Item>
-              <Descriptions.Item label={DETAIL.MENTOR}>
-                {student.mentorName || '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label={DETAIL.PROJECT}>
-                {student.projectName || student.track || '-'}
-              </Descriptions.Item>
-            </Descriptions>
-          </div>
-
-          <Divider className="my-0 opacity-20" />
-
-          {/* Section: Change History (AC-S05) */}
-          <div>
-            <div className="mb-4 flex items-center gap-2">
-              <HistoryOutlined className="text-primary text-sm" />
-              <Text className="text-[11px] font-extrabold uppercase tracking-widest text-muted/60">
-                Change History
-              </Text>
-            </div>
-            <div className="rounded-xl border border-dashed border-border p-3 bg-bg/30">
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description={
-                  <span className="text-[10px] uppercase font-bold text-muted/40 tracking-tighter italic">
-                    History recording disabled
-                  </span>
+            <SectionTitle icon={<UserOutlined />} label={DETAIL.SECTION_PERSONAL} />
+            <div className="grid grid-cols-2 gap-3">
+              <InfoRow
+                icon={<BankOutlined />}
+                label={DETAIL.UNIVERSITY}
+                value={student.universityName}
+              />
+              <InfoRow
+                icon={<MailOutlined />}
+                label={DETAIL.EMAIL}
+                value={
+                  student.studentEmail ? (
+                    <a
+                      href={`mailto:${student.studentEmail}`}
+                      className="text-info hover:underline truncate text-sm"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {student.studentEmail}
+                    </a>
+                  ) : null
                 }
+              />
+              <InfoRow icon={<PhoneOutlined />} label={DETAIL.PHONE} value={student.phone} />
+              <InfoRow
+                icon={<CalendarOutlined />}
+                label={DETAIL.DOB}
+                value={student.dob ? dayjs(student.dob).format('DD/MM/YYYY') : null}
+              />
+            </div>
+          </div>
+
+          {/* Internship Details */}
+          <div>
+            <SectionTitle icon={<HistoryOutlined />} label={DETAIL.SECTION_INTERNSHIP} />
+            <div className="grid grid-cols-2 gap-3">
+              <InfoRow
+                icon={<ApartmentOutlined />}
+                label={DETAIL.PHASE}
+                value={student.phaseName}
+              />
+              <InfoRow icon={<TeamOutlined />} label={DETAIL.GROUP} value={student.groupName} />
+              <InfoRow icon={<UserOutlined />} label={DETAIL.MENTOR} value={student.mentorName} />
+              <InfoRow
+                icon={<CalendarOutlined />}
+                label={DETAIL.PLACEMENT_DATE}
+                value={student.appliedAt ? dayjs(student.appliedAt).format('DD/MM/YYYY') : null}
               />
             </div>
           </div>
         </div>
       </CompoundModal.Content>
 
-      <CompoundModal.Footer
-        confirmText={INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.MODALS.VIEW.CLOSE}
-        onConfirm={onCancel}
-        showCancel={false}
-      />
+      <CompoundModal.Footer confirmText={DETAIL.CLOSE} onConfirm={onCancel} showCancel={false} />
     </CompoundModal>
   );
 };

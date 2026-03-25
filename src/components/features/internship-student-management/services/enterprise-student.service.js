@@ -1,83 +1,139 @@
 import { httpGet, httpPatch } from '@/services/httpClient';
 
-const BASE_URL = '/enterprises/me/applications';
-
-const cleanPayload = (obj) => {
-  const newObj = { ...obj };
-  Object.keys(newObj).forEach((key) => {
-    if (newObj[key] === undefined || newObj[key] === '' || newObj[key] === null) delete newObj[key];
-  });
-  return newObj;
-};
-
 export const EnterpriseStudentService = {
-  async getApplications(params = {}) {
-    const finalParams = { ...params };
-    if (finalParams.TermId === 'ALL_ACTIVE') {
-      delete finalParams.TermId;
-    }
-    const cleanParams = cleanPayload(finalParams);
-    return httpGet(BASE_URL, cleanParams);
-  },
-
-  async getApplicationDetail(applicationId) {
-    return httpGet(`${BASE_URL}/${applicationId}`);
-  },
-
-  async acceptApplication(applicationId) {
-    return httpPatch(`${BASE_URL}/${applicationId}/accept`);
-  },
-
-  async rejectApplication(applicationId, reason) {
-    return httpPatch(`${BASE_URL}/${applicationId}/reject`, { reason });
-  },
-
-  async assignMentor(applicationId, data) {
-    // Body: { mentorId: uuid, projectName: string }
-    return httpPatch(`${BASE_URL}/${applicationId}/assign`, data);
-  },
-
   mapApplication(item) {
+    if (!item) return null;
+
     const applicationId =
-      item.ApplicationId ||
       item.applicationId ||
+      item.ApplicationId ||
       item.studentTermId ||
       item.StudentTermId ||
       item.id;
-    const studentId = item.StudentId || item.studentId;
-    const termId = item.TermId || item.termId || item.internshipTermId;
 
-    // Align with backend: Pending = 1, Approved = 2, Rejected = 3
-    let rawStatus = item.Status !== undefined ? item.Status : item.status;
+    const personId = item.studentId || item.StudentId || item.userId;
+
+    const studentCode = item.studentCode || item.StudentCode || item.code || 'NO_CODE';
+
+    const uniqueId = applicationId || `${personId}-${studentCode}`;
+
+    const studentIdForPayLoad = personId || applicationId;
+
+    const phaseId =
+      item.phaseId ||
+      item.PhaseId ||
+      item.internshipPhaseId ||
+      item.internshipPhase?.id ||
+      item.phase?.id ||
+      item.termId ||
+      item.TermId;
+
+    let rawStatus = item.status !== undefined ? item.status : item.Status;
     if (typeof rawStatus === 'string') {
-      if (rawStatus === 'Pending') rawStatus = 1;
-      else if (rawStatus === 'Approved') rawStatus = 2;
-      else if (rawStatus === 'Rejected') rawStatus = 3;
+      const s = rawStatus.toLowerCase();
+      if (s === 'pending') rawStatus = 1;
+      else if (s === 'approved' || s === 'active' || s === 'placed') rawStatus = 2;
+      else if (s === 'rejected') rawStatus = 3;
     }
-    const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 1;
+    const status = rawStatus !== undefined ? parseInt(rawStatus, 10) : 2;
+
+    let rawPhaseStatus =
+      item.phaseStatus || item.PhaseStatus || item.termStatus || item.TermStatus || 0;
+    if (typeof rawPhaseStatus === 'string') {
+      const s = rawPhaseStatus.toLowerCase();
+      if (s === 'draft') rawPhaseStatus = 0;
+      else if (s === 'open') rawPhaseStatus = 1;
+      else if (s === 'inprogress' || s === 'active') rawPhaseStatus = 2;
+      else if (s === 'closed' || s === 'ended') rawPhaseStatus = 3;
+    }
+    const phaseStatus = rawPhaseStatus !== undefined ? parseInt(rawPhaseStatus, 10) : 0;
+
+    // 6. Identify Group Association (Improved detection for ADD vs MOVE)
+    const groupId =
+      item.groupId ||
+      item.GroupId ||
+      item.assignedGroupId ||
+      item.AssignedGroupId ||
+      item.internshipGroupId ||
+      item.InternshipGroupId ||
+      item.group_id ||
+      item.internshipId;
 
     return {
       ...item,
-      id: applicationId,
+      id: uniqueId, // Used as rowKey in table and selection list
       applicationId,
-      studentId: studentId || applicationId,
-      termId,
+      studentId: studentIdForPayLoad, // Passed to API commands
+      personId, // Pure person reference
+      phaseId,
+      termId: phaseId, // Backward compatibility
       studentFullName:
+        item.studentName ||
         item.studentFullName ||
         item.StudentFullName ||
         item.fullName ||
         item.FullName ||
         item.name ||
-        'Unknown Student',
-      studentCode: item.studentCode || item.StudentCode || item.code || item.UserCode || '-',
+        'Sinh viên chưa rõ',
+      studentEmail: item.studentEmail || item.StudentEmail || item.email || item.Email,
+      studentCode,
       universityName: item.universityName || item.UniversityName || '-',
       major: item.major || item.Major || '-',
       status,
+      phaseStatus,
+      termStatus: phaseStatus, // Backward compatibility
       appliedAt: item.appliedAt || item.AppliedAt,
-      termStatus: item.termStatus || item.TermStatus || item.statusTerm || 0,
-      groupName: item.groupName || item.GroupName,
+      groupId,
+      isAssignedToGroup: item.isAssignedToGroup !== undefined ? item.isAssignedToGroup : !!groupId,
+      groupName: item.groupName || item.GroupName || item.assignedGroupName,
       mentorName: item.mentorName || item.MentorName,
+      mentorId:
+        item.mentorId || item.MentorId || item.mentor?.id || item.mentor?.mentorId
+          ? String(item.mentorId || item.MentorId || item.mentor?.id || item.mentor?.mentorId)
+          : undefined,
       projectName: item.projectName || item.ProjectName,
+      phaseName:
+        item.phaseName ||
+        item.PhaseName ||
+        item.internshipPhase?.name ||
+        item.phase?.name ||
+        item.termName,
+      startDate:
+        item.startDate ||
+        item.internshipStartDate ||
+        item.internshipPhase?.startDate ||
+        item.phase?.startDate ||
+        item.internshipTerm?.startDate ||
+        item.term?.startDate,
+      endDate:
+        item.endDate ||
+        item.internshipEndDate ||
+        item.internshipPhase?.endDate ||
+        item.phase?.endDate ||
+        item.internshipTerm?.endDate ||
+        item.term?.endDate,
     };
+  },
+
+  async getApplications(params = {}) {
+    const cleanParams = {};
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined && params[key] !== null) {
+        cleanParams[key] = params[key];
+      }
+    });
+    return httpGet('/enterprises/me/applications', cleanParams);
+  },
+
+  async getApplicationDetail(id) {
+    return httpGet(`/enterprises/me/applications/${id}`);
+  },
+
+  async assignMentor(studentId, data) {
+    return httpPatch(`/enterprises/me/students/${studentId}/mentor`, data);
+  },
+
+  async getMyEnterprise() {
+    return httpGet('/enterprises/mine');
   },
 };

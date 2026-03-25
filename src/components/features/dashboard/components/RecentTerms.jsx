@@ -7,7 +7,8 @@ import React, { memo } from 'react';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { DASHBOARD, TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
-const { RECENT_TERMS } = DASHBOARD;
+// const { RECENT_TERMS } = DASHBOARD;
+const RECENT_TERMS = INTERNSHIP_MANAGEMENT_UI?.UNI_ADMIN?.DASHBOARD?.RECENT_TERMS || {};
 
 const STATUS_CONFIG = {
   1: { bgClass: 'bg-info/10', textClass: 'text-info', dotClass: 'bg-info' },

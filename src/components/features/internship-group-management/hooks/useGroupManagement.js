@@ -1,8 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
 import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
@@ -14,6 +17,7 @@ import { useEnterpriseGroups } from '../hooks/useEnterpriseGroups';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
 export const useGroupManagement = () => {
+  const toast = useToast();
   const filters = useEnterpriseGroupFilters();
   const [enterpriseId, setEnterpriseId] = useState(null);
 
@@ -24,7 +28,7 @@ export const useGroupManagement = () => {
         const data = res?.data || res;
         setEnterpriseId(data?.enterpriseId || data?.enterprise_id || data?.enterpriseID);
       } catch (err) {
-        console.error('Failed to fetch user info:', err);
+        // Silent error
       }
     };
     fetchMe();
@@ -32,12 +36,12 @@ export const useGroupManagement = () => {
 
   // Real data fetching
   const { data, total, loading, refetch } = useEnterpriseGroups({
-    termId: filters.termId, // Will be undefined initially, API will fetch all/current
+    phaseId: filters.phaseId, // Will be undefined initially, API will fetch all/current
     filters: filters.filters,
     search: filters.debouncedSearch,
     pagination: filters.pagination,
     sort: filters.sort,
-    termOptions: filters.termOptions,
+    phaseOptions: filters.phaseOptions,
   });
 
   const [mentors, setMentors] = useState([]);
@@ -46,11 +50,28 @@ export const useGroupManagement = () => {
   const fetchMentors = useCallback(async () => {
     try {
       setLoadingMentors(true);
-      const res = await EnterpriseMentorService.getMentors({ PageSize: 100 });
-      const items = res?.data?.items || res?.data || res?.items || [];
-      setMentors(items);
+      // Fetch multiple roles that can act as mentors (4: Admin, 5: HR, 6: Mentor)
+      const roles = [4, 5, 6];
+      // Use allSettled so if one role (e.g. role 4) is forbidden, we still get others
+      const results = await Promise.allSettled(
+        roles.map((r) => EnterpriseMentorService.getMentors({ Role: r, PageSize: 100 }))
+      );
+
+      const allItems = results
+        .filter((r) => r.status === 'fulfilled')
+        .flatMap((r) => {
+          const res = r.value;
+          const data = res?.data || res;
+          return data?.items || data?.Items || (Array.isArray(data) ? data : []);
+        });
+
+      // Remove duplicates based on userId/id
+      const uniqueItems = Array.from(
+        new Map(allItems.map((item) => [item?.userId || item?.UserId || item?.id, item])).values()
+      ).filter(Boolean);
+
+      setMentors(uniqueItems);
     } catch (err) {
-      console.error('Failed to fetch mentors:', err);
       setMentors([]);
     } finally {
       setLoadingMentors(false);
@@ -61,45 +82,74 @@ export const useGroupManagement = () => {
     fetchMentors();
   }, [fetchMentors]);
 
+  // Listen for global group refresh events
+  useEffect(() => {
+    const handleRefresh = () => {
+      refetch();
+    };
+    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    return () =>
+      window.removeEventListener(
+        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
+        handleRefresh
+      );
+  }, [refetch]);
+
   const {
     createGroup,
     updateGroup,
     archiveGroup,
-    moveStudents,
     removeStudents,
+    addStudents: addGroupStudents,
     deleteGroup,
     loading: actionLoading,
   } = useEnterpriseGroupActions(refetch);
 
   const [assignModal, setAssignModal] = useState({ open: false, group: null });
-  const [viewModal, setViewModal] = useState({ open: false, group: null, loading: false });
   const [createModal, setCreateModal] = useState({ open: false, group: null });
   const [editModal, setEditModal] = useState({ open: false, group: null });
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [fetchingStudents, setFetchingStudents] = useState(false);
+  const [selectedGroupDetail, setSelectedGroupDetail] = useState(null);
+  const router = useRouter();
+
+  const handleViewGroup = useCallback((group) => {
+    setSelectedGroupDetail(group);
+  }, []);
 
   const fetchUnassignedStudents = useCallback(async () => {
-    if (!filters.termId) return;
+    let targetPhaseId = filters.phaseId;
+
+    // Handle 'ALL_VISIBLE' or empty phaseId
+    const isAllVisible = targetPhaseId === 'ALL_VISIBLE' || !targetPhaseId;
+
     try {
       setFetchingStudents(true);
-      const res = await EnterpriseStudentService.getApplications({
-        TermId: filters.termId,
-        Status: 2, // Approved (Placed)
+      const res = await EnterpriseGroupService.getPlacedStudents({
+        PhaseId: isAllVisible ? undefined : targetPhaseId,
+        TermId: isAllVisible ? undefined : targetPhaseId, // Backward compatibility
         PageIndex: 1,
-        PageSize: 100,
+        PageSize: 1000, // Fetch more for 'full list'
       });
-      const items = res?.data?.items || [];
-      // Filter for approved students without a group
-      const unassigned = items
-        .filter((s) => s.status === 2 && !s.groupId)
-        .map(EnterpriseStudentService.mapApplication);
+      const items = res?.data?.items || res.items || [];
+      const mappedItems = items.map(EnterpriseStudentService.mapApplication);
+
+      // Filter: Unassigned AND Phase Status is 1 (Open)
+      const unassigned = mappedItems.filter((s) => {
+        if (s.groupId) return false;
+
+        // Find phase status from phaseOptions
+        const phase = filters.phaseOptions.find((p) => p.value === s.phaseId);
+        return phase ? phase.status === 1 : false;
+      });
+
       setUnassignedStudents(unassigned);
     } catch (err) {
-      console.error('Failed to fetch unassigned students:', err);
+      // Silent error
     } finally {
       setFetchingStudents(false);
     }
-  }, [filters.termId]);
+  }, [filters.phaseId]);
 
   useEffect(() => {
     if (createModal.open || editModal.open) {
@@ -123,17 +173,35 @@ export const useGroupManagement = () => {
   );
 
   const handleDeleteGroup = useCallback(
-    (group) => {
-      showDeleteConfirm({
-        title: ENTERPRISE_GROUP_UI.MODALS.DELETE.TITLE,
-        content: ENTERPRISE_GROUP_UI.MODALS.DELETE.CONTENT,
-        okText: ENTERPRISE_GROUP_UI.MODALS.DELETE.SUBMIT,
-        onOk: async () => {
-          await deleteGroup(group.id, group.memberCount || 0);
-        },
-      });
+    async (group) => {
+      try {
+        const dashRes = await EnterpriseGroupService.getGroupDashboard(group.id);
+        const summary = dashRes?.data?.summary || {};
+        const hasData = (summary.totalTasks || 0) > 0 || (summary.done || 0) > 0;
+        const hasStudents = (group.memberCount || 0) > 0;
+
+        if (hasData) {
+          toast.warning(ENTERPRISE_GROUP_UI.MESSAGES.DELETE_ERROR_HAS_DATA, { duration: 6 });
+          return;
+        }
+
+        const content = hasStudents
+          ? ENTERPRISE_GROUP_UI.MESSAGES.DELETE_CONFIRM_HAS_STUDENTS
+          : ENTERPRISE_GROUP_UI.MODALS.DELETE.CONTENT;
+
+        showDeleteConfirm({
+          title: ENTERPRISE_GROUP_UI.MODALS.DELETE.TITLE,
+          content,
+          okText: ENTERPRISE_GROUP_UI.MODALS.DELETE.SUBMIT,
+          onOk: async () => {
+            await deleteGroup(group.id);
+          },
+        });
+      } catch (err) {
+        toast.error('Không thể kiểm tra dữ liệu nhóm');
+      }
     },
-    [deleteGroup]
+    [deleteGroup, toast]
   );
 
   const handleArchiveGroup = useCallback(
@@ -144,7 +212,7 @@ export const useGroupManagement = () => {
         okText: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.SUBMIT,
         type: 'warning',
         onOk: async () => {
-          await archiveGroup(group.id, group.memberCount || 0);
+          await archiveGroup(group.id);
         },
       });
     },
@@ -153,90 +221,130 @@ export const useGroupManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (payload) => {
+      let targetPhaseId = filters.phaseId;
+
+      // If in "All Phases" view, respect the phaseId from the payload (modal)
+      if (targetPhaseId === 'ALL_VISIBLE' || !targetPhaseId) {
+        targetPhaseId = payload.phaseId || payload.termId;
+      }
+
+      // Secondary fallback: find the phaseId from unassignedStudents list using the first studentId in payload
+      if (!targetPhaseId && payload.students?.[0]?.studentId) {
+        const firstStudentId = payload.students[0].studentId;
+        const studentInfo = unassignedStudents.find(
+          (s) => String(s.studentId || s.id || s.applicationId) === String(firstStudentId)
+        );
+        targetPhaseId = studentInfo?.phaseId || studentInfo?.termId;
+      }
+
       await createGroup({
         ...payload,
-        termId: filters.termId,
+        phaseId: targetPhaseId,
+        internshipPhaseId: targetPhaseId, // Extended compatibility
+        termId: targetPhaseId, // Backward compatibility
+        internshipTermId: targetPhaseId, // Legacy compatibility
         enterpriseId: enterpriseId,
       });
       setCreateModal({ open: false, group: null });
     },
-    [createGroup, filters.termId, enterpriseId]
+    [createGroup, filters.phaseId, enterpriseId]
   );
 
   const handleUpdateGroup = useCallback(
     async (values) => {
       const { group } = editModal;
       if (!group) return;
-      await updateGroup(group.id, {
-        ...values,
-        termId: filters.termId,
-      });
-      setEditModal({ open: false, group: null });
+
+      const groupId = group.internshipId || group.id || group.groupId;
+
+      try {
+        // 1. Sync students ONLY if they were provided AND we are NOT in addingStudents mode
+        if (!editModal.isAddingStudents && values.students !== undefined) {
+          const newStudents = values.students || [];
+          const oldMembers = group.members || [];
+
+          const newIds = new Set(newStudents.map((s) => String(s.studentId)));
+          const oldIds = new Set(
+            oldMembers.map((m) => String(m.studentId || m.id || m.applicationId))
+          );
+
+          const toAdd = newStudents.filter((s) => !oldIds.has(String(s.studentId)));
+          const toRemove = oldMembers
+            .filter((m) => !newIds.has(String(m.studentId || m.id || m.applicationId)))
+            .map((m) => m.studentId || m.id || m.applicationId);
+
+          if (toRemove.length > 0) {
+            await EnterpriseGroupService.removeStudents(groupId, toRemove);
+          }
+          if (toAdd.length > 0) {
+            await EnterpriseGroupService.addStudents(groupId, toAdd);
+          }
+        }
+
+        // 2. Branch: Add Students vs. Update Group Info
+        if (editModal.isAddingStudents) {
+          if (values.studentIds?.length > 0) {
+            // Map student IDs to required format { studentId, role }
+            const studentsToUpdate = values.studentIds.map((id) => ({
+              studentId: id,
+              role: 1,
+            }));
+            await addGroupStudents(groupId, studentsToUpdate);
+          }
+        } else {
+          // Normalize Phase ID compatibility
+          const targetPhaseId = group.phaseId || group.termId || group.internshipPhaseId;
+
+          await updateGroup(groupId, {
+            groupName: values.groupName,
+            description: values.description,
+            mentorId: values.mentorId,
+            enterpriseId: enterpriseId || group.enterpriseId,
+            startDate: values.startDate || group.startDate,
+            endDate: values.endDate || group.endDate,
+            phaseId: targetPhaseId,
+            internshipPhaseId: targetPhaseId,
+            termId: targetPhaseId,
+            internshipTermId: targetPhaseId,
+          });
+        }
+
+        setEditModal({ open: false, group: null, isAddingStudents: false });
+      } catch (err) {
+        // Error already handled by useEnterpriseGroupActions toast
+      }
     },
-    [editModal, updateGroup, filters.termId]
+    [editModal, updateGroup, addGroupStudents, enterpriseId]
   );
-
-  const handleViewGroup = useCallback(async (group) => {
-    try {
-      setViewModal({ open: true, group, loading: true });
-      const res = await EnterpriseGroupService.getGroupDetail(group.id);
-      const detailedGroup = res?.data || res;
-
-      // Map members data to ensure it matches ViewGroupModal expectations
-      const members = (detailedGroup.members || detailedGroup.students || []).map((s) => ({
-        id: s.studentId || s.id || s.applicationId,
-        fullName: s.studentFullName || s.fullName || s.name || 'Unknown',
-        code: s.studentCode || s.code || '-',
-        email: s.email || '-',
-        avatar: s.avatar,
-        universityName: s.universityName || s.schoolName || s.university || '-',
-      }));
-
-      setViewModal({
-        open: true,
-        group: {
-          ...group,
-          ...detailedGroup,
-          description: detailedGroup.description || detailedGroup.Description || '-',
-          mentorEmail: detailedGroup.mentorEmail || detailedGroup.MentorEmail || '',
-          members,
-        },
-        loading: false,
-      });
-    } catch (err) {
-      console.error('Failed to fetch group details:', err);
-      setViewModal({ open: true, group, loading: false });
-    }
-  }, []);
 
   const handleRemoveStudentFromGroup = useCallback(
     async (groupId, studentId) => {
       try {
+        const { MODALS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
         showDeleteConfirm({
-          title: 'Delete Student',
+          title: MODALS.GROUP_ACTION.REMOVE_STUDENT_TITLE || 'Remove Student',
           content:
-            'Are you sure you want to remove this student from the group? This action will only remove the student from the group, it will not change the Placed status.',
-          okText: 'Delete',
+            MODALS.GROUP_ACTION.REMOVE_STUDENT_CONTENT ||
+            'Are you sure you want to remove this student from the group?',
+          okText: MODALS.GROUP_ACTION.REMOVE_CONFIRM || 'Remove',
           onOk: async () => {
             const success = await removeStudents(groupId, [studentId]);
             if (success) {
-              // Refresh group detail if modal is open
-              if (viewModal.open && viewModal.group?.id === groupId) {
-                handleViewGroup(viewModal.group);
+              if (selectedGroupDetail?.id === groupId) {
+                handleViewGroup(selectedGroupDetail);
               }
             }
           },
         });
       } catch (err) {
-        console.error('Failed to remove student:', err);
+        toast.error('Failed to remove student');
       }
     },
-    [removeStudents, viewModal.open, viewModal.group, handleViewGroup]
+    [removeStudents, selectedGroupDetail, handleViewGroup, toast]
   );
 
   return {
     filteredGroups: data,
-    existingGroups: data,
     activeTab: filters.filters.status !== null ? filters.filters.status : 'ALL',
     setActiveTab: (val) => filters.handleFilterChange('status', val === 'ALL' ? null : val),
     search: filters.searchValue,
@@ -245,8 +353,6 @@ export const useGroupManagement = () => {
     loading: loading || actionLoading,
     assignModal,
     setAssignModal,
-    viewModal,
-    setViewModal: (val) => setViewModal(val),
     handleViewGroup,
     createModal,
     setCreateModal,
@@ -262,17 +368,20 @@ export const useGroupManagement = () => {
     handleRemoveStudentFromGroup,
     mentors,
     loadingMentors,
-    termId: filters.termId,
-    setTermId: filters.setTermId,
-    termOptions: filters.termOptions,
-    fetchingTerms: filters.fetchingTerms,
+    phaseId: filters.phaseId,
+    setPhaseId: filters.setPhaseId,
+    phaseOptions: filters.phaseOptions,
+    fetchingPhases: filters.fetchingPhases,
     pagination: filters.pagination,
     handleTableChange: (page, filter, sorter) => filters.handleTableChange(page, filter, sorter),
     handlePageSizeChange: (size) => filters.handleTableChange({ current: 1, pageSize: size }),
-    isTermEditable:
-      filters.termId === 'ALL_ACTIVE' ||
-      (filters.termId && filters.termOptions.find((t) => t.value === filters.termId)?.status === 2),
+    isPhaseEditable:
+      filters.phaseId === 'ALL_VISIBLE' ||
+      (filters.phaseId &&
+        filters.phaseOptions.find((p) => p.value === filters.phaseId)?.status === 1),
     filters: filters.filters,
     handleFilterChange: filters.handleFilterChange,
+    selectedGroupDetail,
+    setSelectedGroupDetail,
   };
 };

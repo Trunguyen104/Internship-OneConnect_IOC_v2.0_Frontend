@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { useLayoutStore } from '@/store/useLayoutStore';
+
 export default function BaseSidebar({
   menus = [],
   backButton,
@@ -12,6 +14,7 @@ export default function BaseSidebar({
   className = '',
 }) {
   const pathname = usePathname();
+  const { isSidebarCollapsed } = useLayoutStore();
 
   const isItemActive = (href) => {
     if (activeStrategy === 'prefix') {

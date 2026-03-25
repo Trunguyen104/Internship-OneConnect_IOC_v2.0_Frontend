@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 import { getErrorDetail } from '@/utils/errorUtils';
 
@@ -17,9 +18,11 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       await actionFn();
       toast.success(successMessage);
       if (onSuccess) onSuccess();
+      window.dispatchEvent(
+        new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
+      );
       return true;
     } catch (error) {
-      console.error('Group Action Error:', error);
       toast.error(getErrorDetail(error, MESSAGES.ERROR));
       return false;
     } finally {
@@ -33,13 +36,8 @@ export const useEnterpriseGroupActions = (onSuccess) => {
   const updateGroup = (id, data) =>
     handleAction(() => EnterpriseGroupService.updateGroup(id, data), MESSAGES.UPDATE_SUCCESS);
 
-  const archiveGroup = (id, memberCount) => {
-    if (memberCount > 0) {
-      toast.error(MESSAGES.DELETE_ERROR_HAS_STUDENTS);
-      return false;
-    }
-    return handleAction(() => EnterpriseGroupService.archiveGroup(id), MESSAGES.ARCHIVE_SUCCESS);
-  };
+  const archiveGroup = (id) =>
+    handleAction(() => EnterpriseGroupService.archiveGroup(id), MESSAGES.ARCHIVE_SUCCESS);
 
   const moveStudents = (data) =>
     handleAction(() => EnterpriseGroupService.moveStudents(data), MESSAGES.UPDATE_SUCCESS);
@@ -56,21 +54,17 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       MESSAGES.REMOVE_STUDENT_SUCCESS
     );
 
-  const deleteGroup = async (id, memberCount) => {
-    if (memberCount > 0) {
-      toast.error(MESSAGES.DELETE_ERROR_HAS_STUDENTS);
-      return false;
-    }
-
+  const deleteGroup = async (id) => {
     try {
       setLoading(true);
       await EnterpriseGroupService.deleteGroup(id);
       toast.success(MESSAGES.DELETE_SUCCESS);
       if (onSuccess) onSuccess();
+      window.dispatchEvent(
+        new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
+      );
       return true;
     } catch (error) {
-      console.error('Delete Group Error:', error);
-      // AC-G09: If group has data, suggest Archive
       const errorMsg = error?.message || '';
       if (
         error?.status === 400 ||

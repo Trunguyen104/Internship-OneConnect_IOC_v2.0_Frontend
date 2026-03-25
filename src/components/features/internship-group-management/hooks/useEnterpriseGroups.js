@@ -1,82 +1,82 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
+const DEFAULT_PHASE_OPTIONS = [];
+
 export const useEnterpriseGroups = ({
-  termId,
+  phaseId,
   filters,
   search,
   pagination,
   sort,
-  termOptions = [],
+  phaseOptions = DEFAULT_PHASE_OPTIONS,
 }) => {
   const toast = useToast();
+
   const [data, setData] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Fetch Groups
+   */
   const fetchGroups = useCallback(async () => {
-    if (!termId) return;
+    if (phaseId === undefined || phaseId === null) return;
 
     try {
       setLoading(true);
 
-      const allTerms = termOptions.filter((t) => t.value !== 'ALL_ACTIVE');
-      if (allTerms.length === 0) {
-        setData([]);
-        setTotal(0);
-        return;
-      }
+      const isBulkPhase = phaseId === 'ALL_VISIBLE';
 
-      // If a specific term is selected (not 'ALL_ACTIVE'), we could use just that.
-      // But based on user request "get hết", we usually are in ALL_ACTIVE mode.
-      const targetTerms = termId === 'ALL_ACTIVE' ? allTerms : [{ value: termId }];
+      const params = {
+        PhaseId: isBulkPhase ? undefined : phaseId,
+        TermId: isBulkPhase ? undefined : phaseId,
+        PageIndex: isBulkPhase ? 1 : pagination?.current || 1,
+        PageSize: isBulkPhase ? 1000 : pagination?.pageSize || 10,
+        Search: search || undefined,
+        Status: filters?.status,
+        IncludeArchived: filters?.includeArchived,
+        Month: filters?.dateFilter ? filters.dateFilter.month() + 1 : undefined,
+        Year: filters?.dateFilter ? filters.dateFilter.year() : undefined,
+        SortColumn: sort?.column,
+        SortOrder: sort?.order,
+      };
 
-      const fetchPromises = targetTerms.map(async (term) => {
-        const params = {
-          TermId: term.value,
-          PageIndex: 1, // Aggregating everything for now
-          PageSize: 100,
-          Search: search,
-          Status: filters.status,
-          IncludeArchived: filters.includeArchived,
-          Month: filters.dateFilter ? filters.dateFilter.month() + 1 : undefined,
-          Year: filters.dateFilter ? filters.dateFilter.year() : undefined,
-          SortColumn: sort?.column,
-          SortOrder: sort?.order,
+      const response = await EnterpriseGroupService.getGroups(params);
+
+      const items = response?.data?.items || response?.items || [];
+
+      const mapped = items.map((item) => {
+        const itemPhaseId = item.phaseId || item.termId || item.internshipPhaseId;
+        const phaseMatch = phaseOptions.find(
+          (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
+        );
+
+        return {
+          ...item,
+          id: item.internshipId || item.groupId || item.internshipGroupId || item.id,
+          name: item.groupName || item.GroupName || item.name || item.Name,
+          memberCount: item.numberOfMembers ?? item.numberOfMembers ?? item.memberCount ?? 0,
+          mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
+          phaseName:
+            item.phaseName ||
+            item.phase?.name ||
+            item.termName ||
+            phaseMatch?.label ||
+            phaseMatch?.name ||
+            '-',
         };
-        try {
-          const response = await EnterpriseGroupService.getGroups(params);
-          const items = response?.data?.items || response?.items || [];
-          return items.map((item) => {
-            const t = termOptions.find(
-              (opt) => opt.value?.toLowerCase() === item.termId?.toLowerCase()
-            );
-            return {
-              ...item,
-              id: item.internshipId || item.id || item.groupId,
-              name: item.groupName || item.GroupName || item.name,
-              termName: item.termName || item.TermName || t?.label || term.label || '-',
-              memberCount: item.numberOfMembers ?? item.NumberOfMembers ?? item.memberCount ?? 0,
-              mentorName: item.mentorName || item.MentorName || '-',
-            };
-          });
-        } catch (err) {
-          console.error(`Failed to fetch groups for term ${term.value}:`, err);
-          return [];
-        }
       });
 
-      const results = await Promise.all(fetchPromises);
-      const combinedGroups = results.flat();
-
-      setData(combinedGroups);
-      setTotal(combinedGroups.length);
+      setData(mapped);
+      setTotal(isBulkPhase ? mapped.length : response?.data?.total || mapped.length);
     } catch (error) {
-      console.error('Fetch Enterprise Groups Error:', error);
+      console.error(error);
       toast.error(ENTERPRISE_GROUP_UI.MESSAGES.ERROR);
       setData([]);
       setTotal(0);
@@ -84,20 +84,42 @@ export const useEnterpriseGroups = ({
       setLoading(false);
     }
   }, [
-    termId,
-    pagination,
+    phaseId,
+    pagination?.current,
+    pagination?.pageSize,
     search,
     filters?.status,
     filters?.includeArchived,
     filters?.dateFilter,
     sort?.column,
     sort?.order,
-    termOptions,
+    phaseOptions,
     toast,
   ]);
 
+  /**
+   * Auto fetch when dependency changes
+   */
   useEffect(() => {
     fetchGroups();
+  }, [fetchGroups]);
+
+  /**
+   * Refresh event (after create/update/delete group)
+   */
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchGroups();
+    };
+
+    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+
+    return () => {
+      window.removeEventListener(
+        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
+        handleRefresh
+      );
+    };
   }, [fetchGroups]);
 
   return {

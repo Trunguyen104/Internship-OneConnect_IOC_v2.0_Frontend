@@ -8,8 +8,11 @@ import {
   TeamOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
+import React, { useMemo } from 'react';
 
+import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { USER_ROLE } from '@/constants/user-management/enums';
 
 import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
@@ -34,6 +37,7 @@ const enterpriseMenu = [
     icon: <WarningOutlined />,
     label: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TITLE,
     href: '/violation-reports',
+    role: [USER_ROLE.MENTOR],
   },
   {
     icon: <TeamOutlined />,
@@ -49,9 +53,19 @@ const enterpriseMenu = [
 ];
 
 export default function EnterpriseSidebar() {
+  const { userInfo } = useProfile();
+  const userRole = userInfo?.role ?? userInfo?.Role;
+
+  const filteredMenu = useMemo(() => {
+    return enterpriseMenu.filter((item) => {
+      if (!item.role) return true;
+      return item.role.includes(userRole);
+    });
+  }, [userRole]);
+
   return (
     <ProfileAwareSidebar
-      defaultMenus={enterpriseMenu}
+      defaultMenus={filteredMenu}
       profilePrefix="/profile"
       profileBackButton={{
         href: '/dashboard',

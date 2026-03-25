@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { useToast } from '@/providers/ToastProvider';
 import { getErrorDetail } from '@/utils/errorUtils';
 
@@ -340,5 +341,6 @@ export const useViolationManagement = () => {
     termOptions,
     fetchingTerms,
     studentOptions,
+    isMentor: me?.role === USER_ROLE.MENTOR || me?.Role === USER_ROLE.MENTOR,
   };
 };

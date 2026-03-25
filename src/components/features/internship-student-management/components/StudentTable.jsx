@@ -6,7 +6,6 @@ import {
   EyeOutlined,
   MinusCircleFilled,
   MoreOutlined,
-  UserAddOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
@@ -15,10 +14,7 @@ import React, { memo, useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
-import {
-  INTERNSHIP_MANAGEMENT_UI,
-  TERM_STATUS_VARIANTS,
-} from '@/constants/internship-management/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const STATUS_CONFIG = {
   Pending: {
@@ -49,13 +45,11 @@ const StudentTable = memo(function StudentTable({
   page = 1,
   pageSize = 10,
   onView,
-  onAccept,
-  onReject,
   onAssign,
   onCreateGroup,
   onAddToGroup,
   onChangeGroup,
-  isTermEditable,
+  isPhaseEditable,
   hasGroups,
   sortBy,
   sortOrder,
@@ -72,7 +66,7 @@ const StudentTable = memo(function StudentTable({
       {
         title: '#',
         key: 'index',
-        width: 80,
+        width: 60,
         align: 'center',
         render: (_, __, index) => (
           <span className="text-muted font-mono text-xs font-bold">
@@ -83,14 +77,12 @@ const StudentTable = memo(function StudentTable({
       {
         title: TABLE.COLUMNS.FULL_NAME,
         key: 'studentFullName',
-        sortKey: 'studentFullName',
-        width: '180px',
+        sortKey: 'FullName',
+        sorter: true,
+        width: '170px',
         render: (_, record) => (
           <div className="flex flex-col">
             <span className="text-text text-sm font-semibold">{record.studentFullName}</span>
-            <span className="text-muted text-[11px] font-medium uppercase opacity-60">
-              {record.universityName || '-'}
-            </span>
           </div>
         ),
       },
@@ -107,8 +99,7 @@ const StudentTable = memo(function StudentTable({
         title: TABLE.COLUMNS.STATUS,
         dataIndex: 'status',
         key: 'status',
-        sortKey: 'status',
-        width: '100px',
+        width: '140px', // Adjusted width
         align: 'center',
         render: (statusIdx) => {
           const config =
@@ -135,17 +126,18 @@ const StudentTable = memo(function StudentTable({
         },
       },
       {
-        title: TABLE.COLUMNS.TERM_STATUS,
-        key: 'termStatus',
-        width: '110px',
+        title: TABLE.COLUMNS.PHASE_STATUS,
+        key: 'phaseStatus',
+        width: '140px', // Adjusted width
         align: 'center',
         render: (_, record) => {
-          const status = record.termStatus;
-          const variant = TERM_STATUS_VARIANTS[status] || 'default';
+          const status = record.phaseStatus !== undefined ? record.phaseStatus : record.termStatus;
+          const variant =
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_VARIANTS[status] || 'default';
           const label =
             INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || '-';
           return (
-            <Badge variant={variant} size="sm">
+            <Badge variant={variant || 'default'} size="sm">
               {label}
             </Badge>
           );
@@ -154,13 +146,13 @@ const StudentTable = memo(function StudentTable({
       {
         title: TABLE.COLUMNS.INTERNSHIP_PERIOD,
         key: 'period',
-        width: '160px',
+        width: '220px', // Adjusted width
         align: 'center',
         render: (_, record) => {
           if (!record.startDate || !record.endDate)
             return <span className="text-muted text-xs">-</span>;
           return (
-            <div className="text-muted flex flex-col text-[10px] font-medium uppercase leading-tight">
+            <div className="text-muted flex items-center justify-center gap-1.5 whitespace-nowrap text-[10px] font-medium uppercase tracking-tight">
               <span>{dayjs(record.startDate).format('DD/MM/YYYY')}</span>
               <span className="opacity-40">
                 {INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.COMMON.DASH_SEPARATOR}
@@ -173,14 +165,25 @@ const StudentTable = memo(function StudentTable({
       {
         title: TABLE.COLUMNS.GROUP,
         key: 'group',
+        sortKey: 'GroupName',
+        sorter: true,
         width: '150px',
         render: (_, record) => {
           const isPlaced = record.status === 2;
+          const isEditable =
+            [1, 2].includes(record.phaseStatus) || [1, 2].includes(record.termStatus);
 
           if (isPlaced && !record.groupId) {
             return (
               <span
-                className={`${record.termStatus !== 2 ? 'opacity-50' : ''} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
+                className={`${isEditable ? 'cursor-pointer hover:bg-warning/20' : 'opacity-50'} bg-warning-surface text-warning inline-flex h-5 items-center rounded px-2 text-[11px] font-medium transition-colors`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isEditable) {
+                    if (hasGroups) onAddToGroup(record);
+                    else onCreateGroup(record);
+                  }
+                }}
               >
                 {INTERNSHIP_LIST.BADGES.NO_GROUP}
               </span>
@@ -189,10 +192,10 @@ const StudentTable = memo(function StudentTable({
           if (record.groupName) {
             return (
               <span
-                className={`${record.termStatus === 2 ? 'text-primary cursor-pointer underline hover:text-primary-hover' : 'text-muted cursor-default'} text-xs font-medium transition-all`}
+                className={`${isEditable ? 'text-primary cursor-pointer underline hover:text-primary-hover' : 'text-muted cursor-default'} block truncate max-w-[140px] text-xs font-medium transition-all`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (record.termStatus === 2) onChangeGroup(record);
+                  if (isEditable) onChangeGroup(record);
                 }}
               >
                 {record.groupName}
@@ -201,14 +204,6 @@ const StudentTable = memo(function StudentTable({
           }
           return <span className="text-muted text-xs">-</span>;
         },
-      },
-      {
-        title: TABLE.COLUMNS.MENTOR,
-        key: 'mentor',
-        width: '140px',
-        render: (_, record) => (
-          <span className="text-text text-xs">{record.mentorName || '-'}</span>
-        ),
       },
       {
         title: TABLE.COLUMNS.ACTION,
@@ -228,39 +223,34 @@ const StudentTable = memo(function StudentTable({
             },
           ];
 
-          const isEditable = record.termStatus === 2;
+          const isEditable =
+            [1, 2].includes(record.phaseStatus) || [1, 2].includes(record.termStatus);
 
           if (isApproved && isEditable) {
-            menuItems.push({
-              key: 'assign',
-              label: ACTIONS.ASSIGN,
-              icon: <UserAddOutlined />,
-              onClick: () => onAssign(record),
-            });
-          }
+            if (!record.groupId) {
+              menuItems.push({
+                key: 'createGroup',
+                label: ACTIONS.CREATE_GROUP,
+                icon: <UsergroupAddOutlined />,
+                onClick: () => onCreateGroup(record),
+              });
 
-          if (isPending && isEditable) {
-            menuItems.push({
-              key: 'accept',
-              label: ACTIONS.ACCEPT,
-              icon: <CheckCircleFilled className="text-success" />,
-              onClick: () => onAccept(record),
-            });
-            menuItems.push({
-              key: 'reject',
-              label: ACTIONS.REJECT,
-              icon: <CloseCircleFilled className="text-danger" />,
-              onClick: () => onReject(record),
-            });
-          }
-
-          if (isApproved && isEditable && !record.groupId) {
-            menuItems.push({
-              key: 'createGroup',
-              label: ACTIONS.CREATE_GROUP,
-              icon: <UsergroupAddOutlined />,
-              onClick: () => onCreateGroup(record),
-            });
+              if (hasGroups) {
+                menuItems.push({
+                  key: 'addToGroup',
+                  label: ACTIONS.ADD_TO_GROUP,
+                  icon: <UsergroupAddOutlined />,
+                  onClick: () => onAddToGroup(record),
+                });
+              }
+            } else {
+              menuItems.push({
+                key: 'changeGroup',
+                label: ACTIONS.CHANGE_GROUP,
+                icon: <UsergroupAddOutlined />,
+                onClick: () => onChangeGroup(record),
+              });
+            }
           }
 
           return (
@@ -280,15 +270,15 @@ const StudentTable = memo(function StudentTable({
       page,
       pageSize,
       onView,
-      onAccept,
-      onReject,
-      onAssign,
       onCreateGroup,
+      onAddToGroup,
       onChangeGroup,
-      isTermEditable,
+      isPhaseEditable,
+      hasGroups,
       ACTIONS,
       STATUS_LABELS,
-      TABLE.COLUMNS,
+      TABLE,
+      INTERNSHIP_LIST,
     ]
   );
 
@@ -307,6 +297,7 @@ const StudentTable = memo(function StudentTable({
         onChange: onSelectRowChange,
       }}
       minWidth="800px"
+      size="small"
       tableLayout="fixed"
       emptyText={emptyText}
       className="no-scrollbar mt-2 min-h-0 flex-1"
