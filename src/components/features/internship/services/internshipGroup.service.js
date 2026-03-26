@@ -21,8 +21,8 @@ export const InternshipGroupService = {
     return httpGet(`/mine/internship-terms${query ? `?${query}` : ''}`);
   },
 
-  getById(id) {
-    return httpGet(`/internship-groups/${id}`);
+  getById(id, params = {}) {
+    return httpGet(`/internship-groups/${id}`, params);
   },
 
   create(data) {
