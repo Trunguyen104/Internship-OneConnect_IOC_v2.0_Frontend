@@ -4,15 +4,12 @@ const BASE_URL = '/projects';
 
 export const ProjectService = {
   async getAll(params) {
-    const queryParams = {
-      PageNumber: params?.PageNumber || 1,
-      PageSize: params?.PageSize || 10,
-      SearchTerm: params?.SearchTerm || undefined,
-      GroupId: params?.GroupId || undefined,
-      Status: params?.Status || undefined,
-      OrderByCreatedAscending: params?.OrderByCreatedAscending || false,
-    };
-    return httpClient.httpGet(BASE_URL, queryParams);
+    // If internshipId is provided, fetch specifically for that group
+    if (params.internshipId) {
+      return httpClient.httpGet(`${BASE_URL}/internship-group`, params);
+    }
+    // Otherwise fetch all projects for the mentor/enterprise
+    return httpClient.httpGet(BASE_URL, params);
   },
 
   async getById(id) {
@@ -20,6 +17,7 @@ export const ProjectService = {
   },
 
   async create(payload) {
+    // Payload expected: { internshipId, projectName, projectCode, description, startDate, endDate, field, requirements, deliverables, template }
     return httpClient.httpPost(BASE_URL, payload);
   },
 
@@ -56,6 +54,11 @@ export const ProjectService = {
   },
 
   async getStudentsByGroup(groupId) {
-    return httpClient.httpGet(`/internship-groups/${groupId}/students`);
+    // Backend returns students within the Group Detail DTO as 'members'
+    return httpClient.httpGet(`/internship-groups/${groupId}`);
+  },
+
+  async assignGroup(projectId, internshipGroupId) {
+    return httpClient.httpPost(`${BASE_URL}/${projectId}/assign-group`, { internshipGroupId });
   },
 };

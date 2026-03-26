@@ -9,12 +9,12 @@ import {
   InfoCircleOutlined,
   MailOutlined,
   ProjectOutlined,
-  TeamOutlined,
+  SearchOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
-import { Button, Empty, Spin, Table, Typography } from 'antd';
+import { Button, Empty, Input, Spin, Table, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
 import StatusBadge from '@/components/ui/badge';
 import Card from '@/components/ui/card';
@@ -35,9 +35,23 @@ export default function GroupGeneralInfo({
   onAddStudent = null,
 }) {
   const { info, loading } = useGroupDetail(groupId);
+  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const VIEW = ENTERPRISE_GROUP_UI.MODALS.VIEW;
 
+  const members = info?.members || [];
+
+  const filteredMembers = useMemo(() => {
+    if (!searchQuery.trim()) return members;
+
+    const query = searchQuery.toLowerCase().trim();
+    return members.filter(
+      (m) =>
+        m.fullName?.toLowerCase().includes(query) ||
+        m.code?.toLowerCase().includes(query) ||
+        m.email?.toLowerCase().includes(query)
+    );
+  }, [members, searchQuery]);
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -63,7 +77,19 @@ export default function GroupGeneralInfo({
   }
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="flex justify-start">
+        <Button
+          type="text"
+          size="small"
+          icon={<ArrowLeftOutlined className="text-xs" />}
+          onClick={handleBack}
+          className="flex items-center gap-2 text-slate-600 hover:text-primary font-bold text-xs hover:bg-primary/10 rounded-lg px-3 h-9 transition-all shadow-sm bg-slate-100/80 border border-slate-200/50"
+        >
+          {ENTERPRISE_GROUP_UI.ACTIONS.BACK_TO_LIST}
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Detail Column (Left) */}
         <div className="lg:col-span-2 flex flex-col gap-6">
@@ -77,16 +103,6 @@ export default function GroupGeneralInfo({
                   {VIEW.TITLE}
                 </h3>
               </div>
-
-              <Button
-                type="text"
-                size="small"
-                icon={<ArrowLeftOutlined className="text-[9px]" />}
-                onClick={handleBack}
-                className="flex items-center gap-1 text-muted/60 hover:text-primary font-medium text-[10px] hover:bg-slate-100/30 rounded-md px-1.5 h-6 transition-all"
-              >
-                {ENTERPRISE_GROUP_UI.ACTIONS.BACK_TO_LIST}
-              </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
@@ -216,22 +232,28 @@ export default function GroupGeneralInfo({
       {/* Student List Section */}
       <Card className="!p-6 border-none shadow-sm flex flex-col gap-6">
         <div className="flex items-center justify-between border-b border-slate-50 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 text-sm font-bold">
-              <TeamOutlined />
-            </div>
+          <div className="flex items-center gap-2">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-text/80 mb-0">
               {VIEW.MEMBERS}
             </h3>
+            <Input
+              placeholder="Search students..."
+              allowClear
+              prefix={<SearchOutlined className="text-muted/40 text-xs" />}
+              size="small"
+              className="w-48 !rounded-full text-[11px] h-8 bg-slate-50 border-slate-100 hover:border-primary focus:border-primary transition-all shadow-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
-              {info.members?.length || 0} {VIEW.STUDENTS_SUFFIX}
+            <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm whitespace-nowrap">
+              {filteredMembers.length} {VIEW.STUDENTS_SUFFIX}
             </span>
             {info.status === GROUP_STATUS.ACTIVE && (
               <button
                 onClick={onAddStudent}
-                className="bg-primary hover:bg-primary-hover flex h-8 shrink-0 items-center gap-2 rounded-full px-5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all active:scale-95 cursor-pointer border-none outline-none"
+                className="bg-primary hover:bg-primary-hover flex h-8 shrink-0 items-center gap-2 rounded-full px-5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all active:scale-95 cursor-pointer border-none outline-none whitespace-nowrap"
               >
                 <UsergroupAddOutlined className="text-sm" />
                 {VIEW.TABLE.ADD_STUDENT}
@@ -241,7 +263,7 @@ export default function GroupGeneralInfo({
         </div>
 
         <Table
-          dataSource={info.members || []}
+          dataSource={filteredMembers}
           rowKey="id"
           pagination={false}
           size="small"

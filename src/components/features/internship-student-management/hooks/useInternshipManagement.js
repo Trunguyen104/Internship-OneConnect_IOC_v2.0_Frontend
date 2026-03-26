@@ -430,6 +430,16 @@ export const useInternshipManagement = () => {
         toast.success(
           type === 'ADD' ? `Đã thêm ${students.length} sinh viên.` : MESSAGES.GROUP_CHANGE_SUCCESS
         );
+
+        // AC-11 Case 2b: Notify about access changes during transfer
+        if (type === 'CHANGE') {
+          students.forEach((s) => {
+            toast.info(
+              `Sinh viên ${s.studentFullName} đã được chuyển nhóm. Quyền truy cập dự án cũ đã bị thu hồi và cấp mới cho nhóm mới.`,
+              { duration: 5 }
+            );
+          });
+        }
       } catch (err) {
         // RESILIENCY: Force Refresh on backend errors as data might have partially updated
         if (err.status === 400 || err.status === 500) {

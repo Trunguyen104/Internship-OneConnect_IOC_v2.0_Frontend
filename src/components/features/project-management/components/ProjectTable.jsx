@@ -5,21 +5,22 @@ import {
   DeleteOutlined,
   EditOutlined,
   EllipsisOutlined,
+  ExclamationCircleOutlined,
   EyeOutlined,
   RocketOutlined,
-  UserAddOutlined,
 } from '@ant-design/icons';
-import { Dropdown } from 'antd';
+import { Dropdown, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import {
-  INTERNSHIP_MANAGEMENT_UI,
+  PROJECT_MANAGEMENT,
   PROJECT_STATUS,
+  PROJECT_STATUS_LABELS,
   PROJECT_STATUS_VARIANTS,
-} from '@/constants/internship-management/internship-management';
+} from '@/constants/project-management/project-management';
 
 export default function ProjectTable({
   data,
@@ -33,7 +34,6 @@ export default function ProjectTable({
   onComplete,
   onDelete,
 }) {
-  const { PROJECT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { TABLE } = PROJECT_MANAGEMENT;
 
   const columns = useMemo(
@@ -47,53 +47,92 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
-        width: 150,
+        width: 140,
         render: (text, record) => (
-          <div
-            className="font-semibold text-primary hover:underline cursor-pointer truncate w-[160px]"
-            title={record.name}
-            onClick={() => onView(record)}
-          >
-            {record.name}
+          <div className="flex items-center gap-2">
+            <div
+              className="font-semibold text-primary hover:underline cursor-pointer truncate max-w-[140px]"
+              title={record.projectName}
+              onClick={() => onView(record)}
+            >
+              {record.projectName}
+            </div>
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.CODE,
         key: 'code',
-        width: 100,
-        render: (text) => (
-          <div className="text-gray-500 truncate w-[80px]" title={text}>
-            {text}
+        width: 120,
+        render: (_, record) => (
+          <div
+            className="text-gray-500 truncate w-[100px]"
+            title={record.projectCode || record.code}
+          >
+            {record.projectCode || record.code}
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.GROUP,
         key: 'group',
-        width: 120,
-        render: (_, record) => (
-          <div className="truncate w-[120px]" title={record.internshipGroup?.internshipGroupName}>
-            {record.internshipGroup?.internshipGroupName || '-'}
-          </div>
-        ),
+        width: 180,
+        render: (_, record) => {
+          const groupName =
+            record.groupInfo?.groupName || record.groupName || record.internshipGroup?.groupName;
+
+          const gid = record.internshipId || record.internshipGroupId || record.groupId;
+          const isEmptyGuid = gid === '00000000-0000-0000-0000-000000000000';
+          const isMissing = !gid || isEmptyGuid || gid === '';
+
+          if (isMissing) {
+            return (
+              <Tooltip title={PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_TOOLTIP}>
+                <div className="flex items-center gap-1.5 text-warning cursor-help whitespace-nowrap">
+                  <ExclamationCircleOutlined className="text-sm" />
+                  <span className="text-xs font-medium italic">
+                    {PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_BADGE}
+                  </span>
+                </div>
+              </Tooltip>
+            );
+          }
+
+          return (
+            <div className="truncate w-[170px]" title={groupName}>
+              {groupName || '-'}
+            </div>
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.FIELD,
         key: 'field',
-        width: 120,
+        width: 100,
         render: (text) => (
-          <div className="truncate w-[110px]" title={text}>
-            {text}
+          <div className="truncate w-[100px]" title={text}>
+            {text || '-'}
           </div>
         ),
+      },
+      {
+        title: TABLE.COLUMNS.TEMPLATE,
+        key: 'template',
+        width: 110,
+        render: (template) => {
+          return (
+            <span className="text-gray-500 text-xs">
+              {PROJECT_MANAGEMENT.FORM.TEMPLATE_LABELS[template] || 'None'}
+            </span>
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.START_DATE,
         key: 'startDate',
         width: 100,
         render: (_, record) => (
-          <div className="text-gray-600 text-[13px]">
+          <div className="text-gray-600 text-[12px]">
             {record.startDate ? dayjs(record.startDate).format('DD/MM/YYYY') : '-'}
           </div>
         ),
@@ -103,7 +142,7 @@ export default function ProjectTable({
         key: 'endDate',
         width: 100,
         render: (_, record) => (
-          <div className="text-gray-600 text-[13px]">
+          <div className="text-gray-600 text-[12px]">
             {record.endDate ? dayjs(record.endDate).format('DD/MM/YYYY') : '-'}
           </div>
         ),
@@ -111,19 +150,12 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.STATUS,
         key: 'status',
-        width: 50,
+        width: 70,
         render: (status) => {
           const variant = PROJECT_STATUS_VARIANTS[status] || 'default';
-          const label =
-            status === PROJECT_STATUS.DRAFT
-              ? 'Draft'
-              : status === PROJECT_STATUS.PUBLISHED
-                ? 'Pub'
-                : status === PROJECT_STATUS.COMPLETED
-                  ? 'Done'
-                  : 'Err';
+          const label = PROJECT_STATUS_LABELS[status] || 'Unknown';
           return (
-            <Badge variant={variant} size="sm" className="px-1.5">
+            <Badge variant={variant} size="xs">
               {label}
             </Badge>
           );
@@ -132,7 +164,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 70,
+        width: 90,
         render: (_, record) => {
           const items = [
             {
@@ -176,16 +208,29 @@ export default function ProjectTable({
                 onClick: () => onEdit(record),
               },
               {
-                key: 'assign',
-                label: 'Assign Students',
-                icon: <UserAddOutlined className="text-primary" />,
-                onClick: () => onAssign(record),
-              },
-              {
                 key: 'complete',
                 label: 'Complete Project',
                 icon: <CheckCircleOutlined className="text-success" />,
-                onClick: () => onComplete(record.projectId),
+                onClick: () => onComplete(record),
+              },
+              { type: 'divider' },
+              {
+                key: 'delete',
+                label: 'Delete',
+                icon: <DeleteOutlined className="text-danger" />,
+                danger: true,
+                onClick: () => onDelete(record),
+              }
+            );
+          } else if (record.status === PROJECT_STATUS.COMPLETED) {
+            items.push(
+              { type: 'divider' },
+              {
+                key: 'delete',
+                label: 'Delete',
+                icon: <DeleteOutlined className="text-danger" />,
+                danger: true,
+                onClick: () => onDelete(record),
               }
             );
           }
@@ -213,6 +258,13 @@ export default function ProjectTable({
       rowKey="projectId"
       size="small"
       minWidth="100%"
+      locale={{
+        emptyText: (
+          <div className="py-12 text-center">
+            <p className="text-gray-400 italic">{TABLE.EMPTY_MESSAGE}</p>
+          </div>
+        ),
+      }}
     />
   );
 }

@@ -1,27 +1,28 @@
 'use client';
 
-import { Tag } from 'antd';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
 
 const VARIANT_MAP = {
   default: 'border-slate-200 bg-slate-100 text-slate-700',
-  primary: 'border-primary/20 bg-primary-surface text-primary',
-  success: 'border-success/20 bg-success-surface text-success',
-  warning: 'border-warning/20 bg-warning-surface text-warning-text',
-  danger: 'border-danger/20 bg-danger-surface text-danger',
-  info: 'border-info/20 bg-info-surface text-info',
-  // Solid variants
-  'success-solid': 'border-transparent bg-success text-white',
-  'primary-solid': 'border-transparent bg-primary text-white',
-  'warning-solid': 'border-transparent bg-warning text-white',
+  primary: 'border-primary bg-primary text-white', // Use solid by default for primary
+  success: 'border-success bg-success text-white', // Use solid by default for success
+  warning: 'border-warning bg-warning text-white', // Use solid by default for warning
+  danger: 'border-error bg-error text-white',
+  info: 'border-info bg-info text-white',
+  // Soft variants
+  'primary-soft': 'border-primary/20 bg-primary-surface text-primary',
+  'success-soft': 'border-success/20 bg-success-surface text-success',
+  'warning-soft': 'border-warning/20 bg-warning-surface text-warning-text',
+  'info-soft': 'border-info/20 bg-info-surface text-info',
 };
 
 const SIZE_MAP = {
-  sm: 'text-[10px] px-2 py-0',
-  md: 'text-[11px] px-2.5 py-0.5',
-  lg: 'text-xs px-3 py-1',
+  xs: 'text-[9px] px-1.5 h-4 leading-none font-medium normal-case tracking-normal',
+  sm: 'text-[10px] px-2 py-0 font-bold uppercase tracking-wider',
+  md: 'text-[11px] px-2.5 py-0.5 font-bold uppercase tracking-wider',
+  lg: 'text-xs px-3 py-1 font-bold uppercase tracking-wider',
 };
 
 const Badge = ({ children, variant = 'default', size = 'md', className = '', icon }) => {
@@ -29,17 +30,17 @@ const Badge = ({ children, variant = 'default', size = 'md', className = '', ico
   const sizeStyles = SIZE_MAP[size] || SIZE_MAP.md;
 
   return (
-    <Tag
-      icon={icon}
+    <span
       className={cn(
-        'm-0 inline-flex items-center rounded-full border font-bold uppercase tracking-wider',
+        'inline-flex items-center rounded-full border',
         variantStyles,
         sizeStyles,
         className
       )}
     >
+      {icon && <span className="mr-1">{icon}</span>}
       {children}
-    </Tag>
+    </span>
   );
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export const useProjectFilters = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,36 +12,36 @@ export const useProjectFilters = () => {
     total: 0,
   });
 
-  const handleSearchChange = (val) => {
+  const handleSearchChange = useCallback((val) => {
     setSearchTerm(val);
     setPagination((prev) => ({ ...prev, current: 1 }));
-  };
+  }, []);
 
-  const handleGroupFilterChange = (val) => {
+  const handleGroupFilterChange = useCallback((val) => {
     setGroupIdFilter(val);
     setPagination((prev) => ({ ...prev, current: 1 }));
-  };
+  }, []);
 
-  const handleStatusFilterChange = (val) => {
+  const handleStatusFilterChange = useCallback((val) => {
     setStatusFilter(val);
     setPagination((prev) => ({ ...prev, current: 1 }));
-  };
+  }, []);
 
-  const handleTableChange = (newPagination) => {
+  const handleTableChange = useCallback((newPagination) => {
     setPagination((prev) => ({
       ...prev,
       current: newPagination.current,
       pageSize: newPagination.pageSize,
     }));
-  };
+  }, []);
 
-  const handlePageSizeChange = (newSize) => {
+  const handlePageSizeChange = useCallback((newSize) => {
     setPagination((prev) => ({
       ...prev,
       current: 1,
       pageSize: newSize,
     }));
-  };
+  }, []);
 
   return {
     searchTerm,
