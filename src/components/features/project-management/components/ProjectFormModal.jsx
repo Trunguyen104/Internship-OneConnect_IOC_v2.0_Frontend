@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import React, { useEffect, useMemo } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -33,8 +33,7 @@ export default function ProjectFormModal({
   groups = [],
 }) {
   const [form] = Form.useForm();
-  const { PROJECT_MANAGEMENT = {} } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE || {};
-  const { FORM = {} } = PROJECT_MANAGEMENT.MODALS || {};
+  const { FORM = {} } = PROJECT_MANAGEMENT;
   const { userInfo } = useProfile();
 
   const enterpriseName = useMemo(() => {
@@ -102,6 +101,15 @@ export default function ProjectFormModal({
     form
       .validateFields()
       .then((values) => {
+        // Block saving if assigned group is archived (AC-11)
+        const selectedGroupId = values.internshipGroupId;
+        const selectedGroup = groups.find((g) => (g.internshipId || g.id) === selectedGroupId);
+        const groupStatus = selectedGroup?.status || selectedGroup?.groupStatus;
+        if (groupStatus === 3 || groupStatus === 2) {
+          // Archived or Finished
+          message.warning(PROJECT_MANAGEMENT.MESSAGES.ERROR_INACTIVE_GROUP);
+          return;
+        }
         onSave(values, isDraft);
       })
       .catch(() => {
@@ -128,10 +136,10 @@ export default function ProjectFormModal({
             <Button onClick={onCancel}>Cancel</Button>
             <Space>
               <Button onClick={() => handleSubmit(true)} loading={loading}>
-                Save Draft
+                {FORM.SAVE_DRAFT}
               </Button>
               <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
-                Publish Project
+                {FORM.PUBLISH}
               </Button>
             </Space>
           </div>
@@ -150,19 +158,19 @@ export default function ProjectFormModal({
           <Col span={14}>
             <Form.Item
               name="name"
-              label={FORM.NAME_LABEL}
-              rules={[{ required: true, message: FORM.VALIDATION?.NAME_REQUIRED || 'Bắt buộc' }]}
+              label={FORM.LABEL.NAME}
+              rules={[{ required: true, message: FORM.VALIDATION.NAME_REQUIRED }]}
             >
-              <Input placeholder={FORM.PLACEHOLDERS?.NAME} />
+              <Input placeholder={FORM.PLACEHOLDER.NAME} />
             </Form.Item>
           </Col>
           <Col span={10}>
             <Form.Item
               name="code"
-              label={FORM.CODE_LABEL}
-              rules={[{ required: true, message: FORM.VALIDATION?.CODE_REQUIRED || 'Bắt buộc' }]}
+              label={FORM.LABEL.CODE}
+              rules={[{ required: true, message: FORM.VALIDATION.CODE_REQUIRED }]}
             >
-              <Input placeholder={FORM.PLACEHOLDERS?.CODE} />
+              <Input placeholder={FORM.PLACEHOLDER.CODE} />
             </Form.Item>
           </Col>
         </Row>
@@ -171,39 +179,47 @@ export default function ProjectFormModal({
           <Col span={12}>
             <Form.Item
               name="field"
-              label={FORM.FIELD_LABEL}
-              rules={[{ required: true, message: FORM.VALIDATION?.FIELD_REQUIRED || 'Bắt buộc' }]}
+              label={FORM.LABEL.FIELD}
+              rules={[{ required: true, message: FORM.VALIDATION.FIELD_REQUIRED }]}
             >
-              <Select placeholder={FORM.PLACEHOLDERS?.FIELD}>
-                <Option value="CNTT">Công nghệ thông tin</Option>
-                <Option value="Kinh tế">Kinh tế</Option>
-                <Option value="Truyền thông">Truyền thông</Option>
-                <Option value="Ngôn ngữ">Ngôn ngữ</Option>
-                <Option value="Khác">Khác</Option>
+              <Select placeholder={FORM.PLACEHOLDER.FIELD}>
+                {Object.entries(FORM.FIELD_OPTIONS.FIELD).map(([key, label]) => (
+                  <Option key={key} value={label}>
+                    {label}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item
               name="internshipGroupId"
-              label={FORM.GROUP_LABEL}
-              rules={[{ required: false }]} // AC-02: Optional during creation
-              extra="Bắt buộc chọn trước khi Publish"
+              label={FORM.LABEL.GROUP}
+              rules={[{ required: false }]}
+              extra={FORM.VALIDATION.GROUP_MUST_SELECT}
             >
-              <Select placeholder={FORM.PLACEHOLDERS?.GROUP} allowClear>
+              <Select placeholder={FORM.PLACEHOLDER.GROUP} allowClear>
                 {groups
                   .filter((g) => {
                     // Filter: Active (status 1)
-                    const isActive = g.status === 1 || g.groupStatus === 1;
-                    if (!isActive) return false;
+                    const gStatus = g.status || g.groupStatus;
+                    const isActive = gStatus === 1; // ACTIVE_STATUS
+
+                    // If we are EDITING and this is the current group of the project,
+                    // we show it even if it's archived (but we'll block saving later)
+                    const isCurrentGroup =
+                      editingRecord?.internshipGroupId === g.id ||
+                      editingRecord?.internshipId === g.id;
+
+                    if (!isActive && !isCurrentGroup) return false;
 
                     // Filter by Mentor ONLY if the user is a Mentor AND g.mentorId exists
                     const userRoleId = userInfo?.roleId || userInfo?.RoleId;
                     const isMentor = userRoleId === 6; // MENTOR_ROLE
                     if (isMentor) {
                       const mid = g.mentorId || g.MentorId;
+                      // AC-11 Case 3: Current mentor of the group can manage, regardless of project creator
                       if (mid) return mid === (userInfo?.userId || userInfo?.Id);
-                      // If mid is missing from API, we can't filter correctly, so we show it anyway to be safe
                     }
 
                     return true;
@@ -220,44 +236,54 @@ export default function ProjectFormModal({
 
         <Row gutter={16}>
           <Col span={8}>
-            <Form.Item name="template" label={FORM.TEMPLATE_LABEL}>
+            <Form.Item name="template" label={FORM.LABEL.TEMPLATE}>
               <Select>
-                <Option value="Scrum">Scrum</Option>
-                <Option value="Kanban">Kanban</Option>
-                <Option value="None">None</Option>
+                {Object.entries(FORM.FIELD_OPTIONS.TEMPLATE).map(([key, label]) => (
+                  <Option key={key} value={label}>
+                    {label}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item name="startDate" label={FORM.START_DATE}>
-              <DatePicker className="w-full" format="DD/MM/YYYY" placeholder="Chọn ngày" />
+            <Form.Item name="startDate" label={FORM.LABEL.START_DATE}>
+              <DatePicker
+                className="w-full"
+                format="DD/MM/YYYY"
+                placeholder={FORM.PLACEHOLDER.DATE}
+              />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item name="endDate" label={FORM.END_DATE}>
-              <DatePicker className="w-full" format="DD/MM/YYYY" placeholder="Chọn ngày" />
+            <Form.Item name="endDate" label={FORM.LABEL.END_DATE}>
+              <DatePicker
+                className="w-full"
+                format="DD/MM/YYYY"
+                placeholder={FORM.PLACEHOLDER.DATE}
+              />
             </Form.Item>
           </Col>
         </Row>
 
         <Form.Item
           name="description"
-          label={FORM.DESCRIPTION}
-          rules={[{ required: true, message: FORM.VALIDATION?.DESC_REQUIRED || 'Bắt buộc' }]}
+          label={FORM.LABEL.DESCRIPTION}
+          rules={[{ required: true, message: FORM.VALIDATION.DESC_REQUIRED || 'Required' }]}
         >
-          <TextArea rows={6} placeholder={FORM.PLACEHOLDERS?.DESC} />
+          <TextArea rows={6} placeholder={FORM.PLACEHOLDER.DESCRIPTION} />
         </Form.Item>
 
         <Form.Item
           name="requirements"
-          label={FORM.REQUIREMENTS}
-          rules={[{ required: true, message: FORM.VALIDATION?.REQ_REQUIRED || 'Bắt buộc' }]}
+          label={FORM.LABEL.REQUIREMENTS}
+          rules={[{ required: true, message: FORM.VALIDATION.REQ_REQUIRED || 'Required' }]}
         >
-          <TextArea rows={4} placeholder={FORM.PLACEHOLDERS?.REQ} />
+          <TextArea rows={4} placeholder={FORM.PLACEHOLDER.REQUIREMENTS} />
         </Form.Item>
 
-        <Form.Item name="deliverables" label={FORM.DELIVERABLES}>
-          <TextArea rows={3} placeholder={FORM.PLACEHOLDERS?.DEL} />
+        <Form.Item name="deliverables" label={FORM.LABEL.DELIVERABLES}>
+          <TextArea rows={3} placeholder={FORM.PLACEHOLDER.DELIVERABLES} />
         </Form.Item>
 
         <Divider className="my-6" />
@@ -265,12 +291,12 @@ export default function ProjectFormModal({
         <section>
           <h4 className="mb-4 font-bold text-gray-800 uppercase text-xs flex items-center gap-2">
             <UploadOutlined className="text-primary" />
-            Resources & Attachments
+            {FORM.SECTIONS.RESOURCES}
           </h4>
 
           <Form.Item
             name="attachments"
-            label="Project Documents"
+            label={PROJECT_MANAGEMENT.TABS.RESOURCES}
             valuePropName="fileList"
             getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
           >
@@ -283,9 +309,11 @@ export default function ProjectFormModal({
               <p className="ant-upload-drag-icon">
                 <UploadOutlined />
               </p>
-              <p className="ant-upload-text text-sm">Click or drag files to this area to upload</p>
+              <p className="ant-upload-text text-sm">
+                {FORM.PLACEHOLDER.UPLOAD_PRIMARY || 'Click or drag files to this area to upload'}
+              </p>
               <p className="ant-upload-hint text-xs font-normal opacity-50">
-                Support for PDF, DOCX, ZIP, etc.
+                {FORM.PLACEHOLDER.UPLOAD_HINT || 'Support for PDF, DOCX, ZIP, etc.'}
               </p>
             </Upload.Dragger>
           </Form.Item>
@@ -322,7 +350,7 @@ export default function ProjectFormModal({
                   ))}
                   <Form.Item>
                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      Add Link
+                      {FORM.LABEL.ADD_LINK || 'Add Link'}
                     </Button>
                   </Form.Item>
                 </>

@@ -8,7 +8,7 @@ import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 
 import { useProjectManagement } from '../hooks/useProjectManagement';
 import ProjectDetailDrawer from './ProjectDetailDrawer';
@@ -18,7 +18,6 @@ import ProjectTable from './ProjectTable';
 const { Option } = Select;
 
 export default function ProjectManagement() {
-  const { PROJECT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { FILTERS } = PROJECT_MANAGEMENT;
 
   const {
@@ -66,20 +65,20 @@ export default function ProjectManagement() {
           <DataTableToolbar.Filters>
             <Select
               className="h-9 w-48"
-              placeholder={FILTERS.GROUP}
+              placeholder={FILTERS.GROUP_FILTER}
               allowClear
               value={groupIdFilter}
               onChange={handleGroupFilterChange}
             >
               {groups.map((g) => (
-                <Option key={g.internshipId} value={g.internshipId}>
+                <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
                   {g.groupName}
                 </Option>
               ))}
             </Select>
             <Select
               className="h-9 w-40"
-              placeholder={FILTERS.STATUS}
+              placeholder={FILTERS.STATUS_FILTER}
               allowClear
               value={statusFilter}
               onChange={handleStatusFilterChange}

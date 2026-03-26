@@ -4,9 +4,9 @@ import { App } from 'antd';
 import { useState } from 'react';
 
 import {
-  INTERNSHIP_MANAGEMENT_UI,
+  PROJECT_MANAGEMENT,
   PROJECT_STATUS,
-} from '@/constants/internship-management/internship-management';
+} from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
@@ -21,14 +21,18 @@ export const useProjectActions = ({
   const { modal } = App.useApp();
   const toast = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
-  const { PROJECT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { MESSAGES } = PROJECT_MANAGEMENT;
 
   const getErrorMessage = (err, defaultMsg) => {
     // Backend structure: { message, errors: [ "reason" ], validationErrors }
-    if (err.data?.errors?.[0]) return err.data.errors[0];
-    if (err.data?.message) return err.data.message;
-    return err.message || defaultMsg;
+    const resMsg = err.data?.errors?.[0] || err.data?.message || err.message;
+
+    // Fallback: Translate common BE errors to English if they come back in VN
+    if (resMsg?.includes('chưa được gắn với nhóm thực tập')) {
+      return MESSAGES.ERROR_PUBLISH_NO_GROUP;
+    }
+
+    return resMsg || defaultMsg;
   };
 
   const executeSave = async (values, isDraft) => {
@@ -58,6 +62,12 @@ export const useProjectActions = ({
         },
       };
 
+      // AC-02/AC-13: Cannot publish without a group
+      if (!isDraft && !payload.internshipId) {
+        toast.error(MESSAGES.ERROR_PUBLISH_NO_GROUP);
+        return;
+      }
+
       if (editingRecord) {
         await ProjectService.update(editingRecord.projectId, payload);
         toast.success(MESSAGES.UPDATE_SUCCESS);
@@ -77,6 +87,15 @@ export const useProjectActions = ({
 
   const handleSaveProject = async (values, isDraft = true) => {
     try {
+      // AC-11: Block saving if assigned group is archived or finished
+      const selectedGroupId = values.internshipGroupId;
+      const selectedGroup = groups.find((g) => (g.internshipId || g.id) === selectedGroupId);
+      const groupStatus = selectedGroup?.status || selectedGroup?.groupStatus;
+      if (groupStatus === 3 || groupStatus === 2) {
+        toast.warning(PROJECT_MANAGEMENT.MESSAGES.ERROR_INACTIVE_GROUP);
+        return;
+      }
+
       // AC-07: Check if project is Published and has assigned students
       if (editingRecord && editingRecord.status === PROJECT_STATUS.PUBLISHED) {
         setSubmitLoading(true);

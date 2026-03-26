@@ -8,7 +8,7 @@ import {
   SearchOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Divider, Drawer, Form, Input, List, Space, Table, Tabs, Tag } from 'antd';
+import { Avatar, Button, Divider, Drawer, Input, List, Space, Table, Tabs, Tag } from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -16,18 +16,21 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { USER_ROLE } from '@/constants/common/enums';
 import {
-  INTERNSHIP_MANAGEMENT_UI,
+  PROJECT_MANAGEMENT,
   PROJECT_STATUS,
-} from '@/constants/internship-management/internship-management';
-import { useToast } from '@/providers/ToastProvider';
+} from '@/constants/project-management/project-management';
 
-import { Select } from '../../backlog/components/TaskFields';
 import { ProjectService } from '../services/project.service';
 
 export default function ProjectDetailDrawer({ visible, onClose, project, groups = [], onRefresh }) {
-  const toast = useToast();
-  const { PROJECT_MANAGEMENT = {} } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE || {};
-  const { TABS = {}, STUDENT_STATUS = {}, MESSAGES = {}, MODALS = {} } = PROJECT_MANAGEMENT;
+  const {
+    TABS = {},
+    STUDENT_STATUS = {},
+    MESSAGES = {},
+    MODALS = {},
+    DETAIL = {},
+    VIEW: FORM_VIEW = {},
+  } = PROJECT_MANAGEMENT;
   const { ASSIGN = {} } = MODALS;
 
   const { userInfo } = useProfile();
@@ -87,11 +90,12 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
   useEffect(() => {
     if (visible) {
       fetchProjectDetail();
+      setActiveTab('details');
     } else {
       setProjectDetail(null);
       setActiveTab('details');
     }
-  }, [visible, fetchProjectDetail]);
+  }, [visible, project?.projectId, fetchProjectDetail]);
 
   useEffect(() => {
     if (activeTab === 'students') {
@@ -138,7 +142,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
 
   const studentColumns = [
     {
-      title: 'Họ và tên',
+      title: DETAIL.STUDENTS.COLUMNS?.NAME || 'Full Name',
       dataIndex: 'fullName',
       key: 'fullName',
       render: (text, record) => (
@@ -152,7 +156,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
       ),
     },
     {
-      title: 'Trường đại học',
+      title: DETAIL.STUDENTS.COLUMNS?.UNIVERSITY || 'University',
       dataIndex: 'universityName',
       key: 'universityName',
       render: (text, record) =>
@@ -166,7 +170,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
       responsive: ['lg'],
     },
     {
-      title: 'Trạng thái kỳ',
+      title: DETAIL.STUDENTS.COLUMNS?.STATUS || 'Status',
       dataIndex: 'termStatus',
       key: 'termStatus',
       render: (status) => {
@@ -192,22 +196,22 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
     <Drawer
       title={
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-surface text-primary">
-            {detailLoading ? <SearchOutlined className="animate-spin" /> : <SearchOutlined />}
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            {detailLoading ? <SearchOutlined className="animate-spin" /> : <FileOutlined />}
           </div>
           <div>
             <h3 className="mb-0 text-base font-bold text-gray-800">
-              {currentProject?.projectName || 'Chi tiết dự án'}
+              {currentProject?.projectName || DETAIL.TITLE}
             </h3>
-            <span className="text-xs font-medium text-primary bg-primary-surface px-2 py-0.5 rounded">
-              {currentProject?.projectCode || currentProject?.code || 'NO-CODE'}
+            <span className="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded border border-primary/10 uppercase tracking-widest">
+              {currentProject?.projectCode || currentProject?.code || DETAIL.NO_CODE}
             </span>
           </div>
         </div>
       }
       open={visible}
       onClose={onClose}
-      size={800}
+      size={640}
     >
       <Tabs
         activeKey={activeTab}
@@ -216,63 +220,67 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
         items={[
           {
             key: 'details',
-            label: TABS.DETAILS,
+            label: TABS.DETAIL || 'Details',
             children: (
               <div className="space-y-6 pt-4">
                 <section>
-                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-xs">
-                    Project Description
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-[10px] tracking-widest">
+                    {DETAIL.SECTIONS.DESCRIPTION}
                   </h4>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                    {currentProject?.description || 'Chưa cập nhật mô tả.'}
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap text-sm">
+                    {currentProject?.description || DETAIL.SECTIONS.DESCRIPTION_EMPTY}
                   </p>
                 </section>
 
-                <div className="grid grid-cols-3 gap-6 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
-                  <section>
-                    <h4 className="mb-2 font-bold text-gray-500 text-[10px] uppercase tracking-wider">
-                      Project Mentor
+                <div className="flex flex-wrap gap-x-8 gap-y-6 bg-slate-50 p-4 rounded-xl border border-slate-100/50">
+                  <section className="min-w-[120px]">
+                    <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
+                      {DETAIL.SECTIONS.MENTOR}
                     </h4>
                     <div className="flex items-center gap-2">
                       <Avatar
                         size="small"
                         src={currentProject?.mentorAvatar}
                         icon={<UserOutlined />}
-                        className="bg-primary-surface text-primary"
+                        className="bg-primary/10 text-primary border-none"
                       />
-                      <span className="text-sm font-semibold text-gray-700">
+                      <span className="text-sm font-bold text-slate-700">
                         {currentProject?.mentorName ||
                           currentProject?.groupInfo?.mentorName ||
-                          'Admin'}
+                          'N/A'}
                       </span>
                     </div>
                   </section>
-                  <section>
-                    <h4 className="mb-2 font-bold text-gray-500 text-[10px] uppercase tracking-wider">
-                      Lĩnh vực & Framework
+                  <section className="min-w-[140px]">
+                    <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
+                      {DETAIL.SECTIONS.FIELD_TEMPLATE}
                     </h4>
                     <div className="flex flex-col gap-1">
-                      <Tag color="blue" className="w-fit m-0 border-none font-medium">
+                      <Tag
+                        color="blue"
+                        className="w-fit m-0 border-none font-bold text-[10px] rounded-md px-2"
+                      >
                         {currentProject?.field || 'N/A'}
                       </Tag>
-                      <span className="text-[11px] text-gray-500 font-medium">
+                      <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">
                         Template:{' '}
                         <span className="text-primary">
-                          {{ 0: 'Scrum', 1: 'Kanban', 2: 'None' }[currentProject?.template] ||
-                            'None'}
+                          {FORM_VIEW.FIELD_OPTIONS?.TEMPLATE?.[
+                            { 0: 'SCRUM', 1: 'KANBAN', 2: 'NONE' }[currentProject?.template]
+                          ] || 'None'}
                         </span>
                       </span>
                     </div>
                   </section>
-                  <section>
-                    <h4 className="mb-2 font-bold text-gray-500 text-[10px] uppercase tracking-wider">
-                      Thời gian thực hiện
+                  <section className="min-w-[180px]">
+                    <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
+                      {DETAIL.SECTIONS.TIMELINE}
                     </h4>
-                    <div className="text-sm font-semibold text-gray-700 flex items-center">
+                    <div className="text-sm font-bold text-slate-700 flex items-center whitespace-nowrap">
                       {currentProject?.startDate
                         ? dayjs(currentProject.startDate).format('DD/MM/YYYY')
                         : 'TBA'}
-                      <ArrowRightOutlined className="mx-2 text-[10px] text-gray-400" />
+                      <ArrowRightOutlined className="mx-2 text-[10px] text-slate-300" />
                       {currentProject?.endDate
                         ? dayjs(currentProject.endDate).format('DD/MM/YYYY')
                         : 'TBA'}
@@ -283,26 +291,26 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                 <Divider className="my-2 opacity-50" />
 
                 <section>
-                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-xs tracking-widest">
-                    Thông tin Intern Group
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-[10px] tracking-widest">
+                    {DETAIL.SECTIONS.GROUP_INFO}
                   </h4>
                   {currentProject?.groupInfo?.groupName ||
                   currentProject?.groupName ||
                   currentProject?.internshipGroup?.groupName ? (
-                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div className="bg-white rounded-xl p-5 border border-slate-100 shadow-sm relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110" />
                       <div className="flex justify-between items-start mb-5 relative z-10">
                         <div>
-                          <div className="text-xl font-bold text-gray-800">
+                          <div className="text-lg font-bold text-slate-800">
                             {currentProject?.groupInfo?.groupName ||
                               currentProject.groupName ||
-                              currentProject.internshipGroup?.groupName ||
-                              'Chưa gán nhóm'}
+                              currentProject.internshipGroup?.groupName}
                           </div>
-                          <div className="text-[11px] text-gray-400 mt-1 font-mono uppercase tracking-tighter">
-                            {currentProject.groupInfo?.internshipId || currentProject.internshipId
-                              ? `Group ID: ${currentProject.groupInfo?.internshipId || currentProject.internshipId}`
-                              : 'Chưa có thông tin Group ID'}
+                          <div className="text-[9px] text-slate-400 mt-1 font-mono uppercase tracking-widest font-bold">
+                            {DETAIL.GROUP.ID}:{' '}
+                            {currentProject.groupInfo?.internshipId ||
+                              currentProject.internshipId ||
+                              'N/A'}
                           </div>
                         </div>
                         {isHR &&
@@ -310,41 +318,42 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                             currentProject.groupInfo?.internshipId) && (
                             <Link
                               href={`/internship-groups/${currentProject.groupInfo?.internshipId || currentProject.internshipId}`}
-                              className="text-xs bg-primary text-white hover:bg-primary-hover px-4 py-2 rounded-xl flex items-center gap-2 font-bold transition-all shadow-md active:scale-95"
+                              className="text-[10px] bg-primary text-white hover:bg-primary-hover px-4 py-2 rounded-lg flex items-center gap-2 font-bold transition-all shadow-sm active:scale-95 uppercase tracking-wide"
                             >
-                              <ArrowRightOutlined className="rotate-180" /> Quản lý nhóm
+                              <ArrowRightOutlined className="rotate-180" />{' '}
+                              {DETAIL.GROUP.MANAGE_LINK}
                             </Link>
                           )}
                       </div>
                       <div className="grid grid-cols-2 gap-6 relative z-10">
-                        <div className="flex flex-col bg-gray-50 rounded-xl p-3">
-                          <span className="text-[9px] uppercase text-gray-400 font-black mb-1.5 tracking-widest">
-                            Group Mentor
+                        <div className="flex flex-col bg-slate-50 border border-slate-100/50 rounded-lg p-3">
+                          <span className="text-[9px] uppercase text-slate-400 font-bold mb-1.5 tracking-widest">
+                            {DETAIL.GROUP.MENTOR}
                           </span>
                           <div className="flex items-center gap-2">
                             <Avatar
                               size={20}
                               icon={<UserOutlined />}
-                              className="bg-blue-100 text-blue-600"
+                              className="bg-blue-50 text-blue-500 border-none"
                             />
-                            <span className="text-sm font-bold text-gray-700">
+                            <span className="text-xs font-bold text-slate-700">
                               {currentProject.groupInfo?.mentorName ||
                                 currentProject.internshipGroup?.mentorName ||
                                 'N/A'}
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col bg-gray-50 rounded-xl p-3">
-                          <span className="text-[9px] uppercase text-gray-400 font-black mb-1.5 tracking-widest">
-                            Sĩ số sinh viên
+                        <div className="flex flex-col bg-slate-50 border border-slate-100/50 rounded-lg p-3">
+                          <span className="text-[9px] uppercase text-slate-400 font-bold mb-1.5 tracking-widest">
+                            {DETAIL.GROUP.STUDENT_COUNT}
                           </span>
-                          <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                            <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                          <div className="text-xs font-bold text-slate-700 flex items-center gap-2">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             {currentProject.groupInfo?.studentCount ||
                               currentProject.internshipGroup?.studentCount ||
                               assignedStudents.length ||
                               0}{' '}
-                            sinh viên
+                            {DETAIL.GROUP.STUDENTS_SUFFIX}
                           </div>
                         </div>
                       </div>
@@ -354,33 +363,33 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                       <div className="flex items-center gap-2 text-red-600 font-bold text-sm">
                         <ExclamationCircleOutlined />
                         {currentProject?.status === PROJECT_STATUS.DRAFT
-                          ? 'Chưa gán nhóm'
-                          : 'Nhóm đã bị xóa'}
+                          ? DETAIL.GROUP.NOT_ASSIGNED
+                          : DETAIL.GROUP.DELETED}
                       </div>
-                      <span className="text-xs text-red-400">
+                      <span className="text-[11px] text-red-400 font-medium">
                         {currentProject?.status === PROJECT_STATUS.DRAFT
-                          ? 'Vui lòng vào Edit để chọn Intern Group trước khi Publish.'
-                          : 'Dự án cần được gán lại nhóm mới để tiếp tục.'}
+                          ? DETAIL.GROUP.NOT_ASSIGNED_HINT
+                          : DETAIL.GROUP.DELETED_HINT}
                       </span>
                     </div>
                   )}
                 </section>
 
                 <section>
-                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-warning pl-3 uppercase text-xs tracking-widest">
-                    Yêu cầu kỹ thuật (Requirements)
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-amber-400 pl-3 uppercase text-[10px] tracking-widest">
+                    {DETAIL.SECTIONS.REQUIREMENTS}
                   </h4>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap bg-gray-50/30 p-4 rounded-xl text-sm">
-                    {currentProject?.requirements || 'Chưa cập nhật yêu cầu kỹ thuật.'}
+                  <p className="text-slate-600 leading-relaxed whitespace-pre-wrap bg-slate-50/50 p-4 rounded-xl text-sm border border-slate-100/50">
+                    {currentProject?.requirements || DETAIL.SECTIONS.REQUIREMENTS_EMPTY}
                   </p>
                 </section>
 
                 <section>
-                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-success pl-3 uppercase text-xs tracking-widest">
-                    Sản phẩm đầu ra (Deliverables)
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-emerald-400 pl-3 uppercase text-[10px] tracking-widest">
+                    {DETAIL.SECTIONS.DELIVERABLES}
                   </h4>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap bg-gray-50/30 p-4 rounded-xl text-sm">
-                    {currentProject?.deliverables || 'Chưa cập nhật sản phẩm đầu ra.'}
+                  <p className="text-slate-600 leading-relaxed whitespace-pre-wrap bg-slate-50/50 p-4 rounded-xl text-sm border border-slate-100/50">
+                    {currentProject?.deliverables || DETAIL.SECTIONS.DELIVERABLES_EMPTY}
                   </p>
                 </section>
               </div>
@@ -388,29 +397,30 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
           },
           {
             key: 'students',
-            label: 'Sinh viên trong Nhóm',
+            label: TABS.STUDENTS || 'Students',
             children: (
               <div className="pt-2">
                 <div className="mb-4 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <Input
-                      placeholder="Tìm kiếm sinh viên..."
-                      prefix={<SearchOutlined className="text-gray-400" />}
-                      className="w-64 rounded-xl"
+                      placeholder={DETAIL.STUDENTS.SEARCH_PLACEHOLDER}
+                      prefix={<SearchOutlined className="text-slate-400" />}
+                      className="w-64 rounded-xl bg-slate-50 border-slate-100 shadow-sm"
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     {isHR &&
                       (currentProject.internshipId || currentProject.groupInfo?.internshipId) && (
                         <Link
                           href={`/internship-groups/${currentProject.groupInfo?.internshipId || currentProject.internshipId}`}
-                          className="flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-hover bg-primary/5 px-3 py-2 rounded-lg transition-all"
+                          className="flex items-center gap-1.5 text-[10px] font-bold text-primary hover:text-primary-hover bg-primary/5 px-3 py-2 rounded-lg transition-all uppercase tracking-wide border border-primary/10 shadow-sm"
                         >
-                          <ArrowRightOutlined className="rotate-180" /> Quản lý nhóm
+                          <ArrowRightOutlined className="rotate-180" /> {DETAIL.GROUP.MANAGE_LINK}
                         </Link>
                       )}
                   </div>
-                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                    Sĩ số: {assignedStudents.length} sinh viên
+                  <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full uppercase tracking-widest border border-slate-200/50 shadow-sm">
+                    {DETAIL.STUDENTS.COUNT_LABEL} {assignedStudents.length}{' '}
+                    {DETAIL.GROUP.STUDENTS_SUFFIX}
                   </span>
                 </div>
                 <Table
@@ -423,10 +433,12 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                   className="custom-table"
                   locale={{
                     emptyText: (
-                      <div className="py-12 text-center">
-                        <p className="text-gray-400 italic mb-2">Nhóm hiện chưa có sinh viên.</p>
-                        <p className="text-xs text-gray-400">
-                          HR cần thêm sinh viên vào nhóm (Issue-77 AC-G05).
+                      <div className="py-12 text-center bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-100 mt-2">
+                        <p className="text-slate-400 italic mb-1 text-sm font-medium">
+                          {DETAIL.STUDENTS.EMPTY_MESSAGE}
+                        </p>
+                        <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
+                          {DETAIL.STUDENTS.EMPTY_HINT}
                         </p>
                       </div>
                     ),
@@ -437,14 +449,14 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
           },
           {
             key: 'resources',
-            label: 'Tài liệu & Links',
+            label: TABS.RESOURCES || 'Resources',
             children: (
               <div className="space-y-8 pt-4">
                 <section>
-                  <h4 className="mb-4 font-bold text-gray-800 border-l-4 border-info pl-3 uppercase text-xs flex items-center justify-between tracking-widest">
-                    Tài liệu đính kèm
-                    <span className="text-[10px] font-normal text-gray-400 normal-case italic">
-                      Xem và tải xuống các tệp tin của dự án
+                  <h4 className="mb-4 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-[10px] flex items-center justify-between tracking-widest">
+                    {DETAIL.SECTIONS.RESOURCES}
+                    <span className="text-[9px] font-bold text-slate-400 normal-case italic uppercase tracking-tighter">
+                      {DETAIL.SECTIONS.RESOURCES_HINT}
                     </span>
                   </h4>
                   {currentProject?.projectResources?.length > 0 ||
@@ -458,16 +470,16 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                       }
                       renderItem={(item) => (
                         <List.Item
-                          className="hover:bg-primary-surface/50 rounded-xl border border-transparent hover:border-primary/10 px-4 transition-all mb-2"
+                          className="hover:bg-primary/5 rounded-xl border border-transparent hover:border-primary/10 px-4 transition-all mb-2 bg-slate-50/30"
                           extra={
                             <Button
                               type="primary"
                               ghost
                               size="small"
                               onClick={() => window.open(item.resourceUrl || item.url, '_blank')}
-                              className="rounded-lg font-bold"
+                              className="rounded-lg font-bold text-[10px] uppercase tracking-widest h-8"
                             >
-                              Truy cập
+                              {DETAIL.RESOURCES.ACCESS}
                             </Button>
                           }
                         >
@@ -478,13 +490,15 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                               </div>
                             }
                             title={
-                              <span className="text-sm font-bold text-gray-700">
+                              <span className="text-sm font-bold text-slate-700">
                                 {item.resourceName || item.name}
                               </span>
                             }
                             description={
-                              <span className="text-[11px] text-gray-400 font-medium italic">
-                                {item.resourceType === 1 ? 'Internal Doc' : 'External Link'}
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                {item.resourceType === 1
+                                  ? DETAIL.RESOURCES.INTERNAL
+                                  : DETAIL.RESOURCES.EXTERNAL}
                               </span>
                             }
                           />
@@ -492,15 +506,15 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                       )}
                     />
                   ) : (
-                    <div className="text-center py-10 text-gray-400 italic text-sm bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
-                      Chưa có tài liệu đính kèm cho dự án này.
+                    <div className="text-center py-10 text-slate-400 italic text-sm bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-100">
+                      {DETAIL.SECTIONS.NO_RESOURCES}
                     </div>
                   )}
                 </section>
 
                 <section>
-                  <h4 className="mb-4 font-bold text-gray-800 border-l-4 border-success pl-3 uppercase text-xs tracking-widest">
-                    Liên kết nhanh (Quick Links)
+                  <h4 className="mb-4 font-bold text-gray-800 border-l-4 border-emerald-400 pl-3 uppercase text-[10px] tracking-widest">
+                    {DETAIL.SECTIONS.LINKS}
                   </h4>
                   {currentProject?.resources?.links?.length > 0 ? (
                     <div className="flex flex-wrap gap-3">
@@ -509,7 +523,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                           key={idx}
                           icon={<LinkOutlined />}
                           color="processing"
-                          className="cursor-pointer py-2 px-4 hover:scale-105 transition-all rounded-xl border-none font-bold shadow-sm"
+                          className="cursor-pointer py-2 px-4 hover:scale-105 transition-all rounded-xl border-none font-bold shadow-sm bg-blue-50 text-blue-600"
                           onClick={() => window.open(link.url, '_blank')}
                         >
                           {link.title || link.url}
@@ -517,73 +531,11 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-10 text-gray-400 italic text-sm bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-100">
-                      Chưa có liên kết bên ngoài.
+                    <div className="text-center py-10 text-slate-400 italic text-sm bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-100">
+                      {DETAIL.SECTIONS.NO_LINKS}
                     </div>
                   )}
                 </section>
-              </div>
-            ),
-          },
-          {
-            key: 'assign_group',
-            label: 'Cấp phát nhóm',
-            children: (
-              <div className="pt-6 px-4">
-                <div className="mb-6 rounded-lg bg-blue-50 p-4 border border-blue-100 italic text-blue-700 text-sm">
-                  Notice: You can assign an internship group to take over this project. All students
-                  in the group will be automatically assigned to the project.
-                </div>
-
-                <Form layout="vertical">
-                  <Form.Item
-                    label="Select internship group"
-                    required
-                    tooltip="Only active groups you manage are shown"
-                  >
-                    <Select
-                      placeholder="Search and select group..."
-                      className="w-full"
-                      size="large"
-                      onChange={(v) => setSelectedGroupId(v)}
-                      value={selectedGroupId}
-                    >
-                      {groups.map((g) => (
-                        <Select.Option
-                          key={g.id || g.internshipId || g.internshipGroupId}
-                          value={g.id || g.internshipId || g.internshipGroupId}
-                        >
-                          {g.groupName}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-
-                  <div className="mt-8 flex justify-center">
-                    <Button
-                      type="primary"
-                      size="large"
-                      icon={<SearchOutlined />}
-                      onClick={handleAssignGroup}
-                      loading={loading}
-                      disabled={!selectedGroupId}
-                      className="min-w-[200px]"
-                    >
-                      Assign Group to Project
-                    </Button>
-                  </div>
-                </Form>
-
-                {(currentProject?.internshipGroup || currentProject?.groupInfo) && (
-                  <div className="mt-12 border-t pt-8 text-center text-gray-400">
-                    Project is currently assigned to:{' '}
-                    <span className="font-bold text-gray-700">
-                      {currentProject.groupInfo?.groupName ||
-                        currentProject.groupName ||
-                        currentProject.internshipGroup?.groupName}
-                    </span>
-                  </div>
-                )}
               </div>
             ),
           },

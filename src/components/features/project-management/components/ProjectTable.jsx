@@ -16,10 +16,10 @@ import React, { useMemo } from 'react';
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import {
-  INTERNSHIP_MANAGEMENT_UI,
+  PROJECT_MANAGEMENT,
   PROJECT_STATUS,
   PROJECT_STATUS_VARIANTS,
-} from '@/constants/internship-management/internship-management';
+} from '@/constants/project-management/project-management';
 
 export default function ProjectTable({
   data,
@@ -33,7 +33,6 @@ export default function ProjectTable({
   onComplete,
   onDelete,
 }) {
-  const { PROJECT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { TABLE } = PROJECT_MANAGEMENT;
 
   const columns = useMemo(
@@ -47,7 +46,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
-        width: 150,
+        width: 140,
         render: (text, record) => (
           <div className="flex items-center gap-2">
             <div
@@ -57,11 +56,6 @@ export default function ProjectTable({
             >
               {record.projectName}
             </div>
-            {!record.internshipId && record.status !== PROJECT_STATUS.DRAFT && (
-              <Tooltip title="Nhóm đã bị xóa. Cần gán lại nhóm mới để tiếp tục.">
-                <ExclamationCircleOutlined className="text-warning text-sm" />
-              </Tooltip>
-            )}
           </div>
         ),
       },
@@ -81,12 +75,30 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.GROUP,
         key: 'group',
-        width: 120,
+        width: 180,
         render: (_, record) => {
           const groupName =
             record.groupInfo?.groupName || record.groupName || record.internshipGroup?.groupName;
+
+          const gid = record.internshipId || record.internshipGroupId || record.groupId;
+          const isEmptyGuid = gid === '00000000-0000-0000-0000-000000000000';
+          const isMissing = !gid || isEmptyGuid || gid === '';
+
+          if (isMissing) {
+            return (
+              <Tooltip title={PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_TOOLTIP}>
+                <div className="flex items-center gap-1.5 text-warning cursor-help whitespace-nowrap">
+                  <ExclamationCircleOutlined className="text-sm" />
+                  <span className="text-xs font-medium italic">
+                    {PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_BADGE}
+                  </span>
+                </div>
+              </Tooltip>
+            );
+          }
+
           return (
-            <div className="truncate w-[120px]" title={groupName}>
+            <div className="truncate w-[170px]" title={groupName}>
               {groupName || '-'}
             </div>
           );
@@ -95,7 +107,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.FIELD,
         key: 'field',
-        width: 110,
+        width: 100,
         render: (text) => (
           <div className="truncate w-[100px]" title={text}>
             {text || '-'}
@@ -105,7 +117,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.TEMPLATE,
         key: 'template',
-        width: 100,
+        width: 110,
         render: (template) => {
           const labels = { 0: 'Scrum', 1: 'Kanban', 2: 'None' };
           return <span className="text-gray-500 text-xs">{labels[template] || 'None'}</span>;
@@ -114,7 +126,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.START_DATE,
         key: 'startDate',
-        width: 90,
+        width: 100,
         render: (_, record) => (
           <div className="text-gray-600 text-[12px]">
             {record.startDate ? dayjs(record.startDate).format('DD/MM/YYYY') : '-'}
@@ -124,7 +136,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.END_DATE,
         key: 'endDate',
-        width: 90,
+        width: 100,
         render: (_, record) => (
           <div className="text-gray-600 text-[12px]">
             {record.endDate ? dayjs(record.endDate).format('DD/MM/YYYY') : '-'}
@@ -134,7 +146,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.STATUS,
         key: 'status',
-        width: 50,
+        width: 70,
         render: (status) => {
           const variant = PROJECT_STATUS_VARIANTS[status] || 'default';
           const label =
@@ -146,7 +158,7 @@ export default function ProjectTable({
                   ? 'Done'
                   : 'Err';
           return (
-            <Badge variant={variant} size="sm" className="px-1.5">
+            <Badge variant={variant} size="xs">
               {label}
             </Badge>
           );
@@ -155,7 +167,7 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 70,
+        width: 90,
         render: (_, record) => {
           const items = [
             {
