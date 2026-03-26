@@ -3,7 +3,7 @@
 import { Progress as AntdProgress } from 'antd';
 import React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 
 export function Progress({
   percent,
