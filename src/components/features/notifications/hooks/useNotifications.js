@@ -14,6 +14,7 @@ export const useNotifications = () => {
         setUnreadCount(response.data.unreadCount);
       }
     } catch (error) {
+      if (error?.status === 401 || error?.silent) return;
       console.error('Failed to fetch unread count:', error);
     }
   }, []);
@@ -26,6 +27,7 @@ export const useNotifications = () => {
         setNotifications(response.data.items || []);
       }
     } catch (error) {
+      if (error?.status === 401 || error?.silent) return;
       console.error('Failed to fetch notifications:', error);
     } finally {
       setLoading(false);
@@ -44,6 +46,7 @@ export const useNotifications = () => {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
+      if (error?.status === 401 || error?.silent) return;
       console.error('Failed to mark notification as read:', error);
     }
   };
@@ -56,6 +59,7 @@ export const useNotifications = () => {
         setUnreadCount(0);
       }
     } catch (error) {
+      if (error?.status === 401 || error?.silent) return;
       console.error('Failed to mark all as read:', error);
     }
   };

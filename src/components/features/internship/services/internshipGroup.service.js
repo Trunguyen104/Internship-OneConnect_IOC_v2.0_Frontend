@@ -18,7 +18,7 @@ export const InternshipGroupService = {
 
   getMyTerms(params = {}) {
     const query = new URLSearchParams(params).toString();
-    return httpGet(`/mine/terms${query ? `?${query}` : ''}`);
+    return httpGet(`/mine/internship-terms${query ? `?${query}` : ''}`);
   },
 
   getById(id) {

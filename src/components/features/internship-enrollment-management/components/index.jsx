@@ -260,6 +260,7 @@ export default function TermStudentManagement() {
           }
         }
       } catch (error) {
+        if (error?.status === 401 || error?.silent) return;
         console.error('Fetch terms failed:', error);
       } finally {
         setTermsLoading(false);

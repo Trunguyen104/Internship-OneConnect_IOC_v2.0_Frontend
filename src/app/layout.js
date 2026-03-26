@@ -1,6 +1,7 @@
 import './globals.css';
 
 import { AntdConfigProvider } from '../providers/AntdConfigProvider';
+import { AuthEventsProvider } from '../providers/AuthEventsProvider';
 import { PageHeaderProvider } from '../providers/PageHeaderProvider';
 import { ToastProvider } from '../providers/ToastProvider';
 
@@ -17,9 +18,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased">
         <PageHeaderProvider>
-          <AntdConfigProvider>
-            <ToastProvider>{children}</ToastProvider>
-          </AntdConfigProvider>
+          <AuthEventsProvider>
+            <AntdConfigProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </AntdConfigProvider>
+          </AuthEventsProvider>
         </PageHeaderProvider>
       </body>
     </html>
