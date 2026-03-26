@@ -227,134 +227,151 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
       }
       open={visible}
       onClose={onClose}
-      width="800px"
+      size={800}
     >
-      <Tabs activeKey={activeTab} onChange={setActiveTab} className="project-detail-tabs">
-        <Tabs.TabPane tab={TABS.DETAILS} key="details">
-          <div className="space-y-6 pt-4">
-            <section>
-              <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-xs">
-                Project Description
-              </h4>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                {project?.description}
-              </p>
-            </section>
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        className="project-detail-tabs"
+        items={[
+          {
+            key: 'details',
+            label: TABS.DETAILS,
+            children: (
+              <div className="space-y-6 pt-4">
+                <section>
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-xs">
+                    Project Description
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    {project?.description}
+                  </p>
+                </section>
 
-            <div className="grid grid-cols-2 gap-6">
-              <section>
-                <h4 className="mb-2 font-bold text-gray-800 text-xs uppercase">Field</h4>
-                <Tag color="geekblue">{project?.field}</Tag>
-              </section>
-              <section>
-                <h4 className="mb-2 font-bold text-gray-800 text-xs uppercase">Assigned Group</h4>
-                <span className="text-gray-600 font-medium">
-                  {project?.internshipGroup?.internshipGroupName || '-'}
-                </span>
-              </section>
-            </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <section>
+                    <h4 className="mb-2 font-bold text-gray-800 text-xs uppercase">Field</h4>
+                    <Tag color="geekblue">{project?.field}</Tag>
+                  </section>
+                  <section>
+                    <h4 className="mb-2 font-bold text-gray-800 text-xs uppercase">
+                      Assigned Group
+                    </h4>
+                    <span className="text-gray-600 font-medium">
+                      {project?.internshipGroup?.internshipGroupName || '-'}
+                    </span>
+                  </section>
+                </div>
 
-            <section>
-              <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-info pl-3 uppercase text-xs">
-                Requirements
-              </h4>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                {project?.requirements}
-              </p>
-            </section>
+                <section>
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-info pl-3 uppercase text-xs">
+                    Requirements
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    {project?.requirements}
+                  </p>
+                </section>
 
-            <section>
-              <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-success pl-3 uppercase text-xs">
-                Deliverables
-              </h4>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                {project?.deliverables || 'Not updated'}
-              </p>
-            </section>
-          </div>
-        </Tabs.TabPane>
-
-        <Tabs.TabPane tab={TABS.STUDENTS} key="students">
-          <div className="pt-2">
-            <div className="mb-4 flex justify-between items-center">
-              <Input
-                placeholder="Search students..."
-                prefix={<SearchOutlined className="text-gray-400" />}
-                className="w-64"
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <span className="text-xs text-gray-400">
-                Total: {filteredStudents.length} students
-              </span>
-            </div>
-            <Table
-              columns={studentColumns}
-              dataSource={filteredStudents}
-              loading={loading}
-              rowKey="studentId"
-              size="small"
-              pagination={{ pageSize: 8 }}
-            />
-          </div>
-        </Tabs.TabPane>
-
-        <Tabs.TabPane tab={TABS.GROUPS} key="groups">
-          <div className="pt-6 px-4">
-            <div className="mb-6 rounded-lg bg-blue-50 p-4 border border-blue-100 italic text-blue-700 text-sm">
-              Notice: You can assign an internship group to take over this project. All students in
-              the group will be automatically assigned to the project.
-            </div>
-
-            <Form layout="vertical">
-              <Form.Item
-                label="Select internship group"
-                required
-                tooltip="Only active groups you manage are shown"
-              >
-                <Select
-                  placeholder="Search and select group..."
-                  className="w-full"
-                  size="large"
-                  onChange={(v) => setSelectedGroupId(v)}
-                  value={selectedGroupId}
-                >
-                  {groups.map((g) => (
-                    <Select.Option
-                      key={g.id || g.internshipGroupId}
-                      value={g.id || g.internshipGroupId}
-                    >
-                      {g.internshipGroupName}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-              <div className="mt-8 flex justify-center">
-                <Button
-                  type="primary"
-                  size="large"
-                  icon={<SearchOutlined />}
-                  onClick={handleAssignGroup}
+                <section>
+                  <h4 className="mb-3 font-bold text-gray-800 border-l-4 border-success pl-3 uppercase text-xs">
+                    Deliverables
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    {project?.deliverables || 'Not updated'}
+                  </p>
+                </section>
+              </div>
+            ),
+          },
+          {
+            key: 'students',
+            label: TABS.STUDENTS,
+            children: (
+              <div className="pt-2">
+                <div className="mb-4 flex justify-between items-center">
+                  <Input
+                    placeholder="Search students..."
+                    prefix={<SearchOutlined className="text-gray-400" />}
+                    className="w-64"
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <span className="text-xs text-gray-400">
+                    Total: {filteredStudents.length} students
+                  </span>
+                </div>
+                <Table
+                  columns={studentColumns}
+                  dataSource={filteredStudents}
                   loading={loading}
-                  disabled={!selectedGroupId}
-                  className="min-w-[200px]"
-                >
-                  Assign Group to Project
-                </Button>
+                  rowKey="studentId"
+                  size="small"
+                  pagination={{ pageSize: 8 }}
+                />
               </div>
-            </Form>
+            ),
+          },
+          {
+            key: 'groups',
+            label: TABS.GROUPS,
+            children: (
+              <div className="pt-6 px-4">
+                <div className="mb-6 rounded-lg bg-blue-50 p-4 border border-blue-100 italic text-blue-700 text-sm">
+                  Notice: You can assign an internship group to take over this project. All students
+                  in the group will be automatically assigned to the project.
+                </div>
 
-            {project?.internshipGroup && (
-              <div className="mt-12 border-t pt-8 text-center text-gray-400">
-                Project is currently assigned to:{' '}
-                <span className="font-bold text-gray-700">
-                  {project.internshipGroup.internshipGroupName}
-                </span>
+                <Form layout="vertical">
+                  <Form.Item
+                    label="Select internship group"
+                    required
+                    tooltip="Only active groups you manage are shown"
+                  >
+                    <Select
+                      placeholder="Search and select group..."
+                      className="w-full"
+                      size="large"
+                      onChange={(v) => setSelectedGroupId(v)}
+                      value={selectedGroupId}
+                    >
+                      {groups.map((g) => (
+                        <Select.Option
+                          key={g.id || g.internshipGroupId}
+                          value={g.id || g.internshipGroupId}
+                        >
+                          {g.internshipGroupName}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <div className="mt-8 flex justify-center">
+                    <Button
+                      type="primary"
+                      size="large"
+                      icon={<SearchOutlined />}
+                      onClick={handleAssignGroup}
+                      loading={loading}
+                      disabled={!selectedGroupId}
+                      className="min-w-[200px]"
+                    >
+                      Assign Group to Project
+                    </Button>
+                  </div>
+                </Form>
+
+                {project?.internshipGroup && (
+                  <div className="mt-12 border-t pt-8 text-center text-gray-400">
+                    Project is currently assigned to:{' '}
+                    <span className="font-bold text-gray-700">
+                      {project.internshipGroup.internshipGroupName}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </Tabs.TabPane>
-      </Tabs>
+            ),
+          },
+        ]}
+      />
     </Drawer>
   );
 }

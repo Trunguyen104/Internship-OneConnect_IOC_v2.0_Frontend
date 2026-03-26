@@ -115,9 +115,10 @@ export const ENTERPRISE_GROUP_UI = {
     LOAD_ERROR: 'Could not load group information.',
     ERROR: 'An error occurred. Please try again later.',
     DELETE_ERROR_HAS_DATA:
-      'Nhóm đã có dữ liệu làm việc (tasks/violations). Vui lòng sử dụng tính năng Lưu trữ (Archive) thay vì Xóa để bảo toàn lịch sử.',
+      'This group already has work data (tasks/violations). Please use the Archive feature instead of Delete to preserve the history.',
     DELETE_CONFIRM_HAS_STUDENTS:
-      "Nhóm có sinh viên. Khi xóa, sinh viên sẽ tự động được đưa về danh sách 'Chưa có nhóm'. Bạn có chắc chắn muốn xóa?",
+      "This group has students. If deleted, the students will automatically be moved to the 'Ungrouped' list. Are you sure you want to delete it?",
+    CHECK_DATA_ERROR: 'This group cannot be deleted because it already contains work data.',
   },
 };
 

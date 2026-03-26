@@ -18,7 +18,10 @@ import React from 'react';
 
 import StatusBadge from '@/components/ui/badge';
 import Card from '@/components/ui/card';
-import { GROUP_STATUS_VARIANTS } from '@/constants/internship-management/internship-management';
+import {
+  GROUP_STATUS,
+  GROUP_STATUS_VARIANTS,
+} from '@/constants/internship-management/internship-management';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { useGroupDetail } from '../hooks/useGroupDetail';
@@ -225,13 +228,15 @@ export default function GroupGeneralInfo({
             <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
               {info.members?.length || 0} {VIEW.STUDENTS_SUFFIX}
             </span>
-            <button
-              onClick={onAddStudent}
-              className="bg-primary hover:bg-primary-hover flex h-8 shrink-0 items-center gap-2 rounded-full px-5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all active:scale-95 cursor-pointer border-none outline-none"
-            >
-              <UsergroupAddOutlined className="text-sm" />
-              {VIEW.TABLE.ADD_STUDENT}
-            </button>
+            {info.status === GROUP_STATUS.ACTIVE && (
+              <button
+                onClick={onAddStudent}
+                className="bg-primary hover:bg-primary-hover flex h-8 shrink-0 items-center gap-2 rounded-full px-5 text-[11px] font-bold uppercase tracking-wider text-white shadow-md transition-all active:scale-95 cursor-pointer border-none outline-none"
+              >
+                <UsergroupAddOutlined className="text-sm" />
+                {VIEW.TABLE.ADD_STUDENT}
+              </button>
+            )}
           </div>
         </div>
 
@@ -303,14 +308,20 @@ export default function GroupGeneralInfo({
               width: 80,
               align: 'center',
               render: (_, student) => (
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  className="hover:bg-danger/5"
-                  icon={<DeleteOutlined className="text-xs" />}
-                  onClick={() => onRemoveStudent && onRemoveStudent(groupId, student.id)}
-                />
+                <div className="flex items-center justify-center">
+                  {info.status === GROUP_STATUS.ACTIVE ? (
+                    <Button
+                      type="text"
+                      danger
+                      size="small"
+                      className="hover:bg-danger/5"
+                      icon={<DeleteOutlined className="text-xs" />}
+                      onClick={() => onRemoveStudent && onRemoveStudent(groupId, student.id)}
+                    />
+                  ) : (
+                    <span className="text-muted/30 text-[10px]">-</span>
+                  )}
+                </div>
               ),
             },
           ]}

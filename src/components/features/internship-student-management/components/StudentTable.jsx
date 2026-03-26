@@ -44,7 +44,6 @@ const StudentTable = memo(function StudentTable({
   page = 1,
   pageSize = 10,
   onView,
-  onAssign,
   onCreateGroup,
   onAddToGroup,
   onChangeGroup,
@@ -94,54 +93,6 @@ const StudentTable = memo(function StudentTable({
           <span className="text-muted font-mono text-xs font-semibold">{record.studentCode}</span>
         ),
       },
-      {
-        title: TABLE.COLUMNS.STATUS,
-        dataIndex: 'status',
-        key: 'status',
-        width: '140px', // Adjusted width
-        align: 'center',
-        render: (statusIdx) => {
-          const config =
-            statusIdx === 2
-              ? STATUS_CONFIG.Approved
-              : statusIdx === 3
-                ? STATUS_CONFIG.Rejected
-                : STATUS_CONFIG.Pending;
-
-          const uiLabel =
-            statusIdx === 2
-              ? STATUS_LABELS.ACCEPTED
-              : statusIdx === 3
-                ? STATUS_LABELS.REJECTED
-                : STATUS_LABELS.PENDING;
-
-          return (
-            <span
-              className={`${config.bgClass} ${config.textClass} inline-flex h-6 items-center rounded-full px-2.5 text-[10px] font-bold uppercase transition-all`}
-            >
-              {uiLabel}
-            </span>
-          );
-        },
-      },
-      // {
-      //   title: TABLE.COLUMNS.PHASE_STATUS,
-      //   key: 'phaseStatus',
-      //   width: '140px', // Adjusted width
-      //   align: 'center',
-      //   render: (_, record) => {
-      //     const status = record.phaseStatus !== undefined ? record.phaseStatus : record.termStatus;
-      //     const variant =
-      //       INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_VARIANTS[status] || 'default';
-      //     const label =
-      //       INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || '-';
-      //     return (
-      //       <Badge variant={variant || 'default'} size="sm">
-      //         {label}
-      //       </Badge>
-      //     );
-      //   },
-      // },
       {
         title: TABLE.COLUMNS.INTERNSHIP_PERIOD,
         key: 'period',

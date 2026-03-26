@@ -20,6 +20,7 @@ export const useGroupManagement = () => {
   const toast = useToast();
   const filters = useEnterpriseGroupFilters();
   const [enterpriseId, setEnterpriseId] = useState(null);
+  const { MESSAGES } = ENTERPRISE_GROUP_UI;
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -198,7 +199,7 @@ export const useGroupManagement = () => {
           },
         });
       } catch (err) {
-        toast.error('Không thể kiểm tra dữ liệu nhóm');
+        toast.error(MESSAGES.CHECK_DATA_ERROR);
       }
     },
     [deleteGroup, toast]
