@@ -1,16 +1,10 @@
 'use client';
 
+import { Dropdown } from 'antd';
 import { List, LockKeyhole, Trash2, UserPen } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import UserManagementDeleteModal from './modal/UserManagementDeleteModal';
@@ -23,72 +17,92 @@ export default function UserManagementAction({ user }) {
 
   const handleEdit = (newModal) => {
     setSelectedUser(user);
-    setOpen((prev) => ({
-      isOpen: prev.isOpen ? false : true,
+    setOpen({
+      isOpen: !!newModal,
       modal: newModal,
-    }));
+    });
   };
+
+  const menuItems = [
+    {
+      key: 'edit',
+      label: (
+        <div className="flex items-center gap-4 py-1.5 pr-8">
+          <div className="rounded-xl bg-blue-50/50 p-2.5">
+            <UserPen className="size-4 text-blue-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black tracking-tight text-text">
+              {UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted/60">
+              {UI_TEXT.USER_MANAGEMENT.UPDATE_INFO}
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: () => handleEdit('edit'),
+    },
+    {
+      key: 'reset',
+      label: (
+        <div className="flex items-center gap-4 py-1.5 pr-8">
+          <div className="rounded-xl bg-emerald-50/50 p-2.5">
+            <LockKeyhole className="size-4 text-emerald-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black tracking-tight text-text">
+              {UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted/60">
+              {UI_TEXT.USER_MANAGEMENT.ACCOUNT_SECURITY}
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: () => handleEdit('reset'),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'delete',
+      danger: true,
+      label: (
+        <div className="flex items-center gap-4 py-1.5 pr-8">
+          <div className="rounded-xl bg-rose-50/50 p-2.5">
+            <Trash2 className="size-4 text-rose-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black tracking-tight text-rose-600">
+              {UI_TEXT.USER_MANAGEMENT.DELETE_TITLE}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400">
+              {UI_TEXT.USER_MANAGEMENT.LOSS_ACCESS_HINT}
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: () => handleEdit('delete'),
+    },
+  ];
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 rounded-lg text-slate-400 transition-colors hover:bg-slate-200/50 hover:text-slate-600"
-          >
-            <List className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          className="w-56 rounded-2xl border-slate-100 p-1.5 shadow-2xl"
-          align="end"
-          sideOffset={8}
+      <Dropdown
+        menu={{ items: menuItems }}
+        trigger={['click']}
+        placement="bottomRight"
+        classNames={{ root: 'premium-dropdown' }}
+      >
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-10 w-10 rounded-2xl text-muted transition-all hover:bg-white hover:shadow-xl active:scale-95 border border-transparent hover:border-gray-100"
         >
-          <DropdownMenuItem onClick={() => handleEdit('edit')} className="rounded-xl p-2.5">
-            <div className="rounded-lg bg-blue-50 p-2">
-              <UserPen className="size-4 text-blue-600" />
-            </div>
-            <div className="flex flex-col">
-              <span>{UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE}</span>
-              <span className="text-xs text-slate-400">{UI_TEXT.USER_MANAGEMENT.UPDATE_INFO}</span>
-            </div>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem onClick={() => handleEdit('reset')} className="rounded-xl p-2.5">
-            <div className="rounded-lg bg-emerald-50 p-2">
-              <LockKeyhole className="size-4 text-emerald-600" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">
-                {UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
-              </span>
-              <span className="text-[10px] tracking-tight text-slate-400 uppercase">
-                {UI_TEXT.USER_MANAGEMENT.ACCOUNT_SECURITY}
-              </span>
-            </div>
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator className="mx-2 my-1.5" />
-
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => handleEdit('delete')}
-            className="rounded-xl p-2.5"
-          >
-            <div className="rounded-lg bg-rose-50 p-2">
-              <Trash2 className="size-4 text-rose-600" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold">{UI_TEXT.USER_MANAGEMENT.DELETE}</span>
-              <span className="text-[10px] tracking-tight text-rose-400 uppercase">
-                {UI_TEXT.USER_MANAGEMENT.REMOVE_FROM_SYSTEM}
-              </span>
-            </div>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          <List className="size-5" />
+        </Button>
+      </Dropdown>
 
       <UserManagementUpdateModal
         open={open.isOpen && open.modal === 'edit'}

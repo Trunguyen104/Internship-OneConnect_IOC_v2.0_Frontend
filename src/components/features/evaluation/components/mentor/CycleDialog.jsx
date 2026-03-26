@@ -56,34 +56,56 @@ export default function CycleDialog({
 
   return (
     <CompoundModal
-      title={initialData ? BUTTONS.EDIT : BUTTONS.CREATE_CYCLE}
+      title={
+        <div className="flex flex-col gap-1 pr-10">
+          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+            Evaluation Cycle
+          </span>
+          <span className="text-xl font-black text-text tracking-tight">
+            {initialData ? BUTTONS.EDIT : BUTTONS.CREATE_CYCLE}
+          </span>
+        </div>
+      }
       open={open}
       onCancel={() => onOpenChange(false)}
       footer={
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className="flex justify-end gap-3 p-2">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="rounded-full h-11 px-8 font-black uppercase tracking-widest text-[11px] border-gray-200 transition-all hover:bg-white active:scale-95"
+          >
             {BUTTONS.CANCEL}
           </Button>
-          <Button variant="primary" onClick={handleSave}>
+          <Button
+            variant="primary"
+            onClick={handleSave}
+            className="rounded-full h-11 px-10 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all"
+          >
             {BUTTONS.SAVE}
           </Button>
         </div>
       }
     >
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <label className="text-sm font-semibold">{LABELS.CYCLE_NAME}</label>
+      <div className="space-y-8 py-8 px-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-2.5">
+          <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
+            {LABELS.CYCLE_NAME}
+          </span>
           <Input
             placeholder={LABELS.CYCLE_NAME}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="h-12 rounded-2xl border-none! bg-gray-50/50 shadow-sm font-bold text-sm focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold">{LABELS.START_DATE}</label>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-2.5">
+            <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
+              {LABELS.START_DATE}
+            </span>
             <DatePicker
-              className="w-full"
+              className="w-full h-12 rounded-2xl border-none! bg-gray-50/50 shadow-sm font-bold text-sm [&_.ant-picker-input]:font-bold transition-all hover:bg-white focus:bg-white focus:ring-4 focus:ring-primary/5"
               value={formData.startDate ? dayjs(formData.startDate) : null}
               disabledDate={disabledStartDate}
               getPopupContainer={(trigger) => trigger.parentElement}
@@ -95,12 +117,16 @@ export default function CycleDialog({
                 setFormData({ ...formData, startDate: iso });
               }}
               format="DD/MM/YYYY"
+              placeholder="Pick Start Date"
+              suffixIcon={null}
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold">{LABELS.END_DATE}</label>
+          <div className="space-y-2.5">
+            <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
+              {LABELS.END_DATE}
+            </span>
             <DatePicker
-              className="w-full"
+              className="w-full h-12 rounded-2xl border-none! bg-gray-50/50 shadow-sm font-bold text-sm [&_.ant-picker-input]:font-bold transition-all hover:bg-white focus:bg-white focus:ring-4 focus:ring-primary/5"
               value={formData.endDate ? dayjs(formData.endDate) : null}
               disabledDate={disabledEndDate}
               getPopupContainer={(trigger) => trigger.parentElement}
@@ -112,6 +138,8 @@ export default function CycleDialog({
                 setFormData({ ...formData, endDate: iso });
               }}
               format="DD/MM/YYYY"
+              placeholder="Pick End Date"
+              suffixIcon={null}
             />
           </div>
         </div>

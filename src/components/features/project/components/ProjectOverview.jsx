@@ -1,107 +1,92 @@
 'use client';
 
-import { Empty, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
+import React from 'react';
 
+import { EmptyState } from '@/components/ui/atoms';
+import Badge from '@/components/ui/badge';
 import { PROJECT_UI } from '@/constants/project/uiText';
 
-const { Title, Text, Paragraph } = Typography;
-
 const STATUS_PROJECT_CONFIG = {
-  1: { label: PROJECT_UI.STATUS_LABELS.PLANNING, color: 'info' },
-  2: { label: PROJECT_UI.STATUS_LABELS.IN_PROGRESS, color: 'warning' },
-  3: { label: PROJECT_UI.STATUS_LABELS.DONE, color: 'success' },
-  4: { label: PROJECT_UI.STATUS_LABELS.CANCELLED, color: 'danger' },
+  1: { label: PROJECT_UI.STATUS_LABELS.PLANNING, variant: 'info' },
+  2: { label: PROJECT_UI.STATUS_LABELS.IN_PROGRESS, variant: 'warning' },
+  3: { label: PROJECT_UI.STATUS_LABELS.DONE, variant: 'success' },
+  4: { label: PROJECT_UI.STATUS_LABELS.CANCELLED, variant: 'danger' },
 };
 
 export default function ProjectOverview({ project }) {
   if (!project) {
     return (
-      <div className="flex min-h-[400px] flex-1 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 py-20">
-        <Empty description={PROJECT_UI.EMPTY.NO_PROJECT} />
+      <div className="flex min-h-[400px] flex-1 items-center justify-center rounded-[32px] border border-dashed border-gray-200 bg-gray-50/50 py-20 transition-all duration-700">
+        <EmptyState description={PROJECT_UI.EMPTY.NO_PROJECT} />
       </div>
     );
   }
 
   const statusInfo = STATUS_PROJECT_CONFIG[project.status] || {
     label: project.status,
-    color: 'default',
+    variant: 'default',
   };
 
   return (
-    <div className={'space-y-10'}>
-      <div className="w-full overflow-x-auto pb-4">
-        <div className="grid min-w-[600px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="col-span-1 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:col-span-2">
-            <Text
-              type={'secondary'}
-              className={
-                'mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'
-              }
-            >
+    <div className="animate-in fade-in space-y-12 duration-700">
+      <div className="w-full overflow-x-auto pb-4 custom-scrollbar">
+        <div className="grid min-w-[600px] grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="col-span-1 border-gray-100 bg-white p-8 rounded-[32px] sm:col-span-2 shadow-sm border transition-all duration-500 hover:shadow-lg">
+            <span className="mb-3 block text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase">
               {PROJECT_UI.LABELS.NAME}
-            </Text>
-            <Text
-              strong
-              className={'block truncate text-lg leading-tight text-slate-800'}
+            </span>
+            <h2
+              className="text-gray-900 m-0 block truncate text-2xl font-black tracking-tighter"
               title={project?.projectName}
             >
               {project?.projectName}
-            </Text>
+            </h2>
           </div>
 
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-            <Text
-              type={'secondary'}
-              className={
-                'mb-2 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'
-              }
-            >
+          <div className="border-gray-100 bg-white p-8 rounded-[32px] shadow-sm border transition-all duration-500 hover:shadow-lg">
+            <span className="mb-4 block text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase">
               {PROJECT_UI.LABELS.STATUS}
-            </Text>
-            <Tag
-              style={{
-                backgroundColor: `var(--color-${statusInfo.color}-surface, var(--color-bg))`,
-                color: `var(--color-${statusInfo.color})`,
-              }}
-              className={
-                'min-w-[100px] rounded-full border-none py-1 text-center text-[10px] font-black tracking-widest uppercase shadow-sm'
-              }
+            </span>
+            <Badge
+              variant={statusInfo.variant}
+              size="lg"
+              className="w-full justify-center py-2 rounded-2xl shadow-sm border-0 font-black"
             >
               {statusInfo.label}
-            </Tag>
+            </Badge>
           </div>
 
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-            <Text
-              type={'secondary'}
-              className={
-                'mb-1 block text-[10px] font-bold tracking-widest text-slate-400 uppercase'
-              }
-            >
+          <div className="border-gray-100 bg-white p-8 rounded-[32px] shadow-sm border transition-all duration-500 hover:shadow-lg">
+            <span className="mb-3 block text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase">
               {PROJECT_UI.LABELS.TIMELINE}
-            </Text>
-            <div className={'flex flex-col'}>
-              <Text className={'text-xs font-medium text-slate-600'}>
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-900 text-sm font-black tracking-tight">
                 {project?.startDate ? dayjs(project.startDate).format('DD/MM/YYYY') : '—'}
-                <span className={'mx-1 text-slate-300'}>{PROJECT_UI.LABELS.TO}</span>
+              </span>
+              <span className="text-gray-300 text-[10px] font-black uppercase">
+                {PROJECT_UI.LABELS.TO}
+              </span>
+              <span className="text-gray-900 text-sm font-black tracking-tight">
                 {project?.endDate ? dayjs(project.endDate).format('DD/MM/YYYY') : '—'}
-              </Text>
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="space-y-6">
-        <section className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6 sm:p-8">
+        <section className="border-gray-50 bg-gray-50/30 p-8 rounded-[32px] border transition-all duration-700 hover:bg-white hover:shadow-xl hover:border-gray-100">
           <div className="mb-6 flex items-center gap-4">
-            <Title level={4} className="!m-0 !text-xl !font-bold !text-slate-800">
+            <div className="bg-primary/10 h-2 w-2 rounded-full" />
+            <h3 className="text-gray-900 m-0 text-xl font-black tracking-tight">
               {PROJECT_UI.LABELS.DESCRIPTION}
-            </Title>
+            </h3>
           </div>
-          <Paragraph className="text-[15px] leading-relaxed text-slate-600">
+          <p className="text-gray-600 m-0 text-[15px] leading-relaxed font-medium">
             {project?.description || PROJECT_UI.EMPTY.NO_DESCRIPTION}
-          </Paragraph>
+          </p>
         </section>
       </div>
     </div>

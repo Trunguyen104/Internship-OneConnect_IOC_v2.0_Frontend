@@ -5,15 +5,8 @@ import {
   useUserManagementForm,
 } from '@/components/features/user-management/hooks/useUserManagementForm';
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import Select from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { USER_ROLE_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
@@ -44,115 +37,120 @@ export default function UserManagementForm({ onSuccess, onCancel }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="fullName">{UI_TEXT.USER_MANAGEMENT.FULL_NAME}</FieldLabel>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="space-y-2 md:col-span-2">
+          <label
+            htmlFor="fullName"
+            className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+          >
+            {UI_TEXT.USER_MANAGEMENT.FULL_NAME}
+          </label>
           <Input
             id="fullName"
             name="fullName"
             required
             placeholder={UI_TEXT.USER_MANAGEMENT.FULL_NAME_PLACEHOLDER}
-            className="rounded-xl"
+            className="rounded-2xl border-gray-100 h-12"
             error={errors.fullName}
           />
-        </Field>
+        </div>
 
-        <Field>
-          <FieldLabel htmlFor="email">{UI_TEXT.USER_MANAGEMENT.EMAIL_ADDRESS}</FieldLabel>
+        <div className="space-y-2">
+          <label
+            htmlFor="email"
+            className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+          >
+            {UI_TEXT.USER_MANAGEMENT.EMAIL_ADDRESS}
+          </label>
           <Input
             id="email"
             name="email"
             type="email"
             required
             placeholder={UI_TEXT.USER_MANAGEMENT.EMAIL_PLACEHOLDER}
-            className="rounded-xl"
+            className="rounded-2xl border-gray-100 h-12"
             error={errors.email}
           />
-        </Field>
+        </div>
 
-        <Field>
-          <FieldLabel>{UI_TEXT.USER_MANAGEMENT.ASSIGNED_ROLE}</FieldLabel>
+        <div className="space-y-2">
+          <label className="text-[11px] font-black uppercase tracking-widest text-muted/60">
+            {UI_TEXT.USER_MANAGEMENT.ASSIGNED_ROLE}
+          </label>
           <Select
             value={role ? String(role) : undefined}
-            labels={USER_ROLE_LABEL}
-            onValueChange={(val) => {
+            onChange={(val) => {
               setRole(Number(val));
               if (!isUnitLocked) setUnitId('');
             }}
             disabled={allowedRoles.length <= 1}
-          >
-            <SelectTrigger className="rounded-xl">
-              <SelectValue placeholder="Select a role" />
-            </SelectTrigger>
-            <SelectContent>
-              {allowedRoles.map((v) => (
-                <SelectItem key={v} value={String(v)} className="rounded-lg">
-                  {USER_ROLE_LABEL[v]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
+            options={allowedRoles.map((v) => ({
+              label: USER_ROLE_LABEL[v],
+              value: String(v),
+            }))}
+            className="!h-12 !rounded-2xl !border-gray-100"
+            placeholder="Select a role"
+          />
+        </div>
 
         {unitRequired(role) && !isUnitLocked && (
-          <Field className="animate-in slide-in-from-top-2 duration-300 md:col-span-2">
-            <FieldLabel>{unitLabel}</FieldLabel>
-            <Select value={unitId} onValueChange={setUnitId} disabled={isUnitLocked}>
-              <SelectTrigger className="rounded-xl">
-                <SelectValue
-                  placeholder={
-                    fetchingUnits
-                      ? UI_TEXT.USER_MANAGEMENT.LOADING_DOTS
-                      : `${UI_TEXT.USER_MANAGEMENT.SELECT_A} ${unitLabel}`
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {currentUnits.map((u) => (
-                  <SelectItem
-                    key={u.universityId || u.enterpriseId || u.id}
-                    value={String(u.universityId || u.enterpriseId || u.id)}
-                    className="rounded-lg"
-                  >
-                    {u.name}
-                  </SelectItem>
-                ))}
-                {currentUnits.length === 0 && !fetchingUnits && (
-                  <div className="p-2 text-center text-xs text-slate-400">
-                    {UI_TEXT.USER_MANAGEMENT.NO} {unitLabel.toLowerCase()}{' '}
-                    {UI_TEXT.USER_MANAGEMENT.S_FOUND_SUFFIX}
-                  </div>
-                )}
-              </SelectContent>
-            </Select>
-            {errors.unitId ? (
+          <div className="animate-in slide-in-from-top-2 duration-300 space-y-2 md:col-span-2">
+            <label className="text-[11px] font-black uppercase tracking-widest text-muted/60">
+              {unitLabel}
+            </label>
+            <Select
+              value={unitId}
+              onChange={setUnitId}
+              disabled={isUnitLocked}
+              options={currentUnits.map((u) => ({
+                label: u.name,
+                value: String(u.universityId || u.enterpriseId || u.id),
+              }))}
+              className="!h-12 !rounded-2xl !border-gray-100"
+              placeholder={
+                fetchingUnits
+                  ? UI_TEXT.USER_MANAGEMENT.LOADING_DOTS
+                  : `${UI_TEXT.USER_MANAGEMENT.SELECT_A} ${unitLabel}`
+              }
+            />
+            {errors.unitId && (
               <div className="mt-1 text-xs font-semibold text-rose-600">{errors.unitId}</div>
-            ) : null}
-          </Field>
+            )}
+          </div>
         )}
 
-        <Field>
-          <FieldLabel htmlFor="phoneNumber">{UI_TEXT.USER_MANAGEMENT.PHONE_NUMBER}</FieldLabel>
+        <div className="space-y-2">
+          <label
+            htmlFor="phoneNumber"
+            className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+          >
+            {UI_TEXT.USER_MANAGEMENT.PHONE_NUMBER}
+          </label>
           <Input
             id="phoneNumber"
             name="phoneNumber"
             placeholder={UI_TEXT.USER_MANAGEMENT.PHONE_PLACEHOLDER}
-            className="rounded-xl"
+            className="rounded-2xl border-gray-100 h-12"
           />
-        </Field>
-      </FieldGroup>
+        </div>
+      </div>
 
-      <div className="flex justify-end gap-3">
-        <Button type="button" variant="ghost" className="rounded-full" onClick={() => onCancel?.()}>
+      <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
+        <Button
+          type="button"
+          variant="ghost"
+          className="rounded-full h-11 px-6 font-bold text-muted/60 hover:text-text transition-colors"
+          onClick={() => onCancel?.()}
+        >
           {UI_TEXT.COMMON.CANCEL}
         </Button>
         <Button
           type="submit"
           disabled={loading || fetchingUnits}
-          className="bg-primary hover:bg-primary-hover min-w-[120px] rounded-full"
+          className="bg-primary hover:bg-primary-hover min-w-[140px] rounded-full h-11 font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-white"
         >
-          {loading ? <Spinner className="mr-2" /> : UI_TEXT.USER_MANAGEMENT.CREATE_BTN}
+          {loading ? <Spinner className="mr-2 h-4 w-4" /> : UI_TEXT.USER_MANAGEMENT.CREATE_BTN}
         </Button>
       </div>
     </form>

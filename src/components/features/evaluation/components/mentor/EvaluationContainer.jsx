@@ -29,24 +29,31 @@ export default function EvaluationContainer() {
   }
 
   return (
-    <div className="flex flex-1 flex-col space-y-4">
-      {/* Main Content Area - Filters move inside MentorEvaluationPage for better layout integration */}
+    <div className="flex flex-1 flex-col fade-in">
       <div className="flex-1 min-h-[400px]">
         {loading && groups.length === 0 ? (
-          <div className="flex h-64 items-center justify-center">
-            <Spin description={MESSAGES.LOADING} />
+          <div className="flex flex-col h-96 items-center justify-center gap-4">
+            <Spin size="large" />
+            <span className="text-sm font-bold text-muted/60 animate-pulse uppercase tracking-widest">
+              {MESSAGES.LOADING}
+            </span>
           </div>
         ) : !selectedGroup ? (
-          <div className="flex h-96 flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50/20 p-12 text-center">
-            <Empty
-              description={
-                terms.length === 0
-                  ? LABELS.NO_ASSIGNED_GROUP
-                  : groups.length === 0
-                    ? LABELS.NO_GROUPS
-                    : LABELS.SELECT_GROUP_PROMPT
-              }
-            />
+          <div className="flex h-[500px] flex-col items-center justify-center rounded-[40px] border border-gray-100 bg-white/50 backdrop-blur-sm p-12 text-center transition-all duration-500 hover:shadow-xl hover:bg-white/80">
+            <div className="mb-6 rounded-[32px] bg-gray-50/50 p-10 ring-8 ring-gray-50/20 transition-transform hover:scale-105">
+              <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </div>
+            <h3 className="text-xl font-black text-text mb-2 tracking-tight">
+              {terms.length === 0
+                ? LABELS.NO_ASSIGNED_GROUP
+                : groups.length === 0
+                  ? LABELS.NO_GROUPS
+                  : LABELS.SELECT_GROUP_PROMPT}
+            </h3>
+            <p className="text-sm font-medium text-muted/60 max-w-sm">
+              Please select a term and an internship group from the sidebar or filters to begin
+              evaluating students.
+            </p>
           </div>
         ) : (
           <MentorEvaluationPage
@@ -58,7 +65,6 @@ export default function EvaluationContainer() {
               startDate: selectedTerm?.startDate,
               endDate: selectedTerm?.endDate,
             }}
-            // Filters
             terms={terms}
             selectedTerm={selectedTerm}
             setSelectedTerm={setSelectedTerm}

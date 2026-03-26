@@ -6,10 +6,10 @@ import {
   RocketOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Progress } from 'antd';
 import React from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import { Progress } from '@/components/ui/progress';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import { useUniAdminDashboard } from '../services/useUniAdminDashboard.service';
@@ -93,7 +93,7 @@ export default function UniAdminDashboard() {
 
       {/* Activity Header */}
       <div className="flex items-center justify-between px-2">
-        <h3 className="text-text text-2xl font-black tracking-tighter">
+        <h3 className="text-gray-900 text-2xl font-black tracking-tighter">
           {DASHBOARD.RECENT_TERMS.TITLE}
         </h3>
       </div>
@@ -108,38 +108,37 @@ export default function UniAdminDashboard() {
         {/* Right Column: Analytics & Quick Actions */}
         <div className="space-y-8">
           {/* Placement Analytics Widget */}
-          <div className="bg-surface ring-border/50 rounded-3xl p-6 shadow-sm ring-1 transition-all duration-700 hover:shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-xl">
-                  <RocketOutlined className="text-primary" />
+          <div className="bg-white border-gray-100 rounded-[32px] p-8 shadow-sm border transition-all duration-700 hover:shadow-xl">
+            <div className="mb-8 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-primary-surface flex h-10 w-10 items-center justify-center rounded-2xl">
+                  <RocketOutlined className="text-primary text-lg" />
                 </div>
-                <h4 className="text-text text-sm font-black tracking-wider uppercase">
+                <h4 className="text-gray-900 text-sm font-black tracking-wider uppercase">
                   {DASHBOARD.ANALYTICS.TITLE}
                 </h4>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pb-4">
+            <div className="space-y-8">
               <div className="flex flex-col items-center justify-center space-y-4">
                 <Progress
-                  type="circle"
                   percent={endedPercent}
-                  size={120}
+                  size={140}
                   strokeWidth={10}
                   strokeColor="var(--color-success)"
-                  railColor="var(--color-success-surface)"
+                  trailColor="var(--color-success-surface)"
                   format={(percent) => (
                     <div className="flex flex-col">
-                      <span className="text-success text-2xl font-black">{percent}%</span>
+                      <span className="text-success text-3xl font-black">{percent}%</span>
                     </div>
                   )}
                 />
                 <div className="text-center">
-                  <div className="text-text text-sm font-black">
+                  <div className="text-gray-900 text-lg font-black leading-tight">
                     {stats?.statusCounts?.ended || 0}
                   </div>
-                  <div className="text-muted text-[10px] font-bold uppercase">
+                  <div className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
                     {DASHBOARD.ANALYTICS.ENDED}
                   </div>
                 </div>
@@ -147,23 +146,22 @@ export default function UniAdminDashboard() {
 
               <div className="flex flex-col items-center justify-center space-y-4">
                 <Progress
-                  type="circle"
                   percent={upcomingPercent}
-                  size={120}
+                  size={140}
                   strokeWidth={10}
                   strokeColor="var(--color-info)"
-                  railColor="var(--color-info-surface)"
+                  trailColor="var(--color-info-surface)"
                   format={(percent) => (
                     <div className="flex flex-col">
-                      <span className="text-info text-2xl font-black">{percent}%</span>
+                      <span className="text-info text-3xl font-black">{percent}%</span>
                     </div>
                   )}
                 />
                 <div className="text-center">
-                  <div className="text-text text-sm font-black">
+                  <div className="text-gray-900 text-lg font-black leading-tight">
                     {stats?.statusCounts?.upcoming || 0}
                   </div>
-                  <div className="text-muted text-[10px] font-bold uppercase">
+                  <div className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
                     {DASHBOARD.ANALYTICS.UPCOMING}
                   </div>
                 </div>

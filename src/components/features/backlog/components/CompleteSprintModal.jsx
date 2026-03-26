@@ -1,7 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 
+import CompoundModal from '@/components/ui/CompoundModal';
+import { Input } from '@/components/ui/input';
+import { Radio, RadioGroup } from '@/components/ui/radio';
+import { Select } from '@/components/ui/select';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import {
   MOVE_INCOMPLETE_ITEMS_OPTION,
@@ -33,8 +38,6 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
 
   const selectedNextSprintId = userSelectedNextSprintId ?? futureSprints[0]?.sprintId ?? '';
 
-  if (!open) return null;
-
   const handleSubmit = () => {
     let option = MOVE_INCOMPLETE_ITEMS_OPTION.TO_BACKLOG;
     let targetId = null;
@@ -55,105 +58,97 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
   };
 
   return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-      <div className="relative flex w-full max-w-[500px] flex-col rounded-3xl bg-white p-8 shadow-2xl">
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">
-          {BACKLOG_UI.COMPLETE_SPRINT_TITLE} {sprint?.name}
-        </h2>
-        <p className="mb-6 text-sm font-medium text-gray-500">
-          {BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT} ({undoneItems.length})
-        </p>
+    <CompoundModal open={open} onCancel={onClose} width={640}>
+      <CompoundModal.Header
+        title={`${BACKLOG_UI.COMPLETE_SPRINT_TITLE} ${sprint?.name}`}
+        subtitle={`${BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT} (${undoneItems.length} công việc chưa hoàn thành)`}
+        icon={<CheckCircleOutlined />}
+      />
 
-        <div className="mb-8 space-y-4">
-          {/* 1. Move to backlog */}
-          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50">
-            <input
-              type="radio"
-              checked={moveOption === 'backlog'}
-              onChange={() => setMoveOption('backlog')}
-              className="text-primary focus:ring-primary h-4 w-4"
-            />
-            <span className="text-sm font-semibold text-gray-700">
-              {BACKLOG_UI.OPT_PRODUCT_BACKLOG}
-            </span>
-          </label>
+      <CompoundModal.Content className="px-6">
+        <div className="flex flex-col pb-2">
+          <RadioGroup
+            value={moveOption}
+            onChange={(e) => setMoveOption(e.target.value)}
+            className="flex flex-col gap-4 w-full"
+          >
+            {/* 1. Move to backlog */}
+            <div
+              className={`group flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
+                moveOption === 'backlog'
+                  ? 'border-primary bg-primary/[0.03] shadow-sm'
+                  : 'border-gray-100 bg-gray-50/30 hover:bg-gray-50'
+              }`}
+            >
+              <Radio value="backlog" className="font-bold text-[13px] text-gray-700">
+                {BACKLOG_UI.OPT_PRODUCT_BACKLOG}
+              </Radio>
+            </div>
 
-          {/* 2. Move to next planned sprint */}
-          <div className="space-y-2">
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50">
-              <input
-                type="radio"
-                checked={moveOption === 'next'}
-                onChange={() => setMoveOption('next')}
-                className="text-primary focus:ring-primary h-4 w-4"
-              />
-              <span className="text-sm font-semibold text-gray-700">
+            {/* 2. Move to next planned sprint */}
+            <div
+              className={`group flex flex-col gap-4 p-4 rounded-xl border transition-all duration-300 ${
+                moveOption === 'next'
+                  ? 'border-primary bg-primary/[0.03] shadow-sm'
+                  : 'border-gray-100 bg-gray-50/30 hover:bg-gray-50'
+              }`}
+            >
+              <Radio value="next" className="font-bold text-[13px] text-gray-700">
                 {BACKLOG_UI.OPT_NEXT_SPRINT}
-              </span>
-            </label>
-            {moveOption === 'next' && (
-              <div className="animate-in slide-in-from-left-2 ml-9">
-                <select
-                  value={selectedNextSprintId}
-                  onChange={(e) => setUserSelectedNextSprintId(e.target.value)}
-                  className="focus:border-primary h-10 w-full rounded-xl border border-gray-200 px-3 text-sm font-medium transition-all outline-none"
-                >
-                  {futureSprints.map((s) => (
-                    <option key={s.sprintId} value={s.sprintId}>
-                      {s.name || s.title}
-                    </option>
-                  ))}
-                  {futureSprints.length === 0 && (
-                    <option value="">{BACKLOG_UI.NO_PLANNED_SPRINT}</option>
-                  )}
-                </select>
-              </div>
-            )}
-          </div>
-          {/* 3. Move to a new sprint */}
-          <div className="space-y-2">
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-transparent p-3 transition-colors hover:bg-gray-50">
-              <input
-                type="radio"
-                checked={moveOption === 'new'}
-                onChange={() => setMoveOption('new')}
-                className="text-primary focus:ring-primary h-4 w-4"
-              />
-              <span className="text-sm font-semibold text-gray-700">
-                {BACKLOG_UI.OPT_NEW_SPRINT}
-              </span>
-            </label>
-            {moveOption === 'new' && (
-              <div className="animate-in slide-in-from-left-2 ml-9">
-                <input
-                  type="text"
-                  placeholder={BACKLOG_UI.PLACEHOLDER_NEW_SPRINT}
-                  value={newSprintName}
-                  onChange={(e) => setNewSprintName(e.target.value)}
-                  className="border-primary/20 bg-primary-50/20 focus:ring-primary/20 h-10 w-full rounded-xl border px-4 text-sm outline-none focus:ring-2"
-                  autoFocus
-                />
-              </div>
-            )}
-          </div>
-        </div>
+              </Radio>
 
-        <div className="flex justify-end gap-3 border-t border-gray-100 pt-6">
-          <button
-            onClick={onClose}
-            className="h-11 rounded-full px-6 font-bold text-gray-500 hover:bg-gray-100"
-          >
-            {BACKLOG_UI.CANCEL}
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={moveOption === 'new' && !newSprintName.trim()}
-            className="bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white shadow-lg disabled:opacity-50"
-          >
-            {BACKLOG_UI.COMPLETE_SPRINT}
-          </button>
+              {moveOption === 'next' && (
+                <div className="animate-in slide-in-from-top-2 duration-300 pl-7">
+                  <Select
+                    value={selectedNextSprintId}
+                    onChange={setUserSelectedNextSprintId}
+                    className="h-10 w-full"
+                    options={futureSprints.map((s) => ({
+                      value: s.sprintId,
+                      label: s.name || s.title,
+                    }))}
+                    placeholder={BACKLOG_UI.NO_PLANNED_SPRINT}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* 3. Move to a new sprint */}
+            <div
+              className={`group flex flex-col gap-4 p-4 rounded-xl border transition-all duration-300 ${
+                moveOption === 'new'
+                  ? 'border-primary bg-primary/[0.03] shadow-sm'
+                  : 'border-gray-100 bg-gray-50/30 hover:bg-gray-50'
+              }`}
+            >
+              <Radio value="new" className="font-bold text-[13px] text-gray-700">
+                {BACKLOG_UI.OPT_NEW_SPRINT}
+              </Radio>
+
+              {moveOption === 'new' && (
+                <div className="animate-in slide-in-from-top-2 duration-300 pl-7">
+                  <Input
+                    placeholder={BACKLOG_UI.PLACEHOLDER_NEW_SPRINT}
+                    value={newSprintName}
+                    onChange={(e) => setNewSprintName(e.target.value)}
+                    className="h-10 w-full rounded-xl border-gray-200 bg-white"
+                    autoFocus
+                  />
+                </div>
+              )}
+            </div>
+          </RadioGroup>
         </div>
-      </div>
-    </div>
+      </CompoundModal.Content>
+
+      <CompoundModal.Footer
+        onCancel={onClose}
+        onConfirm={handleSubmit}
+        cancelText={BACKLOG_UI.CANCEL}
+        confirmText={BACKLOG_UI.COMPLETE_SPRINT}
+        disabled={moveOption === 'new' && !newSprintName.trim()}
+        className="px-6 py-4"
+      />
+    </CompoundModal>
   );
 }

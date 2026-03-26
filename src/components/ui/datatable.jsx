@@ -180,7 +180,7 @@ export default function DataTable({
                 <tr
                   key={key}
                   onClick={() => !disabled && onRowClick?.(record)}
-                  className={`${rowHeight} transition-all duration-200 ${
+                  className={`group h-[72px] transition-all duration-200 ${
                     isSelected
                       ? 'bg-primary/5 border-l-2 border-l-primary shadow-sm'
                       : 'hover:bg-bg/80'

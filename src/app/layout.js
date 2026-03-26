@@ -1,5 +1,6 @@
 import './globals.css';
 
+import { AntdConfigProvider } from '../providers/AntdConfigProvider';
 import { PageHeaderProvider } from '../providers/PageHeaderProvider';
 import { ToastProvider } from '../providers/ToastProvider';
 
@@ -14,9 +15,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body className="antialiased">
         <PageHeaderProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <AntdConfigProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </AntdConfigProvider>
         </PageHeaderProvider>
       </body>
     </html>

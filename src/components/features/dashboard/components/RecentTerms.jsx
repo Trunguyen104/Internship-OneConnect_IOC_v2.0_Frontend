@@ -30,7 +30,7 @@ const TermCard = ({ term }) => {
   const label = TERM_MANAGEMENT.STATUS_LABELS[term.status] || term.status;
 
   return (
-    <div className="group bg-surface ring-border/50 relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 shadow-sm ring-1 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl">
+    <div className="group bg-white border-gray-100 relative flex flex-col justify-between overflow-hidden rounded-[32px] p-6 shadow-sm border transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
       <div className="bg-primary/5 absolute top-0 right-0 h-24 w-24 translate-x-12 -translate-y-12 rounded-full transition-transform duration-700 group-hover:scale-150" />
 
       <div className="relative space-y-4">
@@ -48,23 +48,23 @@ const TermCard = ({ term }) => {
         </div>
 
         <div>
-          <h4 className="text-text group-hover:text-primary line-clamp-2 min-h-[3rem] text-lg leading-tight font-black tracking-tight transition-colors">
+          <h4 className="text-gray-900 group-hover:text-primary line-clamp-2 min-h-[3rem] text-lg leading-tight font-black tracking-tight transition-colors">
             {term.name}
           </h4>
-          <p className="text-muted mt-1 text-[10px] font-bold tracking-widest uppercase opacity-60">
+          <p className="text-gray-400 mt-1 text-[10px] font-bold tracking-widest uppercase">
             {RECENT_TERMS.SUBTITLE}
           </p>
         </div>
 
-        <div className="bg-primary/5 group-hover:bg-primary/10 flex items-center gap-3 rounded-2xl p-3 transition-colors">
-          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-xl">
+        <div className="bg-gray-50 group-hover:bg-primary-surface flex items-center gap-3 rounded-2xl p-3 transition-colors">
+          <div className="bg-white border border-gray-100 flex h-8 w-8 items-center justify-center rounded-xl shadow-sm">
             <CalendarOutlined className="text-primary text-sm" />
           </div>
           <div className="flex flex-col">
-            <span className="text-text text-[11px] leading-none font-bold">
+            <span className="text-gray-900 text-[11px] leading-none font-bold">
               {dayjs(term.startDate).format(RECENT_TERMS.START_MONTH_FORMAT)}
             </span>
-            <span className="text-muted mt-1 text-[9px] font-medium opacity-70">
+            <span className="text-gray-400 mt-1 text-[9px] font-medium">
               {RECENT_TERMS.START_DATE}
             </span>
           </div>
@@ -79,7 +79,10 @@ const RecentTerms = memo(function RecentTerms({ data, loading }) {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {[1, 2, 4].map((i) => (
-          <div key={i} className="h-64 animate-pulse rounded-3xl bg-white/50" />
+          <div
+            key={i}
+            className="h-64 animate-pulse rounded-[32px] bg-gray-50 border border-gray-100"
+          />
         ))}
       </div>
     );
@@ -92,7 +95,7 @@ const RecentTerms = memo(function RecentTerms({ data, loading }) {
           data.map((term) => <TermCard key={term.termId} term={term} />)
         ) : (
           <div className="col-span-full py-12 text-center">
-            <p className="text-muted text-sm font-medium">{RECENT_TERMS.EMPTY_TEXT}</p>
+            <p className="text-gray-400 text-sm font-medium">{RECENT_TERMS.EMPTY_TEXT}</p>
           </div>
         )}
       </div>

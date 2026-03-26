@@ -1,69 +1,98 @@
-'use client';
-
-import { Tooltip } from 'antd';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Dropdown } from 'antd';
+import { List, Trash2, UserPen } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/providers/ToastProvider';
-import { universityService } from '@/services/university.service';
-import { useUniversitiesStore } from '@/store/useUniversitiesStore';
+import { UI_TEXT } from '@/lib/UI_Text';
 
+import UniversitiesDeleteModal from './UniversitiesDeleteModal';
 import UniversitiesDialog from './UniversitiesDialog';
 
 export default function UniversitiesAction({ university }) {
-  const toast = useToast();
-  const [loading, setLoading] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+  const [open, setOpen] = useState({ isOpen: false, modal: null });
 
-  const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete ${university.name}?`)) return;
-
-    setLoading(true);
-    try {
-      await universityService.delete(university.universityId);
-      useUniversitiesStore.increment();
-      toast.success('Deleted university');
-    } catch (err) {
-      toast.error(err?.data?.message || err?.message || 'Delete failed');
-    } finally {
-      setLoading(false);
-    }
+  const handleAction = (modalType) => {
+    setOpen({ isOpen: !!modalType, modal: modalType });
   };
 
+  const menuItems = [
+    {
+      key: 'edit',
+      label: (
+        <div className="flex items-center gap-4 py-1.5 pr-8">
+          <div className="rounded-xl bg-blue-50/50 p-2.5">
+            <UserPen className="size-4 text-blue-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black tracking-tight text-text">
+              {UI_TEXT.UNIVERSITIES.UPDATE}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted/60">
+              Update institution profile
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: () => handleAction('edit'),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'delete',
+      danger: true,
+      label: (
+        <div className="flex items-center gap-4 py-1.5 pr-8">
+          <div className="rounded-xl bg-rose-50/50 p-2.5">
+            <Trash2 className="size-4 text-rose-600" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-black tracking-tight text-rose-600">
+              {UI_TEXT.BUTTON.DELETE}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400">
+              Irreversible action
+            </span>
+          </div>
+        </div>
+      ),
+      onClick: () => handleAction('delete'),
+    },
+  ];
+
   return (
-    <div className="flex items-center justify-end gap-1">
-      <Tooltip title="Chỉnh sửa trường">
+    <>
+      <Dropdown
+        menu={{ items: menuItems }}
+        trigger={['click']}
+        placement="bottomRight"
+        classNames={{ root: 'premium-dropdown' }}
+      >
         <Button
-          variant="ghost"
           size="icon"
-          className="hover:text-primary h-9 w-9 rounded-full text-slate-500 transition-all hover:bg-slate-100/80"
-          onClick={() => setOpenEdit(true)}
-        >
-          <Edit2 className="h-4 w-4" />
-        </Button>
-      </Tooltip>
-
-      <Tooltip title="Xóa trường">
-        <Button
           variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-full text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 active:scale-95"
-          onClick={handleDelete}
-          disabled={loading}
+          className="h-10 w-10 rounded-2xl text-muted transition-all hover:bg-white hover:shadow-xl active:scale-95 border border-transparent hover:border-gray-100"
         >
-          <Trash2 className="h-4 w-4" />
+          <List className="size-5" />
         </Button>
-      </Tooltip>
+      </Dropdown>
 
-      {openEdit && (
+      {open.isOpen && open.modal === 'edit' && (
         <UniversitiesDialog
-          open={openEdit}
-          onOpenChange={setOpenEdit}
+          open={open.isOpen}
+          onOpenChange={() => handleAction(null)}
           university={university}
           controlled
         />
       )}
-    </div>
+
+      {open.isOpen && open.modal === 'delete' && (
+        <UniversitiesDeleteModal
+          open={open.isOpen}
+          onOpenChange={() => handleAction(null)}
+          university={university}
+        />
+      )}
+    </>
   );
 }

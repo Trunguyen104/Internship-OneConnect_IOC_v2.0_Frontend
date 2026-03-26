@@ -2,13 +2,7 @@
 
 import { Filter } from 'lucide-react';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import Select from '@/components/ui/select';
 import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
@@ -31,23 +25,24 @@ export default function UserManagementFilter() {
     }
   };
 
-  return (
-    <Select defaultValue="all" onValueChange={handleSelectedRole}>
-      <SelectTrigger className="flex w-auto items-center gap-2 px-2 md:w-26">
-        <Filter className="h-4 w-4 md:hidden" />
-        <span className="hidden md:inline">
-          <SelectValue placeholder={UI_TEXT.COMMON.FILTER} />
-        </span>
-      </SelectTrigger>
+  const options = [
+    { label: UI_TEXT.COMMON.ALL, value: 'all' },
+    ...Object.values(USER_ROLE).map((v) => ({
+      label: USER_ROLE_LABEL[v] || String(v),
+      value: String(v),
+    })),
+  ];
 
-      <SelectContent position="popper">
-        <SelectItem value="all">{UI_TEXT.COMMON.ALL}</SelectItem>
-        {Object.values(USER_ROLE).map((v) => (
-          <SelectItem key={String(v)} value={String(v)}>
-            {USER_ROLE_LABEL[v] || String(v)}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+  return (
+    <div className="flex items-center gap-2">
+      <Filter className="h-4 w-4 text-muted md:hidden" />
+      <Select
+        defaultValue="all"
+        onChange={handleSelectedRole}
+        options={options}
+        className="!w-40 !rounded-2xl"
+        placeholder={UI_TEXT.COMMON.FILTER}
+      />
+    </div>
   );
 }

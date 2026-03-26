@@ -1,12 +1,12 @@
 'use client';
 
-import { EditOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Select, Space, Typography } from 'antd';
+import { SaveOutlined, UserOutlined } from '@ant-design/icons';
+import { Input, Select } from 'antd';
 import React, { memo } from 'react';
 
+import { Button } from '@/components/ui/button';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
-
-const { Text } = Typography;
 
 const StakeholderFormModal = memo(function StakeholderFormModal({
   isOpen,
@@ -40,140 +40,137 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
     MODAL_ADD,
   } = STAKEHOLDER_UI;
 
+  const handleInputChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
   return (
-    <Modal
-      open={isOpen}
-      onCancel={onClose}
-      footer={null}
-      width={520}
-      centered
-      destroyOnHidden
-      title={
-        <Space className="mb-2">
-          {editingId ? (
-            <EditOutlined className="text-primary" />
-          ) : (
-            <UserOutlined className="text-primary" />
-          )}
-          <span>{editingId ? MODAL_EDIT : MODAL_ADD}</span>
-        </Space>
-      }
-    >
-      <div className="mt-4 space-y-4">
-        <div className="flex flex-col gap-1.5">
-          <Text strong>
-            {FIELD_NAME} <span className="text-danger">*</span>
-          </Text>
-          <Input
-            placeholder={PLACEHOLDER_NAME}
-            value={form.name}
-            onChange={(e) => {
-              setForm((prev) => ({ ...prev, name: e.target.value }));
-              if (errors.name) setErrors((prev) => ({ ...prev, name: null }));
-            }}
-            status={errors.name ? 'error' : ''}
-          />
-          {errors.name && (
-            <Text type="danger" className="text-xs">
-              {errors.name}
-            </Text>
-          )}
-        </div>
+    <CompoundModal open={isOpen} onCancel={onClose} width={560}>
+      <CompoundModal.Header
+        title={editingId ? MODAL_EDIT : MODAL_ADD}
+        subtitle={STAKEHOLDER_UI.SUBTITLE || 'Quản lý thông tin bên liên quan trong dự án'}
+        icon={<UserOutlined />}
+      />
 
-        {/* Email */}
-        <div className="flex flex-col gap-1.5">
-          <Text strong>
-            {FIELD_EMAIL} <span className="text-danger">*</span>
-          </Text>
-          <Input
-            placeholder={PLACEHOLDER_EMAIL}
-            value={form.email}
-            onChange={(e) => {
-              setForm((prev) => ({ ...prev, email: e.target.value }));
-              if (errors.email) setErrors((prev) => ({ ...prev, email: null }));
-            }}
-            status={errors.email ? 'error' : ''}
-          />
-          {errors.email && (
-            <Text type="danger" className="text-xs">
-              {errors.email}
-            </Text>
-          )}
-        </div>
+      <CompoundModal.Content>
+        <div className="space-y-6 py-2">
+          {/* Name & Email Group */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-bold tracking-wide text-text/80 uppercase">
+                {FIELD_NAME} <span className="text-rose-500">*</span>
+              </label>
+              <Input
+                placeholder={PLACEHOLDER_NAME}
+                value={form.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                status={errors.name ? 'error' : ''}
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+              />
+              {errors.name && (
+                <span className="text-xs font-semibold text-rose-500">{errors.name}</span>
+              )}
+            </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Text strong>{FIELD_ROLE}</Text>
-            <Select
-              placeholder={ROLE_SELECT}
-              value={form.role || undefined}
-              onChange={(val) => {
-                setForm((prev) => ({ ...prev, role: val }));
-                if (errors.role) setErrors((prev) => ({ ...prev, role: null }));
-              }}
-              status={errors.role ? 'error' : ''}
-              className="w-full"
-              options={[
-                { value: 'Mentor', label: ROLE_MENTOR },
-                { value: 'Supervisor', label: ROLE_SUPERVISOR },
-                { value: 'Lecturer', label: ROLE_LECTURER },
-                { value: 'Team Member', label: ROLE_MEMBER },
-              ]}
-            />
-            {errors.role && (
-              <Text type="danger" className="text-xs">
-                {errors.role}
-              </Text>
-            )}
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-bold tracking-wide text-text/80 uppercase">
+                {FIELD_EMAIL} <span className="text-rose-500">*</span>
+              </label>
+              <Input
+                placeholder={PLACEHOLDER_EMAIL}
+                value={form.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                status={errors.email ? 'error' : ''}
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+              />
+              {errors.email && (
+                <span className="text-xs font-semibold text-rose-500">{errors.email}</span>
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <Text strong>{FIELD_PHONE}</Text>
-            <Input
-              placeholder={PLACEHOLDER_PHONE}
-              value={form.phoneNumber}
-              onChange={(e) => {
-                const val = e.target.value.replace(/[^0-9+\-().\s]/g, '');
-                setForm((prev) => ({ ...prev, phoneNumber: val }));
-                if (errors.phoneNumber) setErrors((prev) => ({ ...prev, phoneNumber: null }));
-              }}
-              status={errors.phoneNumber ? 'error' : ''}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-bold tracking-wide text-text/80 uppercase">
+                {FIELD_ROLE}
+              </label>
+              <Select
+                placeholder={ROLE_SELECT}
+                value={form.role || undefined}
+                onChange={(val) => handleInputChange('role', val)}
+                status={errors.role ? 'error' : ''}
+                className="h-11 w-full !rounded-xl"
+                options={[
+                  { value: 'Mentor', label: ROLE_MENTOR },
+                  { value: 'Supervisor', label: ROLE_SUPERVISOR },
+                  { value: 'Lecturer', label: ROLE_LECTURER },
+                  { value: 'Team Member', label: ROLE_MEMBER },
+                ]}
+              />
+              {errors.role && (
+                <span className="text-xs font-semibold text-rose-500">{errors.role}</span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[13px] font-bold tracking-wide text-text/80 uppercase">
+                {FIELD_PHONE}
+              </label>
+              <Input
+                placeholder={PLACEHOLDER_PHONE}
+                value={form.phoneNumber}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^0-9+\-().\s]/g, '');
+                  handleInputChange('phoneNumber', val);
+                }}
+                status={errors.phoneNumber ? 'error' : ''}
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+              />
+              {errors.phoneNumber && (
+                <span className="text-xs font-semibold text-rose-500">{errors.phoneNumber}</span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[13px] font-bold tracking-wide text-text/80 uppercase">
+              {FIELD_DESC}
+            </label>
+            <Input.TextArea
+              rows={3}
+              placeholder={PLACEHOLDER_DESC}
+              value={form.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              status={errors.description ? 'error' : ''}
+              className="rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md py-3"
             />
-            {errors.phoneNumber && (
-              <Text type="danger" className="text-xs">
-                {errors.phoneNumber}
-              </Text>
+            {errors.description && (
+              <span className="text-xs font-semibold text-rose-500">{errors.description}</span>
             )}
           </div>
         </div>
+      </CompoundModal.Content>
 
-        <div className="flex flex-col gap-1.5">
-          <Text strong>{FIELD_DESC}</Text>
-          <Input.TextArea
-            rows={3}
-            placeholder={PLACEHOLDER_DESC}
-            value={form.description}
-            onChange={(e) => {
-              setForm((prev) => ({ ...prev, description: e.target.value }));
-              if (errors.description) setErrors((prev) => ({ ...prev, description: null }));
-            }}
-            status={errors.description ? 'error' : ''}
-          />
-          {errors.description && (
-            <Text type="danger" className="text-xs">
-              {errors.description}
-            </Text>
-          )}
-        </div>
-
-        <div className="mt-6 flex justify-end gap-3">
-          <Button onClick={onClose}>{CANCEL}</Button>
-          <Button type="primary" onClick={onSave} icon={<SaveOutlined />}>
+      <CompoundModal.Footer>
+        <div className="flex w-full items-center justify-end gap-3">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="h-11 rounded-2xl px-8 font-black tracking-tight text-muted/60 transition-all hover:bg-gray-100 hover:text-text active:scale-95"
+          >
+            {CANCEL}
+          </Button>
+          <Button
+            onClick={onSave}
+            className="h-11 rounded-2xl bg-primary px-8 font-black tracking-tight text-white shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] hover:bg-primary/90 active:scale-95"
+          >
+            <SaveOutlined className="mr-2" />
             {editingId ? UPDATE : SAVE}
           </Button>
         </div>
-      </div>
-    </Modal>
+      </CompoundModal.Footer>
+    </CompoundModal>
   );
 });
 

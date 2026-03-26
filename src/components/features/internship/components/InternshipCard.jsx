@@ -27,7 +27,7 @@ const InternshipCard = ({ data, children, className = '' }) => {
   return (
     <InternshipCardContext.Provider value={data}>
       <div
-        className={`bg-surface border-border transition-all hover:shadow-md ${className} overflow-hidden rounded-3xl border p-6 shadow-sm`}
+        className={`bg-surface border-gray-100 transition-all duration-300 hover:shadow-xl ${className} overflow-hidden rounded-[32px] border p-8 shadow-sm`}
       >
         {children}
       </div>
@@ -53,7 +53,7 @@ const Header = ({ title, isCurrent = false }) => {
           {isCurrent && (
             <Tag
               color="green"
-              className="bg-success-surface text-success border-none px-2 py-0.5 font-sans text-[10px] font-bold"
+              className="bg-success-surface text-success border-none px-3 py-1 font-sans text-[10px] font-bold"
             >
               {INTERNSHIP_UI.LABELS.CURRENT}
             </Tag>
@@ -62,13 +62,13 @@ const Header = ({ title, isCurrent = false }) => {
             (status === INTERNSHIP_STATUS.UPCOMING || status === INTERNSHIP_STATUS.ACTIVE) && (
               <Tag
                 color="error"
-                className="bg-danger-surface text-danger border-none px-2 py-0.5 font-sans text-[10px] font-bold"
+                className="bg-danger-surface text-danger border-none px-3 py-1 font-sans text-[10px] font-bold"
               >
                 {INTERNSHIP_UI.LABELS.UNPLACED_WARNING}
               </Tag>
             )}
         </div>
-        <h2 className="text-text text-2xl font-bold">{title}</h2>
+        <h2 className="text-text text-3xl font-black tracking-tight">{title}</h2>
       </div>
 
       <div className="flex flex-col items-end gap-2">
@@ -77,7 +77,7 @@ const Header = ({ title, isCurrent = false }) => {
         </span>
         <Tag
           color={config.tagColor}
-          className="m-0 border-none px-4 py-1 text-xs font-bold uppercase transition-all"
+          className="m-0 border-none px-5 py-1.5 text-xs font-bold uppercase transition-all"
         >
           {config.label}
         </Tag>
@@ -103,13 +103,13 @@ const BodyTitle = ({ title, href = null }) => {
         {isPlaced && href ? (
           <Link
             href={href}
-            className="!visited:text-black text-xl font-bold !text-black !no-underline underline-offset-4 transition-colors hover:!text-black hover:!underline hover:decoration-black"
+            className="text-2xl font-black tracking-tight text-gray-900 no-underline transition-all hover:text-primary hover:underline"
             title="Go to Space"
           >
             {title}
           </Link>
         ) : (
-          <h3 className="text-text text-xl font-bold">
+          <h3 className="text-text text-2xl font-black tracking-tight">
             {title ||
               (isPlaced ? INTERNSHIP_UI.LABELS.PLACED_SUCCESS : INTERNSHIP_UI.LABELS.NO_GROUP)}
           </h3>
@@ -117,7 +117,7 @@ const BodyTitle = ({ title, href = null }) => {
         {isPlaced && (
           <Tag
             color="purple"
-            className="bg-info-surface text-info border-none px-3 py-0.5 text-[10px] font-bold"
+            className="bg-info-surface text-info border-none px-4 py-1 text-[10px] font-bold uppercase"
           >
             {config.label}
           </Tag>
@@ -131,15 +131,17 @@ const Info = ({ enterprise, mentor, project }) => {
   const { isPlaced } = useInternshipCard();
 
   return (
-    <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
       {/* Mentor Info */}
-      <div className="flex items-center gap-4">
-        <div className="bg-success-surface text-success flex h-12 w-12 items-center justify-center rounded-full shadow-sm">
-          <User size={24} />
+      <div className="flex items-center gap-5">
+        <div className="bg-success-surface text-success flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-transform hover:scale-105">
+          <User size={28} />
         </div>
         <div className="flex flex-col">
-          <span className="text-muted text-xs font-medium">{INTERNSHIP_UI.LABELS.MENTOR}</span>
-          <span className="text-text text-lg font-bold">
+          <span className="text-muted text-xs font-bold uppercase tracking-wider">
+            {INTERNSHIP_UI.LABELS.MENTOR}
+          </span>
+          <span className="text-text text-xl font-black">
             {mentor ||
               (isPlaced ? INTERNSHIP_UI.LABELS.UPDATE_PENDING : INTERNSHIP_UI.LABELS.NOT_AVAILABLE)}
           </span>
@@ -147,13 +149,15 @@ const Info = ({ enterprise, mentor, project }) => {
       </div>
 
       {/* Enterprise Info */}
-      <div className="flex items-center gap-4">
-        <div className="bg-primary-surface text-primary flex h-12 w-12 items-center justify-center rounded-full shadow-sm">
-          <Building2 size={24} />
+      <div className="flex items-center gap-5">
+        <div className="bg-primary-surface text-primary flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-transform hover:scale-105">
+          <Building2 size={28} />
         </div>
         <div className="flex flex-col">
-          <span className="text-muted text-xs font-medium">{INTERNSHIP_UI.LABELS.ENTERPRISE}</span>
-          <span className="text-text text-lg font-bold">
+          <span className="text-muted text-xs font-bold uppercase tracking-wider">
+            {INTERNSHIP_UI.LABELS.ENTERPRISE}
+          </span>
+          <span className="text-text text-xl font-black">
             {enterprise ||
               (isPlaced ? INTERNSHIP_UI.LABELS.UPDATE_PENDING : INTERNSHIP_UI.LABELS.NOT_AVAILABLE)}
           </span>
@@ -161,13 +165,15 @@ const Info = ({ enterprise, mentor, project }) => {
       </div>
 
       {/* Project Info */}
-      <div className="flex items-center gap-4">
-        <div className="bg-info-surface text-info flex h-12 w-12 items-center justify-center rounded-full shadow-sm">
-          <BookOpen size={24} />
+      <div className="flex items-center gap-5">
+        <div className="bg-info-surface text-info flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-transform hover:scale-105">
+          <BookOpen size={28} />
         </div>
         <div className="flex flex-col">
-          <span className="text-muted text-xs font-medium">{INTERNSHIP_UI.LABELS.PROJECT}</span>
-          <span className="text-text text-lg font-bold">
+          <span className="text-muted text-xs font-bold uppercase tracking-wider">
+            {INTERNSHIP_UI.LABELS.PROJECT}
+          </span>
+          <span className="text-text text-xl font-black">
             {project ||
               (isPlaced ? INTERNSHIP_UI.LABELS.UPDATE_PENDING : INTERNSHIP_UI.LABELS.NOT_AVAILABLE)}
           </span>
@@ -183,13 +189,13 @@ const Action = ({ onDetailClick }) => {
   if (!isPlaced) {
     if (status === INTERNSHIP_STATUS.UPCOMING) {
       return (
-        <div className="mt-10 flex flex-col items-end gap-3">
-          <p className="text-muted text-sm italic">{INTERNSHIP_UI.MESSAGES.APPLY_PROMPT}</p>
+        <div className="mt-12 flex flex-col items-end gap-4">
+          <p className="text-muted font-medium italic">{INTERNSHIP_UI.MESSAGES.APPLY_PROMPT}</p>
           <Button
             type="primary"
             size="large"
             href="/job-board"
-            className="bg-primary rounded-xl font-bold"
+            className="bg-primary h-14 rounded-2xl px-10 font-bold shadow-lg shadow-primary/20 transition-all hover:scale-105"
           >
             {INTERNSHIP_UI.MESSAGES.VIEW_JOB_POSTINGS}
           </Button>
@@ -198,8 +204,10 @@ const Action = ({ onDetailClick }) => {
     }
     if (status === INTERNSHIP_STATUS.ACTIVE) {
       return (
-        <div className="bg-danger-surface border-danger/20 mt-10 rounded-2xl border p-4 text-center">
-          <p className="text-danger font-medium">{INTERNSHIP_UI.MESSAGES.UNPLACED_ACTIVE_ALERT}</p>
+        <div className="bg-danger-surface border-danger/20 mt-12 rounded-[24px] border p-6 text-center">
+          <p className="text-danger text-lg font-bold">
+            {INTERNSHIP_UI.MESSAGES.UNPLACED_ACTIVE_ALERT}
+          </p>
         </div>
       );
     }
@@ -207,15 +215,17 @@ const Action = ({ onDetailClick }) => {
   }
 
   return (
-    <div className="mt-10 flex justify-end">
+    <div className="mt-12 flex justify-end">
       <Button
         type="primary"
         size="large"
-        icon={<ExternalLink size={18} />}
-        className="group bg-primary shadow-primary/10 h-14 rounded-2xl px-10 font-bold text-white shadow-xl transition-all hover:scale-105 active:scale-95"
+        icon={<ExternalLink size={20} />}
+        className="group bg-primary shadow-primary/20 h-16 rounded-[24px] px-12 font-black text-white shadow-2xl transition-all hover:scale-105 active:scale-95"
         onClick={onDetailClick}
       >
-        <span className="flex items-center gap-2">{INTERNSHIP_UI.LABELS.VIEW_DETAIL}</span>
+        <span className="flex items-center gap-3 text-lg font-black uppercase tracking-tight">
+          {INTERNSHIP_UI.LABELS.VIEW_DETAIL}
+        </span>
       </Button>
     </div>
   );

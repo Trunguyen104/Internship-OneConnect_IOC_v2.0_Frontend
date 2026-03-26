@@ -2,9 +2,7 @@
 
 import React, { memo } from 'react';
 
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
 import { useIssueTab } from '../hooks/useIssueTab';
@@ -38,40 +36,41 @@ const IssueTab = memo(function IssueTab() {
   } = useIssueTab();
 
   return (
-    <div className="animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500">
-      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
-        <DataTableToolbar
-          className="mb-6 !border-0 !p-0"
-          searchProps={{
-            placeholder: ISSUE_UI.SEARCH_PLACEHOLDER,
-            value: search,
-            onChange: (e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            },
-          }}
-          actionProps={{
-            label: ISSUE_UI.ADD_BUTTON,
-            onClick: () => setOpenIssueForm(true),
-          }}
-        />
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <PageLayout.Card>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <PageLayout.Toolbar
+            searchProps={{
+              placeholder: ISSUE_UI.SEARCH_PLACEHOLDER,
+              value: search,
+              onChange: (e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              },
+            }}
+            actionProps={{
+              label: ISSUE_UI.ADD_BUTTON,
+              onClick: () => setOpenIssueForm(true),
+            }}
+          />
 
-        <IssueTable
-          issues={issues}
-          stakeholders={stakeholders}
-          loading={loading}
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          onToggleStatus={handleToggleStatus}
-          onDelete={handleDelete}
-          onView={handleViewDetail}
-          tableBodyRef={tableBodyRef}
-        />
+          <PageLayout.Content>
+            <IssueTable
+              issues={issues}
+              stakeholders={stakeholders}
+              loading={loading}
+              page={page}
+              pageSize={pageSize}
+              total={total}
+              onToggleStatus={handleToggleStatus}
+              onDelete={handleDelete}
+              onView={handleViewDetail}
+              tableBodyRef={tableBodyRef}
+            />
+          </PageLayout.Content>
 
-        {total > 0 && (
-          <div className="border-border/50 mt-6 border-t pt-6">
-            <Pagination
+          {total > 0 && (
+            <PageLayout.Pagination
               total={total}
               page={page}
               pageSize={pageSize}
@@ -82,9 +81,9 @@ const IssueTab = memo(function IssueTab() {
                 setPage(1);
               }}
             />
-          </div>
-        )}
-      </Card>
+          )}
+        </div>
+      </PageLayout.Card>
 
       <IssueFormModal
         isOpen={openIssueForm}

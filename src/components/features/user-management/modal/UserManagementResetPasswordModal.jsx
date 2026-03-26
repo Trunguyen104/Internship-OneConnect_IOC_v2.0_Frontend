@@ -1,18 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { Textarea } from '@/components/ui/textarea';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
@@ -56,45 +46,41 @@ export default function UserManagementResetPasswordModal({ open, userId, email, 
   };
 
   return (
-    <Dialog open={open} onOpenChange={onToggle}>
-      <DialogContent aria-describedby={undefined} className="sm:max-w-sm">
-        <form onSubmit={doReset}>
-          <DialogHeader>
-            <DialogTitle>{UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}</DialogTitle>
-            <DialogDescription>{UI_TEXT.USER_MANAGEMENT.ACCOUNT_SECURITY}</DialogDescription>
-          </DialogHeader>
+    <CompoundModal open={open} onCancel={() => onToggle?.(false)} width={420}>
+      <CompoundModal.Header
+        title={UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
+        subtitle={UI_TEXT.USER_MANAGEMENT.ACCOUNT_SECURITY}
+      />
 
-          <FieldGroup className="mt-4 gap-4">
-            <Field>
-              <FieldLabel>{UI_TEXT.USER_MANAGEMENT.TARGET}</FieldLabel>
-              <div className="rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-sm text-slate-700">
-                {email || UI_TEXT.COMMON.MINUS}
-              </div>
-            </Field>
+      <CompoundModal.Content className="space-y-6">
+        <CompoundModal.InfoBox
+          label={UI_TEXT.USER_MANAGEMENT.TARGET}
+          value={email || UI_TEXT.COMMON.MINUS}
+        />
 
-            <Field>
-              <FieldLabel htmlFor="reason">{UI_TEXT.USER_MANAGEMENT.REASON}</FieldLabel>
-              <Textarea
-                id="reason"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="Reason (10..500 chars)"
-              />
-            </Field>
-          </FieldGroup>
+        <div className="space-y-2">
+          <label
+            htmlFor="reason"
+            className="text-[11px] font-black uppercase tracking-widest text-muted/60"
+          >
+            {UI_TEXT.USER_MANAGEMENT.REASON}
+          </label>
+          <Textarea
+            id="reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Reason (10..500 chars)"
+            className="min-h-[120px] rounded-2xl border-gray-100 bg-gray-50/50 p-4 transition-all focus:border-primary/30 focus:bg-white"
+          />
+        </div>
+      </CompoundModal.Content>
 
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                {UI_TEXT.BUTTON.CLOSE}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={busy}>
-              {UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <CompoundModal.Footer
+        onCancel={() => onToggle?.(false)}
+        onConfirm={doReset}
+        confirmText={UI_TEXT.USER_MANAGEMENT.RESET_PASSWORD}
+        loading={busy}
+      />
+    </CompoundModal>
   );
 }

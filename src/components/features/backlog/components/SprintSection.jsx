@@ -1,9 +1,13 @@
+'use client';
+
 import { useDroppable } from '@dnd-kit/core';
 import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { Button } from '@/components/ui/button';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { Dropdown } from '@/components/ui/dropdown';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { SPRINT_STATUS } from '@/constants/common/enums';
 
@@ -27,19 +31,6 @@ export function SprintSection({
     id: sprint.sprintId,
   });
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
     <div
       ref={setNodeRef}
@@ -55,49 +46,48 @@ export function SprintSection({
 
         {/* Dynamic Start/Complete Sprint button based on status */}
         {sprint.status === SPRINT_STATUS.ACTIVE || sprint.status === 'ACTIVE' ? (
-          <button
+          <Button
             onClick={() => handleSprintActionClick(sprint, false)}
             className="flex h-[34px] items-center rounded-full border border-green-200 bg-green-50 px-5 text-[13px] font-medium text-green-700 shadow-sm transition-colors hover:bg-green-100"
           >
             {BACKLOG_UI.COMPLETE_SPRINT}
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
+            variant="outline"
             onClick={() => handleSprintActionClick(sprint, true)}
             className="flex h-[34px] items-center rounded-full border border-gray-200 bg-white px-5 text-[13px] font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
           >
             {BACKLOG_UI.START_SPRINT}
-          </button>
+          </Button>
         )}
 
-        {/* Custom Dropdown Menu */}
-        <div className="relative" ref={menuRef}>
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`ml-3 rounded-full p-1.5 text-gray-500 transition-all outline-none hover:bg-gray-100 ${
-              isMenuOpen ? 'ring-primary bg-gray-50 ring-2' : ''
-            }`}
-          >
-            <MoreVertical className="h-4 w-4" />
-          </button>
-
-          {isMenuOpen && (
-            <div className="animate-in fade-in zoom-in absolute right-0 z-50 mt-2 w-52 rounded-2xl border border-gray-100 bg-white p-1 shadow-xl duration-200">
-              <button
-                onClick={() => {
+        {/* More Menu using Dropdown wrapper */}
+        <Dropdown
+          menu={{
+            items: [
+              {
+                key: 'edit',
+                label: (
+                  <div className="flex items-center gap-2 py-1">
+                    <Pencil className="h-4 w-4 text-blue-600" />
+                    <span>{BACKLOG_UI.EDIT_SPRINT || 'Edit Sprint'}</span>
+                  </div>
+                ),
+                onClick: () => {
                   setSelectedSprintAction(sprint);
                   setOpenUpdateSprint(true);
-                  setIsMenuOpen(false);
-                }}
-                className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-              >
-                <Pencil className="h-4 w-4 text-blue-600" />
-                {BACKLOG_UI.EDIT_SPRINT || 'Edit Sprint'}
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
+                },
+              },
+              {
+                key: 'delete',
+                label: (
+                  <div className="flex items-center gap-2 py-1 text-primary">
+                    <Trash2 className="h-4 w-4" />
+                    <span>{BACKLOG_UI.DELETE_SPRINT || 'Delete Sprint'}</span>
+                  </div>
+                ),
+                onClick: () => {
                   showDeleteConfirm({
                     title: BACKLOG_UI.DELETE_SPRINT || 'Delete Sprint',
                     content:
@@ -106,15 +96,15 @@ export function SprintSection({
                     okText: BACKLOG_UI.DELETE || 'Delete',
                     cancelText: BACKLOG_UI.CANCEL || 'Cancel',
                   });
-                }}
-                className="text-danger flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left font-semibold transition-colors hover:bg-red-50"
-              >
-                <Trash2 className="text-danger h-4 w-4" />
-                {BACKLOG_UI.DELETE_SPRINT || 'Delete Sprint'}
-              </button>
-            </div>
-          )}
-        </div>
+                },
+              },
+            ],
+          }}
+        >
+          <button className="ml-3 rounded-full p-1.5 text-gray-500 transition-all outline-none hover:bg-gray-100">
+            <MoreVertical className="h-4 w-4" />
+          </button>
+        </Dropdown>
       </div>
 
       {/* List Container */}
@@ -150,16 +140,16 @@ export function SprintSection({
 
       {/* Create task under sprint */}
       <div className="mt-4 flex items-center">
-        <button
+        <Button
           onClick={() => {
             setActiveSprintForTask(sprint.sprintId);
             setOpenCreateTask(true);
           }}
-          className="bg-primary hover:bg-primary-hover active:bg-primary-700 flex items-center gap-2 rounded-lg px-4 py-2 font-medium text-white transition-colors"
+          className="flex items-center gap-2 rounded-lg px-4 py-2 font-medium"
         >
           <Plus className="h-4 w-4" />
           <span>{BACKLOG_UI.CREATE_TASK}</span>
-        </button>
+        </Button>
       </div>
     </div>
   );

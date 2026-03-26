@@ -111,100 +111,114 @@ export default function MentorEvaluationPage({
 
   return (
     <PageLayout>
-      <PageLayout.Header {...headerProps} />
+      <PageLayout.Header {...headerProps} className="pb-10" />
 
-      {/* Unified Filter & Action Bar - Responsive Layout */}
-      <div className="flex flex-col lg:flex-row flex-wrap items-stretch lg:items-center gap-4 lg:gap-x-6 lg:gap-y-4 rounded-xl bg-white p-4 px-4 sm:px-8 lg:px-10 xl:px-[56px] shadow-sm mb-4 transition-all">
-        {/* Term Select */}
-        <div className="flex items-center gap-3 min-w-[200px]">
-          <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider shrink-0">
-            {LABELS.TERM}
-          </span>
-          <Select
-            className="flex-1 lg:w-48 xl:w-52"
-            size="middle"
-            value={selectedTerm?.id}
-            onChange={(val) => setSelectedTerm(terms.find((t) => t.id === val))}
-            options={terms.map((t) => ({
-              label: t.name,
-              value: t.id,
-            }))}
-            placeholder={LABELS.SELECT_TERM_PLACEHOLDER}
-          />
+      <div className="rounded-[40px] border border-gray-100/50 bg-white/80 backdrop-blur-md shadow-sm overflow-hidden flex flex-col min-h-0 flex-1 transition-all duration-300">
+        <div className="p-8 pb-4">
+          {/* Unified Filter & Action Bar */}
+          <div className="flex flex-col items-stretch gap-6 lg:flex-row lg:items-center">
+            {/* Term Select */}
+            <div className="flex items-center gap-4 min-w-[220px]">
+              <div className="flex flex-col gap-1 flex-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
+                  {LABELS.TERM}
+                </span>
+                <Select
+                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-11 [&_.ant-select-selection-item]:!leading-[44px] hover:[&_.ant-select-selector]:!bg-gray-100 transition-all font-bold"
+                  value={selectedTerm?.id}
+                  onChange={(val) => setSelectedTerm(terms.find((t) => t.id === val))}
+                  options={terms.map((t) => ({
+                    label: t.name,
+                    value: t.id,
+                  }))}
+                  placeholder={LABELS.SELECT_TERM_PLACEHOLDER}
+                />
+              </div>
+            </div>
+
+            {/* Group Select */}
+            <div className="flex items-center gap-4 flex-1 lg:max-w-md">
+              <div className="flex flex-col gap-1 flex-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
+                  {LABELS.GROUP}
+                </span>
+                <Select
+                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-11 [&_.ant-select-selection-item]:!leading-[44px] hover:[&_.ant-select-selector]:!bg-gray-100 transition-all font-bold"
+                  value={selectedGroup?.internshipId || selectedGroup?.id}
+                  onChange={(val) =>
+                    setSelectedGroup(groups.find((g) => (g.internshipId || g.id) === val))
+                  }
+                  options={groups.map((g) => ({
+                    label: g.groupName,
+                    value: g.internshipId || g.id,
+                  }))}
+                  placeholder={LABELS.SELECT_GROUP_PLACEHOLDER}
+                  disabled={groups.length === 0}
+                  loading={loadingGroups && groups.length > 0}
+                />
+              </div>
+            </div>
+
+            {loadingGroups && <Spin size="small" className="hidden xl:block" />}
+
+            {/* Actions */}
+            <div className="flex justify-end lg:ml-auto pt-5">
+              {view === 'list' && (
+                <Button
+                  variant="primary"
+                  onClick={handleOpenCreate}
+                  disabled={!isTermOngoing}
+                  className="rounded-full h-11 px-8 font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all w-full lg:w-auto flex items-center justify-center gap-2"
+                >
+                  <PlusOutlined /> {BUTTONS.CREATE_CYCLE}
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Group Select */}
-        <div className="flex items-center gap-3 lg:border-l lg:pl-6 min-w-[280px]">
-          <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider shrink-0">
-            {LABELS.GROUP}
-          </span>
-          <Select
-            className="flex-1 lg:w-64 xl:w-72"
-            size="middle"
-            value={selectedGroup?.internshipId || selectedGroup?.id}
-            onChange={(val) =>
-              setSelectedGroup(groups.find((g) => (g.internshipId || g.id) === val))
-            }
-            options={groups.map((g) => ({
-              label: g.groupName,
-              value: g.internshipId || g.id,
-            }))}
-            placeholder={LABELS.SELECT_GROUP_PLACEHOLDER}
-            disabled={groups.length === 0}
-            loading={loadingGroups && groups.length > 0}
-          />
-        </div>
-
-        {loadingGroups && <Spin size="small" className="hidden xl:block ml-2" />}
-
-        {/* Actions */}
-        <div className="flex justify-end lg:ml-auto border-t lg:border-t-0 pt-3 lg:pt-0">
-          {view === 'list' && (
-            <Button
-              variant="primary"
-              onClick={handleOpenCreate}
-              disabled={!isTermOngoing}
-              className="w-full lg:w-auto flex items-center justify-center gap-2"
-            >
-              <PlusOutlined /> {BUTTONS.CREATE_CYCLE}
-            </Button>
+        <div className="flex flex-col flex-1 min-h-0 overflow-hidden px-8 pb-8">
+          {view === 'grading' && (
+            <div className="mb-6">
+              <PageLayout.Toolbar
+                className="!p-0 !border-0"
+                leftContent={
+                  <Button
+                    variant="primary"
+                    onClick={handleBackToList}
+                    className="rounded-full h-11 px-10 font-black uppercase tracking-widest text-[11px] flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all group"
+                  >
+                    <ArrowLeftOutlined className="group-hover:-translate-x-1 transition-transform" />{' '}
+                    {BUTTONS.BACK_TO_LIST}
+                  </Button>
+                }
+              />
+            </div>
           )}
+
+          <div className="flex-1 min-h-0 overflow-auto">
+            {view === 'list' ? (
+              <CycleList
+                cycles={cycles}
+                loading={loadingCycles}
+                onOpenGrading={handleOpenGrading}
+                onEdit={handleOpenEdit}
+                onDelete={handleDeleteCycle}
+                isTermOngoing={isTermOngoing}
+                isTermPast={isTermPast}
+              />
+            ) : (
+              <BatchGrading
+                cycle={selectedCycle}
+                internshipId={internshipId}
+                onBatchGrade={handleSaveEvaluations}
+                onPublish={handlePublish}
+                isTermOngoing={isTermOngoing}
+              />
+            )}
+          </div>
         </div>
       </div>
-
-      <PageLayout.Card>
-        {view === 'grading' && (
-          <PageLayout.Toolbar
-            actionProps={{
-              label: BUTTONS.BACK_TO_LIST,
-              icon: <ArrowLeftOutlined />,
-              onClick: handleBackToList,
-              variant: 'outline',
-            }}
-          />
-        )}
-        <PageLayout.Content>
-          {view === 'list' ? (
-            <CycleList
-              cycles={cycles}
-              loading={loadingCycles}
-              onOpenGrading={handleOpenGrading}
-              onEdit={handleOpenEdit}
-              onDelete={handleDeleteCycle}
-              isTermOngoing={isTermOngoing}
-              isTermPast={isTermPast}
-            />
-          ) : (
-            <BatchGrading
-              cycle={selectedCycle}
-              internshipId={internshipId}
-              onBatchGrade={handleSaveEvaluations}
-              onPublish={handlePublish}
-              isTermOngoing={isTermOngoing}
-            />
-          )}
-        </PageLayout.Content>
-      </PageLayout.Card>
 
       <CycleDialog
         key={editingCycle?.cycleId || 'new'}

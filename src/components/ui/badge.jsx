@@ -1,37 +1,45 @@
+'use client';
+
+import { Tag } from 'antd';
 import React from 'react';
 
+import { cn } from '@/lib/cn';
+
+const VARIANT_MAP = {
+  default: 'border-slate-200 bg-slate-100 text-slate-700',
+  primary: 'border-primary/20 bg-primary-surface text-primary',
+  success: 'border-success/20 bg-success-surface text-success',
+  warning: 'border-warning/20 bg-warning-surface text-warning-text',
+  danger: 'border-danger/20 bg-danger-surface text-danger',
+  info: 'border-info/20 bg-info-surface text-info',
+  // Solid variants
+  'success-solid': 'border-transparent bg-success text-white',
+  'primary-solid': 'border-transparent bg-primary text-white',
+  'warning-solid': 'border-transparent bg-warning text-white',
+};
+
+const SIZE_MAP = {
+  sm: 'text-[10px] px-2 py-0',
+  md: 'text-[11px] px-2.5 py-0.5',
+  lg: 'text-xs px-3 py-1',
+};
+
 const Badge = ({ children, variant = 'default', size = 'md', className = '', icon }) => {
-  const baseStyles = 'inline-flex items-center font-semibold rounded-full';
-
-  const variants = {
-    default: 'bg-gray-100 text-gray-700',
-    primary: 'bg-[var(--primary-50)] text-[var(--primary-700)]',
-    success: 'bg-[var(--green-50)] text-[var(--green-600)]',
-    warning: 'bg-amber-50 text-amber-700',
-    danger: 'bg-red-50 text-red-700',
-    info: 'bg-[var(--blue-50)] text-[var(--blue-700)]',
-    // Solid variants
-    'success-solid': 'bg-[var(--green-500)] text-white',
-    'primary-solid': 'bg-[var(--primary-600)] text-white',
-    'warning-solid': 'bg-amber-500 text-white',
-  };
-
-  const sizes = {
-    sm: 'text-[10px] px-2 py-0.5',
-    md: 'text-xs px-2.5 py-0.5',
-    lg: 'text-sm px-3 py-1',
-  };
-
-  const variantStyles = variants[variant] || variants.default;
-  const sizeStyles = sizes[size] || sizes.md;
+  const variantStyles = VARIANT_MAP[variant] || VARIANT_MAP.default;
+  const sizeStyles = SIZE_MAP[size] || SIZE_MAP.md;
 
   return (
-    <span
-      className={`${baseStyles} ${variantStyles} ${sizeStyles} tracking-wide uppercase ${className}`}
+    <Tag
+      icon={icon}
+      className={cn(
+        'm-0 inline-flex items-center rounded-full border font-bold uppercase tracking-wider',
+        variantStyles,
+        sizeStyles,
+        className
+      )}
     >
-      {icon && <span className="mr-1.5">{icon}</span>}
       {children}
-    </span>
+    </Tag>
   );
 };
 

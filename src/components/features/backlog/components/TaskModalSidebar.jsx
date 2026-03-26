@@ -1,6 +1,9 @@
 'use client';
 
-import DateInput from '@/components/ui/dateinput';
+import dayjs from 'dayjs';
+import React from 'react';
+
+import { DatePicker } from '@/components/ui/datepicker';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
 
@@ -35,12 +38,14 @@ export function TaskModalSidebar({
         className="border-border/50 h-full overflow-y-auto rounded-3xl border bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
         style={{ scrollbarWidth: 'none' }}
       >
-        <h3 className="text-text mb-5 text-[17px] font-bold">{BACKLOG_UI.DETAILS || 'Details'}</h3>
+        <h3 className="text-text mb-5 text-[17px] font-bold text-gray-800">
+          {BACKLOG_UI.DETAILS || 'Details'}
+        </h3>
 
         <div className="space-y-5">
           {/* Status */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[130px] text-[13.5px] font-semibold">
+            <span className="text-muted min-w-[130px] text-[13.5px] font-semibold text-gray-500">
               {BACKLOG_UI.FIELD_STATUS || 'Status'} <span className="text-danger">*</span>
             </span>
             <div className="flex-1">
@@ -60,7 +65,7 @@ export function TaskModalSidebar({
 
           {/* Type */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_TYPE || 'Type'} <span className="text-danger">*</span>
             </span>
             <div className="flex-1">
@@ -79,7 +84,7 @@ export function TaskModalSidebar({
 
           {/* Epic */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.TYPE_EPIC || 'Epic'}
             </span>
             <div className="flex-1">
@@ -97,7 +102,7 @@ export function TaskModalSidebar({
 
           {/* Sprint */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_SPRINT || 'Sprint'}
             </span>
             <div className="flex-1">
@@ -115,7 +120,7 @@ export function TaskModalSidebar({
 
           {/* Assignee */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_ASSIGNEE || 'Assignee'}
             </span>
             <div className="flex-1">
@@ -133,7 +138,7 @@ export function TaskModalSidebar({
 
           {/* Priority */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_PRIORITY || 'Priority'} <span className="text-danger">*</span>
             </span>
             <div className="flex-1">
@@ -152,21 +157,32 @@ export function TaskModalSidebar({
 
           {/* Due Date */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
             </span>
             <div className="flex-1">
-              <DateInput value={dueDate} onChange={setDueDate} />
+              <DatePicker
+                value={dueDate ? dayjs(dueDate) : null}
+                onChange={(date) => setDueDate(date ? date.toISOString() : '')}
+                format="YYYY-MM-DD"
+                placeholder="Select date"
+                className="h-10 rounded-2xl"
+              />
             </div>
           </div>
 
           {/* Story Points */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium">
+            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_STORY_POINTS || 'Story Points'}
             </span>
             <div className="flex-1">
-              <TextInput value={points} onChange={setPoints} placeholder="" />
+              <TextInput
+                value={points}
+                onChange={setPoints}
+                placeholder=""
+                className="h-10 rounded-2xl"
+              />
             </div>
           </div>
         </div>

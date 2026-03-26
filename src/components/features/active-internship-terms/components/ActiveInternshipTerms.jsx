@@ -1,8 +1,9 @@
 'use client';
 
-import { Empty, Result, Spin } from 'antd';
+import { Result, Spin } from 'antd';
 import React, { useMemo, useState } from 'react';
 
+import PageLayout from '@/components/ui/pagelayout';
 import { ACTIVE_TERM_UI } from '@/constants/active-internship-terms/uiText';
 
 import { useActiveTerms } from '../hooks/useActiveTerms';
@@ -31,29 +32,34 @@ export default function ActiveInternshipTerms() {
   }, [terms, selectedUniversity]);
 
   if (error) {
-    return <Result status="error" title={ACTIVE_TERM_UI.ERROR} subTitle={error.message} />;
+    return (
+      <PageLayout>
+        <Result status="error" title={ACTIVE_TERM_UI.ERROR} subTitle={error.message} />
+      </PageLayout>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-6 p-8">
-      {/* Header section with Filter */}
-      <header className="flex flex-col gap-6 justify-between lg:flex-row lg:items-end">
-        <h1 className="m-0 text-2xl font-bold text-gray-800">{ACTIVE_TERM_UI.TITLE}</h1>
-        <UniversityFilter
-          value={selectedUniversity}
-          onChange={setSelectedUniversity}
-          universities={universities}
-        />
-      </header>
+    <PageLayout>
+      <PageLayout.Header title={ACTIVE_TERM_UI.TITLE} />
 
-      {/* Main Content List Area */}
-      <main className="flex flex-1 flex-col mt-4">
+      <PageLayout.Toolbar>
+        <div className="ml-auto">
+          <UniversityFilter
+            value={selectedUniversity}
+            onChange={setSelectedUniversity}
+            universities={universities}
+          />
+        </div>
+      </PageLayout.Toolbar>
+
+      <PageLayout.Content>
         {loading ? (
-          <div className="flex h-64 items-center justify-center">
-            <Spin size="large" />
+          <div className="flex flex-1 items-center justify-center p-20">
+            <Spin size="large" description="Loading active terms..." />
           </div>
         ) : filteredTerms.length > 0 ? (
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6">
             {filteredTerms.map((term) => (
               <TermCard key={term.termId}>
                 <TermCard.Header
@@ -78,9 +84,13 @@ export default function ActiveInternshipTerms() {
             ))}
           </div>
         ) : (
-          <Empty description={ACTIVE_TERM_UI.EMPTY} className="mt-20" />
+          <PageLayout.Card className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <p className="text-muted mb-4 font-medium">{ACTIVE_TERM_UI.EMPTY}</p>
+            </div>
+          </PageLayout.Card>
         )}
-      </main>
-    </div>
+      </PageLayout.Content>
+    </PageLayout>
   );
 }

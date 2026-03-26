@@ -1,7 +1,10 @@
+'use client';
+
 import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import React from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { Dropdown } from '@/components/ui/dropdown';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 export function EpicSidebar({
@@ -15,19 +18,6 @@ export function EpicSidebar({
   setSelectedEpic,
   handleDeleteEpic,
 }) {
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setOpenMenuId(null);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   if (!isSidebarOpen) {
     return (
       <div className="flex h-full w-12 shrink-0 flex-col items-center rounded-3xl border border-gray-200 bg-white py-6 shadow-sm transition-all duration-300">
@@ -92,55 +82,55 @@ export function EpicSidebar({
               <div className="truncate pr-6">{epic.title || epic.name || 'Untitled Epic'}</div>
             </button>
 
-            {/* More Menu */}
+            {/* More Menu using Dropdown wrapper */}
             <div className="absolute top-1/2 right-2 -translate-y-1/2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenMenuId(openMenuId === epic.id ? null : epic.id);
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: 'edit',
+                      label: (
+                        <div className="flex items-center gap-2 py-1">
+                          <Pencil className="text-primary h-3.5 w-3.5" />
+                          <span>{BACKLOG_UI.UPDATE || 'Edit'}</span>
+                        </div>
+                      ),
+                      onClick: (e) => {
+                        e.domEvent.stopPropagation();
+                        setSelectedEpic(epic);
+                        setOpenUpdateEpic(true);
+                      },
+                    },
+                    {
+                      key: 'delete',
+                      label: (
+                        <div className="flex items-center gap-2 py-1 text-primary">
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>{BACKLOG_UI.DELETE || 'Delete'}</span>
+                        </div>
+                      ),
+                      onClick: (e) => {
+                        e.domEvent.stopPropagation();
+                        showDeleteConfirm({
+                          title: 'Delete Epic',
+                          content:
+                            'Are you sure you want to delete this epic? This action cannot be undone.',
+                          onOk: () => handleDeleteEpic(epic.id),
+                          okText: BACKLOG_UI.DELETE || 'Delete',
+                          cancelText: BACKLOG_UI.CANCEL || 'Cancel',
+                        });
+                      },
+                    },
+                  ],
                 }}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100"
               >
-                <MoreVertical className="h-4 w-4" />
-              </button>
-
-              {openMenuId === epic.id && (
-                <div
-                  ref={menuRef}
-                  className="absolute top-full right-0 z-50 mt-1 min-w-[120px] rounded-xl border border-gray-200 bg-white p-1 shadow-lg"
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100"
                 >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedEpic(epic);
-                      setOpenUpdateEpic(true);
-                      setOpenMenuId(null);
-                    }}
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    <Pencil className="text-primary h-3.5 w-3.5" />
-                    {BACKLOG_UI.UPDATE || 'Edit'}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setOpenMenuId(null);
-                      showDeleteConfirm({
-                        title: 'Delete Epic',
-                        content:
-                          'Are you sure you want to delete this epic? This action cannot be undone.',
-                        onOk: () => handleDeleteEpic(epic.id),
-                        okText: BACKLOG_UI.DELETE || 'Delete',
-                        cancelText: BACKLOG_UI.CANCEL || 'Cancel',
-                      });
-                    }}
-                    className="text-primary hover:bg-primary-50 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    {BACKLOG_UI.DELETE || 'Delete'}
-                  </button>
-                </div>
-              )}
+                  <MoreVertical className="h-4 w-4" />
+                </button>
+              </Dropdown>
             </div>
           </div>
         ))}

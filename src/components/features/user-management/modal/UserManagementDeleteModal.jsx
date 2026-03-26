@@ -1,20 +1,10 @@
 'use client';
 
 import { Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Field } from '@/components/ui/field';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
@@ -55,46 +45,47 @@ export default function UserManagementDeleteModal({ open, userId, label, onToggl
   };
 
   return (
-    <Dialog open={open} onOpenChange={onToggle}>
-      <DialogContent aria-describedby={undefined} className="sm:max-w-sm">
-        <form onSubmit={doDelete}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-              <Trash2 className="h-6 w-6 text-rose-600" />
-              {UI_TEXT.USER_MANAGEMENT.DELETE}
-            </DialogTitle>
-            <DialogDescription>{UI_TEXT.USER_MANAGEMENT.DELETE_HINT}</DialogDescription>
-          </DialogHeader>
+    <CompoundModal open={open} onCancel={() => onToggle?.(false)} width={400}>
+      <CompoundModal.Header
+        icon={<Trash2 className="size-5" />}
+        title={UI_TEXT.USER_MANAGEMENT.DELETE}
+        subtitle={UI_TEXT.USER_MANAGEMENT.DELETE_HINT}
+        type="danger"
+      />
 
-          <div className="mt-4 space-y-3">
-            <div className="text-sm text-slate-700">
-              {UI_TEXT.USER_MANAGEMENT.DELETE_BTN} <b>{label || UI_TEXT.COMMON.MINUS}</b>
-              {UI_TEXT.COMMON.QUESTION}
-            </div>
+      <CompoundModal.Content className="space-y-6">
+        <div className="rounded-2xl border border-rose-100 bg-rose-50/30 p-4 text-[13px] font-medium leading-relaxed text-rose-900/80">
+          {UI_TEXT.USER_MANAGEMENT.DELETE_BTN}{' '}
+          <span className="font-black text-rose-600">{label || UI_TEXT.COMMON.MINUS}</span>
+          {UI_TEXT.COMMON.QUESTION}
+        </div>
 
-            <Field orientation="horizontal" className="gap-3">
-              <Checkbox checked={confirmed} onCheckedChange={setConfirmed} />
-              <div className="space-y-1">
-                <span className="text-sm font-semibold">
-                  {UI_TEXT.USER_MANAGEMENT.CONFIRM_DELETE}
-                </span>
-                <p className="text-xs text-slate-500">{UI_TEXT.USER_MANAGEMENT.LOSS_ACCESS_HINT}</p>
-              </div>
-            </Field>
+        <div
+          className={`group flex cursor-pointer items-start gap-3 rounded-2xl border p-4 transition-all duration-300 ${confirmed ? 'border-rose-200 bg-rose-50/50 shadow-sm' : 'border-gray-100 bg-gray-50/50 hover:bg-white'}`}
+          onClick={() => setConfirmed(!confirmed)}
+        >
+          <div className="mt-0.5">
+            <Checkbox checked={confirmed} onCheckedChange={setConfirmed} />
           </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[13px] font-black tracking-tight text-text">
+              {UI_TEXT.USER_MANAGEMENT.CONFIRM_DELETE}
+            </span>
+            <p className="text-[11px] font-medium leading-relaxed text-muted/60">
+              {UI_TEXT.USER_MANAGEMENT.LOSS_ACCESS_HINT}
+            </p>
+          </div>
+        </div>
+      </CompoundModal.Content>
 
-          <DialogFooter className="mt-4">
-            <DialogClose asChild>
-              <Button type="button" variant="outline">
-                {UI_TEXT.BUTTON.CLOSE}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={busy || !confirmed} variant="destructive">
-              {UI_TEXT.BUTTON.DELETE}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <CompoundModal.Footer
+        onCancel={() => onToggle?.(false)}
+        onConfirm={doDelete}
+        confirmText={UI_TEXT.BUTTON.DELETE}
+        loading={busy}
+        danger
+        disabled={!confirmed}
+      />
+    </CompoundModal>
   );
 }

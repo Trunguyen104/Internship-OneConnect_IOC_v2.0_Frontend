@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
 
+import { Button } from '@/components/ui/button';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 
 export function EmptySprintState() {
@@ -40,8 +41,10 @@ export function EmptySprintState() {
         }
         description={
           <div className="flex flex-col items-center">
-            <h3 className="text-text mb-2 text-xl font-bold">{WORK_BOARD_UI.NO_ACTIVE_SPRINT}</h3>
-            <p className="text-muted max-w-md text-sm leading-relaxed">
+            <h3 className="text-text mb-2 text-xl font-bold text-gray-900">
+              {WORK_BOARD_UI.NO_ACTIVE_SPRINT}
+            </h3>
+            <p className="text-muted max-w-md text-sm leading-relaxed text-gray-500">
               {WORK_BOARD_UI.START_SPRINT_DESC}
             </p>
           </div>
@@ -49,9 +52,9 @@ export function EmptySprintState() {
       >
         <div className="flex justify-center">
           <Link href={backlogPath}>
-            <button className="bg-primary hover:bg-primary-hover active:bg-primary flex items-center justify-center rounded-lg px-6 py-2.5 text-[13px] font-bold text-white uppercase transition-all hover:shadow-lg active:scale-95">
+            <Button className="h-11 px-8 rounded-2xl text-[13px] font-bold uppercase">
               {WORK_BOARD_UI.GO_TO_BACKLOG}
-            </button>
+            </Button>
           </Link>
         </div>
       </Empty>

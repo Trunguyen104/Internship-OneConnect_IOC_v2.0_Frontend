@@ -1,8 +1,6 @@
 import React, { memo } from 'react';
 
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 
 import { useStakeholderTab } from '../hooks/useStakeholderTab';
@@ -34,66 +32,70 @@ const StakeholderTab = memo(function StakeholderTab() {
   } = useStakeholderTab();
 
   return (
-    <div className="animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500">
-      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
-        <DataTableToolbar
-          className="mb-6 !border-0 !p-0"
-          searchProps={{
-            placeholder: STAKEHOLDER_UI.SEARCH_PLACEHOLDER,
-            value: search,
-            onChange: (e) => setSearch(e.target.value),
-          }}
-          actionProps={{
-            label: STAKEHOLDER_UI.ADD_BUTTON,
-            onClick: () => {
-              setStakeholderForm({
-                name: '',
-                type: 0,
-                role: '',
-                description: '',
-                email: '',
-                phoneNumber: '',
-              });
-              setErrors({});
-              setOpenStakeholderForm(true);
-            },
-          }}
-        />
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <PageLayout.Card>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <PageLayout.Toolbar
+            searchProps={{
+              placeholder: STAKEHOLDER_UI.SEARCH_PLACEHOLDER,
+              value: search,
+              onChange: (e) => setSearch(e.target.value),
+            }}
+            actionProps={{
+              label: STAKEHOLDER_UI.ADD_BUTTON,
+              onClick: () => {
+                setStakeholderForm({
+                  name: '',
+                  type: 0,
+                  role: '',
+                  description: '',
+                  email: '',
+                  phoneNumber: '',
+                });
+                setErrors({});
+                setOpenStakeholderForm(true);
+              },
+            }}
+          />
 
-        <StakeholderList
-          stakeholders={stakeholders}
-          loading={stakeholderLoading}
-          page={page}
-          pageSize={pageSize}
-          onEdit={(s) => {
-            setEditingStakeholderId(s.id);
-            setStakeholderForm({
-              name: s.name || '',
-              type: s.type || 0,
-              role: s.role || '',
-              description: s.description || '',
-              email: s.email || '',
-              phoneNumber: s.phoneNumber || '',
-            });
-            setErrors({});
-            setOpenStakeholderForm(true);
-          }}
-          onDelete={handleDeleteStakeholder}
-        />
+          <PageLayout.Content>
+            <StakeholderList
+              stakeholders={stakeholders}
+              loading={stakeholderLoading}
+              page={page}
+              pageSize={pageSize}
+              onEdit={(s) => {
+                setEditingStakeholderId(s.id);
+                setStakeholderForm({
+                  name: s.name || '',
+                  type: s.type || 0,
+                  role: s.role || '',
+                  description: s.description || '',
+                  email: s.email || '',
+                  phoneNumber: s.phoneNumber || '',
+                });
+                setErrors({});
+                setOpenStakeholderForm(true);
+              }}
+              onDelete={handleDeleteStakeholder}
+            />
+          </PageLayout.Content>
 
-        {total > 0 && (
-          <div className="border-border/50 mt-6 border-t pt-6">
-            <Pagination
+          {total > 0 && (
+            <PageLayout.Pagination
               page={page}
               pageSize={pageSize}
               total={total}
               totalPages={totalPages}
               onPageChange={setPage}
-              onPageSizeChange={setPageSize}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
             />
-          </div>
-        )}
-      </Card>
+          )}
+        </div>
+      </PageLayout.Card>
       <StakeholderFormModal
         isOpen={openStakeholderForm}
         onClose={() => {

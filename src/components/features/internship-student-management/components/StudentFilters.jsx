@@ -217,7 +217,7 @@ export const StudentFilters = ({
       open={open}
       onOpenChange={setOpen}
       placement="bottomLeft"
-      overlayClassName="filter-popover"
+      classNames={{ root: 'filter-popover' }}
     >
       <Button
         className={`flex h-10 items-center gap-2 rounded-full px-5 font-semibold transition-all duration-300 ${

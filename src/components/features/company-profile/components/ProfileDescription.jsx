@@ -14,12 +14,16 @@ export const ProfileDescription = memo(function ProfileDescription({ profile }) 
       <EmptyState
         title={ENTERPRISE_PROFILE_UI.ENTERPRISE.NO_DESCRIPTION}
         description={ENTERPRISE_PROFILE_UI.ENTERPRISE.ADD_OVERVIEW_HINT}
-        minHeightClassName="min-h-[260px]"
+        minHeightClassName="min-h-[300px]"
       />
     );
   }
 
   return (
-    <Paragraph className="text-muted !mb-0 whitespace-pre-wrap">{profile.description}</Paragraph>
+    <div className="prose prose-slate max-w-none">
+      <p className="text-base leading-loose text-text/80 whitespace-pre-wrap font-medium">
+        {profile.description}
+      </p>
+    </div>
   );
 });

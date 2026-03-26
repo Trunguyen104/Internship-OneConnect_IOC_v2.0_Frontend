@@ -1,12 +1,9 @@
 'use client';
 
 import { DatePicker } from 'antd';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import { useViolation } from '../hooks/useViolation';
@@ -54,17 +51,18 @@ export default function ViolationPage() {
   };
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={VIOLATION_REPORT.TITLE} />
+    <PageLayout>
+      <PageLayout.Header title={VIOLATION_REPORT.TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar className="mb-5 !border-0 !p-0">
-          <DataTableToolbar.Search
-            placeholder={VIOLATION_REPORT.SEARCH_PLACEHOLDER}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <DataTableToolbar.Filters>
+      <PageLayout.Card>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <PageLayout.Toolbar
+            searchProps={{
+              placeholder: VIOLATION_REPORT.SEARCH_PLACEHOLDER,
+              value: search,
+              onChange: (e) => setSearch(e.target.value),
+            }}
+          >
             <div className="relative">
               <RangePicker
                 className="h-9 w-60"
@@ -82,20 +80,20 @@ export default function ViolationPage() {
                 </span>
               )}
             </div>
-          </DataTableToolbar.Filters>
-        </DataTableToolbar>
+          </PageLayout.Toolbar>
 
-        <ViolationTable
-          data={paginated}
-          loading={loading}
-          page={page}
-          pageSize={pageSize}
-          onView={handleView}
-        />
+          <PageLayout.Content>
+            <ViolationTable
+              data={paginated}
+              loading={loading}
+              page={page}
+              pageSize={pageSize}
+              onView={handleView}
+            />
+          </PageLayout.Content>
 
-        {total > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
+          {total > 0 && (
+            <PageLayout.Pagination
               total={total}
               page={page}
               pageSize={pageSize}
@@ -105,9 +103,9 @@ export default function ViolationPage() {
                 setPage(1);
               }}
             />
-          </div>
-        )}
-      </Card>
+          )}
+        </div>
+      </PageLayout.Card>
 
       <ViolationModal
         visible={modalVisible}
@@ -118,6 +116,6 @@ export default function ViolationPage() {
         }}
         viewOnly={true}
       />
-    </section>
+    </PageLayout>
   );
 }

@@ -10,7 +10,7 @@ import { useLayoutStore } from '@/store/useLayoutStore';
 export default function BaseSidebar({
   menus = [],
   backButton,
-  activeStrategy = 'exact',
+  activeStrategy = 'prefix',
   className = '',
 }) {
   const pathname = usePathname();
@@ -25,56 +25,65 @@ export default function BaseSidebar({
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen flex-col border-r border-slate-200 bg-gray-50 transition-all duration-300 ease-in-out md:flex ${
-        isSidebarCollapsed ? 'w-20' : 'w-[15.1rem]'
-      } ${className}`}
+      className={`sticky top-0 hidden h-screen w-64 flex-col border-r border-gray-100 bg-white/80 backdrop-blur-xl md:flex ${className}`}
     >
-      <div
-        className={`flex justify-center px-4 py-6 transition-all duration-300 ${
-          isSidebarCollapsed ? 'opacity-0 h-0 py-0 overflow-hidden' : 'px-14 opacity-100'
-        }`}
-      >
-        {!isSidebarCollapsed && (
-          <Image src="/assets/images/logo.svg" alt="IOC Logo" width={120} height={40} />
-        )}
+      <div className="flex flex-col items-center px-8 py-6">
+        <Image
+          src="/assets/images/logo.svg"
+          alt="IOC Logo"
+          width={120}
+          height={42}
+          className="transition-transform hover:scale-105"
+        />
       </div>
 
-      <div className="flex flex-1 flex-col transition-all duration-300">
+      <div className="mt-2 flex flex-1 flex-col px-4">
         {backButton && (
           <Link
             href={backButton.href}
-            className={`mx-auto mb-6 flex cursor-pointer items-center gap-2 text-[14px] font-bold transition-all ${
-              isSidebarCollapsed ? 'px-0 justify-center' : 'mx-5'
-            } ${backButton.className || 'text-primary hover:text-primary-hover'}`}
+            className={`group mx-2 mb-4 flex items-center gap-3 rounded-xl bg-gray-50/50 p-3 text-sm font-black transition-all hover:bg-white hover:shadow-sm ${
+              backButton.className || 'text-primary'
+            }`}
           >
-            <span className="text-lg">{backButton.icon || <ArrowLeftOutlined />}</span>
-            {!isSidebarCollapsed && backButton.label}
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm transition-transform group-hover:-translate-x-1">
+              {backButton.icon || <ArrowLeftOutlined className="text-[10px]" />}
+            </div>
+            {backButton.label}
           </Link>
         )}
 
-        <nav className={`flex-1 space-y-1 ${isSidebarCollapsed ? 'px-2' : 'px-3'}`}>
+        <nav className="space-y-1">
           {menus.map((item) => {
             const isActive = isItemActive(item.href);
 
             return (
               <Link key={item.href} href={item.href} className="block">
                 <div
-                  className={`flex items-center rounded-xl py-2 text-sm font-semibold transition-all ${
-                    isSidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'
-                  } ${
-                    isActive ? 'bg-primary-surface text-primary' : 'text-slate-600 hover:bg-blue-50'
+                  className={`group relative flex items-center gap-4 rounded-xl px-4 py-2.5 text-sm font-black tracking-tight transition-all duration-300 ${
+                    isActive
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.01]'
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                   }`}
-                  title={isSidebarCollapsed ? item.label : ''}
                 >
-                  <span className="text-xl leading-none flex items-center justify-center">
+                  <span
+                    className={`text-lg transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}
+                  >
                     {item.icon}
                   </span>
-                  {!isSidebarCollapsed && <span className="truncate flex-1">{item.label}</span>}
+                  <span className="flex-1">{item.label}</span>
+
+                  {isActive && (
+                    <div className="absolute right-3 h-1.5 w-1.5 rounded-full bg-white/80 shadow-sm" />
+                  )}
                 </div>
               </Link>
             );
           })}
         </nav>
+      </div>
+
+      <div className="p-4 text-center">
+        <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">Portal v2.0</p>
       </div>
     </aside>
   );

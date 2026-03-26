@@ -1,9 +1,9 @@
 'use client';
 
-import { Empty } from 'antd';
+import React from 'react';
 
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Card from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/atoms';
+import PageLayout from '@/components/ui/pagelayout';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 import { useEvaluation } from '../hooks/useEvaluation';
@@ -30,27 +30,29 @@ export default function EvaluationPage() {
   } = useEvaluation();
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={EVALUATION_UI.TITLE} />
+    <PageLayout>
+      <PageLayout.Header title={EVALUATION_UI.TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        {loading && paginated.length === 0 ? (
-          <div className="flex h-full items-center justify-center py-20">
-            <div className="border-primary/30 border-t-primary h-8 w-8 animate-spin rounded-full border-4"></div>
-          </div>
-        ) : paginated.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center py-12">
-            <Empty description={EVALUATION_UI.LABELS.NO_DATA} />
-          </div>
-        ) : (
-          <CycleTable
-            data={paginated}
-            page={page}
-            pageSize={pageSize}
-            onDetail={openTeamOverview}
-          />
-        )}
-      </Card>
+      <PageLayout.Card>
+        <PageLayout.Content>
+          {loading && paginated.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center py-20">
+              <div className="border-primary/30 border-t-primary h-8 w-8 animate-spin rounded-full border-4"></div>
+            </div>
+          ) : paginated.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center py-12">
+              <EmptyState description={EVALUATION_UI.LABELS.NO_DATA} />
+            </div>
+          ) : (
+            <CycleTable
+              data={paginated}
+              page={page}
+              pageSize={pageSize}
+              onDetail={openTeamOverview}
+            />
+          )}
+        </PageLayout.Content>
+      </PageLayout.Card>
 
       <TeamEvaluationsModal
         visible={teamVisible}
@@ -67,6 +69,6 @@ export default function EvaluationPage() {
         onClose={closeDetail}
         evaluationDetail={myEvaluation}
       />
-    </section>
+    </PageLayout>
   );
 }

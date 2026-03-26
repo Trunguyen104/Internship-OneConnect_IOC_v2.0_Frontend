@@ -99,7 +99,7 @@ export default function EnterprisesTable({ enterprises = [], loading = false }) 
                 </span>
               </TableCell>
               <TableCell className="pr-8 text-right">
-                <div className="flex justify-end transition-opacity duration-200 group-hover:opacity-100 sm:opacity-0">
+                <div className="flex justify-end">
                   <EnterprisesAction enterprise={ent} />
                 </div>
               </TableCell>

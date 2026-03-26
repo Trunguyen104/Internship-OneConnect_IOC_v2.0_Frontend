@@ -145,26 +145,24 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
   return (
     <CompoundModal
       title={
-        <div className="flex h-11 items-center justify-between pr-10">
-          <div className="flex flex-col justify-center">
-            <h3 className="m-0 text-xl font-bold tracking-tight leading-none text-slate-900">
+        <div className="flex items-center justify-between pr-8 min-h-[60px]">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
               {editingItem
                 ? editingItem === 'new'
                   ? LABELS.ADD_NEW
                   : BUTTONS.EDIT
                 : LABELS.EDIT_CRITERIA}
+            </span>
+            <h3 className="m-0 text-xl font-black tracking-tighter text-text">
+              {editingItem ? formData.name || 'New Criteria' : 'Evaluation Criteria'}
             </h3>
-            {editingItem && cycle?.name && (
-              <span className="mt-1.5 text-[10px] font-semibold uppercase text-slate-400">
-                {cycle.name}
-              </span>
-            )}
           </div>
           {!editingItem && (
             <Button
               variant="primary"
-              size="sm"
-              className="flex h-9 items-center gap-1.5 rounded-lg px-5 text-sm font-bold shadow-sm transition-all active:scale-95 -translate-y-[3px]"
+              size="lg"
+              className="rounded-full px-8 h-11 font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-[11px] flex items-center gap-2"
               onClick={() => {
                 setEditingItem('new');
                 setFormData({ name: '', description: '', maxScore: 10, weight: 1 });
@@ -177,58 +175,59 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
       }
       open={open}
       onCancel={onClose}
-      width={700}
-      style={{ maxWidth: '95vw' }}
+      width={800}
     >
-      <div className="py-4">
+      <div className="py-6 min-h-[400px]">
         {editingItem ? (
           /* FORM VIEW - Replaces Table */
-          <div className="animate-in fade-in zoom-in-95 space-y-6 duration-200">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 rounded-2xl border border-slate-100 bg-slate-50/50 p-6">
-              <div className="col-span-2 space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
+          <div className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-500">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 rounded-[32px] border border-gray-100 bg-gray-50/30 p-8 shadow-sm">
+              <div className="col-span-2 space-y-2.5">
+                <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
                   {LABELS.CRITERIA_NAME}
-                </label>
+                </span>
                 <Input
                   placeholder={LABELS.CRITERIA_NAME}
-                  className="h-10 rounded-xl border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                  className="h-12 rounded-2xl border-none! bg-white shadow-sm font-bold text-sm focus:ring-4 focus:ring-primary/5 transition-all"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
+              <div className="space-y-2.5">
+                <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
                   {LABELS.MAX_SCORE}
-                </label>
+                </span>
                 <InputNumber
-                  className="h-10 w-full rounded-xl pt-1 border-slate-200"
+                  className="h-12 w-full rounded-2xl border-none! bg-white shadow-sm font-black text-lg [&_.ant-input-number-input]:h-12 [&_.ant-input-number-input]:leading-[48px] focus:ring-4 focus:ring-primary/5 transition-all"
                   min={1}
                   value={formData.maxScore}
                   onChange={(val) => setFormData({ ...formData, maxScore: val })}
+                  controls={false}
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
+              <div className="space-y-2.5">
+                <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
                   {LABELS.WEIGHT}
-                </label>
+                </span>
                 <InputNumber
-                  className="h-10 w-full rounded-xl pt-1 border-slate-200"
+                  className="h-12 w-full rounded-2xl border-none! bg-white shadow-sm font-black text-lg [&_.ant-input-number-input]:h-12 [&_.ant-input-number-input]:leading-[48px] focus:ring-4 focus:ring-primary/5 transition-all"
                   min={0}
                   step={0.1}
                   value={formData.weight}
                   onChange={(val) => setFormData({ ...formData, weight: val })}
+                  controls={false}
                 />
               </div>
 
-              <div className="col-span-2 space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">
+              <div className="col-span-2 space-y-2.5">
+                <span className="text-[10px] font-black text-muted/50 uppercase tracking-widest ml-1 leading-none">
                   {LABELS.DESCRIPTION}
-                </label>
+                </span>
                 <Input.TextArea
                   placeholder={LABELS.DESCRIPTION}
-                  className="rounded-xl border-slate-200"
+                  className="rounded-[24px] border-none! bg-white shadow-sm p-4 text-sm font-medium focus:ring-4 focus:ring-primary/5 transition-all"
                   rows={4}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -238,15 +237,15 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
 
             <div className="flex justify-end gap-3 pt-2">
               <Button
-                variant="ghost"
-                className="h-11 rounded-xl px-6 font-bold text-gray-500 hover:bg-slate-100"
+                variant="outline"
+                className="rounded-full h-12 px-8 font-black uppercase tracking-widest text-[11px] border-gray-200 transition-all hover:bg-white active:scale-95"
                 onClick={() => setEditingItem(null)}
               >
                 {BUTTONS.CANCEL}
               </Button>
               <Button
                 variant="primary"
-                className="h-11 rounded-xl px-10 font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+                className="rounded-full h-12 px-12 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 transition-all active:scale-95"
                 onClick={handleSave}
               >
                 {BUTTONS.SAVE}
@@ -255,14 +254,23 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
           </div>
         ) : (
           /* TABLE VIEW */
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="max-h-[60vh] overflow-y-auto pr-1">
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="max-h-[55vh] overflow-y-auto pr-1 custom-scrollbar-minimal rounded-[32px] border border-gray-100 bg-white shadow-sm overflow-hidden">
               <DataTable
                 columns={columns}
                 data={criteria}
                 loading={loading}
                 minWidth="0"
-                emptyText={LABELS.NO_CRITERIA}
+                emptyText={
+                  <div className="flex flex-col items-center justify-center py-20 gap-4">
+                    <div className="p-8 rounded-[32px] bg-gray-50 ring-8 ring-gray-50/50">
+                      <MoreOutlined className="text-4xl text-muted/20 rotate-90" />
+                    </div>
+                    <span className="text-sm font-black text-muted/30 uppercase tracking-widest">
+                      {LABELS.NO_CRITERIA}
+                    </span>
+                  </div>
+                }
               />
             </div>
           </div>

@@ -1,7 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 
+import CompoundModal from '@/components/ui/CompoundModal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
@@ -49,6 +51,7 @@ export default function CreateTaskModal({
   }
 
   function handleClose() {
+    reset();
     onClose?.();
   }
 
@@ -66,61 +69,47 @@ export default function CreateTaskModal({
       dueDate,
       points: points ? Number(points) : null,
     });
-    reset();
-    onClose?.();
+    handleClose();
   }
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-      {/* Overlay */}
-      <button
-        type="button"
-        aria-label="Close modal"
-        onClick={handleClose}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+    <CompoundModal open={open} onCancel={handleClose} width={1200}>
+      <CompoundModal.Header
+        title={BACKLOG_UI.MODAL_CREATE_TASK}
+        subtitle="Khởi tạo công việc mới và thiết lập các thông tin chi tiết cho kế hoạch sprint"
+        icon={<PlusCircleOutlined />}
       />
 
-      {/* Modal Container */}
-      <div className="relative flex max-h-[90vh] w-full max-w-[1200px] flex-col rounded-4xl bg-white shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-8 pt-8 pb-5">
-          <h2 className="text-text text-[28px] font-bold">{BACKLOG_UI.MODAL_CREATE_TASK}</h2>
-        </div>
-
-        {/* Content Body - 2 Columns */}
-        <div
-          className="flex flex-1 flex-col overflow-y-auto px-8 pb-3"
-          style={{ scrollbarWidth: 'thin' }}
-        >
-          <div className="flex flex-col gap-8 lg:flex-row">
-            {/* Left column (Main) */}
-            <div className="flex flex-1 flex-col space-y-6">
-              {/* Summary */}
-              <div>
-                <FieldLabel required>{BACKLOG_UI.FIELD_SUMMARY}</FieldLabel>
-                <TextInput
-                  value={summary}
-                  onChange={setSummary}
-                  placeholder={BACKLOG_UI.PLACEHOLDER_SUMMARY}
-                />
-              </div>
-
-              {/* Description */}
-              <div className="flex min-h-[200px] flex-1 flex-col overflow-hidden">
-                <FieldLabel required>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
-                <div className="flex-1 overflow-y-auto rounded-2xl">
-                  <TiptapEditor
-                    value={desc}
-                    onChange={setDesc}
-                    placeholder={BACKLOG_UI.PLACEHOLDER_DESC}
-                  />
-                </div>
-              </div>
+      <CompoundModal.Content className="px-6">
+        <div className="flex flex-col gap-8 lg:flex-row pb-2">
+          {/* Left column (Main) */}
+          <div className="flex flex-1 flex-col space-y-6">
+            {/* Summary */}
+            <div className="flex flex-col gap-2">
+              <FieldLabel required>{BACKLOG_UI.FIELD_SUMMARY}</FieldLabel>
+              <TextInput
+                value={summary}
+                onChange={setSummary}
+                placeholder={BACKLOG_UI.PLACEHOLDER_SUMMARY}
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+              />
             </div>
 
-            {/* Right column (Details sidebar) */}
+            {/* Description */}
+            <div className="flex min-h-[400px] flex-1 flex-col gap-2">
+              <FieldLabel required>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
+              <div className="flex-1 rounded-xl border border-gray-100 overflow-hidden bg-gray-50/20 shadow-inner">
+                <TiptapEditor
+                  value={desc}
+                  onChange={setDesc}
+                  placeholder={BACKLOG_UI.PLACEHOLDER_DESC}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right column (Details sidebar) */}
+          <div className="w-full lg:w-[360px]">
             <TaskModalSidebar
               status={status}
               setStatus={setStatus}
@@ -143,27 +132,16 @@ export default function CreateTaskModal({
             />
           </div>
         </div>
+      </CompoundModal.Content>
 
-        {/* Footer Actions */}
-        <div className="border-border/50 mt-1 flex items-center justify-between gap-4 border-t px-8 py-5">
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-primary bg-primary-50 hover:bg-primary-100 h-[50px] w-[140px] rounded-full px-10 text-[15px] font-bold transition-colors"
-          >
-            {BACKLOG_UI.CANCEL}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!canSubmit}
-            className="bg-primary hover:bg-primary-hover flex h-[50px] flex-1 items-center justify-center rounded-full text-[15px] font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {BACKLOG_UI.MODAL_CREATE_TASK}
-          </button>
-        </div>
-      </div>
-    </div>
+      <CompoundModal.Footer
+        onCancel={handleClose}
+        onConfirm={handleSubmit}
+        cancelText={BACKLOG_UI.CANCEL}
+        confirmText={BACKLOG_UI.MODAL_CREATE_TASK}
+        disabled={!canSubmit}
+        className="px-6 py-4"
+      />
+    </CompoundModal>
   );
 }
