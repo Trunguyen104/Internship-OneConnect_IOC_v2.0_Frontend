@@ -38,6 +38,7 @@ export default function ProjectResources({
   editForm,
   onDownload,
   onView,
+  isReadOnly = false,
 }) {
   const [isUploadModalVisible, setIsUploadModalVisible] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
@@ -74,13 +75,15 @@ export default function ProjectResources({
             {resources.length} {PROJECT_UI.LABEL_FILES || 'FILES'}
           </Badge>
         </div>
-        <Button
-          onClick={handleOpenUpload}
-          className="rounded-2xl px-6 font-black"
-          icon={<PlusCircleOutlined />}
-        >
-          {PROJECT_UI.BUTTON.ADD_RESOURCE || 'Add Resource'}
-        </Button>
+        {!isReadOnly && (
+          <Button
+            onClick={handleOpenUpload}
+            className="rounded-2xl px-6 font-black"
+            icon={<PlusCircleOutlined />}
+          >
+            {PROJECT_UI.BUTTON.ADD_RESOURCE || 'Add Resource'}
+          </Button>
+        )}
       </div>
 
       <div className="custom-scrollbar max-h-[400px] w-full overflow-x-hidden overflow-y-auto pr-2 pb-4">
@@ -135,28 +138,32 @@ export default function ProjectResources({
                       title={PROJECT_UI.BUTTON.DOWNLOAD}
                     />
                   ) : null}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    icon={<EditOutlined />}
-                    onClick={() => openEditModal(item)}
-                    className="text-gray-400 hover:text-primary"
-                    title={PROJECT_UI.BUTTON.EDIT}
-                  />
-                  <Button
-                    variant="danger-ghost"
-                    size="sm"
-                    icon={<DeleteOutlined />}
-                    onClick={() =>
-                      showDeleteConfirm({
-                        title: PROJECT_UI.CONFIRM.DELETE_TITLE || 'Delete Resource',
-                        content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
-                        onOk: () => onDelete(item.projectResourceId),
-                      })
-                    }
-                    className="text-gray-300 hover:text-danger"
-                    title={PROJECT_UI.BUTTON.DELETE}
-                  />
+                  {!isReadOnly && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={<EditOutlined />}
+                        onClick={() => openEditModal(item)}
+                        className="text-gray-400 hover:text-primary"
+                        title={PROJECT_UI.BUTTON.EDIT}
+                      />
+                      <Button
+                        variant="danger-ghost"
+                        size="sm"
+                        icon={<DeleteOutlined />}
+                        onClick={() =>
+                          showDeleteConfirm({
+                            title: PROJECT_UI.CONFIRM.DELETE_TITLE || 'Delete Resource',
+                            content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
+                            onOk: () => onDelete(item.projectResourceId),
+                          })
+                        }
+                        className="text-gray-300 hover:text-danger"
+                        title={PROJECT_UI.BUTTON.DELETE}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             ))

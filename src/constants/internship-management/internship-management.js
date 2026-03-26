@@ -49,9 +49,9 @@ export const GROUP_STATUS_VARIANTS = {
 };
 
 export const PROJECT_STATUS = {
-  DRAFT: 1,
-  PUBLISHED: 2,
-  COMPLETED: 3,
+  DRAFT: 0,
+  PUBLISHED: 1,
+  COMPLETED: 2,
 };
 
 export const PROJECT_STATUS_VARIANTS = {
@@ -981,14 +981,15 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         COMPLETE_SUCCESS: 'Project marked as completed.',
         COMPLETE_CONFIRM: 'Project will be marked as completed. Are you sure?',
         UPDATE_SUCCESS: 'Project updated successfully.',
-        DELETE_SUCCESS: 'Project deleted successfully.',
+        DELETE_SUCCESS: 'Đã xóa dự án.',
+        DELETE_CONFIRM: 'Bạn có chắc chắn muốn xóa dự án này? Thao tác này không thể hoàn tác.',
         ASSIGN_SUCCESS: 'Successfully assigned {count} students to project.',
         UNASSIGN_SUCCESS: 'Student removed from project.',
         EDIT_WARNING:
           'Project has {count} students assigned. Changes may affect progress. Are you sure?',
         ERROR_ARCHIVED_GROUP: 'Cannot publish project for an archived group.',
         ERROR_ASSIGNED_STU:
-          'Project has students assigned and cannot be deleted. Please un-assign them before deleting.',
+          'Dự án đã có dữ liệu thực tế từ sinh viên, không thể xóa. Vui lòng Complete dự án trước.',
         WARNING_COMPLETE_STU:
           'There are {count} students who haven’t completed the project. The project can still be marked as completed.',
       },

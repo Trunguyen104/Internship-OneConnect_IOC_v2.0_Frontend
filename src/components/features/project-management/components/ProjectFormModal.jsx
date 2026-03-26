@@ -1,6 +1,19 @@
 'use client';
 
-import { Button, Col, DatePicker, Drawer, Form, Input, Row, Select, Space } from 'antd';
+import { DeleteOutlined, LinkOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Col,
+  DatePicker,
+  Divider,
+  Drawer,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Upload,
+} from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo } from 'react';
 
@@ -38,8 +51,13 @@ export default function ProjectFormModal({
       if (editingRecord) {
         form.setFieldsValue({
           ...editingRecord,
+          name: editingRecord.projectName || editingRecord.name,
+          code: editingRecord.projectCode || editingRecord.code,
+          internshipGroupId: editingRecord.internshipId || editingRecord.internshipGroupId,
           startDate: editingRecord.startDate ? dayjs(editingRecord.startDate) : null,
           endDate: editingRecord.endDate ? dayjs(editingRecord.endDate) : null,
+          attachments: editingRecord.resources?.attachments || [],
+          links: editingRecord.resources?.links || [],
         });
       } else {
         form.resetFields();
@@ -48,23 +66,23 @@ export default function ProjectFormModal({
   }, [visible, editingRecord, form]);
 
   const handleValuesChange = (changedValues, allValues) => {
-    // AC-02: Auto-generate project code
+    // AC-02: Auto-generate project code: PRJ-[Enterprise]_[Term]_[Tên]
     if (!editingRecord && (changedValues.name || changedValues.internshipGroupId)) {
       const projectName = allValues.name || '';
       const groupId = allValues.internshipGroupId;
-      const group = groups.find((g) => (g.id || g.internshipGroupId) === groupId);
+      const group = groups.find((g) => (g.internshipId || g.id) === groupId);
 
-      // Extract term from group name if possible, or fallback
+      // Extract term from group name or metadata
       let termPart = 'TERM';
-      if (group?.internshipGroupName) {
-        const matches = group.internshipGroupName.match(/SPRING|SUMMER|FALL/i);
-        if (matches) {
-          termPart = matches[0].toUpperCase();
-          const yearMatch = group.internshipGroupName.match(/\d{4}/);
-          if (yearMatch) termPart += `_${yearMatch[0]}`;
+      if (group?.groupName) {
+        // Try to find Spring/Summer/Fall + year
+        const termMatch = group.groupName.match(/(SPRING|SUMMER|FALL)\D*(\d{4})/i);
+        if (termMatch) {
+          termPart = `${termMatch[1].toUpperCase()}${termMatch[2]}`;
         }
       }
 
+      // Project Name initials or similar
       const namePart = projectName
         .trim()
         .split(' ')
@@ -72,7 +90,7 @@ export default function ProjectFormModal({
         .join('')
         .toUpperCase();
 
-      if (projectName && groupId) {
+      if (projectName) {
         form.setFieldsValue({
           code: `PRJ-${enterpriseName}_${termPart}_${namePart}`,
         });
@@ -169,14 +187,32 @@ export default function ProjectFormModal({
             <Form.Item
               name="internshipGroupId"
               label={FORM.GROUP_LABEL}
-              rules={[{ required: true, message: FORM.VALIDATION?.GROUP_REQUIRED || 'Bắt buộc' }]}
+              rules={[{ required: false }]} // AC-02: Optional during creation
+              extra="Bắt buộc chọn trước khi Publish"
             >
-              <Select placeholder={FORM.PLACEHOLDERS?.GROUP}>
-                {groups.map((g) => (
-                  <Option key={g.id || g.internshipGroupId} value={g.id || g.internshipGroupId}>
-                    {g.internshipGroupName}
-                  </Option>
-                ))}
+              <Select placeholder={FORM.PLACEHOLDERS?.GROUP} allowClear>
+                {groups
+                  .filter((g) => {
+                    // Filter: Active (status 1)
+                    const isActive = g.status === 1 || g.groupStatus === 1;
+                    if (!isActive) return false;
+
+                    // Filter by Mentor ONLY if the user is a Mentor AND g.mentorId exists
+                    const userRoleId = userInfo?.roleId || userInfo?.RoleId;
+                    const isMentor = userRoleId === 6; // MENTOR_ROLE
+                    if (isMentor) {
+                      const mid = g.mentorId || g.MentorId;
+                      if (mid) return mid === (userInfo?.userId || userInfo?.Id);
+                      // If mid is missing from API, we can't filter correctly, so we show it anyway to be safe
+                    }
+
+                    return true;
+                  })
+                  .map((g) => (
+                    <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
+                      {g.groupName}
+                    </Option>
+                  ))}
               </Select>
             </Form.Item>
           </Col>
@@ -223,6 +259,77 @@ export default function ProjectFormModal({
         <Form.Item name="deliverables" label={FORM.DELIVERABLES}>
           <TextArea rows={3} placeholder={FORM.PLACEHOLDERS?.DEL} />
         </Form.Item>
+
+        <Divider className="my-6" />
+
+        <section>
+          <h4 className="mb-4 font-bold text-gray-800 uppercase text-xs flex items-center gap-2">
+            <UploadOutlined className="text-primary" />
+            Resources & Attachments
+          </h4>
+
+          <Form.Item
+            name="attachments"
+            label="Project Documents"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+          >
+            <Upload.Dragger
+              name="files"
+              multiple
+              action="/api/v1/media/upload" // Placeholder API
+              listType="picture-card"
+            >
+              <p className="ant-upload-drag-icon">
+                <UploadOutlined />
+              </p>
+              <p className="ant-upload-text text-sm">Click or drag files to this area to upload</p>
+              <p className="ant-upload-hint text-xs font-normal opacity-50">
+                Support for PDF, DOCX, ZIP, etc.
+              </p>
+            </Upload.Dragger>
+          </Form.Item>
+
+          <div className="mt-6">
+            <h5 className="text-[11px] font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+              <LinkOutlined />
+              Quick Links
+            </h5>
+            <Form.List name="links">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'title']}
+                        rules={[{ required: true, message: 'Missing title' }]}
+                      >
+                        <Input placeholder="Link Title (e.g. Figma, PRD)" className="w-40" />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'url']}
+                        rules={[{ required: true, message: 'Missing URL' }]}
+                      >
+                        <Input placeholder="URL" className="w-64" />
+                      </Form.Item>
+                      <DeleteOutlined
+                        onClick={() => remove(name)}
+                        className="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                      />
+                    </Space>
+                  ))}
+                  <Form.Item>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                      Add Link
+                    </Button>
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
+          </div>
+        </section>
       </Form>
     </Drawer>
   );

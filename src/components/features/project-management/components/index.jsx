@@ -72,8 +72,8 @@ export default function ProjectManagement() {
               onChange={handleGroupFilterChange}
             >
               {groups.map((g) => (
-                <Option key={g.id || g.internshipGroupId} value={g.id || g.internshipGroupId}>
-                  {g.internshipGroupName}
+                <Option key={g.internshipId} value={g.internshipId}>
+                  {g.groupName}
                 </Option>
               ))}
             </Select>
@@ -84,9 +84,9 @@ export default function ProjectManagement() {
               value={statusFilter}
               onChange={handleStatusFilterChange}
             >
-              <Option value={1}>Draft</Option>
-              <Option value={2}>Published</Option>
-              <Option value={3}>Completed</Option>
+              <Option value={0}>Draft</Option>
+              <Option value={1}>Published</Option>
+              <Option value={2}>Completed</Option>
             </Select>
           </DataTableToolbar.Filters>
           <DataTableToolbar.Actions

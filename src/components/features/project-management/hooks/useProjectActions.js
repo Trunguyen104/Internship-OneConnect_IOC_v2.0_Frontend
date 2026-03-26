@@ -1,6 +1,6 @@
 'use client';
 
-import { Modal } from 'antd';
+import { App } from 'antd';
 import { useState } from 'react';
 
 import {
@@ -18,52 +18,58 @@ export const useProjectActions = ({
   groups,
   setModalVisible,
 }) => {
+  const { modal } = App.useApp();
   const toast = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
   const { PROJECT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { MESSAGES } = PROJECT_MANAGEMENT;
 
+  const getErrorMessage = (err, defaultMsg) => {
+    // Backend structure: { message, errors: [ "reason" ], validationErrors }
+    if (err.data?.errors?.[0]) return err.data.errors[0];
+    if (err.data?.message) return err.data.message;
+    return err.message || defaultMsg;
+  };
+
   const executeSave = async (values, isDraft) => {
     try {
       setSubmitLoading(true);
       const payload = {
-        ...values,
+        projectName: values.name,
+        projectCode: values.code,
+        internshipId: values.internshipGroupId,
+        description: values.description,
+        startDate: values.startDate ? values.startDate.toISOString() : undefined,
+        endDate: values.endDate ? values.endDate.toISOString() : undefined,
+        field: values.field,
+        requirements: values.requirements,
+        deliverables: values.deliverables,
+        template: values.template === 'Scrum' ? 0 : values.template === 'Kanban' ? 1 : 2,
         status: isDraft ? PROJECT_STATUS.DRAFT : PROJECT_STATUS.PUBLISHED,
+        resources: {
+          attachments:
+            values.attachments?.map((f) => ({
+              name: f.name,
+              url: f.url || f.response?.url,
+              size: f.size,
+              uid: f.uid,
+            })) || [],
+          links: values.links || [],
+        },
       };
 
-      try {
-        if (editingRecord) {
-          await ProjectService.update(editingRecord.projectId, payload);
-          toast.success(MESSAGES.UPDATE_SUCCESS);
-        } else {
-          await ProjectService.create(payload);
-          toast.success(isDraft ? MESSAGES.SAVE_DRAFT_SUCCESS : MESSAGES.PUBLISH_SUCCESS);
-        }
-      } catch (apiErr) {
-        // Mock Update/Create
-        if (editingRecord) {
-          setMockData((prev) =>
-            prev.map((p) => (p.projectId === editingRecord.projectId ? { ...p, ...payload } : p))
-          );
-          toast.success(MESSAGES.UPDATE_SUCCESS + ' (Mock)');
-        } else {
-          const newProject = {
-            ...payload,
-            projectId: Date.now().toString(),
-            internshipGroup: groups.find(
-              (g) => (g.id || g.internshipGroupId) === payload.internshipGroupId
-            ) || { internshipGroupName: 'Unknown Group' },
-          };
-          setMockData((prev) => [newProject, ...prev]);
-          toast.success(
-            (isDraft ? MESSAGES.SAVE_DRAFT_SUCCESS : MESSAGES.PUBLISH_SUCCESS) + ' (Mock)'
-          );
-        }
+      if (editingRecord) {
+        await ProjectService.update(editingRecord.projectId, payload);
+        toast.success(MESSAGES.UPDATE_SUCCESS);
+      } else {
+        await ProjectService.create(payload);
+        toast.success(isDraft ? MESSAGES.SAVE_DRAFT_SUCCESS : MESSAGES.PUBLISH_SUCCESS);
       }
+
       setModalVisible(false);
       fetchData();
     } catch (err) {
-      toast.error(MESSAGES.ERROR);
+      toast.error(getErrorMessage(err, MESSAGES.ERROR));
     } finally {
       setSubmitLoading(false);
     }
@@ -79,7 +85,7 @@ export const useProjectActions = ({
           const studentCount = res?.data?.length || 0;
 
           if (studentCount > 0) {
-            Modal.confirm({
+            modal.confirm({
               title: 'Confirm Project Update',
               content: MESSAGES.EDIT_WARNING.replace('{count}', studentCount),
               okText: 'Confirm',
@@ -94,22 +100,8 @@ export const useProjectActions = ({
             return;
           }
         } catch (err) {
-          // Specific mock case for Project '2'
-          if (editingRecord.projectId === '2') {
-            Modal.confirm({
-              title: 'Confirm Project Update (Mock)',
-              content: MESSAGES.EDIT_WARNING.replace('{count}', 3),
-              okText: 'Confirm',
-              cancelText: 'Cancel',
-              onOk: async () => {
-                await executeSave(values, isDraft);
-              },
-              onCancel: () => {
-                setSubmitLoading(false);
-              },
-            });
-            return;
-          }
+          // Standard API error handling
+          console.error('Error fetching assigned students:', err);
         }
       }
       await executeSave(values, isDraft);
@@ -120,7 +112,7 @@ export const useProjectActions = ({
   };
 
   const handlePublishProject = (id) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Publish Project',
       content: 'Once published, you can assign students and track progress. Proceed?',
       okText: 'Publish',
@@ -131,104 +123,109 @@ export const useProjectActions = ({
           toast.success(MESSAGES.PUBLISH_SUCCESS);
           fetchData();
         } catch (err) {
-          setMockData((prev) =>
-            prev.map((p) => (p.projectId === id ? { ...p, status: PROJECT_STATUS.PUBLISHED } : p))
-          );
-          toast.success(MESSAGES.PUBLISH_SUCCESS + ' (Mock)');
-          fetchData();
+          toast.error(getErrorMessage(err, 'Failed to publish project'));
         }
       },
     });
   };
 
-  const handleCompleteProject = async (id, setOverallLoading) => {
+  const handleCompleteProject = async (record, setOverallLoading) => {
+    const id = typeof record === 'string' ? record : record.projectId || record.id;
+    if (!id) {
+      toast.error('Project ID is missing');
+      return;
+    }
     try {
-      const res = await ProjectService.getAssignedStudents(id);
-      const uncompletedCount = res?.data?.filter((s) => s.status !== 'Completed').length || 0;
+      setOverallLoading?.(true);
+      // Fetch full project detail to get group info and assigned students
+      const [projectRes, studentsRes] = await Promise.all([
+        ProjectService.getById(id),
+        ProjectService.getAssignedStudents(id),
+      ]);
 
+      const projectDetail = projectRes?.data || projectRes;
+      const assignedStudents = studentsRes?.data || studentsRes || [];
+      const studentCount = assignedStudents.length;
+      const groupName =
+        projectDetail.groupInfo?.groupName || projectDetail.groupName || 'Unknown Group';
+
+      // AC-07: If Intern Group is Active and has students, show warning
       const content =
-        uncompletedCount > 0
-          ? MESSAGES.WARNING_COMPLETE_STU.replace('{count}', uncompletedCount)
+        studentCount > 0
+          ? MESSAGES.WARNING_COMPLETE_STU.replace('{groupName}', groupName).replace(
+              '{count}',
+              studentCount
+            )
           : MESSAGES.COMPLETE_CONFIRM;
 
-      Modal.confirm({
+      modal.confirm({
         title: 'Complete Project',
         content,
         okText: 'Confirm',
         cancelText: 'Cancel',
         onOk: async () => {
           try {
-            setOverallLoading(true);
+            setOverallLoading?.(true);
             await ProjectService.complete(id);
             toast.success(MESSAGES.COMPLETE_SUCCESS);
             fetchData();
           } catch (err) {
-            setMockData((prev) =>
-              prev.map((p) => (p.projectId === id ? { ...p, status: PROJECT_STATUS.COMPLETED } : p))
-            );
-            toast.success(MESSAGES.COMPLETE_SUCCESS + ' (Mock)');
-            fetchData();
+            toast.error(getErrorMessage(err, 'Failed to complete project'));
           } finally {
-            setOverallLoading(false);
+            setOverallLoading?.(false);
           }
         },
       });
     } catch (err) {
-      Modal.confirm({
-        title: 'Complete Project (Mock)',
-        content: MESSAGES.COMPLETE_CONFIRM,
-        onOk: () => {
-          setMockData((prev) =>
-            prev.map((p) => (p.projectId === id ? { ...p, status: PROJECT_STATUS.COMPLETED } : p))
-          );
-          toast.success(MESSAGES.COMPLETE_SUCCESS + ' (Mock)');
-          fetchData();
-        },
-      });
+      toast.error(getErrorMessage(err, 'Failed to fetch project details for completion'));
+    } finally {
+      setOverallLoading?.(false);
     }
   };
 
-  const handleDeleteProject = async (id, setOverallLoading) => {
-    try {
-      const res = await ProjectService.getAssignedStudents(id);
-      const studentCount = res?.data?.length || 0;
+  const handleDeleteProject = async (record, setOverallLoading) => {
+    const id = typeof record === 'string' ? record : record.projectId || record.id;
+    if (!id) {
+      toast.error('Project ID is missing');
+      return;
+    }
 
+    try {
+      setOverallLoading?.(true);
+      const res = await ProjectService.getAssignedStudents(id);
+      const assignedStudents = res?.data || res || [];
+      const studentCount = assignedStudents.length;
+
+      // Case 3: Block delete if students are assigned (simple check for now)
+      // Note: Backend will provide more granular check for "actual data" like logbooks
       if (studentCount > 0) {
         toast.error(MESSAGES.ERROR_ASSIGNED_STU);
         return;
       }
 
-      Modal.confirm({
+      modal.confirm({
         title: 'Delete Project',
-        content: 'Are you sure you want to delete this project? This action cannot be undone.',
+        content: MESSAGES.DELETE_CONFIRM,
         okText: 'Delete',
         okType: 'danger',
         cancelText: 'Cancel',
         onOk: async () => {
           try {
-            setOverallLoading(true);
+            setOverallLoading?.(true);
             await ProjectService.delete(id);
             toast.success(MESSAGES.DELETE_SUCCESS);
             fetchData();
           } catch (err) {
-            setMockData((prev) => prev.filter((p) => p.projectId !== id));
-            toast.success(MESSAGES.DELETE_SUCCESS + ' (Mock)');
-            fetchData();
+            toast.error(getErrorMessage(err, 'Failed to delete project'));
           } finally {
-            setOverallLoading(false);
+            setOverallLoading?.(false);
           }
         },
       });
     } catch (err) {
-      Modal.confirm({
-        title: 'Delete Project (Mock)',
-        content: 'Are you sure you want to delete this project?',
-        onOk: () => {
-          setMockData((prev) => prev.filter((p) => p.projectId !== id));
-          toast.success(MESSAGES.DELETE_SUCCESS + ' (Mock)');
-          fetchData();
-        },
-      });
+      toast.error(getErrorMessage(err, 'Failed to check project status for deletion'));
+    } finally {
+      setOverallLoading?.(false);
     }
   };
 

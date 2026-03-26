@@ -2,77 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { PROJECT_STATUS } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
 
+import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
 import { useProjectFilters } from './useProjectFilters';
 import { useProjectModals } from './useProjectModals';
 
 export const useProjectManagement = () => {
+  const toast = useToast();
   // --- Core Data State ---
   const [data, setData] = useState([]);
-  const [mockData, setMockData] = useState([
-    {
-      projectId: '1',
-      name: 'E-Commerce CMS Platform',
-      code: 'PRJ-IOC_2024_001',
-      internshipGroup: { internshipGroupName: 'Group 01 - Backend' },
-      internshipGroupId: 'group-1',
-      field: 'Web Development',
-      template: 'Scrum',
-      startDate: '2024-03-01',
-      endDate: '2024-06-01',
-      status: PROJECT_STATUS.DRAFT,
-      description: 'A robust CMS system for managing e-commerce products and orders.',
-      requirements: 'Node.js, PostgreSQL, Redis',
-      deliverables: 'Architecture Doc, Source Code, API Documentation',
-    },
-    {
-      projectId: '2',
-      name: 'Mobile Banking Wallet',
-      code: 'PRJ-IOC_2024_002',
-      internshipGroup: { internshipGroupName: 'Group 02 - App' },
-      internshipGroupId: 'group-2',
-      field: 'Mobile Development',
-      template: 'Kanban',
-      startDate: '2024-03-15',
-      endDate: '2024-06-15',
-      status: PROJECT_STATUS.PUBLISHED,
-      description: 'Secure mobile banking solution with QR payment support.',
-      requirements: 'Flutter, Firebase, Biometric Auth',
-      deliverables: 'UI/UX Design, iOS/Android Apps',
-    },
-    {
-      projectId: '3',
-      name: 'AI Chatbot Integration',
-      code: 'PRJ-IOC_2024_003',
-      internshipGroup: { internshipGroupName: 'Group 01 - Backend' },
-      internshipGroupId: 'group-1',
-      field: 'Artificial Intelligence',
-      template: 'None',
-      startDate: '2024-02-01',
-      endDate: '2024-05-01',
-      status: PROJECT_STATUS.COMPLETED,
-      description: 'Integrating GPT-4 into existing customer support portal.',
-      requirements: 'Python, OpenAI API, LangChain',
-      deliverables: 'Model Fine-tuning report, Integrated Widget',
-    },
-    {
-      projectId: '4',
-      name: 'DevOps CI/CD Pipeline',
-      code: 'PRJ-IOC_2024_004',
-      internshipGroup: { internshipGroupName: 'Group 03 - Ops' },
-      internshipGroupId: 'group-3',
-      field: 'Infrastructure',
-      template: 'Kanban',
-      startDate: '2024-04-01',
-      endDate: '2024-07-01',
-      status: PROJECT_STATUS.PUBLISHED,
-      description: 'Automating deployment for all internal services.',
-      requirements: 'Docker, Kubernetes, Jenkins',
-      deliverables: 'Pipeline Scripts, K8s Configs',
-    },
-  ]);
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState([]);
 
@@ -104,35 +44,42 @@ export const useProjectManagement = () => {
 
   // --- Data Fetching ---
   const fetchData = useCallback(async () => {
+    // AC-01: allow viewing all projects if no group filter is selected
+    // if (!groupIdFilter) return; // Removed this restrictor
+
     try {
       setLoading(true);
-      // Mock filtering logic
-      let filtered = [...mockData];
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (p) =>
-            p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.code.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      if (groupIdFilter) {
-        filtered = filtered.filter((p) => p.internshipGroupId === groupIdFilter);
-      }
-      if (statusFilter) {
-        filtered = filtered.filter((p) => p.status === statusFilter);
-      }
+      const params = {
+        PageNumber: pagination.current,
+        PageSize: pagination.pageSize,
+        SearchTerm: searchTerm,
+        internshipId: groupIdFilter, // Sync with API parameter name
+        Status: statusFilter,
+      };
 
-      setData(filtered);
-      setPagination((prev) => ({
-        ...prev,
-        total: filtered.length,
-      }));
+      const res = await ProjectService.getAll(params);
+      if (res?.data?.items) {
+        setData(res.data.items);
+        setPagination((prev) => ({
+          ...prev,
+          total: res.data.totalCount || 0,
+        }));
+      }
     } catch (err) {
       console.error('Fetch Projects failed:', err);
+      // toast.error('Failed to load projects'); // Avoid multiple separate toasts if it fails on load
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, groupIdFilter, statusFilter, mockData, setPagination]);
+  }, [
+    searchTerm,
+    groupIdFilter,
+    statusFilter,
+    pagination.current,
+    pagination.pageSize,
+    setPagination,
+    toast,
+  ]);
 
   useEffect(() => {
     fetchData();
@@ -140,12 +87,12 @@ export const useProjectManagement = () => {
 
   const fetchSupportingData = useCallback(async () => {
     try {
-      // Mock groups
-      setGroups([
-        { id: 'group-1', internshipGroupName: 'Group 01 - Backend' },
-        { id: 'group-2', internshipGroupName: 'Group 02 - App' },
-        { id: 'group-3', internshipGroupName: 'Group 03 - Ops' },
-      ]);
+      const res = await ProjectService.getGroupsForMentor();
+      if (res?.data?.items) {
+        // AC-02: Only show Active groups (status 1)
+        const activeGroups = res.data.items.filter((g) => g.status === 1 || g.groupStatus === 1);
+        setGroups(activeGroups);
+      }
     } catch (err) {
       console.error('Fetch Supporting Data failed:', err);
     }
@@ -154,6 +101,15 @@ export const useProjectManagement = () => {
   useEffect(() => {
     fetchSupportingData();
   }, [fetchSupportingData]);
+
+  // Removed auto-select first group logic to allow "View All" (null filter) state
+  /*
+  useEffect(() => {
+    if (!groupIdFilter && groups.length > 0) {
+      handleGroupFilterChange(groups[0].internshipId);
+    }
+  }, [groupIdFilter, groups, handleGroupFilterChange]);
+  */
 
   // --- Actions Hook ---
   const {
@@ -165,7 +121,6 @@ export const useProjectManagement = () => {
   } = useProjectActions({
     editingRecord,
     fetchData,
-    setMockData,
     groups,
     setModalVisible,
   });
