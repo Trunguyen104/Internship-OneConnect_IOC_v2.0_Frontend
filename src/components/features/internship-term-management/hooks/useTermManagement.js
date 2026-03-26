@@ -137,6 +137,7 @@ export const useTermManagement = () => {
           }
         }
       } catch (error) {
+        if (error?.status === 401 || error?.silent) return;
         console.error('Failed to fetch user role or universities:', error);
       }
     };
@@ -159,6 +160,7 @@ export const useTermManagement = () => {
           openFormModal(detailData, false);
         }
       } catch (error) {
+        if (error?.status === 401 || error?.silent) return;
         console.error('GetTermById failed:', error);
         toast.error(
           getErrorDetail(
@@ -187,6 +189,7 @@ export const useTermManagement = () => {
           openFormModal(detailData, true);
         }
       } catch (error) {
+        if (error?.status === 401 || error?.silent) return;
         console.error('GetTermById (View) failed:', error);
         toast.error(
           getErrorDetail(

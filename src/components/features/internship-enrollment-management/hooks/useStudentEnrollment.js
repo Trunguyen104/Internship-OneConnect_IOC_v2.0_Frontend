@@ -91,6 +91,7 @@ export const useStudentEnrollment = () => {
         }));
       }
     } catch (error) {
+      if (error?.silent || error?.status === 401 || error?.status === 403) return;
       console.error('Fetch students failed:', error);
       toast.error(getErrorDetail(error, MESSAGES.LOAD_ERROR));
     } finally {

@@ -1,5 +1,31 @@
 const API_BASE = '/api/proxy';
 
+function notifyUnauthorized() {
+  if (typeof window === 'undefined') return;
+
+  if (window.__IOC_AUTH_REDIRECTING__) return;
+  window.__IOC_AUTH_REDIRECTING__ = true;
+
+  try {
+    window.dispatchEvent(new Event('auth:unauthorized'));
+  } catch {
+    // no-op
+  }
+}
+
+function notifyForbidden() {
+  if (typeof window === 'undefined') return;
+
+  if (window.__IOC_FORBIDDEN_REDIRECTING__) return;
+  window.__IOC_FORBIDDEN_REDIRECTING__ = true;
+
+  try {
+    window.dispatchEvent(new Event('auth:forbidden'));
+  } catch {
+    // no-op
+  }
+}
+
 async function request(path, options = {}) {
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
@@ -37,6 +63,10 @@ async function request(path, options = {}) {
   }
 
   if (!res.ok) {
+    if (res.status === 403 && typeof window !== 'undefined') {
+      notifyForbidden();
+    }
+
     if (res.status === 401 && typeof window !== 'undefined') {
       try {
         const refreshRes = await fetch('/api/auth', {
@@ -63,6 +93,11 @@ async function request(path, options = {}) {
       } catch {
         // Silent: caller will handle the 401/refresh failure via thrown error below.
       }
+
+      // Refresh failed (or no refresh token). Trigger a single global redirect to login.
+      notifyUnauthorized();
+      // Best-effort clear cookies on server to avoid loops.
+      fetch('/api/auth', { method: 'DELETE', credentials: 'include' }).catch(() => {});
     }
 
     // Standardize error shape by throwing
@@ -71,6 +106,7 @@ async function request(path, options = {}) {
     );
     error.status = res.status;
     error.data = data;
+    error.silent = res.status === 401 || res.status === 403;
     throw error;
   }
 

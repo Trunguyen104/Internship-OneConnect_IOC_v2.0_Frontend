@@ -33,6 +33,7 @@ export default function Header() {
         const res = await userService.getMe();
         setUserInfo(res?.data || res);
       } catch (err) {
+        if (err?.status === 401 || err?.silent) return;
         console.error('Failed to fetch user header profile:', err);
       }
     };

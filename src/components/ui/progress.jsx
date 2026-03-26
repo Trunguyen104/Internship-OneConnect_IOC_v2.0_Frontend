@@ -10,11 +10,14 @@ export function Progress({
   size = 120,
   strokeWidth = 10,
   strokeColor,
+  railColor,
   trailColor,
   format,
   className,
   type = 'circle',
 }) {
+  const resolvedRailColor = railColor ?? trailColor;
+
   return (
     <div className={cn('flex flex-col items-center justify-center', className)}>
       <AntdProgress
@@ -23,7 +26,7 @@ export function Progress({
         size={size}
         strokeWidth={strokeWidth}
         strokeColor={strokeColor}
-        trailColor={trailColor}
+        railColor={resolvedRailColor}
         format={format}
       />
     </div>
