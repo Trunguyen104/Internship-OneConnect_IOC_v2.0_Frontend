@@ -1,3 +1,10 @@
+export const TERM_STATUS = {
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
+  CLOSED: 4,
+};
+
 export const PHASE_STATUS = {
   DRAFT: 0,
   OPEN: 1,
@@ -5,8 +12,12 @@ export const PHASE_STATUS = {
   CLOSED: 3,
 };
 
-// Keep TERM_STATUS for backward compatibility if needed, but point to PHASE_STATUS
-export const TERM_STATUS = PHASE_STATUS;
+export const TERM_STATUS_VARIANTS = {
+  [TERM_STATUS.UPCOMING]: 'info',
+  [TERM_STATUS.ACTIVE]: 'success',
+  [TERM_STATUS.ENDED]: 'warning',
+  [TERM_STATUS.CLOSED]: 'default',
+};
 
 export const PHASE_STATUS_VARIANTS = {
   [PHASE_STATUS.DRAFT]: 'default',
@@ -14,8 +25,6 @@ export const PHASE_STATUS_VARIANTS = {
   [PHASE_STATUS.IN_PROGRESS]: 'success',
   [PHASE_STATUS.CLOSED]: 'warning',
 };
-
-export const TERM_STATUS_VARIANTS = PHASE_STATUS_VARIANTS;
 
 export const ENROLLMENT_STATUS = {
   ACTIVE: 1,
@@ -74,9 +83,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     FILTERS: {
       SEARCH_PLACEHOLDER: 'Search groups...',
       STATUS_FILTER: 'Status',
-      SELECT_PHASE: 'Chọn Giai đoạn',
-      SELECT_TERM: 'Chọn Kỳ',
-      SELECT_STATUS: 'Chọn Trạng thái',
+      SELECT_PHASE: 'Select Phase',
+      SELECT_TERM: 'Select Term',
+      SELECT_STATUS: 'Select Status',
       DATE_FILTER_PLACEHOLDER: 'Month/Year',
       INCLUDE_ARCHIVED: 'Archived',
       STATUS_OPTIONS: [
@@ -138,8 +147,15 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         STUDENTS_LABEL: 'Group Members',
         STUDENTS_PLACEHOLDER: 'Select students...',
         STUDENTS_REQUIRED: 'Please select at least one student',
+        EMPTY_STUDENTS: 'No unassigned students available for this phase.',
         DEFAULT_NAME_PREFIX: 'Group ',
         BULLET: '•',
+        UNKNOWN_STUDENT: 'Unknown Student',
+        NO_CODE: 'No Code',
+        NO_MAJOR: 'No Major',
+        CONFLICT_DETECTED: 'Conflict Detected',
+        MULTI_TERM_ERROR:
+          'Selected students belong to different internship terms/phases. A group must consist of students from the same term.',
       },
       ASSIGN: {
         TITLE_ASSIGN: 'Assign Mentor',
@@ -428,31 +444,31 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
       },
       STATUS_OPTIONS: [
-        { value: 0, label: 'Draft' },
-        { value: 1, label: 'Open' },
-        { value: 2, label: 'In Progress' },
-        { value: 3, label: 'Closed' },
+        { value: 1, label: 'Upcoming' },
+        { value: 2, label: 'Active' },
+        { value: 3, label: 'Ended' },
+        { value: 4, label: 'Closed' },
       ],
       STATUS_LABELS: {
-        0: 'Draft',
-        1: 'Open',
-        2: 'In Progress',
-        3: 'Closed',
-        Draft: 'Draft',
-        Open: 'Open',
-        InProgress: 'In Progress',
+        1: 'Upcoming',
+        2: 'Active',
+        3: 'Ended',
+        4: 'Closed',
+        Upcoming: 'Upcoming',
+        Active: 'Active',
+        Ended: 'Ended',
         Closed: 'Closed',
         STALE: 'Stale / Unknown',
       },
       STATUS_VARIANTS: {
-        0: 'default',
         1: 'info',
         2: 'success',
         3: 'warning',
-        Draft: 'default',
-        Open: 'info',
-        InProgress: 'success',
-        Closed: 'warning',
+        4: 'default',
+        Upcoming: 'info',
+        Active: 'success',
+        Ended: 'warning',
+        Closed: 'default',
       },
       ACTIONS: {
         CLOSE: 'Close Term',

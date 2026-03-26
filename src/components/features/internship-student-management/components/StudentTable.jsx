@@ -12,7 +12,6 @@ import { Button, Dropdown } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -125,24 +124,24 @@ const StudentTable = memo(function StudentTable({
           );
         },
       },
-      {
-        title: TABLE.COLUMNS.PHASE_STATUS,
-        key: 'phaseStatus',
-        width: '140px', // Adjusted width
-        align: 'center',
-        render: (_, record) => {
-          const status = record.phaseStatus !== undefined ? record.phaseStatus : record.termStatus;
-          const variant =
-            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_VARIANTS[status] || 'default';
-          const label =
-            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || '-';
-          return (
-            <Badge variant={variant || 'default'} size="sm">
-              {label}
-            </Badge>
-          );
-        },
-      },
+      // {
+      //   title: TABLE.COLUMNS.PHASE_STATUS,
+      //   key: 'phaseStatus',
+      //   width: '140px', // Adjusted width
+      //   align: 'center',
+      //   render: (_, record) => {
+      //     const status = record.phaseStatus !== undefined ? record.phaseStatus : record.termStatus;
+      //     const variant =
+      //       INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_VARIANTS[status] || 'default';
+      //     const label =
+      //       INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.STATUS_LABELS[status] || '-';
+      //     return (
+      //       <Badge variant={variant || 'default'} size="sm">
+      //         {label}
+      //       </Badge>
+      //     );
+      //   },
+      // },
       {
         title: TABLE.COLUMNS.INTERNSHIP_PERIOD,
         key: 'period',

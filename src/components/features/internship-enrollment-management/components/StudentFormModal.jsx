@@ -76,7 +76,7 @@ const StudentFormBody = memo(function StudentFormBody({
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      onSave?.(values);
+      await onSave?.(values);
     } catch (error) {
       if (error.errorFields.length > 0) {
         const firstErrorField = error.errorFields[0].name[0];
