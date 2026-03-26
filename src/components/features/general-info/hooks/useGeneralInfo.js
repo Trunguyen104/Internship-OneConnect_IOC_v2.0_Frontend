@@ -50,7 +50,6 @@ export function useGeneralInfo(initialId = null) {
           return;
         }
 
-        // Set basic info first so the UI shows something
         const baseInfo = {
           ...data,
           groupName: data.groupName || data.name,
@@ -86,7 +85,6 @@ export function useGeneralInfo(initialId = null) {
 
         setInfo(baseInfo);
 
-        // Try to enrich with Term and Project data
         try {
           const internshipId = data.internshipId || data.id;
           const termId = data.termId || data.term?.termId || data.term?.id;
@@ -119,7 +117,6 @@ export function useGeneralInfo(initialId = null) {
           }));
         } catch (enrichErr) {
           console.warn('Enrichment failed:', enrichErr);
-          // If enrichment fails, we already have the base info, so don't throw
         }
       } catch (err) {
         console.error('Fetch general data failed:', err);
@@ -136,7 +133,6 @@ export function useGeneralInfo(initialId = null) {
     const normalizedStatus = status ? String(status).toUpperCase().replace(/_/g, '') : '';
     const color = GROUP_STATUS_COLORS[status] || GROUP_STATUS_COLORS[normalizedStatus] || 'default';
 
-    // Map label
     let label = status || GENERAL_INFO_UI.STATUS.UNKNOWN;
     if (color === 'muted') label = GENERAL_INFO_UI.STATUS.REGISTERED;
     if (color === 'info') label = GENERAL_INFO_UI.STATUS.ONBOARDED;

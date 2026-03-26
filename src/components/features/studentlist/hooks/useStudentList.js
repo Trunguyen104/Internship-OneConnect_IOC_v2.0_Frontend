@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { useDebounce } from '@/components/features/internship-group-management/hooks/useDebounce';
 import { STUDENT_LIST_MESSAGES } from '@/constants/studentList/messages';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -18,6 +19,10 @@ export function useStudentList() {
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const debouncedSearch = useDebounce(searchText, 500);
+
   const fetchGroupDetail = useCallback(async () => {
     let idToFetch = currentId || internshipId;
     setLoading(true);
@@ -39,28 +44,46 @@ export function useStudentList() {
         return;
       }
 
-      const res = await InternshipGroupService.getById(idToFetch);
+      const params = {
+        SearchTerm: debouncedSearch || undefined,
+        PageIndex: page,
+        PageSize: pageSize,
+      };
+
+      const res = await InternshipGroupService.getById(idToFetch, params);
       if (res && res.isSuccess !== false) {
-        setGroupDetail(res.data);
+        const data = res.data || res;
+        setGroupDetail(data);
+
+        // Extract members and total count robustly
+        const membersData = data?.members;
+        if (membersData?.items) {
+          setTotalCount(membersData.totalCount || membersData.items.length);
+        } else if (Array.isArray(membersData)) {
+          setTotalCount(membersData.length);
+        } else {
+          setTotalCount(0);
+        }
       } else {
         toast.error(
           res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED
         );
       }
     } catch (error) {
-      console.error('Error fetching group detail:', error);
       toast.error(STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_EXCEPTION);
     } finally {
       setLoading(false);
     }
-  }, [internshipId, currentId, toast]);
+  }, [internshipId, currentId, debouncedSearch, page, pageSize, toast]);
 
   useEffect(() => {
     fetchGroupDetail();
   }, [fetchGroupDetail]);
+
   useEffect(() => {
     setPage(1);
-  }, [searchText]);
+  }, [debouncedSearch]);
+
   const handleDeleteStudent = useCallback(
     async (studentId) => {
       const targetId = currentId || internshipId;
@@ -79,34 +102,25 @@ export function useStudentList() {
           );
         }
       } catch (error) {
-        console.error('Error removing student:', error);
         toast.error(STUDENT_LIST_MESSAGES.ERROR.REMOVE_EXCEPTION);
       }
     },
     [currentId, internshipId, fetchGroupDetail, toast]
   );
 
-  const filteredMembers = useMemo(() => {
-    if (!groupDetail?.members) return [];
-    return groupDetail.members.filter(
-      (m) =>
-        m.fullName?.toLowerCase().includes(searchText.toLowerCase()) ||
-        m.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-        m.studentCode?.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [groupDetail, searchText]);
   const paginatedMembers = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredMembers.slice(start, start + pageSize);
-  }, [filteredMembers, page, pageSize]);
-  const total = filteredMembers.length;
-  const totalPages = Math.ceil(total / pageSize);
+    const membersData = groupDetail?.members;
+    if (!membersData) return [];
+    return membersData?.items || (Array.isArray(membersData) ? membersData : []);
+  }, [groupDetail]);
+
+  const totalPages = Math.ceil(totalCount / pageSize);
+
   return {
     groupDetail,
     loading,
     searchText,
     setSearchText,
-    filteredMembers,
     handleDeleteStudent,
     internshipId,
     currentId,
@@ -114,7 +128,7 @@ export function useStudentList() {
     setPage,
     pageSize,
     setPageSize,
-    total,
+    total: totalCount,
     totalPages,
     paginatedMembers,
   };
