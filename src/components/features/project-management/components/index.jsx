@@ -8,7 +8,7 @@ import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 
 import { useProjectManagement } from '../hooks/useProjectManagement';
 import ProjectDetailDrawer from './ProjectDetailDrawer';
@@ -18,7 +18,6 @@ import ProjectTable from './ProjectTable';
 const { Option } = Select;
 
 export default function ProjectManagement() {
-  const { PROJECT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { FILTERS } = PROJECT_MANAGEMENT;
 
   const {
@@ -66,27 +65,27 @@ export default function ProjectManagement() {
           <DataTableToolbar.Filters>
             <Select
               className="h-9 w-48"
-              placeholder={FILTERS.GROUP}
+              placeholder={FILTERS.GROUP_FILTER}
               allowClear
               value={groupIdFilter}
               onChange={handleGroupFilterChange}
             >
               {groups.map((g) => (
-                <Option key={g.id || g.internshipGroupId} value={g.id || g.internshipGroupId}>
-                  {g.internshipGroupName}
+                <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
+                  {g.groupName}
                 </Option>
               ))}
             </Select>
             <Select
               className="h-9 w-40"
-              placeholder={FILTERS.STATUS}
+              placeholder={FILTERS.STATUS_FILTER}
               allowClear
               value={statusFilter}
               onChange={handleStatusFilterChange}
             >
-              <Option value={1}>Draft</Option>
-              <Option value={2}>Published</Option>
-              <Option value={3}>Completed</Option>
+              <Option value={0}>Draft</Option>
+              <Option value={1}>Published</Option>
+              <Option value={2}>Completed</Option>
             </Select>
           </DataTableToolbar.Filters>
           <DataTableToolbar.Actions

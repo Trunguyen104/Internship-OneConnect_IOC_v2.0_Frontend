@@ -1,5 +1,6 @@
 'use client';
 
+import { Tabs } from 'antd';
 import React from 'react';
 
 import PageLayout from '@/components/ui/pagelayout';
@@ -9,29 +10,50 @@ import { useProject } from '../hooks/useProject';
 import ProjectOverview from './ProjectOverview';
 import ProjectResources from './ProjectResources';
 
-export default function ProjectPage({ projectId = null }) {
+export default function ProjectPage({ projectId: manualProjectId = null }) {
   const {
+    projectId,
+    setProjectId,
     projectInfo,
+    projectList,
+    isReadOnly,
     resources,
-    fileList,
-    setFileList,
     loading,
     uploading,
+    fileList,
+    setFileList,
     form,
+    editForm,
     isEditModalVisible,
     setIsEditModalVisible,
-    editForm,
     handleUpload,
     handleDelete,
     openEditModal,
     handleUpdate,
     handleDownload,
     handleView,
-  } = useProject(projectId);
+  } = useProject(manualProjectId);
+
+  const showList = projectList.length > 1;
 
   return (
     <PageLayout className="overflow-y-auto pr-2 custom-scrollbar">
-      <PageLayout.Header title="Project Information" />
+      <div className="flex items-center justify-between gap-4 mb-2">
+        <PageLayout.Header title="Project Information" className="mb-0" />
+        {showList && (
+          <div className="flex-1 max-w-md">
+            <Tabs
+              activeKey={projectId}
+              onChange={setProjectId}
+              className="project-selector-tabs"
+              items={projectList.map((p) => ({
+                key: p.projectId || p.id,
+                label: p.projectName,
+              }))}
+            />
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-1 flex-col gap-8 pb-8">
         <PageLayout.Card className="shrink-0 transition-all duration-500 hover:shadow-md">
@@ -66,6 +88,7 @@ export default function ProjectPage({ projectId = null }) {
             editForm={editForm}
             onDownload={handleDownload}
             onView={handleView}
+            isReadOnly={isReadOnly}
           />
         </PageLayout.Card>
       </div>

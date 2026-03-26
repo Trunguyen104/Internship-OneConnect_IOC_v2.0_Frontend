@@ -28,7 +28,6 @@ export default function InternshipManagement() {
 
   const {
     search,
-    statusFilter,
     groupFilter,
     setGroupFilter,
     pagination,
@@ -42,7 +41,6 @@ export default function InternshipManagement() {
     setDetailModal,
     setSelectedRowKeys,
     handleSearchChange,
-    handleStatusChange,
     handleTableChange,
     handlePageSizeChange,
     handleGroupSubmit,
@@ -56,8 +54,7 @@ export default function InternshipManagement() {
     unassignedStudents,
     fetchingStudents,
     handleCreateGroup,
-    dateFilter,
-    setDateFilter,
+
     mentorFilter,
     setMentorFilter,
     isPhaseEditable,
@@ -130,10 +127,6 @@ export default function InternshipManagement() {
           <DataTableToolbar.Filters>
             <div className="flex flex-wrap items-center gap-3">
               <StudentFilters
-                statusFilter={statusFilter}
-                setStatusFilter={handleStatusChange}
-                dateFilter={dateFilter}
-                setDateFilter={setDateFilter}
                 groupFilter={groupFilter}
                 setGroupFilter={setGroupFilter}
                 mentorFilter={mentorFilter}

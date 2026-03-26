@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfigProvider } from 'antd';
+import { App, ConfigProvider } from 'antd';
 import React, { useMemo } from 'react';
 
 const readCssVar = (name) => {
@@ -82,7 +82,7 @@ export const AntdConfigProvider = ({ children }) => {
         },
       }}
     >
-      {children}
+      <App>{children}</App>
     </ConfigProvider>
   );
 };

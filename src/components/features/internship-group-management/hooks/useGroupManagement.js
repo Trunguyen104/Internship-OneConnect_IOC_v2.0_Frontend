@@ -20,6 +20,7 @@ export const useGroupManagement = () => {
   const toast = useToast();
   const filters = useEnterpriseGroupFilters();
   const [enterpriseId, setEnterpriseId] = useState(null);
+  const { MESSAGES } = ENTERPRISE_GROUP_UI;
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -198,7 +199,7 @@ export const useGroupManagement = () => {
           },
         });
       } catch (err) {
-        toast.error('Không thể kiểm tra dữ liệu nhóm');
+        toast.error(MESSAGES.CHECK_DATA_ERROR);
       }
     },
     [deleteGroup, toast]
@@ -275,6 +276,18 @@ export const useGroupManagement = () => {
 
           if (toRemove.length > 0) {
             await EnterpriseGroupService.removeStudents(groupId, toRemove);
+            // AC-11 Case 2: Notify about removal
+            toRemove.forEach((sid) => {
+              const student = oldMembers.find(
+                (m) => String(m.studentId || m.id || m.applicationId) === String(sid)
+              );
+              if (student) {
+                toast.info(
+                  `${student.fullName || student.studentFullName} đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.`,
+                  { duration: 5 }
+                );
+              }
+            });
           }
           if (toAdd.length > 0) {
             await EnterpriseGroupService.addStudents(groupId, toAdd);
@@ -330,6 +343,12 @@ export const useGroupManagement = () => {
           onOk: async () => {
             const success = await removeStudents(groupId, [studentId]);
             if (success) {
+              // AC-11 Case 2: Notify about removal
+              toast.info(
+                'Sinh viên đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.',
+                { duration: 5 }
+              );
+
               if (selectedGroupDetail?.id === groupId) {
                 handleViewGroup(selectedGroupDetail);
               }
