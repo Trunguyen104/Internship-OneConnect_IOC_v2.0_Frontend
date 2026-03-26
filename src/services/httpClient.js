@@ -63,11 +63,11 @@ async function request(path, options = {}) {
   }
 
   if (!res.ok) {
-    if (res.status === 403 && typeof window !== 'undefined') {
+    if (res.status === 403 && typeof window !== 'undefined' && !options.silent) {
       notifyForbidden();
     }
 
-    if (res.status === 401 && typeof window !== 'undefined') {
+    if (res.status === 401 && typeof window !== 'undefined' && !options.silent) {
       try {
         const refreshRes = await fetch('/api/auth', {
           method: 'PUT',

@@ -1,24 +1,20 @@
 import { httpDelete, httpGet, httpPost, httpPut } from '@/services/httpClient';
 
 export const InternshipGroupService = {
-  getAll(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/internship-groups${query ? `?${query}` : ''}`);
+  getAll(params = {}, options = {}) {
+    return httpGet('/internship-groups', params, options);
   },
 
-  getMine(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/mine${query ? `?${query}` : ''}`);
+  getMine(params = {}, options = {}) {
+    return httpGet('/internship-groups/mine', params, options);
   },
 
-  getMyPhases(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/mine/internship-phases${query ? `?${query}` : ''}`);
+  getMyPhases(params = {}, options = {}) {
+    return httpGet('/internship-groups/mine/internship-phases', params, options);
   },
 
-  getMyTerms(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return httpGet(`/mine/internship-terms${query ? `?${query}` : ''}`);
+  getMyTerms(params = {}, options = {}) {
+    return httpGet('/internship-groups/mine/internship-terms', params, options);
   },
 
   getById(id) {

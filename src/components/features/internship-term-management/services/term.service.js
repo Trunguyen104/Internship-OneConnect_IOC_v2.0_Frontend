@@ -1,8 +1,8 @@
 import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
 
 export const TermService = {
-  getAll(params = {}) {
-    return httpGet('/terms', params);
+  getAll(params = {}, options = {}) {
+    return httpGet('/terms', params, options);
   },
 
   getById(id) {

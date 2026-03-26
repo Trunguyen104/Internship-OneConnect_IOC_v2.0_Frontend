@@ -24,8 +24,8 @@ export default function useEvaluationGroups() {
 
         // Attempt parallel fetch for terms
         const results = await Promise.allSettled([
-          TermService.getAll({ pageSize: 100 }),
-          InternshipGroupService.getMyTerms(),
+          TermService.getAll({ pageSize: 100 }, { silent: true }),
+          InternshipGroupService.getMyTerms({}, { silent: true }),
         ]);
 
         let combinedTerms = [];
@@ -51,7 +51,10 @@ export default function useEvaluationGroups() {
         // FALLBACK: If terms found lack names or no terms found at all, derive from groups
         if (uniqueTerms.length === 0 || uniqueTerms.some((t) => !t.name)) {
           try {
-            const groupRes = await InternshipGroupService.getAll({ pageSize: 100 });
+            const groupRes = await InternshipGroupService.getAll(
+              { pageSize: 100 },
+              { silent: true }
+            );
             const groupItems = groupRes?.data?.items || groupRes?.data || [];
 
             // Group by TermId to get the earliest/latest dates for each term
@@ -168,10 +171,13 @@ export default function useEvaluationGroups() {
 
       try {
         setLoading(true);
-        const res = await InternshipGroupService.getAll({
-          termId: selectedTerm.id,
-          pageSize: 100,
-        });
+        const res = await InternshipGroupService.getAll(
+          {
+            termId: selectedTerm.id,
+            pageSize: 100,
+          },
+          { silent: true }
+        );
 
         const items = res?.data?.items || res?.data || [];
         setGroups(items);

@@ -75,14 +75,25 @@ const NotificationBell = () => {
                 </div>
 
                 <div className="min-w-0 flex-1 pr-4">
-                  <div
-                    className={`mb-1 text-sm leading-tight ${
-                      !item.isRead ? 'font-semibold text-gray-900' : 'text-gray-600'
-                    }`}
-                  >
-                    {item.content || item.title}
-                  </div>
-                  <div className="text-xs text-blue-500">{dayjs(item.createdAt).fromNow()}</div>
+                  {item.title && (
+                    <div
+                      className={`mb-0.5 text-sm leading-tight ${
+                        !item.isRead ? 'font-bold text-gray-900' : 'font-medium text-gray-700'
+                      }`}
+                    >
+                      {item.title}
+                    </div>
+                  )}
+                  {item.content && (
+                    <div
+                      className={`mb-1 text-sm leading-tight ${
+                        !item.isRead ? 'text-gray-800' : 'text-gray-500'
+                      }`}
+                    >
+                      {item.content}
+                    </div>
+                  )}
+                  <div className="text-[11px] text-blue-500">{dayjs(item.createdAt).fromNow()}</div>
                 </div>
 
                 {!item.isRead && (
