@@ -11,24 +11,18 @@ import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
 
-export const useProjectActions = ({
-  editingRecord,
-  fetchData,
-  setMockData,
-  groups,
-  setModalVisible,
-}) => {
+export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVisible }) => {
   const { modal } = App.useApp();
   const toast = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
-  const { MESSAGES } = PROJECT_MANAGEMENT;
+  const { MESSAGES, FORM } = PROJECT_MANAGEMENT;
 
   const getErrorMessage = (err, defaultMsg) => {
     // Backend structure: { message, errors: [ "reason" ], validationErrors }
     const resMsg = err.data?.errors?.[0] || err.data?.message || err.message;
 
     // Fallback: Translate common BE errors to English if they come back in VN
-    if (resMsg?.includes('chưa được gắn với nhóm thực tập')) {
+    if (resMsg?.includes(MESSAGES.ERROR_PUBLISH_NO_GROUP_VN)) {
       return MESSAGES.ERROR_PUBLISH_NO_GROUP;
     }
 
@@ -48,7 +42,7 @@ export const useProjectActions = ({
         field: values.field,
         requirements: values.requirements,
         deliverables: values.deliverables,
-        template: values.template === 'Scrum' ? 0 : values.template === 'Kanban' ? 1 : 2,
+        template: FORM.TEMPLATE_MAP[values.template] ?? 2,
         status: isDraft ? PROJECT_STATUS.DRAFT : PROJECT_STATUS.PUBLISHED,
         resources: {
           attachments:

@@ -4,6 +4,12 @@ export const PROJECT_STATUS = {
   COMPLETED: 2,
 };
 
+export const PROJECT_STATUS_LABELS = {
+  [PROJECT_STATUS.DRAFT]: 'Draft',
+  [PROJECT_STATUS.PUBLISHED]: 'Published',
+  [PROJECT_STATUS.COMPLETED]: 'Completed',
+};
+
 export const PROJECT_STATUS_VARIANTS = {
   [PROJECT_STATUS.DRAFT]: 'warning-soft',
   [PROJECT_STATUS.PUBLISHED]: 'primary',
@@ -32,6 +38,7 @@ export const PROJECT_MANAGEMENT = {
       STATUS: 'STATUS',
       ACTIONS: 'ACTIONS',
     },
+    EMPTY_MESSAGE: 'No projects found. Create a new project to get started.',
   },
   FILTERS: {
     GROUP_FILTER: 'Intern Group',
@@ -92,6 +99,16 @@ export const PROJECT_MANAGEMENT = {
         Lang: 'Languages',
         Other: 'Other',
       },
+    },
+    TEMPLATE_MAP: {
+      Scrum: 0,
+      Kanban: 1,
+      None: 2,
+    },
+    TEMPLATE_LABELS: {
+      0: 'Scrum',
+      1: 'Kanban',
+      2: 'None',
     },
   },
   DETAIL: {
@@ -160,5 +177,6 @@ export const PROJECT_MANAGEMENT = {
     ERROR_INACTIVE_GROUP: 'Cannot save project for a finished or archived group.',
     ERROR_PUBLISH_NO_GROUP:
       'Project must be assigned to an intern group before it can be published.',
+    ERROR_PUBLISH_NO_GROUP_VN: 'chưa được gắn với nhóm thực tập',
   },
 };

@@ -19,6 +19,7 @@ import React, { useEffect, useMemo } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
+import { useToast } from '@/providers/ToastProvider';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -35,6 +36,7 @@ export default function ProjectFormModal({
   const [form] = Form.useForm();
   const { FORM = {} } = PROJECT_MANAGEMENT;
   const { userInfo } = useProfile();
+  const toast = useToast();
 
   const enterpriseName = useMemo(() => {
     const name = userInfo?.enterpriseName || userInfo?.EnterpriseName || 'ENT';
@@ -48,11 +50,14 @@ export default function ProjectFormModal({
   useEffect(() => {
     if (visible) {
       if (editingRecord) {
+        const groupId = editingRecord.internshipId || editingRecord.internshipGroupId;
+        const isEmptyGuid = groupId === '00000000-0000-0000-0000-000000000000';
+
         form.setFieldsValue({
           ...editingRecord,
           name: editingRecord.projectName || editingRecord.name,
           code: editingRecord.projectCode || editingRecord.code,
-          internshipGroupId: editingRecord.internshipId || editingRecord.internshipGroupId,
+          internshipGroupId: isEmptyGuid ? null : groupId,
           startDate: editingRecord.startDate ? dayjs(editingRecord.startDate) : null,
           endDate: editingRecord.endDate ? dayjs(editingRecord.endDate) : null,
           attachments: editingRecord.resources?.attachments || [],
@@ -107,7 +112,7 @@ export default function ProjectFormModal({
         const groupStatus = selectedGroup?.status || selectedGroup?.groupStatus;
         if (groupStatus === 3 || groupStatus === 2) {
           // Archived or Finished
-          message.warning(PROJECT_MANAGEMENT.MESSAGES.ERROR_INACTIVE_GROUP);
+          toast.warning(PROJECT_MANAGEMENT.MESSAGES.ERROR_INACTIVE_GROUP);
           return;
         }
         onSave(values, isDraft);

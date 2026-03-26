@@ -18,6 +18,7 @@ import DataTable from '@/components/ui/datatable';
 import {
   PROJECT_MANAGEMENT,
   PROJECT_STATUS,
+  PROJECT_STATUS_LABELS,
   PROJECT_STATUS_VARIANTS,
 } from '@/constants/project-management/project-management';
 
@@ -119,8 +120,11 @@ export default function ProjectTable({
         key: 'template',
         width: 110,
         render: (template) => {
-          const labels = { 0: 'Scrum', 1: 'Kanban', 2: 'None' };
-          return <span className="text-gray-500 text-xs">{labels[template] || 'None'}</span>;
+          return (
+            <span className="text-gray-500 text-xs">
+              {PROJECT_MANAGEMENT.FORM.TEMPLATE_LABELS[template] || 'None'}
+            </span>
+          );
         },
       },
       {
@@ -149,14 +153,7 @@ export default function ProjectTable({
         width: 70,
         render: (status) => {
           const variant = PROJECT_STATUS_VARIANTS[status] || 'default';
-          const label =
-            status === PROJECT_STATUS.DRAFT
-              ? 'Draft'
-              : status === PROJECT_STATUS.PUBLISHED
-                ? 'Pub'
-                : status === PROJECT_STATUS.COMPLETED
-                  ? 'Done'
-                  : 'Err';
+          const label = PROJECT_STATUS_LABELS[status] || 'Unknown';
           return (
             <Badge variant={variant} size="xs">
               {label}
@@ -264,7 +261,7 @@ export default function ProjectTable({
       locale={{
         emptyText: (
           <div className="py-12 text-center">
-            <p className="text-gray-400 italic">Bạn chưa có dự án nào. Tạo dự án mới để bắt đầu.</p>
+            <p className="text-gray-400 italic">{TABLE.EMPTY_MESSAGE}</p>
           </div>
         ),
       }}
