@@ -21,14 +21,16 @@ export const useTermFilters = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
-  const handleTableChange = useCallback((newPagination, filters, sorter) => {
-    if (sorter && sorter.field) {
-      setSortConfig({
-        column: sorter.field.toLowerCase(),
-        order: sorter.order === 'ascend' ? 'asc' : 'desc',
-      });
-    }
+  const handleTableChange = useCallback((newPagination) => {
     setPagination((prev) => ({ ...prev, current: newPagination.current }));
+  }, []);
+
+  const handleSortChange = useCallback((column, order) => {
+    setSortConfig({
+      column: column.toLowerCase(),
+      order: order === 'Asc' ? 'asc' : 'desc',
+    });
+    setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
   return {
@@ -40,5 +42,6 @@ export const useTermFilters = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handleSortChange,
   };
 };

@@ -51,7 +51,7 @@ export const useGroupManagement = () => {
     try {
       setLoadingMentors(true);
       // Fetch multiple roles that can act as mentors (4: Admin, 5: HR, 6: Mentor)
-      const roles = [4, 5, 6];
+      const roles = [6];
       // Use allSettled so if one role (e.g. role 4) is forbidden, we still get others
       const results = await Promise.allSettled(
         roles.map((r) => EnterpriseMentorService.getMentors({ Role: r, PageSize: 100 }))

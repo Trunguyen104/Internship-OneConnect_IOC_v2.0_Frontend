@@ -67,7 +67,7 @@ export const useInternshipManagement = () => {
     try {
       setLoadingMentors(true);
       // Fetch multiple roles that can act as mentors (4: Admin, 5: HR, 6: Mentor)
-      const roles = [4, 5, 6];
+      const roles = [6];
       // Use allSettled so if one role (e.g. role 4) is forbidden, we still get others
       const results = await Promise.allSettled(
         roles.map((r) => EnterpriseMentorService.getMentors({ Role: r, PageSize: 100 }))
@@ -168,11 +168,20 @@ export const useInternshipManagement = () => {
         PageSize: pagination.pageSize,
         SearchTerm: search || undefined,
         IsAssignedToGroup:
-          groupFilter === 'ALL' ? undefined : groupFilter === 'HAS_GROUP' ? true : false,
+          groupFilter === 'HAS_GROUP' ? true : groupFilter === 'NO_GROUP' ? false : undefined,
         Status: statusFilter === 'ALL' ? undefined : statusFilter,
-        IsAssignedToMentor:
-          mentorFilter === 'ALL' ? undefined : mentorFilter === 'HAS_MENTOR' ? true : false,
-        MonthYear: dateFilter ? dayjs(dateFilter).format('YYYY-MM') : undefined,
+        IsAssignedToMentor: ['HAS_MENTOR', 'ASSIGNED'].includes(mentorFilter)
+          ? true
+          : ['NO_MENTOR', 'UNASSIGNED'].includes(mentorFilter)
+            ? false
+            : undefined,
+        mentorAssigned: ['HAS_MENTOR', 'ASSIGNED'].includes(mentorFilter)
+          ? true
+          : ['NO_MENTOR', 'UNASSIGNED'].includes(mentorFilter)
+            ? false
+            : undefined,
+        Month: dateFilter ? dayjs(dateFilter).month() + 1 : undefined,
+        Year: dateFilter ? dayjs(dateFilter).year() : undefined,
         sortBy: sort?.column || 'AppliedAt',
         sortOrder: sort?.order || 'Desc',
       };
@@ -186,7 +195,7 @@ export const useInternshipManagement = () => {
           .map((p) => String(p.value).toLowerCase())
       );
 
-      if (statusFilter === 2) {
+      if (statusFilter === 2 || statusFilter === '2') {
         const res = await EnterpriseGroupService.getPlacedStudents(params);
         items = res?.data?.items || res?.items || [];
         totalCount = res?.data?.totalCount || res?.totalCount || items.length;
@@ -200,6 +209,9 @@ export const useInternshipManagement = () => {
         items = res?.data?.items || res?.items || [];
         totalCount = res?.data?.totalCount || res?.totalCount || items.length;
       }
+
+      // Map items to ensure all required fields are present (using the service's robust mapper)
+      items = items.map(EnterpriseStudentService.mapApplication);
 
       // Filter items to only show those in Open phases if ALL_VISIBLE is selected
       if (isAllVisible) {
@@ -323,6 +335,16 @@ export const useInternshipManagement = () => {
 
   const handleStatusChange = useCallback((value) => {
     setStatusFilter(value);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, []);
+
+  const handleGroupFilterChange = useCallback((value) => {
+    setGroupFilter(value || 'ALL');
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, []);
+
+  const handleMentorFilterChange = useCallback((value) => {
+    setMentorFilter(value || 'ALL');
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
@@ -521,6 +543,8 @@ export const useInternshipManagement = () => {
     setSelectedRowKeys,
     handleSearchChange,
     handleStatusChange,
+    handleGroupFilterChange,
+    handleMentorFilterChange,
     handleTableChange,
     handlePageSizeChange,
     handleGroupSubmit,

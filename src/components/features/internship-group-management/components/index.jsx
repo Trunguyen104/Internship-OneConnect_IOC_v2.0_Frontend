@@ -1,7 +1,7 @@
 'use client';
 
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
-import { DatePicker, Select } from 'antd';
+import { FilterOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
+import { DatePicker, Select, Tooltip } from 'antd';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -111,17 +111,22 @@ export default function GroupManagement({ onDetailMode }) {
                     allowClear
                   />
 
-                  <label className="flex items-center gap-2 px-2 cursor-pointer transition-colors hover:text-primary">
-                    <input
-                      type="checkbox"
-                      checked={filters.includeArchived}
-                      onChange={(e) => handleFilterChange('includeArchived', e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20"
-                    />
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted/80">
-                      {GROUP_MANAGEMENT.FILTERS.INCLUDE_ARCHIVED}
-                    </span>
-                  </label>
+                  <Tooltip title={GROUP_MANAGEMENT.FILTERS.INCLUDE_ARCHIVED}>
+                    <div
+                      onClick={() =>
+                        handleFilterChange('includeArchived', !filters.includeArchived)
+                      }
+                      className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
+                        filters.includeArchived
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <InboxOutlined
+                        className={filters.includeArchived ? 'text-lg' : 'text-base font-bold'}
+                      />
+                    </div>
+                  </Tooltip>
                 </div>
               </DataTableToolbar.Filters>
 

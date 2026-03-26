@@ -1,23 +1,28 @@
 'use client';
 
 import {
+  DeleteOutlined,
   DownloadOutlined,
+  EditOutlined,
+  EyeOutlined,
   FilterOutlined,
   PlusOutlined,
+  ReloadOutlined,
   UserDeleteOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, Select, Space } from 'antd';
+import { Button, Dropdown, Select, Space, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import Badge from '@/components/ui/badge';
 import Card from '@/components/ui/card';
+import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
-import DataGrid from './DataGrid';
 import ImportModal from './ImportModal';
 import StudentFormModal from './StudentFormModal';
 
@@ -68,6 +73,180 @@ export default function TermStudentManagement() {
     onTableChange,
   } = useStudentEnrollment();
 
+  const activeTerm = terms.find((t) => t.termId === termId);
+  const isClosed = activeTerm?.status === 4; // TERM_STATUS.CLOSED is 4
+
+  const { TABLE, ACTIONS: ACTION_LABELS, STATUS_LABELS, PLACEMENT_LABELS } = ENROLLMENT_MANAGEMENT;
+
+  const STATUS_VARIANTS = {
+    PLACED: 'success',
+    ACTIVE: 'success',
+    UNPLACED: 'info',
+    WITHDRAWN: 'danger',
+  };
+
+  const columns = React.useMemo(
+    () => [
+      {
+        title: '#',
+        key: 'index',
+        width: 80,
+        align: 'center',
+        render: (_, __, index) => (
+          <span className="text-muted font-mono text-xs font-bold">
+            {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
+          </span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.FULL_NAME,
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        sortKey: 'FullName',
+        render: (name) => (
+          <span className="text-text text-sm font-bold tracking-tight">{name}</span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.STUDENT_ID,
+        dataIndex: 'id',
+        key: 'id',
+        width: 140,
+        sorter: true,
+        sortKey: 'StudentId',
+        render: (id) => <span className="text-muted font-mono text-xs font-semibold">{id}</span>,
+      },
+      {
+        title: TABLE.COLUMNS.MAJOR,
+        dataIndex: 'major',
+        key: 'major',
+        render: (major) => (
+          <Tooltip title={major}>
+            <span className="text-text block max-w-[150px] truncate text-xs font-medium whitespace-nowrap">
+              {major}
+            </span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.PLACEMENT,
+        key: 'placement',
+        width: 200,
+        render: (_, record) => {
+          const isPlaced = record.placementStatus === 'PLACED';
+          return (
+            <div className="flex flex-col gap-0.5">
+              <Tooltip
+                title={
+                  isPlaced
+                    ? record.enterpriseName || PLACEMENT_LABELS.PLACED
+                    : PLACEMENT_LABELS.UNPLACED
+                }
+              >
+                <span
+                  className={`block truncate text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
+                    isPlaced ? 'text-text max-w-[180px]' : 'text-muted'
+                  }`}
+                >
+                  {isPlaced
+                    ? record.enterpriseName || PLACEMENT_LABELS.PLACED
+                    : PLACEMENT_LABELS.UNPLACED}
+                </span>
+              </Tooltip>
+            </div>
+          );
+        },
+      },
+      {
+        title: TABLE.COLUMNS.STATUS,
+        dataIndex: 'status',
+        key: 'status',
+        width: 140,
+        align: 'center',
+        render: (status) => {
+          const variant = STATUS_VARIANTS[status] || 'default';
+          const label = STATUS_LABELS[status] || status;
+          return <Badge variant={variant}>{label}</Badge>;
+        },
+      },
+      {
+        title: TABLE.COLUMNS.ACTIONS,
+        key: 'actions',
+        width: 160,
+        align: 'right',
+        render: (_, record) => {
+          const isWithdrawn = record.status === 'WITHDRAWN';
+
+          return (
+            <div className="flex items-center justify-end gap-1.5">
+              <Tooltip title={ACTION_LABELS.VIEW}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EyeOutlined />}
+                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleView(record);
+                  }}
+                />
+              </Tooltip>
+              {!isClosed && (
+                <>
+                  {!isWithdrawn ? (
+                    <>
+                      <Tooltip title={ACTION_LABELS.EDIT}>
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<EditOutlined />}
+                          className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(record);
+                          }}
+                        />
+                      </Tooltip>
+                      <Tooltip title={ACTION_LABELS.DELETE}>
+                        <Button
+                          type="text"
+                          size="small"
+                          danger
+                          icon={<DeleteOutlined />}
+                          className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(record);
+                          }}
+                        />
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <Tooltip title={ACTION_LABELS.RECOVER}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<ReloadOutlined />}
+                        className="hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRestore(record);
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                </>
+              )}
+            </div>
+          );
+        },
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pagination.current, pagination.pageSize, isClosed, STATUS_LABELS, PLACEMENT_LABELS, TABLE]
+  );
+
   useEffect(() => {
     const fetchTerms = async () => {
       setTermsLoading(true);
@@ -89,9 +268,6 @@ export default function TermStudentManagement() {
     fetchTerms();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onTermChange]);
-
-  const activeTerm = terms.find((t) => t.termId === termId);
-  const isClosed = activeTerm?.status === 4; // TERM_STATUS.CLOSED is 4
 
   return (
     <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
@@ -176,21 +352,21 @@ export default function TermStudentManagement() {
           </DataTableToolbar.Actions>
         </DataTableToolbar>
 
-        <DataGrid
+        <DataTable
+          columns={columns}
           data={students}
           loading={loading}
-          page={pagination.current}
-          pageSize={pagination.pageSize}
-          selectedRowKeys={selectedIds}
-          onSelectionChange={setSelectedIds}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onRestore={handleRestore}
+          rowKey="studentTermId"
+          className="mt-4"
+          size="small"
+          minWidth="800px"
           sortBy={sortBy}
           sortOrder={sortOrder}
           onSort={handleSortChange}
-          readOnly={isClosed}
+          rowSelection={{
+            selectedRowKeys: selectedIds,
+            onChange: setSelectedIds,
+          }}
         />
 
         {pagination.total > 0 && (

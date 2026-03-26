@@ -64,10 +64,17 @@ const TermFormBody = ({
 
   useEffect(() => {
     if (initialValues) {
+      const name = initialValues.name || initialValues.Name;
+      const universityId = initialValues.universityId || initialValues.UniversityId;
+      const startDate = initialValues.startDate || initialValues.StartDate;
+      const endDate = initialValues.endDate || initialValues.EndDate;
+
       form.setFieldsValue({
         ...initialValues,
-        startDate: initialValues.startDate ? dayjs(initialValues.startDate) : null,
-        endDate: initialValues.endDate ? dayjs(initialValues.endDate) : null,
+        name,
+        universityId,
+        startDate: startDate ? dayjs(startDate) : null,
+        endDate: endDate ? dayjs(endDate) : null,
       });
     } else {
       form.resetFields();
@@ -80,7 +87,7 @@ const TermFormBody = ({
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      onSave({
+      await onSave({
         ...values,
         startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
         endDate: values.endDate ? values.endDate.format('YYYY-MM-DD') : null,

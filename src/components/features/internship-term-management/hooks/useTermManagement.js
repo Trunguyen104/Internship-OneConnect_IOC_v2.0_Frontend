@@ -32,6 +32,7 @@ export const useTermManagement = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handleSortChange,
   } = useTermFilters();
 
   const {
@@ -264,8 +265,8 @@ export const useTermManagement = () => {
     async (payload) => {
       setSubmitLoading(true);
       try {
-        const isUpdate = !!editingRecord?.termId;
-        const termId = editingRecord?.termId;
+        const termId = editingRecord?.termId || editingRecord?.TermId;
+        const isUpdate = !!termId;
 
         const basePayload = {
           Name: payload.name,
@@ -281,7 +282,8 @@ export const useTermManagement = () => {
           const updatePayload = {
             ...basePayload,
             TermId: termId,
-            Version: editingRecord.version || knownVersions.current[termId] || 1,
+            Version:
+              editingRecord.version || editingRecord.Version || knownVersions.current[termId] || 1,
           };
           const response = await TermService.update(termId, updatePayload);
 
@@ -336,6 +338,7 @@ export const useTermManagement = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handleSortChange,
     handleCreateNew,
     handleEdit,
     handleView,

@@ -49,7 +49,7 @@ const GroupTable = memo(function GroupTable({
         title: TABLE.COLUMNS.GROUP_NAME,
         dataIndex: 'name',
         key: 'name',
-        width: 250,
+        width: 180,
         render: (text) => (
           <span className="text-text block truncate text-sm font-bold capitalize">
             {text || TABLE.NOT_ASSIGNED}
@@ -59,7 +59,7 @@ const GroupTable = memo(function GroupTable({
       {
         title: TABLE.COLUMNS.PHASE,
         key: 'phaseName',
-        width: 160,
+        width: 200,
         render: (_, record) => (
           <div className="flex items-center gap-1.5">
             <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
