@@ -50,7 +50,6 @@ export const useEnterpriseGroupFilters = () => {
   const [filters, setFilters] = useState({
     status: null,
     includeArchived: false,
-    dateFilter: null, // Month/Year
   });
   const [sort, setSort] = useState({
     column: 'CreatedAt',
@@ -70,7 +69,7 @@ export const useEnterpriseGroupFilters = () => {
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters({ status: null, includeArchived: false, dateFilter: null });
+    setFilters({ status: null, includeArchived: false });
     setSearchValue('');
     setSort({ column: 'CreatedAt', order: 'desc' });
     setPagination(DEFAULT_PAGINATION);

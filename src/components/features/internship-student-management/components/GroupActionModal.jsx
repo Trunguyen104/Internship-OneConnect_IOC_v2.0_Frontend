@@ -6,7 +6,10 @@ import React, { useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
-import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import {
+  GROUP_STATUS,
+  INTERNSHIP_MANAGEMENT_UI,
+} from '@/constants/internship-management/internship-management';
 
 import { useEnterpriseGroups } from '../../internship-group-management/hooks/useEnterpriseGroups';
 
@@ -28,8 +31,9 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
   const groupFilters = React.useMemo(() => ({ status: undefined, includeArchived: true }), []);
   const groupPagination = React.useMemo(() => ({ current: 1, pageSize: 100 }), []);
 
+  const studentPhaseId = students[0]?.phaseId || students[0]?.termId;
   const { data: activeGroups, loading: fetchingGroups } = useEnterpriseGroups({
-    phaseId: 'ALL_VISIBLE',
+    phaseId: studentPhaseId || 'ALL_VISIBLE',
     filters: groupFilters,
     pagination: groupPagination,
     search: '',
@@ -129,11 +133,18 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
                     className={`flex justify-between items-center w-full px-1 py-0.5 rounded ${isCurrent ? 'bg-primary/5' : ''}`}
                   >
                     <div className="flex flex-col gap-0.5 overflow-hidden">
-                      <span
-                        className={`text-xs font-bold leading-none ${isCurrent ? 'text-primary' : 'text-text'}`}
-                      >
-                        {g.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`text-xs font-bold leading-none ${isCurrent ? 'text-primary' : 'text-text'}`}
+                        >
+                          {g.name}
+                        </span>
+                        {g.status !== GROUP_STATUS.ACTIVE && (
+                          <span className="text-[8px] font-black uppercase tracking-tighter px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200">
+                            {INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.STATUS.LABELS[g.status]}
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[10px] text-muted/60 font-medium truncate">
                         {mentor}
                         {GROUP_ACTION.SEPARATOR}
@@ -148,7 +159,7 @@ const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) =>
                   </div>
                 ),
                 value: g.id,
-                disabled: isCurrent,
+                disabled: isCurrent || g.status !== GROUP_STATUS.ACTIVE,
               };
             })}
             filterOption={(input, option) => {

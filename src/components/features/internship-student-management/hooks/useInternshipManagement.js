@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -38,10 +37,8 @@ export const useInternshipManagement = () => {
   }, []);
 
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState(2); // Default to Placed (Approved = 2)
   const [groupFilter, setGroupFilter] = useState('ALL');
   const [mentorFilter, setMentorFilter] = useState('ALL');
-  const [dateFilter, setDateFilter] = useState(null); // Month/Year filter
   const [universityOptions, setUniversityOptions] = useState([]);
 
   const [pagination, setPagination] = useState({
@@ -136,7 +133,6 @@ export const useInternshipManagement = () => {
 
         setPhaseOptions([allOption, ...options]);
 
-        // Populate University Options from phases
         const uniqueUniversities = Array.from(
           new Set(phases.map((p) => p.universityName).filter(Boolean))
         );
@@ -145,7 +141,6 @@ export const useInternshipManagement = () => {
           setPhaseId('ALL_VISIBLE');
         }
       } catch (err) {
-        // Error handled silently
       } finally {
         setFetchingPhases(false);
       }
@@ -169,7 +164,6 @@ export const useInternshipManagement = () => {
         SearchTerm: search || undefined,
         IsAssignedToGroup:
           groupFilter === 'HAS_GROUP' ? true : groupFilter === 'NO_GROUP' ? false : undefined,
-        Status: statusFilter === 'ALL' ? undefined : statusFilter,
         IsAssignedToMentor: ['HAS_MENTOR', 'ASSIGNED'].includes(mentorFilter)
           ? true
           : ['NO_MENTOR', 'UNASSIGNED'].includes(mentorFilter)
@@ -180,8 +174,6 @@ export const useInternshipManagement = () => {
           : ['NO_MENTOR', 'UNASSIGNED'].includes(mentorFilter)
             ? false
             : undefined,
-        Month: dateFilter ? dayjs(dateFilter).month() + 1 : undefined,
-        Year: dateFilter ? dayjs(dateFilter).year() : undefined,
         sortBy: sort?.column || 'AppliedAt',
         sortOrder: sort?.order || 'Desc',
       };
@@ -195,20 +187,10 @@ export const useInternshipManagement = () => {
           .map((p) => String(p.value).toLowerCase())
       );
 
-      if (statusFilter === 2 || statusFilter === '2') {
-        const res = await EnterpriseGroupService.getPlacedStudents(params);
-        items = res?.data?.items || res?.items || [];
-        totalCount = res?.data?.totalCount || res?.totalCount || items.length;
-      } else {
-        const appParams = {
-          ...params,
-          Search: search || undefined,
-          campusId: universityFilter || undefined,
-        };
-        const res = await EnterpriseStudentService.getApplications(appParams);
-        items = res?.data?.items || res?.items || [];
-        totalCount = res?.data?.totalCount || res?.totalCount || items.length;
-      }
+      // DEFAULT: Fetch placed students (equivalent to statusFilter === 2)
+      const res = await EnterpriseGroupService.getPlacedStudents(params);
+      items = res?.data?.items || res?.items || [];
+      totalCount = res?.data?.totalCount || res?.totalCount || items.length;
 
       // Map items to ensure all required fields are present (using the service's robust mapper)
       items = items.map(EnterpriseStudentService.mapApplication);
@@ -300,11 +282,9 @@ export const useInternshipManagement = () => {
     phaseId,
     phaseOptions,
     search,
-    statusFilter,
     groupFilter,
     pagination.current,
     pagination.pageSize,
-    dateFilter,
     mentorFilter,
     sort?.column,
     sort?.order,
@@ -330,11 +310,6 @@ export const useInternshipManagement = () => {
   const filteredData = students;
   const handleSearchChange = useCallback((value) => {
     setSearch(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleStatusChange = useCallback((value) => {
-    setStatusFilter(value);
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
@@ -517,16 +492,13 @@ export const useInternshipManagement = () => {
 
   const resetFilters = () => {
     setSearch('');
-    setStatusFilter(2);
     setGroupFilter('ALL');
-    setDateFilter(null);
     setMentorFilter('ALL');
     setPagination({ current: 1, pageSize: 10 });
   };
 
   return {
     search,
-    statusFilter,
     groupFilter,
     setGroupFilter,
     pagination,
@@ -542,7 +514,6 @@ export const useInternshipManagement = () => {
     setAssignModal,
     setSelectedRowKeys,
     handleSearchChange,
-    handleStatusChange,
     handleGroupFilterChange,
     handleMentorFilterChange,
     handleTableChange,
@@ -562,8 +533,6 @@ export const useInternshipManagement = () => {
     mentors,
     loadingMentors,
     handleCreateGroup,
-    dateFilter,
-    setDateFilter,
     mentorFilter,
     setMentorFilter,
     isPhaseEditable:

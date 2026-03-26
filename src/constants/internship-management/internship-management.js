@@ -234,7 +234,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       EMPTY_TEXT_ACTIVE: 'No students currently interning at the company.',
     },
     FILTERS: {
-      SEARCH_PLACEHOLDER: 'Search by name, email or major...',
+      SEARCH_PLACEHOLDER: 'Search by name',
       ALL_STATUSES: 'All Statuses',
       STATUS_OPTIONS: [
         { label: 'All Statuses', value: 'ALL' },

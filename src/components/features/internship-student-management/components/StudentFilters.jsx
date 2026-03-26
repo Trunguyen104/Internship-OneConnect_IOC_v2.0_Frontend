@@ -7,7 +7,7 @@ import {
   PlusOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
-import { Button, DatePicker, Divider, Popover, Select, Typography } from 'antd';
+import { Button, Divider, Popover, Select, Typography } from 'antd';
 import React, { useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -15,10 +15,6 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 const { Text } = Typography;
 
 export const StudentFilters = ({
-  statusFilter,
-  setStatusFilter,
-  dateFilter,
-  setDateFilter,
   groupFilter,
   setGroupFilter,
   mentorFilter,
@@ -29,21 +25,6 @@ export const StudentFilters = ({
   const { INTERNSHIP_LIST } = INTERNSHIP_MANAGEMENT_UI;
 
   const FILTER_CONFIG = {
-    date: {
-      label: 'Month / Year (Placed)',
-      value: dateFilter,
-      onChange: setDateFilter,
-    },
-    status: {
-      label: 'Placed Status',
-      options: [
-        { label: 'Pending', value: 1 },
-        { label: 'Accepted', value: 2 },
-        { label: 'Rejected', value: 3 },
-      ],
-      value: statusFilter === 'ALL' ? undefined : statusFilter,
-      onChange: setStatusFilter,
-    },
     group: {
       label: 'Group Status',
       options: [
@@ -66,9 +47,6 @@ export const StudentFilters = ({
 
   const [rows, setRows] = useState(() => {
     const active = [];
-    if (dateFilter) active.push({ id: 'date', type: 'date' });
-    if (statusFilter !== 'ALL' && statusFilter !== undefined)
-      active.push({ id: 'status', type: 'status' });
     if (groupFilter !== 'ALL') active.push({ id: 'group', type: 'group' });
     if (mentorFilter !== 'ALL') active.push({ id: 'mentor', type: 'mentor' });
 
@@ -83,8 +61,7 @@ export const StudentFilters = ({
     setRows(rows.filter((r) => r.id !== id));
     if (type && FILTER_CONFIG[type]) {
       const { onChange } = FILTER_CONFIG[type];
-      if (['status', 'group', 'mentor'].includes(type)) onChange('ALL');
-      else onChange(undefined);
+      if (['group', 'mentor'].includes(type)) onChange('ALL');
     }
   };
 
@@ -97,12 +74,7 @@ export const StudentFilters = ({
     setRows([{ id: Date.now(), type: null }]);
   };
 
-  const activeFiltersCount = [
-    dateFilter !== undefined && dateFilter !== null,
-    statusFilter !== 'ALL' && statusFilter !== undefined,
-    groupFilter !== 'ALL',
-    mentorFilter !== 'ALL',
-  ].filter(Boolean).length;
+  const activeFiltersCount = [groupFilter !== 'ALL', mentorFilter !== 'ALL'].filter(Boolean).length;
 
   const content = (
     <div className="w-[400px] p-2">
@@ -146,30 +118,18 @@ export const StudentFilters = ({
               {INTERNSHIP_LIST.FILTERS.EQUAL_TO}
             </Text>
 
-            {row.type === 'date' ? (
-              <DatePicker
-                picker="month"
-                placeholder={INTERNSHIP_LIST.FILTERS.DATE_FILTER_PLACEHOLDER}
-                value={dateFilter}
-                onChange={setDateFilter}
-                className="flex-1 student-filter-value"
-                allowClear
-                format="MM/YYYY"
-              />
-            ) : (
-              <Select
-                showSearch
-                optionFilterProp="label"
-                placeholder={INTERNSHIP_LIST.FILTERS.SELECT_VALUE}
-                value={row.type ? FILTER_CONFIG[row.type].value : undefined}
-                onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
-                disabled={!row.type}
-                className="flex-1 student-filter-value"
-                options={row.type ? FILTER_CONFIG[row.type].options : []}
-                loading={row.type === 'phase' && fetchingPhases}
-                allowClear
-              />
-            )}
+            <Select
+              showSearch
+              optionFilterProp="label"
+              placeholder={INTERNSHIP_LIST.FILTERS.SELECT_VALUE}
+              value={row.type ? FILTER_CONFIG[row.type].value : undefined}
+              onChange={row.type ? FILTER_CONFIG[row.type].onChange : undefined}
+              disabled={!row.type}
+              className="flex-1 student-filter-value"
+              options={row.type ? FILTER_CONFIG[row.type].options : []}
+              loading={row.type === 'phase' && fetchingPhases}
+              allowClear
+            />
 
             <Button
               type="text"

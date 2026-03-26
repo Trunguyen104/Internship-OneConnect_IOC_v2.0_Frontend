@@ -1,7 +1,7 @@
 'use client';
 
 import { FilterOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
-import { DatePicker, Select, Tooltip } from 'antd';
+import { Select, Tooltip } from 'antd';
 import React from 'react';
 
 import Card from '@/components/ui/card';
@@ -100,15 +100,6 @@ export default function GroupManagement({ onDetailMode }) {
                     className="h-9 min-w-[140px]"
                     options={GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS}
                     suffixIcon={<FilterOutlined className="text-muted" />}
-                  />
-
-                  <DatePicker
-                    picker="month"
-                    placeholder={GROUP_MANAGEMENT.FILTERS.DATE_FILTER_PLACEHOLDER}
-                    className="h-9 w-32"
-                    value={filters.dateFilter}
-                    onChange={(date) => handleFilterChange('dateFilter', date)}
-                    allowClear
                   />
 
                   <Tooltip title={GROUP_MANAGEMENT.FILTERS.INCLUDE_ARCHIVED}>

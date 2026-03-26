@@ -41,8 +41,6 @@ export const useEnterpriseGroups = ({
         Search: search || undefined,
         Status: filters?.status,
         IncludeArchived: filters?.includeArchived,
-        Month: filters?.dateFilter ? filters.dateFilter.month() + 1 : undefined,
-        Year: filters?.dateFilter ? filters.dateFilter.year() : undefined,
         SortColumn: sort?.column,
         SortOrder: sort?.order,
       };
@@ -90,7 +88,6 @@ export const useEnterpriseGroups = ({
     search,
     filters?.status,
     filters?.includeArchived,
-    filters?.dateFilter,
     sort?.column,
     sort?.order,
     phaseOptions,
