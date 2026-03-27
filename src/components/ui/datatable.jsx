@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
+import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 
 import SkeletonTable from '@/components/ui/skeletontable';
@@ -224,3 +225,34 @@ export default function DataTable({
     </div>
   );
 }
+
+DataTable.propTypes = {
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.node.isRequired,
+      key: PropTypes.string,
+      sortKey: PropTypes.string,
+      width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      align: PropTypes.oneOf(['left', 'center', 'right']),
+      className: PropTypes.string,
+      render: PropTypes.func,
+      sorter: PropTypes.bool,
+    })
+  ),
+  data: PropTypes.array,
+  loading: PropTypes.bool,
+  emptyText: PropTypes.node,
+  minWidth: PropTypes.string,
+  rowKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  onRowClick: PropTypes.func,
+  className: PropTypes.string,
+  sortBy: PropTypes.string,
+  sortOrder: PropTypes.oneOf(['Asc', 'Desc']),
+  onSort: PropTypes.func,
+  rowSelection: PropTypes.shape({
+    selectedRowKeys: PropTypes.array,
+    onChange: PropTypes.func,
+    getCheckboxProps: PropTypes.func,
+  }),
+  size: PropTypes.oneOf(['small', 'middle', 'large']),
+};

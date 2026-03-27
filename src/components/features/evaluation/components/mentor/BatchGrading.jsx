@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { EyeOutlined, SaveOutlined } from '@ant-design/icons';
 import { Empty, InputNumber, Table } from 'antd';
@@ -223,7 +223,7 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             {student.totalScore || '0'}
           </span>
           <span className="text-[9px] font-black text-primary/30 uppercase tracking-[0.2em] mt-1">
-            Points
+            {LABELS.POINTS}
           </span>
         </div>
       ),

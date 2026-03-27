@@ -1,6 +1,7 @@
 'use client';
 
 import { Alert, List, Typography } from 'antd';
+import PropTypes from 'prop-types';
 
 import { mapBackendError } from '@/lib/error-handler';
 
@@ -73,3 +74,9 @@ export default function ErrorMessages({ error, message, status }) {
     </div>
   );
 }
+
+ErrorMessages.propTypes = {
+  error: PropTypes.object,
+  message: PropTypes.node,
+  status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};

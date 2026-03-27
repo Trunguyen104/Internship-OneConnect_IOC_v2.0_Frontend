@@ -11,7 +11,7 @@ import {
 import { Avatar, Button, Divider, Drawer, Input, List, Space, Table, Tabs, Tag } from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { USER_ROLE } from '@/constants/common/enums';
@@ -19,29 +19,31 @@ import {
   PROJECT_MANAGEMENT,
   PROJECT_STATUS,
 } from '@/constants/project-management/project-management';
+import { useToast } from '@/providers/ToastProvider';
 
+import { useProjectDetail } from '../hooks/useProjectDetail';
 import { ProjectService } from '../services/project.service';
 
-export default function ProjectDetailDrawer({ visible, onClose, project, groups = [], onRefresh }) {
-  const {
-    TABS = {},
-    STUDENT_STATUS = {},
-    MESSAGES = {},
-    MODALS = {},
-    DETAIL = {},
-    VIEW: FORM_VIEW = {},
-  } = PROJECT_MANAGEMENT;
-  const { ASSIGN = {} } = MODALS;
+export default function ProjectDetailDrawer({ visible, onClose, project, onRefresh }) {
+  const { TABS = {}, MESSAGES = {}, DETAIL = {}, VIEW: FORM_VIEW = {} } = PROJECT_MANAGEMENT;
 
   const { userInfo } = useProfile();
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('details');
-  const [loading, setLoading] = useState(false);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [projectDetail, setProjectDetail] = useState(null);
-  const [assignedStudents, setAssignedStudents] = useState([]);
-  const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Use the new hook for fetching
+  const {
+    project: projectDetail,
+    loading: detailLoading,
+    students: assignedStudents,
+    refreshStudents,
+  } = useProjectDetail(
+    project?.projectId || project?.id,
+    project?.internshipId || project?.groupInfo?.internshipId,
+    visible
+  );
 
   const currentProject = projectDetail || project;
 
@@ -50,99 +52,26 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
     return userRoleId === USER_ROLE.HR || userRoleId === USER_ROLE.ENTERPRISE_ADMIN;
   }, [userInfo]);
 
-  const fetchProjectDetail = useCallback(async () => {
-    if (!project?.projectId || !visible) return;
-    try {
-      setDetailLoading(true);
-      const res = await ProjectService.getById(project.projectId);
-      if (res?.data) {
-        setProjectDetail(res.data);
-      }
-    } catch (err) {
-      console.error('Error fetching project detail:', err);
-    } finally {
-      setDetailLoading(false);
-    }
-  }, [project?.projectId, visible]);
-
-  const fetchAssignedStudents = useCallback(async () => {
-    const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const groupId = currentProject?.internshipId || currentProject?.groupInfo?.internshipId;
-
-    if (!groupId || !guidRegex.test(groupId) || !visible) return;
-
-    try {
-      setLoading(true);
-      const res = await ProjectService.getStudentsByGroup(groupId);
-      const groupInfo = res?.data || res;
-      if (groupInfo?.members) {
-        setAssignedStudents(groupInfo.members);
-      } else if (Array.isArray(groupInfo)) {
-        setAssignedStudents(groupInfo);
-      }
-    } catch (err) {
-      console.error('Error fetching group students:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentProject?.internshipId, currentProject?.groupInfo?.internshipId, visible]);
-
-  useEffect(() => {
-    if (visible) {
-      fetchProjectDetail();
-      setActiveTab('details');
-    } else {
-      setProjectDetail(null);
-      setActiveTab('details');
-    }
-  }, [visible, project?.projectId, fetchProjectDetail]);
-
-  useEffect(() => {
-    if (activeTab === 'students') {
-      fetchAssignedStudents();
-    }
-  }, [activeTab, fetchAssignedStudents]);
-
   const handleUnassign = async (studentId) => {
     try {
-      setLoading(true);
       await ProjectService.unassignStudent(currentProject.projectId, studentId);
       toast.success(MESSAGES.UNASSIGN_SUCCESS);
-      fetchAssignedStudents();
+      refreshStudents();
       if (onRefresh) onRefresh();
     } catch (err) {
       toast.error(err.message || MESSAGES.ERROR);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleAssignGroup = async () => {
-    if (!selectedGroupId || !currentProject?.projectId) return;
-    try {
-      setLoading(true);
-      const group = groups.find(
-        (g) => (g.id || g.internshipGroupId || g.internshipId) === selectedGroupId
-      );
-      await ProjectService.assignGroup(currentProject.projectId, selectedGroupId);
-
-      const count = group?.studentCount || 0;
-      toast.success(MESSAGES.ASSIGN_SUCCESS.replace('{count}', count));
-
-      if (onRefresh) onRefresh();
-      fetchAssignedStudents();
-      fetchProjectDetail();
-      setActiveTab('students');
-    } catch (err) {
-      toast.error(err.message || MESSAGES.ERROR);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredStudents = assignedStudents.filter(
+    (s) =>
+      s.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.studentCode?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const studentColumns = [
     {
-      title: DETAIL.STUDENTS.COLUMNS?.NAME || 'Full Name',
+      title: DETAIL.STUDENTS.COLUMNS.NAME,
       dataIndex: 'fullName',
       key: 'fullName',
       render: (text, record) => (
@@ -156,21 +85,25 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
       ),
     },
     {
-      title: DETAIL.STUDENTS.COLUMNS?.UNIVERSITY || 'University',
+      title: DETAIL.STUDENTS.COLUMNS.UNIVERSITY,
       dataIndex: 'universityName',
       key: 'universityName',
       render: (text, record) =>
-        record.universityName || record.university || record.schoolName || record.school || '-',
+        record.universityName ||
+        record.university ||
+        record.schoolName ||
+        record.school ||
+        DETAIL.NA,
       responsive: ['md'],
     },
     {
-      title: 'Email',
+      title: DETAIL.STUDENTS.COLUMNS.EMAIL,
       dataIndex: 'email',
       key: 'email',
       responsive: ['lg'],
     },
     {
-      title: DETAIL.STUDENTS.COLUMNS?.STATUS || 'Status',
+      title: DETAIL.STUDENTS.COLUMNS.STATUS,
       dataIndex: 'termStatus',
       key: 'termStatus',
       render: (status) => {
@@ -179,18 +112,28 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
         if (status === 'Active') color = 'success';
         return (
           <Tag color={color} className="rounded-md font-medium">
-            {status || 'Active'}
+            {status || DETAIL.STUDENTS.ACTIVE}
           </Tag>
         );
       },
     },
+    {
+      title: DETAIL.STUDENTS.COLUMNS.ACTION,
+      key: 'action',
+      render: (_, record) =>
+        isHR && (
+          <Button
+            type="text"
+            danger
+            size="small"
+            onClick={() => handleUnassign(record.studentId)}
+            className="text-[10px] font-bold uppercase tracking-wider"
+          >
+            {DETAIL.STUDENTS.UNASSIGN}
+          </Button>
+        ),
+    },
   ];
-
-  const filteredStudents = assignedStudents.filter(
-    (s) =>
-      s.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.studentCode?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   return (
     <Drawer
@@ -220,7 +163,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
         items={[
           {
             key: 'details',
-            label: TABS.DETAIL || 'Details',
+            label: DETAIL.TITLE,
             children: (
               <div className="space-y-6 pt-4">
                 <section>
@@ -247,7 +190,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                       <span className="text-sm font-bold text-slate-700">
                         {currentProject?.mentorName ||
                           currentProject?.groupInfo?.mentorName ||
-                          'N/A'}
+                          DETAIL.NA}
                       </span>
                     </div>
                   </section>
@@ -260,10 +203,10 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                         color="blue"
                         className="w-fit m-0 border-none font-bold text-[10px] rounded-md px-2"
                       >
-                        {currentProject?.field || 'N/A'}
+                        {currentProject?.field || DETAIL.NA}
                       </Tag>
                       <span className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">
-                        Template:{' '}
+                        {DETAIL.TEMPLATE_PREFIX}
                         <span className="text-primary">
                           {FORM_VIEW.FIELD_OPTIONS?.TEMPLATE?.[
                             { 0: 'SCRUM', 1: 'KANBAN', 2: 'NONE' }[currentProject?.template]
@@ -279,11 +222,11 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                     <div className="text-sm font-bold text-slate-700 flex items-center whitespace-nowrap">
                       {currentProject?.startDate
                         ? dayjs(currentProject.startDate).format('DD/MM/YYYY')
-                        : 'TBA'}
+                        : DETAIL.TBA}
                       <ArrowRightOutlined className="mx-2 text-[10px] text-slate-300" />
                       {currentProject?.endDate
                         ? dayjs(currentProject.endDate).format('DD/MM/YYYY')
-                        : 'TBA'}
+                        : DETAIL.TBA}
                     </div>
                   </section>
                 </div>
@@ -310,7 +253,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                             {DETAIL.GROUP.ID}:{' '}
                             {currentProject.groupInfo?.internshipId ||
                               currentProject.internshipId ||
-                              'N/A'}
+                              DETAIL.NA}
                           </div>
                         </div>
                         {isHR &&
@@ -339,7 +282,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                             <span className="text-xs font-bold text-slate-700">
                               {currentProject.groupInfo?.mentorName ||
                                 currentProject.internshipGroup?.mentorName ||
-                                'N/A'}
+                                DETAIL.NA}
                             </span>
                           </div>
                         </div>
@@ -397,9 +340,13 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
           },
           {
             key: 'students',
-            label: TABS.STUDENTS || 'Students',
+            label: DETAIL.STUDENTS.TITLE || 'Students',
             children: (
-              <div className="pt-2">
+              <div className="mt-6">
+                <h5 className="text-[11px] font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                  <LinkOutlined />
+                  {FORM.PLACEHOLDER.QUICK_LINKS}
+                </h5>
                 <div className="mb-4 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <Input
@@ -426,7 +373,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
                 <Table
                   columns={studentColumns}
                   dataSource={filteredStudents}
-                  loading={loading}
+                  loading={detailLoading}
                   rowKey="studentId"
                   size="small"
                   pagination={{ pageSize: 8 }}
@@ -449,13 +396,13 @@ export default function ProjectDetailDrawer({ visible, onClose, project, groups 
           },
           {
             key: 'resources',
-            label: TABS.RESOURCES || 'Resources',
+            label: DETAIL.SECTIONS.RESOURCES,
             children: (
               <div className="space-y-8 pt-4">
                 <section>
                   <h4 className="mb-4 font-bold text-gray-800 border-l-4 border-primary pl-3 uppercase text-[10px] flex items-center justify-between tracking-widest">
                     {DETAIL.SECTIONS.RESOURCES}
-                    <span className="text-[9px] font-bold text-slate-400 normal-case italic uppercase tracking-tighter">
+                    <span className="text-[9px] font-bold text-slate-400 italic uppercase tracking-tighter">
                       {DETAIL.SECTIONS.RESOURCES_HINT}
                     </span>
                   </h4>

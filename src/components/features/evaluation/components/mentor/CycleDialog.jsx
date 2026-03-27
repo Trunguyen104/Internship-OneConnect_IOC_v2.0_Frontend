@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { DatePicker, Input } from 'antd';
 import dayjs from 'dayjs';
@@ -59,7 +59,7 @@ export default function CycleDialog({
       title={
         <div className="flex flex-col gap-1 pr-10">
           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-            Evaluation Cycle
+            {LABELS.CYCLE_TITLE}
           </span>
           <span className="text-xl font-black text-text tracking-tight">
             {initialData ? BUTTONS.EDIT : BUTTONS.CREATE_CYCLE}
@@ -117,7 +117,7 @@ export default function CycleDialog({
                 setFormData({ ...formData, startDate: iso });
               }}
               format="DD/MM/YYYY"
-              placeholder="Pick Start Date"
+              placeholder={LABELS.PICK_START}
               suffixIcon={null}
             />
           </div>
@@ -138,7 +138,7 @@ export default function CycleDialog({
                 setFormData({ ...formData, endDate: iso });
               }}
               format="DD/MM/YYYY"
-              placeholder="Pick End Date"
+              placeholder={LABELS.PICK_END}
               suffixIcon={null}
             />
           </div>

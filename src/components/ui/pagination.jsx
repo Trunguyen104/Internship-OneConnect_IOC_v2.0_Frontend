@@ -1,6 +1,7 @@
 'use client';
 
 import { Pagination as AntdPagination } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { UI_TEXT } from '@/lib/UI_Text';
@@ -34,3 +35,11 @@ export default function Pagination({
     </div>
   );
 }
+
+Pagination.propTypes = {
+  total: PropTypes.number,
+  page: PropTypes.number,
+  pageSize: PropTypes.number,
+  onPageChange: PropTypes.func,
+  onPageSizeChange: PropTypes.func,
+};

@@ -61,26 +61,24 @@ export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
                 )}
               </div>
             </div>
-            <div className="flex flex-col gap-1.5 border-l-2 border-slate-200 pl-4">
-              <span className="text-[10px] font-black uppercase leading-none tracking-widest text-slate-400">
-                Source
-              </span>
-              <span className="text-sm font-bold text-slate-700">
-                {isLoading
-                  ? '...'
-                  : app?.source === APPLICATION_SOURCE.UNI_ASSIGN
-                    ? 'Uni-Assign'
-                    : 'Self-Apply'}
-              </span>
-            </div>
-            <div className="flex flex-col gap-1.5 border-l-2 border-slate-200 pl-4">
-              <span className="text-[10px] font-black uppercase leading-none tracking-widest text-slate-400">
-                {APPLICATIONS_UI.COLUMNS.APPLIED_DATE}
-              </span>
-              <span className="text-sm font-bold text-slate-700">
-                {isLoading ? '...' : dayjs(app?.appliedAt).format('DD MMM, YYYY')}
-              </span>
-            </div>
+            <span className="text-[10px] font-black uppercase leading-none tracking-widest text-slate-400">
+              {APPLICATIONS_UI.MODAL.SOURCE}
+            </span>
+            <span className="text-sm font-bold text-slate-700">
+              {isLoading
+                ? APPLICATIONS_UI.COMMON.LOADING
+                : app?.source === APPLICATION_SOURCE.UNI_ASSIGN
+                  ? APPLICATIONS_UI.MODAL.UNI_ASSIGN
+                  : APPLICATIONS_UI.MODAL.SELF_APPLY}
+            </span>
+            <span className="text-[10px] font-black uppercase leading-none tracking-widest text-slate-400">
+              {APPLICATIONS_UI.COLUMNS.APPLIED_DATE}
+            </span>
+            <span className="text-sm font-bold text-slate-700">
+              {isLoading
+                ? APPLICATIONS_UI.COMMON.LOADING
+                : dayjs(app?.appliedAt).format(APPLICATIONS_UI.COMMON.DATE_FORMAT)}
+            </span>
           </div>
 
           <Divider className="my-0 border-slate-100" />
@@ -102,7 +100,9 @@ export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
                       {APPLICATIONS_UI.MODAL.STUDENT_ID}
                     </span>
                     <span className="text-sm font-bold text-slate-600">
-                      {isLoading ? '...' : app?.studentCode || '—'}
+                      {isLoading
+                        ? APPLICATIONS_UI.COMMON.LOADING
+                        : app?.studentCode || APPLICATIONS_UI.COMMON.EMPTY}
                     </span>
                   </div>
                 </div>
@@ -116,7 +116,9 @@ export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
                       {APPLICATIONS_UI.MODAL.EMAIL}
                     </span>
                     <span className="max-w-[200px] truncate text-sm font-bold text-slate-600">
-                      {isLoading ? '...' : app?.studentEmail || '—'}
+                      {isLoading
+                        ? APPLICATIONS_UI.COMMON.LOADING
+                        : app?.studentEmail || APPLICATIONS_UI.COMMON.EMPTY}
                     </span>
                   </div>
                 </div>
@@ -130,7 +132,9 @@ export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
                       {APPLICATIONS_UI.MODAL.UNIVERSITY}
                     </span>
                     <span className="line-clamp-1 text-sm font-bold text-slate-600">
-                      {isLoading ? '...' : app?.schoolName || app?.universityName || '—'}
+                      {isLoading
+                        ? APPLICATIONS_UI.COMMON.LOADING
+                        : app?.schoolName || app?.universityName || APPLICATIONS_UI.COMMON.EMPTY}
                     </span>
                   </div>
                 </div>
@@ -149,7 +153,9 @@ export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
                     {APPLICATIONS_UI.MODAL.JOB_POSITION}
                   </span>
                   <span className="text-sm font-black leading-tight text-slate-800">
-                    {isLoading ? '...' : app?.jobPostingTitle || APPLICATIONS_UI.MODAL.GENERAL_APP}
+                    {isLoading
+                      ? APPLICATIONS_UI.COMMON.LOADING
+                      : app?.jobPostingTitle || APPLICATIONS_UI.MODAL.GENERAL_APP}
                   </span>
                   <span className="mt-2 text-[11px] font-medium text-slate-500">
                     {APPLICATIONS_UI.MODAL.DEPARTMENT}{' '}

@@ -83,9 +83,15 @@ export default function ProjectManagement() {
               value={statusFilter}
               onChange={handleStatusFilterChange}
             >
-              <Option value={0}>Draft</Option>
-              <Option value={1}>Published</Option>
-              <Option value={2}>Completed</Option>
+              <Option value={PROJECT_STATUS.DRAFT}>
+                {PROJECT_STATUS_LABELS[PROJECT_STATUS.DRAFT]}
+              </Option>
+              <Option value={PROJECT_STATUS.PUBLISHED}>
+                {PROJECT_STATUS_LABELS[PROJECT_STATUS.PUBLISHED]}
+              </Option>
+              <Option value={PROJECT_STATUS.COMPLETED}>
+                {PROJECT_STATUS_LABELS[PROJECT_STATUS.COMPLETED]}
+              </Option>
             </Select>
           </DataTableToolbar.Filters>
           <DataTableToolbar.Actions

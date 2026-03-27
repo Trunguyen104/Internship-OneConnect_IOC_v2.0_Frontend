@@ -1,7 +1,8 @@
-﻿'use client';
+'use client';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { useDebounce } from '@/components/features/internship-group-management/hooks/useDebounce';
@@ -10,102 +11,101 @@ import { useToast } from '@/providers/ToastProvider';
 
 export function useStudentList() {
   const toast = useToast();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
-  const internshipId = searchParams.get('id');
+  const internshipIdFromUrl = searchParams.get('id');
 
-  const [groupDetail, setGroupDetail] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [currentId, setCurrentId] = useState(internshipId);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
 
   const debouncedSearch = useDebounce(searchText, 500);
 
-  const fetchGroupDetail = useCallback(async () => {
-    let idToFetch = currentId || internshipId;
-    setLoading(true);
-
-    try {
-      if (!idToFetch) {
-        const groupsRes = await InternshipGroupService.getAll();
-        if (groupsRes && groupsRes.isSuccess !== false && groupsRes.data) {
-          const items = groupsRes.data.items || groupsRes.items || [];
-          if (items.length > 0) {
-            idToFetch = items[0].internshipId;
-            setCurrentId(idToFetch);
-          }
-        }
+  // 1. Logic to handle "Auto-select first group"
+  const { data: autoSelectedId = null } = useQuery({
+    queryKey: ['available-groups-for-student-list'],
+    queryFn: async () => {
+      if (internshipIdFromUrl) return null;
+      try {
+        const res = await InternshipGroupService.getAll();
+        const items = res?.data?.items || res?.items || [];
+        return items.length > 0 ? items[0].internshipId : null;
+      } catch {
+        return null;
       }
+    },
+    enabled: !internshipIdFromUrl,
+    staleTime: 10 * 60 * 1000,
+  });
 
-      if (!idToFetch) {
-        setLoading(false);
-        return;
-      }
+  const effectiveId = useMemo(
+    () => internshipIdFromUrl || autoSelectedId,
+    [internshipIdFromUrl, autoSelectedId]
+  );
 
-      const params = {
-        SearchTerm: debouncedSearch || undefined,
-        PageIndex: page,
-        PageSize: pageSize,
-      };
-
-      const res = await InternshipGroupService.getById(idToFetch, params);
-      if (res && res.isSuccess !== false) {
-        const data = res.data || res;
-        setGroupDetail(data);
-
-        // Extract members and total count robustly
-        const membersData = data?.members;
-        if (membersData?.items) {
-          setTotalCount(membersData.totalCount || membersData.items.length);
-        } else if (Array.isArray(membersData)) {
-          setTotalCount(membersData.length);
-        } else {
-          setTotalCount(0);
-        }
-      } else {
-        toast.error(
-          res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED
-        );
-      }
-    } catch (error) {
-      toast.error(STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_EXCEPTION);
-    } finally {
-      setLoading(false);
-    }
-  }, [internshipId, currentId, debouncedSearch, page, pageSize, toast]);
-
-  useEffect(() => {
-    fetchGroupDetail();
-  }, [fetchGroupDetail]);
-
-  useEffect(() => {
+  const handleSearchChange = useCallback((value) => {
+    setSearchText(value);
     setPage(1);
-  }, [debouncedSearch]);
+  }, []);
+
+  // 2. Main Query for Group Detail
+  const { data: groupDetail = null, isLoading: loading } = useQuery({
+    queryKey: ['group-detail-student-list', effectiveId, page, pageSize, debouncedSearch],
+    queryFn: async () => {
+      if (!effectiveId) return null;
+      try {
+        const params = {
+          SearchTerm: debouncedSearch || undefined,
+          PageIndex: page,
+          PageSize: pageSize,
+        };
+        const res = await InternshipGroupService.getById(effectiveId, params);
+        if (res && res.isSuccess !== false) {
+          return res.data || res;
+        } else {
+          toast.error(
+            res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_FAILED
+          );
+          return null;
+        }
+      } catch {
+        toast.error(STUDENT_LIST_MESSAGES.ERROR.FETCH_GROUP_EXCEPTION);
+        return null;
+      }
+    },
+    enabled: !!effectiveId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const totalCount = useMemo(() => {
+    const membersData = groupDetail?.members;
+    if (membersData?.totalCount !== undefined) return membersData.totalCount;
+    if (membersData?.items) return membersData.items.length;
+    if (Array.isArray(membersData)) return membersData.length;
+    return 0;
+  }, [groupDetail]);
 
   const handleDeleteStudent = useCallback(
     async (studentId) => {
-      const targetId = currentId || internshipId;
-      if (!targetId) return;
+      if (!effectiveId) return;
       try {
         const payload = {
           studentIds: [studentId],
         };
-        const res = await InternshipGroupService.removeStudents(targetId, payload);
+        const res = await InternshipGroupService.removeStudents(effectiveId, payload);
         if (res && res.isSuccess !== false) {
           toast.success(STUDENT_LIST_MESSAGES.SUCCESS.REMOVE_STUDENT);
-          fetchGroupDetail();
+          queryClient.invalidateQueries({ queryKey: ['group-detail-student-list'] });
         } else {
           toast.error(
             res?.message || res?.data?.message || STUDENT_LIST_MESSAGES.ERROR.REMOVE_FAILED
           );
         }
-      } catch (error) {
+      } catch {
         toast.error(STUDENT_LIST_MESSAGES.ERROR.REMOVE_EXCEPTION);
       }
     },
-    [currentId, internshipId, fetchGroupDetail, toast]
+    [effectiveId, queryClient, toast]
   );
 
   const paginatedMembers = useMemo(() => {
@@ -114,16 +114,16 @@ export function useStudentList() {
     return membersData?.items || (Array.isArray(membersData) ? membersData : []);
   }, [groupDetail]);
 
-  const totalPages = Math.ceil(totalCount / pageSize);
+  const totalPages = useMemo(() => Math.ceil(totalCount / pageSize), [totalCount, pageSize]);
 
   return {
     groupDetail,
     loading,
     searchText,
-    setSearchText,
+    setSearchText: handleSearchChange,
     handleDeleteStudent,
-    internshipId,
-    currentId,
+    internshipId: internshipIdFromUrl,
+    currentId: effectiveId,
     page,
     setPage,
     pageSize,

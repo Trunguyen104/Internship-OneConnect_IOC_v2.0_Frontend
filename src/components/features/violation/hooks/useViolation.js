@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -8,16 +9,14 @@ import { violationReportService } from '../services/violation-report.service';
 
 export function useViolation() {
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
-  const [violations, setViolations] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState([null, null]);
   const [pageSize, setPageSize] = useState(10);
   const [sortOrder] = useState('desc');
-  const [total, setTotal] = useState(0);
 
+  // Debounce Search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
@@ -26,52 +25,58 @@ export function useViolation() {
     return () => clearTimeout(handler);
   }, [search]);
 
-  const fetchViolations = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {
-        PageNumber: page,
-        PageSize: pageSize,
-        SearchTerm: debouncedSearch || undefined,
-        OccurredFrom: dateRange[0]
-          ? dateRange[0].format(VIOLATION_REPORT.DATE_FORMATS.API)
-          : undefined,
-        OccurredTo: dateRange[1]
-          ? dateRange[1].format(VIOLATION_REPORT.DATE_FORMATS.API)
-          : undefined,
-        OrderByCreatedAscending: sortOrder === 'asc',
-      };
+  // Main Query
+  const {
+    data: result = { items: [], totalCount: 0 },
+    isLoading: loading,
+    refetch: refresh,
+  } = useQuery({
+    queryKey: ['violation-reports', page, pageSize, debouncedSearch, dateRange, sortOrder],
+    queryFn: async () => {
+      try {
+        const params = {
+          PageNumber: page,
+          PageSize: pageSize,
+          SearchTerm: debouncedSearch || undefined,
+          OccurredFrom: dateRange[0]
+            ? dateRange[0].format(VIOLATION_REPORT.DATE_FORMATS.API)
+            : undefined,
+          OccurredTo: dateRange[1]
+            ? dateRange[1].format(VIOLATION_REPORT.DATE_FORMATS.API)
+            : undefined,
+          OrderByCreatedAscending: sortOrder === 'asc',
+        };
 
-      const response = await violationReportService.getReports(params);
+        const response = await violationReportService.getReports(params);
 
-      if (response?.data) {
-        const items = response.data.items || [];
-        const mapped = items.map((item) => ({
-          id: item.violationReportId || item.id,
-          name: item.studentName,
-          description: item.description,
-          violationTime: item.occurredDate,
-          reporter: item.mentorName || VIOLATION_REPORT.COMMON.REPORTER_DEFAULT,
-          reporterId: item.createdById,
-          createdAt: item.createdAt,
-          internshipGroupName: item.internshipGroupName,
-          studentCode: item.studentCode,
-          universityName: item.universityName,
-        }));
+        if (response?.data) {
+          const items = response.data.items || [];
+          const mapped = items.map((item) => ({
+            id: item.violationReportId || item.id,
+            name: item.studentName,
+            description: item.description,
+            violationTime: item.occurredDate,
+            reporter: item.mentorName || VIOLATION_REPORT.COMMON.REPORTER_DEFAULT,
+            reporterId: item.createdById,
+            createdAt: item.createdAt,
+            internshipGroupName: item.internshipGroupName,
+            studentCode: item.studentCode,
+            universityName: item.universityName,
+          }));
 
-        setViolations(mapped);
-        setTotal(response.data.totalCount || 0);
+          return {
+            items: mapped,
+            totalCount: response.data.totalCount || 0,
+          };
+        }
+        return { items: [], totalCount: 0 };
+      } catch (err) {
+        console.error(VIOLATION_REPORT.LOGS.FETCH_ERROR, err);
+        throw err;
       }
-    } catch (error) {
-      console.error(VIOLATION_REPORT.LOGS.FETCH_ERROR, error);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, pageSize, debouncedSearch, dateRange, sortOrder, VIOLATION_REPORT]);
-
-  useEffect(() => {
-    fetchViolations();
-  }, [fetchViolations]);
+    },
+    staleTime: 5 * 1000 * 60,
+  });
 
   const resetFilters = useCallback(() => {
     setSearch('');
@@ -79,7 +84,7 @@ export function useViolation() {
     setPage(1);
   }, []);
 
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.ceil(result.totalCount / pageSize);
 
   return {
     search,
@@ -96,10 +101,10 @@ export function useViolation() {
     setPageSize,
     sortOrder,
     resetFilters,
-    paginated: violations,
+    paginated: result.items,
     loading,
-    total,
+    total: result.totalCount,
     totalPages,
-    refresh: fetchViolations,
+    refresh,
   };
 }

@@ -2,6 +2,7 @@
 
 import { CloseOutlined } from '@ant-design/icons';
 import { Button, Modal, Typography } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const { Text, Title } = Typography;
@@ -35,6 +36,14 @@ const CompoundModal = ({
   );
 };
 
+CompoundModal.propTypes = {
+  children: PropTypes.node,
+  open: PropTypes.bool.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  destroyOnClose: PropTypes.bool,
+};
+
 const Header = ({ icon, title, subtitle, type = 'default' }) => {
   const typeClasses = {
     danger: 'bg-danger/5 text-danger',
@@ -66,9 +75,21 @@ const Header = ({ icon, title, subtitle, type = 'default' }) => {
   );
 };
 
+Header.propTypes = {
+  icon: PropTypes.node,
+  title: PropTypes.node.isRequired,
+  subtitle: PropTypes.node,
+  type: PropTypes.oneOf(['default', 'danger', 'warning', 'success']),
+};
+
 const Content = ({ children, className = '' }) => (
   <div className={`py-4 ${className}`}>{children}</div>
 );
+
+Content.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
 
 const Footer = ({
   onCancel,
@@ -121,6 +142,24 @@ const Footer = ({
   );
 };
 
+Footer.propTypes = {
+  onCancel: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func,
+  onSubmit: PropTypes.func,
+  cancelText: PropTypes.string,
+  confirmText: PropTypes.string,
+  submitText: PropTypes.string,
+  loading: PropTypes.bool,
+  danger: PropTypes.bool,
+  submitDanger: PropTypes.bool,
+  confirmIcon: PropTypes.node,
+  icon: PropTypes.node,
+  disabled: PropTypes.bool,
+  submitDisabled: PropTypes.bool,
+  showCancel: PropTypes.bool,
+  className: PropTypes.string,
+};
+
 const COLOR_MAP = {
   primary: 'hover:border-primary/50',
   danger: 'hover:border-danger/50',
@@ -143,6 +182,12 @@ const InfoBox = ({ label, value, color = 'primary' }) => (
     </Text>
   </div>
 );
+
+InfoBox.propTypes = {
+  label: PropTypes.node.isRequired,
+  value: PropTypes.node.isRequired,
+  color: PropTypes.oneOf(['primary', 'danger', 'success', 'warning']),
+};
 
 CompoundModal.Header = Header;
 CompoundModal.Content = Content;

@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { useToast } from '@/providers/ToastProvider';
 
@@ -11,10 +12,6 @@ import { useProjectModals } from './useProjectModals';
 
 export const useProjectManagement = () => {
   const toast = useToast();
-  // --- Core Data State ---
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [groups, setGroups] = useState([]);
 
   // --- Specialized Hooks ---
   const {
@@ -43,73 +40,65 @@ export const useProjectManagement = () => {
   } = useProjectModals();
 
   // --- Data Fetching ---
-  const fetchData = useCallback(async () => {
-    // AC-01: allow viewing all projects if no group filter is selected
-    // if (!groupIdFilter) return; // Removed this restrictor
 
-    try {
-      setLoading(true);
-      const params = {
-        PageNumber: pagination.current,
-        PageSize: pagination.pageSize,
-        SearchTerm: searchTerm,
-        internshipId: groupIdFilter, // Sync with API parameter name
-        Status: statusFilter,
-      };
-
-      const res = await ProjectService.getAll(params);
-      if (res?.data?.items) {
-        setData(res.data.items);
-        setPagination((prev) => ({
-          ...prev,
-          total: res.data.totalCount || 0,
-        }));
+  // 1. Fetch Supporting Data (Groups)
+  const { data: groups = [] } = useQuery({
+    queryKey: ['groups-for-mentor'],
+    queryFn: async () => {
+      try {
+        const res = await ProjectService.getGroupsForMentor();
+        if (res?.data?.items) {
+          // AC-02: Only show Active groups (status 1)
+          return res.data.items.filter((g) => g.status === 1 || g.groupStatus === 1);
+        }
+        return [];
+      } catch (err) {
+        return [];
       }
-    } catch (err) {
-      console.error('Fetch Projects failed:', err);
-      // toast.error('Failed to load projects'); // Avoid multiple separate toasts if it fails on load
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    searchTerm,
-    groupIdFilter,
-    statusFilter,
-    pagination.current,
-    pagination.pageSize,
-    setPagination,
-    toast,
-  ]);
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const fetchSupportingData = useCallback(async () => {
-    try {
-      const res = await ProjectService.getGroupsForMentor();
-      if (res?.data?.items) {
-        // AC-02: Only show Active groups (status 1)
-        const activeGroups = res.data.items.filter((g) => g.status === 1 || g.groupStatus === 1);
-        setGroups(activeGroups);
+  // 2. Fetch Projects
+  const {
+    data: projectsResult,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      'projects',
+      searchTerm,
+      groupIdFilter,
+      statusFilter,
+      pagination.current,
+      pagination.pageSize,
+    ],
+    queryFn: async () => {
+      try {
+        const params = {
+          PageNumber: pagination.current,
+          PageSize: pagination.pageSize,
+          SearchTerm: searchTerm,
+          internshipId: groupIdFilter,
+          Status: statusFilter,
+        };
+        const res = await ProjectService.getAll(params);
+        if (res?.data?.items) {
+          // Update pagination total outside of render
+          setPagination((prev) => ({
+            ...prev,
+            total: res.data.totalCount || 0,
+          }));
+          return res.data.items;
+        }
+        return [];
+      } catch (err) {
+        console.error('Fetch Projects failed:', err);
+        return [];
       }
-    } catch (err) {
-      console.error('Fetch Supporting Data failed:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSupportingData();
-  }, [fetchSupportingData]);
-
-  // Removed auto-select first group logic to allow "View All" (null filter) state
-  /*
-  useEffect(() => {
-    if (!groupIdFilter && groups.length > 0) {
-      handleGroupFilterChange(groups[0].internshipId);
-    }
-  }, [groupIdFilter, groups, handleGroupFilterChange]);
-  */
+    },
+    staleTime: 2 * 60 * 1000,
+  });
 
   // --- Actions Hook ---
   const {
@@ -120,14 +109,16 @@ export const useProjectManagement = () => {
     handleDeleteProject,
   } = useProjectActions({
     editingRecord,
-    fetchData,
+    fetchData: refetch, // Use refetch from useQuery
     groups,
     setModalVisible,
   });
 
+  const [actionLoading, setActionLoading] = useState(false);
+
   return {
-    data,
-    loading,
+    data: projectsResult || [],
+    loading: loading || actionLoading,
     searchTerm,
     groupIdFilter,
     statusFilter,
@@ -150,8 +141,8 @@ export const useProjectManagement = () => {
     handleView,
     handleSaveProject,
     handlePublishProject,
-    handleCompleteProject: (id) => handleCompleteProject(id, setLoading),
-    handleDeleteProject: (id) => handleDeleteProject(id, setLoading),
-    fetchData,
+    handleCompleteProject: (id) => handleCompleteProject(id, setActionLoading),
+    handleDeleteProject: (id) => handleDeleteProject(id, setActionLoading),
+    fetchData: refetch,
   };
 };

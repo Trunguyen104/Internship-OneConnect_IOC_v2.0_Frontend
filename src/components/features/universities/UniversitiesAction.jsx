@@ -28,7 +28,7 @@ export default function UniversitiesAction({ university }) {
               {UI_TEXT.UNIVERSITIES.UPDATE}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-widest text-muted/60">
-              Update institution profile
+              {UI_TEXT.UNIVERSITIES.UPDATE_DESC}
             </span>
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function UniversitiesAction({ university }) {
               {UI_TEXT.BUTTON.DELETE}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400">
-              Irreversible action
+              {UI_TEXT.UNIVERSITIES.IRREVERSIBLE}
             </span>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Input } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
@@ -20,6 +21,10 @@ function Textarea({ className, ...props }) {
     />
   );
 }
+
+Textarea.propTypes = {
+  className: PropTypes.string,
+};
 
 export { Textarea };
 export default Textarea;

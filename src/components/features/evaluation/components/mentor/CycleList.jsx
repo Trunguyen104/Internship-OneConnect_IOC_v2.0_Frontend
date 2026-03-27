@@ -125,14 +125,14 @@ export default function CycleList({
         const menuItems = [
           {
             key: 'edit',
-            label: <span className="font-bold text-xs">Edit</span>,
+            label: <span className="font-bold text-xs">{BUTTONS.EDIT}</span>,
             icon: <EditOutlined className="text-blue-500" />,
             disabled: isTermPast,
             onClick: () => onEdit(record),
           },
           {
             key: 'delete',
-            label: <span className="font-bold text-xs">Delete</span>,
+            label: <span className="font-bold text-xs">{BUTTONS.DELETE}</span>,
             icon: <DeleteOutlined className="text-rose-500" />,
             danger: true,
             disabled: isTermPast,

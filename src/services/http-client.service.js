@@ -1,5 +1,9 @@
 const API_BASE = '/api/proxy';
 
+/**
+ * Triggers a global redirect to the login page when a 401 Unauthorized response is received.
+ * @returns {void}
+ */
 function notifyUnauthorized() {
   if (typeof window === 'undefined') return;
 
@@ -13,6 +17,10 @@ function notifyUnauthorized() {
   }
 }
 
+/**
+ * Triggers a global redirect or notification when a 403 Forbidden response is received.
+ * @returns {void}
+ */
 function notifyForbidden() {
   if (typeof window === 'undefined') return;
 
@@ -26,6 +34,17 @@ function notifyForbidden() {
   }
 }
 
+/**
+ * Core request function that wraps the native fetch API with project-specific logic.
+ * Handles base URL, headers, 401/403 intercepts, and token refreshing.
+ *
+ * @param {string} path - The API endpoint path (e.g., '/users').
+ * @param {Object} [options={}] - Standard fetch options plus specific extensions.
+ * @param {string} [options.responseType] - Set to 'blob' for binary data.
+ * @param {boolean} [options.silent] - If true, suppresses global redirects on 401/403.
+ * @returns {Promise<any>} The parsed JSON data or response text.
+ * @throws {Error} Throws an error object with status and data if the request fails.
+ */
 async function request(path, options = {}) {
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
@@ -113,6 +132,13 @@ async function request(path, options = {}) {
   return data;
 }
 
+/**
+ * Performs a GET request with query parameters.
+ * @param {string} path - Endpoint path.
+ * @param {Object} [params={}] - Object containing query parameters.
+ * @param {Object} [options={}] - Additional fetch options.
+ * @returns {Promise<any>}
+ */
 export const httpGet = (path, params = {}, options = {}) => {
   // Filter out undefined and null values
   const cleanParams = Object.fromEntries(
@@ -124,12 +150,28 @@ export const httpGet = (path, params = {}, options = {}) => {
 
   return request(url, { method: 'GET', ...options });
 };
+
+/**
+ * Performs a DELETE request.
+ * @param {string} path - Endpoint path.
+ * @param {Object} [body] - Optional request body.
+ * @param {Object} [options={}] - Additional fetch options.
+ * @returns {Promise<any>}
+ */
 export const httpDelete = (path, body, options = {}) =>
   request(path, {
     method: 'DELETE',
     body: body ? JSON.stringify(body) : undefined,
     ...options,
   });
+
+/**
+ * Performs a POST request.
+ * @param {string} path - Endpoint path.
+ * @param {Object|FormData} body - Request body.
+ * @param {Object} [options={}] - Additional fetch options.
+ * @returns {Promise<any>}
+ */
 export const httpPost = (path, body, options = {}) =>
   request(path, {
     method: 'POST',
@@ -137,6 +179,13 @@ export const httpPost = (path, body, options = {}) =>
     ...options,
   });
 
+/**
+ * Performs a PUT request.
+ * @param {string} path - Endpoint path.
+ * @param {Object|FormData} body - Request body.
+ * @param {Object} [options={}] - Additional fetch options.
+ * @returns {Promise<any>}
+ */
 export const httpPut = (path, body, options = {}) =>
   request(path, {
     method: 'PUT',
@@ -144,12 +193,20 @@ export const httpPut = (path, body, options = {}) =>
     ...options,
   });
 
+/**
+ * Performs a PATCH request.
+ * @param {string} path - Endpoint path.
+ * @param {Object|FormData} body - Request body.
+ * @param {Object} [options={}] - Additional fetch options.
+ * @returns {Promise<any>}
+ */
 export const httpPatch = (path, body, options = {}) =>
   request(path, {
     method: 'PATCH',
     body: body instanceof FormData ? body : JSON.stringify(body),
     ...options,
   });
+
 const httpClient = {
   httpGet,
   httpPost,

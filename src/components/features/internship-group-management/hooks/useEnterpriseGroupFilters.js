@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 
 import { EnterprisePhaseService } from '../../internship-student-management/services/enterprise-phase.service';
 import { useDebounce } from './useDebounce';
@@ -9,14 +10,12 @@ const DEFAULT_PAGINATION = {
 };
 
 export const useEnterpriseGroupFilters = () => {
-  const [phaseId, setPhaseId] = useState(null);
-  const [phaseOptions, setPhaseOptions] = useState([]);
-  const [fetchingPhases, setFetchingPhases] = useState(false);
+  const [phaseId, setPhaseId] = useState('ALL_VISIBLE');
 
-  useEffect(() => {
-    const fetchPhases = async () => {
+  const { data: phaseOptions = [], isLoading: fetchingPhases } = useQuery({
+    queryKey: ['enterprise-phases'],
+    queryFn: async () => {
       try {
-        setFetchingPhases(true);
         const res = await EnterprisePhaseService.getPhases();
         const phases = res?.data?.items || res?.data || [];
 
@@ -27,23 +26,23 @@ export const useEnterpriseGroupFilters = () => {
             status: p.status,
           }));
 
-          const allOption = {
-            label: 'All Phases',
-            value: 'ALL_VISIBLE',
-            status: undefined, // Show all
-          };
-
-          setPhaseOptions([allOption, ...options]);
-          setPhaseId('ALL_VISIBLE');
+          return [
+            {
+              label: 'All Phases',
+              value: 'ALL_VISIBLE',
+              status: undefined,
+            },
+            ...options,
+          ];
         }
+        return [];
       } catch (err) {
-        // Error handled silently
-      } finally {
-        setFetchingPhases(false);
+        return [];
       }
-    };
-    fetchPhases();
-  }, []);
+    },
+    staleTime: 10 * 60 * 1000, // Phases don't change often
+  });
+
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 300);
 
@@ -86,7 +85,7 @@ export const useEnterpriseGroupFilters = () => {
         column: Array.isArray(newSorter.columnKey) ? newSorter.columnKey[0] : newSorter.columnKey,
         order: newSorter.order === 'ascend' ? 'asc' : 'desc',
       });
-    } else if (!newSorter.columnKey) {
+    } else if (!newSorter?.columnKey) {
       setSort({ column: 'CreatedAt', order: 'desc' });
     }
   }, []);

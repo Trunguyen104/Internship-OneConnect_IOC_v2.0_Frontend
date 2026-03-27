@@ -67,9 +67,15 @@ export const EVALUATION_UI = {
     SELECT_PHASE_PLACEHOLDER: 'Chọn giai đoạn...',
     SELECT_GROUP_PLACEHOLDER: 'Chọn nhóm thực tập...',
     SELECT_GROUP_PROMPT: 'Vui lòng chọn một nhóm thực tập từ danh sách trên để xem đánh giá.',
+    SELECT_GROUP_PROMPT_DETAIL:
+      'Please select a term and an internship group from the sidebar or filters to begin evaluating students.',
     NO_GROUPS: 'Không tìm thấy nhóm nào trong giai đoạn này.',
     MAX_LABEL: 'Max:',
     DETAIL: 'Detail',
+    POINTS: 'Points',
+    CYCLE_TITLE: 'Evaluation Cycle',
+    PICK_START: 'Pick Start Date',
+    PICK_END: 'Pick End Date',
   },
 
   BUTTONS: {

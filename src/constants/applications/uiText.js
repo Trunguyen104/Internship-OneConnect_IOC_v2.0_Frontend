@@ -49,6 +49,14 @@ export const APPLICATIONS_UI = {
     CLOSE: 'Close',
     UNSPECIFIED: 'Not specified',
     GENERAL_APP: 'General Application',
+    SOURCE: 'Source',
+    UNI_ASSIGN: 'Uni-Assign',
+    SELF_APPLY: 'Self-Apply',
+  },
+  COMMON: {
+    LOADING: '...',
+    EMPTY: '—',
+    DATE_FORMAT: 'DD MMM, YYYY',
   },
   BULLET: '•',
 };

@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -14,14 +15,13 @@ export function useLogbook() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
+  // Route Synchronization
   const urlInternshipId = searchParams.get('internshipId');
   const [internshipId, setInternshipIdState] = useState(urlInternshipId);
-  const [userProfile, setUserProfile] = useState(null);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
 
+  // Filter & Pagination States
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [statusFilter, setStatusFilter] = useState();
@@ -29,19 +29,33 @@ export function useLogbook() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPageNumber(1);
-    }, 500);
-    return () => clearTimeout(t);
-  }, [search]);
+  // 1. Fetch User Profile
+  const { data: userProfile = null } = useQuery({
+    queryKey: ['user-profile-me'],
+    queryFn: async () => {
+      try {
+        const res = await userService.getMe();
+        return res?.data || null;
+      } catch (err) {
+        return null;
+      }
+    },
+    staleTime: Infinity,
+  });
 
-  useEffect(() => {
-    if (urlInternshipId && urlInternshipId !== internshipId) {
-      setInternshipIdState(urlInternshipId);
-    }
-  }, [urlInternshipId, internshipId]);
+  // 2. Fetch Available Internships
+  const { data: internships = [] } = useQuery({
+    queryKey: ['available-internships-logbook'],
+    queryFn: async () => {
+      try {
+        const res = await InternshipGroupService.getAll();
+        return res?.data?.items || res?.data || [];
+      } catch (err) {
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   const setInternshipId = useCallback(
     (id) => {
@@ -57,88 +71,83 @@ export function useLogbook() {
     [searchParams, router, pathname]
   );
 
+  // 3. Sync Internship Selection
   useEffect(() => {
-    const fetchInternship = async () => {
-      try {
-        const res = await InternshipGroupService.getAll();
-        const items = res?.data?.items || res?.data || [];
+    if (urlInternshipId && urlInternshipId !== internshipId) {
+      setTimeout(() => setInternshipIdState(urlInternshipId), 0);
+    } else if (!urlInternshipId && internships.length > 0) {
+      const firstId = internships[0].internshipId || internships[0].id;
+      setTimeout(() => setInternshipId(firstId), 0);
+    }
+  }, [urlInternshipId, internshipId, internships, setInternshipId]);
 
-        if (items.length > 0 && !urlInternshipId) {
-          const firstId = items[0].internshipId || items[0].id;
-          setInternshipId(firstId);
-        }
-      } catch (err) {}
-    };
-
-    fetchInternship();
-  }, [urlInternshipId, setInternshipId]);
-
+  // Debounce Search
   useEffect(() => {
-    const fetchProfile = async () => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPageNumber(1);
+    }, 500);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // 4. Fetch Logbook Entries
+  const {
+    data: logbookResult = { items: [], totalCount: 0 },
+    isLoading: loading,
+    refetch: fetchLogbooks,
+  } = useQuery({
+    queryKey: [
+      'logbook-entries',
+      internshipId,
+      pageNumber,
+      pageSize,
+      sortOrder,
+      statusFilter,
+      debouncedSearch,
+    ],
+    queryFn: async () => {
+      if (!internshipId) return { items: [], totalCount: 0 };
       try {
-        const res = await userService.getMe();
-        if (res?.data) {
-          setUserProfile(res.data);
+        const params = {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SortColumn: 'dateReport',
+          SortOrder: sortOrder,
+        };
+
+        if (statusFilter !== undefined && statusFilter !== null) {
+          params.Status = statusFilter;
         }
+
+        if (debouncedSearch?.trim()) {
+          params.SearchTerm = debouncedSearch.trim();
+        }
+
+        const res = await LogBookService.getAll(internshipId, params);
+        return {
+          items: res?.data?.items || [],
+          totalCount: res?.data?.totalCount || 0,
+        };
       } catch (err) {
-        // Silently fail
+        return { items: [], totalCount: 0 };
       }
-    };
-    fetchProfile();
-  }, []);
-
-  const fetchLogbooks = useCallback(async () => {
-    if (!internshipId) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const params = {
-        PageNumber: pageNumber,
-        PageSize: pageSize,
-        SortColumn: 'dateReport',
-        SortOrder: sortOrder,
-      };
-
-      if (statusFilter !== undefined && statusFilter !== null) {
-        params.Status = statusFilter;
-      }
-
-      if (debouncedSearch?.trim()) {
-        params.SearchTerm = debouncedSearch.trim();
-      }
-
-      const res = await LogBookService.getAll(internshipId, params);
-
-      const items = res?.data?.items || [];
-      const totalCount = res?.data?.totalCount || 0;
-
-      setData(items);
-      setTotal(totalCount);
-    } catch (err) {
-      // Silently fail
-    } finally {
-      setLoading(false);
-    }
-  }, [internshipId, pageNumber, pageSize, sortOrder, statusFilter, debouncedSearch]);
-
-  useEffect(() => {
-    fetchLogbooks();
-  }, [fetchLogbooks]);
+    },
+    enabled: !!internshipId,
+    staleTime: 2 * 60 * 1000,
+  });
 
   const handleDelete = async (id) => {
     try {
       const res = await LogBookService.delete(id);
       if (res && (res.isSuccess !== false || res.success !== false)) {
         toast.success(DAILY_REPORT_MESSAGES.SUCCESS.DELETE);
-        if (data.length === 1 && pageNumber > 1) {
+
+        // Correctively handle page decrement if empty after delete
+        if (logbookResult.items.length === 1 && pageNumber > 1) {
           setPageNumber((prev) => prev - 1);
-        } else {
-          fetchLogbooks();
         }
+
+        queryClient.invalidateQueries({ queryKey: ['logbook-entries'] });
         return true;
       } else {
         toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.DELETE_FAILED);
@@ -151,9 +160,9 @@ export function useLogbook() {
   };
 
   return {
-    data,
+    data: logbookResult.items,
     loading,
-    total,
+    total: logbookResult.totalCount,
     pageNumber,
     setPageNumber,
     pageSize,

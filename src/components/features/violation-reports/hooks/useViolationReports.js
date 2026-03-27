@@ -1,6 +1,7 @@
-﻿'use client';
+'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { useToast } from '@/providers/ToastProvider';
 
@@ -8,9 +9,8 @@ import { VIOLATION_REPORT_UI } from '../constants/violationReportUI';
 import { violationReportService } from '../services/violation-report.service';
 
 export const useViolationReports = () => {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
+  const toast = useToast();
+
   const [params, setParams] = useState({
     page: 1,
     pageSize: 10,
@@ -19,62 +19,46 @@ export const useViolationReports = () => {
     search: '',
   });
 
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [students, setStudents] = useState([]);
-  const [groups, setGroups] = useState([]);
+  // 1. Fetch Students & Groups (Initial Data)
+  const { data: initialData = { students: [], groups: [] } } = useQuery({
+    queryKey: ['violation-report-initial-data'],
+    queryFn: async () => {
+      try {
+        const [students, groups] = await Promise.all([
+          violationReportService.getStudentsForMentor(),
+          violationReportService.getGroupsForMentor(),
+        ]);
+        return { students: students || [], groups: groups || [] };
+      } catch (err) {
+        return { students: [], groups: [] };
+      }
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 
-  const toast = useToast();
-
-  // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(params.search);
-      setParams((prev) => ({ ...prev, page: 1 }));
-    }, 300);
-
-    return () => clearTimeout(handler);
-  }, [params.search]);
-
-  const fetchReports = useCallback(async () => {
-    setLoading(true);
-    try {
-      const queryParams = {
-        ...params,
-        search: debouncedSearch || undefined,
-      };
-      const response = await violationReportService.getReports(queryParams);
-      setReports(response?.data || []);
-      setTotal(response?.total || 0);
-    } catch (error) {
-      console.error('Failed to fetch reports:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, params]);
-
-  const fetchInitialData = useCallback(async () => {
-    try {
-      const [studentsRes, groupsRes] = await Promise.all([
-        violationReportService.getStudentsForMentor(),
-        violationReportService.getGroupsForMentor(),
-      ]);
-      setStudents(studentsRes || []);
-      setGroups(groupsRes || []);
-    } catch (error) {
-      console.error('Failed to fetch initial data:', error);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
-
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+  // 2. Fetch Violation Reports
+  const {
+    data: reportsResult,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: ['violation-reports', params],
+    queryFn: async () => {
+      try {
+        const response = await violationReportService.getReports(params);
+        return {
+          data: response?.data || [],
+          total: response?.total || 0,
+        };
+      } catch (err) {
+        return { data: [], total: 0 };
+      }
+    },
+    staleTime: 2 * 60 * 1000,
+  });
 
   const handleSearch = (value) => {
-    setParams((prev) => ({ ...prev, search: value }));
+    setParams((prev) => ({ ...prev, search: value, page: 1 }));
   };
 
   const handleFilterChange = (newFilters) => {
@@ -95,7 +79,7 @@ export const useViolationReports = () => {
     try {
       await violationReportService.createReport(payload);
       toast.success(VIOLATION_REPORT_UI.CREATE_SUCCESS);
-      fetchReports();
+      refetch();
       return true;
     } catch {
       toast.error(VIOLATION_REPORT_UI.CREATE_FAIL);
@@ -107,7 +91,7 @@ export const useViolationReports = () => {
     try {
       await violationReportService.updateReport(id, payload);
       toast.success(VIOLATION_REPORT_UI.UPDATE_SUCCESS);
-      fetchReports();
+      refetch();
       return true;
     } catch {
       toast.error(VIOLATION_REPORT_UI.UPDATE_FAIL);
@@ -119,7 +103,7 @@ export const useViolationReports = () => {
     try {
       await violationReportService.deleteReport(id);
       toast.success(VIOLATION_REPORT_UI.DELETE_SUCCESS);
-      fetchReports();
+      refetch();
       return true;
     } catch {
       toast.error(VIOLATION_REPORT_UI.DELETE_FAIL);
@@ -128,18 +112,18 @@ export const useViolationReports = () => {
   };
 
   return {
-    reports,
+    reports: reportsResult?.data || [],
     loading,
-    total,
+    total: reportsResult?.total || 0,
     params,
-    students,
-    groups,
+    students: initialData.students,
+    groups: initialData.groups,
     handleSearch,
     handleFilterChange,
     handleTableChange,
     handleCreateReport,
     handleUpdateReport,
     handleDeleteReport,
-    refresh: fetchReports,
+    refresh: refetch,
   };
 };

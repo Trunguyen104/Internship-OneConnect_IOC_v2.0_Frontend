@@ -1,6 +1,7 @@
-﻿'use client';
+'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { useToast } from '@/providers/ToastProvider';
@@ -10,23 +11,7 @@ import { EvaluationService } from '../services/evaluation.service';
 export function useEvaluation() {
   const toast = useToast();
 
-  // --- Core State ---
-  const [internshipId, setInternshipId] = useState(null);
-  const [myStudentId, setMyStudentId] = useState(null);
-
-  // --- Cycles ---
-  const [cycles, setCycles] = useState([]);
-  const [loadingCycles, setLoadingCycles] = useState(false);
-
-  // --- Team ---
-  const [teamData, setTeamData] = useState([]);
-  const [loadingTeam, setLoadingTeam] = useState(false);
-
-  // --- My Evaluation ---
-  const [myEvaluation, setMyEvaluation] = useState(null);
-  const [loadingMyEval, setLoadingMyEval] = useState(false);
-
-  // --- UI ---
+  // --- UI States ---
   const [selectedCycle, setSelectedCycle] = useState(null);
   const [teamVisible, setTeamVisible] = useState(false);
   const [detailVisible, setDetailVisible] = useState(false);
@@ -35,107 +20,90 @@ export function useEvaluation() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // =========================
-  // ðŸ”§ Helper normalize data
-  // =========================
+  // Helper normalize data
   const normalizeArray = (res) => {
     const data = res?.data ?? res ?? [];
     return Array.isArray(data) ? data : [];
   };
 
-  // =========================
-  // 1. Fetch Internship
-  // =========================
-  const fetchInternship = useCallback(async () => {
-    try {
-      const res = await InternshipGroupService.getAll();
-      const items = normalizeArray(res);
-
-      if (!items.length) {
-        toast.warning('You are not currently enrolled in any internship.');
-        return;
-      }
-
-      const active = items.find((it) => it.status !== 'Failed') || items[0];
-
-      setInternshipId(active.internshipId || active.id);
-      setMyStudentId(active.studentId);
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to load internship.');
-    }
-  }, [toast]);
-
-  // =========================
-  // 2. Fetch Cycles
-  // =========================
-  const fetchCycles = useCallback(async () => {
-    if (!internshipId) return;
-
-    try {
-      setLoadingCycles(true);
-      const res = await EvaluationService.getStudentEvaluationCycles(internshipId);
-      setCycles(normalizeArray(res));
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to load evaluation cycles.');
-    } finally {
-      setLoadingCycles(false);
-    }
-  }, [internshipId, toast]);
-
-  // =========================
-  // 3. Fetch Team
-  // =========================
-  const fetchTeamData = useCallback(
-    async (cycleId) => {
+  // 1. Fetch Internship Enrollment
+  const { data: internshipContext = { id: null, studentId: null } } = useQuery({
+    queryKey: ['my-internship-enrollment'],
+    queryFn: async () => {
       try {
-        setLoadingTeam(true);
-        const res = await EvaluationService.getStudentTeamEvaluations(cycleId);
-        setTeamData(normalizeArray(res));
-      } catch (error) {
-        console.error(error);
+        const res = await InternshipGroupService.getAll();
+        const items = normalizeArray(res);
+        if (!items.length) {
+          toast.warning('You are not currently enrolled in any internship.');
+          return { id: null, studentId: null };
+        }
+        const active = items.find((it) => it.status !== 'Failed') || items[0];
+        return {
+          id: active.internshipId || active.id,
+          studentId: active.studentId,
+        };
+      } catch {
+        toast.error('Failed to load internship.');
+        return { id: null, studentId: null };
+      }
+    },
+    staleTime: Infinity,
+  });
+
+  const internshipId = internshipContext.id;
+  const myStudentId = internshipContext.studentId;
+
+  // 2. Fetch Evaluation Cycles
+  const { data: cycles = [], isLoading: loadingCycles } = useQuery({
+    queryKey: ['evaluation-cycles', internshipId],
+    queryFn: async () => {
+      try {
+        const res = await EvaluationService.getStudentEvaluationCycles(internshipId);
+        return normalizeArray(res);
+      } catch {
+        toast.error('Failed to load evaluation cycles.');
+        return [];
+      }
+    },
+    enabled: !!internshipId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // 3. Fetch Team Evaluations (Dependent)
+  const [teamCycleId, setTeamCycleId] = useState(null);
+  const { data: teamData = [], isLoading: loadingTeam } = useQuery({
+    queryKey: ['team-evaluations', teamCycleId],
+    queryFn: async () => {
+      try {
+        const res = await EvaluationService.getStudentTeamEvaluations(teamCycleId);
+        return normalizeArray(res);
+      } catch {
         toast.error('Failed to load team evaluations.');
-      } finally {
-        setLoadingTeam(false);
+        return [];
       }
     },
-    [toast]
-  );
+    enabled: !!teamCycleId,
+    staleTime: 2 * 60 * 1000,
+  });
 
-  // =========================
-  // 4. Fetch My Evaluation
-  // =========================
-  const fetchMyEvalData = useCallback(
-    async (cycleId) => {
+  // 4. Fetch My Evaluation (Dependent)
+  const [myEvalCycleId, setMyEvalCycleId] = useState(null);
+  const { data: myEvaluation = null, isLoading: loadingMyEval } = useQuery({
+    queryKey: ['my-evaluation-detail', myEvalCycleId],
+    queryFn: async () => {
       try {
-        setLoadingMyEval(true);
-        const res = await EvaluationService.getStudentMyEvaluation(cycleId);
-        setMyEvaluation(res?.data ?? res ?? null);
-      } catch (error) {
-        console.error(error);
+        const res = await EvaluationService.getStudentMyEvaluation(myEvalCycleId);
+        return res?.data ?? res ?? null;
+      } catch {
         toast.error('Failed to load evaluation details.');
-      } finally {
-        setLoadingMyEval(false);
+        return null;
       }
     },
-    [toast]
-  );
+    enabled: !!myEvalCycleId,
+    staleTime: 2 * 60 * 1000,
+  });
 
-  // =========================
-  // ðŸ” Effects
-  // =========================
-  useEffect(() => {
-    fetchInternship();
-  }, [fetchInternship]);
-
-  useEffect(() => {
-    if (internshipId) fetchCycles();
-  }, [internshipId, fetchCycles]);
-
-  // =========================
-  // ðŸ“„ Pagination
-  // =========================
+  // Pagination Logic
   const total = cycles.length;
   const totalPages = Math.ceil(total / pageSize);
 
@@ -144,13 +112,11 @@ export function useEvaluation() {
     return cycles.slice(start, start + pageSize);
   }, [cycles, page, pageSize]);
 
-  // =========================
-  // ðŸŽ¯ Actions
-  // =========================
+  // Actions
   const openTeamOverview = (cycle) => {
     setSelectedCycle(cycle);
     setTeamVisible(true);
-    fetchTeamData(cycle.cycleId);
+    setTeamCycleId(cycle.cycleId);
   };
 
   const openDetail = (cycle) => {
@@ -159,43 +125,37 @@ export function useEvaluation() {
 
     setSelectedCycle(target);
     setTeamVisible(false);
-    setDetailVisible(true); // âŒ bá» setTimeout
-
-    fetchMyEvalData(target.cycleId);
+    setDetailVisible(true);
+    setMyEvalCycleId(target.cycleId);
   };
 
-  const closeTeam = () => setTeamVisible(false);
-  const closeDetail = () => setDetailVisible(false);
+  const closeTeam = () => {
+    setTeamVisible(false);
+    setTeamCycleId(null);
+  };
 
-  // =========================
-  // ðŸš€ Return
-  // =========================
+  const closeDetail = () => {
+    setDetailVisible(false);
+    setMyEvalCycleId(null);
+  };
+
   return {
-    // loading
     loadingCycles,
     loadingTeam,
     loadingMyEval,
-
-    // data
     myStudentId,
     paginated,
     total,
     totalPages,
     teamData,
     myEvaluation,
-
-    // pagination
     page,
     pageSize,
     setPage,
     setPageSize,
-
-    // UI
     selectedCycle,
     teamVisible,
     detailVisible,
-
-    // actions
     openTeamOverview,
     openDetail,
     closeTeam,

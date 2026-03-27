@@ -52,9 +52,11 @@ export const PROJECT_MANAGEMENT = {
       TIMELINE: 'Project Timeline',
       RESOURCES: 'Resources & Deliverables',
     },
+    TITLE_DETAIL: 'Project Details',
     TITLE_ADD: 'Create Brand New Project',
     TITLE_EDIT: 'Edit Project Details',
     DESC: 'Define the scope, goals, and technical requirements for this project.',
+    CANCEL_BTN: 'Cancel',
     SAVE_DRAFT: 'Save Draft',
     PUBLISH: 'Publish Project',
     LABEL: {
@@ -78,6 +80,10 @@ export const PROJECT_MANAGEMENT = {
       DESCRIPTION: 'Brief project overview...',
       REQUIREMENTS: 'Technical stack, tools, environment...',
       DELIVERABLES: 'Source code, documentation, presentations...',
+      UPLOAD_PRIMARY: 'Click or drag files to this area to upload',
+      UPLOAD_HINT: 'Support for PDF, DOCX, ZIP, etc.',
+      QUICK_LINKS: 'Quick Links',
+      LINK_TITLE: 'Link Title (e.g. Figma, PRD)',
     },
     VALIDATION: {
       NAME_REQUIRED: 'Please enter project name',
@@ -85,6 +91,10 @@ export const PROJECT_MANAGEMENT = {
       GROUP_REQUIRED: 'Please select an intern group',
       FIELD_REQUIRED: 'Please select a project field',
       GROUP_MUST_SELECT: 'Group must be selected before publishing',
+      DESC_REQUIRED: 'Description is required',
+      REQ_REQUIRED: 'Technical requirements are required',
+      MISSING_TITLE: 'Missing title',
+      MISSING_URL: 'Missing URL',
     },
     FIELD_OPTIONS: {
       TEMPLATE: {
@@ -130,6 +140,9 @@ export const PROJECT_MANAGEMENT = {
       LINKS: 'Quick Links',
       NO_RESOURCES: 'No attachments for this project.',
       NO_LINKS: 'No external links available.',
+      TEMPLATE_PREFIX: 'Template: ',
+      NA: 'N/A',
+      TBA: 'TBA',
     },
     GROUP: {
       NOT_ASSIGNED: 'Not Assigned',
@@ -147,6 +160,15 @@ export const PROJECT_MANAGEMENT = {
       COUNT_LABEL: 'Total:',
       EMPTY_MESSAGE: 'No students in this group yet.',
       EMPTY_HINT: 'HR needs to add students to this group (AC-G05).',
+      UNASSIGN: 'Unassign',
+      ACTIVE: 'Active',
+      COLUMNS: {
+        NAME: 'Full Name',
+        UNIVERSITY: 'University',
+        EMAIL: 'Email',
+        STATUS: 'Status',
+        ACTION: 'Action',
+      },
     },
     RESOURCES: {
       ACCESS: 'Open/Download',

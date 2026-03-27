@@ -44,6 +44,8 @@ export const COMMON_UI = {
     ONBOARD_ENTERPRISE: 'Onboard Enterprise',
     COMMUNICATION_ERROR: 'Communication Error',
     TRY_AGAIN: 'Try Again',
+    ERROR_OCCURRED: 'An error occurred',
+    DEFAULT_ERROR_MESSAGE: 'We could not complete your request.',
     VIEW_LINK: 'View Link',
     LOGO: 'LOGO',
     SCORE_DENOMINATOR: '/ 10',

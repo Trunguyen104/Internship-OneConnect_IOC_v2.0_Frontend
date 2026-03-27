@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { PlusCircleOutlined } from '@ant-design/icons';
 import React, { useMemo, useState } from 'react';
@@ -76,7 +76,7 @@ export default function CreateTaskModal({
     <CompoundModal open={open} onCancel={handleClose} width={1200}>
       <CompoundModal.Header
         title={BACKLOG_UI.MODAL_CREATE_TASK}
-        subtitle="Khá»Ÿi táº¡o cÃ´ng viá»‡c má»›i vÃ  thiáº¿t láº­p cÃ¡c thÃ´ng tin chi tiáº¿t cho káº¿ hoáº¡ch sprint"
+        subtitle={BACKLOG_UI.MODAL_CREATE_TASK_SUBTITLE}
         icon={<PlusCircleOutlined />}
       />
 
@@ -86,7 +86,7 @@ export default function CreateTaskModal({
           <div className="flex flex-1 flex-col space-y-6">
             {/* Summary */}
             <div className="flex flex-col gap-2">
-              <FieldLabel required>alo</FieldLabel>
+              <FieldLabel required>{BACKLOG_UI.FIELD_SUMMARY}</FieldLabel>
               <TextInput
                 value={summary}
                 onChange={setSummary}

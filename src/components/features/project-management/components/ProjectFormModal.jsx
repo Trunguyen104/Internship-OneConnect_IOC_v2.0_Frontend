@@ -127,7 +127,7 @@ export default function ProjectFormModal({
       title={
         <div>
           <h3 className="mb-0 text-lg font-bold">
-            {editingRecord ? (viewOnly ? 'Project Details' : FORM.TITLE_EDIT) : FORM.TITLE_ADD}
+            {editingRecord ? (viewOnly ? FORM.TITLE_DETAIL : FORM.TITLE_EDIT) : FORM.TITLE_ADD}
           </h3>
           {!viewOnly && <p className="mt-1 text-xs font-normal text-gray-400">{FORM.DESC}</p>}
         </div>
@@ -138,7 +138,7 @@ export default function ProjectFormModal({
       footer={
         !viewOnly && (
           <div className="flex justify-between px-4 py-2">
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button onClick={onCancel}>{FORM.CANCEL_BTN}</Button>
             <Space>
               <Button onClick={() => handleSubmit(true)} loading={loading}>
                 {FORM.SAVE_DRAFT}
@@ -274,7 +274,7 @@ export default function ProjectFormModal({
         <Form.Item
           name="description"
           label={FORM.LABEL.DESCRIPTION}
-          rules={[{ required: true, message: FORM.VALIDATION.DESC_REQUIRED || 'Required' }]}
+          rules={[{ required: true, message: FORM.VALIDATION.DESC_REQUIRED }]}
         >
           <TextArea rows={6} placeholder={FORM.PLACEHOLDER.DESCRIPTION} />
         </Form.Item>
@@ -282,7 +282,7 @@ export default function ProjectFormModal({
         <Form.Item
           name="requirements"
           label={FORM.LABEL.REQUIREMENTS}
-          rules={[{ required: true, message: FORM.VALIDATION.REQ_REQUIRED || 'Required' }]}
+          rules={[{ required: true, message: FORM.VALIDATION.REQ_REQUIRED }]}
         >
           <TextArea rows={4} placeholder={FORM.PLACEHOLDER.REQUIREMENTS} />
         </Form.Item>
@@ -314,11 +314,9 @@ export default function ProjectFormModal({
               <p className="ant-upload-drag-icon">
                 <UploadOutlined />
               </p>
-              <p className="ant-upload-text text-sm">
-                {FORM.PLACEHOLDER.UPLOAD_PRIMARY || 'Click or drag files to this area to upload'}
-              </p>
+              <p className="ant-upload-text text-sm">{FORM.PLACEHOLDER.UPLOAD_PRIMARY}</p>
               <p className="ant-upload-hint text-xs font-normal opacity-50">
-                {FORM.PLACEHOLDER.UPLOAD_HINT || 'Support for PDF, DOCX, ZIP, etc.'}
+                {FORM.PLACEHOLDER.UPLOAD_HINT}
               </p>
             </Upload.Dragger>
           </Form.Item>
@@ -326,7 +324,7 @@ export default function ProjectFormModal({
           <div className="mt-6">
             <h5 className="text-[11px] font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
               <LinkOutlined />
-              Quick Links
+              {FORM.PLACEHOLDER.QUICK_LINKS}
             </h5>
             <Form.List name="links">
               {(fields, { add, remove }) => (
@@ -336,16 +334,19 @@ export default function ProjectFormModal({
                       <Form.Item
                         {...restField}
                         name={[name, 'title']}
-                        rules={[{ required: true, message: 'Missing title' }]}
+                        rules={[{ required: true, message: FORM.VALIDATION.MISSING_TITLE }]}
                       >
-                        <Input placeholder="Link Title (e.g. Figma, PRD)" className="w-40" />
+                        <Input placeholder={FORM.PLACEHOLDER.LINK_TITLE} className="w-40" />
                       </Form.Item>
                       <Form.Item
                         {...restField}
                         name={[name, 'url']}
-                        rules={[{ required: true, message: 'Missing URL' }]}
+                        rules={[{ required: true, message: FORM.VALIDATION.MISSING_URL }]}
                       >
-                        <Input placeholder="URL" className="w-64" />
+                        <Input
+                          placeholder={PROJECT_MANAGEMENT.DETAIL.SESOURCES?.EXTERNAL || 'URL'}
+                          className="w-64"
+                        />
                       </Form.Item>
                       <DeleteOutlined
                         onClick={() => remove(name)}
@@ -355,7 +356,7 @@ export default function ProjectFormModal({
                   ))}
                   <Form.Item>
                     <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      {FORM.LABEL.ADD_LINK || 'Add Link'}
+                      {PROJECT_MANAGEMENT.BUTTON.ADD_LINK || 'Add Link'}
                     </Button>
                   </Form.Item>
                 </>

@@ -29,18 +29,14 @@ export default function UniversitiesPage() {
   return (
     <PageLayout>
       <PageLayout.Header
-        title={UI_TEXT.UNIVERSITIES.TITLE || 'University Management'}
-        subtitle={
-          UI_TEXT.UNIVERSITIES.DESCRIPTION ||
-          'Manage educational institutions, their codes, and headquarters information.'
-        }
+        title={UI_TEXT.UNIVERSITIES.TITLE}
+        subtitle={UI_TEXT.UNIVERSITIES.DESCRIPTION}
       />
 
       <PageLayout.Card className="flex flex-col overflow-hidden">
         <PageLayout.Toolbar
           searchProps={{
-            placeholder:
-              UI_TEXT.UNIVERSITIES.SEARCH_PLACEHOLDER || 'Search by university name or code...',
+            placeholder: UI_TEXT.UNIVERSITIES.SEARCH_PLACEHOLDER,
             value: search,
             onChange: (e) => setSearch(e.target.value),
             className: 'max-w-md',
@@ -64,8 +60,7 @@ export default function UniversitiesPage() {
         {total > 0 && (
           <div className="mt-4 border-t border-gray-100 pt-8 flex items-center justify-between">
             <span className="text-[13px] font-bold text-muted/40 tracking-tight uppercase">
-              {UI_TEXT.COMMON.TOTAL || 'Total records'}:{' '}
-              <span className="text-text font-black">{total}</span>
+              {UI_TEXT.COMMON.TOTAL_RECORDS}: <span className="text-text font-black">{total}</span>
             </span>
             <PageLayout.Pagination
               total={total}
