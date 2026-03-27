@@ -128,7 +128,6 @@ export const useGroupManagement = () => {
       setFetchingStudents(true);
       const res = await EnterpriseGroupService.getPlacedStudents({
         PhaseId: isAllVisible ? undefined : targetPhaseId,
-        TermId: isAllVisible ? undefined : targetPhaseId, // Backward compatibility
         PageIndex: 1,
         PageSize: 1000, // Fetch more for 'full list'
       });
@@ -242,8 +241,6 @@ export const useGroupManagement = () => {
         ...payload,
         phaseId: targetPhaseId,
         internshipPhaseId: targetPhaseId, // Extended compatibility
-        termId: targetPhaseId, // Backward compatibility
-        internshipTermId: targetPhaseId, // Legacy compatibility
         enterpriseId: enterpriseId,
       });
       setCreateModal({ open: false, group: null });
@@ -317,8 +314,6 @@ export const useGroupManagement = () => {
             endDate: values.endDate || group.endDate,
             phaseId: targetPhaseId,
             internshipPhaseId: targetPhaseId,
-            termId: targetPhaseId,
-            internshipTermId: targetPhaseId,
           });
         }
 
@@ -397,7 +392,7 @@ export const useGroupManagement = () => {
     isPhaseEditable:
       filters.phaseId === 'ALL_VISIBLE' ||
       (filters.phaseId &&
-        filters.phaseOptions.find((p) => p.value === filters.phaseId)?.status === 1),
+        [1, 2].includes(filters.phaseOptions.find((p) => p.value === filters.phaseId)?.status)),
     filters: filters.filters,
     handleFilterChange: filters.handleFilterChange,
     selectedGroupDetail,

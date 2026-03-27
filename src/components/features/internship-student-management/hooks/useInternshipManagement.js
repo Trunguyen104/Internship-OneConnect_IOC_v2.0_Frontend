@@ -104,11 +104,11 @@ export const useInternshipManagement = () => {
         const phases = res?.data?.items || res?.data || [];
 
         const openPhases = phases
-          .filter((p) => p.status === 1)
+          .filter((p) => p.status === 1 || p.status === 2)
           .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
         let phasesToShow = openPhases;
-        let defaultLabel = 'All Open Phases';
+        let defaultLabel = 'All Active Phases';
 
         const options = openPhases.map((p) => ({
           label: p.phaseName || p.name || p.termName,
@@ -158,7 +158,6 @@ export const useInternshipManagement = () => {
 
       const params = {
         PhaseId: isAllVisible ? undefined : phaseId,
-        TermId: isAllVisible ? undefined : phaseId, // Backward compatibility for backend
         PageIndex: pagination.current,
         PageSize: pagination.pageSize,
         SearchTerm: search || undefined,
@@ -183,7 +182,7 @@ export const useInternshipManagement = () => {
 
       const openPhaseIds = new Set(
         phaseOptions
-          .filter((p) => p.status === 1 && p.value !== 'ALL_VISIBLE')
+          .filter((p) => (p.status === 1 || p.status === 2) && p.value !== 'ALL_VISIBLE')
           .map((p) => String(p.value).toLowerCase())
       );
 
@@ -265,7 +264,6 @@ export const useInternshipManagement = () => {
       // Fetch groups for the selected context
       const groupParams = {
         phaseId: isAllVisible ? undefined : phaseId,
-        termId: isAllVisible ? undefined : phaseId,
         pageSize: 100,
       };
       const groupRes = await EnterpriseGroupService.getGroups(groupParams).catch(() => ({
@@ -483,7 +481,6 @@ export const useInternshipManagement = () => {
         await EnterpriseGroupService.createGroup({
           ...payload,
           phaseId: targetPhaseId,
-          termId: targetPhaseId, // Keep termId key for backend compatibility if needed
           enterpriseId: enterpriseId,
         });
         toast.success('Group created successfully');

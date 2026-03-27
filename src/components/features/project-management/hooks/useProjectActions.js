@@ -15,13 +15,11 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
   const { modal } = App.useApp();
   const toast = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
-  const { MESSAGES, FORM } = PROJECT_MANAGEMENT;
+  const { MESSAGES } = PROJECT_MANAGEMENT;
 
   const getErrorMessage = (err, defaultMsg) => {
-    // Backend structure: { message, errors: [ "reason" ], validationErrors }
     const resMsg = err.data?.errors?.[0] || err.data?.message || err.message;
 
-    // Fallback: Translate common BE errors to English if they come back in VN
     if (resMsg?.includes(MESSAGES.ERROR_PUBLISH_NO_GROUP_VN)) {
       return MESSAGES.ERROR_PUBLISH_NO_GROUP;
     }
@@ -32,41 +30,91 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
   const executeSave = async (values, isDraft) => {
     try {
       setSubmitLoading(true);
-      const payload = {
-        projectName: values.name,
-        projectCode: values.code,
-        internshipId: values.internshipGroupId,
-        description: values.description,
-        startDate: values.startDate ? values.startDate.toISOString() : undefined,
-        endDate: values.endDate ? values.endDate.toISOString() : undefined,
-        field: values.field,
-        requirements: values.requirements,
-        deliverables: values.deliverables,
-        template: FORM.TEMPLATE_MAP[values.template] ?? 2,
-        status: isDraft ? PROJECT_STATUS.DRAFT : PROJECT_STATUS.PUBLISHED,
-        resources: {
-          attachments:
-            values.attachments?.map((f) => ({
-              name: f.name,
-              url: f.url || f.response?.url,
-              size: f.size,
-              uid: f.uid,
-            })) || [],
-          links: values.links || [],
-        },
-      };
 
       // AC-02/AC-13: Cannot publish without a group
-      if (!isDraft && !payload.internshipId) {
+      if (!isDraft && !values.internshipGroupId) {
         toast.error(MESSAGES.ERROR_PUBLISH_NO_GROUP);
         return;
       }
 
       if (editingRecord) {
-        await ProjectService.update(editingRecord.projectId, payload);
+        // PER BACKEND: UpdateProject expects JSON (application/json)
+        // and does not currently support Links or Files in the Command DTO.
+        const updatePayload = {
+          internshipId: values.internshipGroupId,
+          projectName: values.name,
+          description: values.description,
+          startDate: values.startDate?.toISOString(),
+          endDate: values.endDate?.toISOString(),
+          field: values.field || '',
+          requirements: values.requirements || '',
+          deliverables: values.deliverables || '',
+          template: values.template ?? 2,
+        };
+
+        await ProjectService.update(editingRecord.projectId, updatePayload);
+
+        // If updating a Draft and clicking Publish
+        if (!isDraft && editingRecord.status === PROJECT_STATUS.DRAFT) {
+          await ProjectService.publish(editingRecord.projectId);
+        }
         toast.success(MESSAGES.UPDATE_SUCCESS);
       } else {
-        await ProjectService.create(payload);
+        // PER BACKEND: CreateProject expects FormData (multipart/form-data)
+        // to support initial file attachments.
+        const formData = new FormData();
+        if (values.internshipGroupId) {
+          formData.append('InternshipId', values.internshipGroupId);
+        }
+        formData.append('ProjectName', values.name);
+        if (values.code) {
+          formData.append('ProjectCode', values.code);
+        }
+        if (values.description) {
+          formData.append('Description', values.description);
+        }
+        if (values.startDate) {
+          formData.append('StartDate', values.startDate.toISOString());
+        }
+        if (values.endDate) {
+          formData.append('EndDate', values.endDate.toISOString());
+        }
+        formData.append('Field', values.field || '');
+        formData.append('Requirements', values.requirements || '');
+        if (values.deliverables) {
+          formData.append('Deliverables', values.deliverables);
+        }
+        formData.append('Template', values.template ?? 2);
+
+        // Add Links for Create only (backend supports it in Create DTO)
+        if (values.links && values.links.length > 0) {
+          values.links.forEach((link, index) => {
+            if (link.url) {
+              formData.append(`Links[${index}].resourceName`, link.title || '');
+              formData.append(`Links[${index}].url`, link.url);
+            }
+          });
+        }
+
+        // Add Files for Create only
+        if (values.attachments && values.attachments.length > 0) {
+          values.attachments.forEach((file) => {
+            if (file.originFileObj) {
+              formData.append('Files', file.originFileObj);
+            }
+          });
+        }
+
+        // Initial status
+        formData.append('Status', isDraft ? 0 : 1);
+
+        const res = await ProjectService.create(formData);
+        const newProject = res?.data || res;
+
+        // If creating and clicking Publish immediately
+        if (!isDraft && newProject?.projectId) {
+          await ProjectService.publish(newProject.projectId);
+        }
         toast.success(isDraft ? MESSAGES.SAVE_DRAFT_SUCCESS : MESSAGES.PUBLISH_SUCCESS);
       }
 

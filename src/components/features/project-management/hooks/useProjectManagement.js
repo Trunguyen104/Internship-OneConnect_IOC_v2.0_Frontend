@@ -44,30 +44,41 @@ export const useProjectManagement = () => {
 
   // --- Data Fetching ---
   const fetchData = useCallback(async () => {
-    // AC-01: allow viewing all projects if no group filter is selected
-    // if (!groupIdFilter) return; // Removed this restrictor
-
     try {
       setLoading(true);
       const params = {
         PageNumber: pagination.current,
         PageSize: pagination.pageSize,
         SearchTerm: searchTerm,
-        internshipId: groupIdFilter, // Sync with API parameter name
+        internshipId: groupIdFilter,
         Status: statusFilter,
       };
 
       const res = await ProjectService.getAll(params);
       if (res?.data?.items) {
-        setData(res.data.items);
+        let items = res.data.items;
+
+        // AC-01: Filter locally to only show projects belonging to mentor's groups
+        // or projects that have no group assigned (orphans)
+        if (!groupIdFilter && groups.length > 0) {
+          const mentorGroupIds = groups.map((g) => (g.internshipId || g.id).toLowerCase());
+          items = items.filter((p) => {
+            if (!p.internshipId) return true; // Show orphans
+            return mentorGroupIds.includes(p.internshipId.toLowerCase());
+          });
+        }
+
+        // AC-01: Only show Draft (0), Published (1), and Completed (2)
+        const finalItems = items.filter((p) => p.status <= 2);
+
+        setData(finalItems);
         setPagination((prev) => ({
           ...prev,
-          total: res.data.totalCount || 0,
+          total: res.data.totalCount || finalItems.length,
         }));
       }
     } catch (err) {
       console.error('Fetch Projects failed:', err);
-      // toast.error('Failed to load projects'); // Avoid multiple separate toasts if it fails on load
     } finally {
       setLoading(false);
     }
@@ -78,7 +89,7 @@ export const useProjectManagement = () => {
     pagination.current,
     pagination.pageSize,
     setPagination,
-    toast,
+    groups,
   ]);
 
   useEffect(() => {
@@ -89,9 +100,9 @@ export const useProjectManagement = () => {
     try {
       const res = await ProjectService.getGroupsForMentor();
       if (res?.data?.items) {
-        // AC-02: Only show Active groups (status 1)
-        const activeGroups = res.data.items.filter((g) => g.status === 1 || g.groupStatus === 1);
-        setGroups(activeGroups);
+        // Keep all groups for the name mapping in the table,
+        // but the selection in the form will remain restricted if needed
+        setGroups(res.data.items);
       }
     } catch (err) {
       console.error('Fetch Supporting Data failed:', err);
@@ -102,16 +113,6 @@ export const useProjectManagement = () => {
     fetchSupportingData();
   }, [fetchSupportingData]);
 
-  // Removed auto-select first group logic to allow "View All" (null filter) state
-  /*
-  useEffect(() => {
-    if (!groupIdFilter && groups.length > 0) {
-      handleGroupFilterChange(groups[0].internshipId);
-    }
-  }, [groupIdFilter, groups, handleGroupFilterChange]);
-  */
-
-  // --- Actions Hook ---
   const {
     submitLoading,
     handleSaveProject,

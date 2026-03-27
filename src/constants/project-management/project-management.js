@@ -2,18 +2,21 @@ export const PROJECT_STATUS = {
   DRAFT: 0,
   PUBLISHED: 1,
   COMPLETED: 2,
+  ARCHIVED: 3,
 };
 
 export const PROJECT_STATUS_LABELS = {
   [PROJECT_STATUS.DRAFT]: 'Draft',
   [PROJECT_STATUS.PUBLISHED]: 'Published',
   [PROJECT_STATUS.COMPLETED]: 'Completed',
+  [PROJECT_STATUS.ARCHIVED]: 'Archived',
 };
 
 export const PROJECT_STATUS_VARIANTS = {
   [PROJECT_STATUS.DRAFT]: 'warning-soft',
   [PROJECT_STATUS.PUBLISHED]: 'primary',
   [PROJECT_STATUS.COMPLETED]: 'success',
+  [PROJECT_STATUS.ARCHIVED]: 'default',
 };
 
 export const PROJECT_MANAGEMENT = {
@@ -38,7 +41,7 @@ export const PROJECT_MANAGEMENT = {
       STATUS: 'STATUS',
       ACTIONS: 'ACTIONS',
     },
-    EMPTY_MESSAGE: 'No projects found. Create a new project to get started.',
+    EMPTY_MESSAGE: 'Bạn chưa có dự án nào. Tạo dự án mới để bắt đầu.',
   },
   FILTERS: {
     GROUP_FILTER: 'Intern Group',
@@ -57,6 +60,7 @@ export const PROJECT_MANAGEMENT = {
     DESC: 'Define the scope, goals, and technical requirements for this project.',
     SAVE_DRAFT: 'Save Draft',
     PUBLISH: 'Publish Project',
+    SAVE_CHANGES: 'Save Changes',
     LABEL: {
       NAME: 'Project Name',
       CODE: 'Project Code',

@@ -70,11 +70,13 @@ export default function ProjectManagement() {
               value={groupIdFilter}
               onChange={handleGroupFilterChange}
             >
-              {groups.map((g) => (
-                <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
-                  {g.groupName}
-                </Option>
-              ))}
+              {groups
+                .filter((g) => g.status === 1 || g.status === 2)
+                .map((g) => (
+                  <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
+                    {g.groupName}
+                  </Option>
+                ))}
             </Select>
             <Select
               className="h-9 w-40"
@@ -100,6 +102,7 @@ export default function ProjectManagement() {
           data={data}
           loading={loading}
           pagination={pagination}
+          groups={groups}
           onChange={handleTableChange}
           onEdit={handleEdit}
           onView={handleView}

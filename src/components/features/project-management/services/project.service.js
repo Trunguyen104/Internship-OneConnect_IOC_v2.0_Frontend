@@ -50,7 +50,7 @@ export const ProjectService = {
   },
 
   async getGroupsForMentor() {
-    return httpClient.httpGet('/internship-groups', { pageSize: 100 });
+    return httpClient.httpGet('/internship-groups', { pageSize: 100, IncludeArchived: true });
   },
 
   async getStudentsByGroup(groupId) {

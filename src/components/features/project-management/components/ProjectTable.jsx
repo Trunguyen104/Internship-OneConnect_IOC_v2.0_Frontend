@@ -26,6 +26,7 @@ export default function ProjectTable({
   data,
   loading,
   pagination,
+  groups = [],
   onChange,
   onEdit,
   onView,
@@ -35,14 +36,15 @@ export default function ProjectTable({
   onDelete,
 }) {
   const { TABLE } = PROJECT_MANAGEMENT;
-
+  const current = pagination?.current ?? 1;
+  const pageSize = pagination?.pageSize ?? 10;
   const columns = useMemo(
     () => [
       {
         title: TABLE.COLUMNS.INDEX,
         key: 'index',
         width: 40,
-        render: (_, record, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
+        render: (_, record, index) => (current - 1) * pageSize + index + 1,
       },
       {
         title: TABLE.COLUMNS.NAME,
@@ -74,14 +76,35 @@ export default function ProjectTable({
         ),
       },
       {
+        title: TABLE.COLUMNS.FIELD,
+        key: 'field',
+        width: 100,
+        render: (text) => (
+          <div className="truncate w-[100px]" title={text}>
+            {text || '-'}
+          </div>
+        ),
+      },
+      {
         title: TABLE.COLUMNS.GROUP,
         key: 'group',
         width: 180,
         render: (_, record) => {
-          const groupName =
+          const gid = record.internshipId || record.internshipGroupId || record.groupId;
+
+          let groupName =
             record.groupInfo?.groupName || record.groupName || record.internshipGroup?.groupName;
 
-          const gid = record.internshipId || record.internshipGroupId || record.groupId;
+          // If background data doesn't provide name, try mapping from groups list
+          if (!groupName && gid && groups.length > 0) {
+            const group = groups.find(
+              (g) =>
+                (g.internshipId && g.internshipId.toLowerCase() === gid.toLowerCase()) ||
+                (g.id && g.id.toLowerCase() === gid.toLowerCase())
+            );
+            if (group) groupName = group.groupName;
+          }
+
           const isEmptyGuid = gid === '00000000-0000-0000-0000-000000000000';
           const isMissing = !gid || isEmptyGuid || gid === '';
 
@@ -105,16 +128,7 @@ export default function ProjectTable({
           );
         },
       },
-      {
-        title: TABLE.COLUMNS.FIELD,
-        key: 'field',
-        width: 100,
-        render: (text) => (
-          <div className="truncate w-[100px]" title={text}>
-            {text || '-'}
-          </div>
-        ),
-      },
+
       {
         title: TABLE.COLUMNS.TEMPLATE,
         key: 'template',
@@ -212,25 +226,6 @@ export default function ProjectTable({
                 label: 'Complete Project',
                 icon: <CheckCircleOutlined className="text-success" />,
                 onClick: () => onComplete(record),
-              },
-              { type: 'divider' },
-              {
-                key: 'delete',
-                label: 'Delete',
-                icon: <DeleteOutlined className="text-danger" />,
-                danger: true,
-                onClick: () => onDelete(record),
-              }
-            );
-          } else if (record.status === PROJECT_STATUS.COMPLETED) {
-            items.push(
-              { type: 'divider' },
-              {
-                key: 'delete',
-                label: 'Delete',
-                icon: <DeleteOutlined className="text-danger" />,
-                danger: true,
-                onClick: () => onDelete(record),
               }
             );
           }
@@ -245,7 +240,7 @@ export default function ProjectTable({
         },
       },
     ],
-    [TABLE, pagination, onView, onEdit, onPublish, onComplete, onDelete, onAssign]
+    [TABLE, current, pageSize, groups, onView, onEdit, onPublish, onComplete, onDelete]
   );
 
   return (
