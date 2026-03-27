@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { DashboardService } from './DashboardService';
+import { DashboardService } from './dashboard-stats.service';
 
 export const useUniAdminDashboard = () => {
   const [loading, setLoading] = useState(true);

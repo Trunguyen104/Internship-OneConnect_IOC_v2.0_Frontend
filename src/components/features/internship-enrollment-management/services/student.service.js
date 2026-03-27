@@ -1,10 +1,10 @@
-import dayjs from 'dayjs';
+﻿import dayjs from 'dayjs';
 
 import {
   ENROLLMENT_STATUS,
   PLACEMENT_STATUS,
 } from '@/constants/internship-management/internship-management';
-import { httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
+import { httpGet, httpPatch, httpPost, httpPut } from '@/services/http-client.service';
 
 const ENROLLMENT_STATUS_MAP = {
   [ENROLLMENT_STATUS.ACTIVE]: 'ACTIVE',

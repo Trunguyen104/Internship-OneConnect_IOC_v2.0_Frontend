@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { userManagementService } from '@/components/features/user-management/userManagement.service';
+import { userManagementService } from '@/components/features/user-management/user-management.service';
 import { getErrorMessage } from '@/lib/error';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 

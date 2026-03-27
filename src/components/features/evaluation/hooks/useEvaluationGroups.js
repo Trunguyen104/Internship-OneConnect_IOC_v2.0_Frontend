@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
 
 /**

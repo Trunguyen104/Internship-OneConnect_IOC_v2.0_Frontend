@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -6,7 +6,7 @@ import { USER_ROLE } from '@/constants/user-management/enums';
 import { useToast } from '@/providers/ToastProvider';
 import { getErrorDetail } from '@/utils/errorUtils';
 
-import { userService } from '../../user/services/userService';
+import { userService } from '../../user/services/user.service';
 import { ViolationService } from '../services/violation.service';
 import { useViolationFilters } from './useViolationFilters';
 import { useViolationModals } from './useViolationModals';

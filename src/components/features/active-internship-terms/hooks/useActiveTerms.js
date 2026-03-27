@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 
-import { activeTermService } from '../services/activeTermService';
+import { activeTermService } from '../services/active-term.service';
 
 export const useActiveTerms = () => {
   const [data, setData] = useState([]);

@@ -1,13 +1,13 @@
-import { CONFIG } from '@/constants/common/config';
+﻿import { CONFIG } from '@/constants/common/config';
 import { getDashboardMock } from '@/mocks/mockServer';
-import { httpGet } from '@/services/httpClient';
+import { httpGet } from '@/services/http-client.service';
 
 export async function getDashboardData(internshipGroupId) {
-  // 1️⃣ Nếu đang dev → dùng mock
+  // 1ï¸âƒ£ Náº¿u Ä‘ang dev â†’ dÃ¹ng mock
   if (CONFIG.useMocks) {
     return getDashboardMock();
   }
 
-  // 2️⃣ Khi backend có → gọi API thật qua proxy Next
+  // 2ï¸âƒ£ Khi backend cÃ³ â†’ gá»i API tháº­t qua proxy Next
   return httpGet(`/internship-groups/${internshipGroupId}/dashboard`);
 }

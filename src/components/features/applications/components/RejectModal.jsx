@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import Textarea from '@/components/ui/textarea';
 import { APPLICATIONS_UI } from '@/constants/applications/uiText';
 

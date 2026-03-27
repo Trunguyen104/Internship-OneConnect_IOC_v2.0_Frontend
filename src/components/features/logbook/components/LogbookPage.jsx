@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 
-import { LogBookService } from '@/components/features/logbook/services/logBook.service';
+import { LogBookService } from '@/components/features/logbook/services/log-book.service';
 import { EmptyState } from '@/components/ui/atoms';
 import { Button } from '@/components/ui/button';
 import PageLayout from '@/components/ui/pagelayout';

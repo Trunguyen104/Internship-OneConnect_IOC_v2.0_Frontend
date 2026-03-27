@@ -105,24 +105,12 @@ const TermCardDeadlines = ({ deadlines = [] }) => {
       {allDeadlines.map((item, idx) => (
         <div
           key={idx}
-          className={`flex items-center justify-between rounded-2xl p-4 transition-all hover:shadow-md ${
-            item.isUrgent
-              ? 'bg-danger-surface border border-danger/20'
-              : 'bg-gray-50/50 border border-transparent'
-          }`}
+          className="flex items-center justify-between rounded-2xl bg-gray-50/50 border border-transparent p-4 transition-all hover:shadow-md"
         >
           <div className="flex flex-col">
             <span className="text-xs font-black text-text">{item.label}</span>
             <span className="text-[10px] font-medium text-muted">{item.date}</span>
           </div>
-          {item.isUrgent && (
-            <Tag
-              color="error"
-              className="m-0 border-none bg-danger text-[9px] font-bold text-white uppercase px-2"
-            >
-              {ACTIVE_TERM_UI.DEADLINE.URGENT_TAG}
-            </Tag>
-          )}
         </div>
       ))}
     </div>

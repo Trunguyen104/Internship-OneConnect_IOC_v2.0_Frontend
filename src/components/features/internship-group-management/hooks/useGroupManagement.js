@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
 import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
-import { userService } from '../../user/services/userService';
+import { userService } from '../../user/services/user.service';
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { useEnterpriseGroupActions } from '../hooks/useEnterpriseGroupActions';
 import { useEnterpriseGroupFilters } from '../hooks/useEnterpriseGroupFilters';
@@ -283,7 +283,7 @@ export const useGroupManagement = () => {
               );
               if (student) {
                 toast.info(
-                  `${student.fullName || student.studentFullName} đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.`,
+                  `${student.fullName || student.studentFullName} Ä‘Ã£ bá»‹ xÃ³a khá»i nhÃ³m. Sinh viÃªn khÃ´ng cÃ²n truy cáº­p Ä‘Æ°á»£c cÃ¡c dá»± Ã¡n cá»§a nhÃ³m.`,
                   { duration: 5 }
                 );
               }
@@ -345,7 +345,7 @@ export const useGroupManagement = () => {
             if (success) {
               // AC-11 Case 2: Notify about removal
               toast.info(
-                'Sinh viên đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.',
+                'Sinh viÃªn Ä‘Ã£ bá»‹ xÃ³a khá»i nhÃ³m. Sinh viÃªn khÃ´ng cÃ²n truy cáº­p Ä‘Æ°á»£c cÃ¡c dá»± Ã¡n cá»§a nhÃ³m.',
                 { duration: 5 }
               );
 

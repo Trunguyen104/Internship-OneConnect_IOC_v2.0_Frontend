@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { RocketOutlined } from '@ant-design/icons';
 import React from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
@@ -63,7 +63,7 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
     <CompoundModal open={open} onCancel={handleClose} width={900}>
       <CompoundModal.Header
         title={BACKLOG_UI.CREATE_SPRINT_NEW}
-        subtitle="Lên kế hoạch cho sprint tiếp theo và lựa chọn các công việc ưu tiên từ backlog"
+        subtitle="LÃªn káº¿ hoáº¡ch cho sprint tiáº¿p theo vÃ  lá»±a chá»n cÃ¡c cÃ´ng viá»‡c Æ°u tiÃªn tá»« backlog"
         icon={<RocketOutlined />}
       />
 

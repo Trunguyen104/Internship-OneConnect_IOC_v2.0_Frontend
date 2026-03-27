@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { ProjectService } from '@/components/features/project/services/projectService';
-import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
+import { ProjectService } from '@/components/features/project/services/project.service';
+import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder.service';
 import { STAKEHOLDER_MESSAGES } from '@/constants/stakeholder/messages';
 import { useToast } from '@/providers/ToastProvider';
 

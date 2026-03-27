@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
-import { userService } from '../../user/services/userService';
+import { userService } from '../../user/services/user.service';
 import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
 import { EnterprisePhaseService } from '../services/enterprise-phase.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
@@ -85,7 +85,7 @@ export const useInternshipManagement = () => {
 
       setMentors(uniqueItems);
     } catch (err) {
-      toast.error('Không thể tải danh sách Mentor');
+      toast.error('KhÃ´ng thá»ƒ táº£i danh sÃ¡ch Mentor');
       setMentors([]);
     } finally {
       setLoadingMentors(false);
@@ -428,14 +428,16 @@ export const useInternshipManagement = () => {
         }
 
         toast.success(
-          type === 'ADD' ? `Đã thêm ${students.length} sinh viên.` : MESSAGES.GROUP_CHANGE_SUCCESS
+          type === 'ADD'
+            ? `ÄÃ£ thÃªm ${students.length} sinh viÃªn.`
+            : MESSAGES.GROUP_CHANGE_SUCCESS
         );
 
         // AC-11 Case 2b: Notify about access changes during transfer
         if (type === 'CHANGE') {
           students.forEach((s) => {
             toast.info(
-              `Sinh viên ${s.studentFullName} đã được chuyển nhóm. Quyền truy cập dự án cũ đã bị thu hồi và cấp mới cho nhóm mới.`,
+              `Sinh viÃªn ${s.studentFullName} Ä‘Ã£ Ä‘Æ°á»£c chuyá»ƒn nhÃ³m. Quyá»n truy cáº­p dá»± Ã¡n cÅ© Ä‘Ã£ bá»‹ thu há»“i vÃ  cáº¥p má»›i cho nhÃ³m má»›i.`,
               { duration: 5 }
             );
           });
@@ -446,7 +448,7 @@ export const useInternshipManagement = () => {
           const errorMsg =
             err?.response?.data?.message ||
             err?.message ||
-            'Sinh viên đã có nhóm khác hoặc dữ liệu không đồng bộ.';
+            'Sinh viÃªn Ä‘Ã£ cÃ³ nhÃ³m khÃ¡c hoáº·c dá»¯ liá»‡u khÃ´ng Ä‘á»“ng bá»™.';
           toast.warning(errorMsg);
         } else {
           toast.error('Failed to update group');
@@ -471,7 +473,7 @@ export const useInternshipManagement = () => {
 
       if (phaseIds.size > 1) {
         toast.error(
-          'Sinh viên được chọn thuộc nhiều giai đoạn khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một giai đoạn.'
+          'Sinh viÃªn Ä‘Æ°á»£c chá»n thuá»™c nhiá»u giai Ä‘oáº¡n khÃ¡c nhau. Vui lÃ²ng chá»‰ chá»n sinh viÃªn trong cÃ¹ng má»™t giai Ä‘oáº¡n.'
         );
         return;
       }

@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
-import { ProjectService } from '@/components/features/project/services/projectService';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import { useToast } from '@/providers/ToastProvider';
 

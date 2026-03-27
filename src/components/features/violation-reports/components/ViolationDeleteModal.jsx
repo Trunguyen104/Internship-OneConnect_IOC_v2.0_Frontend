@@ -1,7 +1,7 @@
-import { DeleteOutlined } from '@ant-design/icons';
+﻿import { DeleteOutlined } from '@ant-design/icons';
 import React from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const ViolationDeleteModal = ({ open, onCancel, onConfirm, record, loading }) => {

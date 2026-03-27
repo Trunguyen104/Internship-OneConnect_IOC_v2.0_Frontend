@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../services/evaluation.service';
@@ -36,7 +36,7 @@ export function useEvaluation() {
   const [pageSize, setPageSize] = useState(10);
 
   // =========================
-  // 🔧 Helper normalize data
+  // ðŸ”§ Helper normalize data
   // =========================
   const normalizeArray = (res) => {
     const data = res?.data ?? res ?? [];
@@ -123,7 +123,7 @@ export function useEvaluation() {
   );
 
   // =========================
-  // 🔁 Effects
+  // ðŸ” Effects
   // =========================
   useEffect(() => {
     fetchInternship();
@@ -134,7 +134,7 @@ export function useEvaluation() {
   }, [internshipId, fetchCycles]);
 
   // =========================
-  // 📄 Pagination
+  // ðŸ“„ Pagination
   // =========================
   const total = cycles.length;
   const totalPages = Math.ceil(total / pageSize);
@@ -145,7 +145,7 @@ export function useEvaluation() {
   }, [cycles, page, pageSize]);
 
   // =========================
-  // 🎯 Actions
+  // ðŸŽ¯ Actions
   // =========================
   const openTeamOverview = (cycle) => {
     setSelectedCycle(cycle);
@@ -159,7 +159,7 @@ export function useEvaluation() {
 
     setSelectedCycle(target);
     setTeamVisible(false);
-    setDetailVisible(true); // ❌ bỏ setTimeout
+    setDetailVisible(true); // âŒ bá» setTimeout
 
     fetchMyEvalData(target.cycleId);
   };
@@ -168,7 +168,7 @@ export function useEvaluation() {
   const closeDetail = () => setDetailVisible(false);
 
   // =========================
-  // 🚀 Return
+  // ðŸš€ Return
   // =========================
   return {
     // loading

@@ -1,4 +1,4 @@
-import { httpGet, httpPatch } from '@/services/httpClient';
+﻿import { httpGet, httpPatch } from '@/services/http-client.service';
 
 export const EnterpriseStudentService = {
   mapApplication(item) {
@@ -74,7 +74,7 @@ export const EnterpriseStudentService = {
         item.fullName ||
         item.FullName ||
         item.name ||
-        'Sinh viên chưa rõ',
+        'Sinh viÃªn chÆ°a rÃµ',
       studentEmail: item.studentEmail || item.StudentEmail || item.email || item.Email,
       studentCode,
       universityName: item.universityName || item.UniversityName || '-',

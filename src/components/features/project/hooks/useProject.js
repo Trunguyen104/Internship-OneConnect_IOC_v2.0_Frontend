@@ -1,9 +1,10 @@
-'use client';
+﻿'use client';
 
 import { Form } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import {
   createProjectResource,
   deleteProjectResource,
@@ -11,8 +12,7 @@ import {
   getProjectResources,
   readProjectResource,
   updateProjectResource,
-} from '@/components/features/project/services/projectResources';
-import { ProjectService } from '@/components/features/project/services/projectService';
+} from '@/components/features/project/services/project-resources.service';
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { USER_ROLE } from '@/constants/common/enums';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';

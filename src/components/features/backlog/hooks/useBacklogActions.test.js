@@ -1,7 +1,7 @@
-import { act, renderHook } from '@testing-library/react';
+﻿import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { BACKLOG_UI } from '@/constants/backlog';
 import { MOVE_INCOMPLETE_ITEMS_OPTION, SPRINT_STATUS } from '@/constants/enums';
 import { useToast } from '@/providers/ToastProvider';
@@ -13,7 +13,7 @@ vi.mock('@/providers/ToastProvider', () => ({
   useToast: vi.fn(),
 }));
 
-vi.mock('@/components/features/backlog/services/productbacklog.service', () => ({
+vi.mock('@/components/features/backlog/services/product-backlog.service', () => ({
   productBacklogService: {
     createEpic: vi.fn(),
     updateEpic: vi.fn(),
@@ -85,7 +85,7 @@ describe('useBacklogActions Hook', () => {
       expect(mockToast.success).toHaveBeenCalledWith(BACKLOG_UI.SUCCESS_CREATE_EPIC);
       expect(mockProps.ui.setOpenCreateEpic).toHaveBeenCalledWith(false);
 
-      // Kiểm tra setter được gọi để update state local
+      // Kiá»ƒm tra setter Ä‘Æ°á»£c gá»i Ä‘á»ƒ update state local
       const updateFn = mockProps.setEpics.mock.calls[0][0];
       const newState = updateFn(mockProps.epics);
       expect(newState).toContainEqual(expect.objectContaining({ id: 'epic-2', title: 'New Epic' }));
@@ -127,7 +127,7 @@ describe('useBacklogActions Hook', () => {
       expect(productBacklogService.startSprint).toHaveBeenCalled();
       expect(mockToast.success).toHaveBeenCalledWith(BACKLOG_UI.SUCCESS_START_SPRINT);
 
-      // Kiểm tra việc cập nhật trạng thái sprint trong state
+      // Kiá»ƒm tra viá»‡c cáº­p nháº­t tráº¡ng thÃ¡i sprint trong state
       const updateFn = mockProps.setSprints.mock.calls[0][0];
       const mockSprints = [{ sprintId: 'sprint-1', status: 'PLANNED' }];
       const newState = updateFn(mockSprints);
@@ -157,7 +157,7 @@ describe('useBacklogActions Hook', () => {
 
       expect(mockToast.success).toHaveBeenCalledWith(BACKLOG_UI.SUCCESS_COMPLETE_SPRINT);
 
-      // Kiểm tra task chưa xong chuyển sang backlog
+      // Kiá»ƒm tra task chÆ°a xong chuyá»ƒn sang backlog
       const backlogUpdateFn = mockProps.setBacklogItems.mock.calls[0][0];
       const newBacklog = backlogUpdateFn([]);
       expect(newBacklog).toHaveLength(1);
@@ -186,7 +186,7 @@ describe('useBacklogActions Hook', () => {
 
       expect(mockToast.success).toHaveBeenCalledWith(BACKLOG_UI.SUCCESS_CREATE_TASK_SPRINT);
 
-      // Kiểm tra cập nhật state sprint (optimistic)
+      // Kiá»ƒm tra cáº­p nháº­t state sprint (optimistic)
       const updateFn = mockProps.setSprints.mock.calls[0][0];
       const mockSprints = [{ sprintId: 'sprint-1', items: [], itemCount: 0 }];
       const newState = updateFn(mockSprints);
@@ -195,7 +195,7 @@ describe('useBacklogActions Hook', () => {
       expect(newState[0].items[0].workItemId).toBe('new-task-id');
       expect(newState[0].itemCount).toBe(1);
 
-      // Kiểm tra fetchData được gọi sau timeout
+      // Kiá»ƒm tra fetchData Ä‘Æ°á»£c gá»i sau timeout
       act(() => {
         vi.runAllTimers();
       });
@@ -251,7 +251,7 @@ describe('useBacklogActions Hook', () => {
 
       expect(productBacklogService.updateSprint).toHaveBeenCalled();
 
-      // Kiểm tra local state update
+      // Kiá»ƒm tra local state update
       const updateFn = mockProps.setSprints.mock.calls[0][0];
       const mockSprints = [{ sprintId: 'sprint-123', name: 'Old Name' }];
       const newState = updateFn(mockSprints);

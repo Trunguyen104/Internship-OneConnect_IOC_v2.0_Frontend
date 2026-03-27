@@ -1,23 +1,23 @@
-import { act, renderHook } from '@testing-library/react';
+﻿import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { login } from '@/components/features/auth/services/authService';
-import { setAccessToken } from '@/components/features/auth/services/authStorage';
+import { setAccessToken } from '@/components/features/auth/lib/auth-storage';
+import { login } from '@/components/features/auth/services/auth.service';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useLogin } from './useLogin';
 
-// Mock các module của Next.js và services
+// Mock cÃ¡c module cá»§a Next.js vÃ  services
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
 }));
 
-vi.mock('@/components/features/auth/services/authService', () => ({
+vi.mock('@/components/features/auth/services/auth.service', () => ({
   login: vi.fn(),
 }));
 
-vi.mock('@/components/features/auth/services/authStorage', () => ({
+vi.mock('@/components/features/auth/lib/auth-storage', () => ({
   setAccessToken: vi.fn(),
 }));
 
@@ -35,7 +35,7 @@ describe('useLogin Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Setup mặc định cho các mock
+    // Setup máº·c Ä‘á»‹nh cho cÃ¡c mock
     useRouter.mockReturnValue({ push: mockPush });
     useToast.mockReturnValue(mockToast);
 
@@ -64,8 +64,8 @@ describe('useLogin Hook', () => {
     window.localStorage.clear();
   });
 
-  describe('Khởi tạo (Initial State)', () => {
-    it('nên khởi tạo state với các giá trị mặc định khi localStorage trống', () => {
+  describe('Khá»Ÿi táº¡o (Initial State)', () => {
+    it('nÃªn khá»Ÿi táº¡o state vá»›i cÃ¡c giÃ¡ trá»‹ máº·c Ä‘á»‹nh khi localStorage trá»‘ng', () => {
       const { result } = renderHook(() => useLogin());
 
       expect(result.current.form).toEqual({
@@ -76,7 +76,7 @@ describe('useLogin Hook', () => {
       expect(result.current.errors).toEqual({});
     });
 
-    it('nên khởi tạo state với dữ liệu từ localStorage nếu đã lưu thông tin đăng nhập', () => {
+    it('nÃªn khá»Ÿi táº¡o state vá»›i dá»¯ liá»‡u tá»« localStorage náº¿u Ä‘Ã£ lÆ°u thÃ´ng tin Ä‘Äƒng nháº­p', () => {
       window.localStorage.setItem('rememberEmail', 'test@example.com');
       window.localStorage.setItem('rememberPassword', 'password123');
 
@@ -90,8 +90,8 @@ describe('useLogin Hook', () => {
     });
   });
 
-  describe('Xử lý sự kiện (Actions)', () => {
-    it('nên cập nhật form state khi gọi handleChange cho text input', () => {
+  describe('Xá»­ lÃ½ sá»± kiá»‡n (Actions)', () => {
+    it('nÃªn cáº­p nháº­t form state khi gá»i handleChange cho text input', () => {
       const { result } = renderHook(() => useLogin());
 
       act(() => {
@@ -103,7 +103,7 @@ describe('useLogin Hook', () => {
       expect(result.current.form.email).toBe('new@example.com');
     });
 
-    it('nên cập nhật form state khi gọi handleChange cho checkbox', () => {
+    it('nÃªn cáº­p nháº­t form state khi gá»i handleChange cho checkbox', () => {
       const { result } = renderHook(() => useLogin());
 
       act(() => {
@@ -115,16 +115,16 @@ describe('useLogin Hook', () => {
       expect(result.current.form.rememberMe).toBe(true);
     });
 
-    it('nên xóa lỗi của field tương ứng khi người dùng thay đổi giá trị field đó', async () => {
+    it('nÃªn xÃ³a lá»—i cá»§a field tÆ°Æ¡ng á»©ng khi ngÆ°á»i dÃ¹ng thay Ä‘á»•i giÃ¡ trá»‹ field Ä‘Ã³', async () => {
       const { result } = renderHook(() => useLogin());
 
-      // Giả lập case có lỗi trước đó
+      // Giáº£ láº­p case cÃ³ lá»—i trÆ°á»›c Ä‘Ã³
       act(() => {
         result.current.handleSubmit({ preventDefault: vi.fn() });
       });
       expect(result.current.errors.email).toBeDefined();
 
-      // Thay đổi giá trị email
+      // Thay Ä‘á»•i giÃ¡ trá»‹ email
       act(() => {
         result.current.handleChange({
           target: { name: 'email', value: 'a@gmail.com', type: 'text' },
@@ -135,8 +135,8 @@ describe('useLogin Hook', () => {
     });
   });
 
-  describe('Kiểm tra hợp lệ (Validation)', () => {
-    it('nên báo lỗi nếu email hoặc password trống khi submit', async () => {
+  describe('Kiá»ƒm tra há»£p lá»‡ (Validation)', () => {
+    it('nÃªn bÃ¡o lá»—i náº¿u email hoáº·c password trá»‘ng khi submit', async () => {
       const { result } = renderHook(() => useLogin());
 
       await act(async () => {
@@ -148,7 +148,7 @@ describe('useLogin Hook', () => {
       expect(login).not.toHaveBeenCalled();
     });
 
-    it('nên báo lỗi nếu định dạng email không đúng', async () => {
+    it('nÃªn bÃ¡o lá»—i náº¿u Ä‘á»‹nh dáº¡ng email khÃ´ng Ä‘Ãºng', async () => {
       const { result } = renderHook(() => useLogin());
 
       act(() => {
@@ -166,11 +166,11 @@ describe('useLogin Hook', () => {
   });
 
   describe('Submit (handleSubmit)', () => {
-    it('nên đăng nhập thành công, lưu token và điều hướng khi dữ liệu hợp lệ', async () => {
+    it('nÃªn Ä‘Äƒng nháº­p thÃ nh cÃ´ng, lÆ°u token vÃ  Ä‘iá»u hÆ°á»›ng khi dá»¯ liá»‡u há»£p lá»‡', async () => {
       login.mockResolvedValue('fake-token');
       const { result } = renderHook(() => useLogin());
 
-      // Điền form
+      // Äiá»n form
       act(() => {
         result.current.handleChange({
           target: { name: 'email', value: 'user@example.com', type: 'text' },
@@ -194,7 +194,7 @@ describe('useLogin Hook', () => {
       expect(mockPush).toHaveBeenCalledWith('/internship-groups');
     });
 
-    it('nên lưu thông tin vào localStorage nếu chọn rememberMe', async () => {
+    it('nÃªn lÆ°u thÃ´ng tin vÃ o localStorage náº¿u chá»n rememberMe', async () => {
       login.mockResolvedValue('fake-token');
       const { result } = renderHook(() => useLogin());
 
@@ -221,7 +221,7 @@ describe('useLogin Hook', () => {
       expect(window.localStorage.setItem).toHaveBeenCalledWith('rememberPassword', 'securePass');
     });
 
-    it('nên xóa thông tin khỏi localStorage nếu KHÔNG chọn rememberMe', async () => {
+    it('nÃªn xÃ³a thÃ´ng tin khá»i localStorage náº¿u KHÃ”NG chá»n rememberMe', async () => {
       login.mockResolvedValue('fake-token');
       const { result } = renderHook(() => useLogin());
 
@@ -243,7 +243,7 @@ describe('useLogin Hook', () => {
       expect(window.localStorage.removeItem).toHaveBeenCalledWith('rememberPassword');
     });
 
-    it('nên hiển thị lỗi khi API login thất bại', async () => {
+    it('nÃªn hiá»ƒn thá»‹ lá»—i khi API login tháº¥t báº¡i', async () => {
       const errorMessage = 'Invalid email or password';
       login.mockRejectedValue(new Error(errorMessage));
 

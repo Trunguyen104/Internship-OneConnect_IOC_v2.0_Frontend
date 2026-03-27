@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 
-import { httpGet, httpPatch } from '@/services/httpClient';
+import { httpGet, httpPatch } from '@/services/http-client.service';
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);

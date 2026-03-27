@@ -1,4 +1,4 @@
-import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
+﻿import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/http-client.service';
 
 // Backlog API service wrapper (epics, work items, sprints)
 export const productBacklogService = {

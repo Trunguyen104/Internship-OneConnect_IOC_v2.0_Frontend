@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
-import { LogBookService } from '@/components/features/logbook/services/logBook.service';
-import { userService } from '@/components/features/user/services/userService';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
+import { LogBookService } from '@/components/features/logbook/services/log-book.service';
+import { userService } from '@/components/features/user/services/user.service';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { useToast } from '@/providers/ToastProvider';
 

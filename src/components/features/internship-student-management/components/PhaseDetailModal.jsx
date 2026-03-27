@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   ApartmentOutlined,
@@ -12,7 +12,7 @@ import { Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const { Text } = Typography;
@@ -24,7 +24,7 @@ const InfoRow = ({ icon, label, value }) => (
       {label}
     </span>
     <div className="bg-bg border border-border rounded-xl px-3 py-2 text-sm font-medium text-text min-h-[36px] flex items-center">
-      {value ?? <span className="text-muted/30 text-xs">—</span>}
+      {value ?? <span className="text-muted/30 text-xs">â€”</span>}
     </div>
   </div>
 );
@@ -92,7 +92,7 @@ const PhaseDetailModal = ({ open, phase, onCancel }) => {
               <InfoRow
                 icon={<UsergroupAddOutlined />}
                 label={PHASE_DETAIL.MAX_STUDENTS}
-                value={phase.maxStudents ?? '—'}
+                value={phase.maxStudents ?? 'â€”'}
               />
               <InfoRow
                 icon={<CalendarOutlined />}

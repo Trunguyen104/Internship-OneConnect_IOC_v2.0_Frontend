@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   ApartmentOutlined,
@@ -14,7 +14,7 @@ import { Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import StatusTag from './StatusTag';
@@ -28,7 +28,7 @@ const InfoRow = ({ icon, label, value }) => (
       {label}
     </span>
     <div className="bg-bg border border-border rounded-xl px-3 py-2 text-sm font-medium text-text min-h-[36px] flex items-center">
-      {value || <span className="text-muted/30 text-xs">—</span>}
+      {value || <span className="text-muted/30 text-xs">â€”</span>}
     </div>
   </div>
 );
@@ -61,7 +61,7 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
           </Text>
           <Text className="block text-[11px] text-muted/60 font-semibold mt-0.5">
             {student.studentCode}
-            {student.major ? <span className="text-muted/30 mx-1">·</span> : null}
+            {student.major ? <span className="text-muted/30 mx-1">Â·</span> : null}
             {student.major}
           </Text>
         </div>

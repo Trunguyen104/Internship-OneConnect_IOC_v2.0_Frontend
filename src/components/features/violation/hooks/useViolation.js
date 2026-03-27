@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { violationReportService } from '../services/violation.services';
+import { violationReportService } from '../services/violation-report.service';
 
 export function useViolation() {
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;

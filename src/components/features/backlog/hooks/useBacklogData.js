@@ -1,7 +1,7 @@
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { ProjectService } from '@/components/features/project/services/projectService';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import { SPRINT_STATUS } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';
 

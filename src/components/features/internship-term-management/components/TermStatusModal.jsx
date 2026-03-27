@@ -1,8 +1,8 @@
-import { SyncOutlined } from '@ant-design/icons';
+﻿import { SyncOutlined } from '@ant-design/icons';
 import { Input, Typography } from 'antd';
 import React, { useState } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import {
   INTERNSHIP_MANAGEMENT_UI,
   TERM_STATUS,

@@ -1,15 +1,15 @@
-'use client';
+﻿'use client';
 
 import { Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 import { Checkbox } from '@/components/ui/checkbox';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { userManagementService } from '../userManagement.service';
+import { userManagementService } from '../user-management.service';
 
 export default function UserManagementDeleteModal({ open, userId, label, onToggle }) {
   const toast = useToast();

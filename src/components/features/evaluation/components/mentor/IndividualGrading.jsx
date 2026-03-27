@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { SaveOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Input, InputNumber } from 'antd';
@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   CheckCircleOutlined,
@@ -11,7 +11,7 @@ import { Button, Table, Tooltip, Upload } from 'antd';
 import { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -61,12 +61,12 @@ export default function ImportModal({
     if (record.isValid) return false;
     const errors = record.errors || [];
     const fieldKeywords = {
-      studentCode: ['ID', 'Code', 'MSSV', 'mã'],
-      fullName: ['Name', 'Họ tên', 'tên'],
+      studentCode: ['ID', 'Code', 'MSSV', 'mÃ£'],
+      fullName: ['Name', 'Há» tÃªn', 'tÃªn'],
       email: ['Email'],
-      phone: ['Phone', 'thoại', 'SĐT'],
-      dateOfBirth: ['Birth', 'Ngày sinh', 'ngày sinh'],
-      major: ['Major', 'ngành'],
+      phone: ['Phone', 'thoáº¡i', 'SÄT'],
+      dateOfBirth: ['Birth', 'NgÃ y sinh', 'ngÃ y sinh'],
+      major: ['Major', 'ngÃ nh'],
     };
     const keywords = fieldKeywords[field] || [];
     return errors.some((err) =>

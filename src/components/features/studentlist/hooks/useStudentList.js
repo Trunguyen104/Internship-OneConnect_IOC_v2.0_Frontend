@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { useDebounce } from '@/components/features/internship-group-management/hooks/useDebounce';
 import { STUDENT_LIST_MESSAGES } from '@/constants/studentList/messages';
 import { useToast } from '@/providers/ToastProvider';

@@ -1,11 +1,12 @@
-'use client';
+﻿'use client';
 
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
 import React, { useCallback, useMemo } from 'react';
 
+import SkeletonTable from '@/components/ui/skeletontable';
+
 import { Checkbox } from './checkbox';
-import SkeletonTable from './SkeletonTable';
 
 export default function DataTable({
   columns = [],
@@ -26,7 +27,6 @@ export default function DataTable({
   const isLarge = size === 'large';
 
   const headerPadding = isSmall ? 'py-3' : isLarge ? 'py-6' : 'py-5';
-  const rowHeight = isSmall ? 'h-[48px]' : isLarge ? 'h-[80px]' : 'h-[64px]';
   const cellPadding = isSmall ? 'py-2' : isLarge ? 'py-5' : 'py-3.5';
   const handleSort = (columnKey) => {
     if (!onSort || !columnKey) return;

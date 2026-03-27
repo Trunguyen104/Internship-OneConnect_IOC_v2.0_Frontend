@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Dropdown, Input, InputNumber } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import DataTable from '@/components/ui/datatable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';

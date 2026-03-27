@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { PlusCircleOutlined } from '@ant-design/icons';
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
@@ -76,7 +76,7 @@ export default function CreateTaskModal({
     <CompoundModal open={open} onCancel={handleClose} width={1200}>
       <CompoundModal.Header
         title={BACKLOG_UI.MODAL_CREATE_TASK}
-        subtitle="Khởi tạo công việc mới và thiết lập các thông tin chi tiết cho kế hoạch sprint"
+        subtitle="Khá»Ÿi táº¡o cÃ´ng viá»‡c má»›i vÃ  thiáº¿t láº­p cÃ¡c thÃ´ng tin chi tiáº¿t cho káº¿ hoáº¡ch sprint"
         icon={<PlusCircleOutlined />}
       />
 
@@ -86,7 +86,7 @@ export default function CreateTaskModal({
           <div className="flex flex-1 flex-col space-y-6">
             {/* Summary */}
             <div className="flex flex-col gap-2">
-              <FieldLabel required>{BACKLOG_UI.FIELD_SUMMARY}</FieldLabel>
+              <FieldLabel required>alo</FieldLabel>
               <TextInput
                 value={summary}
                 onChange={setSummary}

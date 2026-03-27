@@ -1,4 +1,4 @@
-import { httpDelete, httpGet, httpPost, httpPut } from '@/services/httpClient';
+﻿import { httpDelete, httpGet, httpPost, httpPut } from '@/services/http-client.service';
 
 export const ProjectService = {
   getAll(params = {}) {

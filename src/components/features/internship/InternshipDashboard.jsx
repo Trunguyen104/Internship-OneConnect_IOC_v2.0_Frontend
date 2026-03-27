@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Empty, Skeleton } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { useToast } from '@/providers/ToastProvider';
 
 import InternshipCard from './components/InternshipCard';
 import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
-import { InternshipGroupService } from './services/internshipGroup.service';
+import { InternshipGroupService } from './services/internship-group.service';
 
 const InternshipDashboard = () => {
   const [loading, setLoading] = useState(true);

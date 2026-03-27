@@ -1,12 +1,12 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/common/enums';
 import { mediaService } from '@/services/media.service';
 
-import { getEnterpriseById, updateEnterpriseProfile } from '../services/enterpriseProfile.service';
+import { getEnterpriseById, updateEnterpriseProfile } from '../services/enterprise-profile.service';
 
 function normalizeProfileResponse(response) {
   if (response?.data?.data) return response.data.data;

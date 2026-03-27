@@ -1,4 +1,4 @@
-import { httpGet } from '@/services/httpClient';
+﻿import { httpGet } from '@/services/http-client.service';
 
 const BASE_URL = '/user-management';
 const MENTOR_ROLE = 6;

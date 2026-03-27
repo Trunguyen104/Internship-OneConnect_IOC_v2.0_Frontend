@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState } from 'react';
 
 import AvatarUploader from '@/components/ui/avataruploader';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { Input } from '@/components/ui/input';
 import Select from '@/components/ui/select';
 import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
@@ -12,7 +12,7 @@ import { useToast } from '@/providers/ToastProvider';
 import { mediaService } from '@/services/media.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { userManagementService } from '../userManagement.service';
+import { userManagementService } from '../user-management.service';
 
 const initialEditForm = {
   fullName: '',

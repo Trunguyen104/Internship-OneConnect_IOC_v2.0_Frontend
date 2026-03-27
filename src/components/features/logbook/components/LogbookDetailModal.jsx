@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import dayjs from 'dayjs';
 import React, { memo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
 import LogbookStatusTag from './LogbookStatusTag';

@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';

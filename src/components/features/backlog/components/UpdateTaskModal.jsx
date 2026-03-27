@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { EditOutlined } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
@@ -135,8 +135,8 @@ export default function UpdateTaskModal({
   return (
     <CompoundModal open={open} onCancel={handleClose} width={1200}>
       <CompoundModal.Header
-        title={BACKLOG_UI.UPDATE_TASK || 'Cập nhật công việc'}
-        subtitle="Chỉnh sửa chi tiết công việc, trạng thái và lộ trình thực hiện trong dự án"
+        title={BACKLOG_UI.UPDATE_TASK || 'Cáº­p nháº­t cÃ´ng viá»‡c'}
+        subtitle="Chá»‰nh sá»­a chi tiáº¿t cÃ´ng viá»‡c, tráº¡ng thÃ¡i vÃ  lá»™ trÃ¬nh thá»±c hiá»‡n trong dá»± Ã¡n"
         icon={<EditOutlined />}
       />
 

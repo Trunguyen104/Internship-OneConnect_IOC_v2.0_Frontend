@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { DatePicker } from '@/components/ui/datepicker';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
@@ -42,8 +42,8 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
   return (
     <CompoundModal open={open} onCancel={handleClose} width={800}>
       <CompoundModal.Header
-        title={`${BACKLOG_UI.UPDATE || 'Cập nhật'} ${BACKLOG_UI.TYPE_EPIC || 'Epic'}`}
-        subtitle="Chỉnh sửa thông tin chi tiết và thời hạn hoàn thành cho mục tiêu lớn"
+        title={`${BACKLOG_UI.UPDATE || 'Cáº­p nháº­t'} ${BACKLOG_UI.TYPE_EPIC || 'Epic'}`}
+        subtitle="Chá»‰nh sá»­a thÃ´ng tin chi tiáº¿t vÃ  thá»i háº¡n hoÃ n thÃ nh cho má»¥c tiÃªu lá»›n"
         icon={<EditOutlined />}
       />
 
@@ -80,7 +80,7 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
                 value={endDate ? dayjs(endDate) : null}
                 onChange={(date) => setEndDate(date ? date.toISOString() : '')}
                 format="YYYY-MM-DD"
-                placeholder="Chọn ngày kết thúc"
+                placeholder="Chá»n ngÃ y káº¿t thÃºc"
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
               />
             </div>

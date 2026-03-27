@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 
 import { useToast } from '@/providers/ToastProvider';
 
 import { VIOLATION_REPORT_UI } from '../constants/violationReportUI';
-import { violationReportService } from '../services/violationReportService';
+import { violationReportService } from '../services/violation-report.service';
 
 export const useViolationReports = () => {
   const [reports, setReports] = useState([]);

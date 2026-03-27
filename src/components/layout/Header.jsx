@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   LogoutOutlined,
@@ -12,10 +12,10 @@ import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { logout } from '@/components/features/auth/services/authService';
-import { clearAuth } from '@/components/features/auth/services/authStorage';
+import { clearAuth } from '@/components/features/auth/lib/auth-storage';
+import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
 
@@ -57,7 +57,7 @@ export default function Header() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+              {userInfo?.fullName || userInfo?.FullName || 'NgÆ°á»i dÃ¹ng'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>

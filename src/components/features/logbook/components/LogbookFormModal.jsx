@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { EditOutlined, PlusCircleOutlined, SendOutlined } from '@ant-design/icons';
 import { DatePicker, Form, Input } from 'antd';
@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import React, { memo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
 
 const { TextArea } = Input;

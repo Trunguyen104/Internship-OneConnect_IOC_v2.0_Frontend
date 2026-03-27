@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { PlusCircleOutlined, SaveOutlined } from '@ant-design/icons';
 import { Input, Select } from 'antd';
 import React, { memo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
 const IssueFormModal = memo(function IssueFormModal({
@@ -26,7 +26,10 @@ const IssueFormModal = memo(function IssueFormModal({
     <CompoundModal open={isOpen} onCancel={onClose} width={560}>
       <CompoundModal.Header
         title={FORM.ADD_TITLE}
-        subtitle={ISSUE_UI.SUBTITLE || 'Ghi nhận và quản lý các vấn đề phát sinh từ bên liên quan'}
+        subtitle={
+          ISSUE_UI.SUBTITLE ||
+          'Ghi nháº­n vÃ  quáº£n lÃ½ cÃ¡c váº¥n Ä‘á» phÃ¡t sinh tá»« bÃªn liÃªn quan'
+        }
         icon={<PlusCircleOutlined />}
       />
 

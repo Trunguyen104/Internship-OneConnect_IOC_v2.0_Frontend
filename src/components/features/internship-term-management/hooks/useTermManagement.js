@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/common/enums';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';

@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { DatePicker, Input } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 export default function CycleDialog({

@@ -1,4 +1,4 @@
-import {
+﻿import {
   EditOutlined,
   InfoCircleOutlined,
   SearchOutlined,
@@ -9,7 +9,7 @@ import { Avatar, DatePicker, Form, Input, Select, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useEffect } from 'react';
 
-import CompoundModal from '@/components/ui/CompoundModal';
+import CompoundModal from '@/components/ui/compoundmodal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
@@ -423,7 +423,9 @@ export const CreateGroupModal = memo(
                               }`}
                             >
                               {isSelected && (
-                                <span className="text-white text-[10px] font-black italic">✓</span>
+                                <span className="text-white text-[10px] font-black italic">
+                                  âœ“
+                                </span>
                               )}
                             </div>
 
@@ -436,7 +438,7 @@ export const CreateGroupModal = memo(
                                 {fullName}
                               </Text>
                               <Text className="text-muted text-[9px] uppercase font-medium opacity-60">
-                                {code} • {s.major || CREATE.NO_MAJOR}
+                                {code} â€¢ {s.major || CREATE.NO_MAJOR}
                               </Text>
                             </div>
                           </div>

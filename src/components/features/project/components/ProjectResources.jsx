@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   DeleteOutlined,
@@ -15,7 +15,7 @@ import { EmptyState } from '@/components/ui/atoms';
 import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
-import SkeletonTable from '@/components/ui/SkeletonTable';
+import SkeletonTable from '@/components/ui/skeletontable';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import { PROJECT_UI } from '@/constants/project/uiText';
 
