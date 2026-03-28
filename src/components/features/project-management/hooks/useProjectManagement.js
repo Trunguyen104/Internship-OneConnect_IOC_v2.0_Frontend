@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
+import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
@@ -76,7 +77,7 @@ export const useProjectManagement = () => {
           );
         }
         return [];
-      } catch (err) {
+      } catch {
         return [];
       }
     },
@@ -194,6 +195,9 @@ export const useProjectManagement = () => {
     handleView,
     handleSaveProject,
     handlePublishProject,
+    handleUnpublishProject,
+    handleArchiveProject,
+    handleAssignGroup,
     handleCompleteProject: (id) => handleCompleteProject(id, setActionLoading),
     handleDeleteProject: (id) => handleDeleteProject(id, setActionLoading),
     fetchData: refetch,

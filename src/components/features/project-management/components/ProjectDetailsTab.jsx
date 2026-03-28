@@ -27,7 +27,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
         </p>
       </section>
 
-      <Card className="!min-h-0 border-none shadow-none bg-slate-50 p-4">
+      <Card className="min-h-0! border-none shadow-none bg-slate-50 p-4">
         <div className="flex flex-wrap gap-x-8 gap-y-6">
           <section className="min-w-[120px]">
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
