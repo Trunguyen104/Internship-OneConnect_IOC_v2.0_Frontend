@@ -2,24 +2,68 @@ export const PROJECT_STATUS = {
   DRAFT: 0,
   PUBLISHED: 1,
   COMPLETED: 2,
+  ARCHIVED: 3,
 };
 
-export const PROJECT_STATUS_LABELS = {
-  [PROJECT_STATUS.DRAFT]: 'Draft',
-  [PROJECT_STATUS.PUBLISHED]: 'Published',
-  [PROJECT_STATUS.COMPLETED]: 'Completed',
+export const INTERN_GROUP_STATUS = {
+  ACTIVE: 1,
+  COMPLETED: 2,
+  ARCHIVED: 3,
+};
+
+// AC-01 Visibility Status
+export const VISIBILITY_STATUS = {
+  DRAFT: 0,
+  PUBLISHED: 1,
+};
+
+export const VISIBILITY_LABELS = {
+  [VISIBILITY_STATUS.DRAFT]: 'Draft',
+  [VISIBILITY_STATUS.PUBLISHED]: 'Published',
+};
+
+// AC-01 Operational Status
+export const OPERATIONAL_STATUS = {
+  UNSTARTED: 0,
+  ACTIVE: 1,
+  COMPLETED: 2,
+  ARCHIVED: 3,
+};
+
+export const OPERATIONAL_LABELS = {
+  [OPERATIONAL_STATUS.UNSTARTED]: 'Unstarted',
+  [OPERATIONAL_STATUS.ACTIVE]: 'Active',
+  [OPERATIONAL_STATUS.COMPLETED]: 'Completed',
+  [OPERATIONAL_STATUS.ARCHIVED]: 'Archived',
 };
 
 export const PROJECT_STATUS_VARIANTS = {
   [PROJECT_STATUS.DRAFT]: 'warning-soft',
   [PROJECT_STATUS.PUBLISHED]: 'primary',
   [PROJECT_STATUS.COMPLETED]: 'success',
+  [PROJECT_STATUS.ARCHIVED]: 'default',
+};
+
+export const STATUS_VARIANTS = {
+  // Operational
+  [OPERATIONAL_STATUS.UNSTARTED]: 'warning-soft',
+  [OPERATIONAL_STATUS.ACTIVE]: 'primary',
+  [OPERATIONAL_STATUS.COMPLETED]: 'success',
+  [OPERATIONAL_STATUS.ARCHIVED]: 'default',
+  // Visibility
+  [VISIBILITY_STATUS.DRAFT]: 'warning',
+  [VISIBILITY_STATUS.PUBLISHED]: 'info',
 };
 
 export const PROJECT_MANAGEMENT = {
   TITLE: 'Project Management',
   CREATE_BTN: 'Create Project',
   SEARCH_PLACEHOLDER: 'Search projects by name or code...',
+  COMMON: {
+    N_A: 'N/A',
+    DASH: '—',
+    UNKNOWN: 'Unknown',
+  },
   TABS: {
     DETAIL: 'Project Details',
     RESOURCES: 'Resources & Deliverables',
@@ -32,17 +76,35 @@ export const PROJECT_MANAGEMENT = {
       CODE: 'PROJECT CODE',
       GROUP: 'INTERN GROUP',
       FIELD: 'FIELD',
-      TEMPLATE: 'TEMPLATE',
-      START_DATE: 'START DATE',
-      END_DATE: 'END DATE',
-      STATUS: 'STATUS',
+      TIMELINE: 'TIMELINE',
+      VISIBILITY: 'VISIBILITY',
+      STATUS: 'OPERATIONAL STATUS',
       ACTIONS: 'ACTIONS',
     },
-    EMPTY_MESSAGE: 'No projects found. Create a new project to get started.',
+    EMPTY_MESSAGE: 'You have no projects yet. Create a new project to get started.',
+    STATUS_TEXT: {
+      ORPHANED_TITLE: 'Intern group has been disbanded',
+      ORPHANED_HINT: 'Reassign to a new group to reactive project',
+      NO_GROUP: 'No group assigned',
+      GROUP_ARCHIVED: 'GROUP ARCHIVED',
+    },
+    ACTIONS_LABEL: {
+      VIEW: 'View',
+      EDIT: 'Edit',
+      PUBLISH: 'Publish',
+      UNPUBLISH: 'Unpublish',
+      COMPLETE: 'Mark as Completed',
+      ARCHIVE: 'Archive',
+      DELETE: 'Delete Project',
+      ASSIGN_GROUP: 'Assign Group',
+      CHANGE_GROUP: 'Change Group',
+    },
   },
   FILTERS: {
     GROUP_FILTER: 'Intern Group',
-    STATUS_FILTER: 'Status',
+    STATUS_FILTER: 'Operational Status',
+    VISIBILITY_FILTER: 'Visibility',
+    SHOW_ARCHIVED: 'Show Archived',
     ALL_GROUPS: 'All Groups',
     ALL_STATUSES: 'All Statuses',
   },
@@ -54,9 +116,12 @@ export const PROJECT_MANAGEMENT = {
     },
     TITLE_ADD: 'Create Brand New Project',
     TITLE_EDIT: 'Edit Project Details',
+    TITLE_VIEW: 'Project Details',
     DESC: 'Define the scope, goals, and technical requirements for this project.',
     SAVE_DRAFT: 'Save Draft',
-    PUBLISH: 'Publish Project',
+    PUBLISH: 'Save',
+    SAVE_CHANGES: 'Save Changes',
+    CANCEL: 'Cancel',
     LABEL: {
       NAME: 'Project Name',
       CODE: 'Project Code',
@@ -68,6 +133,9 @@ export const PROJECT_MANAGEMENT = {
       DESCRIPTION: 'Description',
       REQUIREMENTS: 'Technical Requirements',
       DELIVERABLES: 'Key Deliverables/Outcomes',
+      ADD_LINK: 'Add Quick Link',
+      PHASE: 'Phase:',
+      N_A: 'N/A',
     },
     PLACEHOLDER: {
       NAME: 'Enter project name',
@@ -78,13 +146,21 @@ export const PROJECT_MANAGEMENT = {
       DESCRIPTION: 'Brief project overview...',
       REQUIREMENTS: 'Technical stack, tools, environment...',
       DELIVERABLES: 'Source code, documentation, presentations...',
+      UPLOAD_PRIMARY: 'Click or drag files to this area to upload',
+      UPLOAD_HINT: 'Support for PDF, DOCX, ZIP, etc.',
+      LINK_TITLE: 'Link Title (e.g. Figma, PRD)',
+      URL: 'URL',
     },
     VALIDATION: {
       NAME_REQUIRED: 'Please enter project name',
       CODE_REQUIRED: 'Project code is required',
       GROUP_REQUIRED: 'Please select an intern group',
       FIELD_REQUIRED: 'Please select a project field',
+      DESC_REQUIRED: 'Description is required',
+      REQ_REQUIRED: 'Technical requirements are required',
       GROUP_MUST_SELECT: 'Group must be selected before publishing',
+      MISSING_LINK_TITLE: 'Missing title',
+      MISSING_URL: 'Missing URL',
     },
     FIELD_OPTIONS: {
       TEMPLATE: {
@@ -114,6 +190,10 @@ export const PROJECT_MANAGEMENT = {
   DETAIL: {
     TITLE: 'Project Details',
     NO_CODE: 'NO-CODE',
+    LABELS: {
+      VISIBILITY: 'Visibility',
+      OPERATIONAL: 'Operational',
+    },
     SECTIONS: {
       DESCRIPTION: 'Project Description',
       DESCRIPTION_EMPTY: 'No description updated yet.',
@@ -131,6 +211,11 @@ export const PROJECT_MANAGEMENT = {
       NO_RESOURCES: 'No attachments for this project.',
       NO_LINKS: 'No external links available.',
     },
+    RESOURCES: {
+      ACCESS: 'Open/Download',
+      INTERNAL: 'Internal Document',
+      EXTERNAL: 'External Link',
+    },
     GROUP: {
       NOT_ASSIGNED: 'Not Assigned',
       NOT_ASSIGNED_HINT: 'Please go to Edit to assign an Intern Group before publishing.',
@@ -141,33 +226,42 @@ export const PROJECT_MANAGEMENT = {
       STUDENT_COUNT: 'Student Count',
       STUDENTS_SUFFIX: 'students',
       MANAGE_LINK: 'Manage Group',
+      ARCHIVED_LABEL: 'Group Archived',
+      ARCHIVED_VALUE: 'Archived',
+      TBA: 'TBA',
+      ASSIGN_BTN: 'Assign Group',
     },
     STUDENTS: {
       SEARCH_PLACEHOLDER: 'Search students by name or ID...',
       COUNT_LABEL: 'Total:',
       EMPTY_MESSAGE: 'No students in this group yet.',
       EMPTY_HINT: 'HR needs to add students to this group (AC-G05).',
-    },
-    RESOURCES: {
-      ACCESS: 'Open/Download',
-      INTERNAL: 'Internal Document',
-      EXTERNAL: 'External Link',
+      COLUMNS: {
+        NAME: 'Full Name',
+        UNIVERSITY: 'University',
+        EMAIL: 'Email',
+        STATUS: 'Status',
+      },
+      STATUS_ACTIVE: 'Active',
+      STATUS_ENDED: 'Ended',
     },
   },
   MESSAGES: {
     PUBLISH_SUCCESS: 'Project has been published successfully.',
-    COMPLETE_SUCCESS: 'Project marked as completed.',
-    COMPLETE_CONFIRM: 'Project will be marked as completed. Are you sure?',
+    COMPLETE_SUCCESS: 'Project marked as completed successfully.',
+    COMPLETE_CONFIRM: 'This project will be marked as completed. Are you sure?',
+    COMPLETE_EARLY_WARNING:
+      'The intern phase for group "{groupName}" is still active until {date}. Completing the project early will move it into read-only mode. Proceed?',
     UPDATE_SUCCESS: 'Project updated successfully.',
     DELETE_SUCCESS: 'Project deleted successfully.',
     DELETE_CONFIRM: 'Are you sure you want to delete this project? This action cannot be undone.',
     ASSIGN_SUCCESS: 'Successfully assigned {count} students to project.',
     UNASSIGN_SUCCESS: 'Student removed from project.',
     EDIT_WARNING:
-      'Project has {count} students assigned. Changes may affect progress. Are you sure?',
+      'Updating this project may affect the {count} students currently participating. Continue?',
     ERROR_ARCHIVED_GROUP: 'Cannot publish project for an archived group.',
     ERROR_ASSIGNED_STU:
-      'Project has student activity data and cannot be deleted. Please complete the project first.',
+      'Project has student interaction data (logbook/evaluation) and cannot be deleted. Please mark it as completed instead.',
     WARNING_COMPLETE_STU:
       'There are {count} students who haven’t completed the project. The project can still be marked as completed.',
     ORPHANED_GROUP_TOOLTIP: 'Intern group was deleted. A new group must be assigned to publish.',
@@ -178,5 +272,26 @@ export const PROJECT_MANAGEMENT = {
     ERROR_PUBLISH_NO_GROUP:
       'Project must be assigned to an intern group before it can be published.',
     ERROR_PUBLISH_NO_GROUP_VN: 'chưa được gắn với nhóm thực tập',
+    ERROR_ALREADY_PUBLISHED_VN: 'Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp',
+    ERROR_FETCH_DETAIL: 'Failed to fetch project details',
+    ERROR_RESOURCE_ACCESS: 'Could not open file. Access denied or file removed.',
+  },
+  MODALS: {
+    ASSIGN_GROUP: {
+      TITLE: 'Assign / Change Intern Group',
+      DESC: 'Select an active Intern Group to assign to project <b>{name}</b>:',
+      PLACEHOLDER: 'Select an Intern Group',
+      CONFIRM: 'Confirm Assignment',
+      SUCCESS_ASSIGN: 'Group assigned successfully.',
+      SUCCESS_CHANGE: 'Group changed successfully.',
+      ERROR_NO_CHANGE: 'Cannot Change Group',
+      ERROR_HAS_DATA:
+        'Project has student interaction data (logbook/eval/violation) and cannot change group. Please mark as completed instead.',
+      CONFIRM_CHANGE_TITLE: 'Confirm Group Change',
+      CONFIRM_CHANGE_DESC:
+        'Are you sure you want to change the group? Existing students will lose access to this project.',
+      ERROR_BACKEND: 'Backend error during assignment',
+      ERROR_FAILED: 'Assignment failed: ',
+    },
   },
 };

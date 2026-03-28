@@ -1,6 +1,7 @@
 'use client';
 
 import { SolutionOutlined, TeamOutlined } from '@ant-design/icons';
+import { useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -10,7 +11,9 @@ import InternshipManagement from '../../internship-student-management/components
 
 export default function InternshipManagementContainer() {
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
-  const [tab, setTab] = useState('students');
+  const searchParams = useSearchParams();
+  const urlGroupId = searchParams?.get('groupId');
+  const [tab, setTab] = useState(urlGroupId ? 'groups' : 'students');
   const [isDetail, setIsDetail] = useState(false);
 
   return (

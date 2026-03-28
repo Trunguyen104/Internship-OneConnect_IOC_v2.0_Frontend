@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { requestPasswordReset } from '@/components/features/auth/services/authService';
 import Input from '@/components/ui/input';
 import { AUTH_MESSAGES, AUTH_UI } from '@/constants/auth/uiText';
 
@@ -13,7 +14,9 @@ export default function ForgotPasswordPage() {
   });
 
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +27,7 @@ export default function ForgotPasswordPage() {
     }));
 
     setErrors({});
+    setApiError('');
   };
 
   const validate = () => {
@@ -39,11 +43,22 @@ export default function ForgotPasswordPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validate()) {
-      setSuccess(true);
+      setIsLoading(true);
+      setApiError('');
+
+      try {
+        await requestPasswordReset(form.email);
+        setSuccess(true);
+      } catch (err) {
+        setApiError(err.message || AUTH_MESSAGES.ERROR.API_RESET_REQUEST_FAILED);
+        setSuccess(false);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -89,11 +104,20 @@ export default function ForgotPasswordPage() {
               error={errors.email}
             />
 
+            {apiError && (
+              <p className="mb-4 text-center text-sm text-(--color-danger)">{apiError}</p>
+            )}
+
             <button
               type="submit"
-              className="mt-2 h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)"
+              disabled={isLoading}
+              className={`mt-2 h-11 w-full cursor-pointer rounded-xl font-semibold text-white ${
+                isLoading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-(--color-primary) hover:bg-(--color-primary-hover)'
+              }`}
             >
-              {AUTH_UI.FORGOT_PASSWORD.BUTTON}
+              {isLoading ? AUTH_UI.FORGOT_PASSWORD.BUTTON_LOADING : AUTH_UI.FORGOT_PASSWORD.BUTTON}
             </button>
 
             <div className="mt-4 text-center text-sm">

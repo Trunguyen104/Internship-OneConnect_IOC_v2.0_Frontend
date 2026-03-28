@@ -20,12 +20,9 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
 
   const validate = (payload) => {
     const nextErrors = {};
-    if (!payload.name)
-      nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED || 'University name is required';
-    if (!payload.code)
-      nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED || 'University code is required';
-    if (!payload.address)
-      nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED || 'Address is required';
+    if (!payload.name) nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED;
+    if (!payload.code) nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED;
+    if (!payload.address) nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED;
     return nextErrors;
   };
 
@@ -83,11 +80,11 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           value={logoUrl}
           onChange={setLogoUrl}
           size={120}
-          label="Institution Logo"
+          label={UI_TEXT.UNIVERSITIES.LOGO_LABEL}
           folder="Universities"
         />
         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted/40 text-center">
-          University Identity
+          {UI_TEXT.UNIVERSITIES.IDENTITY}
         </p>
       </div>
 
@@ -99,7 +96,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           <Input
             name="name"
             defaultValue={university?.name}
-            placeholder="Official University Name"
+            placeholder={UI_TEXT.UNIVERSITIES.NAME_PLACEHOLDER}
             className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.name}
           />
@@ -112,7 +109,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           <Input
             name="code"
             defaultValue={university?.code}
-            placeholder="EX: VNU-H"
+            placeholder={UI_TEXT.UNIVERSITIES.CODE_PLACEHOLDER}
             className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.code}
           />
@@ -125,7 +122,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           <Input
             name="address"
             defaultValue={university?.address}
-            placeholder="Headquarters Address"
+            placeholder={UI_TEXT.UNIVERSITIES.ADDRESS_PLACEHOLDER}
             className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.address}
           />

@@ -11,6 +11,7 @@ import React, { memo, useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 
@@ -223,11 +224,13 @@ export const CreateGroupModal = memo(
           const selectedInfo = combinedStudentList.filter((s) =>
             selectedStudentIds?.includes(s.studentId || s.StudentId || s.id || s.applicationId)
           );
-          const uniqueTerms = new Set(selectedInfo.map((s) => s.termId).filter(Boolean));
-          const hasTermConflict = uniqueTerms.size > 1;
+          const uniquePhases = new Set(
+            selectedInfo.map((s) => s.phaseId || s.termId).filter(Boolean)
+          );
+          const hasPhaseConflict = uniquePhases.size > 1;
 
           return (
-            hasTermConflict && (
+            hasPhaseConflict && (
               <div className="mx-6 mt-4 mb-2 rounded-xl bg-danger/5 border border-danger/20 p-3 flex items-start gap-3 animate-in shake duration-500">
                 <InfoCircleOutlined className="text-danger text-base mt-0.5" />
                 <div className="flex flex-col gap-1">
@@ -382,6 +385,18 @@ export const CreateGroupModal = memo(
                           s.isAssignedToGroup || !!s.assignedGroupId || !!s.groupId;
                         if (isAssigned) return false;
 
+                        // Phase match constraint: ensure students belong to the same phase as the group
+                        const groupPhaseId =
+                          group?.phaseId || group?.termId || group?.internshipPhaseId;
+                        const studentPid = s.phaseId || s.termId || s.internshipPhaseId;
+                        if (
+                          groupPhaseId &&
+                          studentPid &&
+                          String(groupPhaseId) !== String(studentPid)
+                        ) {
+                          return false;
+                        }
+
                         const name = (
                           s.studentFullName ||
                           s.fullName ||
@@ -423,7 +438,9 @@ export const CreateGroupModal = memo(
                               }`}
                             >
                               {isSelected && (
-                                <span className="text-white text-[10px] font-black italic">✓</span>
+                                <span className="text-white text-[10px] font-black italic">
+                                  {UI_TEXT.COMMON.CHECKMARK}
+                                </span>
                               )}
                             </div>
 
@@ -436,7 +453,7 @@ export const CreateGroupModal = memo(
                                 {fullName}
                               </Text>
                               <Text className="text-muted text-[9px] uppercase font-medium opacity-60">
-                                {code} • {s.major || CREATE.NO_MAJOR}
+                                {code} {UI_TEXT.COMMON.BULLET} {s.major || CREATE.NO_MAJOR}
                               </Text>
                             </div>
                           </div>
@@ -502,8 +519,10 @@ export const CreateGroupModal = memo(
                       s.studentId || s.StudentId || s.id || s.applicationId
                     )
                   );
-                const uniqueTerms = new Set(selectedInfo.map((s) => s.termId).filter(Boolean));
-                return uniqueTerms.size > 1;
+                const uniquePhases = new Set(
+                  selectedInfo.map((s) => s.phaseId || s.termId).filter(Boolean)
+                );
+                return uniquePhases.size > 1;
               })()
             }
           />

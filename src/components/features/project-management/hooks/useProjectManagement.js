@@ -1,31 +1,49 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useToast } from '@/providers/ToastProvider';
+import { useProfile } from '@/components/features/user/hooks/useProfile';
 
+import { mapProjectsToFrontend } from '../services/project.mapper';
 import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
 import { useProjectFilters } from './useProjectFilters';
 import { useProjectModals } from './useProjectModals';
 
 export const useProjectManagement = () => {
-  const toast = useToast();
+  const { userInfo } = useProfile();
+
+  const r = userInfo?.roleId || userInfo?.RoleId || userInfo?.role || userInfo?.Role;
+  const roleName = String(userInfo?.roleName || userInfo?.RoleName || r || '').toLowerCase();
+  const numRole = Number(r);
+
+  const isMentor = numRole === 6 || roleName.includes('mentor');
+  const isHR =
+    (numRole >= 1 && numRole <= 5) ||
+    roleName.includes('hr') ||
+    roleName.includes('admin') ||
+    roleName.includes('enterprise');
+
   // --- Core Data State ---
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [groups, setGroups] = useState([]);
+  const hasNotifiedOrphaned = useRef(false);
 
   // --- Specialized Hooks ---
   const {
     searchTerm,
     groupIdFilter,
     statusFilter,
+    visibilityFilter,
+    showArchived,
     pagination,
     setPagination,
     handleSearchChange,
     handleGroupFilterChange,
     handleStatusFilterChange,
+    handleVisibilityFilterChange,
+    handleShowArchivedChange,
     handleTableChange,
     handlePageSizeChange,
   } = useProjectFilters();
@@ -44,30 +62,76 @@ export const useProjectManagement = () => {
 
   // --- Data Fetching ---
   const fetchData = useCallback(async () => {
-    // AC-01: allow viewing all projects if no group filter is selected
-    // if (!groupIdFilter) return; // Removed this restrictor
-
     try {
       setLoading(true);
+
       const params = {
         PageNumber: pagination.current,
         PageSize: pagination.pageSize,
         SearchTerm: searchTerm,
-        internshipId: groupIdFilter, // Sync with API parameter name
-        Status: statusFilter,
+        internshipId: groupIdFilter,
+        Status: statusFilter !== undefined ? statusFilter : undefined,
+        // AC-14: HR and Uni Admin only see Published (1)
+        Visibility: !isMentor ? 1 : visibilityFilter !== undefined ? visibilityFilter : undefined,
+        showArchived: showArchived,
       };
 
       const res = await ProjectService.getAll(params);
-      if (res?.data?.items) {
-        setData(res.data.items);
+      let items = res?.data?.items || [];
+
+      if (items) {
+        // AC-15 & AC-16: Normalize DTOs via Mapper
+        const normalizedItems = mapProjectsToFrontend(items);
+
+        // AC-01 Visibility Logic:
+        const finalItems = normalizedItems.filter((p) => {
+          const op = p.operationalStatus;
+          const vis = p.visibilityStatus;
+
+          // Rule: Hide archived unless toggled
+          const isArchived = op === 3;
+          if (!showArchived && isArchived) return false;
+
+          // AC-14: Strictly enforce Published for non-mentors on the frontend too
+          if (!isMentor && vis !== 1) return false;
+
+          // Rule: Visibility Filter (Manual)
+          if (isMentor && visibilityFilter !== undefined) {
+            if (vis !== visibilityFilter) return false;
+          }
+
+          // Rule: Status Filter (Manual)
+          if (statusFilter !== undefined) {
+            if (op !== statusFilter) return false;
+          }
+
+          return true;
+        });
+
+        setData(finalItems);
         setPagination((prev) => ({
           ...prev,
-          total: res.data.totalCount || 0,
+          total: res?.data?.totalCount || finalItems.length,
         }));
+
+        // AC-16: Notify Mentor about orphaned projects (once)
+        const orphanedList = finalItems.filter((p) => p.isOrphaned);
+        if (orphanedList.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
+          const firstName = orphanedList[0].projectName;
+          const message =
+            orphanedList.length === 1
+              ? PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_NOTIFY.replace(
+                  '{projectName}',
+                  firstName
+                )
+              : `Có ${orphanedList.length} dự án đã bị giải thể nhóm và chuyển về trạng thái Unstarted.`;
+
+          toast.warning(message, { duration: 10 });
+          hasNotifiedOrphaned.current = true;
+        }
       }
     } catch (err) {
       console.error('Fetch Projects failed:', err);
-      // toast.error('Failed to load projects'); // Avoid multiple separate toasts if it fails on load
     } finally {
       setLoading(false);
     }
@@ -75,10 +139,13 @@ export const useProjectManagement = () => {
     searchTerm,
     groupIdFilter,
     statusFilter,
+    visibilityFilter,
+    showArchived,
     pagination.current,
     pagination.pageSize,
     setPagination,
-    toast,
+    isMentor,
+    groups,
   ]);
 
   useEffect(() => {
@@ -89,9 +156,16 @@ export const useProjectManagement = () => {
     try {
       const res = await ProjectService.getGroupsForMentor();
       if (res?.data?.items) {
-        // AC-02: Only show Active groups (status 1)
-        const activeGroups = res.data.items.filter((g) => g.status === 1 || g.groupStatus === 1);
-        setGroups(activeGroups);
+        // AC-01: Dropdown only shows Active groups managed by the mentor
+        setGroups(
+          res.data.items.filter(
+            (g) =>
+              g.status === 1 ||
+              g.groupStatus === 1 ||
+              g.status === 'Active' ||
+              g.groupStatus === 'Active'
+          )
+        );
       }
     } catch (err) {
       console.error('Fetch Supporting Data failed:', err);
@@ -102,20 +176,13 @@ export const useProjectManagement = () => {
     fetchSupportingData();
   }, [fetchSupportingData]);
 
-  // Removed auto-select first group logic to allow "View All" (null filter) state
-  /*
-  useEffect(() => {
-    if (!groupIdFilter && groups.length > 0) {
-      handleGroupFilterChange(groups[0].internshipId);
-    }
-  }, [groupIdFilter, groups, handleGroupFilterChange]);
-  */
-
-  // --- Actions Hook ---
   const {
     submitLoading,
     handleSaveProject,
     handlePublishProject,
+    handleUnpublishProject,
+    handleArchiveProject,
+    handleAssignGroup,
     handleCompleteProject,
     handleDeleteProject,
   } = useProjectActions({
@@ -123,6 +190,7 @@ export const useProjectManagement = () => {
     fetchData,
     groups,
     setModalVisible,
+    userInfo,
   });
 
   return {
@@ -131,6 +199,8 @@ export const useProjectManagement = () => {
     searchTerm,
     groupIdFilter,
     statusFilter,
+    visibilityFilter,
+    showArchived,
     pagination,
     modalVisible,
     detailDrawerVisible,
@@ -143,6 +213,8 @@ export const useProjectManagement = () => {
     handleSearchChange,
     handleGroupFilterChange,
     handleStatusFilterChange,
+    handleVisibilityFilterChange,
+    handleShowArchivedChange,
     handleTableChange,
     handlePageSizeChange,
     handleCreateNew,
@@ -150,8 +222,14 @@ export const useProjectManagement = () => {
     handleView,
     handleSaveProject,
     handlePublishProject,
+    handleUnpublishProject,
+    handleArchiveProject,
+    handleAssignGroup,
     handleCompleteProject: (id) => handleCompleteProject(id, setLoading),
     handleDeleteProject: (id) => handleDeleteProject(id, setLoading),
     fetchData,
+    userInfo,
+    isMentor,
+    isHR,
   };
 };

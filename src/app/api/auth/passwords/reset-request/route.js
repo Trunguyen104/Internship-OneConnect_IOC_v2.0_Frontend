@@ -14,39 +14,38 @@ export async function POST(req) {
       return NextResponse.json({ message: API_MESSAGES.ERROR.INVALID_PAYLOAD }, { status: 400 });
     }
 
-    const accessToken = req.cookies.get('accessToken')?.value;
-
-    if (!accessToken) {
-      return NextResponse.json({ message: 'Missing access token' }, { status: 401 });
-    }
-
+    const resetRequestUrl = `${BE_URL}/passwords/reset-request`;
     let res;
+
     try {
-      res = await fetch(`${BE_URL}/passwords/change`, {
+      res = await fetch(resetRequestUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
     } catch (upstreamError) {
-      console.error('CHANGE PASSWORD UPSTREAM ERROR:', upstreamError);
+      console.error('RESET REQUEST UPSTREAM ERROR:', upstreamError);
       return NextResponse.json(
         { message: API_MESSAGES.ERROR.SERVICE_UNAVAILABLE },
         { status: 502 }
       );
     }
 
-    const text = await res.text();
-    const contentType = res.headers.get('content-type') || 'application/json';
+    const rawBody = await res.text();
+    let data = {};
+    try {
+      data = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      data = { message: rawBody || API_MESSAGES.ERROR.UNEXPECTED_RESPONSE };
+    }
 
-    return new NextResponse(text, {
-      status: res.status,
-      headers: { 'Content-Type': contentType },
-    });
+    if (!res.ok) {
+      return NextResponse.json(data, { status: res.status });
+    }
+
+    return NextResponse.json(data);
   } catch (err) {
-    console.error('CHANGE PASSWORD ERROR:', err);
+    console.error('RESET REQUEST ERROR:', err);
     return NextResponse.json({ message: API_MESSAGES.ERROR.SERVER_ERROR }, { status: 500 });
   }
 }

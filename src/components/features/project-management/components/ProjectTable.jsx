@@ -7,7 +7,9 @@ import {
   EllipsisOutlined,
   ExclamationCircleOutlined,
   EyeOutlined,
-  RocketOutlined,
+  RollbackOutlined,
+  SwapOutlined,
+  UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Dropdown, Tooltip } from 'antd';
 import dayjs from 'dayjs';
@@ -16,16 +18,20 @@ import React, { useMemo } from 'react';
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import {
+  OPERATIONAL_LABELS,
+  OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
-  PROJECT_STATUS,
-  PROJECT_STATUS_LABELS,
-  PROJECT_STATUS_VARIANTS,
+  STATUS_VARIANTS,
+  VISIBILITY_LABELS,
+  VISIBILITY_STATUS,
 } from '@/constants/project-management/project-management';
 
 export default function ProjectTable({
   data,
   loading,
   pagination,
+  groups = [],
+  isMentor = true, // Default to true for backward compatibility
   onChange,
   onEdit,
   onView,
@@ -33,8 +39,12 @@ export default function ProjectTable({
   onPublish,
   onComplete,
   onDelete,
+  onArchive,
+  onUnpublish,
 }) {
   const { TABLE } = PROJECT_MANAGEMENT;
+  const current = pagination?.current ?? 1;
+  const pageSize = pagination?.pageSize ?? 10;
 
   const columns = useMemo(
     () => [
@@ -42,28 +52,26 @@ export default function ProjectTable({
         title: TABLE.COLUMNS.INDEX,
         key: 'index',
         width: 40,
-        render: (_, record, index) => (pagination.current - 1) * pagination.pageSize + index + 1,
+        render: (_, record, index) => (current - 1) * pageSize + index + 1,
       },
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
         width: 140,
         render: (text, record) => (
-          <div className="flex items-center gap-2">
-            <div
-              className="font-semibold text-primary hover:underline cursor-pointer truncate max-w-[140px]"
-              title={record.projectName}
-              onClick={() => onView(record)}
-            >
-              {record.projectName}
-            </div>
+          <div
+            className="font-semibold text-primary hover:underline cursor-pointer truncate max-w-[140px]"
+            title={record.projectName}
+            onClick={() => onView(record)}
+          >
+            {record.projectName}
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.CODE,
         key: 'code',
-        width: 120,
+        width: 110,
         render: (_, record) => (
           <div
             className="text-gray-500 truncate w-[100px]"
@@ -74,33 +82,74 @@ export default function ProjectTable({
         ),
       },
       {
-        title: TABLE.COLUMNS.GROUP,
+        title: PROJECT_MANAGEMENT.FILTERS.GROUP_FILTER,
         key: 'group',
-        width: 180,
+        width: 160,
         render: (_, record) => {
-          const groupName =
-            record.groupInfo?.groupName || record.groupName || record.internshipGroup?.groupName;
-
           const gid = record.internshipId || record.internshipGroupId || record.groupId;
+          let groupName =
+            record.groupName || record.groupInfo?.groupName || record.internshipGroup?.groupName;
+
+          if (!groupName && gid && Array.isArray(groups)) {
+            const group = groups.find(
+              (g) =>
+                (g.internshipId && g.internshipId.toLowerCase() === gid.toLowerCase()) ||
+                (g.id && g.id.toLowerCase() === gid.toLowerCase())
+            );
+            if (group) groupName = group.groupName;
+          }
+
           const isEmptyGuid = gid === '00000000-0000-0000-0000-000000000000';
           const isMissing = !gid || isEmptyGuid || gid === '';
 
+          let content = null;
           if (isMissing) {
-            return (
-              <Tooltip title={PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_TOOLTIP}>
-                <div className="flex items-center gap-1.5 text-warning cursor-help whitespace-nowrap">
-                  <ExclamationCircleOutlined className="text-sm" />
-                  <span className="text-xs font-medium italic">
-                    {PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_BADGE}
+            if (record.isOrphaned) {
+              content = (
+                <div className="text-red-500 font-medium text-[10px] leading-tight flex flex-col gap-0.5 w-[150px]">
+                  <div className="flex items-center gap-1 font-bold">
+                    <ExclamationCircleOutlined /> {TABLE.STATUS_TEXT.ORPHANED_TITLE}
+                  </div>
+                  <span className="text-[9px] opacity-90 uppercase italic">
+                    {TABLE.STATUS_TEXT.ORPHANED_HINT}
                   </span>
                 </div>
-              </Tooltip>
+              );
+            } else {
+              content = (
+                <span className="text-red-500 italic text-xs font-medium">
+                  {TABLE.STATUS_TEXT.NO_GROUP}
+                </span>
+              );
+            }
+          } else {
+            content = (
+              <div className="flex flex-col gap-1 items-start max-w-[150px]">
+                <div className="truncate w-full font-medium" title={groupName}>
+                  {groupName}
+                </div>
+                {record.isGroupArchived && (
+                  <Badge
+                    variant="default"
+                    size="xs"
+                    className="text-[9px] px-1.5 py-0 bg-gray-100 text-gray-500 border-gray-200"
+                  >
+                    {TABLE.STATUS_TEXT.GROUP_ARCHIVED}
+                  </Badge>
+                )}
+              </div>
             );
           }
 
           return (
-            <div className="truncate w-[170px]" title={groupName}>
-              {groupName || '-'}
+            <div
+              className="cursor-pointer hover:text-primary transition-colors group/cell"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAssign?.(record);
+              }}
+            >
+              <div className="group-hover/cell:underline">{content}</div>
             </div>
           );
         },
@@ -111,51 +160,58 @@ export default function ProjectTable({
         width: 100,
         render: (text) => (
           <div className="truncate w-[100px]" title={text}>
-            {text || '-'}
+            {text || PROJECT_MANAGEMENT.COMMON.N_A}
           </div>
         ),
       },
       {
-        title: TABLE.COLUMNS.TEMPLATE,
-        key: 'template',
-        width: 110,
-        render: (template) => {
+        title: TABLE.COLUMNS.TIMELINE,
+        key: 'timeline',
+        width: 160,
+        render: (_, record) => {
+          if (record.isOrphaned) {
+            return <div className="text-gray-400">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
+          }
+          const start = record.startDate
+            ? dayjs(record.startDate).format('DD/MM/YYYY')
+            : PROJECT_MANAGEMENT.COMMON.N_A;
+          const end = record.endDate
+            ? dayjs(record.endDate).format('DD/MM/YYYY')
+            : PROJECT_MANAGEMENT.COMMON.N_A;
           return (
-            <span className="text-gray-500 text-xs">
-              {PROJECT_MANAGEMENT.FORM.TEMPLATE_LABELS[template] || 'None'}
-            </span>
+            <div className="text-gray-600 text-[11px] font-medium tracking-tight">
+              {start} {PROJECT_MANAGEMENT.COMMON.DASH} {end}
+            </div>
           );
         },
       },
       {
-        title: TABLE.COLUMNS.START_DATE,
-        key: 'startDate',
-        width: 100,
-        render: (_, record) => (
-          <div className="text-gray-600 text-[12px]">
-            {record.startDate ? dayjs(record.startDate).format('DD/MM/YYYY') : '-'}
-          </div>
-        ),
-      },
-      {
-        title: TABLE.COLUMNS.END_DATE,
-        key: 'endDate',
-        width: 100,
-        render: (_, record) => (
-          <div className="text-gray-600 text-[12px]">
-            {record.endDate ? dayjs(record.endDate).format('DD/MM/YYYY') : '-'}
-          </div>
-        ),
+        title: TABLE.COLUMNS.VISIBILITY,
+        key: 'visibility',
+        width: 90,
+        align: 'center',
+        render: (_, record) => {
+          const vis = record.visibilityStatus ?? record.visibility ?? VISIBILITY_STATUS.DRAFT;
+          const label = VISIBILITY_LABELS[vis] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
+          const variant = STATUS_VARIANTS[vis] || 'default';
+          return (
+            <Badge variant={variant} size="xs" className="uppercase tracking-tighter">
+              {label}
+            </Badge>
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.STATUS,
-        key: 'status',
-        width: 70,
-        render: (status) => {
-          const variant = PROJECT_STATUS_VARIANTS[status] || 'default';
-          const label = PROJECT_STATUS_LABELS[status] || 'Unknown';
+        key: 'operationalStatus',
+        width: 110,
+        align: 'center',
+        render: (_, record) => {
+          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const label = OPERATIONAL_LABELS[op] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
+          const variant = STATUS_VARIANTS[op] || 'default';
           return (
-            <Badge variant={variant} size="xs">
+            <Badge variant={variant} size="xs" className="font-bold">
               {label}
             </Badge>
           );
@@ -164,80 +220,117 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 90,
+        width: 80,
+        align: 'center',
         render: (_, record) => {
+          const vis =
+            record.visibilityStatus ??
+            record.visibility ??
+            (record.status === OPERATIONAL_STATUS.UNSTARTED
+              ? VISIBILITY_STATUS.DRAFT
+              : VISIBILITY_STATUS.PUBLISHED);
+          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+
+          if (!isMentor) {
+            return (
+              <div className="flex justify-center">
+                <Tooltip title={TABLE.ACTIONS_LABEL.VIEW}>
+                  <div
+                    className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-primary/10 text-primary cursor-pointer transition-colors"
+                    onClick={() => onView(record)}
+                  >
+                    <EyeOutlined style={{ fontSize: 18 }} />
+                  </div>
+                </Tooltip>
+              </div>
+            );
+          }
+
           const items = [
             {
               key: 'view',
-              label: 'View Details',
-              icon: <EyeOutlined className="text-primary" />,
+              label: TABLE.ACTIONS_LABEL.VIEW,
+              icon: <EyeOutlined />,
               onClick: () => onView(record),
             },
           ];
 
-          if (record.status === PROJECT_STATUS.DRAFT) {
+          // Action Matrix (AC-01)
+          if (op === OPERATIONAL_STATUS.ARCHIVED) {
+            // Archived + Any: View
+          } else if (op === OPERATIONAL_STATUS.COMPLETED) {
+            // Completed + Any: View, Archive
             items.push(
               { type: 'divider' },
               {
-                key: 'edit',
-                label: 'Edit',
-                icon: <EditOutlined />,
-                onClick: () => onEdit(record),
+                key: 'archive',
+                label: TABLE.ACTIONS_LABEL.ARCHIVE,
+                onClick: () => onArchive?.(record.projectId),
               },
               {
-                key: 'publish',
-                label: 'Publish',
-                icon: <RocketOutlined className="text-info" />,
-                onClick: () => onPublish(record.projectId),
-              },
-              {
-                key: 'delete',
-                label: 'Delete',
-                icon: <DeleteOutlined className="text-danger" />,
-                danger: true,
-                onClick: () => onDelete(record.projectId),
+                key: 'change-group',
+                label: TABLE.ACTIONS_LABEL.CHANGE_GROUP,
+                onClick: () => onAssign?.(record),
               }
             );
-          } else if (record.status === PROJECT_STATUS.PUBLISHED) {
-            items.push(
-              { type: 'divider' },
-              {
-                key: 'edit',
-                label: 'Edit',
-                icon: <EditOutlined />,
-                onClick: () => onEdit(record),
-              },
-              {
+          } else if (op === OPERATIONAL_STATUS.UNSTARTED || op === OPERATIONAL_STATUS.ACTIVE) {
+            items.push({ type: 'divider' });
+
+            // Edit is available for Unstarted/Active
+            items.push({
+              key: 'edit',
+              label: TABLE.ACTIONS_LABEL.EDIT,
+              icon: <EditOutlined />,
+              onClick: () => onEdit(record),
+            });
+
+            // Specific actions for Unstarted based on Visibility
+            if (vis === VISIBILITY_STATUS.PUBLISHED && op === OPERATIONAL_STATUS.UNSTARTED) {
+              items.push({
+                key: 'unpublish',
+                label: TABLE.ACTIONS_LABEL.UNPUBLISH,
+                icon: <RollbackOutlined />,
+                onClick: () => onUnpublish?.(record.projectId),
+              });
+            }
+
+            // Group Management
+            items.push({
+              key: 'assign',
+              label:
+                op === OPERATIONAL_STATUS.UNSTARTED
+                  ? TABLE.ACTIONS_LABEL.ASSIGN_GROUP
+                  : TABLE.ACTIONS_LABEL.CHANGE_GROUP,
+              icon:
+                op === OPERATIONAL_STATUS.UNSTARTED ? <UsergroupAddOutlined /> : <SwapOutlined />,
+              onClick: () => onAssign?.(record),
+            });
+
+            // Transition actions
+            if (op === OPERATIONAL_STATUS.ACTIVE) {
+              items.push({
                 key: 'complete',
-                label: 'Complete Project',
+                label: TABLE.ACTIONS_LABEL.COMPLETE,
                 icon: <CheckCircleOutlined className="text-success" />,
                 onClick: () => onComplete(record),
-              },
-              { type: 'divider' },
-              {
+              });
+            }
+
+            // Delete for Unstarted or Active (AC-11)
+            if (op === OPERATIONAL_STATUS.UNSTARTED || op === OPERATIONAL_STATUS.ACTIVE) {
+              items.push({
                 key: 'delete',
-                label: 'Delete',
+                label: TABLE.ACTIONS_LABEL.DELETE,
                 icon: <DeleteOutlined className="text-danger" />,
                 danger: true,
-                onClick: () => onDelete(record),
-              }
-            );
-          } else if (record.status === PROJECT_STATUS.COMPLETED) {
-            items.push(
-              { type: 'divider' },
-              {
-                key: 'delete',
-                label: 'Delete',
-                icon: <DeleteOutlined className="text-danger" />,
-                danger: true,
-                onClick: () => onDelete(record),
-              }
-            );
+                onClick: () => onDelete(record), // Pass full record for ownership check
+              });
+            }
           }
 
           return (
             <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-              <div className="flex justify-center hover:bg-gray-100 p-1 rounded cursor-pointer">
+              <div className="flex justify-center hover:bg-gray-100 p-1 rounded cursor-pointer transition-colors w-8 h-8 items-center mx-auto">
                 <EllipsisOutlined className="text-lg rotate-90" />
               </div>
             </Dropdown>
@@ -245,7 +338,21 @@ export default function ProjectTable({
         },
       },
     ],
-    [TABLE, pagination, onView, onEdit, onPublish, onComplete, onDelete, onAssign]
+    [
+      groups,
+      isMentor,
+      onView,
+      onEdit,
+      onPublish,
+      onComplete,
+      onDelete,
+      onArchive,
+      onUnpublish,
+      onAssign,
+      current,
+      pageSize,
+      TABLE,
+    ]
   );
 
   return (
@@ -257,11 +364,12 @@ export default function ProjectTable({
       onChange={onChange}
       rowKey="projectId"
       size="small"
-      minWidth="100%"
+      minWidth="1000px"
+      className="project-table"
       locale={{
         emptyText: (
-          <div className="py-12 text-center">
-            <p className="text-gray-400 italic">{TABLE.EMPTY_MESSAGE}</p>
+          <div className="py-20 text-center">
+            <p className="text-gray-400 font-medium italic">{TABLE.EMPTY_MESSAGE}</p>
           </div>
         ),
       }}

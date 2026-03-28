@@ -18,7 +18,14 @@ export const useEnterpriseGroupFilters = () => {
       try {
         setFetchingPhases(true);
         const res = await EnterprisePhaseService.getPhases();
-        const phases = res?.data?.items || res?.data || [];
+        const phases = (res?.data?.items || res?.data || []).map((p) => {
+          let s = p.status;
+          if (typeof s === 'string') {
+            const statusMap = { open: 1, inprogress: 2, completed: 3, closed: 4 };
+            s = statusMap[s.toLowerCase()] || s;
+          }
+          return { ...p, status: s };
+        });
 
         if (phases.length > 0) {
           const options = phases.map((p) => ({
