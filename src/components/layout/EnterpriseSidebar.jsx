@@ -52,6 +52,11 @@ const enterpriseMenu = [
   },
 
   {
+    icon: <SolutionOutlined />,
+    label: 'Application',
+    href: '/applications',
+  },
+  {
     icon: <TeamOutlined />,
     label: 'Evaluation Management',
     href: '/evaluation',

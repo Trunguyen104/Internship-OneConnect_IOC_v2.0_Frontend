@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { resetPassword } from '@/components/features/auth/services/authService';
+import { resetPassword } from '@/components/features/auth/services/auth.service';
 import Input from '@/components/ui/input';
 import { AUTH_MESSAGES, AUTH_UI } from '@/constants/auth/uiText';
 

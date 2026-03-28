@@ -1,20 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
 import { universityService } from '@/services/university.service';
 import { useUniversitiesStore } from '@/store/useUniversitiesStore';
 
 export function useUniversities() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { universities, totalCount, refreshCount } = useUniversitiesStore();
-
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  const { refreshCount } = useUniversitiesStore();
+
+  // Debounce search input
   useEffect(() => {
     const t = setTimeout(() => {
       setDebouncedSearch(search);
@@ -23,44 +23,49 @@ export function useUniversities() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {
-        PageNumber: pageNumber,
-        PageSize: pageSize,
-        SearchTerm: debouncedSearch || undefined,
-      };
-      const res = await universityService.getAll(params);
+  // Use TanStack Query for data fetching
+  const {
+    data: resData = { items: [], total: 0 },
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['universities', pageNumber, pageSize, debouncedSearch, refreshCount],
+    queryFn: async () => {
+      try {
+        const params = {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchTerm: debouncedSearch || undefined,
+        };
+        const res = await universityService.getAll(params);
 
-      const items = res?.data?.items ?? res?.items ?? [];
-      const total = res?.data?.totalCount ?? res?.totalCount ?? items.length;
+        const items = res?.data?.items ?? res?.items ?? [];
+        const total = res?.data?.totalCount ?? res?.totalCount ?? items.length;
 
-      useUniversitiesStore.setUniversities(items, total);
-      setError(null);
-    } catch (err) {
-      setError(err?.message || 'Failed to load universities');
-      useUniversitiesStore.setUniversities([], 0);
-    } finally {
-      setLoading(false);
-    }
-  }, [pageNumber, pageSize, debouncedSearch]);
+        // Sync with existing store if needed (keeping original behavior)
+        useUniversitiesStore.setUniversities(items, total);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData, refreshCount]);
+        return { items, total };
+      } catch (err) {
+        useUniversitiesStore.setUniversities([], 0);
+        throw err;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   return {
-    universities,
+    universities: resData.items,
     loading,
-    error,
-    total: totalCount,
+    error: error?.message || null,
+    total: resData.total,
     pageNumber,
     setPageNumber,
     pageSize,
     setPageSize,
     search,
     setSearch,
-    refresh: fetchData,
+    refresh: refetch,
   };
 }

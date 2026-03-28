@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { userService } from '@/components/features/user/services/userService';
-import { userManagementService } from '@/components/features/user-management/userManagement.service';
+import { userService } from '@/components/features/user/services/user.service';
+import { userManagementService } from '@/components/features/user-management/user-management.service';
 import { USER_ROLE } from '@/constants/user-management/enums';
 import { getErrorMessage } from '@/lib/error';
 import { useToast } from '@/providers/ToastProvider';

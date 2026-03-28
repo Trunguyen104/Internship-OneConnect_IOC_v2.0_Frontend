@@ -1,9 +1,20 @@
 'use client';
 
 import { Avatar as AntdAvatar } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
+
+Avatar.propTypes = {
+  src: PropTypes.string,
+  alt: PropTypes.string,
+  children: PropTypes.node,
+  size: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['small', 'default', 'large'])]),
+  shape: PropTypes.oneOf(['circle', 'square']),
+  className: PropTypes.string,
+  icon: PropTypes.node,
+};
 
 export function Avatar({
   src,

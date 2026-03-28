@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import { PROJECT_UI } from '@/constants/project/uiText';
-import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function ProjectResourceUpload({
@@ -62,9 +61,9 @@ export default function ProjectResourceUpload({
           rules={[
             {
               required: true,
-              message: PROJECT_MESSAGES.ERROR.RESOURCE_NAME_REQUIRED || 'Resource name is required',
+              message: PROJECT_MESSAGES.ERROR.RESOURCE_NAME_REQUIRED,
             },
-            { max: 100, message: PROJECT_MESSAGES.ERROR.MAX_LENGTH || 'Max length exceeded' },
+            { max: 100, message: PROJECT_MESSAGES.ERROR.MAX_LENGTH },
           ]}
         >
           <Input
@@ -85,7 +84,7 @@ export default function ProjectResourceUpload({
           rules={[
             {
               required: true,
-              message: PROJECT_MESSAGES.ERROR.RESOURCE_TYPE_REQUIRED || 'Resource type is required',
+              message: PROJECT_MESSAGES.ERROR.RESOURCE_TYPE_REQUIRED,
             },
           ]}
         >
@@ -96,17 +95,17 @@ export default function ProjectResourceUpload({
           <Form.Item
             label={
               <span className="text-[11px] font-black tracking-widest text-gray-400 uppercase">
-                {UI_TEXT.PROJECTS.EXTERNAL_URL}
+                {PROJECT_UI.FORM.EXTERNAL_URL}
               </span>
             }
             name="externalUrl"
             rules={[
-              { required: true, message: 'Please enter link URL' },
-              { type: 'url', message: 'Please enter a valid URL' },
+              { required: true, message: PROJECT_MESSAGES.ERROR.ENTER_LINK },
+              { type: 'url', message: PROJECT_MESSAGES.ERROR.INVALID_URL },
             ]}
           >
             <Input
-              placeholder="https://docs.google.com/... or https://figma.com/..."
+              placeholder={PROJECT_UI.PLACEHOLDER.URL_PLACEHOLDER}
               className="h-11 rounded-xl border-gray-100 font-bold"
             />
           </Form.Item>

@@ -1,11 +1,11 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
-import { ProjectService } from '@/components/features/project/services/projectService';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import { GENERAL_INFO_UI } from '@/constants/general-info/general-info';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -13,9 +13,6 @@ export function useGeneralInfo(initialId = null) {
   const toast = useToast();
   const params = useParams();
   const effectiveId = initialId || params?.internshipGroupId;
-
-  const [info, setInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const GROUP_STATUS_COLORS = {
     1: 'info',
@@ -32,25 +29,19 @@ export function useGeneralInfo(initialId = null) {
     FAILED: 'danger',
   };
 
-  useEffect(() => {
-    const fetchGeneralData = async () => {
+  // Main Query
+  const { data: info = null, isLoading: loading } = useQuery({
+    queryKey: ['general-info-detail', effectiveId],
+    queryFn: async () => {
+      if (!effectiveId) return null;
       try {
-        setLoading(true);
-
-        if (!effectiveId) {
-          setLoading(false);
-          return;
-        }
-
         const res = await InternshipGroupService.getById(effectiveId);
         const data = res?.data || res;
 
-        if (!data) {
-          setLoading(false);
-          return;
-        }
+        if (!data) return null;
 
-        const baseInfo = {
+        // Base Mapping
+        let baseInfo = {
           ...data,
           groupName: data.groupName || data.name,
           internshipTermName:
@@ -83,8 +74,7 @@ export function useGeneralInfo(initialId = null) {
             : data.updatedText || '',
         };
 
-        setInfo(baseInfo);
-
+        // Enrichment
         try {
           const internshipId = data.internshipId || data.id;
           const termId = data.termId || data.term?.termId || data.term?.id;
@@ -100,34 +90,38 @@ export function useGeneralInfo(initialId = null) {
           const projectData =
             projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
 
-          setInfo((prev) => ({
-            ...prev,
-            internshipTermName: termData?.name || prev.internshipTermName,
-            project: projectData
-              ? {
-                  id: projectData.projectId || projectData.id,
-                  name: projectData.projectName || projectData.name,
-                }
-              : prev.project,
-            projectDescription:
-              projectData?.description ||
+          if (termData?.name) {
+            baseInfo.internshipTermName = termData.name;
+          }
+
+          if (projectData) {
+            baseInfo.project = {
+              id: projectData.projectId || projectData.id,
+              name: projectData.projectName || projectData.name,
+            };
+            baseInfo.projectDescription = projectData.description || baseInfo.projectDescription;
+          }
+
+          if (!baseInfo.projectDescription) {
+            baseInfo.projectDescription =
               data.project?.description ||
               data.description ||
-              GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC,
-          }));
+              GENERAL_INFO_UI.VALUES.NO_PROJECT_DESC;
+          }
         } catch (enrichErr) {
           console.warn('Enrichment failed:', enrichErr);
         }
+
+        return baseInfo;
       } catch (err) {
         console.error('Fetch general data failed:', err);
         toast.error(GENERAL_INFO_UI.MESSAGES.FETCH_ERROR);
-      } finally {
-        setLoading(false);
+        throw err;
       }
-    };
-
-    fetchGeneralData();
-  }, [effectiveId, toast]);
+    },
+    enabled: !!effectiveId,
+    staleTime: 5 * 1000 * 60,
+  });
 
   const getStatusConfig = (status) => {
     const normalizedStatus = status ? String(status).toUpperCase().replace(/_/g, '') : '';

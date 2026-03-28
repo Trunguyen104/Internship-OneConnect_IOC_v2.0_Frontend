@@ -45,3 +45,15 @@ next-env.d.ts
 skills-lock.json
 .gitnexus
 .md
+
+# Junk files and logs
+eslint.json
+parse_errors.py
+clean_v2.json
+eslint_output.txt
+agent.zip
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

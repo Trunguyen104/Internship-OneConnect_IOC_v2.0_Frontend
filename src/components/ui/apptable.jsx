@@ -1,6 +1,7 @@
 'use client';
 
 import { Empty, Skeleton, Table } from 'antd';
+import PropTypes from 'prop-types';
 
 export default function AppTable({
   columns,
@@ -42,3 +43,14 @@ export default function AppTable({
     />
   );
 }
+
+AppTable.propTypes = {
+  columns: PropTypes.array.isRequired,
+  data: PropTypes.array,
+  loading: PropTypes.bool,
+  rowKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  pagination: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
+  onChange: PropTypes.func,
+  scroll: PropTypes.object,
+  emptyText: PropTypes.node,
+};

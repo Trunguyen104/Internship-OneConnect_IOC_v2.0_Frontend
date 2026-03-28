@@ -1,4 +1,4 @@
-import httpClient from '@/services/httpClient';
+import httpClient from '@/services/http-client.service';
 
 export const getProjectResources = (projectId) =>
   httpClient.httpGet(`/project-resources?ProjectId=${projectId}`);

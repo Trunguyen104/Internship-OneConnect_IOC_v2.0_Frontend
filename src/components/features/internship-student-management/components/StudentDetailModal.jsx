@@ -63,7 +63,7 @@ const StudentDetailModal = ({ open, student, onCancel }) => {
           <Text className="block text-[11px] text-muted/60 font-semibold mt-0.5">
             {student.studentCode}
             {student.major ? (
-              <span className="text-muted/30 mx-1">{UI_TEXT.COMMON.MIDDLE_DOT}</span>
+              <span className="text-muted/30 mx-1">{UI_TEXT.COMMON.DOT}</span>
             ) : null}
             {student.major}
           </Text>

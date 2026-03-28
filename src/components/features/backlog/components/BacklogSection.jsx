@@ -4,7 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import React from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { Button } from '@/components/ui/button';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 

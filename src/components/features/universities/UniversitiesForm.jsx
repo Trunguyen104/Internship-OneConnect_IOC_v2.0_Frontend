@@ -52,10 +52,10 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
           logoUrl: logoUrl.trim() || undefined,
           universityId: university.universityId,
         });
-        toast.success(UI_TEXT.COMMON.UPDATE_SUCCESS || `Updated ${payload.name}`);
+        toast.success(UI_TEXT.COMMON.UPDATE_SUCCESS);
       } else {
         await universityService.create(payload);
-        toast.success(UI_TEXT.COMMON.CREATE_SUCCESS || `Created ${payload.name}`);
+        toast.success(UI_TEXT.COMMON.CREATE_SUCCESS);
       }
 
       useUniversitiesStore.increment();

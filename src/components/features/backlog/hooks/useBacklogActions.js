@@ -1,6 +1,6 @@
 'use client';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import {
   MOVE_INCOMPLETE_ITEMS_OPTION,

@@ -14,7 +14,6 @@ import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-import { UI_TEXT } from '@/lib/UI_Text';
 
 import CriteriaSettings from './CriteriaSettings';
 
@@ -126,14 +125,14 @@ export default function CycleList({
         const menuItems = [
           {
             key: 'edit',
-            label: <span className="font-bold text-xs">{UI_TEXT.COMMON.EDIT}</span>,
+            label: <span className="font-bold text-xs">{BUTTONS.EDIT}</span>,
             icon: <EditOutlined className="text-blue-500" />,
             disabled: isTermPast,
             onClick: () => onEdit(record),
           },
           {
             key: 'delete',
-            label: <span className="font-bold text-xs">{UI_TEXT.BUTTON.DELETE}</span>,
+            label: <span className="font-bold text-xs">{BUTTONS.DELETE}</span>,
             icon: <DeleteOutlined className="text-rose-500" />,
             danger: true,
             disabled: isTermPast,

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { useToast } from '@/providers/ToastProvider';
 import { mediaService } from '@/services/media.service';

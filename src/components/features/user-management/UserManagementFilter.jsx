@@ -7,7 +7,7 @@ import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { userManagementService } from './userManagement.service';
+import { userManagementService } from './user-management.service';
 
 export default function UserManagementFilter() {
   const handleSelectedRole = async (value) => {

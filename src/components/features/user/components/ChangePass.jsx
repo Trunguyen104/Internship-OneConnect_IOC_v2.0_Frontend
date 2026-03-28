@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { changePassword } from '@/components/features/auth/services/authService';
+import { changePassword } from '@/components/features/auth/services/auth.service';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import { Field, FieldGroup } from '@/components/ui/field';

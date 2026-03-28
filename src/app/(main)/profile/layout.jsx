@@ -3,7 +3,7 @@
 import { Spin } from 'antd';
 import { useEffect, useState } from 'react';
 
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import EnterpriseSidebar from '@/components/layout/EnterpriseSidebar';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';

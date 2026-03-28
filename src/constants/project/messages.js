@@ -9,6 +9,9 @@ export const PROJECT_MESSAGES = {
     LOAD_PROJECT_FAILED: 'Failed to load project information.',
     RESOURCE_NAME_REQUIRED: 'Please enter the resource name!',
     RESOURCE_TYPE_REQUIRED: 'Please select the resource type!',
+    MAX_LENGTH: 'Max length exceeded',
+    ENTER_LINK: 'Please enter link URL',
+    INVALID_URL: 'Please enter a valid URL',
   },
 
   SUCCESS: {

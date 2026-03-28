@@ -2,10 +2,12 @@
 
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { Empty } from 'antd';
+import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 
+import SkeletonTable from '@/components/ui/SkeletonTable';
+
 import { Checkbox } from './checkbox';
-import SkeletonTable from './SkeletonTable';
 
 export default function DataTable({
   columns = [],
@@ -26,7 +28,6 @@ export default function DataTable({
   const isLarge = size === 'large';
 
   const headerPadding = isSmall ? 'py-3' : isLarge ? 'py-6' : 'py-5';
-  const rowHeight = isSmall ? 'h-[48px]' : isLarge ? 'h-[80px]' : 'h-[64px]';
   const cellPadding = isSmall ? 'py-2' : isLarge ? 'py-5' : 'py-3.5';
   const handleSort = (columnKey) => {
     if (!onSort || !columnKey) return;
@@ -224,3 +225,34 @@ export default function DataTable({
     </div>
   );
 }
+
+DataTable.propTypes = {
+  columns: PropTypes.arrayOf(
+    PropTypes.shape({
+      title: PropTypes.node.isRequired,
+      key: PropTypes.string,
+      sortKey: PropTypes.string,
+      width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      align: PropTypes.oneOf(['left', 'center', 'right']),
+      className: PropTypes.string,
+      render: PropTypes.func,
+      sorter: PropTypes.bool,
+    })
+  ),
+  data: PropTypes.array,
+  loading: PropTypes.bool,
+  emptyText: PropTypes.node,
+  minWidth: PropTypes.string,
+  rowKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+  onRowClick: PropTypes.func,
+  className: PropTypes.string,
+  sortBy: PropTypes.string,
+  sortOrder: PropTypes.oneOf(['Asc', 'Desc']),
+  onSort: PropTypes.func,
+  rowSelection: PropTypes.shape({
+    selectedRowKeys: PropTypes.array,
+    onChange: PropTypes.func,
+    getCheckboxProps: PropTypes.func,
+  }),
+  size: PropTypes.oneOf(['small', 'middle', 'large']),
+};

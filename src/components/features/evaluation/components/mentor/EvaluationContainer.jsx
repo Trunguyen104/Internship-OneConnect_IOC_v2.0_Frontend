@@ -4,7 +4,6 @@ import { Empty, Spin } from 'antd';
 import React from 'react';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-import { UI_TEXT } from '@/lib/UI_Text';
 
 import useEvaluationGroups from '../../hooks/useEvaluationGroups';
 import MentorEvaluationPage from './MentorEvaluationPage';
@@ -52,7 +51,7 @@ export default function EvaluationContainer() {
                   : LABELS.SELECT_GROUP_PROMPT}
             </h3>
             <p className="text-sm font-medium text-muted/60 max-w-sm">
-              {UI_TEXT.EVALUATION.EMPTY_STATE_DESC}
+              {LABELS.SELECT_GROUP_PROMPT_DETAIL}
             </p>
           </div>
         ) : (

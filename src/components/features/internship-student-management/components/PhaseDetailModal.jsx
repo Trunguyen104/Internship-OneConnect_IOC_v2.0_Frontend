@@ -93,7 +93,7 @@ const PhaseDetailModal = ({ open, phase, onCancel }) => {
               <InfoRow
                 icon={<UsergroupAddOutlined />}
                 label={PHASE_DETAIL.MAX_STUDENTS}
-                value={phase.maxStudents ?? '—'}
+                value={phase.maxStudents ?? 'â€”'}
               />
               <InfoRow
                 icon={<CalendarOutlined />}

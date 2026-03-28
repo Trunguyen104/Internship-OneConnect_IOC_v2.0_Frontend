@@ -76,7 +76,7 @@ export default function CreateTaskModal({
     <CompoundModal open={open} onCancel={handleClose} width={1200}>
       <CompoundModal.Header
         title={BACKLOG_UI.MODAL_CREATE_TASK}
-        subtitle="Khởi tạo công việc mới và thiết lập các thông tin chi tiết cho kế hoạch sprint"
+        subtitle={BACKLOG_UI.MODAL_CREATE_TASK_SUBTITLE}
         icon={<PlusCircleOutlined />}
       />
 

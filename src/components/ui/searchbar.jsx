@@ -1,6 +1,7 @@
 'use client';
 
 import { FilterOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -54,3 +55,15 @@ export default function SearchBar({
     </div>
   );
 }
+
+SearchBar.propTypes = {
+  placeholder: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  width: PropTypes.string,
+  showFilter: PropTypes.bool,
+  onFilterClick: PropTypes.func,
+  showAction: PropTypes.bool,
+  actionLabel: PropTypes.node,
+  onActionClick: PropTypes.func,
+};

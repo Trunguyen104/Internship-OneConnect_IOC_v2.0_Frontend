@@ -1,4 +1,4 @@
-import { violationReportService } from './violationReportService';
+import { violationReportService } from './violation-report.service';
 
 export const ViolationService = {
   getAll: (params) => violationReportService.getReports(params),

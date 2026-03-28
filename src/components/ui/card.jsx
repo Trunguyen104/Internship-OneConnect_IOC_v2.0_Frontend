@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import { cn } from '@/lib/cn';
 
 function CardRoot({ children, className = '', ...props }) {
@@ -12,6 +14,11 @@ function CardRoot({ children, className = '', ...props }) {
   );
 }
 
+CardRoot.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
 function CardHeader({ children, className = '', ...props }) {
   return (
     <div
@@ -23,6 +30,11 @@ function CardHeader({ children, className = '', ...props }) {
     </div>
   );
 }
+
+CardHeader.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
 
 function CardTitle({ children, className = '', ...props }) {
   return (
@@ -36,6 +48,11 @@ function CardTitle({ children, className = '', ...props }) {
   );
 }
 
+CardTitle.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
 function CardDescription({ children, className = '', ...props }) {
   return (
     <div
@@ -48,6 +65,11 @@ function CardDescription({ children, className = '', ...props }) {
   );
 }
 
+CardDescription.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
 function CardAction({ children, className = '', ...props }) {
   return (
     <div data-slot="card-action" className={cn('shrink-0', className)} {...props}>
@@ -56,6 +78,11 @@ function CardAction({ children, className = '', ...props }) {
   );
 }
 
+CardAction.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+
 function CardContent({ children, className = '', ...props }) {
   return (
     <div data-slot="card-content" className={cn('min-h-0 flex-1', className)} {...props}>
@@ -63,6 +90,11 @@ function CardContent({ children, className = '', ...props }) {
     </div>
   );
 }
+
+CardContent.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
 
 function CardFooter({ children, className = '', ...props }) {
   return (
@@ -75,6 +107,11 @@ function CardFooter({ children, className = '', ...props }) {
     </div>
   );
 }
+
+CardFooter.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
 
 const Card = Object.assign(CardRoot, {
   Header: CardHeader,

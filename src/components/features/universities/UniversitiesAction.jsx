@@ -51,7 +51,7 @@ export default function UniversitiesAction({ university }) {
               {UI_TEXT.BUTTON.DELETE}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-widest text-rose-400">
-              {UI_TEXT.UNIVERSITIES.DELETE_DESC}
+              {UI_TEXT.UNIVERSITIES.IRREVERSIBLE}
             </span>
           </div>
         </div>

@@ -1,4 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
@@ -18,76 +21,8 @@ export const useEnterpriseGroups = ({
 }) => {
   const toast = useToast();
 
-  const [data, setData] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-
-  /**
-   * Fetch Groups
-   */
-  const fetchGroups = useCallback(async () => {
-    if (phaseId === undefined || phaseId === null) return;
-
-    try {
-      setLoading(true);
-
-      const isBulkPhase = phaseId === 'ALL_VISIBLE';
-
-      const params = {
-        PhaseId: isBulkPhase ? undefined : phaseId,
-        PageIndex: isBulkPhase ? 1 : pagination?.current || 1,
-        PageSize: isBulkPhase ? 1000 : pagination?.pageSize || 10,
-        SearchTerm: search || undefined,
-        Status: filters?.status,
-        IncludeArchived: filters?.includeArchived,
-        SortColumn: sort?.column,
-        SortOrder: sort?.order,
-      };
-
-      const response = await EnterpriseGroupService.getGroups(params);
-
-      const items = response?.data?.items || response?.items || [];
-
-      const mapped = items.map((item) => {
-        const itemPhaseId = item.phaseId || item.termId || item.internshipPhaseId;
-        const phaseMatch = phaseOptions.find(
-          (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
-        );
-
-        let s = item.status;
-        if (typeof s === 'string') {
-          const statusMap = { active: 1, finished: 2, archived: 3 };
-          s = statusMap[s.toLowerCase()] || s;
-        }
-
-        return {
-          ...item,
-          status: s,
-          id: item.internshipId || item.groupId || item.internshipGroupId || item.id,
-          name: item.groupName || item.GroupName || item.name || item.Name,
-          memberCount: item.numberOfMembers ?? item.numberOfMembers ?? item.memberCount ?? 0,
-          mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
-          phaseName:
-            item.phaseName ||
-            item.phase?.name ||
-            item.termName ||
-            phaseMatch?.label ||
-            phaseMatch?.name ||
-            '-',
-        };
-      });
-
-      setData(mapped);
-      setTotal(isBulkPhase ? mapped.length : response?.data?.total || mapped.length);
-    } catch (error) {
-      console.error(error);
-      toast.error(ENTERPRISE_GROUP_UI.MESSAGES.ERROR);
-      setData([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [
+  const queryKey = [
+    'enterprise-groups',
     phaseId,
     pagination?.current,
     pagination?.pageSize,
@@ -96,23 +31,81 @@ export const useEnterpriseGroups = ({
     filters?.includeArchived,
     sort?.column,
     sort?.order,
-    phaseOptions,
-    toast,
-  ]);
+  ];
 
-  /**
-   * Auto fetch when dependency changes
-   */
-  useEffect(() => {
-    fetchGroups();
-  }, [fetchGroups]);
+  const {
+    data: queryResult,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      if (phaseId === undefined || phaseId === null) return { items: [], total: 0 };
+
+      try {
+        const isBulkPhase = phaseId === 'ALL_VISIBLE';
+
+        const params = {
+          PhaseId: isBulkPhase ? undefined : phaseId,
+          TermId: isBulkPhase ? undefined : phaseId,
+          PageIndex: isBulkPhase ? 1 : pagination?.current || 1,
+          PageSize: isBulkPhase ? 1000 : pagination?.pageSize || 10,
+          Search: search || undefined,
+          Status: filters?.status,
+          IncludeArchived: filters?.includeArchived,
+          SortColumn: sort?.column,
+          SortOrder: sort?.order,
+        };
+
+        const response = await EnterpriseGroupService.getGroups(params);
+        const items = response?.data?.items || response?.items || [];
+        const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
+
+        const mapped = Array.isArray(items)
+          ? items.map((item) => {
+              const itemPhaseId = item.phaseId || item.termId || item.internshipPhaseId;
+              const phaseMatch = safePhaseOptions.find(
+                (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
+              );
+
+              return {
+                ...item,
+                id: item.internshipId || item.groupId || item.internshipGroupId || item.id,
+                name: item.groupName || item.GroupName || item.name || item.Name,
+                memberCount: item.numberOfMembers ?? item.memberCount ?? 0,
+                mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
+                phaseName:
+                  item.phaseName ||
+                  item.phase?.name ||
+                  item.termName ||
+                  phaseMatch?.label ||
+                  phaseMatch?.name ||
+                  '-',
+              };
+            })
+          : [];
+
+        return {
+          items: mapped,
+          total: isBulkPhase ? mapped.length : response?.data?.total || mapped.length,
+        };
+      } catch (error) {
+        console.error(error);
+        toast.error(ENTERPRISE_GROUP_UI.MESSAGES.ERROR);
+        return { items: [], total: 0 };
+      }
+    },
+    enabled: phaseId !== undefined && phaseId !== null,
+    staleTime: 5 * 60 * 1000,
+  });
 
   /**
    * Refresh event (after create/update/delete group)
+   * Giữ nguyên để component cha không bị ảnh hưởng
    */
   useEffect(() => {
     const handleRefresh = () => {
-      fetchGroups();
+      refetch();
     };
 
     window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
@@ -123,12 +116,12 @@ export const useEnterpriseGroups = ({
         handleRefresh
       );
     };
-  }, [fetchGroups]);
+  }, [refetch]);
 
   return {
-    data,
-    total,
-    loading,
-    refetch: fetchGroups,
+    data: queryResult?.items || [],
+    total: queryResult?.total || 0,
+    loading: isLoading,
+    refetch,
   };
 };

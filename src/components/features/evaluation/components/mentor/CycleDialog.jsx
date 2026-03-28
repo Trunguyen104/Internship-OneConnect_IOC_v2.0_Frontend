@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import CompoundModal from '@/components/ui/CompoundModal';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-import { UI_TEXT } from '@/lib/UI_Text';
 
 export default function CycleDialog({
   open,
@@ -60,7 +59,7 @@ export default function CycleDialog({
       title={
         <div className="flex flex-col gap-1 pr-10">
           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-            {UI_TEXT.EVALUATION.CYCLE_TITLE}
+            {LABELS.CYCLE_TITLE}
           </span>
           <span className="text-xl font-black text-text tracking-tight">
             {initialData ? BUTTONS.EDIT : BUTTONS.CREATE_CYCLE}
@@ -118,7 +117,7 @@ export default function CycleDialog({
                 setFormData({ ...formData, startDate: iso });
               }}
               format="DD/MM/YYYY"
-              placeholder="Pick Start Date"
+              placeholder={LABELS.PICK_START}
               suffixIcon={null}
             />
           </div>
@@ -139,7 +138,7 @@ export default function CycleDialog({
                 setFormData({ ...formData, endDate: iso });
               }}
               format="DD/MM/YYYY"
-              placeholder="Pick End Date"
+              placeholder={LABELS.PICK_END}
               suffixIcon={null}
             />
           </div>

@@ -1,8 +1,10 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useRef, useState } from 'react';
 
 import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/common/enums';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
@@ -15,12 +17,7 @@ import { useTermModals } from './useTermModals';
 
 export const useTermManagement = () => {
   const toast = useToast();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [universities, setUniversities] = useState([]);
-  const [userUniversity, setUserUniversity] = useState(null);
   const knownVersions = useRef({});
 
   const {
@@ -50,103 +47,106 @@ export const useTermManagement = () => {
     handleRequestChangeStatus,
   } = useTermModals();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {
-        pageNumber: pagination.current,
-        pageSize: pagination.pageSize,
-        searchTerm: searchTerm || undefined,
-        status: statusFilter ?? undefined,
-        sortColumn: sortConfig.column,
-        sortOrder: sortConfig.order,
-      };
+  // 1. Fetch User Role and Universities
+  const { data: roleData = { isSuperAdmin: false, universities: [], userUniversity: null } } =
+    useQuery({
+      queryKey: ['term-management-role-context'],
+      queryFn: async () => {
+        try {
+          const res = await userService.getMe();
+          const userData = res?.data || res;
+          const role = userData?.role;
+          const superAdmin =
+            role === USER_ROLE.SUPER_ADMIN || String(role).toLowerCase() === 'superadmin';
 
-      const response = await TermService.getAll(params);
+          let universities = [];
+          let userUniversity = null;
 
-      if (response?.data) {
-        // Apply version syncing if missing in list
-        const items = (response.data.items || []).map((item) => ({
-          ...item,
-          version: item.version || knownVersions.current[item.termId] || 1,
-        }));
+          if (superAdmin) {
+            const uniRes = await universityService.getAll({ pageNumber: 1, pageSize: 100 });
+            universities = uniRes?.data?.items || [];
+          } else {
+            const uniId = userData?.universityId || userData?.university?.id;
+            const uniName = userData?.universityName || userData?.university?.name;
+            userUniversity = { id: uniId, name: uniName };
 
-        setData(items);
-        setPagination((prev) => ({
-          ...prev,
-          total: response.data.totalCount || 0,
-        }));
-      }
-    } catch (error) {
-      toast.error(
-        getErrorDetail(
-          error,
-          INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR
-        )
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    pagination.current,
-    pagination.pageSize,
-    sortConfig,
-    searchTerm,
-    statusFilter,
-    toast,
-    setPagination,
-  ]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  useEffect(() => {
-    const checkRoleAndFetchUniversities = async () => {
-      try {
-        const res = await userService.getMe();
-        const userData = res?.data || res;
-        const role = userData?.role;
-        const superAdmin =
-          role === USER_ROLE.SUPER_ADMIN || String(role).toLowerCase() === 'superadmin';
-        setIsSuperAdmin(superAdmin);
-
-        if (superAdmin) {
-          const uniRes = await universityService.getAll({ pageNumber: 1, pageSize: 100 });
-          setUniversities(uniRes?.data?.items || []);
-        } else {
-          // Robust check for universityId and universityName
-          const uniId = userData?.universityId || userData?.university?.id;
-          const uniName = userData?.universityName || userData?.university?.name;
-
-          setUserUniversity({
-            id: uniId,
-            name: uniName,
-          });
-
-          // If we have an ID but no name, attempt to fetch it for clear UI display
-          if (uniId && !uniName) {
-            universityService
-              .getById(uniId)
-              .then((res) => {
-                if (res?.data?.name) {
-                  setUserUniversity({ id: uniId, name: res.data.name });
-                }
-              })
-              .catch(() => {});
+            if (uniId && !uniName) {
+              try {
+                const res = await universityService.getById(uniId);
+                if (res?.data?.name) userUniversity.name = res.data.name;
+              } catch (err) {}
+            }
           }
+          return { isSuperAdmin: superAdmin, universities, userUniversity };
+        } catch (err) {
+          return { isSuperAdmin: false, universities: [], userUniversity: null };
         }
+      },
+      staleTime: Infinity,
+    });
+
+  const { isSuperAdmin, universities, userUniversity } = roleData;
+
+  // 2. Fetch Terms List
+  const {
+    data: termsResult = { items: [], totalCount: 0 },
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      'terms-list',
+      pagination.current,
+      pagination.pageSize,
+      searchTerm,
+      statusFilter,
+      sortConfig,
+    ],
+    queryFn: async () => {
+      try {
+        const params = {
+          pageNumber: pagination.current,
+          pageSize: pagination.pageSize,
+          searchTerm: searchTerm || undefined,
+          status: statusFilter ?? undefined,
+          sortColumn: sortConfig.column,
+          sortOrder: sortConfig.order,
+        };
+
+        const response = await TermService.getAll(params);
+        if (response?.data) {
+          const items = (response.data.items || []).map((item) => ({
+            ...item,
+            version: item.version || knownVersions.current[item.termId] || 1,
+          }));
+
+          setPagination((prev) => ({
+            ...prev,
+            total: response.data.totalCount || 0,
+          }));
+
+          return {
+            items,
+            totalCount: response.data.totalCount || 0,
+          };
+        }
+        return { items: [], totalCount: 0 };
       } catch (error) {
-        if (error?.status === 401 || error?.silent) return;
-        console.error('Failed to fetch user role or universities:', error);
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR
+          )
+        );
+        throw error;
       }
-    };
-    checkRoleAndFetchUniversities();
-  }, []);
+    },
+    staleTime: 2 * 60 * 1000,
+  });
 
   const handleEdit = useCallback(
     async (record) => {
       try {
+        setSubmitLoading(true);
         const [termRes, enrollmentRes] = await Promise.all([
           TermService.getById(record.termId),
           StudentService.getAll(record.termId, { pageSize: 1 }),
@@ -160,14 +160,14 @@ export const useTermManagement = () => {
           openFormModal(detailData, false);
         }
       } catch (error) {
-        if (error?.status === 401 || error?.silent) return;
-        console.error('GetTermById failed:', error);
         toast.error(
           getErrorDetail(
             error,
             INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR
           )
         );
+      } finally {
+        setSubmitLoading(false);
       }
     },
     [openFormModal, toast]
@@ -176,6 +176,7 @@ export const useTermManagement = () => {
   const handleView = useCallback(
     async (record) => {
       try {
+        setSubmitLoading(true);
         const [termRes, enrollmentRes] = await Promise.all([
           TermService.getById(record.termId),
           StudentService.getAll(record.termId, { pageSize: 1 }),
@@ -189,14 +190,14 @@ export const useTermManagement = () => {
           openFormModal(detailData, true);
         }
       } catch (error) {
-        if (error?.status === 401 || error?.silent) return;
-        console.error('GetTermById (View) failed:', error);
         toast.error(
           getErrorDetail(
             error,
             INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR
           )
         );
+      } finally {
+        setSubmitLoading(false);
       }
     },
     [openFormModal, toast]
@@ -211,7 +212,7 @@ export const useTermManagement = () => {
       await TermService.delete(record.termId);
       toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_SUCCESS);
       setDeleteModalState({ open: false, record: null });
-      fetchData();
+      refetch();
     } catch (error) {
       toast.error(
         getErrorDetail(
@@ -222,7 +223,7 @@ export const useTermManagement = () => {
     } finally {
       setSubmitLoading(false);
     }
-  }, [deleteModalState, fetchData, toast, setDeleteModalState]);
+  }, [deleteModalState, refetch, toast, setDeleteModalState]);
 
   const handleChangeStatus = useCallback(
     async (reason) => {
@@ -240,16 +241,11 @@ export const useTermManagement = () => {
 
         if (response?.data) {
           knownVersions.current[record.termId] = response.data.version;
-          setData((prev) =>
-            prev.map((item) =>
-              item.termId === record.termId ? { ...item, ...response.data } : item
-            )
-          );
         }
 
         toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.STATUS_SUCCESS);
         setStatusModalState({ open: false, record: null, newStatus: null });
-        fetchData();
+        refetch();
       } catch (error) {
         toast.error(
           getErrorDetail(
@@ -261,7 +257,7 @@ export const useTermManagement = () => {
         setSubmitLoading(false);
       }
     },
-    [statusModalState, fetchData, toast, setStatusModalState]
+    [statusModalState, refetch, toast, setStatusModalState]
   );
 
   const handleSaveModal = useCallback(
@@ -292,9 +288,6 @@ export const useTermManagement = () => {
 
           if (response?.data) {
             knownVersions.current[termId] = response.data.version;
-            setData((prev) =>
-              prev.map((item) => (item.termId === termId ? { ...item, ...response.data } : item))
-            );
           }
           toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.UPDATE_SUCCESS);
         } else {
@@ -306,7 +299,7 @@ export const useTermManagement = () => {
         }
 
         setModalVisible(false);
-        fetchData();
+        refetch();
       } catch (error) {
         toast.error(
           getErrorDetail(
@@ -318,11 +311,11 @@ export const useTermManagement = () => {
         setSubmitLoading(false);
       }
     },
-    [editingRecord, fetchData, toast, setModalVisible, isSuperAdmin]
+    [editingRecord, refetch, toast, setModalVisible, isSuperAdmin]
   );
 
   return {
-    data,
+    data: termsResult.items,
     loading,
     searchTerm,
     statusFilter,
@@ -353,5 +346,6 @@ export const useTermManagement = () => {
     isSuperAdmin,
     universities,
     userUniversity,
+    fetchData: refetch,
   };
 };

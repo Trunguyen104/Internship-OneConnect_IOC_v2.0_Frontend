@@ -1,11 +1,12 @@
 'use client';
 
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import React from 'react';
 
 import { Button } from '@/components/ui/button';
+import { COMMON_UI } from '@/constants/common/ui-text';
 import { cn } from '@/lib/cn';
 import { mapBackendError } from '@/lib/error-handler';
-import { UI_TEXT } from '@/lib/UI_Text';
 
 /**
  * ErrorState Component
@@ -20,8 +21,8 @@ export function ErrorState({
   variant = 'default', // 'default' | 'card'
 }) {
   const mapped = mapBackendError(error);
-  const finalTitle = title || mapped?.title || 'An error occurred';
-  const finalDesc = description || mapped?.message || 'We could not complete your request.';
+  const finalTitle = title || mapped?.title || COMMON_UI.LABELS.ERROR_OCCURRED;
+  const finalDesc = description || mapped?.message || COMMON_UI.LABELS.DEFAULT_ERROR_MESSAGE;
 
   return (
     <div
@@ -51,7 +52,7 @@ export function ErrorState({
           className="group h-12 rounded-full border-none bg-rose-600 px-8 font-bold text-white shadow-lg shadow-rose-200 hover:bg-rose-700 active:scale-95 transition-all"
         >
           <RefreshCw className="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
-          {UI_TEXT.BUTTON.TRY_AGAIN}
+          {COMMON_UI.LABELS.TRY_AGAIN}
         </Button>
       )}
     </div>

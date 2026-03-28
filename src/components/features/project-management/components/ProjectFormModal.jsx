@@ -218,7 +218,7 @@ export default function ProjectFormModal({
       footer={
         !viewOnly && (
           <div className="flex justify-between px-4 py-2">
-            <Button onClick={handleModalClose}>{FORM.CANCEL || 'Cancel'}</Button>
+            <Button onClick={onCancel}>{FORM.CANCEL_BTN}</Button>
             <Space>
               <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
                 {editingRecord ? FORM.SAVE_CHANGES || 'Save Changes' : FORM.PUBLISH || 'Save'}

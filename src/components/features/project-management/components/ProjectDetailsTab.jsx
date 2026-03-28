@@ -15,14 +15,7 @@ import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 
-export default function ProjectDetailsTab({
-  currentProject,
-  DETAIL,
-  FORM,
-  PROJECT_STATUS,
-  isHR,
-  onAssign,
-}) {
+export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, onAssign }) {
   return (
     <div className="space-y-6 pt-4">
       <section>
@@ -34,7 +27,7 @@ export default function ProjectDetailsTab({
         </p>
       </section>
 
-      <Card className="!min-h-0 border-none shadow-none bg-slate-50 p-4">
+      <Card className="min-h-0! border-none shadow-none bg-slate-50 p-4">
         <div className="flex flex-wrap gap-x-8 gap-y-6">
           <section className="min-w-[120px]">
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">

@@ -1,6 +1,7 @@
 'use client';
 
 import { Input as AntdInput } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
@@ -37,6 +38,14 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, ...pro
 });
 
 Input.displayName = 'Input';
+
+Input.propTypes = {
+  className: PropTypes.string,
+  type: PropTypes.string,
+  label: PropTypes.node,
+  error: PropTypes.node,
+  required: PropTypes.bool,
+};
 
 export { Input };
 export default Input;

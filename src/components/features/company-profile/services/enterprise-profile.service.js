@@ -1,6 +1,6 @@
 'use client';
 
-import { httpGet, httpPut } from '@/services/httpClient';
+import { httpGet, httpPut } from '@/services/http-client.service';
 
 export function getEnterpriseById(enterpriseId) {
   return httpGet(`/enterprises/${enterpriseId}`);

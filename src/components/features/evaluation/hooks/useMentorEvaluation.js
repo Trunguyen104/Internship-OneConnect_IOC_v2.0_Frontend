@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
@@ -9,75 +10,70 @@ import { EvaluationService } from '../services/evaluation.service';
 
 export function useMentorEvaluation(internshipId, termId) {
   const toast = useToast();
+  const queryClient = useQueryClient();
   const { MESSAGES } = EVALUATION_UI;
 
-  // --- Cycles ---
-  const [cycles, setCycles] = useState([]);
-  const [loadingCycles, setLoadingCycles] = useState(false);
   const [selectedCycle, setSelectedCycle] = useState(null);
 
-  // --- Criteria ---
-  const [criteria, setCriteria] = useState([]);
-  const [loadingCriteria, setLoadingCriteria] = useState(false);
-
-  // --- Grading ---
-  const [gradingData, setGradingData] = useState({
-    criteria: [],
-    students: [],
+  // 1. Fetch Cycles
+  const {
+    data: cycles = [],
+    isLoading: loadingCycles,
+    refetch: refetchCycles,
+  } = useQuery({
+    queryKey: ['evaluation-cycles-mentor', termId],
+    queryFn: async () => {
+      try {
+        const res = await EvaluationService.getCycles(termId);
+        return res?.data?.items || res?.data || [];
+      } catch (err) {
+        toast.error(MESSAGES.FETCH_ERROR);
+        throw err;
+      }
+    },
+    enabled: !!termId,
+    staleTime: 5 * 60 * 1000,
   });
-  const [loadingGrading, setLoadingGrading] = useState(false);
 
-  const fetchCycles = useCallback(async () => {
-    if (!termId) return;
-
-    try {
-      setLoadingCycles(true);
-      const res = await EvaluationService.getCycles(termId);
-      setCycles(res?.data?.items || res?.data || []);
-    } catch {
-      toast.error(MESSAGES.FETCH_ERROR);
-    } finally {
-      setLoadingCycles(false);
-    }
-  }, [termId, toast, MESSAGES.FETCH_ERROR]);
-
-  const fetchCriteria = useCallback(
-    async (cycleId) => {
-      if (!cycleId) return;
-
+  // 2. Fetch Criteria
+  const {
+    data: criteria = [],
+    isLoading: loadingCriteria,
+    refetch: refetchCriteria,
+  } = useQuery({
+    queryKey: ['evaluation-criteria', selectedCycle?.cycleId],
+    queryFn: async () => {
       try {
-        setLoadingCriteria(true);
-        const res = await EvaluationService.getCriteria(cycleId);
-        setCriteria(res?.data?.items || res?.data || []);
-      } catch {
+        const res = await EvaluationService.getCriteria(selectedCycle.cycleId);
+        return res?.data?.items || res?.data || [];
+      } catch (err) {
         toast.error(MESSAGES.FETCH_ERROR);
-      } finally {
-        setLoadingCriteria(false);
+        throw err;
       }
     },
-    [toast, MESSAGES.FETCH_ERROR]
-  );
+    enabled: !!selectedCycle?.cycleId,
+    staleTime: 5 * 60 * 1000,
+  });
 
-  const fetchGradingGrid = useCallback(
-    async (cycleId) => {
-      if (!cycleId || !internshipId) return;
-
+  // 3. Fetch Grading Grid
+  const {
+    data: gradingData = { criteria: [], students: [] },
+    isLoading: loadingGrading,
+    refetch: refetchGrading,
+  } = useQuery({
+    queryKey: ['evaluation-grading-grid', selectedCycle?.cycleId, internshipId],
+    queryFn: async () => {
       try {
-        setLoadingGrading(true);
-        const res = await EvaluationService.getGradingGrid(cycleId, internshipId);
-        setGradingData(res?.data || { criteria: [], students: [] });
-      } catch {
+        const res = await EvaluationService.getGradingGrid(selectedCycle.cycleId, internshipId);
+        return res?.data || { criteria: [], students: [] };
+      } catch (err) {
         toast.error(MESSAGES.FETCH_ERROR);
-      } finally {
-        setLoadingGrading(false);
+        throw err;
       }
     },
-    [internshipId, toast, MESSAGES.FETCH_ERROR]
-  );
-
-  useEffect(() => {
-    if (termId) fetchCycles();
-  }, [termId, fetchCycles]);
+    enabled: !!selectedCycle?.cycleId && !!internshipId,
+    staleTime: 2 * 60 * 1000,
+  });
 
   // =========================
   // 🎯 CYCLE ACTIONS
@@ -90,7 +86,7 @@ export function useMentorEvaluation(internshipId, termId) {
         termId,
       });
       toast.success(MESSAGES.CREATE_SUCCESS);
-      fetchCycles();
+      refetchCycles();
       return true;
     } catch (error) {
       if (error.status === 409) {
@@ -106,7 +102,7 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.updateCycle(cycleId, data);
       toast.success(MESSAGES.UPDATE_SUCCESS);
-      fetchCycles();
+      refetchCycles();
       return true;
     } catch (error) {
       if (error.status === 409) {
@@ -122,7 +118,7 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.deleteCycle(cycleId);
       toast.success(MESSAGES.DELETE_SUCCESS);
-      fetchCycles();
+      refetchCycles();
       return true;
     } catch (error) {
       toast.error(error.message || MESSAGES.FETCH_ERROR);
@@ -134,7 +130,7 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.createCriteria(cycleId, data);
       toast.success(MESSAGES.CREATE_SUCCESS);
-      fetchCriteria(cycleId);
+      queryClient.invalidateQueries({ queryKey: ['evaluation-criteria', cycleId] });
       return true;
     } catch (error) {
       if (error.status === 409) {
@@ -148,10 +144,9 @@ export function useMentorEvaluation(internshipId, termId) {
 
   const handleUpdateCriteria = async (cycleId, criteriaId, data) => {
     try {
-      // FIX: chỉ truyền criteriaId
       await EvaluationService.updateCriteria(criteriaId, data);
       toast.success(MESSAGES.UPDATE_SUCCESS);
-      fetchCriteria(cycleId);
+      queryClient.invalidateQueries({ queryKey: ['evaluation-criteria', cycleId] });
       return true;
     } catch (error) {
       if (error.status === 409) {
@@ -167,7 +162,7 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.deleteCriteria(criteriaId);
       toast.success(MESSAGES.DELETE_SUCCESS);
-      fetchCriteria(cycleId);
+      queryClient.invalidateQueries({ queryKey: ['evaluation-criteria', cycleId] });
       return true;
     } catch (error) {
       toast.error(error.message || MESSAGES.FETCH_ERROR);
@@ -179,7 +174,9 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.batchGrade(cycleId, internshipId, data);
       toast.success(MESSAGES.GRADE_SUCCESS);
-      fetchGradingGrid(cycleId);
+      queryClient.invalidateQueries({
+        queryKey: ['evaluation-grading-grid', cycleId, internshipId],
+      });
       return true;
     } catch (error) {
       toast.error(error.message || MESSAGES.VALIDATION_ERROR);
@@ -191,7 +188,9 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.submitEvaluations(cycleId, internshipId, data);
       toast.success('Submitted successfully');
-      fetchGradingGrid(cycleId);
+      queryClient.invalidateQueries({
+        queryKey: ['evaluation-grading-grid', cycleId, internshipId],
+      });
       return true;
     } catch (error) {
       toast.error(error.message || MESSAGES.FETCH_ERROR);
@@ -203,7 +202,9 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.publishEvaluations(cycleId, internshipId, data);
       toast.success(MESSAGES.PUBLISH_SUCCESS);
-      fetchGradingGrid(cycleId);
+      queryClient.invalidateQueries({
+        queryKey: ['evaluation-grading-grid', cycleId, internshipId],
+      });
       return true;
     } catch (error) {
       toast.error(error.message || MESSAGES.FETCH_ERROR);
@@ -216,15 +217,15 @@ export function useMentorEvaluation(internshipId, termId) {
     loadingCycles,
     selectedCycle,
     setSelectedCycle,
-    fetchCycles,
+    fetchCycles: refetchCycles,
 
     criteria,
     loadingCriteria,
-    fetchCriteria,
+    fetchCriteria: refetchCriteria,
 
     gradingData,
     loadingGrading,
-    fetchGradingGrid,
+    fetchGradingGrid: refetchGrading,
 
     handleCreateCycle,
     handleUpdateCycle,

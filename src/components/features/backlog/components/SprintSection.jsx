@@ -4,7 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { Button } from '@/components/ui/button';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { Dropdown } from '@/components/ui/dropdown';

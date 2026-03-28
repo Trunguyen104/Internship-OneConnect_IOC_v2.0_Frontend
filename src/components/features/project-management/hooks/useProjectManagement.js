@@ -1,16 +1,18 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useRef, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
+import { useToast } from '@/providers/ToastProvider';
 
-import { mapProjectsToFrontend } from '../services/project.mapper';
 import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
 import { useProjectFilters } from './useProjectFilters';
 import { useProjectModals } from './useProjectModals';
 
 export const useProjectManagement = () => {
+  const toast = useToast();
   const { userInfo } = useProfile();
 
   const r = userInfo?.roleId || userInfo?.RoleId || userInfo?.role || userInfo?.Role;
@@ -24,10 +26,6 @@ export const useProjectManagement = () => {
     roleName.includes('admin') ||
     roleName.includes('enterprise');
 
-  // --- Core Data State ---
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [groups, setGroups] = useState([]);
   const hasNotifiedOrphaned = useRef(false);
 
   // --- Specialized Hooks ---
@@ -61,121 +59,94 @@ export const useProjectManagement = () => {
   } = useProjectModals();
 
   // --- Data Fetching ---
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
 
-      const params = {
-        PageNumber: pagination.current,
-        PageSize: pagination.pageSize,
-        SearchTerm: searchTerm,
-        internshipId: groupIdFilter,
-        Status: statusFilter !== undefined ? statusFilter : undefined,
-        // AC-14: HR and Uni Admin only see Published (1)
-        Visibility: !isMentor ? 1 : visibilityFilter !== undefined ? visibilityFilter : undefined,
-        showArchived: showArchived,
-      };
-
-      const res = await ProjectService.getAll(params);
-      let items = res?.data?.items || [];
-
-      if (items) {
-        // AC-15 & AC-16: Normalize DTOs via Mapper
-        const normalizedItems = mapProjectsToFrontend(items);
-
-        // AC-01 Visibility Logic:
-        const finalItems = normalizedItems.filter((p) => {
-          const op = p.operationalStatus;
-          const vis = p.visibilityStatus;
-
-          // Rule: Hide archived unless toggled
-          const isArchived = op === 3;
-          if (!showArchived && isArchived) return false;
-
-          // AC-14: Strictly enforce Published for non-mentors on the frontend too
-          if (!isMentor && vis !== 1) return false;
-
-          // Rule: Visibility Filter (Manual)
-          if (isMentor && visibilityFilter !== undefined) {
-            if (vis !== visibilityFilter) return false;
-          }
-
-          // Rule: Status Filter (Manual)
-          if (statusFilter !== undefined) {
-            if (op !== statusFilter) return false;
-          }
-
-          return true;
-        });
-
-        setData(finalItems);
-        setPagination((prev) => ({
-          ...prev,
-          total: res?.data?.totalCount || finalItems.length,
-        }));
-
-        // AC-16: Notify Mentor about orphaned projects (once)
-        const orphanedList = finalItems.filter((p) => p.isOrphaned);
-        if (orphanedList.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
-          const firstName = orphanedList[0].projectName;
-          const message =
-            orphanedList.length === 1
-              ? PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_NOTIFY.replace(
-                  '{projectName}',
-                  firstName
-                )
-              : `Có ${orphanedList.length} dự án đã bị giải thể nhóm và chuyển về trạng thái Unstarted.`;
-
-          toast.warning(message, { duration: 10 });
-          hasNotifiedOrphaned.current = true;
-        }
-      }
-    } catch (err) {
-      console.error('Fetch Projects failed:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    searchTerm,
-    groupIdFilter,
-    statusFilter,
-    visibilityFilter,
-    showArchived,
-    pagination.current,
-    pagination.pageSize,
-    setPagination,
-    isMentor,
-    groups,
-  ]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const fetchSupportingData = useCallback(async () => {
-    try {
-      const res = await ProjectService.getGroupsForMentor();
-      if (res?.data?.items) {
-        // AC-01: Dropdown only shows Active groups managed by the mentor
-        setGroups(
-          res.data.items.filter(
+  // 1. Fetch Supporting Data (Groups)
+  const { data: groups = [] } = useQuery({
+    queryKey: ['groups-for-mentor'],
+    queryFn: async () => {
+      try {
+        const res = await ProjectService.getGroupsForMentor();
+        if (res?.data?.items) {
+          // AC-02: Only show Active groups (status 1)
+          return res.data.items.filter(
             (g) =>
               g.status === 1 ||
               g.groupStatus === 1 ||
               g.status === 'Active' ||
               g.groupStatus === 'Active'
-          )
-        );
+          );
+        }
+        return [];
+      } catch {
+        return [];
       }
-    } catch (err) {
-      console.error('Fetch Supporting Data failed:', err);
-    }
-  }, []);
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    fetchSupportingData();
-  }, [fetchSupportingData]);
+  // 2. Fetch Projects
+  const {
+    data: projectsResult,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      'projects',
+      searchTerm,
+      groupIdFilter,
+      statusFilter,
+      visibilityFilter,
+      showArchived,
+      pagination.current,
+      pagination.pageSize,
+    ],
+    queryFn: async () => {
+      try {
+        const params = {
+          PageNumber: pagination.current,
+          PageSize: pagination.pageSize,
+          SearchTerm: searchTerm,
+          internshipId: groupIdFilter,
+          Status: statusFilter,
+          // AC-14: HR and Uni Admin only see Published (1)
+          Visibility: !isMentor ? 1 : visibilityFilter !== undefined ? visibilityFilter : undefined,
+          showArchived: showArchived,
+        };
+        const res = await ProjectService.getAll(params);
+        if (res?.data?.items) {
+          // Update pagination total outside of render
+          setPagination((prev) => ({
+            ...prev,
+            total: res.data.totalCount || 0,
+          }));
 
+          // AC-16: Notify Mentor about orphaned projects (once)
+          const items = res.data.items;
+          const orphanedList = items.filter((p) => p.isOrphaned || p.isOrphan);
+          if (orphanedList.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
+            const firstName = orphanedList[0].projectName || orphanedList[0].name;
+            const message =
+              orphanedList.length === 1
+                ? PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_NOTIFY.replace(
+                    '{projectName}',
+                    firstName
+                  )
+                : `Có ${orphanedList.length} dự án đã bị giải thể nhóm và chuyển về trạng thái Unstarted.`;
+
+            toast.warning(message, { duration: 10 });
+            hasNotifiedOrphaned.current = true;
+          }
+
+          return items;
+        }
+        return [];
+      } catch (err) {
+        console.error('Fetch Projects failed:', err);
+        return [];
+      }
+    },
+    staleTime: 2 * 60 * 1000,
+  });
   const {
     submitLoading,
     handleSaveProject,
@@ -187,15 +158,17 @@ export const useProjectManagement = () => {
     handleDeleteProject,
   } = useProjectActions({
     editingRecord,
-    fetchData,
+    fetchData: refetch, // Use refetch from useQuery
     groups,
     setModalVisible,
     userInfo,
   });
 
+  const [actionLoading, setActionLoading] = useState(false);
+
   return {
-    data,
-    loading,
+    data: projectsResult || [],
+    loading: loading || actionLoading,
     searchTerm,
     groupIdFilter,
     statusFilter,
@@ -225,9 +198,9 @@ export const useProjectManagement = () => {
     handleUnpublishProject,
     handleArchiveProject,
     handleAssignGroup,
-    handleCompleteProject: (id) => handleCompleteProject(id, setLoading),
-    handleDeleteProject: (id) => handleDeleteProject(id, setLoading),
-    fetchData,
+    handleCompleteProject: (id) => handleCompleteProject(id, setActionLoading),
+    handleDeleteProject: (id) => handleDeleteProject(id, setActionLoading),
+    fetchData: refetch,
     userInfo,
     isMentor,
     isHR,
