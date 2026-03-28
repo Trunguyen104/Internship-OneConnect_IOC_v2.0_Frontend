@@ -33,7 +33,7 @@ export default function UniversitiesDeleteModal({ university, open, onOpenChange
     <CompoundModal open={open} onCancel={() => onOpenChange(false)} width={440}>
       <CompoundModal.Header
         title={UI_TEXT.COMMON.DELETE_CONFIRM || 'Confirm Deletion'}
-        subtitle={`This action will permanently remove ${university?.name} from the system. This cannot be undone.`}
+        subtitle={UI_TEXT.UNIVERSITIES.DELETE_SUBTITLE(university?.name)}
       />
 
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -41,10 +41,11 @@ export default function UniversitiesDeleteModal({ university, open, onOpenChange
           <Trash2 className="size-10" />
         </div>
         <h3 className="mt-6 text-xl font-black tracking-tight text-text">
-          Are you absolutely sure?
+          {UI_TEXT.UNIVERSITIES.DELETE_CONFIRM}
         </h3>
         <p className="mt-2 max-w-[280px] text-sm font-bold leading-relaxed text-muted/60">
-          You are about to delete <span className="text-rose-500">{university?.name}</span>.
+          {UI_TEXT.UNIVERSITIES.DELETE_WARNING}{' '}
+          <span className="text-rose-500">{university?.name}</span>.
         </p>
       </div>
 
