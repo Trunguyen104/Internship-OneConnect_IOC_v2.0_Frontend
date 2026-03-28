@@ -5,7 +5,7 @@ import { Empty, InputNumber, Table } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import SkeletonTable from '@/components/ui/skeletontable';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
 

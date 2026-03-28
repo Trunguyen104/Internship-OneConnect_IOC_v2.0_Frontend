@@ -5,7 +5,7 @@ import { Empty } from 'antd';
 import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 
-import SkeletonTable from '@/components/ui/skeletontable';
+import SkeletonTable from '@/components/ui/SkeletonTable';
 
 import { Checkbox } from './checkbox';
 
