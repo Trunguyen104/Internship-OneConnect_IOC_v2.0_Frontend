@@ -4,7 +4,6 @@ import {
   ArrowLeftOutlined,
   BankOutlined,
   BlockOutlined,
-  CalendarOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
   MailOutlined,
@@ -145,18 +144,6 @@ export default function GroupGeneralInfo({
 
               <div className="flex flex-col gap-1.5">
                 <span className="text-muted/60 text-[10px] font-bold uppercase tracking-widest ml-1">
-                  {VIEW.TERM}
-                </span>
-                <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold text-text shadow-sm min-h-[44px] flex items-center">
-                  <div className="flex items-center gap-2">
-                    <CalendarOutlined className="text-primary/40" />
-                    <span>{info.internshipTermName || '-'}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <span className="text-muted/60 text-[10px] font-bold uppercase tracking-widest ml-1">
                   {VIEW.PROJECT_NAME}
                 </span>
                 <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold text-text shadow-sm min-h-[44px] flex items-center">
@@ -173,38 +160,6 @@ export default function GroupGeneralInfo({
                 </span>
                 <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold text-text shadow-sm min-h-[44px] flex items-center text-xs truncate">
                   {info.enterpriseName || '-'}
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <span className="text-muted/60 text-[10px] font-bold uppercase tracking-widest ml-1">
-                  {VIEW.TIMELINE}
-                </span>
-                <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-[11px] font-bold text-text shadow-sm min-h-[44px] flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <CalendarOutlined className="text-muted/30" />
-                    <span>
-                      {info.startDate ? new Date(info.startDate).toLocaleDateString('en-GB') : '-'}
-                    </span>
-                  </div>
-                  <span className="text-muted/20 mx-1">→</span>
-                  <div className="flex items-center gap-1">
-                    <span>
-                      {info.endDate ? new Date(info.endDate).toLocaleDateString('en-GB') : '-'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <span className="text-muted/60 text-[10px] font-bold uppercase tracking-widest ml-1">
-                  {VIEW.HISTORY}
-                </span>
-                <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-[10px] font-semibold text-muted/60 shadow-sm min-h-[44px] flex flex-col justify-center">
-                  <span>
-                    {VIEW.CREATED_AT} {info.displayCreatedAt}
-                  </span>
-                  {info.displayUpdatedAt && <span>{info.displayUpdatedAt}</span>}
                 </div>
               </div>
             </div>
@@ -229,23 +184,25 @@ export default function GroupGeneralInfo({
         </div>
       </div>
 
-      {/* Student List Section */}
       <Card className="!p-6 border-none shadow-sm flex flex-col gap-6">
         <div className="flex items-center justify-between border-b border-slate-50 pb-4">
           <div className="flex items-center gap-2">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-text/80 mb-0">
               {VIEW.MEMBERS}
             </h3>
+          </div>
+          <div className="ml-5 flex flex-1">
             <Input
               placeholder="Search students..."
               allowClear
               prefix={<SearchOutlined className="text-muted/40 text-xs" />}
               size="small"
-              className="w-48 !rounded-full text-[11px] h-8 bg-slate-50 border-slate-100 hover:border-primary focus:border-primary transition-all shadow-sm"
+              className="w-48 !rounded-full max-w-[300px] text-[11px] h-8 bg-slate-50 border-slate-100 hover:border-primary focus:border-primary transition-all shadow-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100 shadow-sm whitespace-nowrap">
               {filteredMembers.length} {VIEW.STUDENTS_SUFFIX}

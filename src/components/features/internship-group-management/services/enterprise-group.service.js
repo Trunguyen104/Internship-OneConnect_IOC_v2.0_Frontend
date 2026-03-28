@@ -72,7 +72,7 @@ export const EnterpriseGroupService = {
   },
 
   async archiveGroup(id) {
-    return httpPatch(`${BASE_URL}/${id}/archive`);
+    return httpPatch(`${BASE_URL}/${id}/archive`, {});
   },
 
   async getPlacedStudents(params = {}) {

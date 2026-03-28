@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import {
   ApartmentOutlined,
@@ -14,6 +14,7 @@ import React from 'react';
 
 import CompoundModal from '@/components/ui/compoundmodal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const { Text } = Typography;
 
@@ -24,7 +25,7 @@ const InfoRow = ({ icon, label, value }) => (
       {label}
     </span>
     <div className="bg-bg border border-border rounded-xl px-3 py-2 text-sm font-medium text-text min-h-[36px] flex items-center">
-      {value ?? <span className="text-muted/30 text-xs">â€”</span>}
+      {value ?? <span className="text-muted/30 text-xs">{UI_TEXT.COMMON.EM_DASH}</span>}
     </div>
   </div>
 );

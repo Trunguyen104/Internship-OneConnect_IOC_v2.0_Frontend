@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
@@ -18,6 +19,8 @@ import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
 export const useGroupManagement = () => {
   const toast = useToast();
+  const searchParams = useSearchParams();
+  const urlGroupId = searchParams.get('groupId');
   const filters = useEnterpriseGroupFilters();
   const { MESSAGES } = ENTERPRISE_GROUP_UI;
 
@@ -29,7 +32,7 @@ export const useGroupManagement = () => {
         const res = await userService.getMe();
         const data = res?.data || res;
         return data?.enterpriseId || data?.enterprise_id || data?.enterpriseID;
-      } catch (err) {
+      } catch {
         return null;
       }
     },
@@ -67,7 +70,7 @@ export const useGroupManagement = () => {
         return Array.from(
           new Map(allItems.map((item) => [item?.userId || item?.UserId || item?.id, item])).values()
         ).filter(Boolean);
-      } catch (err) {
+      } catch {
         return [];
       }
     },
@@ -99,7 +102,7 @@ export const useGroupManagement = () => {
           const phase = filters.phaseOptions.find((p) => p.value === s.phaseId);
           return phase ? phase.status === 1 : false;
         });
-      } catch (err) {
+      } catch {
         return [];
       }
     },
@@ -117,7 +120,31 @@ export const useGroupManagement = () => {
   } = useEnterpriseGroupActions(refetch);
 
   const [selectedGroupDetail, setSelectedGroupDetail] = useState(null);
-  const router = useRouter();
+  const [isAutoSelecting, setIsAutoSelecting] = useState(!!urlGroupId);
+
+  // Handle auto-selection from URL
+  useEffect(() => {
+    if (urlGroupId) {
+      const fetchInitialGroup = async () => {
+        try {
+          setIsAutoSelecting(true);
+          const res = await EnterpriseGroupService.getGroupDetail(urlGroupId);
+          const rawData = res?.data || res;
+          if (rawData) {
+            setSelectedGroupDetail({
+              ...rawData,
+              id: rawData.id || rawData.internshipId || rawData.groupId || urlGroupId,
+            });
+          }
+        } catch (err) {
+          console.error('Failed to auto-select group from URL', err);
+        } finally {
+          setIsAutoSelecting(false);
+        }
+      };
+      fetchInitialGroup();
+    }
+  }, [urlGroupId]);
 
   const handleViewGroup = useCallback((group) => {
     setSelectedGroupDetail(group);
@@ -162,7 +189,7 @@ export const useGroupManagement = () => {
             await deleteGroup(group.id);
           },
         });
-      } catch (err) {
+      } catch {
         toast.error(MESSAGES.CHECK_DATA_ERROR);
       }
     },
@@ -241,7 +268,7 @@ export const useGroupManagement = () => {
               );
               if (student) {
                 toast.info(
-                  `${student.fullName || student.studentFullName} Ä‘Ã£ bá»‹ xÃ³a khá» i nhÃ³m. Sinh viÃªn khÃ´ng cÃ²n truy cáº­p Ä‘Æ°á»£c cÃ¡c dá»± Ã¡n cá»§a nhÃ³m.`,
+                  `${student.fullName || student.studentFullName} đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.`,
                   { duration: 5 }
                 );
               }
@@ -276,7 +303,7 @@ export const useGroupManagement = () => {
         }
 
         setEditModal({ open: false, group: null, isAddingStudents: false });
-      } catch (err) {
+      } catch {
         // Handled
       }
     },
@@ -297,7 +324,7 @@ export const useGroupManagement = () => {
             const success = await removeStudents(groupId, [studentId]);
             if (success) {
               toast.info(
-                'Sinh viÃªn Ä‘Ã£ bá»‹ xÃ³a khá» i nhÃ³m. Sinh viÃªn khÃ´ng cÃ²n truy cáº­p Ä‘Æ°á»£c cÃ¡c dá»± Ã¡n cá»§a nhÃ³m.',
+                'Sinh viên đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.',
                 { duration: 5 }
               );
 
@@ -307,7 +334,7 @@ export const useGroupManagement = () => {
             }
           },
         });
-      } catch (err) {
+      } catch {
         toast.error('Failed to remove student');
       }
     },
@@ -349,10 +376,11 @@ export const useGroupManagement = () => {
     isPhaseEditable:
       filters.phaseId === 'ALL_VISIBLE' ||
       (filters.phaseId &&
-        filters.phaseOptions.find((p) => p.value === filters.phaseId)?.status === 1),
+        [1, 2].includes(filters.phaseOptions.find((p) => p.value === filters.phaseId)?.status)),
     filters: filters.filters,
     handleFilterChange: filters.handleFilterChange,
     selectedGroupDetail,
     setSelectedGroupDetail,
+    isAutoSelecting,
   };
 };

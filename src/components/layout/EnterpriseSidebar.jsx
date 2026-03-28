@@ -4,6 +4,7 @@ import {
   BankOutlined,
   CalendarOutlined,
   DashboardOutlined,
+  ProjectOutlined,
   SolutionOutlined,
   TeamOutlined,
   WarningOutlined,
@@ -32,6 +33,11 @@ const enterpriseMenu = [
     icon: <SolutionOutlined />,
     label: 'Internship Management',
     href: '/internship-management',
+  },
+  {
+    icon: <ProjectOutlined />,
+    label: 'Project Management',
+    href: '/projects',
   },
   {
     icon: <WarningOutlined />,

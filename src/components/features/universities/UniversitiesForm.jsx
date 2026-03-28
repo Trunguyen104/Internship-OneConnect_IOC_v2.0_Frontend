@@ -20,12 +20,9 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
 
   const validate = (payload) => {
     const nextErrors = {};
-    if (!payload.name)
-      nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED || 'University name is required';
-    if (!payload.code)
-      nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED || 'University code is required';
-    if (!payload.address)
-      nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED || 'Address is required';
+    if (!payload.name) nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED;
+    if (!payload.code) nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED;
+    if (!payload.address) nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED;
     return nextErrors;
   };
 

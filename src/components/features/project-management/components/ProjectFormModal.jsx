@@ -1,28 +1,20 @@
 'use client';
 
-import { DeleteOutlined, LinkOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Col,
-  DatePicker,
-  Divider,
-  Drawer,
-  Form,
-  Input,
-  Row,
-  Select,
-  Space,
-  Upload,
-} from 'antd';
+import { Button, Drawer, Form, Space } from 'antd';
 import dayjs from 'dayjs';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
-import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
+import {
+  PROJECT_MANAGEMENT,
+  VISIBILITY_STATUS,
+} from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
-const { TextArea } = Input;
-const { Option } = Select;
+import { ProjectService } from '../services/project.service';
+import ProjectBasicInfoFields from './ProjectBasicInfoFields';
+import ProjectDescriptionFields from './ProjectDescriptionFields';
+import ProjectResourceFields from './ProjectResourceFields';
 
 export default function ProjectFormModal({
   visible,
@@ -47,46 +39,90 @@ export default function ProjectFormModal({
       .toUpperCase();
   }, [userInfo]);
 
+  const [dataLoading, setDataLoading] = useState(false);
+
   useEffect(() => {
+    const fetchDetail = async () => {
+      if (!visible || !editingRecord?.projectId) return;
+
+      try {
+        setDataLoading(true);
+        const res = await ProjectService.getById(editingRecord.projectId);
+        const fullRecord = res?.data || res;
+
+        if (fullRecord) {
+          const groupId = fullRecord.internshipId || fullRecord.internshipGroupId;
+          const isEmptyGuid = groupId === '00000000-0000-0000-0000-000000000000';
+
+          form.setFieldsValue({
+            ...fullRecord,
+            name: fullRecord.projectName || fullRecord.name,
+            code: fullRecord.projectCode || fullRecord.code,
+            internshipGroupId: isEmptyGuid ? null : groupId,
+            startDate: fullRecord.startDate ? dayjs(fullRecord.startDate) : null,
+            endDate: fullRecord.endDate ? dayjs(fullRecord.endDate) : null,
+            template:
+              typeof fullRecord.template === 'string'
+                ? FORM.TEMPLATE_MAP?.[fullRecord.template]
+                : fullRecord.template,
+            description: fullRecord.description || fullRecord.projectDescription,
+            requirements: fullRecord.requirements || fullRecord.technicalRequirements,
+            deliverables: fullRecord.deliverables || fullRecord.outcomes,
+            attachments: [
+              ...(fullRecord.resources?.attachments || []),
+              ...(fullRecord.projectResources || [])
+                .filter((r) => r.resourceType === 1)
+                .map((r) => ({
+                  uid: r.projectId + r.resourceName + r.resourceType,
+                  name: r.resourceName,
+                  status: 'done',
+                  url: r.resourceUrl,
+                })),
+            ],
+            links: [
+              ...(fullRecord.resources?.links || []),
+              ...(fullRecord.projectResources || [])
+                .filter((r) => r.resourceType === 10)
+                .map((r) => ({
+                  title: r.resourceName,
+                  url: r.resourceUrl,
+                })),
+            ],
+          });
+        }
+      } catch (err) {
+        toast.error(
+          PROJECT_MANAGEMENT.MESSAGES?.ERROR_FETCH_DETAIL || 'Failed to fetch project details'
+        );
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
     if (visible) {
       if (editingRecord) {
-        const groupId = editingRecord.internshipId || editingRecord.internshipGroupId;
-        const isEmptyGuid = groupId === '00000000-0000-0000-0000-000000000000';
-
-        form.setFieldsValue({
-          ...editingRecord,
-          name: editingRecord.projectName || editingRecord.name,
-          code: editingRecord.projectCode || editingRecord.code,
-          internshipGroupId: isEmptyGuid ? null : groupId,
-          startDate: editingRecord.startDate ? dayjs(editingRecord.startDate) : null,
-          endDate: editingRecord.endDate ? dayjs(editingRecord.endDate) : null,
-          attachments: editingRecord.resources?.attachments || [],
-          links: editingRecord.resources?.links || [],
-        });
+        fetchDetail();
       } else {
         form.resetFields();
       }
     }
-  }, [visible, editingRecord, form]);
+  }, [visible, editingRecord, form, FORM.TEMPLATE_MAP, toast]);
 
   const handleValuesChange = (changedValues, allValues) => {
-    // AC-02: Auto-generate project code: PRJ-[Enterprise]_[Term]_[Tên]
+    // 1. Auto-generate Code (New project only)
     if (!editingRecord && (changedValues.name || changedValues.internshipGroupId)) {
       const projectName = allValues.name || '';
       const groupId = allValues.internshipGroupId;
       const group = groups.find((g) => (g.internshipId || g.id) === groupId);
 
-      // Extract term from group name or metadata
       let termPart = 'TERM';
       if (group?.groupName) {
-        // Try to find Spring/Summer/Fall + year
         const termMatch = group.groupName.match(/(SPRING|SUMMER|FALL)\D*(\d{4})/i);
         if (termMatch) {
           termPart = `${termMatch[1].toUpperCase()}${termMatch[2]}`;
         }
       }
 
-      // Project Name initials or similar
       const namePart = projectName
         .trim()
         .split(' ')
@@ -100,51 +136,92 @@ export default function ProjectFormModal({
         });
       }
     }
+
+    // 2. Auto-set Dates from Intern Phase (AC-08)
+    if (changedValues.internshipGroupId) {
+      const groupId = changedValues.internshipGroupId;
+      const group = groups.find((g) => (g.internshipId || g.id) === groupId);
+      if (group?.startDate && group?.endDate) {
+        form.setFieldsValue({
+          startDate: dayjs(group.startDate),
+          endDate: dayjs(group.endDate),
+        });
+      }
+    }
+
+    // 3. Mark form as dirty (AC-08 optimization)
+    if (!viewOnly) {
+      const isActuallyDirty = Object.keys(changedValues).length > 0;
+      if (isActuallyDirty) {
+        form.setFieldsValue({ _isDirty: true });
+      }
+    }
   };
 
   const handleSubmit = (isDraft = true) => {
     form
       .validateFields()
       .then((values) => {
-        // Block saving if assigned group is archived (AC-11)
-        const selectedGroupId = values.internshipGroupId;
-        const selectedGroup = groups.find((g) => (g.internshipId || g.id) === selectedGroupId);
-        const groupStatus = selectedGroup?.status || selectedGroup?.groupStatus;
-        if (groupStatus === 3 || groupStatus === 2) {
-          // Archived or Finished
-          toast.warning(PROJECT_MANAGEMENT.MESSAGES.ERROR_INACTIVE_GROUP);
-          return;
-        }
         onSave(values, isDraft);
       })
-      .catch(() => {
-        // Validation errors are handled by Ant Design UI
-      });
+      .catch(() => {});
+  };
+
+  // AC-02: Auto-save on close if creating new project and name is entered
+  const handleModalClose = () => {
+    if (loading) return;
+
+    const values = form.getFieldsValue(true);
+    const hasContent = values.name && values.name.trim().length > 0;
+    const isDirty = values._isDirty === true;
+
+    // AC-02/AC-08: Auto-save on close if name is entered AND changes were made
+    if (!viewOnly && hasContent && isDirty) {
+      const isNew = !editingRecord;
+      const visStatus = editingRecord?.visibilityStatus ?? VISIBILITY_STATUS.DRAFT; // Default to Draft if uncertain
+      const isDraftStatus = visStatus === VISIBILITY_STATUS.DRAFT;
+
+      if (isNew || isDraftStatus) {
+        // Auto-save as draft
+        onSave({ ...values, template: values.template ?? 2 }, true);
+        return;
+      }
+
+      // For Published projects, we just save the content without changing status
+      if (visStatus === VISIBILITY_STATUS.PUBLISHED) {
+        onSave({ ...values, template: values.template ?? 2 }, false);
+        return;
+      }
+    }
+    onCancel();
   };
 
   return (
     <Drawer
+      loading={dataLoading}
+      forceRender={true}
       title={
         <div>
           <h3 className="mb-0 text-lg font-bold">
-            {editingRecord ? (viewOnly ? FORM.TITLE_DETAIL : FORM.TITLE_EDIT) : FORM.TITLE_ADD}
+            {editingRecord
+              ? viewOnly
+                ? FORM.TITLE_VIEW || 'Project Details'
+                : FORM.TITLE_EDIT
+              : FORM.TITLE_ADD}
           </h3>
           {!viewOnly && <p className="mt-1 text-xs font-normal text-gray-400">{FORM.DESC}</p>}
         </div>
       }
       open={visible}
-      onClose={onCancel}
+      onClose={handleModalClose}
       size={640}
       footer={
         !viewOnly && (
           <div className="flex justify-between px-4 py-2">
             <Button onClick={onCancel}>{FORM.CANCEL_BTN}</Button>
             <Space>
-              <Button onClick={() => handleSubmit(true)} loading={loading}>
-                {FORM.SAVE_DRAFT}
-              </Button>
               <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
-                {FORM.PUBLISH}
+                {editingRecord ? FORM.SAVE_CHANGES || 'Save Changes' : FORM.PUBLISH || 'Save'}
               </Button>
             </Space>
           </div>
@@ -155,215 +232,26 @@ export default function ProjectFormModal({
         form={form}
         layout="vertical"
         disabled={viewOnly}
-        initialValues={{ template: 'None' }}
+        initialValues={{
+          template: 'None',
+          links: [],
+          attachments: [],
+        }}
         onValuesChange={handleValuesChange}
         className="pb-10"
       >
-        <Row gutter={16}>
-          <Col span={14}>
-            <Form.Item
-              name="name"
-              label={FORM.LABEL.NAME}
-              rules={[{ required: true, message: FORM.VALIDATION.NAME_REQUIRED }]}
-            >
-              <Input placeholder={FORM.PLACEHOLDER.NAME} />
-            </Form.Item>
-          </Col>
-          <Col span={10}>
-            <Form.Item
-              name="code"
-              label={FORM.LABEL.CODE}
-              rules={[{ required: true, message: FORM.VALIDATION.CODE_REQUIRED }]}
-            >
-              <Input placeholder={FORM.PLACEHOLDER.CODE} />
-            </Form.Item>
-          </Col>
-        </Row>
+        <ProjectBasicInfoFields
+          FORM={FORM}
+          groups={groups}
+          userInfo={userInfo}
+          editingRecord={editingRecord}
+        />
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="field"
-              label={FORM.LABEL.FIELD}
-              rules={[{ required: true, message: FORM.VALIDATION.FIELD_REQUIRED }]}
-            >
-              <Select placeholder={FORM.PLACEHOLDER.FIELD}>
-                {Object.entries(FORM.FIELD_OPTIONS.FIELD).map(([key, label]) => (
-                  <Option key={key} value={label}>
-                    {label}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="internshipGroupId"
-              label={FORM.LABEL.GROUP}
-              rules={[{ required: false }]}
-              extra={FORM.VALIDATION.GROUP_MUST_SELECT}
-            >
-              <Select placeholder={FORM.PLACEHOLDER.GROUP} allowClear>
-                {groups
-                  .filter((g) => {
-                    // Filter: Active (status 1)
-                    const gStatus = g.status || g.groupStatus;
-                    const isActive = gStatus === 1; // ACTIVE_STATUS
+        <ProjectDescriptionFields FORM={FORM} />
 
-                    // If we are EDITING and this is the current group of the project,
-                    // we show it even if it's archived (but we'll block saving later)
-                    const isCurrentGroup =
-                      editingRecord?.internshipGroupId === g.id ||
-                      editingRecord?.internshipId === g.id;
-
-                    if (!isActive && !isCurrentGroup) return false;
-
-                    // Filter by Mentor ONLY if the user is a Mentor AND g.mentorId exists
-                    const userRoleId = userInfo?.roleId || userInfo?.RoleId;
-                    const isMentor = userRoleId === 6; // MENTOR_ROLE
-                    if (isMentor) {
-                      const mid = g.mentorId || g.MentorId;
-                      // AC-11 Case 3: Current mentor of the group can manage, regardless of project creator
-                      if (mid) return mid === (userInfo?.userId || userInfo?.Id);
-                    }
-
-                    return true;
-                  })
-                  .map((g) => (
-                    <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
-                      {g.groupName}
-                    </Option>
-                  ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col span={8}>
-            <Form.Item name="template" label={FORM.LABEL.TEMPLATE}>
-              <Select>
-                {Object.entries(FORM.FIELD_OPTIONS.TEMPLATE).map(([key, label]) => (
-                  <Option key={key} value={label}>
-                    {label}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item name="startDate" label={FORM.LABEL.START_DATE}>
-              <DatePicker
-                className="w-full"
-                format="DD/MM/YYYY"
-                placeholder={FORM.PLACEHOLDER.DATE}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item name="endDate" label={FORM.LABEL.END_DATE}>
-              <DatePicker
-                className="w-full"
-                format="DD/MM/YYYY"
-                placeholder={FORM.PLACEHOLDER.DATE}
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item
-          name="description"
-          label={FORM.LABEL.DESCRIPTION}
-          rules={[{ required: true, message: FORM.VALIDATION.DESC_REQUIRED }]}
-        >
-          <TextArea rows={6} placeholder={FORM.PLACEHOLDER.DESCRIPTION} />
-        </Form.Item>
-
-        <Form.Item
-          name="requirements"
-          label={FORM.LABEL.REQUIREMENTS}
-          rules={[{ required: true, message: FORM.VALIDATION.REQ_REQUIRED }]}
-        >
-          <TextArea rows={4} placeholder={FORM.PLACEHOLDER.REQUIREMENTS} />
-        </Form.Item>
-
-        <Form.Item name="deliverables" label={FORM.LABEL.DELIVERABLES}>
-          <TextArea rows={3} placeholder={FORM.PLACEHOLDER.DELIVERABLES} />
-        </Form.Item>
-
-        <Divider className="my-6" />
-
-        <section>
-          <h4 className="mb-4 font-bold text-gray-800 uppercase text-xs flex items-center gap-2">
-            <UploadOutlined className="text-primary" />
-            {FORM.SECTIONS.RESOURCES}
-          </h4>
-
-          <Form.Item
-            name="attachments"
-            label={PROJECT_MANAGEMENT.TABS.RESOURCES}
-            valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
-          >
-            <Upload.Dragger
-              name="files"
-              multiple
-              action="/api/v1/media/upload" // Placeholder API
-              listType="picture-card"
-            >
-              <p className="ant-upload-drag-icon">
-                <UploadOutlined />
-              </p>
-              <p className="ant-upload-text text-sm">{FORM.PLACEHOLDER.UPLOAD_PRIMARY}</p>
-              <p className="ant-upload-hint text-xs font-normal opacity-50">
-                {FORM.PLACEHOLDER.UPLOAD_HINT}
-              </p>
-            </Upload.Dragger>
-          </Form.Item>
-
-          <div className="mt-6">
-            <h5 className="text-[11px] font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
-              <LinkOutlined />
-              {FORM.PLACEHOLDER.QUICK_LINKS}
-            </h5>
-            <Form.List name="links">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'title']}
-                        rules={[{ required: true, message: FORM.VALIDATION.MISSING_TITLE }]}
-                      >
-                        <Input placeholder={FORM.PLACEHOLDER.LINK_TITLE} className="w-40" />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'url']}
-                        rules={[{ required: true, message: FORM.VALIDATION.MISSING_URL }]}
-                      >
-                        <Input
-                          placeholder={PROJECT_MANAGEMENT.DETAIL.SESOURCES?.EXTERNAL || 'URL'}
-                          className="w-64"
-                        />
-                      </Form.Item>
-                      <DeleteOutlined
-                        onClick={() => remove(name)}
-                        className="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
-                      />
-                    </Space>
-                  ))}
-                  <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      {PROJECT_MANAGEMENT.BUTTON.ADD_LINK || 'Add Link'}
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
-          </div>
-        </section>
+        {!editingRecord && (
+          <ProjectResourceFields FORM={FORM} PROJECT_MANAGEMENT={PROJECT_MANAGEMENT} />
+        )}
       </Form>
     </Drawer>
   );

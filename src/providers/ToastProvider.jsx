@@ -1,7 +1,7 @@
 'use client';
 
 import { App, ConfigProvider } from 'antd';
-import { createContext, useContext, useLayoutEffect } from 'react';
+import React, { createContext, useContext, useLayoutEffect } from 'react';
 
 const ToastContext = createContext(null);
 

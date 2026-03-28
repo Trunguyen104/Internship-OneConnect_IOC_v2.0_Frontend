@@ -1,9 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
-import { useToast } from '@/providers/ToastProvider';
+import { useProfile } from '@/components/features/user/hooks/useProfile';
 
 import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
@@ -12,17 +12,35 @@ import { useProjectModals } from './useProjectModals';
 
 export const useProjectManagement = () => {
   const toast = useToast();
+  const { userInfo } = useProfile();
+
+  const r = userInfo?.roleId || userInfo?.RoleId || userInfo?.role || userInfo?.Role;
+  const roleName = String(userInfo?.roleName || userInfo?.RoleName || r || '').toLowerCase();
+  const numRole = Number(r);
+
+  const isMentor = numRole === 6 || roleName.includes('mentor');
+  const isHR =
+    (numRole >= 1 && numRole <= 5) ||
+    roleName.includes('hr') ||
+    roleName.includes('admin') ||
+    roleName.includes('enterprise');
+
+  const hasNotifiedOrphaned = useRef(false);
 
   // --- Specialized Hooks ---
   const {
     searchTerm,
     groupIdFilter,
     statusFilter,
+    visibilityFilter,
+    showArchived,
     pagination,
     setPagination,
     handleSearchChange,
     handleGroupFilterChange,
     handleStatusFilterChange,
+    handleVisibilityFilterChange,
+    handleShowArchivedChange,
     handleTableChange,
     handlePageSizeChange,
   } = useProjectFilters();
@@ -49,7 +67,13 @@ export const useProjectManagement = () => {
         const res = await ProjectService.getGroupsForMentor();
         if (res?.data?.items) {
           // AC-02: Only show Active groups (status 1)
-          return res.data.items.filter((g) => g.status === 1 || g.groupStatus === 1);
+          return res.data.items.filter(
+            (g) =>
+              g.status === 1 ||
+              g.groupStatus === 1 ||
+              g.status === 'Active' ||
+              g.groupStatus === 'Active'
+          );
         }
         return [];
       } catch (err) {
@@ -70,6 +94,8 @@ export const useProjectManagement = () => {
       searchTerm,
       groupIdFilter,
       statusFilter,
+      visibilityFilter,
+      showArchived,
       pagination.current,
       pagination.pageSize,
     ],
@@ -81,6 +107,9 @@ export const useProjectManagement = () => {
           SearchTerm: searchTerm,
           internshipId: groupIdFilter,
           Status: statusFilter,
+          // AC-14: HR and Uni Admin only see Published (1)
+          Visibility: !isMentor ? 1 : visibilityFilter !== undefined ? visibilityFilter : undefined,
+          showArchived: showArchived,
         };
         const res = await ProjectService.getAll(params);
         if (res?.data?.items) {
@@ -89,7 +118,25 @@ export const useProjectManagement = () => {
             ...prev,
             total: res.data.totalCount || 0,
           }));
-          return res.data.items;
+
+          // AC-16: Notify Mentor about orphaned projects (once)
+          const items = res.data.items;
+          const orphanedList = items.filter((p) => p.isOrphaned || p.isOrphan);
+          if (orphanedList.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
+            const firstName = orphanedList[0].projectName || orphanedList[0].name;
+            const message =
+              orphanedList.length === 1
+                ? PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_NOTIFY.replace(
+                    '{projectName}',
+                    firstName
+                  )
+                : `Có ${orphanedList.length} dự án đã bị giải thể nhóm và chuyển về trạng thái Unstarted.`;
+
+            toast.warning(message, { duration: 10 });
+            hasNotifiedOrphaned.current = true;
+          }
+
+          return items;
         }
         return [];
       } catch (err) {
@@ -99,12 +146,13 @@ export const useProjectManagement = () => {
     },
     staleTime: 2 * 60 * 1000,
   });
-
-  // --- Actions Hook ---
   const {
     submitLoading,
     handleSaveProject,
     handlePublishProject,
+    handleUnpublishProject,
+    handleArchiveProject,
+    handleAssignGroup,
     handleCompleteProject,
     handleDeleteProject,
   } = useProjectActions({
@@ -112,6 +160,7 @@ export const useProjectManagement = () => {
     fetchData: refetch, // Use refetch from useQuery
     groups,
     setModalVisible,
+    userInfo,
   });
 
   const [actionLoading, setActionLoading] = useState(false);
@@ -122,6 +171,8 @@ export const useProjectManagement = () => {
     searchTerm,
     groupIdFilter,
     statusFilter,
+    visibilityFilter,
+    showArchived,
     pagination,
     modalVisible,
     detailDrawerVisible,
@@ -134,6 +185,8 @@ export const useProjectManagement = () => {
     handleSearchChange,
     handleGroupFilterChange,
     handleStatusFilterChange,
+    handleVisibilityFilterChange,
+    handleShowArchivedChange,
     handleTableChange,
     handlePageSizeChange,
     handleCreateNew,
@@ -144,5 +197,8 @@ export const useProjectManagement = () => {
     handleCompleteProject: (id) => handleCompleteProject(id, setActionLoading),
     handleDeleteProject: (id) => handleDeleteProject(id, setActionLoading),
     fetchData: refetch,
+    userInfo,
+    isMentor,
+    isHR,
   };
 };

@@ -130,7 +130,7 @@ const StudentTable = memo(function StudentTable({
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isEditable) {
-                    if (hasGroups) onAddToGroup(record);
+                    if (hasGroups) onChangeGroup(record);
                     else onCreateGroup(record);
                   }
                 }}
@@ -187,10 +187,10 @@ const StudentTable = memo(function StudentTable({
 
               if (hasGroups) {
                 menuItems.push({
-                  key: 'addToGroup',
-                  label: ACTIONS.ADD_TO_GROUP,
+                  key: 'changeGroup',
+                  label: ACTIONS.CHANGE_GROUP,
                   icon: <UsergroupAddOutlined />,
-                  onClick: () => onAddToGroup(record),
+                  onClick: () => onChangeGroup(record),
                 });
               }
             } else {
