@@ -1,4 +1,4 @@
-﻿import { httpPost } from '@/services/http-client.service';
+import { httpPost } from '@/services/http-client.service';
 
 export const mediaService = {
   /**

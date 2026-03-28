@@ -1,4 +1,4 @@
-﻿import { httpGet, httpPut } from '@/services/http-client.service';
+import { httpGet, httpPut } from '@/services/http-client.service';
 
 export const userService = {
   getMe() {

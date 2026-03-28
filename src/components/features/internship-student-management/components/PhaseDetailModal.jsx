@@ -12,7 +12,7 @@ import { Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { UI_TEXT } from '@/lib/UI_Text';
 

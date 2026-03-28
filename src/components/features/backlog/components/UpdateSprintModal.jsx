@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import { EditOutlined } from '@ant-design/icons';
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
@@ -34,8 +34,8 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
   return (
     <CompoundModal open={open} onCancel={onClose} width={600}>
       <CompoundModal.Header
-        title={BACKLOG_UI.EDIT_SPRINT || 'Chá»‰nh sá»­a Sprint'}
-        subtitle="Cáº­p nháº­t tÃªn gá»i vÃ  má»¥c tiÃªu trá»ng tÃ¢m cho chu ká»³ lÃ m viá»‡c hiá»‡n táº¡i"
+        title={BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
+        subtitle="Cập nhật tên gọi và mục tiêu trọng tâm cho chu kỳ làm việc hiện tại"
         icon={<EditOutlined />}
       />
 

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Empty, Skeleton } from 'antd';
 import React, { useEffect, useState } from 'react';

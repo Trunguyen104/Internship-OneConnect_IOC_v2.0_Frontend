@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { PlayCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { DatePicker } from '@/components/ui/datepicker';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -95,7 +95,7 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
                 value={startDate}
                 onChange={setStartDate}
                 format="YYYY-MM-DD"
-                placeholder="Chá»n ngÃ y báº¯t Ä‘áº§u"
+                placeholder="Chọn ngày bắt đầu"
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
               />
             </div>
@@ -105,7 +105,7 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
                 value={endDate}
                 onChange={setEndDate}
                 format="YYYY-MM-DD"
-                placeholder="Chá»n ngÃ y káº¿t thÃºc"
+                placeholder="Chọn ngày kết thúc"
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
               />
             </div>

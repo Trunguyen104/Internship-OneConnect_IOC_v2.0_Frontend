@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import { Form, Select } from 'antd';
 import React, { useEffect } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import {
   GROUP_STATUS,

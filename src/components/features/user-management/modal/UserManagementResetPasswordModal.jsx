@@ -1,8 +1,8 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { Textarea } from '@/components/ui/textarea';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';

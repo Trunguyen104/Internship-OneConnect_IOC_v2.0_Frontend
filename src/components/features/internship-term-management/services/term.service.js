@@ -1,4 +1,4 @@
-﻿import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/http-client.service';
+import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/http-client.service';
 
 export const TermService = {
   getAll(params = {}, options = {}) {

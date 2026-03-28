@@ -1,4 +1,4 @@
-﻿import {
+import {
   BookOutlined,
   CalendarOutlined,
   EditOutlined,
@@ -13,7 +13,7 @@ import { Col, Form, Input, Row, Select, Tabs, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useEffect, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { enterpriseService } from '@/services/enterprise.service';
 

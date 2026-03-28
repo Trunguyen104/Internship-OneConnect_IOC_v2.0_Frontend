@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
 import { Select } from 'antd';

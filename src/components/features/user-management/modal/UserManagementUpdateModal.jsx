@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 
 import AvatarUploader from '@/components/ui/avataruploader';
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { Input } from '@/components/ui/input';
 import Select from '@/components/ui/select';
 import { USER_ROLE, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';

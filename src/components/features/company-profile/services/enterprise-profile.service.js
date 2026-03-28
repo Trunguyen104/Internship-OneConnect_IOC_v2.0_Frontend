@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { httpGet, httpPut } from '@/services/http-client.service';
 

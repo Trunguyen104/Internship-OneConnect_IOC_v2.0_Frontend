@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import { SaveOutlined } from '@ant-design/icons';
 import { Col, DatePicker, Form, Input, Row, Select } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const TermStats = ({ initialValues }) => {

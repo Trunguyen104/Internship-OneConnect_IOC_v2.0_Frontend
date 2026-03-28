@@ -1,4 +1,4 @@
-﻿import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { useToast } from '@/providers/ToastProvider';

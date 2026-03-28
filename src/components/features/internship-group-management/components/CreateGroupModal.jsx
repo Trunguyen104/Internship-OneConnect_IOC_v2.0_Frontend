@@ -1,4 +1,4 @@
-﻿import {
+import {
   EditOutlined,
   InfoCircleOutlined,
   SearchOutlined,
@@ -9,7 +9,7 @@ import { Avatar, DatePicker, Form, Input, Select, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useEffect } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { UI_TEXT } from '@/lib/UI_Text';
 

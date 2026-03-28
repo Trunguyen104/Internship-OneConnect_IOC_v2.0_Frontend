@@ -1,4 +1,4 @@
-﻿import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
+import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import { userService } from '@/components/features/user/services/user.service';
 

@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import { SaveOutlined, UserOutlined } from '@ant-design/icons';
 import { Input, Select } from 'antd';
 import React, { memo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
 
 const StakeholderFormModal = memo(function StakeholderFormModal({
@@ -49,7 +49,7 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
     <CompoundModal open={isOpen} onCancel={onClose} width={560}>
       <CompoundModal.Header
         title={editingId ? MODAL_EDIT : MODAL_ADD}
-        subtitle={STAKEHOLDER_UI.SUBTITLE || 'Quáº£n lÃ½ thÃ´ng tin bÃªn liÃªn quan trong dá»± Ã¡n'}
+        subtitle={STAKEHOLDER_UI.SUBTITLE || 'Quản lý thông tin bên liên quan trong dự án'}
         icon={<UserOutlined />}
       />
 

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';

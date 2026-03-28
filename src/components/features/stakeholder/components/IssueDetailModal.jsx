@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import { InfoCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React, { memo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 
 import IssueStatusTag from './IssueStatusTag';
@@ -19,9 +19,7 @@ const IssueDetailModal = memo(function IssueDetailModal({ issue, onClose }) {
     <CompoundModal open={!!issue} onCancel={onClose} width={560}>
       <CompoundModal.Header
         title={DETAIL.TITLE}
-        subtitle={
-          ISSUE_UI.SUBTITLE_DETAIL || 'Xem chi tiáº¿t thÃ´ng tin váº¥n Ä‘á» Ä‘Ã£ ghi nháº­n'
-        }
+        subtitle={ISSUE_UI.SUBTITLE_DETAIL || 'Xem chi tiết thông tin vấn đề đã ghi nhận'}
         icon={<InfoCircleOutlined />}
       />
 
@@ -40,9 +38,7 @@ const IssueDetailModal = memo(function IssueDetailModal({ issue, onClose }) {
               <label className="text-[13px] font-bold tracking-wide text-text/60 uppercase">
                 {TABLE.STAKEHOLDER}
               </label>
-              <span className="text-base font-bold text-text">
-                {issue.stakeholderName || 'â€”'}
-              </span>
+              <span className="text-base font-bold text-text">{issue.stakeholderName || '—'}</span>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -70,7 +66,7 @@ const IssueDetailModal = memo(function IssueDetailModal({ issue, onClose }) {
                 {DETAIL.RESOLVED_AT}
               </label>
               <span className="text-base font-bold text-text">
-                {issue.resolvedAt ? dayjs(issue.resolvedAt).format('DD/MM/YYYY') : 'â€”'}
+                {issue.resolvedAt ? dayjs(issue.resolvedAt).format('DD/MM/YYYY') : '—'}
               </span>
             </div>
           </div>

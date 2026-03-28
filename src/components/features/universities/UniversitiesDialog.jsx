@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import UniversitiesForm from './UniversitiesForm';

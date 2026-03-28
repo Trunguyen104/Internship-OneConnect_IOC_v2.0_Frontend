@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useDroppable } from '@dnd-kit/core';
 import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';

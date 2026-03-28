@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 import { CheckCircleOutlined } from '@ant-design/icons';
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { Input } from '@/components/ui/input';
 import { Radio, RadioGroup } from '@/components/ui/radio';
 import { Select } from '@/components/ui/select';
@@ -61,7 +61,7 @@ export default function CompleteSprintModal({ open, sprint, sprints, onClose, on
     <CompoundModal open={open} onCancel={onClose} width={640}>
       <CompoundModal.Header
         title={`${BACKLOG_UI.COMPLETE_SPRINT_TITLE} ${sprint?.name}`}
-        subtitle={`${BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT} (${undoneItems.length} cÃ´ng viá»‡c chÆ°a hoÃ n thÃ nh)`}
+        subtitle={`${BACKLOG_UI.INCOMPLETE_ISSUES_PROMPT} (${undoneItems.length} công việc chưa hoàn thành)`}
         icon={<CheckCircleOutlined />}
       />
 

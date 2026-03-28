@@ -1,4 +1,4 @@
-﻿import { httpGet } from '@/services/http-client.service';
+import { httpGet } from '@/services/http-client.service';
 
 const BASE_URL = '/internship-phases';
 

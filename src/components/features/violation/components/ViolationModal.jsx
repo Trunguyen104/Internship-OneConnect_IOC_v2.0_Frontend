@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { DatePicker, Form, Input } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {

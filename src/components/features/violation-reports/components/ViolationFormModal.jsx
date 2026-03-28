@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import { SaveOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Form, Input } from 'antd';
 import dayjs from 'dayjs';
 import React, { startTransition, useEffect, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
 import StudentPickerModal from './StudentPickerModal';

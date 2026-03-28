@@ -1,4 +1,4 @@
-﻿import { httpDelete, httpGet, httpPost, httpPut } from '@/services/http-client.service';
+import { httpDelete, httpGet, httpPost, httpPut } from '@/services/http-client.service';
 
 export const universityService = {
   getAll(params = { PageNumber: 1, PageSize: 100 }) {

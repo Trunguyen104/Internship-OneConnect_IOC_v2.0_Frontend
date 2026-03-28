@@ -1,4 +1,4 @@
-﻿import { httpGet, httpPatch } from '@/services/http-client.service';
+import { httpGet, httpPatch } from '@/services/http-client.service';
 
 /**
  * Service for handling HR Application Management API calls.

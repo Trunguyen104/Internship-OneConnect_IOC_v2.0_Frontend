@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
 import { FlagOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 
-import CompoundModal from '@/components/ui/compoundmodal';
+import CompoundModal from '@/components/ui/CompoundModal';
 import { DatePicker } from '@/components/ui/datepicker';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
@@ -51,7 +51,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
     <CompoundModal open={open} onCancel={handleClose} width={800}>
       <CompoundModal.Header
         title={BACKLOG_UI.MODAL_CREATE_EPIC}
-        subtitle="Thiáº¿t láº­p cÃ¡c má»¥c tiÃªu lá»›n vÃ  lá»™ trÃ¬nh dÃ i háº¡n cho dá»± Ã¡n"
+        subtitle="Thiết lập các mục tiêu lớn và lộ trình dài hạn cho dự án"
         icon={<FlagOutlined />}
       />
 
@@ -88,7 +88,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
                 value={endDate ? dayjs(endDate) : null}
                 onChange={(date) => setEndDate(date ? date.toISOString() : '')}
                 format="YYYY-MM-DD"
-                placeholder="Chá»n ngÃ y káº¿t thÃºc"
+                placeholder="Chọn ngày kết thúc"
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
               />
             </div>
