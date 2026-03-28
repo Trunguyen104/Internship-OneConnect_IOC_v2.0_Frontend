@@ -24,7 +24,14 @@ export function useGroupDetail(groupId) {
           ...rawData,
           id: rawData.internshipId || rawData.id || rawData.groupId,
           groupName: rawData.groupName || rawData.name,
-          status: rawData.status || 1,
+          status: (() => {
+            let s = rawData.status;
+            if (typeof s === 'string') {
+              const sMap = { active: 1, finished: 2, archived: 3 };
+              s = sMap[s.toLowerCase()] || s;
+            }
+            return s || 1;
+          })(),
           mentorName: rawData.mentorName || rawData.mentor?.fullName || '-',
           mentorEmail: rawData.mentorEmail || rawData.mentor?.email || '',
           internshipTermName:

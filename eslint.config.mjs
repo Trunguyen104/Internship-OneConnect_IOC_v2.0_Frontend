@@ -37,7 +37,7 @@ const eslintConfig = defineConfig([
 
       // ❗ CẤM TEXT TRỰC TIẾP TRONG JSX
       'react/jsx-no-literals': [
-        'warn',
+        'error',
         {
           noStrings: true,
           allowedStrings: [

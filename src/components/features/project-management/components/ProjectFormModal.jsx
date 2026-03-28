@@ -5,13 +5,16 @@ import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
-import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
+import {
+  PROJECT_MANAGEMENT,
+  VISIBILITY_STATUS,
+} from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
-import ProjectBasicInfoFields from './sub-components/ProjectBasicInfoFields';
-import ProjectDescriptionFields from './sub-components/ProjectDescriptionFields';
-import ProjectResourceFields from './sub-components/ProjectResourceFields';
+import ProjectBasicInfoFields from './ProjectBasicInfoFields';
+import ProjectDescriptionFields from './ProjectDescriptionFields';
+import ProjectResourceFields from './ProjectResourceFields';
 
 export default function ProjectFormModal({
   visible,
@@ -88,7 +91,9 @@ export default function ProjectFormModal({
           });
         }
       } catch (err) {
-        toast.error('Failed to fetch project details');
+        toast.error(
+          PROJECT_MANAGEMENT.MESSAGES?.ERROR_FETCH_DETAIL || 'Failed to fetch project details'
+        );
       } finally {
         setDataLoading(false);
       }
@@ -104,6 +109,7 @@ export default function ProjectFormModal({
   }, [visible, editingRecord, form, FORM.TEMPLATE_MAP, toast]);
 
   const handleValuesChange = (changedValues, allValues) => {
+    // 1. Auto-generate Code (New project only)
     if (!editingRecord && (changedValues.name || changedValues.internshipGroupId)) {
       const projectName = allValues.name || '';
       const groupId = allValues.internshipGroupId;
@@ -130,22 +136,64 @@ export default function ProjectFormModal({
         });
       }
     }
+
+    // 2. Auto-set Dates from Intern Phase (AC-08)
+    if (changedValues.internshipGroupId) {
+      const groupId = changedValues.internshipGroupId;
+      const group = groups.find((g) => (g.internshipId || g.id) === groupId);
+      if (group?.startDate && group?.endDate) {
+        form.setFieldsValue({
+          startDate: dayjs(group.startDate),
+          endDate: dayjs(group.endDate),
+        });
+      }
+    }
+
+    // 3. Mark form as dirty (AC-08 optimization)
+    if (!viewOnly) {
+      const isActuallyDirty = Object.keys(changedValues).length > 0;
+      if (isActuallyDirty) {
+        form.setFieldsValue({ _isDirty: true });
+      }
+    }
   };
 
   const handleSubmit = (isDraft = true) => {
     form
       .validateFields()
       .then((values) => {
-        const selectedGroupId = values.internshipGroupId;
-        const selectedGroup = groups.find((g) => (g.internshipId || g.id) === selectedGroupId);
-        const groupStatus = selectedGroup?.status || selectedGroup?.groupStatus;
-        if (groupStatus === 3 || groupStatus === 2) {
-          toast.warning(PROJECT_MANAGEMENT.MESSAGES.ERROR_INACTIVE_GROUP);
-          return;
-        }
         onSave(values, isDraft);
       })
       .catch(() => {});
+  };
+
+  // AC-02: Auto-save on close if creating new project and name is entered
+  const handleModalClose = () => {
+    if (loading) return;
+
+    const values = form.getFieldsValue(true);
+    const hasContent = values.name && values.name.trim().length > 0;
+    const isDirty = values._isDirty === true;
+
+    // AC-02/AC-08: Auto-save on close if name is entered AND changes were made
+    if (!viewOnly && hasContent && isDirty) {
+      const isNew = !editingRecord;
+      const visStatus = editingRecord?.visibilityStatus ?? VISIBILITY_STATUS.DRAFT; // Default to Draft if uncertain
+      const isDraftStatus = visStatus === VISIBILITY_STATUS.DRAFT;
+
+      if (isNew || isDraftStatus) {
+        // Auto-save as draft
+        onSave({ ...values, template: values.template ?? 2 }, true);
+        return;
+      }
+
+      // For Published projects, we just save the content without changing status
+      if (visStatus === VISIBILITY_STATUS.PUBLISHED) {
+        onSave({ ...values, template: values.template ?? 2 }, false);
+        return;
+      }
+    }
+    onCancel();
   };
 
   return (
@@ -155,33 +203,26 @@ export default function ProjectFormModal({
       title={
         <div>
           <h3 className="mb-0 text-lg font-bold">
-            {editingRecord ? (viewOnly ? 'Project Details' : FORM.TITLE_EDIT) : FORM.TITLE_ADD}
+            {editingRecord
+              ? viewOnly
+                ? FORM.TITLE_VIEW || 'Project Details'
+                : FORM.TITLE_EDIT
+              : FORM.TITLE_ADD}
           </h3>
           {!viewOnly && <p className="mt-1 text-xs font-normal text-gray-400">{FORM.DESC}</p>}
         </div>
       }
       open={visible}
-      onClose={onCancel}
+      onClose={handleModalClose}
       size={640}
       footer={
         !viewOnly && (
           <div className="flex justify-between px-4 py-2">
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button onClick={handleModalClose}>{FORM.CANCEL || 'Cancel'}</Button>
             <Space>
-              {editingRecord?.status === 1 ? (
-                <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
-                  {FORM.SAVE_CHANGES || 'Save Changes'}
-                </Button>
-              ) : (
-                <>
-                  <Button onClick={() => handleSubmit(true)} loading={loading}>
-                    {FORM.SAVE_DRAFT}
-                  </Button>
-                  <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
-                    {FORM.PUBLISH}
-                  </Button>
-                </>
-              )}
+              <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
+                {editingRecord ? FORM.SAVE_CHANGES || 'Save Changes' : FORM.PUBLISH || 'Save'}
+              </Button>
             </Space>
           </div>
         )
@@ -191,7 +232,11 @@ export default function ProjectFormModal({
         form={form}
         layout="vertical"
         disabled={viewOnly}
-        initialValues={{ template: 'None' }}
+        initialValues={{
+          template: 'None',
+          links: [],
+          attachments: [],
+        }}
         onValuesChange={handleValuesChange}
         className="pb-10"
       >
@@ -204,7 +249,9 @@ export default function ProjectFormModal({
 
         <ProjectDescriptionFields FORM={FORM} />
 
-        <ProjectResourceFields FORM={FORM} PROJECT_MANAGEMENT={PROJECT_MANAGEMENT} />
+        {!editingRecord && (
+          <ProjectResourceFields FORM={FORM} PROJECT_MANAGEMENT={PROJECT_MANAGEMENT} />
+        )}
       </Form>
     </Drawer>
   );

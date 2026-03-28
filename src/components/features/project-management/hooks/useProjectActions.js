@@ -1,19 +1,26 @@
 'use client';
 
 import { App } from 'antd';
+import dayjs from 'dayjs';
 import { useState } from 'react';
 
 import {
+  OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
-  PROJECT_STATUS,
 } from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
 
-export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVisible }) => {
-  const { modal } = App.useApp();
+export const useProjectActions = ({
+  editingRecord,
+  fetchData,
+  groups,
+  setModalVisible,
+  userInfo,
+}) => {
   const toast = useToast();
+  const { modal } = App.useApp();
   const [submitLoading, setSubmitLoading] = useState(false);
   const { MESSAGES } = PROJECT_MANAGEMENT;
 
@@ -31,17 +38,24 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
     try {
       setSubmitLoading(true);
 
-      // AC-02/AC-13: Cannot publish without a group
-      if (!isDraft && !values.internshipGroupId) {
-        toast.error(MESSAGES.ERROR_PUBLISH_NO_GROUP);
-        return;
-      }
+      // AC-02: Intern Group is optional even when publishing. Group can be assigned later (AC-04).
 
       if (editingRecord) {
         // PER BACKEND: UpdateProject expects JSON (application/json)
         // and does not currently support Links or Files in the Command DTO.
+        const oldGroupId = editingRecord.internshipId || editingRecord.internshipGroupId;
+        const newGroupId = values.internshipGroupId;
+        const isAssigning =
+          newGroupId && (!oldGroupId || oldGroupId === '00000000-0000-0000-0000-000000000000');
+        const isSwapping =
+          newGroupId &&
+          oldGroupId &&
+          oldGroupId !== '00000000-0000-0000-0000-000000000000' &&
+          oldGroupId !== newGroupId;
+
+        // Backend UpdateProject does not handle group changes natively per AC,
+        // so we exclude internshipId or just send it as is, treating it as basic info update.
         const updatePayload = {
-          internshipId: values.internshipGroupId,
           projectName: values.name,
           description: values.description,
           startDate: values.startDate?.toISOString(),
@@ -54,9 +68,24 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
 
         await ProjectService.update(editingRecord.projectId, updatePayload);
 
-        // If updating a Draft and clicking Publish
-        if (!isDraft && editingRecord.status === PROJECT_STATUS.DRAFT) {
-          await ProjectService.publish(editingRecord.projectId);
+        // Transition group separately based on action
+        if (isAssigning) {
+          await ProjectService.assignGroup(editingRecord.projectId, newGroupId);
+        } else if (isSwapping) {
+          await ProjectService.changeGroup(editingRecord.projectId, newGroupId);
+        }
+
+        // If updating a Draft and clicking Publish (explicit save)
+        const currentVis = Number(editingRecord.visibilityStatus ?? editingRecord.visibility ?? 0);
+        if (!isDraft && currentVis === 0) {
+          try {
+            await ProjectService.publish(editingRecord.projectId);
+          } catch (pErr) {
+            const pMsg = pErr.data?.errors?.[0] || pErr.data?.message || pErr.message || '';
+            if (!pMsg.includes(MESSAGES.ERROR_ALREADY_PUBLISHED_VN)) {
+              throw pErr;
+            }
+          }
         }
         toast.success(MESSAGES.UPDATE_SUCCESS);
       } else {
@@ -64,7 +93,8 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
         // to support initial file attachments.
         const formData = new FormData();
         if (values.internshipGroupId) {
-          formData.append('InternshipId', values.internshipGroupId);
+          // Exactly matches C# CreateProjectCommand property
+          formData.append('InternshipGroupId', values.internshipGroupId);
         }
         formData.append('ProjectName', values.name);
         if (values.code) {
@@ -90,8 +120,8 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
         if (values.links && values.links.length > 0) {
           values.links.forEach((link, index) => {
             if (link.url) {
-              formData.append(`Links[${index}].resourceName`, link.title || '');
-              formData.append(`Links[${index}].url`, link.url);
+              formData.append(`Links[${index}].ResourceName`, link.title || link.url);
+              formData.append(`Links[${index}].Url`, link.url);
             }
           });
         }
@@ -105,17 +135,19 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
           });
         }
 
-        // Initial status
+        // Initial status and atomic publish flag per AC test plan
         formData.append('Status', isDraft ? 0 : 1);
+        formData.append('PublishOnSave', isDraft ? false : true);
 
         const res = await ProjectService.create(formData);
-        const newProject = res?.data || res;
 
-        // If creating and clicking Publish immediately
-        if (!isDraft && newProject?.projectId) {
-          await ProjectService.publish(newProject.projectId);
-        }
-        toast.success(isDraft ? MESSAGES.SAVE_DRAFT_SUCCESS : MESSAGES.PUBLISH_SUCCESS);
+        // Extract ID robustly
+        const newId = res?.projectId || res?.id || (typeof res === 'string' ? res : null);
+
+        // Success - C# Backend atomically sets PublishOnSave so we don't need a second API call
+        toast.success(
+          isDraft ? 'Đã lưu bản nháp tự động.' : 'Dự án đã được lưu và công bố thành công.'
+        );
       }
 
       setModalVisible(false);
@@ -138,8 +170,11 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
         return;
       }
 
-      // AC-07: Check if project is Published and has assigned students
-      if (editingRecord && editingRecord.status === PROJECT_STATUS.PUBLISHED) {
+      // AC-08 Case 3: Active, group đã có student
+      const isOperationalActive =
+        editingRecord?.operationalStatus === 1 || editingRecord?.status === 1;
+
+      if (editingRecord && isOperationalActive) {
         setSubmitLoading(true);
         try {
           const res = await ProjectService.getAssignedStudents(editingRecord.projectId);
@@ -147,10 +182,10 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
 
           if (studentCount > 0) {
             modal.confirm({
-              title: 'Confirm Project Update',
+              title: 'Cảnh báo cập nhật dự án',
               content: MESSAGES.EDIT_WARNING.replace('{count}', studentCount),
-              okText: 'Confirm',
-              cancelText: 'Cancel',
+              okText: 'Xác nhận',
+              cancelText: 'Hủy',
               onOk: async () => {
                 await executeSave(values, isDraft);
               },
@@ -168,7 +203,6 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
       await executeSave(values, isDraft);
     } catch (err) {
       toast.error('Failed to save project');
-      setSubmitLoading(false);
     }
   };
 
@@ -191,39 +225,62 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
   };
 
   const handleCompleteProject = async (record, setOverallLoading) => {
-    const id = typeof record === 'string' ? record : record.projectId || record.id;
-    if (!id) {
-      toast.error('Project ID is missing');
+    const id = record?.projectId || record?.id || record;
+    if (!id || typeof id !== 'string') {
+      toast.error('Project ID is missing or invalid');
       return;
     }
     try {
       setOverallLoading?.(true);
-      // Fetch full project detail to get group info and assigned students
-      const [projectRes, studentsRes] = await Promise.all([
-        ProjectService.getById(id),
-        ProjectService.getAssignedStudents(id),
-      ]);
-
+      const projectRes = await ProjectService.getById(id);
       const projectDetail = projectRes?.data || projectRes;
-      const assignedStudents = studentsRes?.data || studentsRes || [];
-      const studentCount = assignedStudents.length;
-      const groupName =
-        projectDetail.groupInfo?.groupName || projectDetail.groupName || 'Unknown Group';
 
-      // AC-07: If Intern Group is Active and has students, show warning
-      const content =
-        studentCount > 0
-          ? MESSAGES.WARNING_COMPLETE_STU.replace('{groupName}', groupName).replace(
-              '{count}',
-              studentCount
-            )
-          : MESSAGES.COMPLETE_CONFIRM;
+      const groupId =
+        projectDetail.internshipId ||
+        projectDetail.internshipGroupId ||
+        projectDetail.groupId ||
+        record?.internshipId ||
+        record?.internshipGroupId;
+
+      const groupName =
+        projectDetail.groupName ||
+        projectDetail.groupInfo?.groupName ||
+        record?.groupName ||
+        'Unknown Group';
+
+      // AC-09 Logic: If phase end is in future -> Warn
+      let content = MESSAGES.COMPLETE_CONFIRM;
+      const isValidGroupId = groupId && groupId !== '00000000-0000-0000-0000-000000000000';
+
+      let phaseEndDate = null;
+
+      if (isValidGroupId) {
+        try {
+          const groupRes = await ProjectService.getStudentsByGroup(groupId);
+          const groupDetail = groupRes?.data || groupRes;
+          phaseEndDate = groupDetail.endDate || groupDetail.internPhaseEnd;
+        } catch (gErr) {
+          console.warn('Failed to fetch group details, falling back to project end date:', gErr);
+        }
+      }
+
+      // Fallback to project's own dates if group fetch failed or returned nothing
+      if (!phaseEndDate) {
+        phaseEndDate = projectDetail.endDate || record?.endDate;
+      }
+
+      if (phaseEndDate && dayjs().isBefore(dayjs(phaseEndDate))) {
+        content = MESSAGES.COMPLETE_EARLY_WARNING.replace('{groupName}', groupName).replace(
+          '{date}',
+          dayjs(phaseEndDate).format('DD/MM/YYYY')
+        );
+      }
 
       modal.confirm({
-        title: 'Complete Project',
+        title: 'Xác nhận hoàn thành dự án',
         content,
-        okText: 'Confirm',
-        cancelText: 'Cancel',
+        okText: 'Xác nhận',
+        cancelText: 'Hủy',
         onOk: async () => {
           try {
             setOverallLoading?.(true);
@@ -245,31 +302,45 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
   };
 
   const handleDeleteProject = async (record, setOverallLoading) => {
-    const id = typeof record === 'string' ? record : record.projectId || record.id;
-    if (!id) {
-      toast.error('Project ID is missing');
+    const id = record?.projectId || record?.id || record;
+    if (!id || typeof id !== 'string') {
+      toast.error('Project ID is missing or invalid');
+      return;
+    }
+
+    // AC-11 Check: Mentor ownership
+    const ownerId = record?.mentorId || record?.MentorId;
+    const currentUserId = userInfo?.userId || userInfo?.Id;
+    const userRoleId = userInfo?.roleId || userInfo?.RoleId;
+
+    if (userRoleId === 6 && ownerId && ownerId !== currentUserId) {
+      toast.error('Bạn chỉ có thể xóa các dự án do chính mình tạo.');
       return;
     }
 
     try {
       setOverallLoading?.(true);
+      // Case 3: Check for student data
       const res = await ProjectService.getAssignedStudents(id);
       const assignedStudents = res?.data || res || [];
       const studentCount = assignedStudents.length;
 
-      // Case 3: Block delete if students are assigned (simple check for now)
-      // Note: Backend will provide more granular check for "actual data" like logbooks
       if (studentCount > 0) {
-        toast.error(MESSAGES.ERROR_ASSIGNED_STU);
+        modal.warning({
+          title: 'Không thể xóa dự án',
+          content: MESSAGES.ERROR_ASSIGNED_STU,
+          okText: 'Đã hiểu',
+        });
         return;
       }
 
+      // Case 1 & 2: Confirm -> Delete
       modal.confirm({
-        title: 'Delete Project',
+        title: 'Xác nhận xóa dự án',
         content: MESSAGES.DELETE_CONFIRM,
-        okText: 'Delete',
+        okText: 'Xóa',
         okType: 'danger',
-        cancelText: 'Cancel',
+        cancelText: 'Hủy',
         onOk: async () => {
           try {
             setOverallLoading?.(true);
@@ -290,11 +361,116 @@ export const useProjectActions = ({ editingRecord, fetchData, groups, setModalVi
     }
   };
 
+  const handleUnpublishProject = (id) => {
+    modal.confirm({
+      title: 'Unpublish Project',
+      content:
+        'The project will be moved back to Draft and will no longer be visible to students. Proceed?',
+      okText: 'Unpublish',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          await ProjectService.unpublish(id);
+          toast.success('Project unpublished successfully.');
+          fetchData();
+        } catch (err) {
+          toast.error(getErrorMessage(err, 'Failed to unpublish project'));
+        }
+      },
+    });
+  };
+
+  const handleArchiveProject = (id) => {
+    modal.confirm({
+      title: 'Archive Project',
+      content: 'Archived projects are hidden by default and cannot be edited. Proceed?',
+      okText: 'Archive',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        try {
+          await ProjectService.archive(id);
+          toast.success('Project archived successfully.');
+          fetchData();
+        } catch (err) {
+          toast.error(getErrorMessage(err, 'Failed to archive project'));
+        }
+      },
+    });
+  };
+
+  const handleAssignGroup = async (
+    assigningProject,
+    selectedGroupId,
+    setLocalLoading,
+    closeLocalModal
+  ) => {
+    if (!selectedGroupId || !assigningProject) return;
+
+    setLocalLoading?.(true);
+    try {
+      const oldGroupId =
+        assigningProject.internshipId ||
+        assigningProject.internshipGroupId ||
+        assigningProject.groupId;
+
+      // Case 1: Initial Assignment (No previous group)
+      if (!oldGroupId || oldGroupId === '00000000-0000-0000-0000-000000000000') {
+        await ProjectService.assignGroup(assigningProject.projectId, selectedGroupId);
+        toast.success(PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SUCCESS_ASSIGN);
+      }
+      // Case 2: Group Swap
+      else if (oldGroupId !== selectedGroupId) {
+        const opStatus = assigningProject.operationalStatus;
+
+        // AC-05 Swap Constraints: Check for student data if Active
+        if (opStatus === OPERATIONAL_STATUS.ACTIVE) {
+          const studentsRes = await ProjectService.getAssignedStudents(assigningProject.projectId);
+          const students = studentsRes.data || studentsRes || [];
+
+          if (students.length > 0) {
+            modal.error({
+              title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_NO_CHANGE,
+              content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_HAS_DATA,
+            });
+            return;
+          }
+
+          // No student data, ask for confirmation
+          await new Promise((resolve, reject) => {
+            modal.confirm({
+              title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM_CHANGE_TITLE,
+              content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM_CHANGE_DESC,
+              onOk: resolve,
+              onCancel: () => reject('cancelled'),
+            });
+          });
+        }
+
+        // Proceed with swap for Active (confirmed) or Completed projects
+        await ProjectService.changeGroup(assigningProject.projectId, selectedGroupId);
+        toast.success(PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SUCCESS_CHANGE);
+      }
+
+      closeLocalModal?.();
+      fetchData();
+    } catch (e) {
+      if (e !== 'cancelled') {
+        const resMsg = getErrorMessage(e, PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_BACKEND);
+        toast.error(PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_FAILED + resMsg);
+      }
+    } finally {
+      setLocalLoading?.(false);
+    }
+  };
+
   return {
     submitLoading,
     handleSaveProject,
     handlePublishProject,
+    handleUnpublishProject,
     handleCompleteProject,
+    handleArchiveProject,
+    handleAssignGroup,
     handleDeleteProject,
   };
 };

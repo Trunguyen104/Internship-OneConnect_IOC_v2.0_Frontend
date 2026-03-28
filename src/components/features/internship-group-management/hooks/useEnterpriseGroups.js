@@ -54,8 +54,15 @@ export const useEnterpriseGroups = ({
           (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
         );
 
+        let s = item.status;
+        if (typeof s === 'string') {
+          const statusMap = { active: 1, finished: 2, archived: 3 };
+          s = statusMap[s.toLowerCase()] || s;
+        }
+
         return {
           ...item,
+          status: s,
           id: item.internshipId || item.groupId || item.internshipGroupId || item.id,
           name: item.groupName || item.GroupName || item.name || item.Name,
           memberCount: item.numberOfMembers ?? item.numberOfMembers ?? item.memberCount ?? 0,

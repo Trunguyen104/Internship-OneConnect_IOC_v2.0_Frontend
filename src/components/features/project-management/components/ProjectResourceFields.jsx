@@ -21,15 +21,13 @@ export default function ProjectResourceFields({ FORM, PROJECT_MANAGEMENT }) {
           valuePropName="fileList"
           getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
         >
-          <Upload.Dragger name="Files" multiple beforeUpload={() => false} listType="picture-card">
+          <Upload.Dragger name="Files" multiple beforeUpload={() => false} listType="text">
             <p className="ant-upload-drag-icon">
               <UploadOutlined />
             </p>
-            <p className="ant-upload-text text-sm">
-              {FORM.PLACEHOLDER?.UPLOAD_PRIMARY || 'Click or drag files to this area to upload'}
-            </p>
+            <p className="ant-upload-text text-sm">{FORM.PLACEHOLDER?.UPLOAD_PRIMARY}</p>
             <p className="ant-upload-hint text-xs font-normal opacity-50">
-              {FORM.PLACEHOLDER?.UPLOAD_HINT || 'Support for PDF, DOCX, ZIP, etc.'}
+              {FORM.PLACEHOLDER?.UPLOAD_HINT}
             </p>
           </Upload.Dragger>
         </Form.Item>
@@ -37,7 +35,7 @@ export default function ProjectResourceFields({ FORM, PROJECT_MANAGEMENT }) {
         <div className="mt-6">
           <h5 className="text-[11px] font-bold text-gray-500 uppercase mb-3 flex items-center gap-2">
             <LinkOutlined />
-            Quick Links
+            {FORM.LABEL?.QUICK_LINKS || 'Quick Links'}
           </h5>
           <Form.List name="links">
             {(fields, { add, remove }) => (
@@ -47,16 +45,26 @@ export default function ProjectResourceFields({ FORM, PROJECT_MANAGEMENT }) {
                     <Form.Item
                       {...restField}
                       name={[name, 'title']}
-                      rules={[{ required: true, message: 'Missing title' }]}
+                      rules={[
+                        {
+                          required: true,
+                          message: FORM.VALIDATION?.MISSING_LINK_TITLE || 'Missing title',
+                        },
+                      ]}
                     >
-                      <Input placeholder="Link Title (e.g. Figma, PRD)" className="w-40" />
+                      <Input
+                        placeholder={FORM.PLACEHOLDER?.LINK_TITLE || 'Link Title (e.g. Figma, PRD)'}
+                        className="w-40"
+                      />
                     </Form.Item>
                     <Form.Item
                       {...restField}
                       name={[name, 'url']}
-                      rules={[{ required: true, message: 'Missing URL' }]}
+                      rules={[
+                        { required: true, message: FORM.VALIDATION?.MISSING_URL || 'Missing URL' },
+                      ]}
                     >
-                      <Input placeholder="URL" className="w-64" />
+                      <Input placeholder={FORM.PLACEHOLDER?.URL || 'URL'} className="w-64" />
                     </Form.Item>
                     <DeleteOutlined
                       onClick={() => remove(name)}

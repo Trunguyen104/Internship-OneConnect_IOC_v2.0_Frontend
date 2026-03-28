@@ -101,7 +101,14 @@ export const useInternshipManagement = () => {
       try {
         setFetchingPhases(true);
         const res = await EnterprisePhaseService.getPhases();
-        const phases = res?.data?.items || res?.data || [];
+        const phases = (res?.data?.items || res?.data || []).map((p) => {
+          let s = p.status;
+          if (typeof s === 'string') {
+            const statusMap = { open: 1, inprogress: 2, completed: 3, closed: 4 };
+            s = statusMap[s.toLowerCase()] || s;
+          }
+          return { ...p, status: s };
+        });
 
         const openPhases = phases
           .filter((p) => p.status === 1 || p.status === 2)
@@ -205,6 +212,13 @@ export const useInternshipManagement = () => {
 
       const mappedStudents = items.map((item) => {
         const mapped = EnterpriseStudentService.mapApplication(item);
+
+        // Normalize phaseStatus if it's a string
+        if (typeof mapped.phaseStatus === 'string') {
+          const pStatMap = { open: 1, inprogress: 2, closed: 3, draft: 0 };
+          mapped.phaseStatus = pStatMap[mapped.phaseStatus.toLowerCase()] ?? mapped.phaseStatus;
+        }
+
         if (mapped.phaseStatus === 0 || mapped.phaseStatus === undefined) {
           const studentPhase = phaseOptions.find((o) => o.value === mapped.phaseId);
           mapped.phaseStatus = studentPhase?.status || 2;
@@ -269,7 +283,14 @@ export const useInternshipManagement = () => {
       const groupRes = await EnterpriseGroupService.getGroups(groupParams).catch(() => ({
         data: { items: [] },
       }));
-      const allGroups = groupRes?.data?.items || groupRes?.items || [];
+      const allGroups = (groupRes?.data?.items || groupRes?.items || []).map((g) => {
+        let s = g.status;
+        if (typeof s === 'string') {
+          const sMap = { active: 1, finished: 2, archived: 3 };
+          s = sMap[s.toLowerCase()] || s;
+        }
+        return { ...g, status: s };
+      });
       setExistingGroups(allGroups);
       setHasGroups(allGroups.some((g) => g.status === 1));
     } catch (err) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
@@ -109,10 +109,37 @@ export const useGroupManagement = () => {
   const [assignModal, setAssignModal] = useState({ open: false, group: null });
   const [createModal, setCreateModal] = useState({ open: false, group: null });
   const [editModal, setEditModal] = useState({ open: false, group: null });
+  const searchParams = useSearchParams();
+  const urlGroupId = searchParams?.get('groupId');
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [fetchingStudents, setFetchingStudents] = useState(false);
   const [selectedGroupDetail, setSelectedGroupDetail] = useState(null);
+  const [isAutoSelecting, setIsAutoSelecting] = useState(!!urlGroupId);
   const router = useRouter();
+
+  // Handle auto-selection from URL
+  useEffect(() => {
+    if (urlGroupId) {
+      const fetchInitialGroup = async () => {
+        try {
+          setIsAutoSelecting(true);
+          const res = await EnterpriseGroupService.getGroupDetail(urlGroupId);
+          const rawData = res?.data || res;
+          if (rawData) {
+            setSelectedGroupDetail({
+              ...rawData,
+              id: rawData.id || rawData.internshipId || rawData.groupId || urlGroupId,
+            });
+          }
+        } catch (err) {
+          console.error('Failed to auto-select group from URL', err);
+        } finally {
+          setIsAutoSelecting(false);
+        }
+      };
+      fetchInitialGroup();
+    }
+  }, [urlGroupId]);
 
   const handleViewGroup = useCallback((group) => {
     setSelectedGroupDetail(group);
@@ -140,7 +167,7 @@ export const useGroupManagement = () => {
 
         // Find phase status from phaseOptions
         const phase = filters.phaseOptions.find((p) => p.value === s.phaseId);
-        return phase ? phase.status === 1 : false;
+        return phase ? [1, 2].includes(phase.status) : false;
       });
 
       setUnassignedStudents(unassigned);
@@ -397,5 +424,6 @@ export const useGroupManagement = () => {
     handleFilterChange: filters.handleFilterChange,
     selectedGroupDetail,
     setSelectedGroupDetail,
+    isAutoSelecting,
   };
 };
