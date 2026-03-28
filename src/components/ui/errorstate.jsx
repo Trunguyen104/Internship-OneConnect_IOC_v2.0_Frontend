@@ -5,6 +5,7 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
 import { mapBackendError } from '@/lib/error-handler';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 /**
  * ErrorState Component
@@ -50,7 +51,7 @@ export function ErrorState({
           className="group h-12 rounded-full border-none bg-rose-600 px-8 font-bold text-white shadow-lg shadow-rose-200 hover:bg-rose-700 active:scale-95 transition-all"
         >
           <RefreshCw className="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
-          Try Again
+          {UI_TEXT.BUTTON.TRY_AGAIN}
         </Button>
       )}
     </div>

@@ -126,6 +126,11 @@ export const UI_TEXT = {
     WEBSITE: 'Corporate Website',
     ENTERPRISE: 'Enterprise',
     INDUSTRY_COLUMN: 'Industry',
+    OPEN_WEBSITE: 'Open Website',
+    OFFICIAL_PAGE: 'Official Page',
+    EDIT_PROFILE: 'Edit Profile',
+    UPDATE_INFO: 'Update Information',
+    DELETE_DESC: 'Irreversible Action',
   },
   UNIVERSITIES: {
     CREATE: 'Create University',

@@ -11,6 +11,7 @@ import React, { memo, useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 
@@ -437,7 +438,9 @@ export const CreateGroupModal = memo(
                               }`}
                             >
                               {isSelected && (
-                                <span className="text-white text-[10px] font-black italic">✓</span>
+                                <span className="text-white text-[10px] font-black italic">
+                                  {UI_TEXT.COMMON.CHECKMARK}
+                                </span>
                               )}
                             </div>
 
@@ -450,7 +453,7 @@ export const CreateGroupModal = memo(
                                 {fullName}
                               </Text>
                               <Text className="text-muted text-[9px] uppercase font-medium opacity-60">
-                                {code} • {s.major || CREATE.NO_MAJOR}
+                                {code} {UI_TEXT.COMMON.BULLET} {s.major || CREATE.NO_MAJOR}
                               </Text>
                             </div>
                           </div>

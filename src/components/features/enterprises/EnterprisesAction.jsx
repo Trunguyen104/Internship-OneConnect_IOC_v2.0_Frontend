@@ -6,6 +6,7 @@ import { Edit3, ExternalLink, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
@@ -46,9 +47,11 @@ export default function EnterprisesAction({ enterprise }) {
                   <ExternalLink className="size-4 text-blue-600" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-700">Open Website</span>
+                  <span className="text-sm font-bold text-slate-700">
+                    {UI_TEXT.ENTERPRISES.OPEN_WEBSITE}
+                  </span>
                   <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-                    Official Page
+                    {UI_TEXT.ENTERPRISES.OFFICIAL_PAGE}
                   </span>
                 </div>
               </div>
@@ -65,9 +68,11 @@ export default function EnterprisesAction({ enterprise }) {
             <Edit3 className="size-4 text-amber-600" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-700">Edit Profile</span>
+            <span className="text-sm font-bold text-slate-700">
+              {UI_TEXT.ENTERPRISES.EDIT_PROFILE}
+            </span>
             <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-              Update Information
+              {UI_TEXT.ENTERPRISES.UPDATE_INFO}
             </span>
           </div>
         </div>
@@ -84,9 +89,9 @@ export default function EnterprisesAction({ enterprise }) {
             <Trash2 className="size-4 text-rose-600" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-rose-600">Delete</span>
+            <span className="text-sm font-bold text-rose-600">{UI_TEXT.BUTTON.DELETE}</span>
             <span className="text-[10px] font-medium text-rose-400 uppercase tracking-wider">
-              Irreversible Action
+              {UI_TEXT.ENTERPRISES.DELETE_DESC}
             </span>
           </div>
         </div>

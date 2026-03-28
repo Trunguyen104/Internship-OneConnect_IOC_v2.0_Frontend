@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../../services/evaluation.service';
@@ -223,7 +224,7 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             {student.totalScore || '0'}
           </span>
           <span className="text-[9px] font-black text-primary/30 uppercase tracking-[0.2em] mt-1">
-            Points
+            {UI_TEXT.EVALUATION.POINTS}
           </span>
         </div>
       ),

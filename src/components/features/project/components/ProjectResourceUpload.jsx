@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import { PROJECT_UI } from '@/constants/project/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function ProjectResourceUpload({
@@ -95,7 +96,7 @@ export default function ProjectResourceUpload({
           <Form.Item
             label={
               <span className="text-[11px] font-black tracking-widest text-gray-400 uppercase">
-                External URL
+                {UI_TEXT.PROJECTS.EXTERNAL_URL}
               </span>
             }
             name="externalUrl"
