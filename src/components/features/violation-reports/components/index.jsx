@@ -14,6 +14,7 @@ import { useViolationManagement } from '../hooks/useViolationManagement';
 import ViolationDeleteModal from './ViolationDeleteModal';
 import ViolationFormModal from './ViolationFormModal';
 import ViolationTable from './ViolationTable';
+import PageLayout from '@/components/ui/pagelayout';
 
 const { RangePicker } = DatePicker;
 
@@ -47,10 +48,10 @@ export default function ViolationManagement() {
   } = useViolationManagement();
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+    <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <PageTitle title={VIOLATION_REPORT.TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
+      <PageLayout.Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
         <DataTableToolbar className="mb-5 flex-shrink-0 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={VIOLATION_REPORT.SEARCH_PLACEHOLDER}
@@ -86,19 +87,17 @@ export default function ViolationManagement() {
           isMentor={isMentor}
         />
 
-        {data.length > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
-              total={pagination.total}
-              page={pagination.current}
-              pageSize={pagination.pageSize}
-              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
-              onPageChange={(page) => handleTableChange({ current: page })}
-              onPageSizeChange={(size) => handleTableChange({ pageSize: size, current: 1 })}
-            />
-          </div>
-        )}
-      </Card>
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+          <Pagination
+            total={pagination.total || 0}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            totalPages={Math.max(1, Math.ceil((pagination.total || 0) / pagination.pageSize))}
+            onPageChange={(page) => handleTableChange({ current: page })}
+            onPageSizeChange={(size) => handleTableChange({ pageSize: size, current: 1 })}
+          />
+        </div>
+      </PageLayout.Card>
 
       <ViolationFormModal
         visible={modalVisible}
@@ -118,6 +117,6 @@ export default function ViolationManagement() {
         onConfirm={handleDelete}
         loading={submitLoading}
       />
-    </section>
+    </PageLayout>
   );
 }

@@ -14,6 +14,10 @@ import React from 'react';
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
+import {
+  OPERATIONAL_STATUS,
+  getOperationalStatus,
+} from '@/constants/project-management/project-management';
 
 export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, onAssign }) {
   return (
@@ -43,8 +47,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
               <span className="text-sm font-bold text-slate-700">
                 {currentProject?.mentorName ||
                   currentProject?.groupInfo?.mentorName ||
-                  FORM.LABEL?.N_A ||
-                  'N/A'}
+                  FORM.LABEL.N_A}
               </span>
             </div>
           </section>
@@ -54,7 +57,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             </h4>
             <div className="flex flex-col gap-1">
               <Badge variant="primary-soft" size="sm">
-                {currentProject?.field || FORM.LABEL?.N_A || 'N/A'}
+                {currentProject?.field || FORM.LABEL.N_A}
               </Badge>
             </div>
           </section>
@@ -65,11 +68,11 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <div className="text-sm font-bold text-slate-700 flex items-center whitespace-nowrap">
               {currentProject?.startDate
                 ? dayjs(currentProject.startDate).format('DD/MM/YYYY')
-                : DETAIL.GROUP?.TBA || 'TBA'}
+                : DETAIL.GROUP.TBA}
               <ArrowRightOutlined className="mx-2 text-[10px] text-slate-300" />
               {currentProject?.endDate
                 ? dayjs(currentProject.endDate).format('DD/MM/YYYY')
-                : DETAIL.GROUP?.TBA || 'TBA'}
+                : DETAIL.GROUP.TBA}
             </div>
           </section>
         </div>
@@ -93,11 +96,10 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 </div>
                 <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                   <div className="text-[9px] text-slate-400 font-mono uppercase tracking-widest font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
-                    {DETAIL.GROUP?.ID}:{' '}
+                    {DETAIL.GROUP.ID}:{' '}
                     {currentProject.groupInfo?.internshipId ||
                       currentProject.internshipId ||
-                      FORM.LABEL?.N_A ||
-                      'N/A'}
+                      FORM.LABEL.N_A}
                   </div>
                   {isHR &&
                     (currentProject.internshipId || currentProject.groupInfo?.internshipId) && (
@@ -114,7 +116,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
               currentProject?.groupStatus === DETAIL.GROUP?.ARCHIVED_VALUE ||
               currentProject?.internshipGroup?.status === DETAIL.GROUP?.ARCHIVED_VALUE ? (
                 <Badge variant="default" size="sm">
-                  {DETAIL.GROUP?.ARCHIVED_LABEL || 'Group Archived'}
+                  {DETAIL.GROUP.ARCHIVED_LABEL}
                 </Badge>
               ) : null}
             </div>
@@ -132,8 +134,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                   <span className="text-xs font-bold text-slate-700">
                     {currentProject.groupInfo?.mentorName ||
                       currentProject.internshipGroup?.mentorName ||
-                      FORM.LABEL?.N_A ||
-                      'N/A'}
+                      FORM.LABEL.N_A}
                   </span>
                 </div>
               </div>
@@ -171,7 +172,12 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
               </div>
             </div>
 
-            {!isHR && onAssign && (
+            {!isHR &&
+              onAssign &&
+              getOperationalStatus(currentProject?.operationalStatus) !==
+                OPERATIONAL_STATUS.COMPLETED &&
+              getOperationalStatus(currentProject?.operationalStatus) !==
+                OPERATIONAL_STATUS.ARCHIVED && (
               <Button
                 size="sm"
                 variant="danger"
@@ -179,7 +185,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 onClick={() => onAssign(currentProject)}
                 icon={<UsergroupAddOutlined />}
               >
-                {DETAIL.GROUP?.ASSIGN_BTN || 'Assign Group'}
+                {DETAIL.GROUP.ASSIGN_BTN}
               </Button>
             )}
           </div>

@@ -10,6 +10,7 @@ import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
 import { useProjectFilters } from './useProjectFilters';
 import { useProjectModals } from './useProjectModals';
+import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 
 export const useProjectManagement = () => {
   const toast = useToast();
@@ -86,7 +87,7 @@ export const useProjectManagement = () => {
 
   // 2. Fetch Projects
   const {
-    data: projectsResult,
+    data: projectsData,
     isLoading: loading,
     refetch,
   } = useQuery({
@@ -113,17 +114,16 @@ export const useProjectManagement = () => {
           showArchived: showArchived,
         };
         const res = await ProjectService.getAll(params);
-        if (res?.data?.items) {
-          // Update pagination total outside of render
-          setPagination((prev) => ({
-            ...prev,
-            total: res.data.totalCount || 0,
-          }));
+        
+        // Robust data extraction
+        const apiData = res?.data || res || {};
+        const items = apiData.items || (Array.isArray(apiData) ? apiData : []);
+        const totalCount = apiData.totalCount || apiData.total || apiData.total_count || items.length || 0;
 
-          // AC-16: Notify Mentor about orphaned projects (once)
-          const items = res.data.items;
+        // AC-16: Notify Mentor about orphaned projects (once)
+        if (items.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
           const orphanedList = items.filter((p) => p.isOrphaned || p.isOrphan);
-          if (orphanedList.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
+          if (orphanedList.length > 0) {
             const firstName = orphanedList[0].projectName || orphanedList[0].name;
             const message =
               orphanedList.length === 1
@@ -131,22 +131,27 @@ export const useProjectManagement = () => {
                     '{projectName}',
                     firstName
                   )
-                : `Có ${orphanedList.length} dự án đã bị giải thể nhóm và chuyển về trạng thái Unstarted.`;
+                : PROJECT_MANAGEMENT.MESSAGES.ORPHANED_PROJECTS_PLURAL.replace(
+                    '{count}',
+                    orphanedList.length
+                  );
 
             toast.warning(message, { duration: 10 });
             hasNotifiedOrphaned.current = true;
           }
-
-          return items;
         }
-        return [];
+
+        return { items, total: totalCount };
       } catch (err) {
-        console.error('Fetch Projects failed:', err);
-        return [];
+        return { items: [], total: 0 };
       }
     },
     staleTime: 2 * 60 * 1000,
   });
+
+  const projectsResult = projectsData?.items || [];
+  const totalRecords = projectsData?.total || 0;
+
   const {
     submitLoading,
     handleSaveProject,
@@ -164,17 +169,16 @@ export const useProjectManagement = () => {
     userInfo,
   });
 
-  const [actionLoading, setActionLoading] = useState(false);
-
   return {
     data: projectsResult || [],
-    loading: loading || actionLoading,
+    loading,
     searchTerm,
     groupIdFilter,
     statusFilter,
     visibilityFilter,
     showArchived,
     pagination,
+    total: totalRecords,
     modalVisible,
     detailDrawerVisible,
     editingRecord,
@@ -198,8 +202,8 @@ export const useProjectManagement = () => {
     handleUnpublishProject,
     handleArchiveProject,
     handleAssignGroup,
-    handleCompleteProject: (id) => handleCompleteProject(id, setActionLoading),
-    handleDeleteProject: (id) => handleDeleteProject(id, setActionLoading),
+    handleCompleteProject,
+    handleDeleteProject,
     fetchData: refetch,
     userInfo,
     isMentor,

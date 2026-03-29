@@ -1,23 +1,13 @@
-import {
-  BookOutlined,
-  CalendarOutlined,
-  EditOutlined,
-  IdcardOutlined,
-  InfoCircleOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  PlusCircleOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { Col, Form, Input, Row, Select, Tabs, Typography } from 'antd';
-import dayjs from 'dayjs';
+import { EditOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Form, Tabs } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { enterpriseService } from '@/services/enterprise.service';
 
-const { Text } = Typography;
+import { PersonalTab } from './PersonalTab';
+import { PlacementTab } from './PlacementTab';
 
 const StudentFormBody = memo(function StudentFormBody({
   initialValues,
@@ -101,235 +91,27 @@ const StudentFormBody = memo(function StudentFormBody({
       ? ADD_EDIT.SUBTITLE_EDIT
       : ADD_EDIT.SUBTITLE_ADD;
 
-  const renderPersonalTab = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[400px] space-y-3 pt-3 duration-300">
-      <Row gutter={12}>
-        <Col span={14}>
-          <Form.Item
-            label={ADD_EDIT.NAME_LABEL}
-            name="fullName"
-            rules={[{ required: true, message: ADD_EDIT.NAME_REQUIRED }]}
-            hidden={viewOnly}
-          >
-            <Input
-              prefix={<UserOutlined className="text-muted/60 ml-0.5" />}
-              placeholder={ADD_EDIT.NAME_PLACEHOLDER}
-              className="!h-10 !rounded-xl"
-            />
-          </Form.Item>
-          {viewOnly && (
-            <CompoundModal.InfoBox
-              label={ADD_EDIT.NAME_LABEL}
-              value={initialValues?.fullName || '-'}
-            />
-          )}
-        </Col>
-        <Col span={10}>
-          <Form.Item
-            label={ADD_EDIT.ID_LABEL}
-            name="studentCode"
-            rules={[{ required: true, message: ADD_EDIT.ID_REQUIRED }]}
-            hidden={viewOnly}
-          >
-            <Input
-              prefix={<IdcardOutlined className="text-muted/60 ml-0.5" />}
-              placeholder={ADD_EDIT.ID_PLACEHOLDER}
-              className="!h-10 !rounded-xl font-mono"
-              // disabled={!!initialValues}
-            />
-          </Form.Item>
-          {viewOnly && (
-            <CompoundModal.InfoBox
-              label={ADD_EDIT.ID_LABEL}
-              value={initialValues?.studentCode || '-'}
-            />
-          )}
-        </Col>
-      </Row>
-
-      <Form.Item
-        label={ADD_EDIT.EMAIL_LABEL}
-        name="email"
-        rules={[
-          { required: true, message: ADD_EDIT.EMAIL_REQUIRED },
-          { type: 'email', message: ADD_EDIT.EMAIL_INVALID },
-        ]}
-        hidden={viewOnly}
-      >
-        <Input
-          prefix={<MailOutlined className="text-muted/60 ml-0.5" />}
-          placeholder={ADD_EDIT.EMAIL_PLACEHOLDER}
-          className="!h-10 !rounded-xl"
-        />
-      </Form.Item>
-      {viewOnly && (
-        <CompoundModal.InfoBox label={ADD_EDIT.EMAIL_LABEL} value={initialValues?.email || '-'} />
-      )}
-
-      <Row gutter={12}>
-        <Col span={12}>
-          <Form.Item
-            label={ADD_EDIT.MAJOR_LABEL}
-            name="major"
-            rules={[{ required: true, message: ADD_EDIT.MAJOR_REQUIRED }]}
-            hidden={viewOnly}
-          >
-            <Input
-              placeholder={ADD_EDIT.MAJOR_PLACEHOLDER}
-              className="!h-10 !rounded-xl"
-              prefix={<BookOutlined className="text-muted/60 ml-0.5" />}
-            />
-          </Form.Item>
-          {viewOnly && (
-            <CompoundModal.InfoBox
-              label={ADD_EDIT.MAJOR_LABEL}
-              value={initialValues?.major || '-'}
-            />
-          )}
-        </Col>
-        <Col span={12}>
-          <Form.Item label={ADD_EDIT.PHONE_LABEL} name="phone" hidden={viewOnly}>
-            <Input
-              prefix={<PhoneOutlined className="text-muted/60 ml-0.5" />}
-              placeholder={ADD_EDIT.PHONE_PLACEHOLDER}
-              className="!h-10 !rounded-xl"
-            />
-          </Form.Item>
-          {viewOnly && (
-            <CompoundModal.InfoBox
-              label={ADD_EDIT.PHONE_LABEL}
-              value={initialValues?.phone || '-'}
-            />
-          )}
-        </Col>
-      </Row>
-
-      {!viewOnly && (
-        <Form.Item label={ADD_EDIT.DOB_LABEL} name="dateOfBirth">
-          <Input
-            type="date"
-            prefix={<CalendarOutlined className="text-muted/60 ml-0.5" />}
-            className="!h-10 !rounded-xl"
-          />
-        </Form.Item>
-      )}
-      {viewOnly && (
-        <CompoundModal.InfoBox
-          label={ADD_EDIT.DOB_LABEL}
-          value={
-            initialValues?.dateOfBirth
-              ? dayjs(initialValues.dateOfBirth).format('DD MMM, YYYY')
-              : '-'
-          }
-          color="primary"
-        />
-      )}
-    </div>
-  );
-
-  const renderPlacementTab = () => (
-    <div className="animate-in fade-in slide-in-from-bottom-2 min-h-[400px] space-y-4 pt-3 duration-300">
-      <Row gutter={12}>
-        <Col span={12}>
-          <Form.Item label={ADD_EDIT.STATUS_LABEL} name="placementStatus" hidden={viewOnly}>
-            <Select
-              className="!h-10 w-full"
-              options={[
-                { label: PLACEMENT_LABELS.PLACED, value: 'PLACED' },
-                { label: PLACEMENT_LABELS.UNPLACED, value: 'UNPLACED' },
-              ]}
-            />
-          </Form.Item>
-          {viewOnly && (
-            <CompoundModal.InfoBox
-              label={ADD_EDIT.STATUS_LABEL}
-              value={
-                PLACEMENT_LABELS[initialValues?.placementStatus] ||
-                initialValues?.placementStatus ||
-                '-'
-              }
-              color="info"
-            />
-          )}
-        </Col>
-        <Col span={12}>
-          <Form.Item label={ADD_EDIT.ENROLL_DATE_LABEL} name="enrollmentDate" hidden={viewOnly}>
-            <Input type="date" className="!h-10 !rounded-xl" />
-          </Form.Item>
-          {viewOnly && (
-            <CompoundModal.InfoBox
-              label={ADD_EDIT.ENROLL_DATE_LABEL}
-              value={
-                initialValues?.enrollmentDate
-                  ? dayjs(initialValues.enrollmentDate).format('DD MMM, YYYY')
-                  : '-'
-              }
-              color="success"
-            />
-          )}
-        </Col>
-      </Row>
-
-      <Form.Item
-        label={ADD_EDIT.ENTERPRISE_LABEL}
-        name="enterpriseId"
-        dependencies={['placementStatus']}
-        hidden={viewOnly}
-        rules={[
-          ({ getFieldValue }) => ({
-            required: getFieldValue('placementStatus') === 'PLACED',
-            message: ADD_EDIT.VALIDATION.ENTERPRISE_REQUIRED,
-          }),
-        ]}
-      >
-        <Select
-          showSearch
-          loading={fetchingEnterprises}
-          placeholder={ADD_EDIT.ENTERPRISE_PLACEHOLDER}
-          className="!h-10 w-full"
-          options={enterprises.map((e) => ({
-            label: e.name || e.Name,
-            value: e.enterpriseId || e.EnterpriseId,
-          }))}
-          filterOption={(input, option) =>
-            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-          }
-        />
-      </Form.Item>
-      {viewOnly && (
-        <CompoundModal.InfoBox
-          label={ADD_EDIT.ENTERPRISE_LABEL}
-          value={initialValues?.enterpriseName || '-'}
-        />
-      )}
-
-      <Form.Item label={ADD_EDIT.NOTE_LABEL} name="enrollmentNote" hidden={viewOnly}>
-        <Input.TextArea
-          placeholder={ADD_EDIT.NOTE_PLACEHOLDER}
-          rows={3}
-          className="!rounded-2xl !bg-gray-50/50 focus:!bg-white"
-        />
-      </Form.Item>
-      {viewOnly && (
-        <div className="bg-slate-50/50 border-gray-100 min-h-[80px] rounded-2xl border p-3.5">
-          <Text className="text-text whitespace-pre-wrap text-[13px] leading-relaxed block overflow-hidden">
-            {initialValues?.enrollmentNote || '-'}
-          </Text>
-        </div>
-      )}
-    </div>
-  );
-
   const tabItems = [
     {
       key: '1',
       label: <span className="flex items-center gap-2 px-1">{ADD_EDIT.TABS.GENERAL}</span>,
-      children: renderPersonalTab(),
+      children: (
+        <PersonalTab viewOnly={viewOnly} initialValues={initialValues} ADD_EDIT={ADD_EDIT} />
+      ),
     },
     (initialValues || viewOnly) && {
       key: '2',
       label: <span className="flex items-center gap-2 px-1">{ADD_EDIT.TABS.PLACEMENT}</span>,
-      children: renderPlacementTab(),
+      children: (
+        <PlacementTab
+          viewOnly={viewOnly}
+          initialValues={initialValues}
+          ADD_EDIT={ADD_EDIT}
+          PLACEMENT_LABELS={PLACEMENT_LABELS}
+          fetchingEnterprises={fetchingEnterprises}
+          enterprises={enterprises}
+        />
+      ),
     },
   ].filter(Boolean);
 

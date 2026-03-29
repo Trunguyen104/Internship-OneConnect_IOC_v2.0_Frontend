@@ -1,11 +1,5 @@
-import {
-  EditOutlined,
-  InfoCircleOutlined,
-  SearchOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { Avatar, DatePicker, Form, Input, Select, Typography } from 'antd';
+import { InfoCircleOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Form, Select, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useEffect } from 'react';
 
@@ -13,7 +7,9 @@ import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
+import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
+import { AddStudentsTable } from './AddStudentsTable';
+import { GroupFormFields } from './GroupFormFields';
 
 const { Text } = Typography;
 
@@ -32,12 +28,18 @@ export const CreateGroupModal = memo(
     isAddingStudents = false,
   }) => {
     const [form] = Form.useForm();
-    const { CREATE } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.MODALS;
-    const GROUP_CREATE = ENTERPRISE_GROUP_UI.MODALS.CREATE;
+    const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
+    const { MODALS } = GROUP_MANAGEMENT;
+    const { CREATE } = MODALS;
+
     const isEdit = !!group;
-    const groupNameValue = Form.useWatch('groupName', form);
     const selectedStudentIds = Form.useWatch('studentIds', form);
     const [studentSearch, setStudentSearch] = React.useState('');
+
+    // Prevent infinite resets by stringifying initialStudents map and group map
+    const initialStudentsStr = React.useMemo(() => JSON.stringify(initialStudents.map(s => s.id || s.studentId)), [initialStudents]);
+    const groupMembersStr = React.useMemo(() => group ? JSON.stringify(group.members) : '', [group]);
+    const groupId = group?.id;
 
     useEffect(() => {
       if (open) {
@@ -58,8 +60,6 @@ export const CreateGroupModal = memo(
             groupName: group.name,
             description: group.description || '',
             mentorId: group.mentorId ? String(group.mentorId) : undefined,
-            // studentIds is not needed for Edit mode anymore as we hide the field,
-            // but we still set it for consistency if needed by handleUpdateGroup
             studentIds: (group.members || []).map((s) =>
               String(s.studentId || s.id || s.applicationId || s.StudentId)
             ),
@@ -68,7 +68,7 @@ export const CreateGroupModal = memo(
           });
         }
       }
-    }, [open, isEdit, form, group]); // Only re-run when modal opens or edit mode changes
+    }, [open, isEdit, form, groupId, groupMembersStr, CREATE.DEFAULT_NAME_PREFIX, initialStudentsStr, existingGroups?.length]);
 
     const handleCancel = () => {
       onCancel();
@@ -101,7 +101,7 @@ export const CreateGroupModal = memo(
               const roleInt = roleValue === 'Leader' || roleValue === 2 ? 2 : 1;
               return { studentId: id, role: roleInt };
             })
-          : undefined, // Don't sync students if field is hidden in Edit mode
+          : undefined,
         startDate: values.startDate?.toISOString(),
         endDate: values.endDate?.toISOString(),
       };
@@ -118,7 +118,7 @@ export const CreateGroupModal = memo(
       const name = m.fullName || m.name || CREATE.UNKNOWN_MENTOR;
       const sub = m.department || m.email || CREATE.MENTOR_LABEL;
       return {
-        label: name, // Compact for selected view
+        label: name,
         value: String(m.userId || m.mentorId || m.id || ''),
         searchValue: `${name} ${m.email || ''} ${m.department || ''}`,
         display: (
@@ -133,7 +133,6 @@ export const CreateGroupModal = memo(
       };
     });
 
-    // CRITICAL: Ensure initialStudents (Flow 2) are included in the available options
     const combinedStudentList = [...students];
     initialStudents.forEach((s) => {
       const id = s.id || s.studentId || s.applicationId;
@@ -148,7 +147,6 @@ export const CreateGroupModal = memo(
 
     if (isEdit && group?.members) {
       group.members.forEach((m) => {
-        // Use mapApplication to standardize member object
         const mapped = EnterpriseStudentService.mapApplication(m);
         const id = mapped.studentId || mapped.id;
         if (
@@ -167,7 +165,7 @@ export const CreateGroupModal = memo(
       const code = s.studentCode || s.code || CREATE.NO_CODE;
 
       return {
-        label: `${fullName} (${code})`, // Selected tag format
+        label: `${fullName} (${code})`,
         value: String(s.studentId || s.id || s.applicationId),
         disabled: isAssigned && !isEdit,
         searchValue: `${fullName} ${code} ${s.name || ''} ${s.email || ''}`,
@@ -181,7 +179,7 @@ export const CreateGroupModal = memo(
                 </Text>
                 {isAssigned && (
                   <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-danger/10 text-danger font-bold uppercase tracking-tighter">
-                    {CREATE.IN_GROUP} {s.assignedGroupName || s.groupName || CREATE.ACTIVE_LABEL}
+                    {CREATE.IN_GROUP || 'In Group'} {s.assignedGroupName || s.groupName || 'Active'}
                   </span>
                 )}
               </div>
@@ -206,14 +204,14 @@ export const CreateGroupModal = memo(
           icon={<TeamOutlined />}
           title={
             isAddingStudents
-              ? INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.ACTIONS.ADD_TO_GROUP
+              ? GROUP_MANAGEMENT.ACTIONS.ADD_TO_GROUP
               : isEdit
                 ? CREATE.TITLE_EDIT
                 : CREATE.TITLE
           }
           subtitle={
             isAddingStudents
-              ? INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST.MODALS.GROUP_ACTION.STUDENT_LABEL
+              ? CREATE.SUBTITLE_EDIT
               : isEdit
                 ? CREATE.SUBTITLE_EDIT
                 : CREATE.SUBTITLE
@@ -257,105 +255,24 @@ export const CreateGroupModal = memo(
             <div className="mb-4 bg-primary-surface border border-primary/10 rounded-xl px-4 py-3 flex items-center justify-between">
               <div className="flex flex-col gap-0.5">
                 <Text className="text-muted/60 text-[9px] font-bold uppercase tracking-widest leading-none">
-                  {GROUP_CREATE.TARGET_GROUP_LABEL}
+                  {GROUP_MANAGEMENT.MODALS.VIEW.TARGET_GROUP_LABEL || 'Target Group'}
                 </Text>
                 <Text className="text-primary text-sm font-black tracking-tight leading-tight">
                   {group.groupName || group.name}
                 </Text>
               </div>
               <div className="bg-success-surface px-2 py-1 rounded-lg text-success text-[10px] font-bold uppercase tracking-tighter shadow-sm">
-                {GROUP_CREATE.ACTIVE_GROUP_LABEL}
+                {GROUP_MANAGEMENT.MODALS.VIEW.ACTIVE_GROUP_LABEL || 'Active'}
               </div>
             </div>
           )}
+
           {!isAddingStudents && (
-            <>
-              <div className="grid grid-cols-2 gap-3 mb-2">
-                <Form.Item
-                  label={
-                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                      {CREATE.NAME_LABEL}
-                    </span>
-                  }
-                  name="groupName"
-                  rules={[{ required: true, message: CREATE.NAME_REQUIRED }]}
-                  className="mb-0"
-                >
-                  <Input
-                    prefix={<EditOutlined className="text-muted/40 text-[10px]" />}
-                    placeholder={CREATE.NAME_PLACEHOLDER}
-                    className="bg-slate-50/50 border-slate-100 h-9 rounded-lg hover:border-primary/50 focus:border-primary/50 transition-all text-xs font-semibold"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  label={
-                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-2">
-                      {CREATE.MENTOR_LABEL}
-                    </span>
-                  }
-                  name="mentorId"
-                  className="mb-0"
-                >
-                  <Select
-                    allowClear
-                    showSearch
-                    placeholder={CREATE.MENTOR_PLACEHOLDER}
-                    className="h-9 w-full rounded-lg bg-slate-50/50"
-                    loading={loadingMentors}
-                    options={mentorOptions}
-                    optionLabelProp="label"
-                    optionRender={(option) => option.data.display}
-                    optionFilterProp="searchValue"
-                    suffixIcon={<UserOutlined className="text-muted/40 text-[10px]" />}
-                  />
-                </Form.Item>
-              </div>
-
-              <Form.Item
-                label={
-                  <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                    {CREATE.DESCRIPTION_LABEL}
-                  </span>
-                }
-                name="description"
-                className="mb-2"
-              >
-                <Input.TextArea
-                  placeholder={CREATE.DESCRIPTION_PLACEHOLDER}
-                  className="bg-slate-50/50 border-slate-100 rounded-lg hover:border-primary/50 focus:border-primary/50 transition-all py-1.5 text-xs font-semibold"
-                  autoSize={{ minRows: 1, maxRows: 2 }}
-                />
-              </Form.Item>
-
-              <div className="grid grid-cols-2 gap-3 mb-2">
-                <Form.Item
-                  label={
-                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                      {CREATE.START_DATE_LABEL}
-                    </span>
-                  }
-                  name="startDate"
-                  rules={[{ required: true, message: CREATE.START_DATE_REQUIRED }]}
-                  className="mb-0"
-                >
-                  <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
-                </Form.Item>
-
-                <Form.Item
-                  label={
-                    <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-                      {CREATE.END_DATE_LABEL}
-                    </span>
-                  }
-                  name="endDate"
-                  rules={[{ required: true, message: CREATE.END_DATE_REQUIRED }]}
-                  className="mb-0"
-                >
-                  <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
-                </Form.Item>
-              </div>
-            </>
+            <GroupFormFields
+              CREATE={CREATE}
+              mentorOptions={mentorOptions}
+              loadingMentors={loadingMentors}
+            />
           )}
 
           {(isAddingStudents || !isEdit) && (
@@ -370,107 +287,16 @@ export const CreateGroupModal = memo(
               className="mb-3"
             >
               {isAddingStudents ? (
-                <div className="flex flex-col gap-3">
-                  <Input
-                    prefix={<SearchOutlined className="text-muted/40 text-[11px]" />}
-                    placeholder="Search by name or code..."
-                    value={studentSearch}
-                    onChange={(e) => setStudentSearch(e.target.value)}
-                    className="h-9 rounded-lg border-slate-100 bg-slate-50/50 text-xs font-semibold"
-                  />
-                  <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 no-scrollbar border border-slate-100 rounded-xl p-2 bg-slate-50/30">
-                    {combinedStudentList
-                      .filter((s) => {
-                        const isAssigned =
-                          s.isAssignedToGroup || !!s.assignedGroupId || !!s.groupId;
-                        if (isAssigned) return false;
-
-                        // Phase match constraint: ensure students belong to the same phase as the group
-                        const groupPhaseId =
-                          group?.phaseId || group?.termId || group?.internshipPhaseId;
-                        const studentPid = s.phaseId || s.termId || s.internshipPhaseId;
-                        if (
-                          groupPhaseId &&
-                          studentPid &&
-                          String(groupPhaseId) !== String(studentPid)
-                        ) {
-                          return false;
-                        }
-
-                        const name = (
-                          s.studentFullName ||
-                          s.fullName ||
-                          s.name ||
-                          ''
-                        ).toLowerCase();
-                        const code = (s.studentCode || s.code || '').toLowerCase();
-                        const search = studentSearch.toLowerCase();
-                        return name.includes(search) || code.includes(search);
-                      })
-                      .map((s) => {
-                        const id = String(s.studentId || s.id || s.applicationId);
-                        const isSelected = selectedStudentIds?.includes(id);
-                        const fullName =
-                          s.studentFullName || s.fullName || s.name || CREATE.UNKNOWN_STUDENT;
-                        const code = s.studentCode || s.code || CREATE.NO_CODE;
-
-                        return (
-                          <div
-                            key={id}
-                            onClick={() => {
-                              const current = selectedStudentIds || [];
-                              const next = isSelected
-                                ? current.filter((cid) => cid !== id)
-                                : [...current, id];
-                              form.setFieldsValue({ studentIds: next });
-                            }}
-                            className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
-                              isSelected
-                                ? 'bg-primary/5 border-primary/20 shadow-sm'
-                                : 'bg-white border-slate-100 hover:border-primary/30 hover:bg-slate-50'
-                            }`}
-                          >
-                            <div
-                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all ${
-                                isSelected
-                                  ? 'bg-primary border-primary'
-                                  : 'bg-white border-slate-300'
-                              }`}
-                            >
-                              {isSelected && (
-                                <span className="text-white text-[10px] font-black italic">
-                                  {UI_TEXT.COMMON.CHECKMARK}
-                                </span>
-                              )}
-                            </div>
-
-                            <Avatar size="small" src={s.avatar} icon={<UserOutlined />} />
-
-                            <div className="flex flex-col leading-tight grow overflow-hidden">
-                              <Text
-                                className={`text-xs font-bold truncate ${isSelected ? 'text-primary' : 'text-text'}`}
-                              >
-                                {fullName}
-                              </Text>
-                              <Text className="text-muted text-[9px] uppercase font-medium opacity-60">
-                                {code} {UI_TEXT.COMMON.BULLET} {s.major || CREATE.NO_MAJOR}
-                              </Text>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    {combinedStudentList.filter(
-                      (s) => !(s.isAssignedToGroup || !!s.assignedGroupId || !!s.groupId)
-                    ).length === 0 && (
-                      <div className="py-8 text-center flex flex-col items-center gap-2">
-                        <TeamOutlined className="text-muted/20 text-3xl" />
-                        <Text className="text-muted/60 text-xs italic">
-                          {CREATE.EMPTY_STUDENTS}
-                        </Text>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <AddStudentsTable
+                  students={combinedStudentList}
+                  value={selectedStudentIds}
+                  onChange={(nextIds) => form.setFieldsValue({ studentIds: nextIds })}
+                  searchQuery={studentSearch}
+                  onSearchChange={setStudentSearch}
+                  groupPhaseId={group?.phaseId || group?.termId}
+                  UI_TEXT={UI_TEXT}
+                  CREATE={CREATE}
+                />
               ) : (
                 <Select
                   mode="multiple"
@@ -502,7 +328,7 @@ export const CreateGroupModal = memo(
             cancelText={CREATE.CANCEL}
             confirmText={
               isAddingStudents
-                ? GROUP_CREATE.SUBMIT_ADD
+                ? CREATE.SUBMIT_ADD
                 : isEdit
                   ? CREATE.SUBMIT_EDIT
                   : CREATE.SUBMIT
@@ -512,13 +338,9 @@ export const CreateGroupModal = memo(
             confirmDisabled={
               (students.length === 0 && !isEdit) ||
               (() => {
-                const selectedInfo = initialStudents
-                  .concat(students)
-                  .filter((s) =>
-                    selectedStudentIds?.includes(
-                      s.studentId || s.StudentId || s.id || s.applicationId
-                    )
-                  );
+                const selectedInfo = combinedStudentList.filter((s) =>
+                  selectedStudentIds?.includes(s.studentId || s.StudentId || s.id || s.applicationId)
+                );
                 const uniquePhases = new Set(
                   selectedInfo.map((s) => s.phaseId || s.termId).filter(Boolean)
                 );

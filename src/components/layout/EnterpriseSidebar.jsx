@@ -43,7 +43,7 @@ const enterpriseMenu = [
     icon: <WarningOutlined />,
     label: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TITLE,
     href: '/violation-reports',
-    role: [USER_ROLE.MENTOR],
+    role: [USER_ROLE.MENTOR, USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR],
   },
   {
     icon: <TeamOutlined />,
@@ -65,14 +65,37 @@ const enterpriseMenu = [
 
 export default function EnterpriseSidebar() {
   const { userInfo } = useProfile();
-  const userRole = userInfo?.role ?? userInfo?.Role;
-
+  
   const filteredMenu = useMemo(() => {
+    const rawRole = userInfo?.roleId || userInfo?.RoleId || userInfo?.role || userInfo?.Role;
+    const roleId = rawRole ? Number(rawRole) : null;
+    const roleName = String(
+      userInfo?.roleName || userInfo?.RoleName || userInfo?.role || userInfo?.Role || ''
+    ).toLowerCase();
+
     return enterpriseMenu.filter((item) => {
       if (!item.role) return true;
-      return item.role.includes(userRole);
+
+      const allowedRoles = item.role || [];
+      
+      // 1. Check numeric match
+      if (roleId && allowedRoles.includes(roleId)) return true;
+      
+      // 2. Check string match (if IDs are strings)
+      if (rawRole && allowedRoles.map(String).includes(String(rawRole))) return true;
+
+      // 3. Fallback: check role name strings for common enterprise roles
+      if (roleName.includes('mentor') && allowedRoles.includes(USER_ROLE.MENTOR)) return true;
+      if (
+        (roleName.includes('enterprise') || roleName.includes('admin')) &&
+        allowedRoles.includes(USER_ROLE.ENTERPRISE_ADMIN)
+      )
+        return true;
+      if (roleName.includes('hr') && allowedRoles.includes(USER_ROLE.HR)) return true;
+
+      return false;
     });
-  }, [userRole]);
+  }, [userInfo]);
 
   return (
     <ProfileAwareSidebar

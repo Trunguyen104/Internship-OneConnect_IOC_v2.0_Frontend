@@ -66,12 +66,12 @@ export const useViolationManagement = () => {
       try {
         setFetchingTerms(true);
         const groupsRes = await ViolationService.getGroups({ pageSize: 100 });
-        const groupsData = groupsRes?.data?.items || groupsRes?.items || [];
+        const groupsData = groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || [];
 
         const termMap = new Map();
         groupsData.forEach((g) => {
-          const tId = g.termId || g.internshipTermId;
-          const tName = g.term || g.termName || g.internshipTermName;
+          const tId = g.termId || g.internshipTermId || g.internshipId;
+          const tName = g.term || g.termName || g.internshipTermName || g.groupName;
           if (tId && !termMap.has(tId)) {
             termMap.set(tId, tName || `${VIOLATION_REPORT.FILTERS.TERM} ${termMap.size + 1}`);
           }
@@ -101,10 +101,10 @@ export const useViolationManagement = () => {
         if (!termId || !me) return { groups: [], students: [] };
 
         const groupsRes = await ViolationService.getGroups({ termId, pageSize: 100 });
-        const groupsData = (groupsRes?.data?.items || groupsRes?.items || []).map((g) => ({
+        const groupsData = (groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || []).map((g) => ({
           ...g,
-          internshipGroupId: g.internshipGroupId || g.id,
-          id: g.id || g.internshipGroupId,
+          internshipGroupId: g.internshipGroupId || g.id || g.internshipId,
+          id: g.id || g.internshipGroupId || g.internshipId,
         }));
 
         // Fetch members for each group
@@ -118,16 +118,24 @@ export const useViolationManagement = () => {
         const memberIds = new Set();
         detailsRes.forEach((res) => {
           const detail = res?.data || res;
-          if (detail?.members) {
-            detail.members.forEach((m) => {
-              if (!memberIds.has(m.studentId)) {
-                memberIds.add(m.studentId);
+          // The Swagger shows students inside detail.members (if detail is res.data)
+          // or detail.data.members (if detail is the whole response)
+          const membersList = detail?.members || detail?.data?.members || [];
+          
+          if (Array.isArray(membersList)) {
+            membersList.forEach((m) => {
+              const sId = m.studentId || m.userId || m.id;
+              if (sId && !memberIds.has(sId)) {
+                memberIds.add(sId);
                 allMembers.push({
                   ...m,
-                  id: m.studentId,
-                  studentFullName: m.fullName || m.studentFullName,
-                  groupStartDate: detail.startDate,
-                  groupEndDate: detail.endDate,
+                  id: sId,
+                  studentId: sId,
+                  studentFullName: m.fullName || m.studentFullName || m.studentName || m.name,
+                  studentCode: m.studentCode || m.userCode || m.code,
+                  groupStartDate: detail?.startDate || detail?.data?.startDate,
+                  groupEndDate: detail?.endDate || detail?.data?.endDate,
+                  groupName: detail?.groupName || detail?.data?.groupName,
                 });
               }
             });
@@ -307,7 +315,27 @@ export const useViolationManagement = () => {
     termOptions,
     fetchingTerms: false,
     studentOptions,
-    isMentor: me?.role === USER_ROLE.MENTOR || me?.Role === USER_ROLE.MENTOR,
+    isMentor: (() => {
+      const rawRole = me?.roleId || me?.RoleId || me?.role || me?.Role;
+      const roleId = rawRole ? Number(rawRole) : null;
+      const roleName = String(
+        me?.roleName || me?.RoleName || me?.role || me?.Role || ''
+      ).toLowerCase();
+
+      // Check numeric IDs
+      if (
+        roleId === USER_ROLE.MENTOR ||
+        roleId === USER_ROLE.HR ||
+        roleId === USER_ROLE.ENTERPRISE_ADMIN
+      )
+        return true;
+
+      // Check string name fallbacks
+      if (roleName.includes('mentor') || roleName.includes('hr') || roleName.includes('admin'))
+        return true;
+
+      return false;
+    })(),
     fetchData,
   };
 };

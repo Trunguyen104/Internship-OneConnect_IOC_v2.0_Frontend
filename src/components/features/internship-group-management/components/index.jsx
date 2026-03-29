@@ -4,10 +4,11 @@ import { FilterOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import { Select, Tooltip } from 'antd';
 import React from 'react';
 
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { cn } from '@/lib/cn';
 
 import { useGroupManagement } from '../hooks/useGroupManagement';
 import { CreateGroupModal } from './CreateGroupModal';
@@ -68,11 +69,17 @@ export default function GroupManagement({ onDetailMode }) {
   };
 
   return (
-    <section
-      className={`animate-in fade-in flex flex-1 flex-col space-y-6 duration-500 ${!selectedGroupDetail ? 'min-h-0' : ''}`}
+    <PageLayout
+      className={cn(
+        'animate-in fade-in flex flex-1 flex-col space-y-6 duration-500',
+        !selectedGroupDetail ? 'min-h-0' : ''
+      )}
     >
-      <Card
-        className={`flex flex-col !rounded-3xl border-none !p-4 shadow-sm sm:!p-8 ${!selectedGroupDetail ? 'min-h-0 flex-1 overflow-hidden' : 'overflow-visible'}`}
+      <PageLayout.Card
+        className={cn(
+          'flex flex-col !p-4 sm:!p-8',
+          !selectedGroupDetail ? 'min-h-0 flex-1 overflow-hidden' : 'overflow-visible'
+        )}
       >
         {selectedGroupDetail ? (
           <GroupGeneralInfo
@@ -107,11 +114,12 @@ export default function GroupManagement({ onDetailMode }) {
                       onClick={() =>
                         handleFilterChange('includeArchived', !filters.includeArchived)
                       }
-                      className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all ${
+                      className={cn(
+                        'flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl transition-all',
                         filters.includeArchived
                           ? 'bg-primary text-white shadow-sm'
                           : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}
+                      )}
                     >
                       <InboxOutlined
                         className={filters.includeArchived ? 'text-lg' : 'text-base font-bold'}
@@ -144,22 +152,20 @@ export default function GroupManagement({ onDetailMode }) {
               onEdit={onEditGroup}
               onAddStudents={onAddStudents}
             />
-
-            {total > 0 && (
-              <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
-                <Pagination
-                  total={total}
-                  page={pagination.current}
-                  pageSize={pagination.pageSize}
-                  totalPages={Math.ceil(total / pagination.pageSize)}
-                  onPageChange={handleTableChange}
-                  onPageSizeChange={handlePageSizeChange}
-                />
-              </div>
-            )}
           </>
         )}
-      </Card>
+
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+          <Pagination
+            total={total || 0}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            totalPages={Math.max(1, Math.ceil((total || 0) / pagination.pageSize))}
+            onPageChange={handleTableChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </div>
+      </PageLayout.Card>
 
       <CreateGroupModal
         open={createModal.open}
@@ -185,6 +191,6 @@ export default function GroupManagement({ onDetailMode }) {
         onCancel={() => setEditModal({ open: false, group: null, isAddingStudents: false })}
         onFinish={handleUpdateGroup}
       />
-    </section>
+    </PageLayout>
   );
 }

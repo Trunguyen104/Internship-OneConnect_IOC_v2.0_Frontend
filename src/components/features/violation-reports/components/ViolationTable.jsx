@@ -153,6 +153,7 @@ const ViolationTable = memo(function ViolationTable({
       data={data}
       loading={loading}
       rowKey="violationReportId"
+      size="small"
       minWidth="800px"
       className="mt-2 min-h-0 flex-1"
       locale={{ emptyText: VIOLATION_REPORT.EMPTY_MESSAGE }}

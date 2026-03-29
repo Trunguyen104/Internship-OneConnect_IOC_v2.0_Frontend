@@ -19,7 +19,7 @@ export function useProjectDetail(projectId, groupId, enabled = false) {
       return res?.data || res;
     },
     enabled: enabled && !!projectId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   // 2. Fetch Assigned Students
@@ -31,7 +31,7 @@ export function useProjectDetail(projectId, groupId, enabled = false) {
       return data?.members || (Array.isArray(data) ? data : []);
     },
     enabled: enabled && !!groupId,
-    staleTime: 10 * 60 * 1000,
+    staleTime: 0,
   });
 
   return {

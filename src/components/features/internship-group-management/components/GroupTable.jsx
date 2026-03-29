@@ -18,6 +18,8 @@ import {
   INTERNSHIP_MANAGEMENT_UI,
 } from '@/constants/internship-management/internship-management';
 
+import dayjs from 'dayjs';
+
 const GroupTable = memo(function GroupTable({
   data,
   loading,
@@ -58,15 +60,25 @@ const GroupTable = memo(function GroupTable({
       },
       {
         title: TABLE.COLUMNS.PHASE,
-        key: 'phaseName',
+        key: 'phaseInfo',
         width: 200,
-        render: (_, record) => (
-          <div className="flex items-center gap-1.5">
-            <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
-              {record.phaseName || record.phase?.name || record.termName || TABLE.NOT_ASSIGNED}
-            </span>
-          </div>
-        ),
+        render: (_, record) => {
+          const name = record.phaseName && record.phaseName !== '-' ? record.phaseName : (record.phase?.name || record.termName);
+          const hasDates = record.startDate && record.endDate;
+          
+          return (
+            <div className="flex flex-col flex-wrap gap-0.5 justify-center">
+              <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
+                {/* {name || (hasDates ? 'PHASE DATES' : TABLE.NOT_ASSIGNED)} */}
+              </span>
+              {hasDates && (
+                <span className="text-muted text-[10px] font-medium opacity-60">
+                  {dayjs(record.startDate).format('DD/MM/YYYY')} - {dayjs(record.endDate).format('DD/MM/YYYY')}
+                </span>
+              )}
+            </div>
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.MENTOR,

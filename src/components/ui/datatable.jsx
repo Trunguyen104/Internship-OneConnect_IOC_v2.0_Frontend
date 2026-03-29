@@ -8,6 +8,7 @@ import React, { useCallback, useMemo } from 'react';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 
 import { Checkbox } from './checkbox';
+import { cn } from '@/lib/cn';
 
 export default function DataTable({
   columns = [],
@@ -124,14 +125,16 @@ export default function DataTable({
             <tr>
               {rowSelection && (
                 <th
-                  className="w-[60px] cursor-pointer px-4 py-5 align-middle"
+                  className={cn(
+                    'w-[60px] cursor-pointer px-4 align-middle',
+                    headerPadding
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleSelectAll(!isAllSelected);
                   }}
                 >
                   <div className="flex items-center justify-center">
-                    {/* <Checkbox checked={isAllSelected} indeterminate={isIndeterminate} /> */}
                     <Checkbox
                       checked={isAllSelected}
                       indeterminate={isIndeterminate}
@@ -181,15 +184,21 @@ export default function DataTable({
                 <tr
                   key={key}
                   onClick={() => !disabled && onRowClick?.(record)}
-                  className={`group h-[72px] transition-all duration-200 ${
+                  className={cn(
+                    'group transition-all duration-200',
+                    isSmall ? 'h-[48px]' : isLarge ? 'h-[80px]' : 'h-[64px]',
                     isSelected
                       ? 'bg-primary/5 border-l-2 border-l-primary shadow-sm'
-                      : 'hover:bg-bg/80'
-                  } ${onRowClick && !disabled ? 'cursor-pointer' : ''} `}
+                      : 'hover:bg-bg/80',
+                    onRowClick && !disabled ? 'cursor-pointer' : ''
+                  )}
                 >
                   {rowSelection && (
                     <td
-                      className="w-[60px] cursor-pointer px-4 py-4 align-middle"
+                      className={cn(
+                        'w-[60px] cursor-pointer px-4 align-middle',
+                        cellPadding
+                      )}
                       onClick={(e) => {
                         e.stopPropagation();
                         const { disabled = false } = rowSelection?.getCheckboxProps?.(record) || {};
@@ -199,7 +208,6 @@ export default function DataTable({
                       }}
                     >
                       <div className="flex items-center justify-center">
-                        {/* <Checkbox checked={isSelected} disabled={disabled} /> */}
                         <Checkbox
                           checked={isSelected}
                           disabled={disabled}

@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { useCallback, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import {
@@ -17,12 +17,13 @@ import { useStudentFilters } from './useStudentFilters';
 import { useStudentModals } from './useStudentModals';
 
 export const useStudentEnrollment = () => {
+  const queryClient = useQueryClient();
   const toast = useToast();
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
   const { MESSAGES } = ENROLLMENT_MANAGEMENT;
 
-  const [submitLoading, setSubmitLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [viewId, setViewId] = useState(null);
 
   const {
     termId,
@@ -57,22 +58,20 @@ export const useStudentEnrollment = () => {
 
   const { current, pageSize } = pagination;
 
-  // 1. Fetch Students with useQuery
-  const {
-    data: studentData = { items: [], total: 0 },
-    isLoading: loading,
-    refetch: fetchStudents,
-  } = useQuery({
-    queryKey: [
-      'students-enrollment',
-      termId,
-      current,
-      pageSize,
-      debouncedSearchTerm,
-      statusFilter,
-      sortBy,
-      sortOrder,
-    ],
+  const queryKey = [
+    'students-enrollment',
+    termId,
+    current,
+    pageSize,
+    debouncedSearchTerm,
+    statusFilter,
+    sortBy,
+    sortOrder,
+  ];
+
+  // 1. Fetch Students
+  const { data: studentData = { items: [], total: 0 }, isLoading: loading } = useQuery({
+    queryKey,
     queryFn: async () => {
       if (!termId) return { items: [], total: 0 };
       try {
@@ -111,6 +110,127 @@ export const useStudentEnrollment = () => {
     staleTime: 2 * 60 * 1000,
   });
 
+  // 2. Fetch Student Detail
+  const studentDetailQuery = useQuery({
+    queryKey: ['student-detail', viewId],
+    queryFn: async () => {
+      try {
+        const response = await StudentService.getById(viewId);
+        return response?.data ? StudentService.mapStudent(response.data) : null;
+      } catch (error) {
+        toast.error(getErrorDetail(error, MESSAGES.DETAIL_LOAD_ERROR));
+        setViewId(null);
+        throw error;
+      }
+    },
+    enabled: !!viewId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const {
+    isFetching: viewLoading,
+    data: viewedStudent,
+    isSuccess: viewSuccess,
+  } = studentDetailQuery;
+
+  // Handle successful view
+  useEffect(() => {
+    if (viewSuccess && viewedStudent && viewId) {
+      handleOpenDetails(viewedStudent);
+      setViewId(null);
+    }
+  }, [viewSuccess, viewedStudent, viewId, handleOpenDetails]);
+
+  // Mutations
+  const { mutate: addStudent, isPending: addLoading } = useMutation({
+    mutationFn: (values) => {
+      if (!termId) throw new Error(MESSAGES.TERM_ID_REQUIRED);
+      const payload = StudentService.mapStudentForCreate({ ...values, termId });
+      return StudentService.create(termId, payload);
+    },
+    onSuccess: () => {
+      toast.success(MESSAGES.ADD_SUCCESS);
+      setAddVisible(false);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.ADD_ERROR)),
+  });
+
+  const { mutate: updateStudent, isPending: updateLoading } = useMutation({
+    mutationFn: (values) => {
+      if (!selectedRecord?.studentTermId) throw new Error(MESSAGES.STUDENT_TERM_ID_REQUIRED);
+      const payload = StudentService.mapStudentForUpdate({
+        ...values,
+        studentTermId: selectedRecord.studentTermId,
+      });
+      return StudentService.update(selectedRecord.studentTermId, payload);
+    },
+    onSuccess: () => {
+      toast.success(MESSAGES.UPDATE_SUCCESS);
+      setEditVisible(false);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.UPDATE_ERROR)),
+  });
+
+  const { mutate: withdrawStudent, isPending: withdrawLoading } = useMutation({
+    mutationFn: (studentTermId) => StudentService.withdraw(studentTermId),
+    onSuccess: () => {
+      toast.success(MESSAGES.DELETE_SUCCESS);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR)),
+  });
+
+  const { mutate: restoreStudent, isPending: restoreLoading } = useMutation({
+    mutationFn: (studentTermId) => StudentService.restore(studentTermId),
+    onSuccess: () => {
+      toast.success(MESSAGES.RESTORE_SUCCESS);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.RESTORE_ERROR)),
+  });
+
+  const { mutate: importConfirm, isPending: importLoading } = useMutation({
+    mutationFn: (validRecords) => StudentService.importConfirm(termId, validRecords),
+    onSuccess: (response) => {
+      toast.success(
+        MESSAGES.IMPORT_BULK_SUCCESS.replace('{count}', response?.data?.importedCount || 0)
+      );
+      setImportVisible(false);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR)),
+  });
+
+  const { mutate: bulkWithdraw, isPending: bulkWithdrawLoading } = useMutation({
+    mutationFn: ({ studentTermIds }) => StudentService.bulkWithdraw(termId, studentTermIds),
+    onSuccess: (_, variables) => {
+      const { unplacedCount, placedCount } = variables;
+      const { BULK_WITHDRAW } = MESSAGES;
+
+      if (placedCount === 0) {
+        toast.success(BULK_WITHDRAW.SUCCESS_ALL_UNPLACED.replace('{count}', unplacedCount));
+      } else {
+        toast.success(
+          BULK_WITHDRAW.SUCCESS_MIXED.replace('{unplacedCount}', unplacedCount).replace(
+            '{placedCount}',
+            placedCount
+          )
+        );
+      }
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+    },
+    onError: () => toast.error(MESSAGES.BULK_WITHDRAW.ERROR_GENERIC),
+  });
+
+  const { mutateAsync: importPreview, isPending: previewLoading } = useMutation({
+    mutationFn: (file) => StudentService.importPreview(termId, file),
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR)),
+  });
+
+  // Handlers
   const handleDelete = useCallback(
     (student) => {
       if (student.placementStatus === 'PLACED') {
@@ -120,105 +240,13 @@ export const useStudentEnrollment = () => {
       showDeleteConfirm({
         title: MESSAGES.DELETE_CONFIRM_TITLE,
         content: MESSAGES.DELETE_CONFIRM_TEXT.replace('{name}', student.name),
-        onOk: async () => {
-          setSubmitLoading(true);
-          try {
-            await StudentService.withdraw(student.studentTermId);
-            toast.success(MESSAGES.DELETE_SUCCESS);
-            fetchStudents();
-          } catch (error) {
-            toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR));
-          } finally {
-            setSubmitLoading(false);
-          }
-        },
+        onOk: () => withdrawStudent(student.studentTermId),
       });
     },
-    [toast, MESSAGES, fetchStudents]
+    [withdrawStudent, MESSAGES, toast]
   );
 
-  const handleUpdateStudent = useCallback(
-    async (values) => {
-      if (!selectedRecord) return;
-      setSubmitLoading(true);
-      try {
-        const payload = StudentService.mapStudentForUpdate({
-          ...values,
-          studentTermId: selectedRecord.studentTermId,
-        });
-        await StudentService.update(selectedRecord.studentTermId, payload);
-        toast.success(MESSAGES.UPDATE_SUCCESS);
-        setEditVisible(false);
-        fetchStudents();
-      } catch (error) {
-        toast.error(getErrorDetail(error, MESSAGES.UPDATE_ERROR));
-      } finally {
-        setSubmitLoading(false);
-      }
-    },
-    [selectedRecord, setEditVisible, toast, MESSAGES, fetchStudents]
-  );
-
-  const handleAddStudent = useCallback(
-    async (values) => {
-      if (!termId) return;
-      setSubmitLoading(true);
-      try {
-        const payload = StudentService.mapStudentForCreate({
-          ...values,
-          termId: termId,
-        });
-        await StudentService.create(termId, payload);
-        toast.success(MESSAGES.ADD_SUCCESS);
-        setAddVisible(false);
-        fetchStudents();
-      } catch (error) {
-        toast.error(getErrorDetail(error, MESSAGES.ADD_ERROR));
-      } finally {
-        setSubmitLoading(false);
-      }
-    },
-    [termId, setAddVisible, toast, MESSAGES, fetchStudents]
-  );
-
-  const handleImportPreview = useCallback(
-    async (file) => {
-      if (!termId) return null;
-      setSubmitLoading(true);
-      try {
-        const response = await StudentService.importPreview(termId, file);
-        return response?.data;
-      } catch (error) {
-        toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
-        return null;
-      } finally {
-        setSubmitLoading(false);
-      }
-    },
-    [termId, toast, MESSAGES]
-  );
-
-  const handleImportConfirm = useCallback(
-    async (validRecords) => {
-      if (!termId) return;
-      setSubmitLoading(true);
-      try {
-        const response = await StudentService.importConfirm(termId, validRecords);
-        toast.success(
-          MESSAGES.IMPORT_BULK_SUCCESS.replace('{count}', response?.data?.importedCount || 0)
-        );
-        setImportVisible(false);
-        fetchStudents();
-      } catch (error) {
-        toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
-      } finally {
-        setSubmitLoading(false);
-      }
-    },
-    [termId, setImportVisible, toast, MESSAGES, fetchStudents]
-  );
-
-  const handleBulkWithdraw = useCallback(async () => {
+  const handleBulkWithdraw = useCallback(() => {
     if (!termId || selectedIds.length === 0) return;
 
     const { BULK_WITHDRAW } = MESSAGES;
@@ -244,48 +272,18 @@ export const useStudentEnrollment = () => {
     showDeleteConfirm({
       title: BULK_WITHDRAW.ACTION_LABEL,
       content: confirmText,
-      onOk: async () => {
-        setSubmitLoading(true);
-        try {
-          await StudentService.bulkWithdraw(
-            termId,
-            unplacedStudents.map((s) => s.studentTermId)
-          );
-
-          if (Y === 0) {
-            toast.success(BULK_WITHDRAW.SUCCESS_ALL_UNPLACED.replace('{count}', X));
-          } else {
-            toast.success(
-              BULK_WITHDRAW.SUCCESS_MIXED.replace('{unplacedCount}', X).replace('{placedCount}', Y)
-            );
-          }
-
-          setSelectedIds([]);
-          fetchStudents();
-        } catch (error) {
-          toast.error(BULK_WITHDRAW.ERROR_GENERIC);
-        } finally {
-          setSubmitLoading(false);
-        }
-      },
+      onOk: () =>
+        bulkWithdraw({
+          studentTermIds: unplacedStudents.map((s) => s.studentTermId),
+          unplacedCount: X,
+          placedCount: Y,
+        }),
     });
-  }, [termId, selectedIds, studentData.items, toast, fetchStudents, MESSAGES]);
+  }, [termId, selectedIds, studentData.items, bulkWithdraw, MESSAGES, toast]);
 
-  const handleRestore = useCallback(
-    async (student) => {
-      setSubmitLoading(true);
-      try {
-        await StudentService.restore(student.studentTermId);
-        toast.success(MESSAGES.RESTORE_SUCCESS);
-        fetchStudents();
-      } catch (error) {
-        toast.error(getErrorDetail(error, MESSAGES.RESTORE_ERROR));
-      } finally {
-        setSubmitLoading(false);
-      }
-    },
-    [toast, MESSAGES, fetchStudents]
-  );
+  const handleView = useCallback((student) => {
+    setViewId(student.studentTermId);
+  }, []);
 
   const handleDownloadTemplate = useCallback(async () => {
     if (!termId) return;
@@ -301,25 +299,16 @@ export const useStudentEnrollment = () => {
     } catch (error) {
       toast.error(getErrorDetail(error, MESSAGES.DOWNLOAD_TEMPLATE_ERROR));
     }
-  }, [termId, toast, MESSAGES]);
+  }, [termId, toast, MESSAGES, ENROLLMENT_MANAGEMENT.MODALS.IMPORT.TEMPLATE_FILENAME]);
 
-  const [viewLoading, setViewLoading] = useState(false);
-  const handleView = useCallback(
-    async (student) => {
-      setViewLoading(true);
-      try {
-        const response = await StudentService.getById(student.studentTermId);
-        if (response?.data) {
-          handleOpenDetails(StudentService.mapStudent(response.data));
-        }
-      } catch (error) {
-        toast.error(getErrorDetail(error, MESSAGES.DETAIL_LOAD_ERROR));
-      } finally {
-        setViewLoading(false);
-      }
-    },
-    [handleOpenDetails, toast, MESSAGES]
-  );
+  const submitLoading =
+    addLoading ||
+    updateLoading ||
+    withdrawLoading ||
+    restoreLoading ||
+    importLoading ||
+    bulkWithdrawLoading ||
+    previewLoading;
 
   return {
     termId,
@@ -350,11 +339,23 @@ export const useStudentEnrollment = () => {
     handleView,
     handleEdit: handleOpenEdit,
     handleDelete,
-    handleRestore,
-    handleUpdateStudent,
-    handleAddStudent,
-    handleImportPreview,
-    handleImportConfirm,
+    handleRestore: useCallback(
+      (student) => restoreStudent(student.studentTermId),
+      [restoreStudent]
+    ),
+    handleUpdateStudent: useCallback((values) => updateStudent(values), [updateStudent]),
+    handleAddStudent: useCallback((values) => addStudent(values), [addStudent]),
+    handleImportPreview: useCallback(
+      async (file) => {
+        const response = await importPreview(file);
+        return response?.data;
+      },
+      [importPreview]
+    ),
+    handleImportConfirm: useCallback(
+      (validRecords) => importConfirm(validRecords),
+      [importConfirm]
+    ),
     handleBulkWithdraw,
     handleDownloadTemplate,
     sortBy,
