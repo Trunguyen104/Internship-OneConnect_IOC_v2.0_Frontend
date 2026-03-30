@@ -1,49 +1,52 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { httpGet, httpPatch } from '@/services/httpClient';
+import { httpGet, httpPatch } from '@/services/http-client.service';
 
 export const useNotifications = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchUnreadCount = useCallback(async () => {
-    try {
-      const response = await httpGet('/notifications/notifications/unread-count');
-      if (response?.success) {
-        setUnreadCount(response.data.unreadCount);
+  // 1. Fetch Unread Count
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['notifications-unread-count'],
+    queryFn: async () => {
+      try {
+        const response = await httpGet('/notifications/notifications/unread-count');
+        return response?.data?.unreadCount || 0;
+      } catch (error) {
+        if (error?.status === 401 || error?.silent) return 0;
+        console.error('Failed to fetch unread count:', error);
+        return 0;
       }
-    } catch (error) {
-      if (error?.status === 401 || error?.silent) return;
-      console.error('Failed to fetch unread count:', error);
-    }
-  }, []);
+    },
+    staleTime: 30 * 1000, // Check every 30s
+  });
 
-  const fetchNotifications = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await httpGet('/notifications/notifications');
-      if (response?.success) {
-        setNotifications(response.data.items || []);
+  // 2. Fetch Notifications List
+  const {
+    data: notifications = [],
+    isLoading: loading,
+    refetch: fetchNotifications,
+  } = useQuery({
+    queryKey: ['notifications-list'],
+    queryFn: async () => {
+      try {
+        const response = await httpGet('/notifications/notifications');
+        return response?.data?.items || [];
+      } catch (error) {
+        if (error?.status === 401 || error?.silent) return [];
+        console.error('Failed to fetch notifications:', error);
+        return [];
       }
-    } catch (error) {
-      if (error?.status === 401 || error?.silent) return;
-      console.error('Failed to fetch notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    staleTime: 2 * 60 * 1000,
+  });
 
   const markAsRead = async (notificationId) => {
     try {
       const response = await httpPatch(`/notifications/notifications/${notificationId}/read`);
       if (response?.success) {
-        setNotifications((prev) =>
-          prev.map((item) =>
-            item.notificationId === notificationId ? { ...item, isRead: true } : item
-          )
-        );
-        setUnreadCount((prev) => Math.max(0, prev - 1));
+        queryClient.invalidateQueries({ queryKey: ['notifications-list'] });
+        queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
       }
     } catch (error) {
       if (error?.status === 401 || error?.silent) return;
@@ -55,18 +58,14 @@ export const useNotifications = () => {
     try {
       const response = await httpPatch('/notifications/notifications/read-all');
       if (response?.success) {
-        setNotifications((prev) => prev.map((item) => ({ ...item, isRead: true })));
-        setUnreadCount(0);
+        queryClient.invalidateQueries({ queryKey: ['notifications-list'] });
+        queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
       }
     } catch (error) {
       if (error?.status === 401 || error?.silent) return;
       console.error('Failed to mark all as read:', error);
     }
   };
-
-  useEffect(() => {
-    fetchUnreadCount();
-  }, [fetchUnreadCount]);
 
   return {
     notifications,

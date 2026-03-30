@@ -1,45 +1,44 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import { getDashboardData } from '@/components/features/dashboard/services/dashboard.service';
 import { DASHBOARD_UI } from '@/constants/dashboard/uiText';
 
 export function useDashboard(internshipGroupId) {
-  const [data, setData] = useState(null);
-  const [err, setErr] = useState('');
-  const [loading, setLoading] = useState(!!internshipGroupId);
-  const [prevId, setPrevId] = useState(internshipGroupId);
-
-  // Reset state during render when internshipGroupId changes
-  // This is the recommended pattern for resetting state from props:
-  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
-  if (internshipGroupId !== prevId) {
-    setPrevId(internshipGroupId);
-    setLoading(!!internshipGroupId);
-    setData(null);
-    setErr('');
-  }
-
-  useEffect(() => {
-    if (!internshipGroupId) return;
-
-    getDashboardData(internshipGroupId)
-      .then((res) => {
+  // Use React Query for dashboard data
+  const {
+    data: dashboardData = null,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ['dashboard-data', internshipGroupId],
+    queryFn: async () => {
+      try {
+        const res = await getDashboardData(internshipGroupId);
         // Unwrap Result<T>.Data if it exists, otherwise use raw response
-        const dashboardData = res?.data ?? res;
-        setData(dashboardData);
-        setErr('');
-      })
-      .catch((e) => setErr(e?.message || DASHBOARD_UI.ERROR))
-      .finally(() => setLoading(false));
-  }, [internshipGroupId]);
+        return res?.data ?? res;
+      } catch (err) {
+        throw err;
+      }
+    },
+    enabled: !!internshipGroupId,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const completionPie = useMemo(() => {
-    if (!data) return [];
+    if (!dashboardData) return [];
     return [
-      { name: DASHBOARD_UI.COMPLETED, value: data?.completionRatio?.onTime || 0 },
-      { name: DASHBOARD_UI.OVERDUE, value: data?.completionRatio?.overdue || 0 },
+      { name: DASHBOARD_UI.COMPLETED, value: dashboardData?.completionRatio?.onTime || 0 },
+      { name: DASHBOARD_UI.OVERDUE, value: dashboardData?.completionRatio?.overdue || 0 },
     ];
-  }, [data]);
+  }, [dashboardData]);
 
-  return { data, err, loading, completionPie };
+  const err = error ? error?.message || DASHBOARD_UI.ERROR : '';
+
+  return {
+    data: dashboardData,
+    err,
+    loading,
+    completionPie,
+  };
 }

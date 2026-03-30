@@ -8,7 +8,7 @@ import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { userManagementService } from '../userManagement.service';
+import { userManagementService } from '../user-management.service';
 
 export default function UserManagementResetPasswordModal({ open, userId, email, onToggle }) {
   const toast = useToast();

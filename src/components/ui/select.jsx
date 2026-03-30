@@ -1,6 +1,7 @@
 'use client';
 
 import { Select as AntdSelect } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 /**
@@ -19,6 +20,10 @@ export const Select = ({ className, ...props }) => {
       {...props}
     />
   );
+};
+
+Select.propTypes = {
+  className: PropTypes.string,
 };
 
 export default Select;

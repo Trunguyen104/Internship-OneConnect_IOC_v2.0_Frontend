@@ -6,6 +6,8 @@ export const useProjectFilters = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [groupIdFilter, setGroupIdFilter] = useState(undefined);
   const [statusFilter, setStatusFilter] = useState(undefined);
+  const [visibilityFilter, setVisibilityFilter] = useState(undefined);
+  const [showArchived, setShowArchived] = useState(false);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -24,6 +26,16 @@ export const useProjectFilters = () => {
 
   const handleStatusFilterChange = useCallback((val) => {
     setStatusFilter(val);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, []);
+
+  const handleVisibilityFilterChange = useCallback((val) => {
+    setVisibilityFilter(val);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, []);
+
+  const handleShowArchivedChange = useCallback((val) => {
+    setShowArchived(val);
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
@@ -47,11 +59,15 @@ export const useProjectFilters = () => {
     searchTerm,
     groupIdFilter,
     statusFilter,
+    visibilityFilter,
+    showArchived,
     pagination,
     setPagination,
     handleSearchChange,
     handleGroupFilterChange,
     handleStatusFilterChange,
+    handleVisibilityFilterChange,
+    handleShowArchivedChange,
     handleTableChange,
     handlePageSizeChange,
   };

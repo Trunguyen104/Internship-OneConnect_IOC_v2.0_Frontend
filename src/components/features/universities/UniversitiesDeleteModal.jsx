@@ -20,10 +20,10 @@ export default function UniversitiesDeleteModal({ university, open, onOpenChange
     try {
       await universityService.delete(university.universityId);
       useUniversitiesStore.increment();
-      toast.success(UI_TEXT.COMMON.DELETE_SUCCESS || 'Deleted university');
+      toast.success(UI_TEXT.COMMON.DELETE_SUCCESS);
       onOpenChange(false);
     } catch (err) {
-      toast.error(err?.data?.message || err?.message || 'Delete failed');
+      toast.error(err?.data?.message || err?.message || UI_TEXT.COMMON.ERROR);
     } finally {
       setLoading(false);
     }
@@ -32,8 +32,8 @@ export default function UniversitiesDeleteModal({ university, open, onOpenChange
   return (
     <CompoundModal open={open} onCancel={() => onOpenChange(false)} width={440}>
       <CompoundModal.Header
-        title={UI_TEXT.COMMON.DELETE_CONFIRM || 'Confirm Deletion'}
-        subtitle={`This action will permanently remove ${university?.name} from the system. This cannot be undone.`}
+        title={UI_TEXT.COMMON.DELETE_CONFIRM}
+        subtitle={`${UI_TEXT.UNIVERSITIES.DELETE_HINT}`}
       />
 
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -41,10 +41,11 @@ export default function UniversitiesDeleteModal({ university, open, onOpenChange
           <Trash2 className="size-10" />
         </div>
         <h3 className="mt-6 text-xl font-black tracking-tight text-text">
-          Are you absolutely sure?
+          {UI_TEXT.UNIVERSITIES.DELETE_SURE}
         </h3>
         <p className="mt-2 max-w-[280px] text-sm font-bold leading-relaxed text-muted/60">
-          You are about to delete <span className="text-rose-500">{university?.name}</span>.
+          {UI_TEXT.UNIVERSITIES.DELETE_WARN_PREFIX}{' '}
+          <span className="text-rose-500">{university?.name}</span>.
         </p>
       </div>
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { API_MESSAGES } from '@/constants/auth/uiText';
 import { resolveAuthBaseUrl } from '@/lib/server/backend-url';
 
 const BE_URL = resolveAuthBaseUrl();
@@ -10,7 +11,7 @@ export async function POST(req) {
     try {
       body = await req.json();
     } catch {
-      return NextResponse.json({ message: 'Invalid request payload' }, { status: 400 });
+      return NextResponse.json({ message: API_MESSAGES.ERROR.INVALID_PAYLOAD }, { status: 400 });
     }
 
     const accessToken = req.cookies.get('accessToken')?.value;
@@ -31,7 +32,10 @@ export async function POST(req) {
       });
     } catch (upstreamError) {
       console.error('CHANGE PASSWORD UPSTREAM ERROR:', upstreamError);
-      return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
+      return NextResponse.json(
+        { message: API_MESSAGES.ERROR.SERVICE_UNAVAILABLE },
+        { status: 502 }
+      );
     }
 
     const text = await res.text();
@@ -43,6 +47,6 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error('CHANGE PASSWORD ERROR:', err);
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    return NextResponse.json({ message: API_MESSAGES.ERROR.SERVER_ERROR }, { status: 500 });
   }
 }

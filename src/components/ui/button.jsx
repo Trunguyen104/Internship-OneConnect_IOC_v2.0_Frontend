@@ -1,6 +1,7 @@
 'use client';
 
 import { Button as AntdButton } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
@@ -60,6 +61,15 @@ function Button({
     </AntdButton>
   );
 }
+
+Button.propTypes = {
+  className: PropTypes.string,
+  variant: PropTypes.oneOf(['default', 'secondary', 'outline', 'ghost', 'destructive', 'link']),
+  size: PropTypes.oneOf(['default', 'sm', 'lg', 'icon', 'xs', 'icon-sm', 'icon-xs', 'icon-lg']),
+  type: PropTypes.string,
+  loading: PropTypes.bool,
+  children: PropTypes.node,
+};
 
 export { Button };
 export default Button;

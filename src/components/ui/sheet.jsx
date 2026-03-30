@@ -27,6 +27,8 @@ function SheetContent({
 }) {
   const { open, onOpenChange } = useSheet();
 
+  const { width, size, ...restProps } = props;
+
   return (
     <AntdDrawer
       open={open}
@@ -34,12 +36,13 @@ function SheetContent({
       placement={side}
       closable={showCloseButton}
       destroyOnClose
-      width={props.width || 520}
+      size={size || 'default'}
       className={cn('premium-drawer', className)}
       styles={{
+        wrapper: { width: width || 520 },
         body: { padding: 0 },
       }}
-      {...props}
+      {...restProps}
     >
       <div className="flex h-full flex-col">{children}</div>
     </AntdDrawer>

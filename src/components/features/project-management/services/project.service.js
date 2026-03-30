@@ -1,4 +1,4 @@
-import httpClient from '@/services/httpClient';
+import httpClient from '@/services/http-client.service';
 
 const BASE_URL = '/projects';
 
@@ -33,16 +33,16 @@ export const ProjectService = {
     return httpClient.httpPatch(`${BASE_URL}/${id}/publish`);
   },
 
+  async unpublish(id) {
+    return httpClient.httpPatch(`${BASE_URL}/${id}/unpublish`);
+  },
+
   async complete(id) {
     return httpClient.httpPatch(`${BASE_URL}/${id}/complete`);
   },
 
-  async assignStudents(projectId, studentIds) {
-    return httpClient.httpPost(`${BASE_URL}/${projectId}/assign`, { studentIds });
-  },
-
-  async unassignStudent(projectId, studentId) {
-    return httpClient.httpDelete(`${BASE_URL}/${projectId}/students/${studentId}`);
+  async archive(id) {
+    return httpClient.httpPost(`${BASE_URL}/${id}/archive`);
   },
 
   async getAssignedStudents(projectId) {
@@ -50,7 +50,7 @@ export const ProjectService = {
   },
 
   async getGroupsForMentor() {
-    return httpClient.httpGet('/internship-groups', { pageSize: 100 });
+    return httpClient.httpGet('/internship-groups', { pageSize: 100, IncludeArchived: true });
   },
 
   async getStudentsByGroup(groupId) {
@@ -58,7 +58,11 @@ export const ProjectService = {
     return httpClient.httpGet(`/internship-groups/${groupId}`);
   },
 
-  async assignGroup(projectId, internshipGroupId) {
-    return httpClient.httpPost(`${BASE_URL}/${projectId}/assign-group`, { internshipGroupId });
+  async assignGroup(projectId, internshipId) {
+    return httpClient.httpPost(`${BASE_URL}/${projectId}/assign-group`, { internshipId });
+  },
+
+  async changeGroup(projectId, newInternshipId) {
+    return httpClient.httpPatch(`${BASE_URL}/${projectId}/change-group`, { newInternshipId });
   },
 };

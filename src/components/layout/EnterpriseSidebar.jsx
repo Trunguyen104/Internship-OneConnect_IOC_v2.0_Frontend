@@ -4,6 +4,7 @@ import {
   BankOutlined,
   CalendarOutlined,
   DashboardOutlined,
+  ProjectOutlined,
   SolutionOutlined,
   TeamOutlined,
   WarningOutlined,
@@ -34,6 +35,11 @@ const enterpriseMenu = [
     href: '/internship-management',
   },
   {
+    icon: <ProjectOutlined />,
+    label: 'Project Management',
+    href: '/projects',
+  },
+  {
     icon: <WarningOutlined />,
     label: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TITLE,
     href: '/violation-reports',
@@ -45,6 +51,11 @@ const enterpriseMenu = [
     href: '/staff-management',
   },
 
+  {
+    icon: <SolutionOutlined />,
+    label: 'Application',
+    href: '/applications',
+  },
   {
     icon: <TeamOutlined />,
     label: 'Evaluation Management',

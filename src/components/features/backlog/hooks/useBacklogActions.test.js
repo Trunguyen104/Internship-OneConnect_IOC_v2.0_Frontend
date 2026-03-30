@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { BACKLOG_UI } from '@/constants/backlog';
 import { MOVE_INCOMPLETE_ITEMS_OPTION, SPRINT_STATUS } from '@/constants/enums';
 import { useToast } from '@/providers/ToastProvider';
@@ -13,7 +13,7 @@ vi.mock('@/providers/ToastProvider', () => ({
   useToast: vi.fn(),
 }));
 
-vi.mock('@/components/features/backlog/services/productbacklog.service', () => ({
+vi.mock('@/components/features/backlog/services/product-backlog.service', () => ({
   productBacklogService: {
     createEpic: vi.fn(),
     updateEpic: vi.fn(),

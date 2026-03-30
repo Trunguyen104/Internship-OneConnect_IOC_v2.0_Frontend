@@ -1,20 +1,74 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
-import { ProjectService } from '@/components/features/project/services/projectService';
-import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
+import { ProjectService } from '@/components/features/project/services/project.service';
+import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder.service';
 import { STAKEHOLDER_MESSAGES } from '@/constants/stakeholder/messages';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useStakeholderTab() {
   const toast = useToast();
-  const [projectId, setProjectId] = useState(null);
-  const [stakeholders, setStakeholders] = useState([]);
-  const [stakeholderLoading, setStakeholderLoading] = useState(false);
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [internshipId, setInternshipId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // 1. Fetch Project & Internship ID
+  const { data: projectInfo } = useQuery({
+    queryKey: ['active-project-info'],
+    queryFn: async () => {
+      try {
+        const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
+        if (res?.data?.items?.length > 0) {
+          const project = res.data.items[0];
+          return {
+            projectId: project.projectId,
+            internshipId: project.internshipId,
+          };
+        }
+        return null;
+      } catch (err) {
+        toast.error(STAKEHOLDER_MESSAGES.PROJECT_NOT_FOUND);
+        return null;
+      }
+    },
+    staleTime: Infinity,
+  });
+
+  const internshipId = projectInfo?.internshipId;
+  const projectId = projectInfo?.projectId;
+
+  // 2. Fetch Stakeholders
+  const {
+    data: stakeholderData,
+    isLoading: stakeholderLoading,
+    refetch: fetchStakeholders,
+  } = useQuery({
+    queryKey: ['stakeholders', internshipId, page, pageSize, search],
+    queryFn: async () => {
+      if (!internshipId) return { items: [], total: 0, totalPages: 1 };
+      try {
+        const params = {
+          PageNumber: page,
+          PageSize: pageSize,
+          SearchTerm: search?.trim() || undefined,
+        };
+        const res = await StakeholderService.getByProject(internshipId, params);
+        return {
+          items: res?.data?.items || [],
+          total: res?.data?.totalCount || 0,
+          totalPages: res?.data?.totalPages || 1,
+        };
+      } catch (err) {
+        toast.error(STAKEHOLDER_MESSAGES.LOAD_FAILED);
+        return { items: [], total: 0, totalPages: 1 };
+      }
+    },
+    enabled: !!internshipId,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const [openStakeholderForm, setOpenStakeholderForm] = useState(false);
   const [editingStakeholderId, setEditingStakeholderId] = useState(null);
   const [stakeholderForm, setStakeholderForm] = useState({
@@ -26,12 +80,6 @@ export function useStakeholderTab() {
     phoneNumber: '',
   });
   const [errors, setErrors] = useState({});
-
-  // Pagination states
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
 
   const validateForm = () => {
     const newErrors = {};
@@ -101,7 +149,6 @@ export function useStakeholderTab() {
         res = await StakeholderService.create(payload);
       }
 
-      // httpClient returns { isSuccess: false, status, data } on error
       if (res && res.isSuccess !== false && res.statusCode !== 403) {
         toast.success(
           editingStakeholderId
@@ -121,7 +168,6 @@ export function useStakeholderTab() {
         setErrors({});
         fetchStakeholders();
       } else {
-        // Handle specific error codes
         const errorMsg =
           res?.data?.errors?.[0] ||
           res?.errors?.[0] ||
@@ -167,75 +213,17 @@ export function useStakeholderTab() {
     }
   };
 
-  const fetchStakeholders = useCallback(async () => {
-    if (!internshipId) return;
-
-    try {
-      setStakeholderLoading(true);
-
-      const params = {
-        PageNumber: page,
-        PageSize: pageSize,
-      };
-
-      if (debouncedSearch?.trim()) {
-        params.SearchTerm = debouncedSearch.trim();
-      }
-
-      const res = await StakeholderService.getByProject(internshipId, params);
-
-      if (res?.data?.items) {
-        setStakeholders(res.data.items);
-        setTotal(res.data.totalCount || 0);
-        setTotalPages(res.data.totalPages || 1);
-      }
-    } catch {
-      toast.error(STAKEHOLDER_MESSAGES.LOAD_FAILED);
-    } finally {
-      setStakeholderLoading(false);
-    }
-  }, [internshipId, debouncedSearch, page, pageSize, toast]);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1); // Reset to page 1 on search
-    }, 500);
-    return () => clearTimeout(t);
-  }, [search]);
-
-  useEffect(() => {
-    const fetchProjectId = async () => {
-      try {
-        const res = await ProjectService.getAll({
-          PageNumber: 1,
-          PageSize: 1,
-        });
-
-        if (res?.data?.items?.length > 0) {
-          const project = res.data.items[0];
-
-          setProjectId(project.projectId);
-          setInternshipId(project.internshipId);
-        }
-      } catch {
-        toast.error(STAKEHOLDER_MESSAGES.PROJECT_NOT_FOUND);
-      }
-    };
-
-    fetchProjectId();
-  }, [toast]);
-
-  useEffect(() => {
-    fetchStakeholders();
-  }, [fetchStakeholders]);
+  const handleSearchChange = (val) => {
+    setSearch(val);
+    setPage(1);
+  };
 
   return {
     projectId,
-    stakeholders,
+    stakeholders: stakeholderData?.items || [],
     stakeholderLoading,
     search,
-    setSearch,
+    setSearch: handleSearchChange, // Replaced with wrapped func
     internshipId,
     openStakeholderForm,
     setOpenStakeholderForm,
@@ -252,7 +240,7 @@ export function useStakeholderTab() {
     setPage,
     pageSize,
     setPageSize,
-    total,
-    totalPages,
+    total: stakeholderData?.total || 0,
+    totalPages: stakeholderData?.totalPages || 1,
   };
 }

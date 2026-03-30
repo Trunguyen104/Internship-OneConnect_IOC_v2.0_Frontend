@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
-import { login } from '@/components/features/auth/services/authService';
+import { login } from '@/components/features/auth/services/auth.service';
 import { AUTH_MESSAGES } from '@/constants/auth/uiText';
 import { USER_ROLE } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';

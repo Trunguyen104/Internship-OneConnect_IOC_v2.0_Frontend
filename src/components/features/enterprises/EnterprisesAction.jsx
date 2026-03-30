@@ -3,9 +3,10 @@
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
 import { Edit3, ExternalLink, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
@@ -19,7 +20,9 @@ export default function EnterprisesAction({ enterprise }) {
 
   const handleDelete = async () => {
     if (
-      !confirm(`Are you sure you want to delete ${enterprise.name}? This action cannot be undone.`)
+      !confirm(
+        `${UI_TEXT.USER_MANAGEMENT.DELETE_CONFIRM} ${enterprise.name}? ${UI_TEXT.USER_MANAGEMENT.DELETE_HINT}`
+      )
     )
       return;
 
@@ -27,9 +30,9 @@ export default function EnterprisesAction({ enterprise }) {
     try {
       await enterpriseService.delete(enterprise.enterpriseId || enterprise.id);
       useEnterprisesStore.increment();
-      toast.success('Successfully removed partner');
+      toast.success(UI_TEXT.ENTERPRISES.REMOVE_SUCCESS);
     } catch (err) {
-      toast.error(err?.data?.message || err?.message || 'Removal process failed');
+      toast.error(err?.data?.message || err?.message || UI_TEXT.COMMON.ERROR);
     } finally {
       setLoading(false);
     }
@@ -46,9 +49,11 @@ export default function EnterprisesAction({ enterprise }) {
                   <ExternalLink className="size-4 text-blue-600" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-700">Open Website</span>
+                  <span className="text-sm font-bold text-slate-700">
+                    {UI_TEXT.ENTERPRISES.WEBSITE_TITLE}
+                  </span>
                   <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-                    Official Page
+                    {UI_TEXT.ENTERPRISES.WEBSITE_DESCRIPTION}
                   </span>
                 </div>
               </div>
@@ -65,9 +70,11 @@ export default function EnterprisesAction({ enterprise }) {
             <Edit3 className="size-4 text-amber-600" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-700">Edit Profile</span>
+            <span className="text-sm font-bold text-slate-700">
+              {UI_TEXT.ENTERPRISES.EDIT_TITLE}
+            </span>
             <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-              Update Information
+              {UI_TEXT.ENTERPRISES.EDIT_DESCRIPTION}
             </span>
           </div>
         </div>
@@ -84,9 +91,11 @@ export default function EnterprisesAction({ enterprise }) {
             <Trash2 className="size-4 text-rose-600" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-rose-600">Delete</span>
+            <span className="text-sm font-bold text-rose-600">
+              {UI_TEXT.ENTERPRISES.DELETE_TITLE}
+            </span>
             <span className="text-[10px] font-medium text-rose-400 uppercase tracking-wider">
-              Irreversible Action
+              {UI_TEXT.ENTERPRISES.DELETE_DESCRIPTION}
             </span>
           </div>
         </div>

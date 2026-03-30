@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { ProjectService } from '@/components/features/project/services/projectService';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import {
   SPRINT_STATUS,
   WORK_ITEM_PRIORITY,
@@ -28,43 +29,44 @@ export const COLUMNS = [
  * Hook for core Board data (Items, Epics, Sprints, Project)
  */
 export function useBoardData() {
-  const [items, setItems] = useState([]);
-  const [projectId, setProjectId] = useState(null);
-  const [epics, setEpics] = useState([]);
-  const [sprints, setSprints] = useState([]);
-  const [activeSprint, setActiveSprint] = useState(null);
-  const [loading, setLoading] = useState(true);
   const toast = useToast();
 
-  useEffect(() => {
-    const fetchProjectId = async () => {
+  // Local state for items to support smooth DND
+  const [items, setItems] = useState([]);
+
+  // 1. Fetch Project ID
+  const { data: projectId = null } = useQuery({
+    queryKey: ['work-board-project-init'],
+    queryFn: async () => {
       try {
         const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
-        if (res?.data?.items?.length > 0) {
-          setProjectId(res.data.items[0].projectId);
-        }
+        return res?.data?.items?.[0]?.projectId || null;
       } catch {
         toast.error(WORK_BOARD_UI.ERROR_FETCH_PROJECT);
+        return null;
       }
-    };
-    fetchProjectId();
-  }, [toast]);
+    },
+    staleTime: Infinity,
+  });
 
-  const fetchBoardData = useCallback(
-    async (showLoading = true) => {
-      if (!projectId) return;
+  // 2. Fetch Board Data
+  const {
+    data: boardResult,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: ['work-board-data', projectId],
+    queryFn: async () => {
       try {
-        if (showLoading) setLoading(true);
         const [sprintsRes, epicsRes] = await Promise.all([
           productBacklogService.getWorkItemsBacklog(projectId),
           productBacklogService.getEpics(projectId),
         ]);
 
-        setEpics(epicsRes?.data?.items || epicsRes?.data || []);
+        const epicsData = epicsRes?.data?.items || epicsRes?.data || [];
         const sprintsData = sprintsRes?.data?.sprints || [];
-        setSprints(sprintsData);
 
-        const foundActiveSprint = sprintsData.find((s) => {
+        const activeSpr = sprintsData.find((s) => {
           const sStatus = s.status?.id || s.status;
           return (
             sStatus === SPRINT_STATUS.ACTIVE ||
@@ -73,12 +75,10 @@ export function useBoardData() {
           );
         });
 
-        setActiveSprint(foundActiveSprint);
-
-        if (foundActiveSprint) {
-          const itemsToMap = foundActiveSprint.items || foundActiveSprint.featureWorkItems || [];
-
-          const mappedItems = itemsToMap.map((it, idx) => {
+        let mappedItems = [];
+        if (activeSpr) {
+          const itemsToMap = activeSpr.items || activeSpr.featureWorkItems || [];
+          mappedItems = itemsToMap.map((it, idx) => {
             let s = it.status?.id || it.status;
             if (typeof s === 'string') {
               const upper = s.toUpperCase().replace(/\s|_/g, '');
@@ -114,26 +114,39 @@ export function useBoardData() {
               points: it.storyPoint || 0,
               assignee: it.assigneeName || WORK_BOARD_UI.UNASSIGNED,
               status: s || WORK_ITEM_STATUS.TODO,
-              sprintId: foundActiveSprint.sprintId || foundActiveSprint.id,
+              sprintId: activeSpr.sprintId || activeSpr.id,
               parentId: it.parentId,
             };
           });
-          setItems(mappedItems);
-        } else {
-          setItems([]);
         }
-      } catch {
+
+        return {
+          items: mappedItems,
+          epics: epicsData,
+          sprints: sprintsData,
+          activeSprint: activeSpr,
+        };
+      } catch (err) {
         toast.error(WORK_BOARD_UI.ERROR_FETCH_BOARD);
-      } finally {
-        setLoading(false);
+        throw err;
       }
     },
-    [projectId, toast]
-  );
+    enabled: !!projectId,
+    staleTime: 2 * 60 * 1000,
+  });
 
+  /**
+   * Sync items with fetched data
+   * We only need to sync "items" because it can be modified by DND locally.
+   * "epics", "sprints", and "activeSprint" can be derived directly from boardResult.
+   */
   useEffect(() => {
-    fetchBoardData();
-  }, [fetchBoardData]);
+    if (boardResult?.items) {
+      setTimeout(() => {
+        setItems(boardResult.items);
+      }, 0);
+    }
+  }, [boardResult?.items, boardResult]);
 
   const byColumn = useMemo(() => {
     const map = Object.fromEntries(COLUMNS.map((c) => [c.id, []]));
@@ -147,11 +160,11 @@ export function useBoardData() {
     projectId,
     items,
     setItems,
-    epics,
-    sprints,
-    activeSprint,
+    epics: boardResult?.epics || [],
+    sprints: boardResult?.sprints || [],
+    activeSprint: boardResult?.activeSprint || null,
     loading,
     byColumn,
-    fetchBoardData,
+    fetchBoardData: refetch,
   };
 }

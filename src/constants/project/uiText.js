@@ -12,6 +12,7 @@ export const PROJECT_UI = {
     RESOURCE_NAME: 'Resource Name',
     RESOURCE_TYPE: 'Resource Type',
     ATTACH_FILE: 'Attach File',
+    EXTERNAL_URL: 'External URL',
   },
 
   LABELS: {
@@ -42,6 +43,7 @@ export const PROJECT_UI = {
 
   PLACEHOLDER: {
     RESOURCE_NAME: 'Enter resource name...',
+    URL_PLACEHOLDER: 'https://docs.google.com/... or https://figma.com/...',
   },
 
   TOOLTIP: {

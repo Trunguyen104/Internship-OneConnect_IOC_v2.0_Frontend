@@ -12,7 +12,7 @@ import { useToast } from '@/providers/ToastProvider';
 import { mediaService } from '@/services/media.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
-import { userManagementService } from '../userManagement.service';
+import { userManagementService } from '../user-management.service';
 
 const initialEditForm = {
   fullName: '',

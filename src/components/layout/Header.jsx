@@ -12,10 +12,10 @@ import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { logout } from '@/components/features/auth/services/authService';
-import { clearAuth } from '@/components/features/auth/services/authStorage';
+import { clearAuth } from '@/components/features/auth/lib/auth-storage';
+import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
 

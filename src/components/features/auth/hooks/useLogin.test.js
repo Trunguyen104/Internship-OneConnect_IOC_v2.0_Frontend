@@ -2,8 +2,8 @@ import { act, renderHook } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { login } from '@/components/features/auth/services/authService';
-import { setAccessToken } from '@/components/features/auth/services/authStorage';
+import { setAccessToken } from '@/components/features/auth/lib/auth-storage';
+import { login } from '@/components/features/auth/services/auth.service';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useLogin } from './useLogin';
@@ -13,11 +13,11 @@ vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
 }));
 
-vi.mock('@/components/features/auth/services/authService', () => ({
+vi.mock('@/components/features/auth/services/auth.service', () => ({
   login: vi.fn(),
 }));
 
-vi.mock('@/components/features/auth/services/authStorage', () => ({
+vi.mock('@/components/features/auth/lib/auth-storage', () => ({
   setAccessToken: vi.fn(),
 }));
 

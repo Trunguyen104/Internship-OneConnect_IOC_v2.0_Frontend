@@ -75,7 +75,7 @@ export default function UniversitiesTable({ universities = [], loading = false }
         data={universities}
         loading={loading}
         rowKey={(record) => record.universityId}
-        emptyText={UI_TEXT.UNIVERSITIES.NOT_FOUND || 'No universities found'}
+        emptyText={UI_TEXT.UNIVERSITIES.NOT_FOUND}
         minWidth="auto"
         className="premium-table mt-0"
       />

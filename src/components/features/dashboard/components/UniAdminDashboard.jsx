@@ -12,7 +12,7 @@ import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import { Progress } from '@/components/ui/progress';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { useUniAdminDashboard } from '../services/useUniAdminDashboard.service';
+import { useUniAdminDashboard } from '../services/use-uni-admin-dashboard.service';
 import MetricCard from './MetricCard';
 import RecentTerms from './RecentTerms';
 

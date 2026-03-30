@@ -1,4 +1,4 @@
-import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/http-client.service';
 
 const BASE_URL = '/internship-groups';
 
@@ -72,7 +72,7 @@ export const EnterpriseGroupService = {
   },
 
   async archiveGroup(id) {
-    return httpPatch(`${BASE_URL}/${id}/archive`);
+    return httpPatch(`${BASE_URL}/${id}/archive`, {});
   },
 
   async getPlacedStudents(params = {}) {

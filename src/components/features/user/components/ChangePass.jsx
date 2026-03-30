@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { changePassword } from '@/components/features/auth/services/auth.service';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import { Field, FieldGroup } from '@/components/ui/field';
@@ -76,39 +77,23 @@ export default function ChangePass() {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(form),
+      await changePassword(form);
+      toast.success(PROFILE_UI.CHANGE_PASSWORD.SUCCESS);
+      setForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (res.ok) {
-        toast.success(PROFILE_UI.CHANGE_PASSWORD.SUCCESS);
-        setForm({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
+    } catch (data) {
+      if (data.validationErrors) {
+        const backendErrors = {};
+        Object.entries(data.validationErrors).forEach(([field, msgs]) => {
+          backendErrors[field] = Array.isArray(msgs) ? msgs[0] : msgs;
         });
+        setErrors((prev) => ({ ...prev, ...backendErrors }));
       } else {
-        // Handle validation errors from backend
-        if (data.validationErrors) {
-          const backendErrors = {};
-          Object.entries(data.validationErrors).forEach(([field, msgs]) => {
-            // Map common backend field names if different (e.g. CurrentPassword -> currentPassword)
-            // GlobalExceptionHandler already camelCases them.
-            backendErrors[field] = Array.isArray(msgs) ? msgs[0] : msgs;
-          });
-          setErrors((prev) => ({ ...prev, ...backendErrors }));
-        } else {
-          toast.error(data.message || PROFILE_UI.CHANGE_PASSWORD.ERROR.FAILED);
-        }
+        toast.error(data.message || PROFILE_UI.CHANGE_PASSWORD.ERROR.FAILED);
       }
-    } catch {
-      toast.error(PROFILE_UI.CHANGE_PASSWORD.ERROR.GENERAL);
     } finally {
       setLoading(false);
     }

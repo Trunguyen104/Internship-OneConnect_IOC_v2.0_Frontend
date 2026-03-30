@@ -1,4 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import {
@@ -18,8 +21,6 @@ export const useStudentEnrollment = () => {
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
   const { MESSAGES } = ENROLLMENT_MANAGEMENT;
 
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -56,63 +57,59 @@ export const useStudentEnrollment = () => {
 
   const { current, pageSize } = pagination;
 
-  const fetchStudents = useCallback(async () => {
-    if (!termId) {
-      setStudents([]);
-      setPagination((prev) => ({ ...prev, total: 0 }));
-      return;
-    }
+  // 1. Fetch Students with useQuery
+  const {
+    data: studentData = { items: [], total: 0 },
+    isLoading: loading,
+    refetch: fetchStudents,
+  } = useQuery({
+    queryKey: [
+      'students-enrollment',
+      termId,
+      current,
+      pageSize,
+      debouncedSearchTerm,
+      statusFilter,
+      sortBy,
+      sortOrder,
+    ],
+    queryFn: async () => {
+      if (!termId) return { items: [], total: 0 };
+      try {
+        const params = {
+          pageNumber: current,
+          pageSize: pageSize,
+          searchTerm: debouncedSearchTerm || undefined,
+          enrollmentStatus: statusFilter === 'WITHDRAWN' ? ENROLLMENT_STATUS.WITHDRAWN : undefined,
+          placementStatus:
+            statusFilter === 'PLACED'
+              ? PLACEMENT_STATUS.PLACED
+              : statusFilter === 'UNPLACED'
+                ? PLACEMENT_STATUS.UNPLACED
+                : undefined,
+          sortBy: sortBy || undefined,
+          sortOrder: sortOrder || undefined,
+        };
 
-    setLoading(true);
-    try {
-      const params = {
-        pageNumber: current,
-        pageSize: pageSize,
-        searchTerm: debouncedSearchTerm || undefined,
-        // EnrollmentStatus: 1=Active, 2=Withdrawn
-        enrollmentStatus: statusFilter === 'WITHDRAWN' ? ENROLLMENT_STATUS.WITHDRAWN : undefined,
-        // PlacementStatus: 0=Unplaced, 1=Placed
-        placementStatus:
-          statusFilter === 'PLACED'
-            ? PLACEMENT_STATUS.PLACED
-            : statusFilter === 'UNPLACED'
-              ? PLACEMENT_STATUS.UNPLACED
-              : undefined,
-        sortBy: sortBy || undefined,
-        sortOrder: sortOrder || undefined,
-      };
+        const response = await StudentService.getAll(termId, params);
+        if (response?.data) {
+          const items = (response.data.items || []).map(StudentService.mapStudent);
+          const total = response.data.totalCount || 0;
 
-      const response = await StudentService.getAll(termId, params);
-      if (response?.data) {
-        setStudents((response.data.items || []).map(StudentService.mapStudent));
-        setPagination((prev) => ({
-          ...prev,
-          total: response.data.totalCount || 0,
-        }));
+          setPagination((prev) => ({ ...prev, total }));
+          return { items, total };
+        }
+        return { items: [], total: 0 };
+      } catch (error) {
+        if (error?.silent || error?.status === 401 || error?.status === 403)
+          return { items: [], total: 0 };
+        toast.error(getErrorDetail(error, MESSAGES.LOAD_ERROR));
+        throw error;
       }
-    } catch (error) {
-      if (error?.silent || error?.status === 401 || error?.status === 403) return;
-      console.error('Fetch students failed:', error);
-      toast.error(getErrorDetail(error, MESSAGES.LOAD_ERROR));
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    termId,
-    current,
-    pageSize,
-    debouncedSearchTerm,
-    statusFilter,
-    sortBy,
-    sortOrder,
-    toast,
-    MESSAGES,
-    setPagination,
-  ]);
-
-  useEffect(() => {
-    fetchStudents();
-  }, [fetchStudents]);
+    },
+    enabled: !!termId,
+    staleTime: 2 * 60 * 1000,
+  });
 
   const handleDelete = useCallback(
     (student) => {
@@ -212,11 +209,6 @@ export const useStudentEnrollment = () => {
         );
         setImportVisible(false);
         fetchStudents();
-
-        // If password file returned, handle it (e.g. download)
-        if (response?.data?.passwordFileBase64) {
-          // Logic to download could go here
-        }
       } catch (error) {
         toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR));
       } finally {
@@ -230,17 +222,15 @@ export const useStudentEnrollment = () => {
     if (!termId || selectedIds.length === 0) return;
 
     const { BULK_WITHDRAW } = MESSAGES;
+    const students = studentData.items;
 
     const selectedStudents = students.filter((s) => selectedIds.includes(s.studentTermId));
-
     const placedStudents = selectedStudents.filter((s) => s.placementStatus === 'PLACED');
-
     const unplacedStudents = selectedStudents.filter((s) => s.placementStatus === 'UNPLACED');
 
     const X = unplacedStudents.length;
     const Y = placedStudents.length;
 
-    // CASE 3: All placed
     if (X === 0 && Y > 0) {
       toast.error(BULK_WITHDRAW.ERROR_ALL_PLACED);
       return;
@@ -279,7 +269,8 @@ export const useStudentEnrollment = () => {
         }
       },
     });
-  }, [termId, selectedIds, students, toast, fetchStudents, MESSAGES]);
+  }, [termId, selectedIds, studentData.items, toast, fetchStudents, MESSAGES]);
+
   const handleRestore = useCallback(
     async (student) => {
       setSubmitLoading(true);
@@ -312,9 +303,10 @@ export const useStudentEnrollment = () => {
     }
   }, [termId, toast, MESSAGES]);
 
+  const [viewLoading, setViewLoading] = useState(false);
   const handleView = useCallback(
     async (student) => {
-      setLoading(true);
+      setViewLoading(true);
       try {
         const response = await StudentService.getById(student.studentTermId);
         if (response?.data) {
@@ -323,7 +315,7 @@ export const useStudentEnrollment = () => {
       } catch (error) {
         toast.error(getErrorDetail(error, MESSAGES.DETAIL_LOAD_ERROR));
       } finally {
-        setLoading(false);
+        setViewLoading(false);
       }
     },
     [handleOpenDetails, toast, MESSAGES]
@@ -338,10 +330,10 @@ export const useStudentEnrollment = () => {
     addVisible,
     editVisible,
     detailsVisible,
-    loading,
+    loading: loading || viewLoading,
     submitLoading,
     selectedStudent: selectedRecord,
-    students,
+    students: studentData.items,
     selectedIds,
 
     onTermChange: handleTermChange,

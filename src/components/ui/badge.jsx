@@ -1,5 +1,6 @@
 'use client';
 
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { cn } from '@/lib/cn';
@@ -42,6 +43,25 @@ const Badge = ({ children, variant = 'default', size = 'md', className = '', ico
       {children}
     </span>
   );
+};
+
+Badge.propTypes = {
+  children: PropTypes.node,
+  variant: PropTypes.oneOf([
+    'default',
+    'primary',
+    'success',
+    'warning',
+    'danger',
+    'info',
+    'primary-soft',
+    'success-soft',
+    'warning-soft',
+    'info-soft',
+  ]),
+  size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
+  className: PropTypes.string,
+  icon: PropTypes.node,
 };
 
 export default Badge;

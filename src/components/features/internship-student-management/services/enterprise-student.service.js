@@ -1,4 +1,4 @@
-import { httpGet, httpPatch } from '@/services/httpClient';
+import { httpGet, httpPatch } from '@/services/http-client.service';
 
 export const EnterpriseStudentService = {
   mapApplication(item) {
@@ -66,7 +66,7 @@ export const EnterpriseStudentService = {
       studentId: studentIdForPayLoad, // Passed to API commands
       personId, // Pure person reference
       phaseId,
-      termId: phaseId, // Backward compatibility
+      phaseId,
       studentFullName:
         item.studentName ||
         item.studentFullName ||
@@ -81,7 +81,7 @@ export const EnterpriseStudentService = {
       major: item.major || item.Major || '-',
       status,
       phaseStatus,
-      termStatus: phaseStatus, // Backward compatibility
+      phaseStatus,
       appliedAt: item.appliedAt || item.AppliedAt,
       groupId,
       isAssignedToGroup: item.isAssignedToGroup !== undefined ? item.isAssignedToGroup : !!groupId,
@@ -92,26 +92,17 @@ export const EnterpriseStudentService = {
           ? String(item.mentorId || item.MentorId || item.mentor?.id || item.mentor?.mentorId)
           : undefined,
       projectName: item.projectName || item.ProjectName,
-      phaseName:
-        item.phaseName ||
-        item.PhaseName ||
-        item.internshipPhase?.name ||
-        item.phase?.name ||
-        item.termName,
+      phaseName: item.phaseName || item.PhaseName || item.internshipPhase?.name || item.phase?.name,
       startDate:
         item.startDate ||
         item.internshipStartDate ||
         item.internshipPhase?.startDate ||
-        item.phase?.startDate ||
-        item.internshipTerm?.startDate ||
-        item.term?.startDate,
+        item.phase?.startDate,
       endDate:
         item.endDate ||
         item.internshipEndDate ||
         item.internshipPhase?.endDate ||
-        item.phase?.endDate ||
-        item.internshipTerm?.endDate ||
-        item.term?.endDate,
+        item.phase?.endDate,
     };
   },
 
