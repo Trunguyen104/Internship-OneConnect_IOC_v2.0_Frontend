@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
+import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 export default function EvaluationsTab({ evaluations, loading }) {
@@ -25,7 +26,7 @@ export default function EvaluationsTab({ evaluations, loading }) {
       <div className="p-24 text-center">
         <div className="inline-block size-8 border-[3px] border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
         <div className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] animate-pulse">
-          {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.FETCHING}
+          {STUDENT_ACTIVITY_UI.EVALUATIONS.FETCHING}
         </div>
       </div>
     );
@@ -37,14 +38,14 @@ export default function EvaluationsTab({ evaluations, loading }) {
           <StarOutlined />
         </div>
         <p className="text-base font-black text-slate-400 tracking-tight uppercase px-12 text-center leading-tight">
-          {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.NO_EVALS}
+          {STUDENT_ACTIVITY_UI.EVALUATIONS.NO_EVALS}
         </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-20 animate-in -mt-10 fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex flex-col gap-4 pb-12 animate-in -mt-4 fade-in slide-in-from-bottom-4 duration-700">
       <Collapse
         activeKey={activeKeys}
         onChange={setActiveKeys}
@@ -61,14 +62,14 @@ export default function EvaluationsTab({ evaluations, loading }) {
         items={evaluations.map((ev, i) => ({
           key: (ev.evaluationId || ev.id || i).toString(),
           className:
-            'mb-5 bg-white rounded-[28px] overflow-hidden border border-white shadow-xl shadow-slate-200/20 transition-all duration-500 hover:shadow-2xl hover:border-primary/10 group',
+            'mb-3 bg-white rounded-[24px] overflow-hidden border border-white shadow-lg shadow-slate-200/20 transition-all duration-500 hover:shadow-xl hover:border-primary/10 group',
           label: (
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 w-full pr-3 group">
               <div className="flex items-center gap-4">
                 <div className="size-9 rounded-lg bg-white shadow-lg flex flex-col items-center justify-center text-primary border border-slate-50 group-hover:scale-105 group-hover:-rotate-3 transition-all duration-500">
                   <span className="text-sm font-black leading-none">{ev.totalScore || 0}</span>
                   <span className="text-[6px] font-black uppercase text-slate-500 mt-0.5 tracking-tighter">
-                    {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.SCORE}
+                    {STUDENT_ACTIVITY_UI.EVALUATIONS.SCORE}
                   </span>
                 </div>
                 <div className="flex flex-col min-w-0">
@@ -81,7 +82,7 @@ export default function EvaluationsTab({ evaluations, loading }) {
                       size="xs"
                       className="font-black ring-1 ring-primary/10 text-[7px] uppercase tracking-widest px-2 py-0.5 rounded-md shadow-sm"
                     >
-                      {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.PUBLISHED}
+                      {STUDENT_ACTIVITY_UI.EVALUATIONS.PUBLISHED}
                     </Badge>
                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-500 uppercase tracking-tight bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100/50">
                       {dayjs(ev.cycleStartDate).format('DD/MM/YYYY')} {UI_TEXT.COMMON.EN_DASH}{' '}
@@ -97,20 +98,20 @@ export default function EvaluationsTab({ evaluations, loading }) {
                     <UserOutlined className="text-primary text-[8px]" />
                   </div>
                   <span className="tracking-tight italic">
-                    {ev.evaluatorName || UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.MENTOR}
+                    {ev.evaluatorName || STUDENT_ACTIVITY_UI.EVALUATIONS.MENTOR}
                   </span>
                 </div>
               </div>
             </div>
           ),
           children: (
-            <div className="px-6 py-6 border-t border-slate-50 space-y-6 bg-gradient-to-b from-slate-50/10 to-white">
+            <div className="px-5 py-4 border-t border-slate-50 space-y-4 bg-gradient-to-b from-slate-50/10 to-white">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {ev.details &&
                   ev.details.map((d, j) => (
                     <div
                       key={j}
-                      className="flex flex-col gap-2.5 p-4 rounded-[20px] bg-white border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 group/criteria"
+                      className="flex flex-col gap-2 p-3.5 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group/criteria"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.1em] truncate">
@@ -122,13 +123,13 @@ export default function EvaluationsTab({ evaluations, loading }) {
                       </div>
                       <div className="h-[1px] w-full bg-slate-50 rounded-full" />
                       <p className="text-[11px] font-bold text-slate-600 italic leading-snug">
-                        &quot;{d.comment || UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.NO_COMMENT}&quot;
+                        &quot;{d.comment || STUDENT_ACTIVITY_UI.EVALUATIONS.NO_COMMENT}&quot;
                       </p>
                     </div>
                   ))}
               </div>
 
-              <div className="relative p-5 rounded-[24px] bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/20 overflow-hidden group/comment shadow-2xl shadow-primary/5">
+              <div className="relative p-4 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/20 overflow-hidden group/comment shadow-xl shadow-primary/5">
                 <div className="absolute -top-10 -right-10 size-32 bg-primary/5 rounded-full blur-3xl opacity-50 group-hover/comment:scale-150 transition-transform duration-1000" />
                 <div className="absolute top-0 right-0 p-5 opacity-10 group-hover/comment:opacity-20 transition-opacity">
                   <CommentOutlined className="text-4xl text-primary" />
@@ -138,18 +139,18 @@ export default function EvaluationsTab({ evaluations, loading }) {
                     <CommentOutlined className="text-xs" />
                   </div>
                   <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">
-                    {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.GENERAL_FEEDBACK}
+                    {STUDENT_ACTIVITY_UI.EVALUATIONS.GENERAL_FEEDBACK}
                   </h4>
                 </div>
-                <p className="text-[13px] font-black text-slate-800 italic leading-relaxed relative z-10 pr-8">
+                <p className="text-xs font-bold text-slate-800 italic leading-relaxed relative z-10 pr-8">
                   &quot;
-                  {ev.generalComment || UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.NO_GENERAL_COMMENT}
+                  {ev.generalComment || STUDENT_ACTIVITY_UI.EVALUATIONS.NO_GENERAL_COMMENT}
                   &quot;
                 </p>
-                <div className="mt-5 flex items-center justify-between border-t border-primary/10 pt-3">
+                <div className="mt-4 flex items-center justify-between border-t border-primary/10 pt-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[8px] font-black text-slate-500 tracking-widest uppercase">
-                      {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.EVALUATED_BY}
+                      {STUDENT_ACTIVITY_UI.EVALUATIONS.EVALUATED_BY}
                     </span>
                     <span className="px-2 py-0.5 bg-primary/10 rounded-md text-[8px] font-black text-primary uppercase tracking-tighter shadow-sm">
                       {ev.evaluatorName}
@@ -167,7 +168,7 @@ export default function EvaluationsTab({ evaluations, loading }) {
           border: none !important;
         }
         .activity-evaluation-collapse .ant-collapse-header {
-          padding: 16px 20px !important;
+          padding: 12px 20px !important;
           align-items: center !important;
         }
         .activity-evaluation-collapse .ant-collapse-content-box {

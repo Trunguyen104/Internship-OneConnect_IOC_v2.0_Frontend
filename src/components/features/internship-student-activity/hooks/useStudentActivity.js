@@ -18,6 +18,8 @@ const useStudentActivity = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [pagination, setPagination] = useState({ current: 1, pageSize: 20, total: 0 });
+  const [sortBy, setSortBy] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
 
   const [summary, setSummary] = useState({
     total: 0,
@@ -71,6 +73,8 @@ const useStudentActivity = () => {
         EnterpriseId: enterpriseId === 'ALL' ? undefined : enterpriseId,
         Status: statusFilter === 'ALL' ? undefined : statusFilter,
         LogbookStatus: logbookFilter === 'ALL' ? undefined : logbookFilter,
+        SortBy: sortBy || undefined,
+        SortOrder: sortOrder || undefined,
         PageNumber: pagination.current,
         PageSize: pagination.pageSize,
       };
@@ -100,7 +104,18 @@ const useStudentActivity = () => {
     } finally {
       setLoading(false);
     }
-  }, [termId, debouncedSearchTerm, enterpriseId, statusFilter, logbookFilter, pagination, toast]);
+  }, [
+    termId,
+    debouncedSearchTerm,
+    enterpriseId,
+    statusFilter,
+    logbookFilter,
+    pagination.current,
+    pagination.pageSize,
+    sortBy,
+    sortOrder,
+    toast,
+  ]);
 
   const fetchStudentDetail = useCallback(
     async (studentId, forcedTermId) => {
@@ -147,6 +162,14 @@ const useStudentActivity = () => {
     setStatusFilter('ALL');
     setLogbookFilter('ALL');
     setSearchTerm('');
+    setSortBy(null);
+    setSortOrder(null);
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  };
+
+  const onSort = (key, order) => {
+    setSortBy(key);
+    setSortOrder(order);
     setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
@@ -162,6 +185,8 @@ const useStudentActivity = () => {
     logbookFilter,
     searchTerm,
     pagination,
+    sortBy,
+    sortOrder,
     studentDetail,
     evaluations,
     violations,
@@ -173,6 +198,7 @@ const useStudentActivity = () => {
     setSearchTerm,
     setPagination,
     resetFilters,
+    onSort,
     fetchStudentDetail,
     refresh: fetchStudents,
   };

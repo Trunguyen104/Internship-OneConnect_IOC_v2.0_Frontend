@@ -5,32 +5,34 @@ export const StudentActivityService = {
    * Fetch students for a specific term with activity summaries
    * Note: The backend typically provides 'logbookSubmitted', 'totalLogbooks', etc.
    */
-  async getStudentActivities(termId, params = {}) {
+  async getStudentActivities(params = {}) {
     // For Uni Admin, we fetch students enrolled in a term
-    // The activity summary (logbook, etc.) is either included or fetched separately
-    return httpGet(`/universities/me/terms/${termId}/student-activities`, params);
+    return httpGet('/uni-admin/internship/students', params);
   },
 
-  async getStudentActivityDetail(studentId) {
+  async getStudentActivityDetail(studentId, termId = null) {
     // Fetches profile and placement details for Uni Admin
-    return httpGet(`/universities/me/students/${studentId}/activity-detail`);
+    const params = termId ? { termId } : {};
+    return httpGet(`/uni-admin/internship/students/${studentId}`, params);
   },
 
-  async getStudentEvaluations(studentId) {
+  async getStudentEvaluations(studentId, termId = null) {
     // Fetches published evaluations (mentor-published)
-    return httpGet(`/universities/me/students/${studentId}/published-evaluations`);
+    const params = termId ? { termId } : {};
+    return httpGet(`/uni-admin/internship/students/${studentId}/evaluations`, params);
   },
 
-  async getStudentViolations(studentId) {
+  async getStudentViolations(studentId, termId = null) {
     // Fetches violation reports for the student
-    return httpGet(`/universities/me/students/${studentId}/violations`);
+    const params = termId ? { termId } : {};
+    return httpGet(`/uni-admin/internship/students/${studentId}/violations`, params);
   },
 
   async getUniversityTerms() {
-    return httpGet('/universities/me/terms');
+    return httpGet('/terms');
   },
 
   async getEnterprises() {
-    return httpGet('/universities/me/enterprises');
+    return httpGet('/enterprises');
   },
 };

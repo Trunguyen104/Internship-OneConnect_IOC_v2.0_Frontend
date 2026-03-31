@@ -13,12 +13,13 @@ import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
+import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 export default function LogbookTab({ student, loading }) {
   const [activeWeeks, setActiveWeeks] = useState([]);
 
-  const logbook = student?.activity || {};
+  const logbook = student?.logbook || {};
   const weeks = student?.logbookWeeks || [];
 
   if (loading || !student) {
@@ -30,27 +31,27 @@ export default function LogbookTab({ student, loading }) {
   }
 
   return (
-    <div className="space-y-6 animate-in -mt-11 fade-in slide-in-from-bottom-4 duration-700 pb-20">
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 bg-white p-8 rounded-[40px] border border-white shadow-2xl shadow-slate-200/40">
+    <div className="space-y-6 animate-in -mt-4 fade-in slide-in-from-bottom-4 duration-700 pb-20">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 bg-white p-6 rounded-[24px] border border-white shadow-xl shadow-slate-200/40">
         <div className="space-y-3">
           <h2 className="text-xl font-black tracking-tight text-slate-800">{student.fullName}</h2>
           <div className="flex flex-wrap items-center gap-5 text-[9px] font-black uppercase tracking-widest text-slate-500">
             <div className="flex items-center gap-2.5 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
               <FileTextOutlined className="text-primary text-[10px] opacity-70" />
               <span>
-                {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.TOTAL}{' '}
+                {STUDENT_ACTIVITY_UI.LOGBOOK.TOTAL}{' '}
                 <span className="text-slate-800 text-[11px]">
                   {logbook.submitted}/{logbook.totalWorkDays}
                 </span>{' '}
-                {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.REPORTS}
+                {STUDENT_ACTIVITY_UI.LOGBOOK.REPORTS}
               </span>
             </div>
             <span className="opacity-20 hidden md:block">|</span>
             <span className="flex items-center gap-2.5 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
               <CalendarOutlined className="text-primary text-[10px] opacity-70" />
-              {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.FROM}{' '}
+              {STUDENT_ACTIVITY_UI.LOGBOOK.FROM}{' '}
               <span className="text-slate-800">{student.termStartDate}</span>{' '}
-              {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.TO}{' '}
+              {STUDENT_ACTIVITY_UI.LOGBOOK.TO}{' '}
               <span className="text-slate-800">{student.termEndDate}</span>
             </span>
           </div>
@@ -76,7 +77,7 @@ export default function LogbookTab({ student, loading }) {
               const isFull = week.submittedCount === week.totalCount;
               return {
                 key: week.weekNumber.toString(),
-                className: 'mb-5 group',
+                className: 'mb-3 group',
                 label: (
                   <div className="flex items-center gap-4 py-1">
                     <div
@@ -102,7 +103,7 @@ export default function LogbookTab({ student, loading }) {
                             size="xs"
                             className="px-2 rounded-md text-[7px] tracking-[0.1em] font-black uppercase ring-1 ring-green-100"
                           >
-                            {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.COMPLETED}
+                            {STUDENT_ACTIVITY_UI.LOGBOOK.COMPLETED}
                           </Badge>
                         )}
                       </h3>
@@ -114,7 +115,7 @@ export default function LogbookTab({ student, loading }) {
                         <span
                           className={`text-[8px] font-black uppercase tracking-widest ${isFull ? 'text-green-500' : 'text-yellow-600'}`}
                         >
-                          {week.completionRatio} {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.REPORTS}
+                          {week.completionRatio} {STUDENT_ACTIVITY_UI.LOGBOOK.REPORTS}
                         </span>
                       </div>
                     </div>
@@ -126,48 +127,48 @@ export default function LogbookTab({ student, loading }) {
                       {week.entries && week.entries.length > 0 ? (
                         week.entries.map((entry, eIdx) => (
                           <div key={eIdx} className="group/entry relative">
-                            <div className="flex flex-col md:flex-row items-start gap-5 p-5 rounded-2xl bg-white border border-transparent hover:border-slate-50 hover:bg-slate-50/10 transition-all duration-300">
-                              <div className="w-24 shrink-0">
-                                <div className="flex flex-col gap-0">
-                                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.1em] mb-1">
-                                    {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.REPORT_DATE}
+                            <div className="flex flex-col md:flex-row items-start gap-4 p-4 rounded-xl bg-white border border-transparent hover:border-slate-50 hover:bg-slate-50/10 transition-all duration-300">
+                              <div className="w-20 shrink-0">
+                                <div className="flex flex-col gap-0 border-r border-slate-100 pr-4">
+                                  <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.1em] mb-0.5">
+                                    {STUDENT_ACTIVITY_UI.LOGBOOK.REPORT_DATE}
                                   </span>
-                                  <span className="text-xs font-black text-slate-800 tracking-tight">
+                                  <span className="text-xs font-black text-slate-800 tracking-tight leading-none">
                                     {dayjs(entry.dateReport).format('dddd')}
                                   </span>
-                                  <span className="text-[10px] font-bold text-slate-400">
+                                  <span className="text-[9px] font-bold text-slate-400 mt-0.5">
                                     {dayjs(entry.dateReport).format('DD/MM/YYYY')}
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="flex-1 space-y-2.5">
+                              <div className="flex-1 space-y-2">
                                 <div className="space-y-0.5">
                                   <span className="text-[7px] font-black uppercase tracking-[0.1em] text-primary/60">
-                                    {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.WORK_SUMMARY}
+                                    {STUDENT_ACTIVITY_UI.LOGBOOK.WORK_SUMMARY}
                                   </span>
-                                  <h5 className="text-[13px] font-black text-slate-800 tracking-tight leading-snug">
+                                  <h5 className="text-[13px] font-bold text-slate-800 tracking-tight leading-snug">
                                     {entry.summary ||
-                                      UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.SUMMARY_UNAVAILABLE}
+                                      STUDENT_ACTIVITY_UI.LOGBOOK.SUMMARY_UNAVAILABLE}
                                   </h5>
                                 </div>
 
                                 <div className="space-y-0.5">
                                   <span className="text-[7px] font-black uppercase tracking-[0.1em] text-slate-400">
-                                    {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.NOTES_ISSUES}
+                                    {STUDENT_ACTIVITY_UI.LOGBOOK.NOTES_ISSUES}
                                   </span>
-                                  <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
-                                    {entry.issue || UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.NO_ISSUES}
+                                  <p className="text-[11px] text-slate-500 leading-relaxed font-bold">
+                                    {entry.issue || STUDENT_ACTIVITY_UI.LOGBOOK.NO_ISSUES}
                                   </p>
                                 </div>
 
                                 {entry.plan && (
-                                  <div className="mt-3 p-3 bg-primary/[0.03] rounded-xl border border-primary/[0.05] relative overflow-hidden group/plan">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/10" />
-                                    <span className="text-[7px] font-black uppercase text-primary tracking-[0.1em] block mb-1 opacity-60">
-                                      {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.NEXT_PLAN}
+                                  <div className="mt-2.5 p-2.5 bg-primary/[0.03] rounded-lg border border-primary/[0.05] relative overflow-hidden group/plan">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/20" />
+                                    <span className="text-[7px] font-black uppercase text-primary tracking-[0.1em] block mb-1 opacity-70">
+                                      {STUDENT_ACTIVITY_UI.LOGBOOK.NEXT_PLAN}
                                     </span>
-                                    <p className="text-[10px] font-black text-slate-600 leading-relaxed italic opacity-90">
+                                    <p className="text-[10px] font-bold text-slate-600 leading-relaxed italic pr-4">
                                       {entry.plan}
                                     </p>
                                   </div>
@@ -184,16 +185,16 @@ export default function LogbookTab({ student, loading }) {
                                         : 'warning-soft'
                                     }
                                     size="xs"
-                                    className="font-black tracking-widest uppercase px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-none ring-1 ring-slate-100/50"
+                                    className="font-black tracking-widest uppercase px-2.5 py-1 rounded-md flex items-center gap-1.5 shadow-none ring-1 ring-slate-100/50"
                                   >
                                     <div
-                                      className={`size-1.5 rounded-full ${entry.status === 'PUNCTUAL' ? 'bg-green-500' : 'bg-yellow-500'}`}
+                                      className={`size-1 rounded-full ${entry.status === 'PUNCTUAL' ? 'bg-green-500' : 'bg-yellow-500'}`}
                                     />
-                                    <span className="text-[8px]">{entry.statusBadge}</span>
+                                    <span className="text-[7px]">{entry.statusBadge}</span>
                                   </Badge>
                                   <div className="flex items-center gap-1.5 text-[8px] font-black text-slate-300 uppercase tracking-tighter">
                                     <ClockCircleOutlined className="text-[10px]" />
-                                    {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.SUBMITTED_AT}{' '}
+                                    {STUDENT_ACTIVITY_UI.LOGBOOK.SUBMITTED_AT}{' '}
                                     <span className="text-slate-400">
                                       {dayjs(entry.dateReport).format('HH:mm DD/MM')}
                                     </span>
@@ -201,7 +202,7 @@ export default function LogbookTab({ student, loading }) {
                                 </div>
                               </div>
                             </div>
-                            <div className="mx-6 h-px bg-slate-50 group-last/entry:hidden" />
+                            <div className="mx-4 h-px bg-slate-50 group-last/entry:hidden" />
                           </div>
                         ))
                       ) : (
@@ -209,7 +210,7 @@ export default function LogbookTab({ student, loading }) {
                           <Empty
                             description={
                               <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic leading-loose">
-                                {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.NO_REPORTS_WEEK}
+                                {STUDENT_ACTIVITY_UI.LOGBOOK.NO_REPORTS_WEEK}
                               </span>
                             }
                           />
@@ -227,10 +228,10 @@ export default function LogbookTab({ student, loading }) {
               <FileTextOutlined />
             </div>
             <h3 className="text-2xl font-black text-slate-800 mb-4 tracking-tight">
-              {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.EMPTY}
+              {STUDENT_ACTIVITY_UI.LOGBOOK.EMPTY}
             </h3>
             <p className="text-slate-400 font-semibold max-w-sm leading-relaxed">
-              {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.NO_REPORTS}
+              {STUDENT_ACTIVITY_UI.LOGBOOK.NO_REPORTS}
             </p>
           </div>
         )}

@@ -1,7 +1,6 @@
-import React from 'react';
+import { Skeleton } from 'antd';
 
 import { cn } from '@/lib/cn';
-import { UI_TEXT } from '@/lib/UI_Text';
 
 const SummaryCard = ({
   title,
@@ -47,9 +46,13 @@ const SummaryCard = ({
           </div>
 
           <div className="flex items-baseline gap-2 overflow-hidden">
-            <h2 className="m-0 text-2xl font-black leading-none tracking-tighter text-slate-900">
-              {loading ? UI_TEXT.COMMON.LOADING : value}
-            </h2>
+            {loading ? (
+              <Skeleton.Button active size="small" className="!w-12 !h-6 !min-w-[48px]" />
+            ) : (
+              <h2 className="m-0 text-3xl italic font-black leading-none tracking-tighter text-slate-900 pr-2">
+                {value}
+              </h2>
+            )}
             {suffix && (
               <span className="mb-0.5 truncate text-[9px] font-black uppercase tracking-widest text-slate-400">
                 {suffix}
