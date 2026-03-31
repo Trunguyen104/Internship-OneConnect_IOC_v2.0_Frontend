@@ -28,7 +28,7 @@ const InfoRow = ({ label, value, icon, className }) => (
           {icon}
         </span>
       )}
-      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">
+      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.1em] leading-none">
         {label}
       </span>
     </div>
@@ -48,7 +48,7 @@ const SectionCard = ({ title, children, icon, className, accentColor = 'primary'
     />
 
     <div className="flex items-center justify-between mb-6 relative z-10">
-      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-3">
+      <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 flex items-center gap-3">
         <div
           className={`size-9 rounded-xl bg-white flex items-center justify-center text-${accentColor} text-lg shadow-sm border border-slate-100 transition-transform duration-500`}
         >
@@ -86,19 +86,19 @@ const StatusMiniCard = ({
         >
           {icon}
         </div>
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+        <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
           {title}
         </span>
       </div>
 
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-black text-slate-800 tracking-tighter italic">{value}</span>
+        <span className="text-3xl font-bold text-slate-800 tracking-tighter italic">{value}</span>
         {subValue && <span className="text-xs font-bold text-slate-400">{subValue}</span>}
       </div>
 
       {progress !== undefined && (
         <div className="space-y-2 pt-1">
-          <div className="flex items-center justify-between text-[9px] font-black uppercase">
+          <div className="flex items-center justify-between text-[9px] font-bold uppercase">
             <span className="text-slate-400">{STUDENT_ACTIVITY_UI.OVERVIEW.COMPLETED}</span>
             <span className={`text-${color}`}>{progress}%</span>
           </div>
@@ -119,7 +119,7 @@ export default function OverviewTab({ student, evaluations = [], violations = []
     return (
       <div className="p-32 text-center">
         <div className="inline-block size-12 border-[5px] border-primary/20 border-t-primary rounded-full animate-spin mb-8" />
-        <div className="text-slate-400 font-black uppercase tracking-[0.25em] text-[11px] animate-pulse">
+        <div className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[11px] animate-pulse">
           {UI_TEXT.COMMON.LOADING}
         </div>
       </div>
@@ -167,7 +167,7 @@ export default function OverviewTab({ student, evaluations = [], violations = []
 
           <div className="space-y-1">
             <div className="flex items-center justify-between mb-4 px-4 text-info">
-              <h5 className="text-[9px] font-black uppercase tracking-[0.2em] flex items-center gap-2">
+              <h5 className="text-[9px] font-bold uppercase tracking-[0.15em] flex items-center gap-2">
                 <TeamOutlined />
                 {STUDENT_ACTIVITY_UI.OVERVIEW.INFO_FIELDS.BUSINESS_MENTOR_INFO}
               </h5>
@@ -251,10 +251,10 @@ export default function OverviewTab({ student, evaluations = [], violations = []
               <CheckCircleOutlined />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600/70">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600/70">
                 {STUDENT_ACTIVITY_UI.OVERVIEW.DISCIPLINE}
               </span>
-              <span className="text-sm font-black text-emerald-800 tracking-tight">
+              <span className="text-sm font-bold text-emerald-800 tracking-tight">
                 {STUDENT_ACTIVITY_UI.OVERVIEW.NO_VIOLATIONS}
               </span>
             </div>

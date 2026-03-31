@@ -5,8 +5,8 @@ import {
   ClearOutlined,
   CloseCircleFilled,
   ExclamationCircleFilled,
-  ExclamationCircleOutlined,
   SearchOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Progress, Select, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -18,15 +18,27 @@ import PageLayout from '@/components/ui/pagelayout';
 import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import useStudentActivity from '../hooks/useStudentActivity';
+import { useActivityFilters } from '../hooks/useActivityFilters';
+import { useStudentList } from '../hooks/useStudentList';
 import SummaryCard from './SummaryCard';
 
 export default function StudentActivityList() {
   const router = useRouter();
+  const filters = useActivityFilters();
   const {
     students,
     loading,
     summary,
+    totalCount,
+    pagination,
+    setPagination,
+    sortBy,
+    sortOrder,
+    onSort,
+    refresh,
+  } = useStudentList(filters);
+
+  const {
     terms,
     enterprises,
     termId,
@@ -34,19 +46,13 @@ export default function StudentActivityList() {
     statusFilter,
     logbookFilter,
     searchTerm,
-    pagination,
-    sortBy,
-    sortOrder,
     setTermId,
     setEnterpriseId,
     setStatusFilter,
     setLogbookFilter,
     setSearchTerm,
-    setPagination,
     resetFilters,
-    onSort,
-    refresh,
-  } = useStudentActivity();
+  } = filters;
 
   const handleRowClick = (record) => {
     const id = record.studentId || record.id;
@@ -122,6 +128,7 @@ export default function StudentActivityList() {
     {
       title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.LOGBOOK_PROGRESS,
       key: 'logbook',
+      dataIndex: 'logbook',
       sortKey: 'LogbookPercent',
       sorter: true,
       width: 160,
@@ -133,15 +140,22 @@ export default function StudentActivityList() {
         )
           return <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>;
 
-        const { submitted, percentComplete: progress, total: totalWorkDays } = record.logbook;
+        const { submitted, total: totalWorkDays, percentComplete: beProgress } = record.logbook;
 
         if (totalWorkDays === 0)
           return <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>;
 
-        let strokeColor = '#22c55e'; // success
+        // Prioritize backend calculated value for filter consistency, fall back to manual ratio
+        const rawProgress = beProgress ?? Math.round((submitted / totalWorkDays) * 100);
+        const progress = Math.min(100, rawProgress);
+
+        let strokeColor = '#22c55e'; // success (green)
         if (progress < 50)
-          strokeColor = '#ef4444'; // danger
-        else if (progress < 75) strokeColor = '#f59e0b'; // warning
+          strokeColor = '#ec4899'; // serious concern (pink/red)
+        else if (progress < 75) strokeColor = '#f59e0b'; // warning (amber)
+
+        // Enhance color logic for 0%
+        if (progress === 0) strokeColor = '#ef4444'; // danger (red)
 
         return (
           <div className="flex w-full flex-col gap-1.5 py-1 pr-4">
@@ -195,16 +209,17 @@ export default function StudentActivityList() {
     {
       title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.VIOLATIONS,
       key: 'violationCount',
+      dataIndex: 'violationCount',
       sortKey: 'ViolationCount',
       sorter: true,
-      width: 80,
+      width: 90,
       align: 'center',
       render: (count) => {
         if (!count || count === 0) return null;
         return (
-          <div className="flex items-center justify-center gap-1.5">
-            <ExclamationCircleOutlined className="text-red-500 font-bold" />
-            <span className="text-xs font-bold text-slate-800">{count}</span>
+          <div className="flex items-center justify-center gap-1.5 py-1">
+            <ExclamationCircleFilled className="text-red-500 scale-110 drop-shadow-sm" />
+            <span className="text-xs font-black text-red-600">{count}</span>
           </div>
         );
       },
@@ -223,6 +238,8 @@ export default function StudentActivityList() {
           active={statusFilter === 'ALL'}
           onClick={() => setStatusFilter('ALL')}
           variant="neutral"
+          icon={<TeamOutlined className="opacity-90 mt-0.5" />}
+          suffix="Students"
         />
         <SummaryCard
           title={STUDENT_ACTIVITY_UI.STATS.PLACED}
@@ -232,6 +249,7 @@ export default function StudentActivityList() {
           onClick={() => setStatusFilter(1)}
           variant="success"
           icon={<CheckCircleFilled className="opacity-90 mt-0.5" />}
+          suffix="Students"
         />
         <SummaryCard
           title={STUDENT_ACTIVITY_UI.STATS.UNPLACED}
@@ -241,6 +259,7 @@ export default function StudentActivityList() {
           onClick={() => setStatusFilter(5)}
           variant="danger"
           icon={<CloseCircleFilled className="opacity-90 mt-0.5" />}
+          suffix="Students"
         />
         <SummaryCard
           title={STUDENT_ACTIVITY_UI.STATS.NO_MENTOR}
@@ -250,6 +269,7 @@ export default function StudentActivityList() {
           onClick={() => setStatusFilter(2)}
           variant="warning"
           icon={<ExclamationCircleFilled className="opacity-90 mt-0.5" />}
+          suffix="Students"
         />
       </div>
 
@@ -318,8 +338,8 @@ export default function StudentActivityList() {
               placeholder={STUDENT_ACTIVITY_UI.FILTERS.ALL_LOGBOOK}
               options={[
                 { value: 1, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_GOOD },
-                { value: 2, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_MEDIUM },
-                { value: 3, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_POOR },
+                { value: 3, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_MEDIUM },
+                { value: 2, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_POOR },
               ]}
             />
             <div className="ml-auto inline-flex items-center gap-2">
@@ -360,14 +380,6 @@ export default function StudentActivityList() {
                   <span className="text-slate-500 font-medium text-sm">
                     {STUDENT_ACTIVITY_UI.FILTERS.NO_STUDENT_MATCH}
                   </span>
-                  <Button
-                    type="link"
-                    danger
-                    onClick={resetFilters}
-                    className="font-semibold px-0 mt-1"
-                  >
-                    {STUDENT_ACTIVITY_UI.FILTERS.RESET_FILTERS}
-                  </Button>
                 </div>
               )
             }
@@ -375,7 +387,7 @@ export default function StudentActivityList() {
         </PageLayout.Content>
 
         <PageLayout.Pagination
-          total={summary.total || students.length}
+          total={totalCount}
           page={pagination.current}
           pageSize={pagination.pageSize}
           onPageChange={(page) => setPagination((prev) => ({ ...prev, current: page }))}
