@@ -85,6 +85,8 @@ export const PROJECT_MANAGEMENT = {
     DASH: '-',
     UNKNOWN: 'Unknown',
     LOADING: 'Loading...',
+    BACK_TO_LIST: 'Back to List',
+    ENTERPRISE: 'Enterprise',
   },
   TABS: {
     DETAIL: 'Project Details',
@@ -227,6 +229,7 @@ export const PROJECT_MANAGEMENT = {
       DESCRIPTION_EMPTY: 'No description updated yet.',
       MENTOR: 'Project Mentor',
       FIELD_TEMPLATE: 'Field & Template',
+      FIELD: 'Field',
       TIMELINE: 'Project Timeline',
       GROUP_INFO: 'Intern Group Info',
       REQUIREMENTS: 'Technical Requirements',
@@ -324,6 +327,8 @@ export const PROJECT_MANAGEMENT = {
     ERROR_ARCHIVE: 'Failed to archive project',
     ERROR_COMPLETE: 'Failed to complete project',
     ERROR_DELETE: 'Failed to delete project',
+    ERROR_HAS_DATA_BACKEND:
+      'This project cannot be moved because it already has operational data (work items or sprints).',
     ERROR_GENERAL: 'An error occurred while processing your request',
   },
   MODALS: {
@@ -336,6 +341,7 @@ export const PROJECT_MANAGEMENT = {
       TITLE: 'Assign / Change Intern Group',
       DESC: 'Select an active Intern Group to assign to project <b>{name}</b>:',
       PLACEHOLDER: 'Select an Intern Group',
+      CURRENT_GROUP: 'Current Group',
       CONFIRM: 'Confirm Assignment',
       SUCCESS_ASSIGN: 'Group assigned successfully.',
       SUCCESS_CHANGE: 'Group changed successfully.',

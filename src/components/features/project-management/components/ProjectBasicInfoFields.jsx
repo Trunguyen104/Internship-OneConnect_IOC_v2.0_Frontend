@@ -78,8 +78,7 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
                   extra={
                     groupId && editingRecord ? (
                       <span className="text-[10px] text-primary/60 italic font-medium">
-                        {FORM.LABEL?.PHASE || 'Phase:'}{' '}
-                        {group?.phaseName || FORM.LABEL?.N_A || 'N/A'} (
+                        {FORM.LABEL?.PHASE} {group?.phaseName || FORM.LABEL?.N_A} (
                         {group?.startDate ? new Date(group.startDate).toLocaleDateString() : '?'} -{' '}
                         {group?.endDate ? new Date(group.endDate).toLocaleDateString() : '?'})
                       </span>

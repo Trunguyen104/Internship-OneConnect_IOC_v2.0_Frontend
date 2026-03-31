@@ -52,7 +52,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
               </span>
             </div>
           </section>
-          <section className="min-w-[140px]">
+          <section className="min-w-fit">
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.FIELD}
             </h4>

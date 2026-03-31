@@ -1,7 +1,7 @@
 'use client';
 
-import { CarryOutOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
-import { App, Modal, Select, Tooltip } from 'antd';
+import { CarryOutOutlined } from '@ant-design/icons';
+import { App, Select, Tooltip } from 'antd';
 import React, { useState } from 'react';
 
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/cn';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useProjectManagement } from '../hooks/useProjectManagement';
-import ProjectDetailDrawer from './ProjectDetailDrawer';
+import ProjectAssignGroupModal from './ProjectAssignGroupModal';
 import ProjectFormModal from './ProjectFormModal';
 import ProjectTable from './ProjectTable';
 
@@ -218,27 +218,10 @@ export default function ProjectManagement() {
           viewOnly={viewOnly}
           groups={groups}
         />
-
-        <ProjectDetailDrawer
-          visible={detailDrawerVisible}
-          onClose={() => setDetailDrawerVisible(false)}
-          project={editingRecord}
-          groups={groups}
-          onRefresh={fetchData}
-          onAssign={(record) => {
-            setAssigningProject(record);
-            setSelectedGroupId(
-              record.internshipId || record.internshipGroupId || record.groupId || null
-            );
-            setReplacementProjectId(null);
-            setAssignModalVisible(true);
-          }}
-        />
-
-        <Modal
-          title={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.TITLE}
-          open={assignModalVisible}
-          onOk={() =>
+        <ProjectAssignGroupModal
+          visible={assignModalVisible}
+          onCancel={() => setAssignModalVisible(false)}
+          onConfirm={() =>
             handleAssignGroup(
               assigningProject,
               selectedGroupId,
@@ -247,94 +230,15 @@ export default function ProjectManagement() {
               replacementProjectId
             )
           }
-          onCancel={() => setAssignModalVisible(false)}
-          confirmLoading={assignLoading}
-          zIndex={2000}
-          okButtonProps={{
-            disabled:
-              !selectedGroupId ||
-              (isMovingFromGroup &&
-                selectedGroupId !== sourceGroupId &&
-                (sourceGroup?.studentCount > 0 ||
-                  sourceGroup?.numberOfMembers > 0 ||
-                  assigningProject?.groupInfo?.studentCount > 0) &&
-                !replacementProjectId),
-          }}
-          okText={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM}
-        >
-          <div className="py-4">
-            <p
-              className="mb-2 text-sm text-gray-600"
-              dangerouslySetInnerHTML={{
-                __html: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.DESC.replace(
-                  '{name}',
-                  assigningProject?.projectName || ''
-                ),
-              }}
-            />
-            <Select
-              className="w-full"
-              placeholder={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.PLACEHOLDER}
-              value={selectedGroupId}
-              onChange={setSelectedGroupId}
-              allowClear
-            >
-              {groups.map((g) => (
-                <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
-                  {g.groupName}
-                </Option>
-              ))}
-            </Select>
-
-            {/* AC-05: Case B - Replacement selection if it's a move */}
-            {isMovingFromGroup && selectedGroupId && selectedGroupId !== sourceGroupId && (
-              <div className="mt-6 border-t pt-4">
-                <div className="mb-3 flex items-start gap-2 rounded-md bg-amber-50 p-3">
-                  <span className="text-amber-500 mt-0.5">
-                    <ExclamationCircleOutlined />
-                  </span>
-                  <p
-                    className="text-xs text-amber-800"
-                    dangerouslySetInnerHTML={{
-                      __html: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SWAP_WARNING.replace(
-                        '{projectName}',
-                        assigningProject?.projectName || ''
-                      ).replace('{groupName}', sourceGroup?.groupName || 'current group'),
-                    }}
-                  />
-                </div>
-
-                <div className="font-medium text-xs text-gray-500 mb-1.5 uppercase tracking-wider">
-                  {PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.REPLACEMENT_LABEL.replace(
-                    '{groupName}',
-                    sourceGroup?.groupName || 'Current Group'
-                  )}
-                </div>
-                <Select
-                  className="w-full"
-                  placeholder={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.REPLACEMENT_PLACEHOLDER}
-                  value={replacementProjectId}
-                  onChange={setReplacementProjectId}
-                  allowClear
-                >
-                  {unstartedProjects.map((p) => (
-                    <Option key={p.projectId} value={p.projectId}>
-                      {p.projectName}
-                    </Option>
-                  ))}
-                </Select>
-                {unstartedProjects.length === 0 && (
-                  <p className="mt-1 text-[10px] italic text-red-400">
-                    {PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.NO_UNSTARTED_PROJECTS.replace(
-                      '{groupName}',
-                      sourceGroup?.groupName || ''
-                    )}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </Modal>
+          loading={assignLoading}
+          assigningProject={assigningProject}
+          groups={groups}
+          unstartedProjects={unstartedProjects}
+          selectedGroupId={selectedGroupId}
+          setSelectedGroupId={setSelectedGroupId}
+          replacementProjectId={replacementProjectId}
+          setReplacementProjectId={setReplacementProjectId}
+        />
       </>
     </PageLayout>
   );

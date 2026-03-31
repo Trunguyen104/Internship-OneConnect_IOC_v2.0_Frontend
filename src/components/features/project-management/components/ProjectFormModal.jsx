@@ -240,7 +240,7 @@ export default function ProjectFormModal({
             <Button onClick={onCancel}>{FORM.CANCEL_BTN}</Button>
             <Space>
               <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
-                {editingRecord ? FORM.SAVE_CHANGES || 'Save Changes' : FORM.PUBLISH || 'Save'}
+                {editingRecord ? FORM.SAVE_CHANGES : FORM.PUBLISH}
               </Button>
             </Space>
           </div>
@@ -253,8 +253,8 @@ export default function ProjectFormModal({
           layout="vertical"
           disabled={viewOnly || dataLoading}
           initialValues={{
-            template: 'None',
-            field: 'Information Technology',
+            template: FORM.FIELD_OPTIONS?.TEMPLATE?.NONE,
+            field: FORM.FIELD_OPTIONS?.FIELD?.IT,
             links: [],
             attachments: [],
           }}

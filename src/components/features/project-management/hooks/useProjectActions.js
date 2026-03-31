@@ -32,9 +32,12 @@ export const useProjectActions = ({
   };
 
   const getErrorMessage = (err, defaultMsg) => {
-    const resMsg = err.data?.errors?.[0] || err.data?.message || err.message;
-    if (resMsg?.includes(MESSAGES.ERROR_PUBLISH_NO_GROUP_VN)) {
-      return MESSAGES.ERROR_PUBLISH_NO_GROUP;
+    const resMsg = err.data?.errors?.[0] || err.data?.message || err.message || '';
+    if (resMsg.includes(PROJECT_MANAGEMENT.MESSAGES.ERROR_PUBLISH_NO_GROUP_VN)) {
+      return PROJECT_MANAGEMENT.MESSAGES.ERROR_PUBLISH_NO_GROUP;
+    }
+    if (resMsg.includes('đã có dữ liệu')) {
+      return PROJECT_MANAGEMENT.MESSAGES.ERROR_HAS_DATA_BACKEND;
     }
     return resMsg || defaultMsg;
   };
@@ -286,10 +289,8 @@ export const useProjectActions = ({
         // AC-05: If group is CHANGED and has student data -> BLOCK
         if (isGroupChanged && studentCount > 0) {
           modal.error({
-            title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_NO_CHANGE || 'Không thể đổi nhóm',
-            content:
-              PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_HAS_DATA ||
-              'Nhóm đang có dữ liệu hoạt động, không thể đổi project.',
+            title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_NO_CHANGE,
+            content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_HAS_DATA,
           });
           return;
         }
@@ -297,8 +298,8 @@ export const useProjectActions = ({
         // AC-08 Case 3: If just EDITING content and has students -> WARN
         if (studentCount > 0) {
           modal.confirm({
-            title: PROJECT_MANAGEMENT.MODALS?.UPDATE_WARNING_TITLE || 'Cảnh báo cập nhật',
-            content: `Dự án đang có ${studentCount} sinh viên tham gia. Thay đổi có thể ảnh hưởng đến trải nghiệm học. Bạn có chắc?`,
+            title: PROJECT_MANAGEMENT.MODALS?.UPDATE_WARNING_TITLE,
+            content: PROJECT_MANAGEMENT.MESSAGES.EDIT_WARNING.replace('{count}', studentCount),
             okText: 'Confirm',
             cancelText: 'Cancel',
             onOk: () => saveMutation.mutateAsync({ values, isDraft }),
@@ -465,7 +466,7 @@ export const useProjectActions = ({
       oldGroupId !== selectedGroupId;
 
     const doMutate = async () => {
-      setLocalLoading?.(true);
+      if (setLocalLoading) setLocalLoading(true);
       try {
         // 1. Assign primary project to target group
         await assignGroupMutation.mutateAsync({ assigningProject, selectedGroupId });
@@ -480,9 +481,15 @@ export const useProjectActions = ({
           }
         }
 
-        closeLocalModal?.();
+        if (closeLocalModal) closeLocalModal();
+        return true; // Resolve for antd modal
+      } catch (e) {
+        // Error toast is handled by assignGroupMutation.onError
+        // When an error occurs (e.g. "has data"), we close the modals so the user can return to a stable state
+        if (closeLocalModal) closeLocalModal();
+        return true; // Resolve for antd modal.confirm to close the small confirmation modal
       } finally {
-        setLocalLoading?.(false);
+        if (setLocalLoading) setLocalLoading(false);
       }
     };
 
@@ -505,8 +512,8 @@ export const useProjectActions = ({
             });
             return;
           }
-        } catch {
-          toast.error(MESSAGES.ERROR_CHECK_BOUNDS);
+        } catch (checkErr) {
+          toast.error(PROJECT_MANAGEMENT.MESSAGES.ERROR_CHECK_BOUNDS);
           return;
         }
 
@@ -523,7 +530,7 @@ export const useProjectActions = ({
     }
 
     // No confirmation needed for new assign
-    doMutate();
+    return await doMutate();
   };
 
   const submitLoading =
