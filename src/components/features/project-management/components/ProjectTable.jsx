@@ -18,6 +18,8 @@ import React, { useMemo } from 'react';
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import {
+  getOperationalStatus,
+  getVisibilityStatus,
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
@@ -25,6 +27,7 @@ import {
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
 } from '@/constants/project-management/project-management';
+import { cn } from '@/lib/cn';
 
 export default function ProjectTable({
   data,
@@ -141,15 +144,23 @@ export default function ProjectTable({
             );
           }
 
+          const op = getOperationalStatus(record.operationalStatus ?? record.status);
+          const isReadOnly =
+            op === OPERATIONAL_STATUS.COMPLETED || op === OPERATIONAL_STATUS.ARCHIVED;
+
           return (
             <div
-              className="cursor-pointer hover:text-primary transition-colors group/cell"
+              className={cn(
+                'transition-colors group/cell',
+                !isReadOnly && 'cursor-pointer hover:text-primary'
+              )}
               onClick={(e) => {
+                if (isReadOnly) return;
                 e.stopPropagation();
                 onAssign?.(record);
               }}
             >
-              <div className="group-hover/cell:underline">{content}</div>
+              <div className={cn(!isReadOnly && 'group-hover/cell:underline')}>{content}</div>
             </div>
           );
         },
@@ -191,7 +202,7 @@ export default function ProjectTable({
         width: 90,
         align: 'center',
         render: (_, record) => {
-          const vis = record.visibilityStatus ?? record.visibility ?? VISIBILITY_STATUS.DRAFT;
+          const vis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const label = VISIBILITY_LABELS[vis] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
           const variant = STATUS_VARIANTS[vis] || 'default';
           return (
@@ -207,7 +218,7 @@ export default function ProjectTable({
         width: 110,
         align: 'center',
         render: (_, record) => {
-          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const op = getOperationalStatus(record.operationalStatus ?? record.status);
           const label = OPERATIONAL_LABELS[op] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
           const variant = STATUS_VARIANTS[op] || 'default';
           return (
@@ -223,13 +234,14 @@ export default function ProjectTable({
         width: 80,
         align: 'center',
         render: (_, record) => {
+          const originalOp = getOperationalStatus(record.operationalStatus ?? record.status);
+          const originalVis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const vis =
-            record.visibilityStatus ??
-            record.visibility ??
-            (record.status === OPERATIONAL_STATUS.UNSTARTED
+            originalVis ??
+            (originalOp === OPERATIONAL_STATUS.UNSTARTED
               ? VISIBILITY_STATUS.DRAFT
               : VISIBILITY_STATUS.PUBLISHED);
-          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const op = originalOp;
 
           if (!isMentor) {
             return (
@@ -266,11 +278,6 @@ export default function ProjectTable({
                 key: 'archive',
                 label: TABLE.ACTIONS_LABEL.ARCHIVE,
                 onClick: () => onArchive?.(record.projectId),
-              },
-              {
-                key: 'change-group',
-                label: TABLE.ACTIONS_LABEL.CHANGE_GROUP,
-                onClick: () => onAssign?.(record),
               }
             );
           } else if (op === OPERATIONAL_STATUS.UNSTARTED || op === OPERATIONAL_STATUS.ACTIVE) {

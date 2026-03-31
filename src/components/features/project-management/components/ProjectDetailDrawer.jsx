@@ -6,6 +6,8 @@ import React, { useMemo, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import {
+  getOperationalStatus,
+  getVisibilityStatus,
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
@@ -13,6 +15,7 @@ import {
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
 } from '@/constants/project-management/project-management';
+import { useToast } from '@/providers/ToastProvider';
 
 import { useProjectDetail } from '../hooks/useProjectDetail';
 import ProjectDetailsTab from './ProjectDetailsTab';
@@ -60,6 +63,48 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
       s.studentCode?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const toast = useToast();
+
+  const handleViewResource = async (item) => {
+    const url = item.resourceUrl || item.url;
+    if (!url) {
+      toast.error(PROJECT_MANAGEMENT.MESSAGES.ERROR_RESOURCE_ACCESS);
+      return;
+    }
+
+    // For Cloudinary API download URLs, probe first to catch "Resource not found" before opening a broken tab
+    if (url.includes('api.cloudinary.com')) {
+      try {
+        const res = await fetch(url, { method: 'GET', mode: 'no-cors' });
+        // no-cors always returns opaque response; we open it and let Cloudinary handle it
+        // If the URL is clearly invalid we catch below
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } catch {
+        toast.error(PROJECT_MANAGEMENT.MESSAGES.ERROR_RESOURCE_ACCESS);
+      }
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const LINK_TYPES = ['8', 'LINK'];
+  const allResources = currentProject?.projectResources || [];
+  const internalDocs = allResources.filter(
+    (r) =>
+      !LINK_TYPES.includes(
+        String(r.resourceType || '')
+          .toUpperCase()
+          .trim()
+      )
+  );
+  const quickLinks = allResources.filter((r) =>
+    LINK_TYPES.includes(
+      String(r.resourceType || '')
+        .toUpperCase()
+        .trim()
+    )
+  );
+
   return (
     <Drawer
       title={
@@ -82,13 +127,14 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
                   </span>
                   <Tag
                     color={
-                      currentProject?.visibilityStatus === VISIBILITY_STATUS.PUBLISHED
+                      getVisibilityStatus(currentProject?.visibilityStatus) ===
+                      VISIBILITY_STATUS.PUBLISHED
                         ? 'blue'
                         : 'orange'
                     }
                     className="m-0 border-none font-bold text-[9px] rounded-md px-1.5 uppercase leading-none h-4 flex items-center"
                   >
-                    {VISIBILITY_LABELS[currentProject?.visibilityStatus ?? VISIBILITY_STATUS.DRAFT]}
+                    {VISIBILITY_LABELS[getVisibilityStatus(currentProject?.visibilityStatus)]}
                   </Tag>
                 </div>
                 <div className="flex flex-col gap-0 border-l border-slate-100 pl-2 ml-1">
@@ -97,19 +143,17 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
                   </span>
                   <Tag
                     color={
-                      currentProject?.operationalStatus === OPERATIONAL_STATUS.ACTIVE
+                      getOperationalStatus(currentProject?.operationalStatus) ===
+                      OPERATIONAL_STATUS.ACTIVE
                         ? 'processing'
-                        : currentProject?.operationalStatus === OPERATIONAL_STATUS.COMPLETED
+                        : getOperationalStatus(currentProject?.operationalStatus) ===
+                            OPERATIONAL_STATUS.COMPLETED
                           ? 'success'
                           : 'default'
                     }
                     className="m-0 border-none font-bold text-[9px] rounded-md px-1.5 uppercase leading-none h-4 flex items-center"
                   >
-                    {
-                      OPERATIONAL_LABELS[
-                        currentProject?.operationalStatus ?? OPERATIONAL_STATUS.UNSTARTED
-                      ]
-                    }
+                    {OPERATIONAL_LABELS[getOperationalStatus(currentProject?.operationalStatus)]}
                   </Tag>
                 </div>
               </div>
@@ -142,7 +186,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
           },
           {
             key: 'students',
-            label: DETAIL.STUDENTS.TITLE || 'Students',
+            label: DETAIL.STUDENTS.TITLE,
             children: (
               <ProjectStudentsTab
                 searchTerm={searchTerm}
@@ -158,8 +202,19 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
           },
           {
             key: 'resources',
-            label: DETAIL.SECTIONS?.RESOURCES || 'Resources',
-            children: <ProjectResourcesTab DETAIL={DETAIL} currentProject={currentProject} />,
+            label: DETAIL.SECTIONS.RESOURCES,
+            children: (
+              <ProjectResourcesTab
+                DETAIL={DETAIL}
+                internalDocs={internalDocs}
+                legacyAttachments={[]}
+                quickLinks={quickLinks}
+                legacyLinks={[]}
+                hasDocs={internalDocs.length > 0}
+                hasLinks={quickLinks.length > 0}
+                onView={handleViewResource}
+              />
+            ),
           },
         ]}
       />
