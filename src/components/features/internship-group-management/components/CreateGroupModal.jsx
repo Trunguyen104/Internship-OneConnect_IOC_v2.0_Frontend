@@ -12,7 +12,6 @@ import { AddStudentsTable } from './AddStudentsTable';
 import { GroupFormFields } from './GroupFormFields';
 
 const { Text } = Typography;
-
 export const CreateGroupModal = memo(
   ({
     open,
@@ -37,8 +36,14 @@ export const CreateGroupModal = memo(
     const [studentSearch, setStudentSearch] = React.useState('');
 
     // Prevent infinite resets by stringifying initialStudents map and group map
-    const initialStudentsStr = React.useMemo(() => JSON.stringify(initialStudents.map(s => s.id || s.studentId)), [initialStudents]);
-    const groupMembersStr = React.useMemo(() => group ? JSON.stringify(group.members) : '', [group]);
+    const initialStudentsStr = React.useMemo(
+      () => JSON.stringify(initialStudents.map((s) => s.id || s.studentId)),
+      [initialStudents]
+    );
+    const groupMembersStr = React.useMemo(
+      () => (group ? JSON.stringify(group.members) : ''),
+      [group]
+    );
     const groupId = group?.id;
 
     useEffect(() => {
@@ -68,7 +73,17 @@ export const CreateGroupModal = memo(
           });
         }
       }
-    }, [open, isEdit, form, groupId, groupMembersStr, CREATE.DEFAULT_NAME_PREFIX, initialStudentsStr, existingGroups?.length]);
+    }, [
+      open,
+      isEdit,
+      form,
+      group,
+      groupId,
+      groupMembersStr,
+      CREATE.DEFAULT_NAME_PREFIX,
+      initialStudentsStr,
+      existingGroups?.length,
+    ]);
 
     const handleCancel = () => {
       onCancel();
@@ -125,8 +140,8 @@ export const CreateGroupModal = memo(
           <div className="flex items-center gap-2 py-1">
             <Avatar size="small" src={m.avatar} icon={<UserOutlined />} />
             <div className="flex flex-col leading-tight grow">
-              <Text className="text-xs font-bold">{name}</Text>
-              <Text className="text-muted text-[10px] opacity-60 italic">{sub}</Text>
+              <span className="text-xs font-bold">{name}</span>
+              <span className="text-muted text-[10px] opacity-60 italic">{sub}</span>
             </div>
           </div>
         ),
@@ -254,12 +269,12 @@ export const CreateGroupModal = memo(
           {isAddingStudents && group && (
             <div className="mb-4 bg-primary-surface border border-primary/10 rounded-xl px-4 py-3 flex items-center justify-between">
               <div className="flex flex-col gap-0.5">
-                <Text className="text-muted/60 text-[9px] font-bold uppercase tracking-widest leading-none">
+                <span className="text-muted/60 text-[9px] font-bold uppercase tracking-widest leading-none">
                   {GROUP_MANAGEMENT.MODALS.VIEW.TARGET_GROUP_LABEL || 'Target Group'}
-                </Text>
-                <Text className="text-primary text-sm font-black tracking-tight leading-tight">
+                </span>
+                <span className="text-primary text-sm font-black tracking-tight leading-tight">
                   {group.groupName || group.name}
-                </Text>
+                </span>
               </div>
               <div className="bg-success-surface px-2 py-1 rounded-lg text-success text-[10px] font-bold uppercase tracking-tighter shadow-sm">
                 {GROUP_MANAGEMENT.MODALS.VIEW.ACTIVE_GROUP_LABEL || 'Active'}
@@ -318,20 +333,16 @@ export const CreateGroupModal = memo(
           {students.length === 0 && !loadingStudents && !isEdit && (
             <div className="mb-4 rounded-xl bg-warning-surface p-4 border border-warning/20 flex items-center gap-3">
               <InfoCircleOutlined className="text-warning text-lg" />
-              <Text className="text-warning-text text-[13px] leading-relaxed">
+              <span className="text-warning-text text-[13px] leading-relaxed">
                 {CREATE.EMPTY_STUDENTS}
-              </Text>
+              </span>
             </div>
           )}
 
           <CompoundModal.Footer
             cancelText={CREATE.CANCEL}
             confirmText={
-              isAddingStudents
-                ? CREATE.SUBMIT_ADD
-                : isEdit
-                  ? CREATE.SUBMIT_EDIT
-                  : CREATE.SUBMIT
+              isAddingStudents ? CREATE.SUBMIT_ADD : isEdit ? CREATE.SUBMIT_EDIT : CREATE.SUBMIT
             }
             onCancel={handleCancel}
             onConfirm={() => form.submit()}
@@ -339,7 +350,9 @@ export const CreateGroupModal = memo(
               (students.length === 0 && !isEdit) ||
               (() => {
                 const selectedInfo = combinedStudentList.filter((s) =>
-                  selectedStudentIds?.includes(s.studentId || s.StudentId || s.id || s.applicationId)
+                  selectedStudentIds?.includes(
+                    s.studentId || s.StudentId || s.id || s.applicationId
+                  )
                 );
                 const uniquePhases = new Set(
                   selectedInfo.map((s) => s.phaseId || s.termId).filter(Boolean)

@@ -6,9 +6,9 @@ import PropTypes from 'prop-types';
 import React, { useCallback, useMemo } from 'react';
 
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import { cn } from '@/lib/cn';
 
 import { Checkbox } from './checkbox';
-import { cn } from '@/lib/cn';
 
 export default function DataTable({
   columns = [],
@@ -125,10 +125,7 @@ export default function DataTable({
             <tr>
               {rowSelection && (
                 <th
-                  className={cn(
-                    'w-[60px] cursor-pointer px-4 align-middle',
-                    headerPadding
-                  )}
+                  className={cn('w-[60px] cursor-pointer px-4 align-middle', headerPadding)}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleSelectAll(!isAllSelected);
@@ -195,10 +192,7 @@ export default function DataTable({
                 >
                   {rowSelection && (
                     <td
-                      className={cn(
-                        'w-[60px] cursor-pointer px-4 align-middle',
-                        cellPadding
-                      )}
+                      className={cn('w-[60px] cursor-pointer px-4 align-middle', cellPadding)}
                       onClick={(e) => {
                         e.stopPropagation();
                         const { disabled = false } = rowSelection?.getCheckboxProps?.(record) || {};

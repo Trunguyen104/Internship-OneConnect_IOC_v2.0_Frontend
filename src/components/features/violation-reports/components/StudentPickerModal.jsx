@@ -22,7 +22,9 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
       const groupA = a.groupName || '';
       const groupB = b.groupName || '';
       if (groupA !== groupB) return groupA.localeCompare(groupB);
-      return (a.studentFullName || a.fullName || '').localeCompare(b.studentFullName || b.fullName || '');
+      return (a.studentFullName || a.fullName || '').localeCompare(
+        b.studentFullName || b.fullName || ''
+      );
     });
 
     if (!search) return sorted;

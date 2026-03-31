@@ -65,7 +65,7 @@ const enterpriseMenu = [
 
 export default function EnterpriseSidebar() {
   const { userInfo } = useProfile();
-  
+
   const filteredMenu = useMemo(() => {
     const rawRole = userInfo?.roleId || userInfo?.RoleId || userInfo?.role || userInfo?.Role;
     const roleId = rawRole ? Number(rawRole) : null;
@@ -77,10 +77,10 @@ export default function EnterpriseSidebar() {
       if (!item.role) return true;
 
       const allowedRoles = item.role || [];
-      
+
       // 1. Check numeric match
       if (roleId && allowedRoles.includes(roleId)) return true;
-      
+
       // 2. Check string match (if IDs are strings)
       if (rawRole && allowedRoles.map(String).includes(String(rawRole))) return true;
 

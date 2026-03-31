@@ -17,17 +17,17 @@ import React, { useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
-import { cn } from '@/lib/cn';
 import {
+  getOperationalStatus,
+  getVisibilityStatus,
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
   STATUS_VARIANTS,
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
-  getVisibilityStatus,
-  getOperationalStatus,
 } from '@/constants/project-management/project-management';
+import { cn } from '@/lib/cn';
 
 export default function ProjectTable({
   data,
@@ -145,7 +145,8 @@ export default function ProjectTable({
           }
 
           const op = getOperationalStatus(record.operationalStatus ?? record.status);
-          const isReadOnly = op === OPERATIONAL_STATUS.COMPLETED || op === OPERATIONAL_STATUS.ARCHIVED;
+          const isReadOnly =
+            op === OPERATIONAL_STATUS.COMPLETED || op === OPERATIONAL_STATUS.ARCHIVED;
 
           return (
             <div

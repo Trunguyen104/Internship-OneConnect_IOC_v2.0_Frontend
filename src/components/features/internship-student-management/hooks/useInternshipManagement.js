@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { useStudentFilters } from './useStudentFilters';
-import { useStudentData } from './useStudentData';
 import { useStudentActions } from './useStudentActions';
+import { useStudentData } from './useStudentData';
+import { useStudentFilters } from './useStudentFilters';
 
 export const useInternshipManagement = () => {
   // 1. Initialize Filters State

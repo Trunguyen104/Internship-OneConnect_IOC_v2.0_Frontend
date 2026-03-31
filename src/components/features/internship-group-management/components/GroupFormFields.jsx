@@ -1,5 +1,5 @@
 import { EditOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, DatePicker, Form, Input, Select, Typography } from 'antd';
+import { DatePicker, Form, Input, Select, Typography } from 'antd';
 import React from 'react';
 
 const { Text } = Typography;

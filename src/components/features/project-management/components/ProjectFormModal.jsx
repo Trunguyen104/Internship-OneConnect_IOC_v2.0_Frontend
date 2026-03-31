@@ -83,7 +83,9 @@ export default function ProjectFormModal({
               ...(fullRecord.resources?.attachments || []),
               ...(fullRecord.projectResources || [])
                 .filter((r) => {
-                  const rType = String(r.resourceType || '').toUpperCase().trim();
+                  const rType = String(r.resourceType || '')
+                    .toUpperCase()
+                    .trim();
                   return rType === '1' || rType === 'FILE' || rType === 'ATTACHMENT';
                 })
                 .map((r) => ({
@@ -97,7 +99,9 @@ export default function ProjectFormModal({
               ...(fullRecord.resources?.links || []),
               ...(fullRecord.projectResources || [])
                 .filter((r) => {
-                  const rType = String(r.resourceType || '').toUpperCase().trim();
+                  const rType = String(r.resourceType || '')
+                    .toUpperCase()
+                    .trim();
                   return (
                     rType === '10' || rType === '8' || rType === 'LINK' || rType === 'EXTERNAL'
                   );
@@ -110,9 +114,7 @@ export default function ProjectFormModal({
           });
         }
       } catch (err) {
-        toast.error(
-          PROJECT_MANAGEMENT.MESSAGES?.ERROR_FETCH_DETAIL
-        );
+        toast.error(PROJECT_MANAGEMENT.MESSAGES?.ERROR_FETCH_DETAIL);
       } finally {
         setDataLoading(false);
       }
@@ -224,11 +226,7 @@ export default function ProjectFormModal({
       title={
         <div>
           <h3 className="mb-0 text-lg font-bold">
-            {editingRecord
-              ? viewOnly
-                ? FORM.TITLE_VIEW
-                : FORM.TITLE_EDIT
-              : FORM.TITLE_ADD}
+            {editingRecord ? (viewOnly ? FORM.TITLE_VIEW : FORM.TITLE_EDIT) : FORM.TITLE_ADD}
           </h3>
           {!viewOnly && <p className="mt-1 text-xs font-normal text-gray-400">{FORM.DESC}</p>}
         </div>
@@ -276,9 +274,7 @@ export default function ProjectFormModal({
             PROJECT_MANAGEMENT={PROJECT_MANAGEMENT}
             existingResources={existingResources}
             deletedResourceIds={deletedResourceIds}
-            onDeleteExisting={(rid) =>
-              setDeletedResourceIds((prev) => [...prev, rid])
-            }
+            onDeleteExisting={(rid) => setDeletedResourceIds((prev) => [...prev, rid])}
           />
         </Form>
       </Spin>

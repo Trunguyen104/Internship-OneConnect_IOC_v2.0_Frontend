@@ -101,7 +101,12 @@ export const useViolationManagement = () => {
         if (!termId || !me) return { groups: [], students: [] };
 
         const groupsRes = await ViolationService.getGroups({ termId, pageSize: 100 });
-        const groupsData = (groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || []).map((g) => ({
+        const groupsData = (
+          groupsRes?.data?.items ||
+          groupsRes?.items ||
+          groupsRes?.data ||
+          []
+        ).map((g) => ({
           ...g,
           internshipGroupId: g.internshipGroupId || g.id || g.internshipId,
           id: g.id || g.internshipGroupId || g.internshipId,
@@ -121,7 +126,7 @@ export const useViolationManagement = () => {
           // The Swagger shows students inside detail.members (if detail is res.data)
           // or detail.data.members (if detail is the whole response)
           const membersList = detail?.members || detail?.data?.members || [];
-          
+
           if (Array.isArray(membersList)) {
             membersList.forEach((m) => {
               const sId = m.studentId || m.userId || m.id;

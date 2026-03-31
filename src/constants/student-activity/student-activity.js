@@ -16,6 +16,7 @@ export const STUDENT_ACTIVITY_UI = {
     LOGBOOK_PROGRESS: 'LOGBOOK PROGRESS',
     STATUS: 'STATUS',
     VIOLATIONS: 'VIOLATIONS',
+    SELECTED: 'Selected',
   },
   STATS: {
     TOTAL_STUDENTS: 'Total Students',

@@ -100,8 +100,8 @@ export const useGroupManagement = () => {
 
         const unassigned = mappedItems.filter((s) => {
           if (s.isAssignedToGroup || s.groupId) return false;
-          
-          // DO NOT filter by phase status STRICTLY here since the backend already 
+
+          // DO NOT filter by phase status STRICTLY here since the backend already
           // provides the eligible students for placed-students!
           // We just allow all students returned by the backend without assigned group.
           return true;
@@ -186,7 +186,8 @@ export const useGroupManagement = () => {
 
         const content = hasStudents
           ? MESSAGES.DELETE_ERROR_HAS_STUDENTS
-          : GROUP_MANAGEMENT.MODALS.DELETE?.CONTENT || 'Are you sure you want to delete this group?';
+          : GROUP_MANAGEMENT.MODALS.DELETE?.CONTENT ||
+            'Are you sure you want to delete this group?';
 
         showDeleteConfirm({
           title: GROUP_MANAGEMENT.MODALS.DELETE?.TITLE || 'Delete Group',
@@ -207,7 +208,9 @@ export const useGroupManagement = () => {
     (group) => {
       showDeleteConfirm({
         title: GROUP_MANAGEMENT.MESSAGES.ARCHIVE_CONFIRM_TITLE || 'Archive Group',
-        content: GROUP_MANAGEMENT.MESSAGES.ARCHIVE_CONFIRM_TEXT || 'Are you sure you want to archive this group?',
+        content:
+          GROUP_MANAGEMENT.MESSAGES.ARCHIVE_CONFIRM_TEXT ||
+          'Are you sure you want to archive this group?',
         okText: 'Confirm',
         type: 'warning',
         onOk: async () => {
@@ -280,7 +283,7 @@ export const useGroupManagement = () => {
           const oldIds = new Set(
             oldMembers.map((m) => String(m.studentId || m.id || m.applicationId))
           );
-          
+
           const newIds = (values.studentIds || []).filter((id) => !oldIds.has(String(id)));
 
           if (newIds.length > 0) {

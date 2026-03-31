@@ -10,13 +10,16 @@ import { usePageHeader } from '@/providers/PageHeaderProvider';
 export default function Admin({ children }) {
   const { headerConfig } = usePageHeader();
   const pathname = usePathname();
-  const shouldScrollGlobally = pathname === '/admin-dashboard' || pathname.startsWith('/internship/students');
+  const shouldScrollGlobally =
+    pathname === '/admin-dashboard' || pathname.startsWith('/internship/students');
 
   return (
     <div className={`flex ${shouldScrollGlobally ? 'min-h-screen' : 'h-screen overflow-hidden'}`}>
       <SidebarAdmin />
 
-      <div className={`flex min-w-0 flex-1 flex-col ${shouldScrollGlobally ? '' : 'overflow-hidden'}`}>
+      <div
+        className={`flex min-w-0 flex-1 flex-col ${shouldScrollGlobally ? '' : 'overflow-hidden'}`}
+      >
         <Header />
         <main
           className={`flex flex-1 flex-col bg-gray-100 p-6 2xl:px-10 ${

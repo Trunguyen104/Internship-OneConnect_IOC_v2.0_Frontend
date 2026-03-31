@@ -2,6 +2,8 @@ import { SearchOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Input, Typography } from 'antd';
 import React from 'react';
 
+import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
+
 const { Text } = Typography;
 
 export const AddStudentsTable = ({
@@ -31,7 +33,7 @@ export const AddStudentsTable = ({
     const next = localSelected.includes(id)
       ? localSelected.filter((cid) => cid !== id)
       : [...localSelected, id];
-      
+
     // Instant UI update
     setLocalSelected(next);
 
@@ -103,10 +105,10 @@ export const AddStudentsTable = ({
                     </Text>
                   </div>
                 </div>
-                
+
                 {isSelected && (
                   <div className="text-primary text-[10px] lowercase font-black italic bg-primary/10 px-2 py-0.5 rounded-full">
-                    Selected
+                    {STUDENT_ACTIVITY_UI.LIST_COLUMNS.SELECTED}
                   </div>
                 )}
               </div>

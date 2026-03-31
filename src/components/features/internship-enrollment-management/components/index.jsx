@@ -1,20 +1,19 @@
 'use client';
 
-import { Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import DataTable from '@/components/ui/datatable';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import { useStudentColumns } from './useStudentColumns';
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
 import ImportModal from './ImportModal';
 import StudentFormModal from './StudentFormModal';
 import { StudentToolbar } from './StudentToolbar';
-import PageLayout from '@/components/ui/pagelayout';
+import { useStudentColumns } from './useStudentColumns';
 
 export default function TermStudentManagement() {
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;

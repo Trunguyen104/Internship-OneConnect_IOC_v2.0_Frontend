@@ -4,8 +4,8 @@ import { PlusOutlined } from '@ant-design/icons';
 import { DatePicker } from 'antd';
 import React from 'react';
 
-import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import PageLayout from '@/components/ui/pagelayout';
 import PageTitle from '@/components/ui/pagetitle';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -14,7 +14,6 @@ import { useViolationManagement } from '../hooks/useViolationManagement';
 import ViolationDeleteModal from './ViolationDeleteModal';
 import ViolationFormModal from './ViolationFormModal';
 import ViolationTable from './ViolationTable';
-import PageLayout from '@/components/ui/pagelayout';
 
 const { RangePicker } = DatePicker;
 

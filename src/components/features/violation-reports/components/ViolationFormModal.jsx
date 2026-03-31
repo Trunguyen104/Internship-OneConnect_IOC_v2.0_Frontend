@@ -120,46 +120,52 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             </Form.Item>
 
             {/* INTERNSHIP PERIOD INFO DISPLAY */}
-            {selectedStudent && (selectedStudent.groupStartDate || selectedStudent.groupEndDate) && (
-              <div
-                className={`mt-2 rounded-lg border px-3 py-2 text-xs transition-all ${
-                  getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
-                    getCalendarDate(selectedStudent.groupEndDate),
-                    'day'
-                  )
-                    ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
-                    : 'border-blue-100 bg-blue-50/50 text-blue-700'
-                }`}
-              >
-                <p className="flex items-center gap-1.5 font-medium">
-                  {VIOLATION_REPORT.DETAIL.INTERN_GROUP}{VIOLATION_REPORT.COMMON.COLON}{selectedStudent.groupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
-                </p>
-                <p className="mt-0.5 opacity-90">
-                  {VIOLATION_REPORT.FILTERS.DATE_RANGE}{VIOLATION_REPORT.COMMON.COLON}{' '}
-                  <span className="font-semibold">
-                    {selectedStudent.groupStartDate
-                      ? dayjs(selectedStudent.groupStartDate.split('T')[0]).format(
-                           VIOLATION_REPORT.DATE_FORMATS.UI
-                        )
-                      : VIOLATION_REPORT.COMMON.QUESTION_MARK}
-                    {VIOLATION_REPORT.COMMON.DASH_SEPARATOR}
-                    {selectedStudent.groupEndDate
-                      ? dayjs(selectedStudent.groupEndDate.split('T')[0]).format(
-                           VIOLATION_REPORT.DATE_FORMATS.UI
-                        )
-                      : VIOLATION_REPORT.COMMON.QUESTION_MARK}
-                  </span>
-                  {getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
-                    getCalendarDate(selectedStudent.groupEndDate),
-                    'day'
-                  ) && (
-                    <span className="ml-1 text-[10px] italic">
-                      {VIOLATION_REPORT.COMMON.LEFT_PAREN}{VIOLATION_REPORT.COMMON.INVALID_RANGE}{VIOLATION_REPORT.COMMON.RIGHT_PAREN}
+            {selectedStudent &&
+              (selectedStudent.groupStartDate || selectedStudent.groupEndDate) && (
+                <div
+                  className={`mt-2 rounded-lg border px-3 py-2 text-xs transition-all ${
+                    getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
+                      getCalendarDate(selectedStudent.groupEndDate),
+                      'day'
+                    )
+                      ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
+                      : 'border-blue-100 bg-blue-50/50 text-blue-700'
+                  }`}
+                >
+                  <p className="flex items-center gap-1.5 font-medium">
+                    {VIOLATION_REPORT.DETAIL.INTERN_GROUP}
+                    {VIOLATION_REPORT.COMMON.COLON}
+                    {selectedStudent.groupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+                  </p>
+                  <p className="mt-0.5 opacity-90">
+                    {VIOLATION_REPORT.FILTERS.DATE_RANGE}
+                    {VIOLATION_REPORT.COMMON.COLON}{' '}
+                    <span className="font-semibold">
+                      {selectedStudent.groupStartDate
+                        ? dayjs(selectedStudent.groupStartDate.split('T')[0]).format(
+                            VIOLATION_REPORT.DATE_FORMATS.UI
+                          )
+                        : VIOLATION_REPORT.COMMON.QUESTION_MARK}
+                      {VIOLATION_REPORT.COMMON.DASH_SEPARATOR}
+                      {selectedStudent.groupEndDate
+                        ? dayjs(selectedStudent.groupEndDate.split('T')[0]).format(
+                            VIOLATION_REPORT.DATE_FORMATS.UI
+                          )
+                        : VIOLATION_REPORT.COMMON.QUESTION_MARK}
                     </span>
-                  )}
-                </p>
-              </div>
-            )}
+                    {getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
+                      getCalendarDate(selectedStudent.groupEndDate),
+                      'day'
+                    ) && (
+                      <span className="ml-1 text-[10px] italic">
+                        {VIOLATION_REPORT.COMMON.LEFT_PAREN}
+                        {VIOLATION_REPORT.COMMON.INVALID_RANGE}
+                        {VIOLATION_REPORT.COMMON.RIGHT_PAREN}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
           </Form.Item>
 
           {viewOnly && (

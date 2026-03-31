@@ -4,9 +4,9 @@ import { FilterOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
 import { Select, Tooltip } from 'antd';
 import React from 'react';
 
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { cn } from '@/lib/cn';
 

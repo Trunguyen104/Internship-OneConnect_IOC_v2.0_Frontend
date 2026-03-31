@@ -8,8 +8,8 @@ import {
 } from '@ant-design/icons';
 import React from 'react';
 
-import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -20,7 +20,6 @@ import PhaseDetailModal from './PhaseDetailModal';
 import StudentDetailModal from './StudentDetailModal';
 import StudentFilters from './StudentFilters';
 import StudentTable from './StudentTable';
-import PageLayout from '@/components/ui/pagelayout';
 
 export default function InternshipManagement() {
   const [phaseDetailModal, setPhaseDetailModal] = React.useState({ open: false, phase: null });

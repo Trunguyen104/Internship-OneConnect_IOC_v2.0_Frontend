@@ -14,9 +14,9 @@ import React, { useMemo } from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Badge from '@/components/ui/badge';
-import Card from '@/components/ui/card';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import {
   INTERNSHIP_MANAGEMENT_UI,
@@ -28,7 +28,6 @@ import { useTermManagement } from '../hooks/useTermManagement';
 import TermDeleteModal from './TermDeleteModal';
 import TermFormModal from './TermFormModal';
 import TermStatusModal from './TermStatusModal';
-import PageLayout from '@/components/ui/pagelayout';
 
 export default function InternshipTermManagement() {
   const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
@@ -211,7 +210,8 @@ export default function InternshipTermManagement() {
       },
     ],
     [
-      pagination,
+      pagination.current,
+      pagination.pageSize,
       TABLE,
       STATUS_LABELS,
       ACTIONS,

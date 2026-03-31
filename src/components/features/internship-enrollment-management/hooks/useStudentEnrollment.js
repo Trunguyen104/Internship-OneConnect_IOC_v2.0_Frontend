@@ -137,7 +137,8 @@ export const useStudentEnrollment = () => {
   useEffect(() => {
     if (viewSuccess && viewedStudent && viewId) {
       handleOpenDetails(viewedStudent);
-      setViewId(null);
+      // Reset viewId on the next tick to avoid cascading render warning
+      setTimeout(() => setViewId(null), 0);
     }
   }, [viewSuccess, viewedStudent, viewId, handleOpenDetails]);
 

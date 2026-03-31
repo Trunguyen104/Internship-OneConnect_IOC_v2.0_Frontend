@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { useToast } from '@/providers/ToastProvider';
+
+import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
 import { userService } from '../../user/services/user.service';
 import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
 import { EnterprisePhaseService } from '../services/enterprise-phase.service';
-import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
 
 export const useStudentData = (filters) => {
@@ -151,7 +153,9 @@ export const useStudentData = (filters) => {
         };
 
         const openPhaseIds = Array.isArray(phaseOptions)
-          ? phaseOptions.filter((p) => p.status === 1 && p.value !== 'ALL_VISIBLE').map((p) => String(p.value))
+          ? phaseOptions
+              .filter((p) => p.status === 1 && p.value !== 'ALL_VISIBLE')
+              .map((p) => String(p.value))
           : [];
 
         let items = [];
@@ -159,7 +163,11 @@ export const useStudentData = (filters) => {
 
         if (isAllVisible && openPhaseIds.length > 0) {
           const promises = openPhaseIds.map(async (pId) => {
-            const res = await EnterpriseGroupService.getPlacedStudents({ ...params, PhaseId: pId, TermId: pId });
+            const res = await EnterpriseGroupService.getPlacedStudents({
+              ...params,
+              PhaseId: pId,
+              TermId: pId,
+            });
             return res?.data?.items || res?.items || [];
           });
           const results = await Promise.all(promises);

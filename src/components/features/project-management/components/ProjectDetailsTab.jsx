@@ -15,8 +15,8 @@ import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
 import Card from '@/components/ui/card';
 import {
-  OPERATIONAL_STATUS,
   getOperationalStatus,
+  OPERATIONAL_STATUS,
 } from '@/constants/project-management/project-management';
 
 export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, onAssign }) {
@@ -178,16 +178,16 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 OPERATIONAL_STATUS.COMPLETED &&
               getOperationalStatus(currentProject?.operationalStatus) !==
                 OPERATIONAL_STATUS.ARCHIVED && (
-              <Button
-                size="sm"
-                variant="danger"
-                className="mt-1 font-bold uppercase tracking-wider"
-                onClick={() => onAssign(currentProject)}
-                icon={<UsergroupAddOutlined />}
-              >
-                {DETAIL.GROUP.ASSIGN_BTN}
-              </Button>
-            )}
+                <Button
+                  size="sm"
+                  variant="danger"
+                  className="mt-1 font-bold uppercase tracking-wider"
+                  onClick={() => onAssign(currentProject)}
+                  icon={<UsergroupAddOutlined />}
+                >
+                  {DETAIL.GROUP.ASSIGN_BTN}
+                </Button>
+              )}
           </div>
         )}
       </section>

@@ -9,6 +9,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
+import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
@@ -17,8 +18,6 @@ import {
   GROUP_STATUS_VARIANTS,
   INTERNSHIP_MANAGEMENT_UI,
 } from '@/constants/internship-management/internship-management';
-
-import dayjs from 'dayjs';
 
 const GroupTable = memo(function GroupTable({
   data,
@@ -63,9 +62,12 @@ const GroupTable = memo(function GroupTable({
         key: 'phaseInfo',
         width: 200,
         render: (_, record) => {
-          const name = record.phaseName && record.phaseName !== '-' ? record.phaseName : (record.phase?.name || record.termName);
+          const name =
+            record.phaseName && record.phaseName !== '-'
+              ? record.phaseName
+              : record.phase?.name || record.termName;
           const hasDates = record.startDate && record.endDate;
-          
+
           return (
             <div className="flex flex-col flex-wrap gap-0.5 justify-center">
               <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
@@ -73,7 +75,8 @@ const GroupTable = memo(function GroupTable({
               </span>
               {hasDates && (
                 <span className="text-muted text-[10px] font-medium opacity-60">
-                  {dayjs(record.startDate).format('DD/MM/YYYY')} - {dayjs(record.endDate).format('DD/MM/YYYY')}
+                  {dayjs(record.startDate).format('DD/MM/YYYY')} -{' '}
+                  {dayjs(record.endDate).format('DD/MM/YYYY')}
                 </span>
               )}
             </div>

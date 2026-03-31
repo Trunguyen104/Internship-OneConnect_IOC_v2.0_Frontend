@@ -5,17 +5,17 @@ import { Drawer, Tabs, Tag } from 'antd';
 import React, { useMemo, useState } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
-import { useToast } from '@/providers/ToastProvider';
 import {
+  getOperationalStatus,
+  getVisibilityStatus,
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
   PROJECT_STATUS,
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
-  getVisibilityStatus,
-  getOperationalStatus,
 } from '@/constants/project-management/project-management';
+import { useToast } from '@/providers/ToastProvider';
 
 import { useProjectDetail } from '../hooks/useProjectDetail';
 import ProjectDetailsTab from './ProjectDetailsTab';
@@ -90,10 +90,19 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
   const LINK_TYPES = ['8', 'LINK'];
   const allResources = currentProject?.projectResources || [];
   const internalDocs = allResources.filter(
-    (r) => !LINK_TYPES.includes(String(r.resourceType || '').toUpperCase().trim())
+    (r) =>
+      !LINK_TYPES.includes(
+        String(r.resourceType || '')
+          .toUpperCase()
+          .trim()
+      )
   );
   const quickLinks = allResources.filter((r) =>
-    LINK_TYPES.includes(String(r.resourceType || '').toUpperCase().trim())
+    LINK_TYPES.includes(
+      String(r.resourceType || '')
+        .toUpperCase()
+        .trim()
+    )
   );
 
   return (
@@ -118,7 +127,8 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
                   </span>
                   <Tag
                     color={
-                      getVisibilityStatus(currentProject?.visibilityStatus) === VISIBILITY_STATUS.PUBLISHED
+                      getVisibilityStatus(currentProject?.visibilityStatus) ===
+                      VISIBILITY_STATUS.PUBLISHED
                         ? 'blue'
                         : 'orange'
                     }
@@ -133,9 +143,11 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
                   </span>
                   <Tag
                     color={
-                      getOperationalStatus(currentProject?.operationalStatus) === OPERATIONAL_STATUS.ACTIVE
+                      getOperationalStatus(currentProject?.operationalStatus) ===
+                      OPERATIONAL_STATUS.ACTIVE
                         ? 'processing'
-                        : getOperationalStatus(currentProject?.operationalStatus) === OPERATIONAL_STATUS.COMPLETED
+                        : getOperationalStatus(currentProject?.operationalStatus) ===
+                            OPERATIONAL_STATUS.COMPLETED
                           ? 'success'
                           : 'default'
                     }

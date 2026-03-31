@@ -32,7 +32,7 @@ export default function UserManagementPage({
 
   return (
     <PageLayout>
-      <PageLayout.Header title={title}className="pb-10" />
+      <PageLayout.Header title={title} className="pb-10" />
 
       <PageLayout.Card className="flex flex-col overflow-hidden">
         <PageLayout.Toolbar

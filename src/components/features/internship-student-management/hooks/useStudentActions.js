@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react';
-import { useToast } from '@/providers/ToastProvider';
+
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { useToast } from '@/providers/ToastProvider';
+
 import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
 

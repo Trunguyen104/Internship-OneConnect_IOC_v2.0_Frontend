@@ -5,10 +5,9 @@ import { App } from 'antd';
 import dayjs from 'dayjs';
 
 import {
+  getOperationalStatus,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
-  getVisibilityStatus,
-  getOperationalStatus,
 } from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -155,9 +154,7 @@ export const useProjectActions = ({
       if (isEdit) {
         toast.success(MESSAGES.UPDATE_SUCCESS);
       } else {
-        toast.success(
-          isDraft ? MESSAGES.SUCCESS_SAVE_DRAFT : MESSAGES.SUCCESS_SAVE_PUBLISH
-        );
+        toast.success(isDraft ? MESSAGES.SUCCESS_SAVE_DRAFT : MESSAGES.SUCCESS_SAVE_PUBLISH);
       }
       setModalVisible(false);
       onSuccessAction();
@@ -252,14 +249,15 @@ export const useProjectActions = ({
     },
   });
 
-
   // --- HANDLERS ---
 
   const handleSaveProject = async (values, isDraft = true) => {
     try {
       const selectedGroupId = values.internshipGroupId;
       const selectedGroup = groups.find((g) => (g.internshipId || g.id) === selectedGroupId);
-      const groupStatusStr = String(selectedGroup?.status || selectedGroup?.groupStatus || '').toLowerCase();
+      const groupStatusStr = String(
+        selectedGroup?.status || selectedGroup?.groupStatus || ''
+      ).toLowerCase();
       if (
         groupStatusStr === '2' ||
         groupStatusStr === '3' ||
@@ -270,11 +268,15 @@ export const useProjectActions = ({
         return;
       }
 
-      const opStatus = getOperationalStatus(editingRecord?.operationalStatus ?? editingRecord?.status);
+      const opStatus = getOperationalStatus(
+        editingRecord?.operationalStatus ?? editingRecord?.status
+      );
       const isOperationalActive = opStatus === OPERATIONAL_STATUS.ACTIVE;
 
       if (editingRecord && isOperationalActive) {
-        const res = await ProjectService.getAssignedStudents(editingRecord.projectId).catch(() => null);
+        const res = await ProjectService.getAssignedStudents(editingRecord.projectId).catch(
+          () => null
+        );
         const studentCount = res?.data?.length || 0;
 
         if (studentCount > 0) {
@@ -383,7 +385,7 @@ export const useProjectActions = ({
     try {
       const res = await ProjectService.getAssignedStudents(id).catch(() => null);
       const assignedStudents = res?.data || res || [];
-      
+
       if (assignedStudents.length > 0) {
         modal.warning({
           title: PROJECT_MANAGEMENT.MODALS?.DELETE_UNABLE_TITLE,
@@ -409,7 +411,8 @@ export const useProjectActions = ({
   const handleUnpublishProject = (id) => {
     modal.confirm({
       title: 'Unpublish Project',
-      content: 'The project will be moved back to Draft and will no longer be visible to students. Proceed?',
+      content:
+        'The project will be moved back to Draft and will no longer be visible to students. Proceed?',
       okText: 'Unpublish',
       cancelText: 'Cancel',
       onOk: () => unpublishMutation.mutateAsync(id),

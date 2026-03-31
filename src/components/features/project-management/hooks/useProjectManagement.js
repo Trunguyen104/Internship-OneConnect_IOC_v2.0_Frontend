@@ -1,16 +1,16 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
+import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
 import { useProjectActions } from './useProjectActions';
 import { useProjectFilters } from './useProjectFilters';
 import { useProjectModals } from './useProjectModals';
-import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 
 export const useProjectManagement = () => {
   const toast = useToast();
@@ -114,11 +114,12 @@ export const useProjectManagement = () => {
           showArchived: showArchived,
         };
         const res = await ProjectService.getAll(params);
-        
+
         // Robust data extraction
         const apiData = res?.data || res || {};
         const items = apiData.items || (Array.isArray(apiData) ? apiData : []);
-        const totalCount = apiData.totalCount || apiData.total || apiData.total_count || items.length || 0;
+        const totalCount =
+          apiData.totalCount || apiData.total || apiData.total_count || items.length || 0;
 
         // AC-16: Notify Mentor about orphaned projects (once)
         if (items.length > 0 && !hasNotifiedOrphaned.current && isMentor) {

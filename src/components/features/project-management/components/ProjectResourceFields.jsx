@@ -27,7 +27,9 @@ export default function ProjectResourceFields({
   const LINK_TYPES = [10, 8, '8', 'LINK', '10'];
   const activeExisting = existingResources.filter((r) => {
     const rid = r.projectResourceId ?? r.resourceId ?? r.id;
-    const rType = String(r.resourceType || '').toUpperCase().trim();
+    const rType = String(r.resourceType || '')
+      .toUpperCase()
+      .trim();
     const isLink = LINK_TYPES.map(String).includes(rType);
 
     if (isLink) return false; // Filter out links from the top list
@@ -119,10 +121,7 @@ export default function ProjectResourceFields({
                         },
                       ]}
                     >
-                      <Input
-                        placeholder={FORM.PLACEHOLDER.LINK_TITLE}
-                        className="w-40"
-                      />
+                      <Input placeholder={FORM.PLACEHOLDER.LINK_TITLE} className="w-40" />
                     </Form.Item>
                     <Form.Item
                       {...restField}
