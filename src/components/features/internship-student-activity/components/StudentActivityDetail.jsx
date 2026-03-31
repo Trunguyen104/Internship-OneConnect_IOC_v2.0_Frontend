@@ -13,14 +13,14 @@ import {
 } from '@ant-design/icons';
 import { Button, Tabs } from 'antd';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import PageLayout from '@/components/ui/pagelayout';
 import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import useStudentActivity from '../hooks/useStudentActivity';
+import { useStudentDetail } from '../hooks/useStudentDetail';
 import EvaluationsTab from './tabs/EvaluationsTab';
 import LogbookTab from './tabs/LogbookTab';
 import OverviewTab from './tabs/OverviewTab';
@@ -35,18 +35,11 @@ export default function StudentActivityDetail() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const {
-    studentDetail: student,
+    student,
     evaluations,
     violations,
-    detailLoading,
-    fetchStudentDetail,
-  } = useStudentActivity();
-
-  useEffect(() => {
-    if (studentId) {
-      fetchStudentDetail(studentId, termIdFromUrl);
-    }
-  }, [studentId, termIdFromUrl, fetchStudentDetail]);
+    loading: detailLoading,
+  } = useStudentDetail(studentId, termIdFromUrl);
 
   const items = [
     {
@@ -84,7 +77,7 @@ export default function StudentActivityDetail() {
           {STUDENT_ACTIVITY_UI.TABS.VIOLATIONS}
         </span>
       ),
-      children: <ViolationsTab violations={violations} loading={detailLoading} />,
+      children: <ViolationsTab student={student} violations={violations} loading={detailLoading} />,
     },
     {
       key: 'evaluations',
@@ -94,7 +87,9 @@ export default function StudentActivityDetail() {
           {STUDENT_ACTIVITY_UI.TABS.EVALUATIONS}
         </span>
       ),
-      children: <EvaluationsTab evaluations={evaluations} loading={detailLoading} />,
+      children: (
+        <EvaluationsTab student={student} evaluations={evaluations} loading={detailLoading} />
+      ),
     },
   ];
 
@@ -118,97 +113,107 @@ export default function StudentActivityDetail() {
 
   return (
     <PageLayout className="gap-0! pt-0!">
-      {/* Detail Header Section */}
       <div className="px-2 mb-6">
         <Button
           type="text"
-          icon={<ArrowLeftOutlined className="text-[10px]" />}
+          icon={
+            <ArrowLeftOutlined className="text-[9px] group-hover:-translate-x-1 transition-transform" />
+          }
           onClick={() => router.back()}
-          className="flex items-center gap-2 font-black text-slate-400 hover:text-primary transition-all p-0 h-auto text-[10px] tracking-widest uppercase mb-6"
+          className="group flex items-center gap-2 font-semibold text-slate-400 hover:text-primary transition-all p-0 h-6 text-[10px] tracking-[0.2em] uppercase mb-6"
         >
           {STUDENT_ACTIVITY_UI.BACK_TO_LIST}
         </Button>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <div className="relative group">
-              <div className="size-16 rounded-[24px] bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-primary border-2 border-white overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                {student?.avatarUrl ? (
-                  <img src={student.avatarUrl} alt="" className="size-full object-cover" />
-                ) : (
-                  <div className="size-full flex items-center justify-center bg-slate-50 text-slate-300">
-                    <UserOutlined className="text-2xl" />
+        {/* Unified Header Card */}
+        <div className="bg-white overflow-hidden border border-white shadow-xl shadow-slate-200/40 rounded-[32px] transition-all duration-500">
+          {/* Profile Section */}
+          <div className="p-8 pb-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="relative group">
+                  <div className="size-20 rounded-[28px] bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-primary border-2 border-white overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                    {student?.avatarUrl ? (
+                      <img src={student.avatarUrl} alt="" className="size-full object-cover" />
+                    ) : (
+                      <div className="size-full flex items-center justify-center bg-slate-50 text-slate-300">
+                        <UserOutlined className="text-3xl" />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div className="absolute -bottom-1 -right-1 size-5 bg-green-500 rounded-lg border-2 border-white shadow-sm" />
-            </div>
+                  <div className="absolute -bottom-1 -right-1 size-6 bg-green-500 rounded-xl border-4 border-white shadow-sm" />
+                </div>
 
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <h1 className="text-2xl font-black tracking-tight text-slate-800">
-                  {STUDENT_ACTIVITY_UI.OVERVIEW.DETAIL_TITLE_PREFIX} {student?.fullName || '...'}
-                </h1>
-                <Badge
-                  variant={status.variant}
-                  className="font-black text-[9px] uppercase tracking-widest px-3 py-1"
-                >
-                  {status.label}
-                </Badge>
-              </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-3 mb-3 flex-wrap">
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-800">
+                      {STUDENT_ACTIVITY_UI.OVERVIEW.DETAIL_TITLE_PREFIX}{' '}
+                      {student?.fullName || '...'}
+                    </h1>
+                    <Badge
+                      variant={status.variant}
+                      className="font-bold text-[9px] uppercase tracking-widest px-3 py-1"
+                    >
+                      {status.label}
+                    </Badge>
+                  </div>
 
-              <div className="flex items-center gap-4 flex-wrap text-slate-400">
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-full border border-slate-100 shadow-sm">
-                  <UserOutlined className="text-[10px]" />
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-600">
-                    {student?.studentCode || '—'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-full border border-slate-100 shadow-sm">
-                  <TeamOutlined className="text-[10px]" />
-                  <span
-                    className="text-[10px] font-black uppercase tracking-wider text-slate-600 truncate max-w-[200px]"
-                    title={student?.enterpriseName}
-                  >
-                    {student?.enterpriseName || STUDENT_ACTIVITY_UI.OVERVIEW.NO_BUSINESS}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-full border border-slate-100 shadow-sm">
-                  <UserOutlined className="text-[10px]" />
-                  <span className="text-[10px] font-black tracking-wider whitespace-nowrap text-slate-500 uppercase">
-                    {STUDENT_ACTIVITY_UI.OVERVIEW.INFO_FIELDS.MENTOR_LABEL}{' '}
-                    <span className="text-slate-800 font-black">
-                      {student?.mentorName || UI_TEXT.COMMON.EM_DASH}
-                    </span>
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-white rounded-full border border-slate-100 shadow-sm">
-                  <CalendarOutlined className="text-[10px]" />
-                  <span className="text-[10px] font-black tracking-wider whitespace-nowrap text-slate-500 uppercase">
-                    {STUDENT_ACTIVITY_UI.OVERVIEW.INFO_FIELDS.TERM_LABEL}{' '}
-                    <span className="text-slate-800 font-black">
-                      {student?.termName || UI_TEXT.COMMON.EM_DASH}
-                    </span>
-                  </span>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100/50">
+                      <UserOutlined className="text-[10px] text-slate-400" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                        {student?.studentCode || '—'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100/50">
+                      <TeamOutlined className="text-[10px] text-slate-400" />
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-wider text-slate-600 truncate max-w-[200px]"
+                        title={student?.enterpriseName}
+                      >
+                        {student?.enterpriseName || STUDENT_ACTIVITY_UI.OVERVIEW.NO_BUSINESS}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100/50">
+                      <SolutionOutlined className="text-[10px] text-slate-400" />
+                      <span className="text-[10px] font-bold tracking-wider whitespace-nowrap text-slate-400 uppercase">
+                        {STUDENT_ACTIVITY_UI.OVERVIEW.INFO_FIELDS.MENTOR_LABEL}{' '}
+                        <span className="text-slate-800 font-bold">
+                          {student?.mentorName || UI_TEXT.COMMON.EM_DASH}
+                        </span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100/50">
+                      <CalendarOutlined className="text-[10px] text-slate-400" />
+                      <span className="text-[10px] font-bold tracking-wider whitespace-nowrap text-slate-400 uppercase">
+                        {STUDENT_ACTIVITY_UI.OVERVIEW.INFO_FIELDS.TERM_LABEL}{' '}
+                        <span className="text-slate-800 font-bold">
+                          {student?.termName || UI_TEXT.COMMON.EM_DASH}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="sticky top-0 z-30 bg-slate-50/80 backdrop-blur-md pt-2 px-2 border-b border-white/40">
-        <Tabs
-          activeKey={activeTab}
-          onChange={setActiveTab}
-          items={items.map(({ children, ...item }) => item)}
-          className="student-activity-detail-tabs"
-        />
-      </div>
+          {/* Sticky Tab bar integrated into Card bottom */}
+          <div className="mb-5 sticky top-0 z-30 bg-white border-t border-slate-50 px-8">
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              items={items.map(({ children, ...item }) => item)}
+              className="student-activity-detail-tabs"
+            />
+          </div>
 
-      <div className="mt-6 flex-1 min-h-0">
-        <div className="max-w-[1700px] mx-auto pb-12 px-2">
-          {items.find((item) => item.key === activeTab)?.children}
+          {/* Tab Content Seamlessly Integrated */}
+          <div className="p-8 pt-8 bg-slate-50/20 min-h-[500px]">
+            <div className="max-w-[1600px] mx-auto">
+              {items.find((item) => item.key === activeTab)?.children}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -224,7 +229,7 @@ export default function StudentActivityDetail() {
           margin: 0 24px 0 0 !important;
         }
         .student-activity-detail-tabs .ant-tabs-tab-btn {
-          font-weight: 900 !important;
+          font-weight: 700 !important;
           font-size: 11px !important;
           letter-spacing: 0.1em !important;
           text-transform: uppercase !important;
