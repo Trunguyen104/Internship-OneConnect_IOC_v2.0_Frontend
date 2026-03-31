@@ -7,7 +7,7 @@ import {
   MoreOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Dropdown } from 'antd';
+import { Dropdown, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
@@ -60,32 +60,45 @@ export default function InternPhaseTable({
           const remaining = majors.length - displayMajors.length;
 
           return (
-            <div className="flex items-center gap-1 overflow-hidden whitespace-nowrap">
-              {displayMajors.map((m, i) => (
-                <Badge key={i} variant="primary-soft" size="xs" className="flex-shrink-0">
-                  {m.trim()}
-                </Badge>
-              ))}
+            <div className="flex items-center gap-1 overflow-hidden">
+              {displayMajors.map((m, i) => {
+                const majorName = m.trim();
+                return (
+                  <Tooltip key={i} title={majorName}>
+                    <Badge
+                      variant="primary-soft"
+                      size="xs"
+                      className="inline-block max-w-[100px] truncate"
+                    >
+                      {majorName}
+                    </Badge>
+                  </Tooltip>
+                );
+              })}
               {remaining > 0 && (
-                <Badge variant="default" size="xs" className="flex-shrink-0">
-                  +{remaining}
-                </Badge>
+                <Tooltip title={majors.slice(2).join(', ')}>
+                  <Badge variant="default" size="xs" className="flex-shrink-0 cursor-help">
+                    +{remaining}
+                  </Badge>
+                </Tooltip>
               )}
             </div>
           );
         },
       },
       {
-        title: TABLE.COLUMNS.START_DATE,
-        key: 'startDate',
-        width: '100px',
-        render: (text) => dayjs(text).format('DD/MM/YYYY'),
-      },
-      {
-        title: TABLE.COLUMNS.END_DATE,
-        key: 'endDate',
-        width: '100px',
-        render: (text) => dayjs(text).format('DD/MM/YYYY'),
+        title: TABLE.COLUMNS.TIMELINE,
+        key: 'timeline',
+        width: '180px',
+        render: (_, record) => (
+          <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
+            <span className="whitespace-nowrap">
+              {dayjs(record.startDate).format('DD/MM/YYYY')}
+            </span>
+            <span className="opacity-40">-</span>
+            <span className="whitespace-nowrap">{dayjs(record.endDate).format('DD/MM/YYYY')}</span>
+          </div>
+        ),
       },
       {
         title: TABLE.COLUMNS.STATUS,

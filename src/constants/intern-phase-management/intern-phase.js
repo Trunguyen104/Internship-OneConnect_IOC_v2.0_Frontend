@@ -31,8 +31,7 @@ export const INTERN_PHASE_MANAGEMENT = {
     COLUMNS: {
       NAME: 'PHASE NAME',
       MAJORS: 'MAJOR FIELDS',
-      START_DATE: 'START DATE',
-      END_DATE: 'END DATE',
+      TIMELINE: 'TIMELINE',
       STATUS: 'STATUS',
       POSTINGS: 'POSTINGS',
       CAPACITY: 'CAPACITY',
@@ -80,13 +79,13 @@ export const INTERN_PHASE_MANAGEMENT = {
       END_AFTER_START: 'End date must be after start date.',
       MIN_DURATION: 'Intern Phase must be at least 4 weeks (28 days).',
       MAX_DURATION: 'Intern Phase must not exceed 12 months (365 days).',
-      NAME_EXISTS: 'Đã có Intern Phase tên này. Bạn vẫn có thể tiếp tục.',
+      NAME_EXISTS: 'An Intern Phase with this name already exists. You can still proceed.',
       DEADLINE_VIOLATION:
-        '{count} tin tuyển dụng đang có deadline vượt quá ngày kết thúc mới. Vui lòng điều chỉnh deadline trước.',
+        '{count} job postings have deadlines exceeding the new end date. Please adjust them first.',
     },
 
     BLOCK_MESSAGE:
-      'Intern Phase này đã có sinh viên được nhận / nhóm thực tập. Không thể thay đổi thời gian hoặc số lượng. Nếu cần thay đổi, hãy xử lý dứt điểm các sinh viên liên quan trước.',
+      'This Intern Phase already has students placed or assigned groups. Dates and capacity cannot be changed. Please resolve associated students before making changes.',
     CANCEL_BTN: 'Cancel',
     SAVE_BTN: 'Create',
     SAVE_CHANGES_BTN: 'Save Changes',
@@ -116,9 +115,9 @@ export const INTERN_PHASE_MANAGEMENT = {
         APPLICATIONS: 'APPLICATIONS',
       },
       STATUS_LABELS: {
-        Published: 'Công khai',
-        Draft: 'Nháp',
-        Closed: 'Đã đóng',
+        Published: 'Published',
+        Draft: 'Draft',
+        Closed: 'Closed',
       },
       STATUS_VARIANTS: {
         Published: 'success-soft',
@@ -139,8 +138,13 @@ export const INTERN_PHASE_MANAGEMENT = {
       END: 'End',
       LEFT: 'left',
       DATE_SEPARATOR: '–',
+      BACK: 'Back',
+      ID: 'Phase ID',
+      TO: 'to',
+      APPLICATIONS_REMAINING: 'APPLICATIONS REMAINING',
+      FILLED: 'filled',
     },
-    NO_DESCRIPTION: 'No description provided.',
+    NO_DESCRIPTION: 'No description provided for this internship phase.',
     TABS: {
       POSTINGS: 'Job Postings',
       STUDENTS: 'Students',
@@ -159,8 +163,8 @@ export const INTERN_PHASE_MANAGEMENT = {
         PLACED_DATE: 'PLACED DATE',
       },
       SOURCE_LABELS: {
-        'Self-apply': 'Tự ứng tuyển',
-        'Uni-assign': 'Trường điều phối',
+        'Self-apply': 'Self-apply',
+        'Uni-assign': 'University assigned',
       },
       SOURCE_VARIANTS: {
         'Self-apply': 'info-soft',
@@ -173,13 +177,26 @@ export const INTERN_PHASE_MANAGEMENT = {
     CREATE_SUCCESS: 'Intern Phase created successfully.',
     UPDATE_SUCCESS: 'Intern Phase updated successfully.',
     DELETE_SUCCESS: 'Intern Phase deleted successfully.',
-    DELETE_CONFIRM: 'Bạn có chắc chắn muốn xóa Intern Phase này?',
+    DELETE_CONFIRM: 'Are you sure you want to delete this Intern Phase?',
     DELETE_WARNING_GROUPS:
-      'Intern Phase này đang được {count} nhóm thực tập sử dụng. Xóa sẽ khiến các nhóm đó mất liên kết ngày bắt đầu/kết thúc.',
+      'This Intern Phase is currently used by {count} internship groups. Deleting it will decouple these groups from their start/end dates.',
     DELETE_BLOCK_POSTINGS:
-      'Intern Phase này đang có {count} job posting. Vui lòng xóa hoặc chuyển các job posting sang Intern Phase khác trước.',
+      'This Intern Phase has {count} job postings. Please delete or transfer them to another phase first.',
     DELETE_BLOCK_PLACED:
-      'Intern Phase này đang có {count} sinh viên thực tập. Không thể xóa khi còn sinh viên đang active.',
-    ERROR_FETCH_DETAIL: 'Lấy thông tin chi tiết thất bại.',
+      'This Intern Phase has {count} active students. Deletion is blocked while students are active.',
+    ERROR_FETCH_DETAIL: 'Failed to fetch phase details.',
+    ERROR_ENTERPRISE_ID: 'Enterprise ID not found for this account.',
+    ERROR_DELETE: 'An error occurred while deleting the Intern Phase.',
+    ERROR_DELETE_TITLE: 'Cannot Delete',
+    DELETE_TITLE: 'Delete Intern Phase',
+    DELETE_OK: 'Delete',
+  },
+  PAGE: {
+    ERROR: {
+      TITLE: 'Phase not found',
+      DESCRIPTION: 'The internship phase you are looking for does not exist or has been deleted.',
+      BACK_BTN: 'Return to List',
+      LOADING: 'Loading phase details...',
+    },
   },
 };

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import PageLayout from '@/components/ui/pagelayout';
@@ -8,14 +9,13 @@ import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/int
 
 import { useInternPhaseActions } from '../hooks/useInternPhaseActions';
 import { useInternPhaseManagement } from '../hooks/useInternPhaseManagement';
-import InternPhaseDetailDrawer from './InternPhaseDetailDrawer';
 import InternPhaseFormModal from './InternPhaseFormModal';
 import InternPhaseTable from './InternPhaseTable';
 import JobPostingFormModal from './JobPostingFormModal';
 
 export default function InternPhaseManagementContainer() {
+  const router = useRouter();
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [isJobModalVisible, setJobModalVisible] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
@@ -49,13 +49,8 @@ export default function InternPhaseManagementContainer() {
   };
 
   const handleView = (record) => {
-    setSelectedRecord(record);
-    setDrawerVisible(true);
-  };
-
-  const handleAddPosting = (record) => {
-    setSelectedRecord(record || selectedRecord);
-    setJobModalVisible(true);
+    const id = record.id || record.internPhaseId;
+    router.push(`/intern-phase-management/${id}`);
   };
 
   const handleSave = (values) => {
@@ -98,13 +93,6 @@ export default function InternPhaseManagementContainer() {
         loading={isSubmitting}
         editingRecord={selectedRecord}
         existingPhases={items}
-      />
-
-      <InternPhaseDetailDrawer
-        visible={isDrawerVisible}
-        onClose={() => setDrawerVisible(false)}
-        phase={selectedRecord}
-        onAddPosting={() => handleAddPosting(selectedRecord)}
       />
 
       <JobPostingFormModal

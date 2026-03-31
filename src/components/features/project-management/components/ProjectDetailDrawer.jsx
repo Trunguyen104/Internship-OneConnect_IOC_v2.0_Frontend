@@ -163,7 +163,7 @@ export default function ProjectDetailDrawer({ visible, onClose, project, onAssig
       }
       open={visible}
       onClose={onClose}
-      size={640}
+      width={640}
     >
       <Tabs
         activeKey={activeTab}

@@ -91,7 +91,6 @@ export default function InternPhaseFormModal({
       }
       open={visible}
       onClose={onCancel}
-      width={700}
       size="large"
       zIndex={1100}
       className="intern-phase-form-drawer"

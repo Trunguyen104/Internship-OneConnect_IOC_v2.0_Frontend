@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App } from 'antd';
 import dayjs from 'dayjs';
 
+import { userService } from '@/components/features/user/services/user.service';
 import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -49,11 +50,21 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
         throw new Error(dateError);
       }
 
+      // Fetch enterpriseId if creating new
+      const meRes = await userService.getMe();
+      const meData = meRes?.data || meRes;
+      const enterpriseId = meData?.enterpriseId || meData?.enterprise_id || meData?.enterpriseID;
+
+      if (!enterpriseId && !editingRecord) {
+        throw new Error(MESSAGES.ERROR_ENTERPRISE_ID);
+      }
+
       const payload = {
+        enterpriseId,
         name: values.name,
         description: values.description,
-        startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        startDate: values.startDate.format('YYYY-MM-DD'),
+        endDate: values.endDate.format('YYYY-MM-DD'),
         majorFields: Array.isArray(values.majorFields)
           ? values.majorFields.join(',')
           : values.majorFields,
@@ -62,48 +73,6 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
 
       if (editingRecord) {
         const phaseId = editingRecord.id || editingRecord.internPhaseId;
-
-        // AC-03: Validate Job Posting Deadlines if endDate changed
-        const originalEnd = dayjs(editingRecord.endDate).startOf('day');
-        const newEnd = dayjs(values.endDate).startOf('day');
-
-        if (!newEnd.isSame(originalEnd)) {
-          const postingsRes = await InternPhaseService.getJobPostings(phaseId);
-          const postings = postingsRes?.data || postingsRes || [];
-
-          const violatingPostings = postings.filter((p) => {
-            if (!p.deadline) return false;
-            return dayjs(p.deadline).startOf('day').isAfter(newEnd);
-          });
-
-          if (violatingPostings.length > 0) {
-            const errorMsg = MESSAGES.DEADLINE_VIOLATION.replace(
-              '{count}',
-              violatingPostings.length
-            );
-            throw new Error(errorMsg);
-          }
-
-          // AC-03: Simulate updates and notifications
-          console.log(
-            `[AC-03] Auto-updating internship dates for ${postings.length} job postings...`
-          );
-
-          const studentsRes = await InternPhaseService.getStudents(phaseId);
-          const students = studentsRes?.data || studentsRes || [];
-          const activeStudents = students.filter((s) =>
-            ['Applied', 'Interviewing', 'Offered'].includes(s.status)
-          );
-
-          if (activeStudents.length > 0) {
-            console.log(
-              `[AC-03] Notifying ${activeStudents.length} students about date updates...`
-            );
-            console.log(
-              `[AC-03] Log: "Job posting tại Enterprise vừa cập nhật thời gian thực tập: ${values.startDate.format('DD/MM/YYYY')} -> ${values.endDate.format('DD/MM/YYYY')}..."`
-            );
-          }
-        }
 
         return InternPhaseService.update(phaseId, payload);
       }
@@ -122,7 +91,7 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
   const deleteMutation = useMutation({
     mutationFn: (id) => InternPhaseService.delete(id),
     onSuccess: () => {
-      toast.success('Đã xóa Intern Phase.');
+      toast.success(MESSAGES.DELETE_SUCCESS);
       onSuccessAction();
     },
     onError: (err) => {
@@ -139,7 +108,7 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
     // Case 3: Block if Students Placed
     if (placedCount > 0) {
       modal.error({
-        title: 'Không thể xóa',
+        title: MESSAGES.ERROR_DELETE_TITLE,
         content: MESSAGES.DELETE_BLOCK_PLACED.replace('{count}', placedCount),
       });
       return;
@@ -148,7 +117,7 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
     // Case 2: Block if Job Postings exist
     if (postingCount > 0) {
       modal.error({
-        title: 'Không thể xóa',
+        title: MESSAGES.ERROR_DELETE_TITLE,
         content: MESSAGES.DELETE_BLOCK_POSTINGS.replace('{count}', postingCount),
       });
       return;
@@ -168,9 +137,9 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
     }
 
     modal.confirm({
-      title: 'Xóa Intern Phase',
+      title: MESSAGES.DELETE_TITLE,
       content,
-      okText: 'Xóa',
+      okText: MESSAGES.DELETE_OK,
       okType: 'danger',
       onOk: () => deleteMutation.mutateAsync(id),
     });

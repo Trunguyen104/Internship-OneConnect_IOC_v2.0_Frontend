@@ -1,7 +1,7 @@
 'use client';
 
-import { CarryOutOutlined } from '@ant-design/icons';
-import { App, ExclamationCircleOutlined, Modal, Select, Tooltip } from 'antd';
+import { CarryOutOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { App, Modal, Select, Tooltip } from 'antd';
 import React, { useState } from 'react';
 
 import DataTableToolbar from '@/components/ui/datatabletoolbar';

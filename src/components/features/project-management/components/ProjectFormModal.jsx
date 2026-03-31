@@ -233,7 +233,7 @@ export default function ProjectFormModal({
       }
       open={visible}
       onClose={handleModalClose}
-      size={640}
+      width={640}
       footer={
         !viewOnly && (
           <div className="flex justify-between px-4 py-2">

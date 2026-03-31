@@ -31,7 +31,6 @@ export default function JobPostingFormModal({ visible, onCancel, phase }) {
       }
       open={visible}
       onClose={onCancel}
-      width={700}
       size="large"
       zIndex={1100}
       className="job-posting-form-drawer"

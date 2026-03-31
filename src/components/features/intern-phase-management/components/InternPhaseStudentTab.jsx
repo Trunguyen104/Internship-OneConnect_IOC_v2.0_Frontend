@@ -6,6 +6,7 @@ import React from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 
 export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
   const { STUDENTS } = INTERN_PHASE_MANAGEMENT;
