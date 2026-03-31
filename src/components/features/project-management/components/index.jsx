@@ -1,7 +1,7 @@
 'use client';
 
 import { CarryOutOutlined } from '@ant-design/icons';
-import { App, Modal, Select, Tooltip } from 'antd';
+import { App, ExclamationCircleOutlined, Modal, Select, Tooltip } from 'antd';
 import React, { useState } from 'react';
 
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
@@ -73,6 +73,21 @@ export default function ProjectManagement() {
     fetchData,
     isMentor,
   } = useProjectManagement();
+
+  const sourceGroupId =
+    assigningProject?.internshipId ||
+    assigningProject?.internshipGroupId ||
+    assigningProject?.groupId;
+  const isMovingFromGroup =
+    sourceGroupId && sourceGroupId !== '00000000-0000-0000-0000-000000000000';
+  const sourceGroup = groups.find((g) => (g.internshipId || g.id) === sourceGroupId);
+
+  const [replacementProjectId, setReplacementProjectId] = useState(null);
+
+  const unstartedProjects = (data || []).filter((p) => {
+    const gid = p.internshipId || p.internshipGroupId || p.groupId;
+    return !gid || gid === '00000000-0000-0000-0000-000000000000';
+  });
 
   return (
     <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
@@ -171,6 +186,7 @@ export default function ProjectManagement() {
             setSelectedGroupId(
               record.internshipId || record.internshipGroupId || record.groupId || null
             );
+            setReplacementProjectId(null);
             setAssignModalVisible(true);
           }}
           onPublish={handlePublishProject}
@@ -214,6 +230,7 @@ export default function ProjectManagement() {
             setSelectedGroupId(
               record.internshipId || record.internshipGroupId || record.groupId || null
             );
+            setReplacementProjectId(null);
             setAssignModalVisible(true);
           }}
         />
@@ -222,13 +239,27 @@ export default function ProjectManagement() {
           title={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.TITLE}
           open={assignModalVisible}
           onOk={() =>
-            handleAssignGroup(assigningProject, selectedGroupId, setAssignLoading, () =>
-              setAssignModalVisible(false)
+            handleAssignGroup(
+              assigningProject,
+              selectedGroupId,
+              setAssignLoading,
+              () => setAssignModalVisible(false),
+              replacementProjectId
             )
           }
           onCancel={() => setAssignModalVisible(false)}
           confirmLoading={assignLoading}
-          okButtonProps={{ disabled: !selectedGroupId }}
+          zIndex={2000}
+          okButtonProps={{
+            disabled:
+              !selectedGroupId ||
+              (isMovingFromGroup &&
+                selectedGroupId !== sourceGroupId &&
+                (sourceGroup?.studentCount > 0 ||
+                  sourceGroup?.numberOfMembers > 0 ||
+                  assigningProject?.groupInfo?.studentCount > 0) &&
+                !replacementProjectId),
+          }}
           okText={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM}
         >
           <div className="py-4">
@@ -254,6 +285,54 @@ export default function ProjectManagement() {
                 </Option>
               ))}
             </Select>
+
+            {/* AC-05: Case B - Replacement selection if it's a move */}
+            {isMovingFromGroup && selectedGroupId && selectedGroupId !== sourceGroupId && (
+              <div className="mt-6 border-t pt-4">
+                <div className="mb-3 flex items-start gap-2 rounded-md bg-amber-50 p-3">
+                  <span className="text-amber-500 mt-0.5">
+                    <ExclamationCircleOutlined />
+                  </span>
+                  <p
+                    className="text-xs text-amber-800"
+                    dangerouslySetInnerHTML={{
+                      __html: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SWAP_WARNING.replace(
+                        '{projectName}',
+                        assigningProject?.projectName || ''
+                      ).replace('{groupName}', sourceGroup?.groupName || 'current group'),
+                    }}
+                  />
+                </div>
+
+                <div className="font-medium text-xs text-gray-500 mb-1.5 uppercase tracking-wider">
+                  {PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.REPLACEMENT_LABEL.replace(
+                    '{groupName}',
+                    sourceGroup?.groupName || 'Current Group'
+                  )}
+                </div>
+                <Select
+                  className="w-full"
+                  placeholder={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.REPLACEMENT_PLACEHOLDER}
+                  value={replacementProjectId}
+                  onChange={setReplacementProjectId}
+                  allowClear
+                >
+                  {unstartedProjects.map((p) => (
+                    <Option key={p.projectId} value={p.projectId}>
+                      {p.projectName}
+                    </Option>
+                  ))}
+                </Select>
+                {unstartedProjects.length === 0 && (
+                  <p className="mt-1 text-[10px] italic text-red-400">
+                    {PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.NO_UNSTARTED_PROJECTS.replace(
+                      '{groupName}',
+                      sourceGroup?.groupName || ''
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </Modal>
       </>

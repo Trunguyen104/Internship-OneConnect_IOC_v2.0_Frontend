@@ -30,6 +30,11 @@ const enterpriseMenu = [
     href: '/company-profile',
   },
   {
+    icon: <CalendarOutlined />,
+    label: 'Intern Phases',
+    href: '/intern-phase-management',
+  },
+  {
     icon: <SolutionOutlined />,
     label: 'Internship Management',
     href: '/internship-management',

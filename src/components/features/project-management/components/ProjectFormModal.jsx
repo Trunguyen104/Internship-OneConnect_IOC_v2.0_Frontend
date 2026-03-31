@@ -254,6 +254,7 @@ export default function ProjectFormModal({
           disabled={viewOnly || dataLoading}
           initialValues={{
             template: 'None',
+            field: 'Information Technology',
             links: [],
             attachments: [],
           }}

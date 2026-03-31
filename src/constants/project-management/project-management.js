@@ -78,10 +78,11 @@ export const STATUS_VARIANTS = {
 export const PROJECT_MANAGEMENT = {
   TITLE: 'Project Management',
   CREATE_BTN: 'Create Project',
+  NO_UNSTARTED_PROJECTS: '* No unstarted projects available to assign to {groupName}.',
   SEARCH_PLACEHOLDER: 'Search projects by name or code...',
   COMMON: {
-    N_A: 'N/A',
-    DASH: '—',
+    N_A: '-',
+    DASH: '-',
     UNKNOWN: 'Unknown',
     LOADING: 'Loading...',
   },
@@ -99,7 +100,7 @@ export const PROJECT_MANAGEMENT = {
       FIELD: 'FIELD',
       TIMELINE: 'TIMELINE',
       VISIBILITY: 'VISIBILITY',
-      STATUS: 'OPERATIONAL STATUS',
+      STATUS: 'OPERATIONAL',
       ACTIONS: 'ACTIONS',
     },
     EMPTY_MESSAGE: 'You have no projects yet. Create a new project to get started.',
@@ -344,6 +345,10 @@ export const PROJECT_MANAGEMENT = {
       CONFIRM_CHANGE_TITLE: 'Confirm Group Change',
       CONFIRM_CHANGE_DESC:
         'Are you sure you want to change the group? Existing students will lose access to this project.',
+      SWAP_WARNING:
+        'Project <b>{projectName}</b> is currently assigned to <b>{groupName}</b>. Moving it will leave <b>{groupName}</b> without a project. Please select a replacement project for them below:',
+      REPLACEMENT_LABEL: 'Replacement Project for {groupName}',
+      REPLACEMENT_PLACEHOLDER: 'Select a replacement project (Unstarted only)',
       ERROR_BACKEND: 'Backend error during assignment',
       ERROR_FAILED: 'Assignment failed: ',
     },

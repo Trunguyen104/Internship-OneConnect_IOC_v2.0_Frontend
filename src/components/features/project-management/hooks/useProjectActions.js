@@ -61,8 +61,9 @@ export const useProjectActions = ({
         if (values.endDate) updateForm.append('EndDate', values.endDate.toISOString());
         updateForm.append('Field', values.field || '');
         updateForm.append('Requirements', values.requirements || '');
-        if (values.deliverables) updateForm.append('Deliverables', values.deliverables);
+        updateForm.append('Deliverables', values.deliverables || '');
         updateForm.append('Template', values.template ?? 2);
+        if (values.code) updateForm.append('ProjectCode', values.code);
 
         // New file uploads
         if (values.attachments && values.attachments.length > 0) {
@@ -273,16 +274,31 @@ export const useProjectActions = ({
       );
       const isOperationalActive = opStatus === OPERATIONAL_STATUS.ACTIVE;
 
+      const oldGroupId = editingRecord?.internshipId || editingRecord?.internshipGroupId;
+      const isGroupChanged = selectedGroupId && oldGroupId && selectedGroupId !== oldGroupId;
+
       if (editingRecord && isOperationalActive) {
         const res = await ProjectService.getAssignedStudents(editingRecord.projectId).catch(
           () => null
         );
         const studentCount = res?.data?.length || 0;
 
+        // AC-05: If group is CHANGED and has student data -> BLOCK
+        if (isGroupChanged && studentCount > 0) {
+          modal.error({
+            title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_NO_CHANGE || 'Không thể đổi nhóm',
+            content:
+              PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_HAS_DATA ||
+              'Nhóm đang có dữ liệu hoạt động, không thể đổi project.',
+          });
+          return;
+        }
+
+        // AC-08 Case 3: If just EDITING content and has students -> WARN
         if (studentCount > 0) {
           modal.confirm({
-            title: PROJECT_MANAGEMENT.MODALS?.UPDATE_WARNING_TITLE,
-            content: MESSAGES.EDIT_WARNING.replace('{count}', studentCount),
+            title: PROJECT_MANAGEMENT.MODALS?.UPDATE_WARNING_TITLE || 'Cảnh báo cập nhật',
+            content: `Dự án đang có ${studentCount} sinh viên tham gia. Thay đổi có thể ảnh hưởng đến trải nghiệm học. Bạn có chắc?`,
             okText: 'Confirm',
             cancelText: 'Cancel',
             onOk: () => saveMutation.mutateAsync({ values, isDraft }),
@@ -433,7 +449,8 @@ export const useProjectActions = ({
     assigningProject,
     selectedGroupId,
     setLocalLoading,
-    closeLocalModal
+    closeLocalModal,
+    replacementProjectId // AC-05: Atomic Swap
   ) => {
     if (!selectedGroupId || !assigningProject) return;
 
@@ -450,7 +467,19 @@ export const useProjectActions = ({
     const doMutate = async () => {
       setLocalLoading?.(true);
       try {
+        // 1. Assign primary project to target group
         await assignGroupMutation.mutateAsync({ assigningProject, selectedGroupId });
+
+        // 2. AC-05 Case B: If it's a swap and we have a replacement, assign it to old group
+        if (isSwapping && replacementProjectId) {
+          try {
+            await ProjectService.assignGroup(replacementProjectId, oldGroupId);
+          } catch (swapErr) {
+            console.error('Replacement assignment failed:', swapErr);
+            toast.warning('Primary assignment succeeded, but replacement assignment failed.');
+          }
+        }
+
         closeLocalModal?.();
       } finally {
         setLocalLoading?.(false);
@@ -481,13 +510,13 @@ export const useProjectActions = ({
           return;
         }
 
-        // Show confirmation — onOk returns Promise so AntD auto-closes on resolve
+        // Show confirmation
         modal.confirm({
           title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM_CHANGE_TITLE,
           content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM_CHANGE_DESC,
           okText: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM || 'Confirm',
           cancelText: 'Cancel',
-          onOk: doMutate, // AntD closes when this promise resolves
+          onOk: doMutate,
         });
         return;
       }
