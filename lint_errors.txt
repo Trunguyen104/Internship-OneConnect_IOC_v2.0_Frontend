@@ -1,0 +1,35 @@
+[0m[0m
+[0m[4mD:\ProjectOjt\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-activity\components\StudentActivityList.jsx[24m[0m
+[0m   [2m75:37[22m  [31merror[39m  Strings not allowed in JSX files: "'•'"  [2mreact/jsx-no-literals[22m[0m
+[0m   [2m90:71[22m  [31merror[39m  Strings not allowed in JSX files: "'—'"  [2mreact/jsx-no-literals[22m[0m
+[0m  [2m103:67[22m  [31merror[39m  Strings not allowed in JSX files: "'—'"  [2mreact/jsx-no-literals[22m[0m
+[0m  [2m117:52[22m  [31merror[39m  Strings not allowed in JSX files: "'—'"  [2mreact/jsx-no-literals[22m[0m
+[0m  [2m121:75[22m  [31merror[39m  Strings not allowed in JSX files: "'—'"  [2mreact/jsx-no-literals[22m[0m
+[0m[0m
+[0m[4mD:\ProjectOjt\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-activity\components\tabs\EvaluationsTab.jsx[24m[0m
+[0m  [2m87:72[22m  [31merror[39m  Strings not allowed in JSX files: "'–'"  [2mreact/jsx-no-literals[22m[0m
+[0m[0m
+[0m[4mD:\ProjectOjt\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-activity\components\tabs\LogbookTab.jsx[24m[0m
+[0m   [2m23:9[22m   [33mwarning[39m  The 'weeks' logical expression could make the dependencies of useEffect Hook (at line 30) change on every render. To fix this, wrap the initialization of 'weeks' in its own useMemo() Hook                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m27:7[22m   [31merror[39m    Error: Calling setState synchronously within an effect can trigger cascading renders[0m
+[0m[0m
+[0mEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:[0m
+[0m* Update external systems with the latest state from React.[0m
+[0m* Subscribe for updates from some external system, calling setState in a callback function when external state changes.[0m
+[0m[0m
+[0mCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).[0m
+[0m[0m
+[0m  25 |   useEffect(() => {[0m
+[0m  26 |     if (weeks.length > 0 && !hasInitialized) {[0m
+[0m> 27 |       setActiveWeeks(weeks.map((w) => w.weekNumber.toString()));[0m
+[0m     |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect[0m
+[0m  28 |       setHasInitialized(true);[0m
+[0m  29 |     }[0m
+[0m  30 |   }, [weeks, hasInitialized]);  [2mreact-hooks/set-state-in-effect[22m[0m
+[0m  [2m119:77[22m  [31merror[39m    Strings not allowed in JSX files: "'—'"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              [2mreact/jsx-no-literals[22m[0m
+[0m[0m
+[0m[4mD:\ProjectOjt\internship-oneconnect_ioc_v2.0_frontend\src\components\features\internship-student-activity\components\tabs\OverviewTab.jsx[24m[0m
+[0m  [2m34:47[22m  [31merror[39m  Strings not allowed in JSX files: "'—'"  [2mreact/jsx-no-literals[22m[0m
+[0m[0m
+[0m[31m[1m✖ 10 problems (9 errors, 1 warning)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

@@ -1,134 +1,173 @@
+'use client';
+
 import { CommentOutlined, DownOutlined, StarOutlined, UserOutlined } from '@ant-design/icons';
 import { Collapse } from 'antd';
-import React from 'react';
+import dayjs from 'dayjs';
+import React, { useEffect, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
-
-import { STUDENT_ACTIVITY_UI } from '../../constants/student-activity.constants';
-
-const { Panel } = Collapse;
+import { UI_TEXT } from '@/lib/UI_Text';
 
 export default function EvaluationsTab({ evaluations, loading }) {
-  if (loading) return <div className="p-12 text-center text-slate-400 font-bold italic animate-pulse">Fetching evaluation records...</div>;
+  const [activeKeys, setActiveKeys] = useState([]);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
-  const publishedEvaluations = (evaluations || []).filter(ev => ev.status === 3 || ev.status === 'Published');
+  useEffect(() => {
+    if (evaluations.length > 0 && !hasInitialized) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveKeys(evaluations.map((ev, index) => (ev.evaluationId || ev.id || index).toString()));
+      setHasInitialized(true);
+    }
+  }, [evaluations, hasInitialized]);
 
-  if (publishedEvaluations.length === 0) {
+  if (loading)
     return (
-      <div className="flex flex-col items-center justify-center p-20 bg-white rounded-[40px] animate-in zoom-in-95 duration-700 shadow-sm border border-slate-100/50">
-        <div className="size-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200 text-4xl mb-6 shadow-inner">
+      <div className="p-24 text-center">
+        <div className="inline-block size-8 border-[3px] border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+        <div className="text-slate-400 font-black uppercase tracking-[0.2em] text-[9px] animate-pulse">
+          {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.FETCHING}
+        </div>
+      </div>
+    );
+
+  if (!evaluations || evaluations.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-16 bg-white/80 backdrop-blur-sm rounded-[32px] animate-in zoom-in-95 duration-1000 shadow-xl shadow-slate-200/40 border border-white mt-[-40px]">
+        <div className="size-16 rounded-[24px] bg-slate-50 flex items-center justify-center text-slate-200 text-3xl mb-4 shadow-inner border border-slate-100/50">
           <StarOutlined />
         </div>
-        <p className="text-xl font-black text-slate-400 tracking-tight uppercase px-8 text-center">
-          {STUDENT_ACTIVITY_UI.DETAIL.OVERVIEW.NO_EVALUATION}
+        <p className="text-base font-black text-slate-400 tracking-tight uppercase px-12 text-center leading-tight">
+          {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.NO_EVALS}
         </p>
-        <span className="text-[10px] font-bold text-slate-300 mt-2 uppercase tracking-widest italic">Waiting for mentor publication</span>
       </div>
     );
   }
 
-  const { EVALUATION } = STUDENT_ACTIVITY_UI.DETAIL;
-
   return (
-    <div className="flex flex-col gap-6 p-1 pb-12">
+    <div className="flex flex-col gap-4 pb-20 animate-in -mt-10 fade-in slide-in-from-bottom-4 duration-700">
       <Collapse
-        accordion
+        activeKey={activeKeys}
+        onChange={setActiveKeys}
         expandIcon={({ isActive }) => (
-          <div className={`size-8 rounded-full bg-slate-50 flex items-center justify-center transition-all duration-500 border border-slate-100 ${isActive ? 'rotate-180 bg-primary/10 border-primary/20 text-primary' : 'text-slate-400'}`}>
-            <DownOutlined className="text-[10px]" />
+          <div
+            className={`size-6 rounded-md bg-white flex items-center justify-center transition-all duration-500 shadow-sm border border-slate-100 ${isActive ? 'rotate-180 bg-primary/5 border-primary/20 text-primary' : 'text-slate-400'}`}
+          >
+            <DownOutlined className="text-[8px]" />
           </div>
         )}
-        expandIconPosition="end"
+        expandIconPlacement="end"
         className="activity-evaluation-collapse border-none bg-transparent"
         ghost
-      >
-        {publishedEvaluations.map((ev, i) => (
-          <Panel
-            key={ev.id || i}
-            header={
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 w-full pr-4 group">
-                <div className="flex items-center gap-5">
-                  <div className="size-12 rounded-[20px] bg-white shadow-lg flex flex-col items-center justify-center text-primary border border-slate-50 group-hover:scale-110 transition-transform">
-                    <span className="text-xl font-black leading-none">{ev.totalScore || 0}</span>
-                    <span className="text-[8px] font-black uppercase opacity-40">Score</span>
-                  </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-lg font-black tracking-tight text-slate-800 leading-tight">{ev.cycleName}</span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="primary-soft" size="xs" className="font-black ring-1 ring-primary/10 text-[9px] uppercase tracking-widest">
-                        Published
-                      </Badge>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter opacity-60">
-                         {ev.startDate} – {ev.endDate}
-                      </span>
+        items={evaluations.map((ev, i) => ({
+          key: (ev.evaluationId || ev.id || i).toString(),
+          className:
+            'mb-5 bg-white rounded-[28px] overflow-hidden border border-white shadow-xl shadow-slate-200/20 transition-all duration-500 hover:shadow-2xl hover:border-primary/10 group',
+          label: (
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 w-full pr-3 group">
+              <div className="flex items-center gap-4">
+                <div className="size-9 rounded-lg bg-white shadow-lg flex flex-col items-center justify-center text-primary border border-slate-50 group-hover:scale-105 group-hover:-rotate-3 transition-all duration-500">
+                  <span className="text-sm font-black leading-none">{ev.totalScore || 0}</span>
+                  <span className="text-[6px] font-black uppercase text-slate-500 mt-0.5 tracking-tighter">
+                    {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.SCORE}
+                  </span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-black tracking-tight text-slate-800 leading-tight mb-1">
+                    {ev.cycleName}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="primary-soft"
+                      size="xs"
+                      className="font-black ring-1 ring-primary/10 text-[7px] uppercase tracking-widest px-2 py-0.5 rounded-md shadow-sm"
+                    >
+                      {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.PUBLISHED}
+                    </Badge>
+                    <div className="flex items-center gap-2 text-[8px] font-black text-slate-500 uppercase tracking-tight bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100/50">
+                      {dayjs(ev.cycleStartDate).format('DD/MM/YYYY')} {UI_TEXT.COMMON.EN_DASH}{' '}
+                      {dayjs(ev.cycleEndDate).format('DD/MM/YYYY')}
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-4 self-end md:self-center">
-                  <div className="flex items-center gap-2.5 text-slate-500 font-bold text-[11px] bg-slate-50/80 px-4 py-2 rounded-2xl border border-slate-100 shadow-sm whitespace-nowrap">
-                    <div className="size-6 rounded-lg bg-white flex items-center justify-center shadow-inner">
-                      <UserOutlined className="text-primary text-[10px]" />
-                    </div>
-                    <span className="tracking-tight italic">{ev.evaluatorName || 'Mentor'}</span>
-                  </div>
-                </div>
-              </div>
-            }
-            className="mb-8 bg-white rounded-[32px] overflow-hidden border border-slate-100/50 shadow-sm transition-all hover:shadow-xl hover:border-primary/10 animate-in slide-in-from-bottom-4 duration-500 group"
-          >
-            <div className="px-8 py-8 border-t border-slate-50 space-y-8 bg-gradient-to-b from-slate-50/30 to-white">
-              {/* Score breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {ev.criteria && ev.criteria.map((c, j) => (
-                  <div key={j} className="flex flex-col gap-3 p-5 rounded-[24px] bg-white border border-slate-100 shadow-sm hover:ring-1 hover:ring-primary/20 transition-all group/criteria">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-black text-slate-500 uppercase tracking-widest truncate">{c.name}</span>
-                      <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-sm shadow-inner group-hover/criteria:scale-110 transition-transform">
-                         {c.score}
-                      </div>
-                    </div>
-                    <div className="h-[1px] w-full bg-slate-50" />
-                    <p className="text-[11px] font-semibold text-slate-400 italic leading-snug">
-                      "{c.comment || 'Không có nhận xét chi tiết cho tiêu chí này.'}"
-                    </p>
-                  </div>
-                ))}
               </div>
 
-              {/* General Comment */}
-              <div className="relative p-8 rounded-[32px] bg-primary/5 border border-primary/20 overflow-hidden group/comment">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/comment:opacity-20 transition-opacity">
-                   <CommentOutlined className="text-6xl text-primary" />
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="size-8 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
-                    <CommentOutlined className="text-sm" />
+              <div className="flex items-center gap-4 self-end md:self-center">
+                <div className="flex items-center gap-2 text-slate-600 font-extrabold text-[9px] bg-white/60 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-white shadow-lg shadow-slate-100/30 whitespace-nowrap group-hover:bg-white transition-all">
+                  <div className="size-5 rounded bg-slate-50 flex items-center justify-center shadow-inner border border-slate-100">
+                    <UserOutlined className="text-primary text-[8px]" />
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/60">{EVALUATION.COMMENT}</span>
-                </div>
-                <p className="text-base font-black text-slate-800 italic leading-relaxed relative z-10">
-                  "{ev.generalComment || 'Chưa có nhận xét tổng quát cho chu kỳ này.'}"
-                </p>
-                <div className="mt-6 flex items-center justify-between border-t border-primary/10 pt-4">
-                   <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">{EVALUATION.EVALUATOR}:</span>
-                      <span className="text-[10px] font-black text-primary uppercase tracking-tighter">{ev.evaluatorName}</span>
-                   </div>
-                   <span className="text-[9px] font-bold text-slate-300 italic">Snapshot tại thời điểm công bố</span>
+                  <span className="tracking-tight italic">
+                    {ev.evaluatorName || UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.MENTOR}
+                  </span>
                 </div>
               </div>
             </div>
-          </Panel>
-        ))}
-      </Collapse>
-      
+          ),
+          children: (
+            <div className="px-6 py-6 border-t border-slate-50 space-y-6 bg-gradient-to-b from-slate-50/10 to-white">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {ev.details &&
+                  ev.details.map((d, j) => (
+                    <div
+                      key={j}
+                      className="flex flex-col gap-2.5 p-4 rounded-[20px] bg-white border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 group/criteria"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.1em] truncate">
+                          {d.criteriaName}
+                        </span>
+                        <div className="size-6 rounded-md bg-primary/5 flex items-center justify-center text-primary font-black text-[10px] shadow-inner group-hover/criteria:scale-110 transition-transform">
+                          {d.score}
+                        </div>
+                      </div>
+                      <div className="h-[1px] w-full bg-slate-50 rounded-full" />
+                      <p className="text-[11px] font-bold text-slate-600 italic leading-snug">
+                        &quot;{d.comment || UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.NO_COMMENT}&quot;
+                      </p>
+                    </div>
+                  ))}
+              </div>
+
+              <div className="relative p-5 rounded-[24px] bg-gradient-to-br from-primary/5 to-primary/[0.02] border border-primary/20 overflow-hidden group/comment shadow-2xl shadow-primary/5">
+                <div className="absolute -top-10 -right-10 size-32 bg-primary/5 rounded-full blur-3xl opacity-50 group-hover/comment:scale-150 transition-transform duration-1000" />
+                <div className="absolute top-0 right-0 p-5 opacity-10 group-hover/comment:opacity-20 transition-opacity">
+                  <CommentOutlined className="text-4xl text-primary" />
+                </div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="size-7 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 group-hover/comment:rotate-6 transition-transform">
+                    <CommentOutlined className="text-xs" />
+                  </div>
+                  <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-primary">
+                    {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.GENERAL_FEEDBACK}
+                  </h4>
+                </div>
+                <p className="text-[13px] font-black text-slate-800 italic leading-relaxed relative z-10 pr-8">
+                  &quot;
+                  {ev.generalComment || UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.NO_GENERAL_COMMENT}
+                  &quot;
+                </p>
+                <div className="mt-5 flex items-center justify-between border-t border-primary/10 pt-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[8px] font-black text-slate-500 tracking-widest uppercase">
+                      {UI_TEXT.STUDENT_ACTIVITY.EVALUATIONS.EVALUATED_BY}
+                    </span>
+                    <span className="px-2 py-0.5 bg-primary/10 rounded-md text-[8px] font-black text-primary uppercase tracking-tighter shadow-sm">
+                      {ev.evaluatorName}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ),
+        }))}
+      />
+      {/* eslint-disable react/jsx-no-literals */}
       <style jsx global>{`
         .activity-evaluation-collapse .ant-collapse-item {
           border: none !important;
         }
         .activity-evaluation-collapse .ant-collapse-header {
-          padding: 24px 32px !important;
+          padding: 16px 20px !important;
           align-items: center !important;
         }
         .activity-evaluation-collapse .ant-collapse-content-box {

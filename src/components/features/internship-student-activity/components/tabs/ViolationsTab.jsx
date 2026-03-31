@@ -1,62 +1,80 @@
-import { ExclamationCircleOutlined, FieldTimeOutlined, HistoryOutlined } from '@ant-design/icons';
+'use client';
+
+import { ExclamationCircleOutlined, HistoryOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import React from 'react';
 
 import Card from '@/components/ui/card';
-import { STUDENT_ACTIVITY_UI } from '../../constants/student-activity.constants';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const ViolationCard = ({ violation }) => {
-  const { DETAIL } = STUDENT_ACTIVITY_UI;
   return (
-    <Card className="animate-in fade-in slide-in-from-left-4 duration-500 !p-0 border-none shadow-sm hover:shadow-xl transition-all !rounded-[32px] bg-white overflow-hidden group border border-slate-100/50">
+    <Card className="animate-in fade-in slide-in-from-left-4 duration-500 !p-0 border-none shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-red-500/10 transition-all !rounded-[40px] bg-white overflow-hidden group border border-slate-100/30">
       <div className="flex flex-col md:flex-row md:items-stretch">
-        {/* Date Section - Side Column */}
-        <div className="flex flex-row md:flex-col items-center md:justify-center gap-4 shrink-0 px-8 py-6 bg-error shadow-inner text-white min-w-[180px] md:rounded-r-[40px] transform group-hover:scale-105 transition-transform duration-500">
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 mb-1">{DETAIL.VIOLATION.INCIDENT_DATE}</span>
-            <span className="text-lg font-black tracking-tight">{violation.incidentDate}</span>
+        <div className="flex flex-row md:flex-col items-center md:justify-center gap-6 shrink-0 px-10 py-10 bg-red-500 shadow-2xl shadow-red-500/20 text-white min-w-[200px] md:rounded-r-[48px] transform group-hover:scale-[1.02] transition-transform duration-700">
+          <div className="flex flex-col items-center text-center">
+            <span className="text-[11px] font-black uppercase tracking-[0.25em] text-white/80 mb-2">
+              {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.INCIDENT_DATE}
+            </span>
+            <span className="text-xl font-black tracking-tight leading-tight italic">
+              {violation.occurredDate}
+            </span>
           </div>
-          <div className="h-[1px] w-12 bg-white/20 hidden md:block" />
-          <div className="flex flex-col items-center opacity-70">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] mb-1">{DETAIL.VIOLATION.REPORT_DATE}</span>
-            <span className="text-xs font-bold">{violation.createdAt}</span>
+          <div className="h-[2px] w-12 bg-white/20 hidden md:block rounded-full shadow-inner" />
+          <div className="flex flex-col items-center opacity-80 text-center">
+            <span className="text-[11px] font-black uppercase tracking-[0.25em] text-white/90 mb-2">
+              {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.REPORT_DATE}
+            </span>
+            <span className="text-sm font-extrabold leading-tight tracking-tight">
+              {violation.reportedAt ? dayjs(violation.reportedAt).format('DD/MM/YYYY') : '—'}
+            </span>
           </div>
         </div>
 
-        {/* Content Section */}
-        <div className="flex flex-col flex-1 p-8 gap-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-2xl bg-error/10 flex items-center justify-center text-error text-xl animate-pulse shadow-inner">
+        <div className="flex flex-col flex-1 p-10 gap-8">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-5">
+              <div className="size-12 rounded-[22px] bg-red-100/50 flex items-center justify-center text-red-600 text-2xl shadow-inner border border-red-200/20 group-hover:rotate-12 transition-transform">
                 <ExclamationCircleOutlined />
               </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-black tracking-tight text-slate-800">
-                  {violation.violationType || violation.type}
+              <div className="flex flex-col min-w-0">
+                <span className="text-2xl font-black tracking-tight text-slate-800 truncate">
+                  {violation.internshipGroupName ||
+                    UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.DISCIPLINARY_RECORD}
                 </span>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-error/40 mt-0.5">Disciplinary Report</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-red-500 mt-1">
+                  {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.DISCIPLINARY_VIOLATION}
+                </span>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100">
-               <HistoryOutlined /> Read-only Record
+            <div className="flex items-center gap-3 text-[11px] font-black text-slate-500 uppercase tracking-widest bg-slate-50/80 px-4 py-2 rounded-full border border-slate-100 shrink-0">
+              <HistoryOutlined className="text-slate-400" />{' '}
+              {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.READ_ONLY_ARCHIVE}
             </div>
           </div>
-          
+
           <div className="relative">
-            <div className="absolute top-0 left-0 h-full w-1.5 bg-error/10 rounded-full" />
-            <div className="pl-6 space-y-3">
-              <div className="flex items-center gap-2 opacity-40">
-                <FieldTimeOutlined className="text-xs" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{DETAIL.VIOLATION.DESCRIPTION}</span>
+            <div className="absolute top-0 left-0 h-full w-2 bg-red-100/30 rounded-full blur-[1px]" />
+            <div className="pl-10 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="size-1.5 rounded-full bg-red-400 animate-pulse" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">
+                  {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.DESCRIPTION}
+                </span>
               </div>
-              <p className="text-base font-medium text-slate-600 leading-relaxed italic pr-4">
-                "{violation.description}"
+              <p className="text-lg font-black text-slate-700 leading-relaxed italic pr-8 opacity-90">
+                &quot;{violation.description}&quot;
               </p>
             </div>
           </div>
 
-          <div className="mt-2 flex items-center gap-2 text-[10px] font-black text-slate-400 italic border-t border-slate-50 pt-4">
-             <span className="size-1.5 rounded-full bg-slate-200" />
-             Snapshot data from enterprise disciplinary management systems.
+          <div className="mt-4 flex items-center gap-3 text-[11px] font-black text-slate-400 italic border-t border-slate-50 pt-6">
+            <div className="px-3 py-1 bg-slate-50 rounded-md border border-slate-100 flex items-center gap-2">
+              <span className="size-1.5 rounded-full bg-slate-300" />
+              <span className="uppercase tracking-widest text-slate-500">
+                {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.SYSTEM_SNAPSHOT}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -65,24 +83,34 @@ const ViolationCard = ({ violation }) => {
 };
 
 export default function ViolationsTab({ violations, loading }) {
-  if (loading) return <div className="p-12 text-center text-slate-400 font-bold italic animate-pulse">Loading violation reports...</div>;
+  if (loading)
+    return (
+      <div className="p-24 text-center">
+        <div className="inline-block size-10 border-[5px] border-primary/20 border-t-primary rounded-full animate-spin mb-6" />
+        <div className="text-slate-600 font-black uppercase tracking-[0.2em] text-[10px] animate-pulse">
+          {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.LOADING}
+        </div>
+      </div>
+    );
 
   if (!violations || violations.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 bg-white rounded-[40px] animate-in zoom-in-95 duration-700 shadow-sm border border-slate-100/50">
-        <div className="size-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200 text-4xl mb-6 shadow-inner">
-           <HistoryOutlined />
+      <div className="flex flex-col items-center justify-center p-24 bg-white/80 backdrop-blur-sm rounded-[48px] animate-in zoom-in-95 duration-1000 shadow-xl shadow-slate-200/40 border border-white">
+        <div className="size-24 rounded-[36px] bg-slate-50 flex items-center justify-center text-slate-200 text-5xl mb-8 shadow-inner border border-slate-100/50">
+          <HistoryOutlined />
         </div>
-        <p className="text-xl font-black text-slate-400 tracking-tight uppercase px-8 text-center">
-          {STUDENT_ACTIVITY_UI.DETAIL.OVERVIEW.NO_VIOLATION}
+        <p className="text-2xl font-black text-slate-500 tracking-tight uppercase px-12 text-center leading-tight">
+          {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.NO_RECORDS}
         </p>
-        <span className="text-[10px] font-bold text-slate-300 mt-2 uppercase tracking-widest italic">Clean disciplinary record</span>
+        <span className="text-[11px] font-extrabold text-slate-300 mt-4 uppercase tracking-[0.2em] italic bg-slate-50/50 px-6 py-2 rounded-full border border-slate-50">
+          {UI_TEXT.STUDENT_ACTIVITY.VIOLATIONS.CLEAR_HISTORY}
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-8 p-1 pb-12">
+    <div className="flex flex-col gap-10 p-2 pb-20">
       {violations.map((v, i) => (
         <ViolationCard key={v.id || i} violation={v} />
       ))}

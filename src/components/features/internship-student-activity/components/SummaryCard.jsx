@@ -1,13 +1,24 @@
 import React from 'react';
-import { cn } from '@/lib/cn';
 
-const SummaryCard = ({ title, value, suffix, icon, variant = 'neutral', active = false, onClick, loading = false }) => {
+import { cn } from '@/lib/cn';
+import { UI_TEXT } from '@/lib/UI_Text';
+
+const SummaryCard = ({
+  title,
+  value,
+  suffix,
+  icon,
+  variant = 'neutral',
+  active = false,
+  onClick,
+  loading = false,
+}) => {
   const colorMap = {
     neutral: '#94a3b8', // slate-400
     success: '#10b981', // green-500
     warning: '#f59e0b', // amber-500
-    danger: '#ef4444',  // red-500
-    info: '#3b82f6',    // blue-500
+    danger: '#ef4444', // red-500
+    info: '#3b82f6', // blue-500
   };
 
   const color = colorMap[variant] || colorMap.neutral;
@@ -37,7 +48,7 @@ const SummaryCard = ({ title, value, suffix, icon, variant = 'neutral', active =
 
           <div className="flex items-baseline gap-2 overflow-hidden">
             <h2 className="m-0 text-2xl font-black leading-none tracking-tighter text-slate-900">
-              {loading ? '...' : value}
+              {loading ? UI_TEXT.COMMON.LOADING : value}
             </h2>
             {suffix && (
               <span className="mb-0.5 truncate text-[9px] font-black uppercase tracking-widest text-slate-400">

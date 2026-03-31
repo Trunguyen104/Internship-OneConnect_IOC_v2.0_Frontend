@@ -1,29 +1,18 @@
 'use client';
 
-import {
-  ExclamationCircleOutlined,
-  FilterOutlined,
-  ReloadOutlined,
-  SearchOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
-import { Input, Select, Tooltip } from 'antd';
+import { ExclamationCircleOutlined, SearchOutlined, SyncOutlined } from '@ant-design/icons';
+import { Button, Card, Input, Progress, Select } from 'antd';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
 import Badge from '@/components/ui/badge';
-import DataTable from '@/components/ui/datatable';
-import PageLayout from '@/components/ui/pagelayout';
-import Pagination from '@/components/ui/pagination';
-import { Progress } from '@/components/ui/progress';
+import DataTable from '@/components/ui/DataTable';
+import { UI_TEXT } from '@/lib/UI_Text';
 
-import { STUDENT_ACTIVITY_UI } from '../constants/student-activity.constants';
-import { useStudentActivity } from '../hooks/useStudentActivity';
-import SummaryCard from './SummaryCard';
+import useStudentActivity from '../hooks/useStudentActivity';
 
 export default function StudentActivityList() {
   const router = useRouter();
-  const { LIST } = STUDENT_ACTIVITY_UI;
   const {
     students,
     loading,
@@ -36,313 +25,308 @@ export default function StudentActivityList() {
     logbookFilter,
     searchTerm,
     pagination,
-    sort,
     setTermId,
     setEnterpriseId,
     setStatusFilter,
     setLogbookFilter,
     setSearchTerm,
     setPagination,
-    setSort,
     resetFilters,
+    refresh,
   } = useStudentActivity();
 
   const handleRowClick = (record) => {
-    router.push(`/internship/students/${record.studentId || record.id}`);
+    const id = record.id;
+    const url =
+      termId && termId !== 'ALL'
+        ? `/internship/students/${id}?termId=${termId}`
+        : `/internship/students/${id}`;
+    router.push(url);
   };
 
   const columns = [
     {
-      title: 'Student',
-      key: 'student',
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.INDEX,
+      key: 'index',
+      width: 60,
+      align: 'center',
+      render: (_, __, index) => (
+        <span className="text-muted font-mono text-xs font-bold leading-none">
+          {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
+        </span>
+      ),
+    },
+    {
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.STUDENT,
+      key: 'fullname',
       width: 200,
+      sorter: true,
+      sortKey: 'FullName',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-full bg-error-surface flex items-center justify-center text-error font-black border-2 border-white shadow-sm shrink-0">
-            {record.studentFullName?.charAt(0)}
+          <div className="size-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 font-bold border border-slate-100 text-xs shrink-0 shadow-sm">
+            {record.fullName?.charAt(0)}
           </div>
-          <div className="flex min-w-0 flex-col">
-            <span className="truncate text-sm font-black leading-tight tracking-tight text-slate-800">
-              {record.studentFullName}
+          <div className="flex flex-col min-w-0 pr-2">
+            <span className="truncate text-sm font-bold text-slate-800 leading-tight mb-0.5">
+              {record.fullName}
             </span>
-            <span className="mt-0.5 truncate text-[10px] font-bold uppercase tracking-tighter text-slate-400">
-              {record.className} • {record.studentCode}
+            <span className="truncate text-[10px] font-medium text-slate-400">
+              {record.studentCode} {UI_TEXT.COMMON.BULLET} {record.className}
             </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Enterprise',
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.ENTERPRISE,
       key: 'enterprise',
-      width: 150,
+      width: 140,
       render: (_, record) => (
-        <span className="block truncate text-sm font-black tracking-tight text-slate-700">
-          {record.derivedStatus?.value === 'UNPLACED' ? (
-            <span className="text-slate-200">—</span>
-          ) : (
-            record.enterpriseName
+        <span
+          className="text-xs font-semibold text-slate-600 truncate block max-w-[130px]"
+          title={record.enterpriseName}
+        >
+          {record.enterpriseName || (
+            <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>
           )}
         </span>
       ),
     },
     {
-      title: 'Mentor',
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.MENTOR,
       key: 'mentor',
-      width: 120,
+      width: 130,
       render: (_, record) => (
-        <span className="block truncate text-sm font-bold italic tracking-tight text-primary/60">
-          {record.mentorName || <span className="text-slate-200">—</span>}
+        <span
+          className="text-xs font-semibold text-slate-600 truncate block max-w-[120px]"
+          title={record.mentorName}
+        >
+          {record.mentorName || <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>}
         </span>
       ),
     },
     {
-      title: 'Logbook',
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.LOGBOOK_PROGRESS,
       key: 'logbook',
-      width: 140,
+      width: 160,
       render: (_, record) => {
-        const { submitted, progress, missing, totalWorkDays } = record.activity;
+        if (
+          !record.activity ||
+          record.internshipStatus === 'Unplaced' ||
+          record.internshipStatus === 5
+        )
+          return <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>;
 
-        if (record.derivedStatus?.value === 'UNPLACED' || totalWorkDays === 0)
-          return <span className="text-slate-300">—</span>;
+        const { submitted, progress, totalWorkDays } = record.activity;
 
-        let strokeColor = '#10b981'; // Green
-        if (progress < 50) strokeColor = '#ef4444'; // Red
-        else if (progress < 75) strokeColor = '#f59e0b'; // Yellow
+        if (totalWorkDays === 0)
+          return <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>;
+
+        let strokeColor = '#22c55e'; // success
+        if (progress < 50)
+          strokeColor = '#ef4444'; // danger
+        else if (progress < 75) strokeColor = '#f59e0b'; // warning
 
         return (
-          <div className="flex w-full max-w-[110px] flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black text-slate-500">
-                {missing}/{submitted}
+          <div className="flex w-full flex-col gap-1.5 py-1 pr-4">
+            <div className="flex items-center justify-between text-[10px] font-bold">
+              <span className="text-slate-400">
+                {UI_TEXT.STUDENT_ACTIVITY.LOGBOOK.REPORTS}: {submitted}/{totalWorkDays}
               </span>
-              <span className="text-[10px] font-black" style={{ color: strokeColor }}>
-                {progress}%
-              </span>
+              <span style={{ color: strokeColor }}>{progress}%</span>
             </div>
             <Progress
-              type="line"
               percent={progress}
-              strokeColor={strokeColor}
-              size={['100%', 4]}
+              size="small"
               showInfo={false}
-              className="!flex-row"
+              type="line"
+              className="m-0 !h-1.5 [&_.ant-progress-inner]:!bg-slate-50 shadow-sm"
+              strokeColor={strokeColor}
             />
           </div>
         );
       },
     },
     {
-      title: 'Status',
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.STATUS,
       key: 'status',
-      width: 110,
-      render: (_, record) => (
-        <Badge
-          variant={record.derivedStatus?.variant}
-          size="xs"
-          className="px-3 py-1 text-[9px] font-black uppercase tracking-widest"
-        >
-          {record.derivedStatus?.label}
-        </Badge>
-      ),
+      width: 140,
+      align: 'center',
+      render: (_, record) => {
+        const statuses = {
+          1: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.ACTIVE, variant: 'success' },
+          2: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.NO_GROUP, variant: 'warning' },
+          3: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.COMPLETED, variant: 'info' },
+          4: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.PENDING, variant: 'warning' },
+          5: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.UNPLACED, variant: 'danger' },
+          Active: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.ACTIVE, variant: 'success' },
+          NoGroup: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.NO_GROUP, variant: 'warning' },
+          Completed: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.COMPLETED, variant: 'info' },
+          PendingConfirmation: {
+            label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.PENDING,
+            variant: 'warning',
+          },
+          Unplaced: { label: UI_TEXT.STUDENT_ACTIVITY.STATUS_LABELS.UNPLACED, variant: 'danger' },
+        };
+
+        const status = statuses[record.internshipStatus] || {
+          label: record.internshipStatus,
+          variant: 'default',
+        };
+        return <Badge variant={status.variant}>{status.label}</Badge>;
+      },
     },
     {
-      title: 'Violations',
+      title: UI_TEXT.STUDENT_ACTIVITY.LIST_COLUMNS.VIOLATIONS,
       key: 'violations',
       width: 80,
       align: 'center',
-      render: (_, record) =>
-        record.violationCount > 0 ? (
-          <div className="flex items-center justify-center gap-1 rounded-lg bg-slate-50 px-2 py-1 text-xs font-bold text-slate-800 ring-1 ring-slate-100">
-            <ExclamationCircleOutlined className="text-[10px] text-error" />
-            {record.violationCount}
+      render: (count) => {
+        if (!count || count === 0) return null;
+        return (
+          <div className="flex items-center justify-center gap-1.5">
+            <ExclamationCircleOutlined className="text-amber-500 font-bold" />
+            <span className="text-xs font-bold text-slate-800">{count}</span>
           </div>
-        ) : (
-          <span className="text-slate-200">—</span>
-        ),
+        );
+      },
     },
   ];
 
-  const statusOptions = [
-    { label: 'All Statuses', value: 'ALL' },
-    { label: 'Interning', value: 'INTERNING' },
-    { label: 'No Group', value: 'NO_GROUP' },
-    { label: 'Completed', value: 'COMPLETED' },
-    { label: 'Unplaced', value: 'UNPLACED' },
-  ];
-
-  const breadcrumbs = [
-    { label: 'Home', href: '/' },
-    { label: 'Internship', href: '/internship' },
-    { label: 'Students', href: '/internship/students' },
-  ];
-
   return (
-    <PageLayout>
-      <PageLayout.Header title="Internship Student List" breadcrumb={breadcrumbs} />
-
-      <div className="grid grid-cols-1 gap-4 px-1 md:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
-          title={LIST.SUMMARY.TOTAL}
-          value={summary.total}
-          suffix="Std"
-          icon={<TeamOutlined className="text-slate-500" />}
-          loading={loading}
-          onClick={() => {
-            resetFilters();
-          }}
-          active={enterpriseId === 'ALL' && statusFilter === 'ALL' && logbookFilter === 'ALL'}
-        />
-        <SummaryCard
-          title={LIST.SUMMARY.INTERNING}
-          value={summary.interning}
-          suffix="Ongoing"
-          icon={<div className="size-2 rounded-full bg-success" />}
-          variant="success"
-          loading={loading}
-          onClick={() => {
-            resetFilters();
-            setStatusFilter('INTERNING');
-          }}
-          active={statusFilter === 'INTERNING'}
-        />
-
-        {/* Only show Missing Logbook if count > 0 */}
-        {summary.missingLogbook > 0 && (
-          <SummaryCard
-            title={LIST.SUMMARY.MISSING_LOGBOOK}
-            value={summary.missingLogbook}
-            suffix="Missing"
-            icon={<ExclamationCircleOutlined className="text-warning" />}
-            variant="warning"
-            loading={loading}
-            onClick={() => {
-              setLogbookFilter('CRITICAL');
-            }}
-            active={logbookFilter === 'CRITICAL'}
-          />
-        )}
-
-        {/* Only show Unplaced if count > 0 */}
-        {summary.unplaced > 0 && (
-          <SummaryCard
-            title={LIST.SUMMARY.UNPLACED}
-            value={summary.unplaced}
-            suffix="Unplaced"
-            icon={<div className="size-2 rounded-full bg-error" />}
-            variant="danger"
-            loading={loading}
-            onClick={() => {
-              resetFilters();
-              setStatusFilter('UNPLACED');
-            }}
-            active={statusFilter === 'UNPLACED'}
-          />
-        )}
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            title: UI_TEXT.STUDENT_ACTIVITY.STATS.TOTAL_STUDENTS,
+            value: summary.total,
+            color: 'primary',
+          },
+          {
+            title: UI_TEXT.STUDENT_ACTIVITY.STATS.INTERNING,
+            value: summary.interning,
+            color: 'success',
+          },
+          {
+            title: UI_TEXT.STUDENT_ACTIVITY.STATS.MISSING_LOGBOOK,
+            value: summary.missingLogbook,
+            color: 'danger',
+          },
+          {
+            title: UI_TEXT.STUDENT_ACTIVITY.STATS.UNPLACED,
+            value: summary.unplaced,
+            color: 'warning',
+          },
+        ].map((stat, i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-1 rounded-[32px] bg-white p-6 shadow-xl shadow-slate-200/50 border border-white"
+          >
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+              {stat.title}
+            </span>
+            <span className="text-3xl font-black tracking-tight text-slate-800 italic">
+              {stat.value}
+            </span>
+          </div>
+        ))}
       </div>
 
-      <PageLayout.Card className="!rounded-[32px] !p-6 sm:!p-8 flex flex-1 flex-col min-h-0 mt-4">
-        <PageLayout.Toolbar className="mb-6 flex-wrap gap-4">
-          <Input
-            prefix={<SearchOutlined className="text-slate-400" />}
-            placeholder={LIST.FILTERS.SEARCH_PLACEHOLDER}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="!h-9 border-slate-200 shadow-sm !rounded-full max-w-sm"
-          />
-
-          <div className="flex flex-wrap items-center gap-3">
-            <Select
-              showSearch
-              placeholder={LIST.FILTERS.TERM}
-              value={termId}
-              onChange={setTermId}
-              className="!h-9 min-w-[200px]"
-              classNames={{ popup: { root: '!rounded-2xl' } }}
-              optionFilterProp="children"
-              options={terms.map((t) => ({ label: t.name, value: t.termId }))}
-              suffixIcon={<FilterOutlined className="text-slate-400" />}
-            />
-            <Select
-              showSearch
-              placeholder={LIST.FILTERS.ENTERPRISE}
-              value={enterpriseId}
-              onChange={setEnterpriseId}
-              className="!h-9 min-w-[180px]"
-              classNames={{ popup: { root: '!rounded-2xl' } }}
-              options={[
-                { label: 'All Enterprises', value: 'ALL' },
-                ...enterprises.map((e) => ({ label: e.name, value: e.id })),
-              ]}
-            />
-            <Select
-              placeholder={LIST.FILTERS.STATUS}
-              value={statusFilter}
-              onChange={setStatusFilter}
-              className="!h-9 min-w-[150px]"
-              classNames={{ popup: { root: '!rounded-2xl' } }}
-              options={statusOptions}
-            />
-            <Select
-              placeholder={LIST.FILTERS.LOGBOOK}
-              value={logbookFilter}
-              onChange={setLogbookFilter}
-              className="!h-9 min-w-[150px]"
-              classNames={{ popup: { root: '!rounded-2xl' } }}
-              options={[
-                { label: 'All Logbook Status', value: 'ALL' },
-                ...LIST.LOGBOOK_STATUS,
-              ]}
-            />
-            <Tooltip title={LIST.FILTERS.RESET}>
-              <button
-                onClick={resetFilters}
-                className="flex size-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-all active:scale-95 shadow-sm"
-              >
-                <ReloadOutlined />
-              </button>
-            </Tooltip>
+      <Card className="!rounded-[44px] border-none shadow-2xl shadow-slate-200/50 bg-white/80 backdrop-blur-md overflow-hidden">
+        <div className="flex flex-col gap-6 p-2">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between px-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <Select
+                value={termId}
+                onChange={setTermId}
+                placeholder={UI_TEXT.STUDENT_ACTIVITY.FILTERS.SELECT_TERM}
+                className="!w-48 !h-10 [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-slate-100"
+                options={terms.map((term) => ({
+                  value: term.termId || term.id,
+                  label: term.termName || term.name,
+                }))}
+              />
+              <Select
+                value={enterpriseId}
+                onChange={setEnterpriseId}
+                className="!w-48 !h-10 [&_.ant-select-selector]:!rounded-xl [&_.ant-select-selector]:!border-slate-100"
+                options={[
+                  { value: 'ALL', label: UI_TEXT.STUDENT_ACTIVITY.FILTERS.ALL_ENTERPRISES },
+                  ...enterprises.map((ent) => ({
+                    value: ent.enterpriseId || ent.id,
+                    label: ent.name,
+                  })),
+                ]}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Input
+                placeholder={UI_TEXT.STUDENT_ACTIVITY.FILTERS.SEARCH_STUDENTS}
+                prefix={<SearchOutlined className="text-slate-400" />}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="!w-64 !h-10 !rounded-xl !border-slate-100 !bg-slate-50/50"
+                allowClear
+              />
+              <Button
+                icon={<SyncOutlined />}
+                onClick={refresh}
+                className="!h-10 !w-10 !rounded-xl !flex !items-center !justify-center"
+              />
+            </div>
           </div>
-        </PageLayout.Toolbar>
 
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-xs font-black uppercase tracking-widest text-slate-400">
-            Total: <span className="text-slate-800">{pagination.total} students</span>
-          </span>
-        </div>
+          <div className="flex flex-wrap items-center gap-2 px-2">
+            {[
+              { label: UI_TEXT.STUDENT_ACTIVITY.FILTERS.ALL_STATUS, value: 'ALL', group: 'status' },
+              {
+                label: UI_TEXT.STUDENT_ACTIVITY.FILTERS.MISSING_LOGBOOK,
+                value: 'MISSING',
+                group: 'logbook',
+              },
+              { label: UI_TEXT.STUDENT_ACTIVITY.FILTERS.UNPLACED, value: '5', group: 'status' },
+            ].map((filter, i) => (
+              <Button
+                key={i}
+                onClick={() => {
+                  if (filter.group === 'status') setStatusFilter(filter.value);
+                  else setLogbookFilter(filter.value);
+                }}
+                className={`!h-8 !px-4 !rounded-full !text-[10px] !font-bold !uppercase !tracking-widest transition-all ${
+                  (filter.group === 'status' ? statusFilter : logbookFilter) === filter.value
+                    ? '!bg-primary !text-white border-primary shadow-lg shadow-primary/20'
+                    : '!bg-slate-50 !text-slate-400 !border-slate-100 hover:!text-primary hover:!border-primary'
+                }`}
+              >
+                {filter.label}
+              </Button>
+            ))}
+            {(statusFilter !== 'ALL' ||
+              logbookFilter !== 'ALL' ||
+              enterpriseId !== 'ALL' ||
+              searchTerm) && (
+              <Button
+                type="text"
+                onClick={resetFilters}
+                className="!text-[10px] !font-bold !text-primary !uppercase font-sans"
+              >
+                {UI_TEXT.STUDENT_ACTIVITY.FILTERS.CLEAR_FILTERS}
+              </Button>
+            )}
+          </div>
 
-        <DataTable
-          columns={columns}
-          data={students}
-          loading={loading}
-          rowKey="id"
-          onRowClick={handleRowClick}
-          emptyText={
-            terms.length === 0
-              ? LIST.TABLE.NO_TERMS
-              : searchTerm
-                ? LIST.TABLE.NO_RESULTS
-                : LIST.TABLE.EMPTY
-          }
-          sortBy={sort.column}
-          sortOrder={sort.order === 'asc' ? 'Asc' : 'Desc'}
-          onSort={(col, order) => setSort({ column: col, order: order.toLowerCase() })}
-          className="group [&_tr]:cursor-pointer"
-        />
-
-        {pagination.total > 0 && (
-          <PageLayout.Pagination
-            total={pagination.total}
-            page={pagination.current}
-            pageSize={pagination.pageSize}
-            totalPages={Math.ceil(pagination.total / pagination.pageSize)}
-            onPageChange={(page) => setPagination((prev) => ({ ...prev, current: page }))}
-            onPageSizeChange={(size) =>
-              setPagination({ current: 1, pageSize: size, total: pagination.total })
-            }
+          <DataTable
+            columns={columns}
+            dataSource={students}
+            loading={loading}
+            pagination={pagination}
+            onChange={(p) => setPagination(p)}
+            onRowClick={handleRowClick}
+            rowKey="id"
           />
-        )}
-      </PageLayout.Card>
-    </PageLayout>
+        </div>
+      </Card>
+    </div>
   );
 }
