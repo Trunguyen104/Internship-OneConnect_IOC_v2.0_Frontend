@@ -13,7 +13,7 @@ const SummaryCard = ({
   loading = false,
 }) => {
   const colorMap = {
-    neutral: 'var(--gray-400)',
+    neutral: 'var(--gray-500)',
     success: 'var(--green-500)',
     warning: 'var(--yellow-500)',
     danger: 'var(--primary-500)',
@@ -41,7 +41,7 @@ const SummaryCard = ({
         <div className="flex min-w-0 flex-col gap-4">
           <div className="flex items-center gap-2.5">
             <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-            <span className="truncate text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--gray-400)]">
+            <span className="truncate text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--gray-500)]">
               {title}
             </span>
           </div>
@@ -55,7 +55,7 @@ const SummaryCard = ({
               </h2>
             )}
             {suffix && (
-              <span className="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--gray-400)]">
+              <span className="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--gray-600)]">
                 {suffix}
               </span>
             )}

@@ -4,17 +4,18 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App } from 'antd';
 import dayjs from 'dayjs';
 
-import { userService } from '@/components/features/user/services/user.service';
 import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 import { useToast } from '@/providers/ToastProvider';
 
 import { InternPhaseService } from '../services/intern-phase.service';
+import { usePhaseEnterprise } from './usePhaseEnterprise';
 
 export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSuccess }) => {
   const toast = useToast();
   const { modal } = App.useApp();
   const queryClient = useQueryClient();
   const { MESSAGES, FORM } = INTERN_PHASE_MANAGEMENT;
+  const { enterpriseId } = usePhaseEnterprise();
 
   const onSuccessAction = () => {
     queryClient.invalidateQueries({ queryKey: ['intern-phases'] });
@@ -49,11 +50,6 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
       if (dateError) {
         throw new Error(dateError);
       }
-
-      // Fetch enterpriseId if creating new
-      const meRes = await userService.getMe();
-      const meData = meRes?.data || meRes;
-      const enterpriseId = meData?.enterpriseId || meData?.enterprise_id || meData?.enterpriseID;
 
       if (!enterpriseId && !editingRecord) {
         throw new Error(MESSAGES.ERROR_ENTERPRISE_ID);

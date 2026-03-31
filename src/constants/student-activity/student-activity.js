@@ -19,13 +19,11 @@ export const STUDENT_ACTIVITY_UI = {
     SELECTED: 'Selected',
   },
   STATS: {
-    TOTAL_STUDENTS: 'Total Students',
-    INTERNING: 'Interning',
-    MISSING_LOGBOOK: 'Missing Logbook',
-    UNPLACED: 'UNPLACED STUDENTS',
-    TOTAL: 'TOTAL STUDENTS',
-    PLACED: 'PLACED STUDENTS',
-    NO_MENTOR: 'NO MENTOR STUDENTS',
+    TOTAL: 'Total System Students',
+    PLACED: 'Students in Internship',
+    UNPLACED: 'Unplaced Students',
+    NO_MENTOR: 'No Mentor Assigned',
+    STUDENTS_LABEL: 'Students',
   },
   FILTERS: {
     SELECT_TERM: 'Select Term',
@@ -102,6 +100,7 @@ export const STUDENT_ACTIVITY_UI = {
     NO_VIOLATIONS: 'No violations recorded',
     DISCIPLINE: 'Discipline',
     MENTOR_EVALUATION: 'MENTOR EVALUATION',
+    MISSING_TEXT: 'Missing',
   },
   EVALUATIONS: {
     FETCHING: 'Fetching evaluations...',
@@ -113,6 +112,7 @@ export const STUDENT_ACTIVITY_UI = {
     MENTOR: 'Mentor',
     NO_COMMENT: 'No specific comment provided',
     NO_GENERAL_COMMENT: 'No general comment provided',
+    NO_RECORDS_DESC: 'No evaluations recorded for this student yet.',
   },
   VIOLATIONS: {
     RECORD_ID: 'ID:',
@@ -151,5 +151,23 @@ export const STUDENT_ACTIVITY_UI = {
     NO_ISSUES: 'No issues recorded',
     SUMMARY_UNAVAILABLE: 'Summary unavailable',
     NO_REPORTS_WEEK: 'No reports recorded for this week',
+    NOT_SUBMITTED: 'NOT SUBMITTED',
+    LATE: 'LATE',
+    PUNCTUAL: 'PUNCTUAL',
+    MISSING_LABEL: 'Missing',
+    ALL_SUBMITTED: 'All reports submitted',
+  },
+  MAPPING: {
+    STATUS: {
+      PUNCTUAL: 'On time',
+      LATE: 'Late',
+      MISSING: 'Missing',
+      UNPLACED: 'Unplaced',
+      ACTIVE: 'Active',
+      NO_GROUP: 'NoGroup',
+      COMPLETED: 'Completed',
+      PENDING: 'PendingConfirmation',
+      SUBMITTED: 'Submitted',
+    },
   },
 };

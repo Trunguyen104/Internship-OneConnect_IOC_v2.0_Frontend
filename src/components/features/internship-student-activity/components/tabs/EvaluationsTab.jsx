@@ -1,7 +1,7 @@
 'use client';
 
-import { CommentOutlined, DownOutlined, StarOutlined, UserOutlined } from '@ant-design/icons';
-import { Collapse } from 'antd';
+import { CommentOutlined, DownOutlined, UserOutlined } from '@ant-design/icons';
+import { Collapse, Empty } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
@@ -25,13 +25,20 @@ export default function EvaluationsTab({ student, evaluations, loading }) {
 
   if (!evaluations || evaluations.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 bg-white/50 backdrop-blur-sm rounded-[32px] border border-white shadow-xl shadow-slate-200/20">
-        <div className="size-16 rounded-[24px] bg-white flex items-center justify-center text-slate-200 text-3xl mb-4 shadow-sm border border-slate-100">
-          <StarOutlined />
-        </div>
-        <p className="text-sm font-bold text-slate-400 tracking-tight uppercase px-12 text-center leading-tight italic">
-          {STUDENT_ACTIVITY_UI.EVALUATIONS.NO_EVALS}
-        </p>
+      <div className="py-32 bg-white/40 backdrop-blur-sm rounded-[32px] border border-white/40">
+        <Empty
+          image={Empty.PRESENTED_IMAGE_DEFAULT}
+          description={
+            <div className="flex flex-col gap-1">
+              <span className="text-base font-bold text-slate-400 uppercase tracking-tight">
+                {STUDENT_ACTIVITY_UI.EVALUATIONS.NO_EVALS}
+              </span>
+              <span className="text-[10px] text-slate-400 italic font-medium">
+                {STUDENT_ACTIVITY_UI.EVALUATIONS.NO_RECORDS_DESC}
+              </span>
+            </div>
+          }
+        />
       </div>
     );
   }
@@ -58,9 +65,9 @@ export default function EvaluationsTab({ student, evaluations, loading }) {
           label: (
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 w-full pr-3">
               <div className="flex items-center gap-4">
-                <div className="size-10 rounded-lg bg-white shadow-lg flex flex-col items-center justify-center text-primary border border-slate-50 group-hover:rotate-3 transition-transform duration-500">
-                  <span className="text-base font-bold leading-none">{ev.totalScore || 0}</span>
-                  <span className="text-[7px] font-bold uppercase text-slate-500 mt-1 tracking-tighter">
+                <div className="size-8 rounded-lg bg-white shadow-md flex flex-col items-center justify-center text-primary border border-slate-50 group-hover:rotate-3 transition-transform duration-500 shrink-0">
+                  <span className="text-sm font-black leading-none">{ev.totalScore || 0}</span>
+                  <span className="text-[6px] font-black uppercase text-slate-500 mt-0.5 tracking-tighter">
                     {STUDENT_ACTIVITY_UI.EVALUATIONS.SCORE}
                   </span>
                 </div>
@@ -97,43 +104,43 @@ export default function EvaluationsTab({ student, evaluations, loading }) {
             </div>
           ),
           children: (
-            <div className="px-5 py-4 border-t border-slate-100/50 space-y-4 bg-slate-50/20">
+            <div className="px-4 py-3 border-t border-slate-100/50 space-y-3 bg-slate-50/20">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {ev.details &&
                   ev.details.map((d, j) => (
                     <div
                       key={j}
-                      className="flex flex-col gap-2 p-3.5 rounded-2xl bg-white border border-white shadow-sm hover:shadow-md transition-all duration-300 group/criteria"
+                      className="flex flex-col gap-1.5 p-3 rounded-xl bg-white border border-white shadow-sm hover:shadow-md transition-all duration-300 group/criteria"
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="text-[8px] font-bold text-slate-500 uppercase tracking-[0.1em] truncate">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[7px] font-black text-slate-500 uppercase tracking-[0.1em] truncate">
                           {d.criteriaName}
                         </span>
-                        <div className="size-6 rounded-md bg-primary/5 flex items-center justify-center text-primary font-bold text-[10px] shadow-inner group-hover/criteria:scale-110 transition-transform">
+                        <div className="size-5 rounded bg-primary/5 flex items-center justify-center text-primary font-black text-[9px] shadow-inner group-hover/criteria:scale-110 transition-transform">
                           {d.score}
                         </div>
                       </div>
-                      <div className="h-[1px] w-full bg-slate-50 rounded-full" />
-                      <p className="text-[11px] font-bold text-slate-600 italic leading-snug">
+                      <div className="h-[1px] w-full bg-slate-50/50 rounded-full" />
+                      <p className="text-[10px] font-bold text-slate-600 italic leading-snug">
                         &quot;{d.comment || STUDENT_ACTIVITY_UI.EVALUATIONS.NO_COMMENT}&quot;
                       </p>
                     </div>
                   ))}
               </div>
 
-              <div className="relative p-4 rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-lg shadow-primary/5 group/comment">
-                <div className="absolute top-0 right-0 p-5 opacity-10 group-hover:opacity-20 transition-opacity">
-                  <CommentOutlined className="text-4xl text-primary" />
+              <div className="relative p-3 rounded-xl bg-white border border-primary/10 overflow-hidden shadow-lg shadow-primary/5 group/comment">
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity text-2xl">
+                  <CommentOutlined className="text-primary" />
                 </div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="size-7 rounded-lg bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30">
-                    <CommentOutlined className="text-xs" />
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="size-6 rounded bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30">
+                    <CommentOutlined className="text-[10px]" />
                   </div>
-                  <h4 className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary">
+                  <h4 className="text-[7px] font-black uppercase tracking-[0.2em] text-primary">
                     {STUDENT_ACTIVITY_UI.EVALUATIONS.GENERAL_FEEDBACK}
                   </h4>
                 </div>
-                <p className="text-xs font-bold text-slate-800 italic leading-relaxed relative z-10 pr-8">
+                <p className="text-[11px] font-bold text-slate-800 italic leading-relaxed relative z-10 pr-8">
                   &quot;
                   {ev.generalComment || STUDENT_ACTIVITY_UI.EVALUATIONS.NO_GENERAL_COMMENT}
                   &quot;

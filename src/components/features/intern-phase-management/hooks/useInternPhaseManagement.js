@@ -4,10 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 
-import { userService } from '@/components/features/user/services/user.service';
 import { INTERN_PHASE_STATUS } from '@/constants/intern-phase-management/intern-phase';
 
 import { InternPhaseService } from '../services/intern-phase.service';
+import { usePhaseEnterprise } from './usePhaseEnterprise';
 
 export const calculatePhaseStatus = (start, end) => {
   const today = dayjs().startOf('day');
@@ -20,6 +20,7 @@ export const calculatePhaseStatus = (start, end) => {
 };
 
 export const useInternPhaseManagement = () => {
+  const { enterpriseId, isLoading: isUserLoading } = usePhaseEnterprise();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(null); // All
   const [includeEnded, setIncludeEnded] = useState(false);
@@ -28,6 +29,7 @@ export const useInternPhaseManagement = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: [
       'intern-phases',
+      enterpriseId,
       search,
       statusFilter,
       includeEnded,
@@ -35,11 +37,6 @@ export const useInternPhaseManagement = () => {
       pagination.pageSize,
     ],
     queryFn: async () => {
-      // First, ensure we have user profile for enterpriseId if needed
-      const meRes = await userService.getMe();
-      const meData = meRes?.data || meRes;
-      const enterpriseId = meData?.enterpriseId || meData?.enterprise_id || meData?.enterpriseID;
-
       const params = {
         PageNumber: pagination.current,
         PageSize: pagination.pageSize,
@@ -73,6 +70,7 @@ export const useInternPhaseManagement = () => {
         totalCount: res?.totalCount || 0,
       };
     },
+    enabled: !!enterpriseId,
   });
 
   const items = useMemo(() => {
@@ -86,7 +84,7 @@ export const useInternPhaseManagement = () => {
   return {
     items,
     totalCount: data?.totalCount || 0,
-    isLoading,
+    isLoading: isLoading || isUserLoading,
     search,
     setSearch,
     statusFilter,

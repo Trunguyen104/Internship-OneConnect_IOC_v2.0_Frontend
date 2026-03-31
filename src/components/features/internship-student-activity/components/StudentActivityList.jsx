@@ -90,7 +90,7 @@ export default function StudentActivityList() {
             <span className="truncate text-sm font-bold text-slate-800 leading-tight mb-0.5">
               {record.fullName}
             </span>
-            <span className="truncate text-[10px] font-medium text-slate-400">
+            <span className="truncate text-[10px] font-bold text-slate-600">
               {record.studentCode} {UI_TEXT.COMMON.BULLET} {record.className}
             </span>
           </div>
@@ -103,11 +103,11 @@ export default function StudentActivityList() {
       width: 140,
       render: (_, record) => (
         <span
-          className="text-xs font-semibold text-slate-600 truncate block max-w-[130px]"
+          className="text-xs font-bold text-slate-700 truncate block max-w-[130px]"
           title={record.enterpriseName}
         >
           {record.enterpriseName || (
-            <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>
+            <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>
           )}
         </span>
       ),
@@ -118,10 +118,12 @@ export default function StudentActivityList() {
       width: 130,
       render: (_, record) => (
         <span
-          className="text-xs font-semibold text-slate-600 truncate block max-w-[120px]"
+          className="text-xs font-bold text-slate-700 truncate block max-w-[120px]"
           title={record.mentorName}
         >
-          {record.mentorName || <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>}
+          {record.mentorName || (
+            <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>
+          )}
         </span>
       ),
     },
@@ -135,15 +137,15 @@ export default function StudentActivityList() {
       render: (_, record) => {
         if (
           !record.logbook ||
-          record.internshipStatus === 'Unplaced' ||
+          record.internshipStatus === STUDENT_ACTIVITY_UI.MAPPING.STATUS.UNPLACED ||
           record.internshipStatus === 5
         )
-          return <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>;
+          return <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>;
 
         const { submitted, total: totalWorkDays, percentComplete: beProgress } = record.logbook;
 
         if (totalWorkDays === 0)
-          return <span className="text-slate-200">{UI_TEXT.COMMON.EM_DASH}</span>;
+          return <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>;
 
         // Prioritize backend calculated value for filter consistency, fall back to manual ratio
         const rawProgress = beProgress ?? Math.round((submitted / totalWorkDays) * 100);
@@ -160,10 +162,12 @@ export default function StudentActivityList() {
         return (
           <div className="flex w-full flex-col gap-1.5 py-1 pr-4">
             <div className="flex items-center justify-between text-[10px] font-bold">
-              <span className="text-slate-400">
+              <span className="text-slate-600">
                 {STUDENT_ACTIVITY_UI.LOGBOOK.REPORTS}: {submitted}/{totalWorkDays}
               </span>
-              <span style={{ color: strokeColor }}>{progress}%</span>
+              <span style={{ color: strokeColor }} className="font-extrabold">
+                {progress}%
+              </span>
             </div>
             <Progress
               percent={progress}
@@ -185,18 +189,30 @@ export default function StudentActivityList() {
       render: (_, record) => {
         const statuses = {
           1: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.ACTIVE, variant: 'success' },
-          2: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.NO_GROUP, variant: 'warning' },
+          2: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.NO_GROUP, variant: 'warning-soft' },
           3: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.COMPLETED, variant: 'info' },
           4: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.PENDING, variant: 'warning' },
           5: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.UNPLACED, variant: 'danger' },
-          Active: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.ACTIVE, variant: 'success' },
-          NoGroup: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.NO_GROUP, variant: 'warning' },
-          Completed: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.COMPLETED, variant: 'info' },
-          PendingConfirmation: {
+          [STUDENT_ACTIVITY_UI.MAPPING.STATUS.ACTIVE]: {
+            label: STUDENT_ACTIVITY_UI.STATUS_LABELS.ACTIVE,
+            variant: 'success',
+          },
+          [STUDENT_ACTIVITY_UI.MAPPING.STATUS.NO_GROUP]: {
+            label: STUDENT_ACTIVITY_UI.STATUS_LABELS.NO_GROUP,
+            variant: 'warning-soft',
+          },
+          [STUDENT_ACTIVITY_UI.MAPPING.STATUS.COMPLETED]: {
+            label: STUDENT_ACTIVITY_UI.STATUS_LABELS.COMPLETED,
+            variant: 'info',
+          },
+          [STUDENT_ACTIVITY_UI.MAPPING.STATUS.PENDING]: {
             label: STUDENT_ACTIVITY_UI.STATUS_LABELS.PENDING,
             variant: 'warning',
           },
-          Unplaced: { label: STUDENT_ACTIVITY_UI.STATUS_LABELS.UNPLACED, variant: 'danger' },
+          [STUDENT_ACTIVITY_UI.MAPPING.STATUS.UNPLACED]: {
+            label: STUDENT_ACTIVITY_UI.STATUS_LABELS.UNPLACED,
+            variant: 'danger',
+          },
         };
 
         const status = statuses[record.internshipStatus] || {
@@ -239,7 +255,7 @@ export default function StudentActivityList() {
           onClick={() => setStatusFilter('ALL')}
           variant="neutral"
           icon={<TeamOutlined className="opacity-90 mt-0.5" />}
-          suffix="Students"
+          suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
         />
         <SummaryCard
           title={STUDENT_ACTIVITY_UI.STATS.PLACED}
@@ -249,7 +265,7 @@ export default function StudentActivityList() {
           onClick={() => setStatusFilter(1)}
           variant="success"
           icon={<CheckCircleFilled className="opacity-90 mt-0.5" />}
-          suffix="Students"
+          suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
         />
         <SummaryCard
           title={STUDENT_ACTIVITY_UI.STATS.UNPLACED}
@@ -259,17 +275,17 @@ export default function StudentActivityList() {
           onClick={() => setStatusFilter(5)}
           variant="danger"
           icon={<CloseCircleFilled className="opacity-90 mt-0.5" />}
-          suffix="Students"
+          suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
         />
         <SummaryCard
           title={STUDENT_ACTIVITY_UI.STATS.NO_MENTOR}
-          value={Math.max(0, summary.total - summary.interning - summary.unplaced)}
+          value={summary.noMentor}
           loading={loading}
           active={statusFilter === 2 || statusFilter === '2'}
           onClick={() => setStatusFilter(2)}
           variant="warning"
           icon={<ExclamationCircleFilled className="opacity-90 mt-0.5" />}
-          suffix="Students"
+          suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
         />
       </div>
 
@@ -338,8 +354,8 @@ export default function StudentActivityList() {
               placeholder={STUDENT_ACTIVITY_UI.FILTERS.ALL_LOGBOOK}
               options={[
                 { value: 1, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_GOOD },
-                { value: 3, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_MEDIUM },
-                { value: 2, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_POOR },
+                { value: 2, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_MEDIUM },
+                { value: 3, label: STUDENT_ACTIVITY_UI.FILTERS.LOGBOOK_POOR },
               ]}
             />
             <div className="ml-auto inline-flex items-center gap-2">

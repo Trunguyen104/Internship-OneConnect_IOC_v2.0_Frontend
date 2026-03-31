@@ -2,6 +2,7 @@ export const UI_TEXT = {
   COMMON: {
     LOADING: 'Loading...',
     EMPTY_VALUE: '—',
+    ID_PREFIX: '#',
     UPLOAD: 'Upload',
     CANCEL: 'Cancel',
     APPLY: 'Apply',

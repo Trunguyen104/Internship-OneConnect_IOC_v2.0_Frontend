@@ -13,12 +13,9 @@ export default function JobPostingFormModal({ visible, onCancel, phase }) {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      console.log('Creating job posting (Placeholder):', { ...values, internPhaseId: phase?.id });
       onCancel();
       form.resetFields();
-    } catch (error) {
-      console.error('Validation failed:', error);
-    }
+    } catch (error) {}
   };
 
   return (

@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  CheckSquareFilled,
+  CheckSquareOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
@@ -12,7 +14,6 @@ import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import {
@@ -192,19 +193,25 @@ export default function InternPhaseTable({
           placeholder={SEARCH_PLACEHOLDER}
         />
         <DataTableToolbar.Filters>
-          <div className="flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 bg-white">
-            <Checkbox
-              id="include-ended"
-              checked={includeEnded}
-              onChange={(e) => setIncludeEnded(e.target.checked)}
-            />
-            <label
-              htmlFor="include-ended"
-              className="text-xs font-semibold text-slate-600 cursor-pointer select-none"
+          <Tooltip title={FILTERS.INCLUDE_ENDED}>
+            <div
+              onClick={() => setIncludeEnded(!includeEnded)}
+              className={`flex items-center gap-2 cursor-pointer transition-all px-3 py-1.5 rounded-full border ${
+                includeEnded
+                  ? 'bg-red-50 border-red-100 text-red-600'
+                  : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+              }`}
             >
-              {FILTERS.INCLUDE_ENDED}
-            </label>
-          </div>
+              {includeEnded ? (
+                <CheckSquareFilled className="text-red-600" />
+              ) : (
+                <CheckSquareOutlined className="text-slate-300" />
+              )}
+              <span className="text-[11px] font-bold uppercase tracking-wider select-none">
+                {FILTERS.INCLUDE_ENDED}
+              </span>
+            </div>
+          </Tooltip>
         </DataTableToolbar.Filters>
         <DataTableToolbar.Actions
           label={CREATE_BTN}

@@ -4,7 +4,6 @@ import {
   ArrowLeftOutlined,
   CalendarOutlined,
   ExportOutlined,
-  InfoCircleOutlined,
   PlusOutlined,
   ProjectOutlined,
   TeamOutlined,
@@ -95,10 +94,6 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
               {phase?.name || phase?.internPhaseName || FORM.TITLE_VIEW}
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-300">
-              <div className="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
-                <InfoCircleOutlined className="text-indigo-300 text-[10px]" />
-                <span className="font-mono tracking-tight">{phaseId}</span>
-              </div>
               <div className="h-3 w-px bg-slate-700 hidden sm:block" />
               <div className="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
                 <CalendarOutlined className="text-indigo-300 text-[10px]" />
@@ -246,10 +241,9 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                 activeKey === '1' ? (
                   <Button
                     type="primary"
-                    size="large"
                     icon={<PlusOutlined />}
                     onClick={onAddPosting}
-                    className="bg-primary hover:opacity-90 shadow-md rounded-xl h-11 px-6 flex items-center font-bold"
+                    className="bg-primary hover:opacity-90 shadow-sm rounded-lg h-9 px-4 flex items-center font-semibold text-xs uppercase tracking-wider"
                   >
                     {DETAILS.CREATE_POSTING}
                   </Button>
