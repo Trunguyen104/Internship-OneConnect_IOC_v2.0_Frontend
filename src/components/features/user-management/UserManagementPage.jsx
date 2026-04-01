@@ -10,6 +10,14 @@ import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useUserManagement } from './useUserManagement';
 
+/**
+ * UserManagementPage - Top-level page component for the User Management feature.
+ *
+ * @param {Object} props - Component properties.
+ * @param {string} [props.title=UI_TEXT.USER_MANAGEMENT.TITLE] - Page title.
+ * @param {string} [props.subtitle=UI_TEXT.USER_MANAGEMENT.SUBTITLE] - Page subtitle/description.
+ * @returns {JSX.Element}
+ */
 export default function UserManagementPage({
   title = UI_TEXT.USER_MANAGEMENT.TITLE,
   subtitle = UI_TEXT.USER_MANAGEMENT.SUBTITLE,
@@ -32,7 +40,7 @@ export default function UserManagementPage({
 
   return (
     <PageLayout>
-      <PageLayout.Header title={title} subtitle={subtitle} className="pb-10" />
+      <PageLayout.Header title={title} subtitle={subtitle} />
 
       <PageLayout.Card className="flex flex-col overflow-hidden">
         <PageLayout.Toolbar
@@ -54,10 +62,10 @@ export default function UserManagementPage({
         </PageLayout.Content>
 
         {total > 0 && (
-          <div className="mt-4 border-t border-gray-100 pt-8 flex items-center justify-between">
-            <span className="text-[13px] font-bold text-muted/40 tracking-tight uppercase">
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-tight">
               {UI_TEXT.COMMON.TOTAL || 'Total records'}:{' '}
-              <span className="text-text font-black">{total}</span>
+              <span className="text-slate-800 font-extrabold">{total}</span>
             </span>
             <PageLayout.Pagination
               total={total}
@@ -67,7 +75,7 @@ export default function UserManagementPage({
               onPageSizeChange={setPageSize}
               className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
       </PageLayout.Card>
 

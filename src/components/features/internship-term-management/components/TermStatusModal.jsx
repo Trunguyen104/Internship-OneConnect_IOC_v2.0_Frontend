@@ -21,10 +21,10 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
     newStatus;
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={500} afterClose={() => setReason('')}>
+    <CompoundModal open={open} onCancel={onCancel} width={480} afterClose={() => setReason('')}>
       <CompoundModal.Header
         title={STATUS.TITLE}
-        subtitle={`Update term status to ${statusLabel}`}
+        subtitle={`${STATUS.SUBTITLE_PREFIX} ${statusLabel}`}
         type={isOpening ? 'success' : 'warning'}
         icon={<SyncOutlined />}
       />
@@ -33,7 +33,7 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
         <div className="flex flex-col gap-5">
           <div className="text-muted text-sm leading-relaxed">
             {STATUS.CONTENT} <span className="text-text font-bold">&quot;{statusLabel}&quot;</span>.
-            {!isOpening && ' Once closed, students will no longer be able to enroll.'}
+            {!isOpening && ` ${STATUS.CLOSE_WARNING}`}
           </div>
 
           <CompoundModal.InfoBox
@@ -43,16 +43,16 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
           />
 
           {!isOpening && (
-            <div className="space-y-2">
-              <Text strong className="text-text block text-sm">
+            <div className="space-y-1.5 min-h-[140px]">
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted/60 ml-1">
                 {STATUS.REASON_LABEL}
-              </Text>
+              </label>
               <Input.TextArea
                 placeholder={STATUS.REASON_PLACEHOLDER}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={4}
-                className="!rounded-xl !bg-gray-50/50 focus:!bg-white"
+                className="!rounded-2xl !bg-gray-50/30 border-gray-100 focus:!bg-white transition-all p-3 text-sm resize-none"
               />
             </div>
           )}
@@ -66,7 +66,6 @@ const TermStatusModal = ({ open, onCancel, onConfirm, record, newStatus }) => {
         cancelText={STATUS.CANCEL}
         danger={!isOpening}
         confirmIcon={<SyncOutlined />}
-        className="!mt-2"
       />
     </CompoundModal>
   );

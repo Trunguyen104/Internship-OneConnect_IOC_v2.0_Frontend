@@ -4,19 +4,20 @@ import {
   CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
-  EllipsisOutlined,
   ExclamationCircleOutlined,
   EyeOutlined,
+  InboxOutlined,
   RollbackOutlined,
   SwapOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown, { TableRowIconButton } from '@/components/ui/TableRowActions';
 import {
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
@@ -32,7 +33,7 @@ export default function ProjectTable({
   pagination,
   groups = [],
   isMentor = true, // Default to true for backward compatibility
-  onChange,
+  onChange: _onChange,
   onEdit,
   onView,
   onAssign,
@@ -74,7 +75,7 @@ export default function ProjectTable({
         width: 110,
         render: (_, record) => (
           <div
-            className="text-gray-500 truncate w-[100px]"
+            className="w-[100px] truncate text-slate-500"
             title={record.projectCode || record.code}
           >
             {record.projectCode || record.code}
@@ -132,7 +133,7 @@ export default function ProjectTable({
                   <Badge
                     variant="default"
                     size="xs"
-                    className="text-[9px] px-1.5 py-0 bg-gray-100 text-gray-500 border-gray-200"
+                    className="border-slate-200 bg-slate-100 px-1.5 py-0 text-[9px] text-slate-500"
                   >
                     {TABLE.STATUS_TEXT.GROUP_ARCHIVED}
                   </Badge>
@@ -170,7 +171,7 @@ export default function ProjectTable({
         width: 160,
         render: (_, record) => {
           if (record.isOrphaned) {
-            return <div className="text-gray-400">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
+            return <div className="text-slate-400">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
           }
           const start = record.startDate
             ? dayjs(record.startDate).format('DD/MM/YYYY')
@@ -179,7 +180,7 @@ export default function ProjectTable({
             ? dayjs(record.endDate).format('DD/MM/YYYY')
             : PROJECT_MANAGEMENT.COMMON.N_A;
           return (
-            <div className="text-gray-600 text-[11px] font-medium tracking-tight">
+            <div className="text-[11px] font-medium tracking-tight text-slate-600">
               {start} {PROJECT_MANAGEMENT.COMMON.DASH} {end}
             </div>
           );
@@ -235,12 +236,13 @@ export default function ProjectTable({
             return (
               <div className="flex justify-center">
                 <Tooltip title={TABLE.ACTIONS_LABEL.VIEW}>
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-primary/10 text-primary cursor-pointer transition-colors"
-                    onClick={() => onView(record)}
-                  >
-                    <EyeOutlined style={{ fontSize: 18 }} />
-                  </div>
+                  <span className="inline-flex">
+                    <TableRowIconButton
+                      icon={<EyeOutlined className="text-lg" />}
+                      onClick={() => onView(record)}
+                      className="hover:text-primary"
+                    />
+                  </span>
                 </Tooltip>
               </div>
             );
@@ -265,11 +267,15 @@ export default function ProjectTable({
               {
                 key: 'archive',
                 label: TABLE.ACTIONS_LABEL.ARCHIVE,
+                icon: <InboxOutlined />,
+                variant: 'warning',
                 onClick: () => onArchive?.(record.projectId),
               },
               {
                 key: 'change-group',
                 label: TABLE.ACTIONS_LABEL.CHANGE_GROUP,
+                icon: <SwapOutlined />,
+                variant: 'neutral',
                 onClick: () => onAssign?.(record),
               }
             );
@@ -303,6 +309,7 @@ export default function ProjectTable({
                   : TABLE.ACTIONS_LABEL.CHANGE_GROUP,
               icon:
                 op === OPERATIONAL_STATUS.UNSTARTED ? <UsergroupAddOutlined /> : <SwapOutlined />,
+              variant: op === OPERATIONAL_STATUS.UNSTARTED ? 'success' : 'neutral',
               onClick: () => onAssign?.(record),
             });
 
@@ -311,7 +318,8 @@ export default function ProjectTable({
               items.push({
                 key: 'complete',
                 label: TABLE.ACTIONS_LABEL.COMPLETE,
-                icon: <CheckCircleOutlined className="text-success" />,
+                icon: <CheckCircleOutlined />,
+                variant: 'success',
                 onClick: () => onComplete(record),
               });
             }
@@ -321,7 +329,7 @@ export default function ProjectTable({
               items.push({
                 key: 'delete',
                 label: TABLE.ACTIONS_LABEL.DELETE,
-                icon: <DeleteOutlined className="text-danger" />,
+                icon: <DeleteOutlined />,
                 danger: true,
                 onClick: () => onDelete(record), // Pass full record for ownership check
               });
@@ -329,11 +337,9 @@ export default function ProjectTable({
           }
 
           return (
-            <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-              <div className="flex justify-center hover:bg-gray-100 p-1 rounded cursor-pointer transition-colors w-8 h-8 items-center mx-auto">
-                <EllipsisOutlined className="text-lg rotate-90" />
-              </div>
-            </Dropdown>
+            <div className="flex justify-center">
+              <TableRowDropdown items={items} />
+            </div>
           );
         },
       },
@@ -360,19 +366,11 @@ export default function ProjectTable({
       columns={columns}
       data={data}
       loading={loading}
-      pagination={pagination}
-      onChange={onChange}
       rowKey="projectId"
       size="small"
       minWidth="1000px"
       className="project-table"
-      locale={{
-        emptyText: (
-          <div className="py-20 text-center">
-            <p className="text-gray-400 font-medium italic">{TABLE.EMPTY_MESSAGE}</p>
-          </div>
-        ),
-      }}
+      emptyText={TABLE.EMPTY_MESSAGE}
     />
   );
 }

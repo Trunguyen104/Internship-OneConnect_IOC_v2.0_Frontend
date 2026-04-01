@@ -1,20 +1,24 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
 import { enterpriseService } from '@/services/enterprise.service';
 import { useEnterprisesStore } from '@/store/useEnterprisesStore';
 
+/**
+ * useEnterprises - Standardized hook for Enterprise management.
+ * Uses TanStack Query for caching and reactivity, synchronized with global store.
+ */
 export function useEnterprises() {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { enterprises, totalCount, refreshCount } = useEnterprisesStore();
-
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  const { refreshCount } = useEnterprisesStore();
+
+  // Debounce search input
   useEffect(() => {
     const t = setTimeout(() => {
       setDebouncedSearch(search);
@@ -23,44 +27,52 @@ export function useEnterprises() {
     return () => clearTimeout(t);
   }, [search]);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {
-        PageNumber: pageNumber,
-        PageSize: pageSize,
-        SearchTerm: debouncedSearch || undefined,
-      };
-      const res = await enterpriseService.getAll(params);
+  // Use TanStack Query for data fetching
+  const {
+    data: resData = { items: [], total: 0 },
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['enterprises', pageNumber, pageSize, debouncedSearch, refreshCount],
+    queryFn: async () => {
+      try {
+        const params = {
+          PageNumber: pageNumber,
+          PageSize: pageSize,
+          SearchTerm: debouncedSearch || undefined,
+        };
+        const res = await enterpriseService.getAll(params);
 
-      const items = res?.data?.items ?? res?.items ?? [];
-      const total = res?.data?.totalCount ?? res?.totalCount ?? items.length;
+        const items = res?.data?.items ?? res?.items ?? [];
+        const total = res?.data?.totalCount ?? res?.totalCount ?? items.length;
 
-      useEnterprisesStore.setEnterprises(items, total);
-      setError(null);
-    } catch (err) {
-      setError(err?.message || 'Failed to load enterprises');
-      useEnterprisesStore.setEnterprises([], 0);
-    } finally {
-      setLoading(false);
-    }
-  }, [pageNumber, pageSize, debouncedSearch]);
+        // Sync with global store
+        useEnterprisesStore.setEnterprises(items, total);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData, refreshCount]);
+        return { items, total };
+      } catch (err) {
+        useEnterprisesStore.setEnterprises([], 0);
+        throw err;
+      }
+    },
+    staleTime: 0,
+  });
 
   return {
-    enterprises,
+    enterprises: resData.items,
     loading,
-    error,
-    total: totalCount,
+    error: error?.message || null,
+    total: resData.total,
     pageNumber,
     setPageNumber,
     pageSize,
-    setPageSize,
+    setPageSize: (size) => {
+      setPageSize(size);
+      setPageNumber(1);
+    },
     search,
     setSearch,
-    refresh: fetchData,
+    refresh: refetch,
   };
 }

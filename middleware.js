@@ -17,7 +17,11 @@ export function middleware(request) {
     pathname.startsWith('/internship-groups') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/profile') ||
-    pathname.startsWith('/admin-users');
+    pathname.startsWith('/admin-users') ||
+    pathname.startsWith('/super-admin') ||
+    pathname.startsWith('/university') ||
+    pathname.startsWith('/enterprise') ||
+    pathname.startsWith('/student');
 
   if (isProtected && !refreshToken) {
     const url = request.nextUrl.clone();
@@ -34,6 +38,10 @@ export const config = {
     '/dashboard/:path*',
     '/profile/:path*',
     '/admin-users/:path*',
+    '/super-admin/:path*',
+    '/university/:path*',
+    '/enterprise/:path*',
+    '/student/:path*',
     '/Uploads/:path*',
   ],
 };

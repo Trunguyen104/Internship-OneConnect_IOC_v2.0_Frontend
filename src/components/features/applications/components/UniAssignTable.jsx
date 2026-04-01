@@ -1,12 +1,17 @@
 'use client';
 
-import { InfoCircleOutlined, MoreOutlined } from '@ant-design/icons';
-import { Dropdown, Tooltip } from 'antd';
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  EyeOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
+import { Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
-import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { APPLICATION_STATUS } from '@/constants/applications/application.constants';
 import { APPLICATIONS_UI } from '@/constants/applications/uiText';
 
@@ -88,33 +93,31 @@ export const UniAssignTable = ({ data = [], loading = false, pagination, onActio
       align: 'right',
       render: (_, record) => {
         const getMenuItems = () => {
-          const items = [{ key: 'details', label: 'View Details' }];
+          const items = [{ key: 'details', label: 'View Details', icon: <EyeOutlined /> }];
 
           if (record.status === APPLICATION_STATUS.PENDING_ASSIGNMENT) {
-            items.push({ key: 'approve', label: 'Approve Assignment' });
-            items.push({ key: 'reject-uni', label: 'Reject Assignment', danger: true });
+            items.push({
+              key: 'approve',
+              label: 'Approve Assignment',
+              icon: <CheckCircleOutlined />,
+              variant: 'success',
+            });
+            items.push({
+              key: 'reject-uni',
+              label: 'Reject Assignment',
+              icon: <CloseCircleOutlined />,
+              danger: true,
+            });
           }
 
           return items;
         };
 
         return (
-          <Dropdown
-            menu={{
-              items: getMenuItems(),
-              onClick: ({ key }) => onAction(key, record),
-            }}
-            trigger={['click']}
-            placement="bottomRight"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full hover:bg-slate-100 text-slate-400"
-            >
-              <MoreOutlined className="rotate-90 text-lg" />
-            </Button>
-          </Dropdown>
+          <TableRowDropdown
+            items={getMenuItems()}
+            menuProps={{ onClick: ({ key }) => onAction(key, record) }}
+          />
         );
       },
     },

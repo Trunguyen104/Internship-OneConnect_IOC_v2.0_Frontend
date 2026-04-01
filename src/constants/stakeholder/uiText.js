@@ -1,4 +1,6 @@
 export const STAKEHOLDER_UI = {
+  PAGE_TITLE: 'Stakeholders & Issues',
+  PAGE_SUBTITLE: 'Manage project stakeholders and track related issues.',
   SEARCH_PLACEHOLDER: 'Search stakeholder...',
   ADD_BUTTON: 'Add Stakeholder',
   TAB_STAKEHOLDER: 'Stakeholders',

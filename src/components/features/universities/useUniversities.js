@@ -52,7 +52,7 @@ export function useUniversities() {
         throw err;
       }
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   return {
@@ -63,7 +63,10 @@ export function useUniversities() {
     pageNumber,
     setPageNumber,
     pageSize,
-    setPageSize,
+    setPageSize: (size) => {
+      setPageSize(size);
+      setPageNumber(1);
+    },
     search,
     setSearch,
     refresh: refetch,

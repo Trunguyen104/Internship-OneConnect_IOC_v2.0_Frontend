@@ -23,7 +23,12 @@ export function useLogbook() {
 
   // Filter & Pagination States
   const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSizeState] = useState(10);
+
+  const setPageSize = useCallback((size) => {
+    setPageSizeState(size);
+    setPageNumber(1);
+  }, []);
   const [statusFilter, setStatusFilter] = useState();
   const [sortOrder, setSortOrder] = useState('desc');
   const [search, setSearch] = useState('');

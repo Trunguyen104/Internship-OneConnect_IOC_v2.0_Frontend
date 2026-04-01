@@ -1,17 +1,15 @@
 'use client';
 
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
+import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 
 import { LogBookService } from '@/components/features/logbook/services/log-book.service';
-import { EmptyState } from '@/components/ui/atoms';
-import { Button } from '@/components/ui/button';
 import PageLayout from '@/components/ui/pagelayout';
-import { Skeleton } from '@/components/ui/skeleton';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useLogbook } from '../hooks/useLogbook';
@@ -19,6 +17,10 @@ import LogbookDetailModal from './LogbookDetailModal';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookTable from './LogbookTable';
 
+/**
+ * Daily Report / Logbook — same shell as SuperAdmin User Management:
+ * PageLayout.Header → Card → Toolbar (search + filters + primary Create) → Content px-0 → Footer + Pagination.
+ */
 export default function LogbookPage() {
   const {
     data,
@@ -171,97 +173,67 @@ export default function LogbookPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} description={DAILY_REPORT_UI.DESCRIPTION} />
+      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} subtitle={DAILY_REPORT_UI.DESCRIPTION} />
 
-      <PageLayout.Card>
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between px-2">
-            <PageLayout.Toolbar
-              className="!p-0 !border-0 flex-1"
-              searchProps={{
-                placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
-                value: search,
-                onChange: (e) => setSearch(e.target.value),
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
+          searchProps={{
+            placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
+          }}
+          actionProps={{
+            label: DAILY_REPORT_UI.CREATE_BUTTON,
+            onClick: () => openFormModal(),
+          }}
+          filterContent={
+            <Select
+              allowClear
+              placeholder={DAILY_REPORT_UI.FILTER_STATUS}
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                setPageNumber(1);
               }}
-              leftContent={
-                <Select
-                  allowClear
-                  placeholder={DAILY_REPORT_UI.FILTER_STATUS}
-                  value={statusFilter}
-                  onChange={(val) => {
-                    setStatusFilter(val);
-                    setPageNumber(1);
-                  }}
-                  className="w-full md:w-64 h-11"
-                  rootClassName="premium-select"
-                  suffixIcon={<FilterOutlined className="text-primary" />}
-                  options={[
-                    { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-                    { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-                    { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
-                  ]}
-                />
-              }
+              className="h-11 w-full md:w-64"
+              rootClassName="premium-select"
+              suffixIcon={<FilterOutlined className="text-primary" />}
+              options={[
+                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
+                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+              ]}
             />
-            <Button
-              variant="primary"
-              onClick={() => openFormModal()}
-              className="h-11 rounded-full px-8 font-black uppercase tracking-widest text-[11px] flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all w-full lg:w-auto justify-center"
-            >
-              <PlusOutlined /> {DAILY_REPORT_UI.CREATE_BUTTON}
-            </Button>
-          </div>
+          }
+        />
 
-          <div className="flex-1 overflow-hidden">
-            <PageLayout.Content>
-              {loading && data.length === 0 ? (
-                <div className="space-y-6">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-gray-50 flex h-20 animate-pulse items-center gap-6 rounded-2xl px-6"
-                    >
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-40" />
-                      <Skeleton className="h-4 flex-1" />
-                      <Skeleton className="h-8 w-24 rounded-full" />
-                      <Skeleton className="h-9 w-20 rounded-xl" />
-                    </div>
-                  ))}
-                </div>
-              ) : data.length === 0 ? (
-                <div className="flex min-h-[400px] flex-col items-center justify-center">
-                  <EmptyState
-                    title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
-                    description={DAILY_REPORT_UI.EMPTY.DESCRIPTION}
-                  />
-                </div>
-              ) : (
-                <LogbookTable
-                  data={data}
-                  loading={loading}
-                  userProfile={userProfile}
-                  onView={openDetailModal}
-                  onEdit={openFormModal}
-                  onDelete={handleDelete}
-                />
-              )}
-            </PageLayout.Content>
-          </div>
+        <PageLayout.Content className="px-0">
+          <LogbookTable
+            data={data}
+            loading={loading}
+            userProfile={userProfile}
+            onView={openDetailModal}
+            onEdit={openFormModal}
+            onDelete={handleDelete}
+          />
+        </PageLayout.Content>
 
-          {!loading && total > 0 && (
+        {total > 0 && (
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
+            </span>
             <PageLayout.Pagination
               total={total}
               page={pageNumber}
               pageSize={pageSize}
               onPageChange={setPageNumber}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPageNumber(1);
-              }}
+              onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
             />
-          )}
-        </div>
+          </PageLayout.Footer>
+        )}
       </PageLayout.Card>
 
       <LogbookFormModal

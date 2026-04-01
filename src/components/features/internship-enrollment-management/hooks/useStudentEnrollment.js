@@ -37,6 +37,7 @@ export const useStudentEnrollment = () => {
     handleSearchChange,
     handleStatusChange,
     handlePageChange,
+    handlePageSizeChange,
     handleSortChange,
   } = useStudentFilters();
 
@@ -340,6 +341,7 @@ export const useStudentEnrollment = () => {
     onSearchChange: handleSearchChange,
     onStatusChange: handleStatusChange,
     onPageChange: handlePageChange,
+    onPageSizeChange: handlePageSizeChange,
     setImportVisible,
     setAddVisible,
     onAdd: handleOpenAdd,

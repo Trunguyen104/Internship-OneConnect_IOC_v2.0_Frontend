@@ -42,6 +42,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         taxCode: taxCodeValue,
         description: enterprise.description ?? '',
         address: enterprise.address ?? '',
+        contactEmail: enterprise.contactEmail ?? '',
       });
     } else {
       form.resetFields();
@@ -81,6 +82,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         description: values.description?.trim() || undefined,
         address: values.address?.trim() || undefined,
         website: values.website?.trim() || undefined,
+        contactEmail: values.contactEmail?.trim() || undefined,
       };
 
       if (typeof logoUrl === 'string' && logoUrl.trim() !== '') {
@@ -96,10 +98,10 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           ...payload,
           enterpriseId: enterprise.enterpriseId || enterprise.id,
         });
-        toast.success(`Updated ${payload.name}`);
+        toast.success(`${payload.name} ${UI_TEXT.COMMON.UPDATE_SUCCESS.toLowerCase()}`);
       } else {
         await enterpriseService.create(payload);
-        toast.success(`Created ${payload.name}`);
+        toast.success(`${payload.name} ${UI_TEXT.COMMON.CREATE_SUCCESS.toLowerCase()}`);
       }
       if (useEnterprisesStore.increment) {
         useEnterprisesStore.increment();
@@ -201,6 +203,18 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
             <Form.Item name="address" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.ADDRESS}>
               <Input size="large" autoComplete="street-address" />
             </Form.Item>
+
+            <Form.Item
+              name="contactEmail"
+              label={UI_TEXT.ENTERPRISES.CONTACT_EMAIL}
+              rules={[{ type: 'email', message: UI_TEXT.ENTERPRISES.INVALID_EMAIL }]}
+            >
+              <Input
+                size="large"
+                type="email"
+                placeholder={UI_TEXT.ENTERPRISES.EMAIL_PLACEHOLDER}
+              />
+            </Form.Item>
           </Space>
 
           <Form.Item
@@ -240,10 +254,10 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         >
           {loading ? (
             <Spinner className="mr-2" />
-          ) : isEdit ? (
+          ) : isHttpUrl(enterprise?.website) ? (
             UI_TEXT.BUTTON.SAVE_CHANGES
           ) : (
-            'Initialize Enterprise'
+            UI_TEXT.ENTERPRISES.INITIALIZE
           )}
         </Button>
       </div>

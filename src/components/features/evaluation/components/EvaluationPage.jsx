@@ -31,13 +31,13 @@ export default function EvaluationPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={EVALUATION_UI.TITLE} />
+      <PageLayout.Header title={EVALUATION_UI.TITLE} subtitle={EVALUATION_UI.SUBTITLE} />
 
-      <PageLayout.Card>
-        <PageLayout.Content>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Content className="px-0">
           {loading && paginated.length === 0 ? (
             <div className="flex flex-1 items-center justify-center py-20">
-              <div className="border-primary/30 border-t-primary h-8 w-8 animate-spin rounded-full border-4"></div>
+              <div className="border-primary/30 border-t-primary h-8 w-8 animate-spin rounded-full border-4" />
             </div>
           ) : paginated.length === 0 ? (
             <div className="flex flex-1 items-center justify-center py-12">

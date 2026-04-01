@@ -92,22 +92,27 @@ export default function EnterpriseProfileContainer() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={ENTERPRISE_PROFILE_UI.TITLE} />
-      <PageLayout.Content>
-        <EnterpriseProfile
-          profile={profile}
-          onEdit={canEdit ? openEdit : null}
-          onLogoChange={canEdit ? handleLogoChange : null}
-          onBannerChange={canEdit ? handleBannerChange : null}
-        />
-        <EnterpriseProfileEditDrawer
-          open={isEditOpen}
-          saving={saving}
-          profile={profile}
-          onClose={closeEdit}
-          onSave={handleSave}
-        />
-      </PageLayout.Content>
+      <PageLayout.Header
+        title={ENTERPRISE_PROFILE_UI.TITLE}
+        subtitle={ENTERPRISE_PROFILE_UI.SUBTITLE}
+      />
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Content className="px-0">
+          <EnterpriseProfile
+            profile={profile}
+            onEdit={canEdit ? openEdit : null}
+            onLogoChange={canEdit ? handleLogoChange : null}
+            onBannerChange={canEdit ? handleBannerChange : null}
+          />
+        </PageLayout.Content>
+      </PageLayout.Card>
+      <EnterpriseProfileEditDrawer
+        open={isEditOpen}
+        saving={saving}
+        profile={profile}
+        onClose={closeEdit}
+        onSave={handleSave}
+      />
     </PageLayout>
   );
 }

@@ -5,18 +5,18 @@ import {
   EditOutlined,
   EyeOutlined,
   InboxOutlined,
-  MoreOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown } from 'antd';
 import React, { memo, useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import {
   GROUP_STATUS_VARIANTS,
   INTERNSHIP_MANAGEMENT_UI,
 } from '@/constants/internship-management/internship-management';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
 const GroupTable = memo(function GroupTable({
   data,
@@ -40,7 +40,7 @@ const GroupTable = memo(function GroupTable({
         width: 80,
         align: 'center',
         render: (_, __, index) => (
-          <span className="text-muted font-mono text-xs font-bold">
+          <span className={`${TABLE_CELL.mono} font-bold`}>
             {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
           </span>
         ),
@@ -51,7 +51,7 @@ const GroupTable = memo(function GroupTable({
         key: 'name',
         width: 180,
         render: (text) => (
-          <span className="text-text block truncate text-sm font-bold capitalize">
+          <span className={`${TABLE_CELL.primary} block truncate capitalize`}>
             {text || TABLE.NOT_ASSIGNED}
           </span>
         ),
@@ -62,7 +62,7 @@ const GroupTable = memo(function GroupTable({
         width: 200,
         render: (_, record) => (
           <div className="flex items-center gap-1.5">
-            <span className="text-text truncate text-[11px] font-bold tracking-wider uppercase">
+            <span className={`${TABLE_CELL.meta} truncate font-bold`}>
               {record.phaseName || record.phase?.name || record.termName || TABLE.NOT_ASSIGNED}
             </span>
           </div>
@@ -76,7 +76,7 @@ const GroupTable = memo(function GroupTable({
           const name = record.mentorName;
           return name && name !== '-' ? (
             <div className="flex items-center gap-1.5 overflow-hidden">
-              <span className="text-text truncate text-xs font-bold">{name}</span>
+              <span className={`${TABLE_CELL.primary} truncate text-xs font-bold`}>{name}</span>
             </div>
           ) : (
             <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
@@ -129,7 +129,7 @@ const GroupTable = memo(function GroupTable({
             {
               key: 'view',
               label: ACTIONS.VIEW_DETAIL,
-              icon: <EyeOutlined className="text-primary" />,
+              icon: <EyeOutlined />,
               onClick: () => onView(record),
             },
             ...(isActive && isPhaseEditable
@@ -137,20 +137,21 @@ const GroupTable = memo(function GroupTable({
                   {
                     key: 'edit',
                     label: ACTIONS.EDIT_GROUP,
-                    icon: <EditOutlined className="text-primary" />,
+                    icon: <EditOutlined />,
                     onClick: () => onEdit(record),
                   },
                   {
                     key: 'archive',
                     label: ACTIONS.ARCHIVE_GROUP,
-                    icon: <InboxOutlined className="text-warning" />,
+                    icon: <InboxOutlined />,
+                    variant: 'warning',
                     onClick: () => onArchive(record),
                   },
                   { type: 'divider' },
                   {
                     key: 'delete',
                     label: ACTIONS.DELETE_GROUP,
-                    icon: <DeleteOutlined className="text-danger" />,
+                    icon: <DeleteOutlined />,
                     danger: true,
                     onClick: () => onDelete(record),
                   },
@@ -160,14 +161,7 @@ const GroupTable = memo(function GroupTable({
 
           return (
             <div onClick={(e) => e.stopPropagation()}>
-              <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<MoreOutlined />}
-                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                />
-              </Dropdown>
+              <TableRowDropdown items={items} />
             </div>
           );
         },

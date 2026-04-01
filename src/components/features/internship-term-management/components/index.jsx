@@ -5,24 +5,24 @@ import {
   EditOutlined,
   EyeOutlined,
   FilterOutlined,
-  PlusOutlined,
+  LoginOutlined,
   StopOutlined,
 } from '@ant-design/icons';
-import { Button, Select, Tooltip } from 'antd';
+import { Select } from 'antd';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react';
 
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Badge from '@/components/ui/badge';
-import Card from '@/components/ui/card';
 import DataTable from '@/components/ui/datatable';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import {
   INTERNSHIP_MANAGEMENT_UI,
   TERM_STATUS,
   TERM_STATUS_VARIANTS,
 } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useTermManagement } from '../hooks/useTermManagement';
 import TermDeleteModal from './TermDeleteModal';
@@ -30,6 +30,7 @@ import TermFormModal from './TermFormModal';
 import TermStatusModal from './TermStatusModal';
 
 export default function InternshipTermManagement() {
+  const router = useRouter();
   const { TERM_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
 
   const {
@@ -48,6 +49,7 @@ export default function InternshipTermManagement() {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handlePageSizeChange,
     handleSortChange,
     handleCreateNew,
     handleEdit,
@@ -84,8 +86,14 @@ export default function InternshipTermManagement() {
         key: 'name',
         sortKey: 'name',
         sorter: true,
-        render: (text) => (
-          <span className="text-text block max-w-[300px] truncate text-sm font-bold tracking-tight">
+        render: (text, record) => (
+          <span
+            className="text-primary block max-w-[300px] cursor-pointer truncate text-sm font-bold tracking-tight hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/school/terms/${record.termId}/overview`);
+            }}
+          >
             {text}
           </span>
         ),
@@ -133,9 +141,9 @@ export default function InternshipTermManagement() {
         },
       },
       {
-        title: TABLE.COLUMNS.ACTIONS,
+        title: '',
         key: 'actions',
-        width: 160,
+        width: 48,
         align: 'right',
         render: (_, record) => {
           const status = Number(record.status);
@@ -143,74 +151,65 @@ export default function InternshipTermManagement() {
           const isUpcoming = status === TERM_STATUS.UPCOMING;
           const isActive = status === TERM_STATUS.ACTIVE;
 
+          const items = [
+            {
+              key: 'manage',
+              label: 'Quản lý', // or UI_TEXT.COMMON.MANAGE
+              icon: <LoginOutlined />,
+              onClick: () => router.push(`/school/terms/${record.termId}/overview`),
+            },
+            { type: 'divider' },
+            {
+              key: 'view',
+              label: ACTIONS.VIEW,
+              icon: <EyeOutlined />,
+              onClick: () => handleView(record),
+            },
+          ];
+
+          if (!isClosed) {
+            items.push({
+              key: 'edit',
+              label: ACTIONS.EDIT,
+              icon: <EditOutlined />,
+              onClick: () => handleEdit(record),
+            });
+          }
+
+          if (isUpcoming) {
+            items.push({ type: 'divider' });
+            items.push({
+              key: 'delete',
+              label: ACTIONS.DELETE,
+              icon: <DeleteOutlined />,
+              danger: true,
+              onClick: () => handleRequestDelete(record),
+            });
+          }
+
+          if (isActive) {
+            items.push({ type: 'divider' });
+            items.push({
+              key: 'close',
+              label: ACTIONS.CLOSE,
+              icon: <StopOutlined />,
+              danger: true,
+              onClick: () => handleRequestChangeStatus(record, TERM_STATUS.CLOSED),
+            });
+          }
+
           return (
-            <div className="flex items-center justify-end gap-1.5">
-              <Tooltip title={ACTIONS.VIEW}>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EyeOutlined />}
-                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleView(record);
-                  }}
-                />
-              </Tooltip>
-
-              {!isClosed && (
-                <Tooltip title={ACTIONS.EDIT}>
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<EditOutlined />}
-                    className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(record);
-                    }}
-                  />
-                </Tooltip>
-              )}
-
-              {isUpcoming && (
-                <Tooltip title={ACTIONS.DELETE}>
-                  <Button
-                    type="text"
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRequestDelete(record);
-                    }}
-                  />
-                </Tooltip>
-              )}
-
-              {isActive && (
-                <Tooltip title={ACTIONS.CLOSE}>
-                  <Button
-                    type="text"
-                    size="small"
-                    danger
-                    icon={<StopOutlined />}
-                    className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRequestChangeStatus(record, TERM_STATUS.CLOSED);
-                    }}
-                  />
-                </Tooltip>
-              )}
+            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+              <TableRowDropdown items={items} />
             </div>
           );
         },
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- row index uses pagination.current/pageSize (React Compiler)
     [
-      pagination,
+      pagination.current,
+      pagination.pageSize,
       TABLE,
       STATUS_LABELS,
       ACTIONS,
@@ -222,63 +221,66 @@ export default function InternshipTermManagement() {
   );
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={TERM_MANAGEMENT.TITLE} />
+    <PageLayout>
+      <PageLayout.Header title={TERM_MANAGEMENT.TITLE} subtitle={TERM_MANAGEMENT.PAGE_SUBTITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !rounded-3xl border-none !p-6 shadow-sm sm:!p-8">
-        <DataTableToolbar className="mb-6 !border-0 !p-0">
-          <DataTableToolbar.Search
-            placeholder={TERM_MANAGEMENT.SEARCH_PLACEHOLDER}
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          />
-          <DataTableToolbar.Filters className="gap-4">
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
+          searchProps={{
+            placeholder: TERM_MANAGEMENT.SEARCH_PLACEHOLDER,
+            value: searchTerm,
+            onChange: (e) => handleSearchChange(e.target.value),
+            className: 'max-w-md',
+          }}
+          filterContent={
             <Select
               allowClear
               placeholder={TERM_MANAGEMENT.STATUS_FILTER}
               value={statusFilter ?? undefined}
               onChange={handleStatusChange}
-              className="!h-10 min-w-[200px]"
+              className="h-11 w-full min-w-[200px] md:w-64"
+              rootClassName="premium-select"
               options={TERM_MANAGEMENT.STATUS_OPTIONS}
-              suffixIcon={<FilterOutlined className="text-muted/60" />}
+              suffixIcon={<FilterOutlined className="text-primary" />}
             />
-          </DataTableToolbar.Filters>
-
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleCreateNew}
-            className="!h-10 !rounded-xl shadow-md ml-auto"
-          >
-            {TERM_MANAGEMENT.CREATE_BTN}
-          </Button>
-        </DataTableToolbar>
-
-        <DataTable
-          columns={columns}
-          data={data}
-          loading={loading}
-          rowKey="termId"
-          className="mt-4"
-          sortBy={sortConfig.column}
-          sortOrder={sortConfig.order === 'asc' ? 'Asc' : 'Desc'}
-          onSort={handleSortChange}
-          size="small"
-          minWidth="800px"
+          }
+          actionProps={{
+            label: TERM_MANAGEMENT.CREATE_BTN,
+            onClick: handleCreateNew,
+          }}
         />
 
-        {data.length > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
+        <PageLayout.Content className="px-0">
+          <DataTable
+            columns={columns}
+            data={data}
+            loading={loading}
+            rowKey="termId"
+            sortBy={sortConfig.column}
+            sortOrder={sortConfig.order === 'asc' ? 'Asc' : 'Desc'}
+            onSort={handleSortChange}
+            size="small"
+            minWidth="800px"
+          />
+        </PageLayout.Content>
+
+        {pagination.total > 0 && (
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}:{' '}
+              <span className="font-extrabold text-slate-800">{pagination.total}</span>
+            </span>
+            <PageLayout.Pagination
               total={pagination.total}
               page={pagination.current}
               pageSize={pagination.pageSize}
-              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
-              onPageChange={(page) => handleTableChange({ current: page })}
+              onPageChange={(p) => handleTableChange({ current: p })}
+              onPageSizeChange={handlePageSizeChange}
+              className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
-      </Card>
+      </PageLayout.Card>
 
       <TermFormModal
         visible={modalVisible}
@@ -307,6 +309,6 @@ export default function InternshipTermManagement() {
         onConfirm={handleDelete}
         loading={submitLoading}
       />
-    </section>
+    </PageLayout>
   );
 }

@@ -5,9 +5,8 @@ import { Filter } from 'lucide-react';
 import Select from '@/components/ui/select';
 import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
+import { userManagementService } from '@/services/user-management.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
-
-import { userManagementService } from './user-management.service';
 
 export default function UserManagementFilter() {
   const handleSelectedRole = async (value) => {
@@ -35,7 +34,7 @@ export default function UserManagementFilter() {
 
   return (
     <div className="flex items-center gap-2">
-      <Filter className="h-4 w-4 text-muted md:hidden" />
+      <Filter className="h-2 w-4 text-muted md:hidden" />
       <Select
         defaultValue="all"
         onChange={handleSelectedRole}

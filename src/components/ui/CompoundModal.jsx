@@ -46,29 +46,27 @@ CompoundModal.propTypes = {
 
 const Header = ({ icon, title, subtitle, type = 'default' }) => {
   const typeClasses = {
-    danger: 'bg-danger/5 text-danger',
-    warning: 'bg-warning/5 text-warning',
-    success: 'bg-success/5 text-success',
-    default: 'bg-primary/5 text-primary',
+    danger: 'bg-danger/10 text-danger',
+    warning: 'bg-warning/10 text-warning',
+    success: 'bg-success/10 text-success',
+    default: 'bg-primary/10 text-primary',
   };
 
   return (
-    <div className="border-border flex flex-col items-center gap-2.5 border-b pt-0.5 pb-3 text-center">
+    <div className="flex flex-col items-center gap-3 border-b border-gray-50 pb-5 text-center">
       {icon && (
         <div
-          className={`flex size-10 items-center justify-center rounded-xl text-lg shadow-sm ${typeClasses[type] || typeClasses.default}`}
+          className={`flex size-12 items-center justify-center rounded-2xl text-xl shadow-sm transition-all duration-300 ${typeClasses[type] || typeClasses.default}`}
         >
           {icon}
         </div>
       )}
-      <div className="space-y-0.5">
-        <Title level={4} className="text-text !m-0 text-base font-black tracking-tight">
+      <div className="space-y-1">
+        <Title level={4} className="!m-0 text-lg font-black tracking-tight text-slate-800">
           {title}
         </Title>
         {subtitle && (
-          <div className="text-muted text-[11px] leading-relaxed font-medium opacity-60">
-            {subtitle}
-          </div>
+          <p className="text-xs font-medium leading-relaxed text-slate-400">{subtitle}</p>
         )}
       </div>
     </div>
@@ -115,12 +113,13 @@ const Footer = ({
   const finalDisabled = disabled || submitDisabled;
 
   return (
-    <div className={`border-border mt-1.5 flex justify-end gap-2 border-t pt-3.5 ${className}`}>
+    <div className={`mt-6 flex justify-end gap-3 border-t border-gray-50 pt-5 ${className}`}>
       {showCancel && (
         <Button
           onClick={onCancel}
           disabled={loading}
-          className="border-border text-muted hover:bg-surface hover:text-text h-9 rounded-xl px-4 text-[11px] font-bold transition-all"
+          variant="ghost"
+          className="h-11 rounded-full px-6 text-[13px] font-bold text-muted/60 transition-all hover:bg-gray-50 hover:text-text"
         >
           {cancelText}
         </Button>
@@ -132,8 +131,10 @@ const Footer = ({
         onClick={finalOnConfirm}
         icon={finalIcon}
         disabled={finalDisabled}
-        className={`h-9 min-w-[90px] rounded-xl px-4 text-[11px] font-bold shadow-sm transition-all focus:shadow-none focus-visible:outline-none ${
-          !finalDanger ? 'bg-primary hover:bg-primary-hover border-none' : ''
+        className={`h-11 min-w-[120px] rounded-full px-6 text-[12px] font-black uppercase tracking-widest shadow-lg transition-all hover:scale-105 active:scale-95 ${
+          !finalDanger
+            ? 'bg-primary shadow-primary/20 hover:bg-primary-hover hover:shadow-primary/30'
+            : 'bg-rose-500 shadow-rose-500/20 hover:bg-rose-600 hover:shadow-rose-500/30'
         }`}
       >
         {finalConfirmText}
@@ -169,15 +170,15 @@ const COLOR_MAP = {
 
 const InfoBox = ({ label, value, color = 'primary' }) => (
   <div
-    className={`bg-slate-50/50 border-gray-100 rounded-xl border p-2.5 transition-colors ${COLOR_MAP[color] || COLOR_MAP.primary}`}
+    className={`bg-gray-50/50 border-gray-100 rounded-2xl border p-4 transition-all duration-300 ${COLOR_MAP[color] || COLOR_MAP.primary}`}
   >
     <Text
       type="secondary"
-      className="text-muted mb-0.5 block text-[9px] font-bold tracking-wide opacity-70"
+      className="text-muted/60 mb-1.5 block text-[10px] font-black uppercase tracking-widest"
     >
       {label}
     </Text>
-    <Text strong className="text-text text-[13px] leading-tight block">
+    <Text strong className="text-slate-800 block text-sm font-bold">
       {value}
     </Text>
   </div>

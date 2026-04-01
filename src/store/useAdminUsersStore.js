@@ -24,11 +24,12 @@ function subscribe(listener) {
 }
 
 export function useAdminUsersStore(selector = (s) => s) {
-  return useSyncExternalStore(
+  const snapshot = useSyncExternalStore(
     subscribe,
-    () => selector(store.state),
-    () => selector(store.state)
+    () => store.state,
+    () => store.state
   );
+  return selector(snapshot);
 }
 
 useAdminUsersStore.setUsers = (users, totalCount = 0) =>

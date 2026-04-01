@@ -14,7 +14,6 @@ export default function ActiveInternshipTerms() {
   const { data: terms, loading, error } = useActiveTerms();
   const [selectedUniversity, setSelectedUniversity] = useState('ALL');
 
-  // Compute unique universities for the filter
   const universities = useMemo(() => {
     const uniMap = new Map();
     terms.forEach((term) => {
@@ -25,7 +24,6 @@ export default function ActiveInternshipTerms() {
     return Array.from(uniMap.values());
   }, [terms]);
 
-  // Filter terms by selected university
   const filteredTerms = useMemo(() => {
     if (selectedUniversity === 'ALL' || !selectedUniversity) return terms;
     return terms.filter((term) => term.universityId === selectedUniversity);
@@ -41,56 +39,58 @@ export default function ActiveInternshipTerms() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={ACTIVE_TERM_UI.TITLE} />
+      <PageLayout.Header title={ACTIVE_TERM_UI.TITLE} subtitle={ACTIVE_TERM_UI.PAGE_SUBTITLE} />
 
-      <PageLayout.Toolbar>
-        <div className="ml-auto">
-          <UniversityFilter
-            value={selectedUniversity}
-            onChange={setSelectedUniversity}
-            universities={universities}
-          />
-        </div>
-      </PageLayout.Toolbar>
-
-      <PageLayout.Content>
-        {loading ? (
-          <div className="flex flex-1 items-center justify-center p-20">
-            <Spin size="large" description="Loading active terms..." />
-          </div>
-        ) : filteredTerms.length > 0 ? (
-          <div className="flex flex-col gap-6">
-            {filteredTerms.map((term) => (
-              <TermCard key={term.termId}>
-                <TermCard.Header
-                  title={term.termName}
-                  university={term.universityName}
-                  status={ACTIVE_TERM_UI.STATUS.ACTIVE}
-                  startDate={term.startDate}
-                  endDate={term.endDate}
-                />
-
-                <TermCard.Dates
-                  daysRemaining={term.daysRemaining}
-                  progressPercent={term.progressPercent}
-                />
-
-                <TermCard.Deadlines
-                  startDate={term.startDate}
-                  endDate={term.endDate}
-                  deadlines={term.deadlines}
-                />
-              </TermCard>
-            ))}
-          </div>
-        ) : (
-          <PageLayout.Card className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <p className="text-muted mb-4 font-medium">{ACTIVE_TERM_UI.EMPTY}</p>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
+          filterContent={
+            <div className="ml-auto shrink-0">
+              <UniversityFilter
+                value={selectedUniversity}
+                onChange={setSelectedUniversity}
+                universities={universities}
+              />
             </div>
-          </PageLayout.Card>
-        )}
-      </PageLayout.Content>
+          }
+        />
+
+        <PageLayout.Content className="px-0">
+          {loading ? (
+            <div className="flex flex-1 items-center justify-center p-20">
+              <Spin size="large" description="Loading active terms..." />
+            </div>
+          ) : filteredTerms.length > 0 ? (
+            <div className="flex flex-col gap-6">
+              {filteredTerms.map((term) => (
+                <TermCard key={term.termId}>
+                  <TermCard.Header
+                    title={term.termName}
+                    university={term.universityName}
+                    status={ACTIVE_TERM_UI.STATUS.ACTIVE}
+                    startDate={term.startDate}
+                    endDate={term.endDate}
+                  />
+
+                  <TermCard.Dates
+                    daysRemaining={term.daysRemaining}
+                    progressPercent={term.progressPercent}
+                  />
+
+                  <TermCard.Deadlines
+                    startDate={term.startDate}
+                    endDate={term.endDate}
+                    deadlines={term.deadlines}
+                  />
+                </TermCard>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-1 items-center justify-center py-20">
+              <p className="text-muted font-medium">{ACTIVE_TERM_UI.EMPTY}</p>
+            </div>
+          )}
+        </PageLayout.Content>
+      </PageLayout.Card>
     </PageLayout>
   );
 }

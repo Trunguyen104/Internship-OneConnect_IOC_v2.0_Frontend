@@ -11,16 +11,18 @@ import {
   SearchOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
-import { Button, Empty, Input, Spin, Table, Typography } from 'antd';
+import { Button, Empty, Input, Spin, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 
 import StatusBadge from '@/components/ui/badge';
 import Card from '@/components/ui/card';
+import DataTable from '@/components/ui/datatable';
 import {
   GROUP_STATUS,
   GROUP_STATUS_VARIANTS,
 } from '@/constants/internship-management/internship-management';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
 import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { useGroupDetail } from '../hooks/useGroupDetail';
@@ -219,92 +221,69 @@ export default function GroupGeneralInfo({
           </div>
         </div>
 
-        <Table
-          dataSource={filteredMembers}
-          rowKey="id"
-          pagination={false}
-          size="small"
-          className="rounded-xl overflow-hidden border border-slate-100 shadow-sm"
-          columns={[
-            {
-              title: (
-                <span className="text-[10px] uppercase font-black tracking-widest opacity-40">
-                  {VIEW.TABLE.CODE}
-                </span>
-              ),
-              dataIndex: 'code',
-              key: 'code',
-              width: 120,
-              render: (text) => <span className="text-xs font-bold text-text/70">{text}</span>,
-            },
-            {
-              title: (
-                <span className="text-[10px] uppercase font-black tracking-widest opacity-40">
-                  {VIEW.TABLE.FULL_NAME}
-                </span>
-              ),
-              dataIndex: 'fullName',
-              key: 'fullName',
-              render: (text) => <span className="text-sm font-black text-text">{text}</span>,
-            },
-            {
-              title: (
-                <span className="text-[10px] uppercase font-black tracking-widest opacity-40">
-                  {VIEW.TABLE.EMAIL}
-                </span>
-              ),
-              dataIndex: 'email',
-              key: 'email',
-              render: (text) => (
-                <div className="flex items-center gap-1.5 opacity-60">
-                  <MailOutlined className="text-[10px]" />
-                  <span className="text-xs font-medium">{text}</span>
-                </div>
-              ),
-            },
-            {
-              title: (
-                <span className="text-[10px] uppercase font-black tracking-widest opacity-40">
-                  {VIEW.TABLE.SCHOOL}
-                </span>
-              ),
-              dataIndex: 'universityName',
-              key: 'universityName',
-              render: (text) => (
-                <div className="flex items-center gap-1.5 opacity-60 truncate max-w-[200px]">
-                  <BankOutlined className="text-[10px]" />
-                  <span className="text-xs font-medium">{text}</span>
-                </div>
-              ),
-            },
-            {
-              title: (
-                <span className="text-[10px] uppercase font-black tracking-widest opacity-40">
-                  {VIEW.TABLE.ACTION || 'ACTION'}
-                </span>
-              ),
-              key: 'action',
-              width: 80,
-              align: 'center',
-              render: (_, student) => (
-                <div className="flex items-center justify-center">
-                  {info.status === GROUP_STATUS.ACTIVE ? (
-                    <Button
-                      type="text"
-                      danger
-                      size="small"
-                      className="hover:bg-danger/5"
-                      icon={<DeleteOutlined className="text-xs" />}
-                      onClick={() => onRemoveStudent && onRemoveStudent(groupId, student.id)}
-                    />
-                  ) : (
-                    <span className="text-muted/30 text-[10px]">-</span>
-                  )}
-                </div>
-              ),
-            },
-          ]}
-        />
+        <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+          <DataTable
+            columns={[
+              {
+                title: VIEW.TABLE.CODE,
+                key: 'code',
+                width: 120,
+                render: (text) => <span className={TABLE_CELL.mono}>{text}</span>,
+              },
+              {
+                title: VIEW.TABLE.FULL_NAME,
+                key: 'fullName',
+                render: (text) => <span className={TABLE_CELL.primary}>{text}</span>,
+              },
+              {
+                title: VIEW.TABLE.EMAIL,
+                key: 'email',
+                render: (text) => (
+                  <div className="flex max-w-[min(100%,320px)] items-center gap-1.5 truncate">
+                    <MailOutlined className="shrink-0 text-[10px] text-slate-400" />
+                    <span className={TABLE_CELL.secondary}>{text}</span>
+                  </div>
+                ),
+              },
+              {
+                title: VIEW.TABLE.SCHOOL,
+                key: 'universityName',
+                render: (text) => (
+                  <div className="flex max-w-[200px] items-center gap-1.5 truncate">
+                    <BankOutlined className="shrink-0 text-[10px] text-slate-400" />
+                    <span className={TABLE_CELL.secondary}>{text}</span>
+                  </div>
+                ),
+              },
+              {
+                title: VIEW.TABLE.ACTION || 'ACTION',
+                key: 'action',
+                width: 80,
+                align: 'center',
+                render: (_, student) => (
+                  <div className="flex items-center justify-center">
+                    {info.status === GROUP_STATUS.ACTIVE ? (
+                      <Button
+                        type="text"
+                        danger
+                        size="small"
+                        className="hover:bg-danger/5"
+                        icon={<DeleteOutlined className="text-xs" />}
+                        onClick={() => onRemoveStudent && onRemoveStudent(groupId, student.id)}
+                      />
+                    ) : (
+                      <span className="text-[12px] text-slate-300">-</span>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+            data={filteredMembers}
+            rowKey="id"
+            size="small"
+            minWidth="auto"
+          />
+        </div>
       </Card>
     </div>
   );

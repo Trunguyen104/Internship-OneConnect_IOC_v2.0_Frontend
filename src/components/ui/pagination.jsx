@@ -4,28 +4,27 @@ import { Pagination as AntdPagination } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { UI_TEXT } from '@/lib/UI_Text';
-
 export default function Pagination({
   total = 0,
   page = 1,
   pageSize = 10,
   onPageChange,
   onPageSizeChange,
+  pageSizeOptions = [10, 20, 50, 100],
 }) {
   return (
-    <div className="mt-4 flex items-center justify-between">
-      <div className="text-muted text-sm font-medium">
-        {UI_TEXT.PAGINATION.TOTAL} <span className="text-text font-bold">{total}</span>
-      </div>
+    <div className="flex items-center">
       <AntdPagination
         current={page}
         pageSize={pageSize}
         total={total}
-        onChange={(p, ps) => {
-          onPageChange?.(p);
-          if (ps !== pageSize) {
-            onPageSizeChange?.(ps);
+        pageSizeOptions={pageSizeOptions}
+        onChange={(current, size) => {
+          if (size !== pageSize) {
+            onPageSizeChange?.(size);
+            onPageChange?.(1); // Luôn về trang 1 khi đổi size
+          } else {
+            onPageChange?.(current);
           }
         }}
         showSizeChanger

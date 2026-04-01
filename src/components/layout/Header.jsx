@@ -16,6 +16,7 @@ import { clearAuth } from '@/components/features/auth/lib/auth-storage';
 import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { usePageHeader } from '@/providers/PageHeaderProvider';
 import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
 
@@ -23,7 +24,7 @@ export default function Header() {
   const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
   const params = useParams();
-  const internshipGroupId = params?.internshipGroupId;
+  const groupId = params?.groupId || params?.internshipGroupId;
   const toast = useToast();
   const { isSidebarCollapsed } = useLayoutStore();
 
@@ -72,7 +73,7 @@ export default function Header() {
     ],
     onClick: async ({ key }) => {
       if (key === 'profile') {
-        const returnTo = internshipGroupId ? `/internship-groups/${internshipGroupId}/space` : null;
+        const returnTo = groupId ? `/internship-groups/${groupId}/space` : null;
         const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
         router.push(`/profile${query}`);
       }
@@ -82,11 +83,13 @@ export default function Header() {
     },
   };
 
+  const { headerConfig } = usePageHeader();
+
   return (
     <header
-      className={`sticky top-0 z-50 flex h-16 items-center justify-between border-b border-slate-200 bg-gray-50 transition-all duration-300 ${isSidebarCollapsed ? 'px-12 2xl:px-16' : 'px-6'}`}
+      className={`sticky top-0 z-50 flex h-[70px] min-h-[70px] max-h-[70px] flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white transition-all duration-300 ${isSidebarCollapsed ? 'px-12 2xl:px-16' : 'px-6'}`}
     >
-      <div className="flex items-center">
+      <div className="flex items-center gap-6">
         <button
           onClick={() => useLayoutStore.toggleSidebar()}
           className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
@@ -98,6 +101,14 @@ export default function Header() {
             <MenuFoldOutlined className="text-xl" />
           )}
         </button>
+
+        {headerConfig.title && (
+          <div className="hidden flex-col justify-center gap-0.5 border-l border-slate-200 pl-6 lg:flex">
+            <h1 className="text-lg font-black tracking-tight text-slate-900 leading-none">
+              {headerConfig.title}
+            </h1>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-4">

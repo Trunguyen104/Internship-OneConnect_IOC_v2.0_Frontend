@@ -1,16 +1,7 @@
-'use client';
-
-import { Plus } from 'lucide-react';
+import { Drawer } from 'antd';
+import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import EnterprisesForm from './EnterprisesForm';
@@ -27,43 +18,43 @@ export default function EnterprisesDialog({
   const isEdit = !!enterprise;
 
   return (
-    <>
-      {!controlled ? (
-        <Button
-          onClick={() => setOpen(true)}
-          className="group flex h-12 items-center justify-center gap-2 rounded-full border-none bg-slate-900 px-8 font-bold text-white shadow-xl shadow-slate-200/50 transition-all outline-none hover:bg-slate-800 hover:shadow-slate-300/60 active:scale-95"
-        >
-          <div className="rounded-full bg-white/10 p-1.5 transition-transform duration-500 group-hover:rotate-180">
-            <Plus className="h-4 w-4 text-white" />
-          </div>
-          {UI_TEXT.ENTERPRISES.ONBOARD}
-        </Button>
-      ) : null}
-
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent className="flex flex-col p-4 sm:max-w-[640px]">
-          <SheetHeader className="mt-2 text-center">
-            <SheetTitle className="text-3xl">
-              {isEdit
-                ? UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE
-                : UI_TEXT.USER_MANAGEMENT.CREATE_TITLE}
-            </SheetTitle>
-            <SheetDescription>
-              {isEdit
-                ? `Editing enterprise profile for ${enterprise?.name || 'enterprise'}.`
-                : 'Create a new enterprise account and metadata.'}
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-4 min-h-0 flex-1 overflow-y-auto pb-8">
-            <EnterprisesForm
-              enterprise={enterprise}
-              onSuccess={() => setOpen(false)}
-              onCancel={() => setOpen(false)}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+    <Drawer
+      title={
+        <div className="flex flex-col gap-1">
+          <span className="text-lg font-black tracking-tight text-slate-900">
+            {isEdit ? UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE : UI_TEXT.USER_MANAGEMENT.CREATE_TITLE}
+          </span>
+          <span className="text-xs font-medium text-slate-400">
+            {isEdit
+              ? `Editing enterprise profile for ${enterprise?.name || 'enterprise'}.`
+              : 'Create a new enterprise account and metadata.'}
+          </span>
+        </div>
+      }
+      open={open}
+      onClose={() => setOpen(false)}
+      width={560}
+      headerStyle={{ borderBottom: '1px solid #f8fafc', padding: '24px' }}
+      bodyStyle={{ padding: '24px' }}
+      footer={null}
+      destroyOnClose
+    >
+      <EnterprisesForm
+        enterprise={enterprise}
+        onSuccess={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+      />
+    </Drawer>
   );
 }
+
+EnterprisesDialog.propTypes = {
+  /** If the dialog is open. */
+  open: PropTypes.bool,
+  /** Callback when open state changes. */
+  onOpenChange: PropTypes.func,
+  /** If true, the trigger button is hidden and state is fully managed by parent. */
+  controlled: PropTypes.bool,
+  /** Data of the enterprise to edit; triggers edit mode if present. */
+  enterprise: PropTypes.object,
+};

@@ -13,23 +13,24 @@ import { EvaluationService } from '../../services/evaluation.service';
 import IndividualGrading from './IndividualGrading';
 
 const GRADING_GRID_CSS = `
+  /* Align with shared DataTable (admin): slate headers, gray dividers */
   .grading-grid .ant-table-thead > tr > th {
-    background: transparent !important;
+    background: #ffffff !important;
     color: #94a3b8;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 600;
     text-transform: uppercase;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    padding: 16px 12px !important;
-    border-bottom: 2px solid #f8fafc !important;
+    letter-spacing: 0.06em;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #f3f4f6 !important;
   }
   .grading-grid .ant-table-tbody > tr > td {
-    padding: 12px !important;
-    border-bottom: 1px solid #f8fafc !important;
-    transition: all 0.3s ease;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    transition: background-color 0.15s ease;
   }
   .grading-grid .ant-table-row:hover > td {
-    background: #f8fafc/50 !important;
+    background: rgb(248 250 252 / 0.95) !important;
   }
   .grading-grid .ant-input-number {
     border-radius: 12px;

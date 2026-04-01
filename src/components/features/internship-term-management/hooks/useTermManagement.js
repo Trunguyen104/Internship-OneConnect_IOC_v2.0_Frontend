@@ -9,6 +9,7 @@ import { USER_ROLE } from '@/constants/common/enums';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 import { universityService } from '@/services/university.service';
+import { useTermsStore } from '@/store/useTermsStore';
 import { getErrorDetail } from '@/utils/errorUtils';
 
 import { TermService } from '../services/term.service';
@@ -18,6 +19,7 @@ import { useTermModals } from './useTermModals';
 export const useTermManagement = () => {
   const toast = useToast();
   const [submitLoading, setSubmitLoading] = useState(false);
+  const { refreshCount } = useTermsStore();
   const knownVersions = useRef({});
 
   const {
@@ -29,6 +31,7 @@ export const useTermManagement = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handlePageSizeChange,
     handleSortChange,
   } = useTermFilters();
 
@@ -100,6 +103,7 @@ export const useTermManagement = () => {
       searchTerm,
       statusFilter,
       sortConfig,
+      refreshCount,
     ],
     queryFn: async () => {
       try {
@@ -140,7 +144,7 @@ export const useTermManagement = () => {
         throw error;
       }
     },
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
   });
 
   const handleEdit = useCallback(
@@ -212,6 +216,7 @@ export const useTermManagement = () => {
       await TermService.delete(record.termId);
       toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_SUCCESS);
       setDeleteModalState({ open: false, record: null });
+      useTermsStore.increment();
       refetch();
     } catch (error) {
       toast.error(
@@ -245,6 +250,7 @@ export const useTermManagement = () => {
 
         toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.STATUS_SUCCESS);
         setStatusModalState({ open: false, record: null, newStatus: null });
+        useTermsStore.increment();
         refetch();
       } catch (error) {
         toast.error(
@@ -299,6 +305,7 @@ export const useTermManagement = () => {
         }
 
         setModalVisible(false);
+        useTermsStore.increment();
         refetch();
       } catch (error) {
         toast.error(
@@ -334,6 +341,7 @@ export const useTermManagement = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handlePageSizeChange,
     handleSortChange,
     handleCreateNew,
     handleEdit,

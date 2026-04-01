@@ -1,5 +1,6 @@
 export const ACTIVE_TERM_UI = {
   TITLE: 'Active Internship Terms',
+  PAGE_SUBTITLE: 'Ongoing terms across partner universities—track deadlines and progress.',
   FILTER: {
     UNIVERSITY_LABEL: 'Filter by University:',
     ALL_UNIVERSITIES: 'All Universities',

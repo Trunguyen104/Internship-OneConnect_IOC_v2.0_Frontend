@@ -8,10 +8,10 @@ const TermDeleteModal = ({ open, onCancel, onConfirm, record, loading }) => {
   const { DELETE } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
 
   return (
-    <CompoundModal open={open} onCancel={onCancel} width={500}>
+    <CompoundModal open={open} onCancel={onCancel} width={480}>
       <CompoundModal.Header
         title={DELETE.TITLE}
-        subtitle="This action is permanent and cannot be reversed"
+        subtitle={DELETE.SUBTITLE}
         type="danger"
         icon={<DeleteOutlined />}
       />
@@ -39,7 +39,6 @@ const TermDeleteModal = ({ open, onCancel, onConfirm, record, loading }) => {
         confirmIcon={<DeleteOutlined />}
         confirmText={DELETE.CONFIRM}
         cancelText={DELETE.CANCEL}
-        className="!mt-4"
       />
     </CompoundModal>
   );

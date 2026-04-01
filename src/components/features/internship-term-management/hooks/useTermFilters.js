@@ -25,6 +25,10 @@ export const useTermFilters = () => {
     setPagination((prev) => ({ ...prev, current: newPagination.current }));
   }, []);
 
+  const handlePageSizeChange = useCallback((size) => {
+    setPagination((prev) => ({ ...prev, pageSize: size, current: 1 }));
+  }, []);
+
   const handleSortChange = useCallback((column, order) => {
     setSortConfig({
       column: column.toLowerCase(),
@@ -42,6 +46,7 @@ export const useTermFilters = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handlePageSizeChange,
     handleSortChange,
   };
 };

@@ -1,14 +1,11 @@
 'use client';
 
-import { PlusOutlined } from '@ant-design/icons';
 import { DatePicker } from 'antd';
 import React from 'react';
 
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import PageTitle from '@/components/ui/pagetitle';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useViolationManagement } from '../hooks/useViolationManagement';
 import ViolationDeleteModal from './ViolationDeleteModal';
@@ -47,58 +44,65 @@ export default function ViolationManagement() {
   } = useViolationManagement();
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <PageTitle title={VIOLATION_REPORT.TITLE} />
+    <PageLayout>
+      <PageLayout.Header title={VIOLATION_REPORT.TITLE} subtitle={VIOLATION_REPORT.SUBTITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar className="mb-5 flex-shrink-0 !border-0 !p-0">
-          <DataTableToolbar.Search
-            placeholder={VIOLATION_REPORT.SEARCH_PLACEHOLDER}
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          />
-          <DataTableToolbar.Filters>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
+          searchProps={{
+            placeholder: VIOLATION_REPORT.SEARCH_PLACEHOLDER,
+            value: searchTerm,
+            onChange: (e) => handleSearchChange(e.target.value),
+            className: 'max-w-md',
+          }}
+          filterContent={
             <RangePicker
-              className="h-9 w-60"
+              className="h-11 w-full min-w-[240px] md:w-72"
               value={dateRange}
               onChange={handleDateRangeChange}
               placeholder={[VIOLATION_REPORT.FILTERS.START_DATE, VIOLATION_REPORT.FILTERS.END_DATE]}
             />
-          </DataTableToolbar.Filters>
-          {isMentor && (
-            <DataTableToolbar.Actions
-              label={VIOLATION_REPORT.CREATE_BUTTON}
-              onClick={handleCreateNew}
-              icon={<PlusOutlined />}
-              className="ml-auto"
-            />
-          )}
-        </DataTableToolbar>
-
-        <ViolationTable
-          data={data}
-          loading={loading}
-          page={pagination.current}
-          pageSize={pagination.pageSize}
-          onEdit={handleEdit}
-          onView={handleView}
-          onRequestDelete={handleRequestDelete}
-          isMentor={isMentor}
+          }
+          actionProps={
+            isMentor
+              ? {
+                  label: VIOLATION_REPORT.CREATE_BUTTON,
+                  onClick: handleCreateNew,
+                }
+              : undefined
+          }
         />
 
-        {data.length > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
+        <PageLayout.Content className="px-0">
+          <ViolationTable
+            data={data}
+            loading={loading}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            onEdit={handleEdit}
+            onView={handleView}
+            onRequestDelete={handleRequestDelete}
+            isMentor={isMentor}
+          />
+        </PageLayout.Content>
+
+        {pagination.total > 0 && (
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}:{' '}
+              <span className="font-extrabold text-slate-800">{pagination.total}</span>
+            </span>
+            <PageLayout.Pagination
               total={pagination.total}
               page={pagination.current}
               pageSize={pagination.pageSize}
-              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
               onPageChange={(page) => handleTableChange({ current: page })}
               onPageSizeChange={(size) => handleTableChange({ pageSize: size, current: 1 })}
+              className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
-      </Card>
+      </PageLayout.Card>
 
       <ViolationFormModal
         visible={modalVisible}
@@ -118,6 +122,6 @@ export default function ViolationManagement() {
         onConfirm={handleDelete}
         loading={submitLoading}
       />
-    </section>
+    </PageLayout>
   );
 }

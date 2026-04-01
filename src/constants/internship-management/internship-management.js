@@ -417,6 +417,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
   UNI_ADMIN: {
     TERM_MANAGEMENT: {
       TITLE: 'Internship Term Management',
+      PAGE_SUBTITLE: 'Create, monitor, and close internship terms for your institution.',
       CREATE_BTN: 'Create New Term',
       TOTAL_LABEL: 'Total Terms',
       SEARCH_PLACEHOLDER: 'Search internship term...',
@@ -469,6 +470,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           TITLE_ADD: 'Create New Internship Term',
           TITLE_EDIT: 'Edit Internship Term',
           TITLE_VIEW: 'Term Details',
+          UPDATE_SUBTITLE: 'Update term details',
+          CREATE_SUBTITLE: 'Create a new internship semester',
           NAME_LABEL: 'Term Name',
           NAME_PLACEHOLDER: 'Ex: Semester 1 - 2024',
           NAME_REQUIRED: 'Please enter term name',
@@ -495,7 +498,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
         STATUS: {
           TITLE: 'Change Term Status',
+          SUBTITLE_PREFIX: 'Update term status to',
           CONTENT: 'Are you sure you want to change the status of the internship term to',
+          CLOSE_WARNING: ' Once closed, students will no longer be able to enroll.',
           REASON_LABEL: 'Reason for closing',
           REASON_PLACEHOLDER: 'Please enter the reason for closing this term...',
           REASON_REQUIRED: 'Please enter a reason for closing',
@@ -504,6 +509,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
         DELETE: {
           TITLE: 'Delete Internship Term',
+          SUBTITLE: 'This action is permanent and cannot be reversed',
           CONTENT_PREFIX: 'Are you sure you want to delete the term',
           CONTENT_SUFFIX: '? This action cannot be undone.',
           REASON_LABEL: 'Reason for deletion',
@@ -531,6 +537,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     PHASE_MANAGEMENT: null,
     ENROLLMENT_MANAGEMENT: {
       TITLE: 'Student Enrollment Management',
+      PAGE_SUBTITLE: 'Enroll students, track placement, and manage withdrawals per term.',
       SEARCH_PLACEHOLDER: 'Search by name or student ID...',
       STATUS_FILTER: 'Status: All',
       MAJOR_FILTER: 'Major: All',
@@ -754,6 +761,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
   ENTERPRISE: {
     VIOLATION_REPORT: {
       TITLE: 'Violation Reports',
+      SUBTITLE: 'Review reported incidents for students in your scope.',
       CREATE_BUTTON: 'Create Report',
       SEARCH_PLACEHOLDER: 'Search student name or code',
       EMPTY_MESSAGE: 'No violation reports found',

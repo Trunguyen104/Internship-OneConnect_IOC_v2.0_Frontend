@@ -3,6 +3,7 @@
 import { EmptyState } from '@/components/ui/atoms';
 import PageLayout from '@/components/ui/pagelayout';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useStudentList } from '../hooks/useStudentList';
 import StudentTable from './StudentTable';
@@ -21,7 +22,6 @@ export default function StudentListPage() {
     pageSize,
     setPageSize,
     total,
-    totalPages,
     paginatedMembers,
   } = useStudentList();
 
@@ -29,14 +29,17 @@ export default function StudentListPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={STUDENT_LIST_UI.PAGE_TITLE} />
+      <PageLayout.Header
+        title={STUDENT_LIST_UI.PAGE_TITLE}
+        subtitle={STUDENT_LIST_UI.PAGE_SUBTITLE}
+      />
 
-      <PageLayout.Card>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
         {showNoGroup ? (
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-1 items-center justify-center py-16">
             <EmptyState
               description={
-                <span className="text-gray-400 font-medium">
+                <span className="font-medium text-gray-400">
                   {STUDENT_LIST_UI.EMPTY.NO_GROUP}
                   <br />
                   {STUDENT_LIST_UI.EMPTY.NOT_ASSIGNED}
@@ -45,16 +48,17 @@ export default function StudentListPage() {
             />
           </div>
         ) : (
-          <div className="flex flex-1 flex-col overflow-hidden">
+          <>
             <PageLayout.Toolbar
               searchProps={{
                 placeholder: STUDENT_LIST_UI.SEARCH.PLACEHOLDER,
                 value: searchText,
                 onChange: (e) => setSearchText(e.target.value),
+                className: 'max-w-md',
               }}
             />
 
-            <PageLayout.Content>
+            <PageLayout.Content className="px-0">
               <StudentTable
                 data={paginatedMembers}
                 loading={loading}
@@ -62,20 +66,23 @@ export default function StudentListPage() {
               />
             </PageLayout.Content>
 
-            {!showNoGroup && total > 0 && (
-              <PageLayout.Pagination
-                total={total}
-                page={page}
-                pageSize={pageSize}
-                totalPages={totalPages}
-                onPageChange={setPage}
-                onPageSizeChange={(size) => {
-                  setPageSize(size);
-                  setPage(1);
-                }}
-              />
+            {total > 0 && (
+              <PageLayout.Footer className="flex items-center justify-between">
+                <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+                  {UI_TEXT.COMMON.TOTAL}:{' '}
+                  <span className="font-extrabold text-slate-800">{total}</span>
+                </span>
+                <PageLayout.Pagination
+                  total={total}
+                  page={page}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={setPageSize}
+                  className="mt-0 border-t-0 pt-0"
+                />
+              </PageLayout.Footer>
             )}
-          </div>
+          </>
         )}
       </PageLayout.Card>
     </PageLayout>

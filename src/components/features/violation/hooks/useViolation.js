@@ -13,7 +13,12 @@ export function useViolation() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState([null, null]);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSizeState] = useState(10);
+
+  const setPageSize = useCallback((size) => {
+    setPageSizeState(size);
+    setPage(1);
+  }, []);
   const [sortOrder] = useState('desc');
 
   // Debounce Search

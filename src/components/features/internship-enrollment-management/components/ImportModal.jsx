@@ -7,12 +7,14 @@ import {
   ExclamationCircleOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { Button, Table, Tooltip, Upload } from 'antd';
+import { Button, Tooltip, Upload } from 'antd';
 import { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import CompoundModal from '@/components/ui/CompoundModal';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { mapAntdColumnsToDataTable } from '@/lib/mapAntdTableColumns';
 import { useToast } from '@/providers/ToastProvider';
 
 const { Dragger } = Upload;
@@ -168,9 +170,9 @@ export default function ImportModal({
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.VALIDITY,
+      key: 'validity',
       align: 'center',
       width: 80,
-      fixed: 'right',
       render: (_, r) =>
         r.isValid ? (
           <Tooltip title={IMPORT.TOOLTIP_VALID}>
@@ -252,15 +254,15 @@ export default function ImportModal({
                   )}
                 </div>
 
-                <Table
-                  dataSource={previewData}
-                  columns={columns}
-                  pagination={false}
-                  rowKey="id"
-                  size="small"
-                  scroll={{ x: 800 }}
-                  className="premium-table overflow-hidden !rounded-xl border border-gray-100 shadow-sm"
-                />
+                <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+                  <DataTable
+                    columns={mapAntdColumnsToDataTable(columns)}
+                    data={previewData}
+                    rowKey="id"
+                    minWidth="800px"
+                    size="small"
+                  />
+                </div>
               </div>
             )}
           </div>

@@ -1,7 +1,18 @@
+import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+/**
+ * Enrollment filters. When rendered under `/school/terms/[termId]/enrollments`,
+ * `termId` is taken from the route so it matches the sidebar workspace.
+ */
 export const useStudentFilters = () => {
-  const [termId, setTermId] = useState(null);
+  const params = useParams();
+  const routeTermId = typeof params?.termId === 'string' ? params.termId : null;
+
+  /** When off a term-scoped route, the dropdown stores the active term. */
+  const [selectedTermId, setSelectedTermId] = useState(null);
+  const termId = routeTermId ?? selectedTermId;
+
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -13,6 +24,13 @@ export const useStudentFilters = () => {
     total: 0,
   });
 
+  // Reset to page 1 when the route-driven term changes (sidebar navigation)
+  useEffect(() => {
+    if (!routeTermId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- term scope from URL; reset list page when it changes
+    setPagination((prev) => ({ ...prev, current: 1 }));
+  }, [routeTermId]);
+
   // Debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -22,7 +40,7 @@ export const useStudentFilters = () => {
   }, [searchTerm]);
 
   const handleTermChange = useCallback((value) => {
-    setTermId(value);
+    setSelectedTermId(value);
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
@@ -38,6 +56,10 @@ export const useStudentFilters = () => {
 
   const handlePageChange = useCallback((page) => {
     setPagination((prev) => ({ ...prev, current: page }));
+  }, []);
+
+  const handlePageSizeChange = useCallback((size) => {
+    setPagination((prev) => ({ ...prev, pageSize: size, current: 1 }));
   }, []);
 
   const handleSortChange = useCallback((newSortBy, newSortOrder) => {
@@ -59,6 +81,7 @@ export const useStudentFilters = () => {
     handleSearchChange,
     handleStatusChange,
     handlePageChange,
+    handlePageSizeChange,
     handleSortChange,
   };
 };

@@ -14,13 +14,13 @@ import { Button, Dropdown, Select, Space, Tooltip } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Badge from '@/components/ui/badge';
-import Card from '@/components/ui/card';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
 import ImportModal from './ImportModal';
@@ -51,6 +51,7 @@ export default function TermStudentManagement() {
     onSearchChange,
     onStatusChange,
     onPageChange,
+    onPageSizeChange,
     setImportVisible,
     setAddVisible,
     onAdd,
@@ -70,11 +71,10 @@ export default function TermStudentManagement() {
     sortBy,
     sortOrder,
     handleSortChange,
-    onTableChange,
   } = useStudentEnrollment();
 
   const activeTerm = terms.find((t) => t.termId === termId);
-  const isClosed = activeTerm?.status === 4; // TERM_STATUS.CLOSED is 4
+  const isClosed = activeTerm?.status === 4;
 
   const { TABLE, ACTIONS: ACTION_LABELS, STATUS_LABELS, PLACEMENT_LABELS } = ENROLLMENT_MANAGEMENT;
 
@@ -171,73 +171,57 @@ export default function TermStudentManagement() {
         },
       },
       {
-        title: TABLE.COLUMNS.ACTIONS,
+        title: '',
         key: 'actions',
-        width: 160,
+        width: 48,
         align: 'right',
         render: (_, record) => {
           const isWithdrawn = record.status === 'WITHDRAWN';
 
+          const items = [
+            {
+              key: 'view',
+              label: ACTION_LABELS.VIEW,
+              icon: <EyeOutlined />,
+              onClick: () => handleView(record),
+            },
+          ];
+
+          if (!isClosed) {
+            if (!isWithdrawn) {
+              items.push(
+                { type: 'divider' },
+                {
+                  key: 'edit',
+                  label: ACTION_LABELS.EDIT,
+                  icon: <EditOutlined />,
+                  onClick: () => handleEdit(record),
+                },
+                {
+                  key: 'delete',
+                  label: ACTION_LABELS.DELETE,
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                  onClick: () => handleDelete(record),
+                }
+              );
+            } else {
+              items.push(
+                { type: 'divider' },
+                {
+                  key: 'recover',
+                  label: ACTION_LABELS.RECOVER,
+                  icon: <ReloadOutlined />,
+                  variant: 'success',
+                  onClick: () => handleRestore(record),
+                }
+              );
+            }
+          }
+
           return (
-            <div className="flex items-center justify-end gap-1.5">
-              <Tooltip title={ACTION_LABELS.VIEW}>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EyeOutlined />}
-                  className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleView(record);
-                  }}
-                />
-              </Tooltip>
-              {!isClosed && (
-                <>
-                  {!isWithdrawn ? (
-                    <>
-                      <Tooltip title={ACTION_LABELS.EDIT}>
-                        <Button
-                          type="text"
-                          size="small"
-                          icon={<EditOutlined />}
-                          className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(record);
-                          }}
-                        />
-                      </Tooltip>
-                      <Tooltip title={ACTION_LABELS.DELETE}>
-                        <Button
-                          type="text"
-                          size="small"
-                          danger
-                          icon={<DeleteOutlined />}
-                          className="hover:bg-danger/10 hover:text-danger text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(record);
-                          }}
-                        />
-                      </Tooltip>
-                    </>
-                  ) : (
-                    <Tooltip title={ACTION_LABELS.RECOVER}>
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<ReloadOutlined />}
-                        className="hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRestore(record);
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                </>
-              )}
+            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+              <TableRowDropdown items={items} />
             </div>
           );
         },
@@ -271,35 +255,39 @@ export default function TermStudentManagement() {
   }, [onTermChange]);
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={ENROLLMENT_MANAGEMENT.TITLE} />
+    <PageLayout>
+      <PageLayout.Header
+        title={ENROLLMENT_MANAGEMENT.TITLE}
+        subtitle={ENROLLMENT_MANAGEMENT.PAGE_SUBTITLE}
+      />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !rounded-3xl border-none !p-6 shadow-sm sm:!p-8">
-        <DataTableToolbar className="mb-6 !border-0 !p-0">
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <DataTableToolbar className="mb-4 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={SEARCH.PLACEHOLDER}
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
+            className="max-w-md"
           />
           <DataTableToolbar.Filters className="gap-0">
-            <Space.Compact className="w-full sm:w-auto shadow-sm !rounded-xl overflow-hidden border border-border">
+            <Space.Compact className="w-full overflow-hidden rounded-xl border border-border shadow-sm sm:w-auto">
               <Select
                 loading={termsLoading}
                 placeholder={SEARCH.TERM_PLACEHOLDER}
                 value={termId}
                 onChange={onTermChange}
-                className="!h-10 min-w-[150px] !border-0 focus:!ring-0"
+                className="!h-11 min-w-[150px] !border-0 focus:!ring-0"
                 variant="borderless"
                 options={terms.map((t) => ({ label: t.name, value: t.termId }))}
                 suffixIcon={<FilterOutlined className="text-muted/40" />}
               />
-              <div className="bg-border h-6 w-[1px] self-center opacity-50" />
+              <div className="bg-border h-6 w-px self-center opacity-50" />
               <Select
                 allowClear
                 placeholder={ENROLLMENT_MANAGEMENT.STATUS_FILTER}
                 value={statusFilter || undefined}
                 onChange={onStatusChange}
-                className="!h-10 min-w-[140px] !border-0 focus:!ring-0"
+                className="!h-11 min-w-[140px] !border-0 focus:!ring-0"
                 variant="borderless"
                 options={STATUS_OPTIONS}
                 suffixIcon={<FilterOutlined className="text-muted/40" />}
@@ -313,7 +301,7 @@ export default function TermStudentManagement() {
               icon={<UserDeleteOutlined />}
               onClick={handleBulkWithdraw}
               disabled={selectedIds.length === 0 || isClosed}
-              className="!h-10 !rounded-xl shadow-md"
+              className="!h-11 !rounded-xl shadow-md"
             >
               {MESSAGES.BULK_WITHDRAW.ACTION_LABEL}
               {selectedIds.length > 0 && ` (${selectedIds.length})`}
@@ -345,7 +333,7 @@ export default function TermStudentManagement() {
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                className="!h-10 !rounded-xl shadow-md px-4 font-semibold"
+                className="!h-11 !rounded-xl px-4 font-semibold shadow-md"
               >
                 {ACTIONS.ADD}
               </Button>
@@ -353,35 +341,41 @@ export default function TermStudentManagement() {
           </DataTableToolbar.Actions>
         </DataTableToolbar>
 
-        <DataTable
-          columns={columns}
-          data={students}
-          loading={loading}
-          rowKey="studentTermId"
-          className="mt-4"
-          size="small"
-          minWidth="800px"
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          onSort={handleSortChange}
-          rowSelection={{
-            selectedRowKeys: selectedIds,
-            onChange: setSelectedIds,
-          }}
-        />
+        <PageLayout.Content className="px-0">
+          <DataTable
+            columns={columns}
+            data={students}
+            loading={loading}
+            rowKey="studentTermId"
+            size="small"
+            minWidth="800px"
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSort={handleSortChange}
+            rowSelection={{
+              selectedRowKeys: selectedIds,
+              onChange: setSelectedIds,
+            }}
+          />
+        </PageLayout.Content>
 
         {pagination.total > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}:{' '}
+              <span className="font-extrabold text-slate-800">{pagination.total}</span>
+            </span>
+            <PageLayout.Pagination
               total={pagination.total}
               page={pagination.current}
               pageSize={pagination.pageSize}
-              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
               onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
-      </Card>
+      </PageLayout.Card>
 
       <ImportModal
         visible={importVisible}
@@ -404,6 +398,6 @@ export default function TermStudentManagement() {
         onSave={editVisible ? handleUpdateStudent : handleAddStudent}
         loading={submitLoading}
       />
-    </section>
+    </PageLayout>
   );
 }

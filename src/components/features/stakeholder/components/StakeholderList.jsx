@@ -1,11 +1,11 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import { Tooltip } from 'antd';
 import React, { memo } from 'react';
 
-import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
 const StakeholderList = memo(function StakeholderList({
   stakeholders,
@@ -21,9 +21,7 @@ const StakeholderList = memo(function StakeholderList({
       key: 'no',
       width: '80px',
       render: (_, __, index) => (
-        <span className="text-muted text-[13px] font-semibold">
-          {(page - 1) * pageSize + index + 1}
-        </span>
+        <span className={TABLE_CELL.rowIndex}>{(page - 1) * pageSize + index + 1}</span>
       ),
     },
     {
@@ -32,9 +30,9 @@ const StakeholderList = memo(function StakeholderList({
       width: '300px',
       render: (_, record) => (
         <div className="flex flex-col">
-          <span className="text-text text-[15px] font-bold">{record.name}</span>
+          <span className={TABLE_CELL.title}>{record.name}</span>
           {record.description && (
-            <span className="text-muted mt-0.5 line-clamp-1 text-[13px] font-medium opacity-60">
+            <span className={`${TABLE_CELL.subtitle} mt-0.5 line-clamp-1 opacity-80`}>
               {record.description}
             </span>
           )}
@@ -45,7 +43,7 @@ const StakeholderList = memo(function StakeholderList({
       title: STAKEHOLDER_UI.FIELD_ROLE,
       key: 'role',
       render: (role) => (
-        <span className="text-primary text-[11px] font-black uppercase tracking-wider bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/10">
+        <span className="border-primary/10 bg-primary/5 text-primary rounded-lg border px-2.5 py-1 text-[11px] font-black uppercase tracking-wider">
           {role || STAKEHOLDER_UI.NO_ROLE}
         </span>
       ),
@@ -53,58 +51,61 @@ const StakeholderList = memo(function StakeholderList({
     {
       title: STAKEHOLDER_UI.FIELD_EMAIL,
       key: 'email',
-      render: (email) => <span className="text-text text-sm font-medium">{email}</span>,
+      render: (email) => <span className={TABLE_CELL.secondary}>{email}</span>,
     },
     {
       title: STAKEHOLDER_UI.FIELD_PHONE,
       key: 'phoneNumber',
       width: '180px',
-      render: (phone) => <span className="text-text text-sm font-medium">{phone || '—'}</span>,
+      render: (phone) => <span className={TABLE_CELL.secondary}>{phone || '—'}</span>,
     },
     {
-      title: STAKEHOLDER_UI.ACTIONS,
+      title: '',
       key: 'action',
       align: 'right',
-      render: (_, record) => (
-        <div className="flex items-center justify-end gap-1 px-2">
-          <Tooltip title={STAKEHOLDER_UI.EDIT_BUTTON}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(record)}
-              className="size-9 rounded-xl text-muted/60 transition-all hover:bg-primary/5 hover:text-primary active:scale-90"
-            >
-              <EditOutlined className="size-4" />
-            </Button>
-          </Tooltip>
-          <Tooltip title={STAKEHOLDER_UI.DELETE_BUTTON}>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() =>
-                showDeleteConfirm({
-                  title: STAKEHOLDER_UI.DELETE_TITLE,
-                  content: STAKEHOLDER_UI.DELETE_CONFIRM,
-                  onOk: () => onDelete(record.id),
-                })
-              }
-              className="size-9 rounded-xl text-muted/40 transition-all hover:bg-rose-50 hover:text-rose-500 active:scale-90"
-            >
-              <DeleteOutlined className="size-4" />
-            </Button>
-          </Tooltip>
-        </div>
-      ),
+      width: '48px',
+      render: (_, record) => {
+        const items = [
+          {
+            key: 'edit',
+            label: STAKEHOLDER_UI.EDIT_BUTTON,
+            icon: <EditOutlined />,
+            onClick: () => onEdit(record),
+          },
+          { type: 'divider' },
+          {
+            key: 'delete',
+            label: STAKEHOLDER_UI.DELETE_BUTTON,
+            icon: <DeleteOutlined />,
+            danger: true,
+            onClick: () =>
+              showDeleteConfirm({
+                title: STAKEHOLDER_UI.DELETE_TITLE,
+                content: STAKEHOLDER_UI.DELETE_CONFIRM,
+                onOk: () => onDelete(record.id),
+              }),
+          },
+        ];
+
+        return (
+          <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+            <TableRowDropdown items={items} />
+          </div>
+        );
+      },
     },
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={stakeholders}
-      loading={loading}
-      emptyText={STAKEHOLDER_UI.EMPTY_TITLE}
-    />
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DataTable
+        columns={columns}
+        data={stakeholders}
+        loading={loading}
+        emptyText={STAKEHOLDER_UI.EMPTY_TITLE}
+        minWidth="auto"
+      />
+    </div>
   );
 });
 

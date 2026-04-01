@@ -1,45 +1,35 @@
 'use client';
 
-import { Empty, Skeleton, Table } from 'antd';
 import PropTypes from 'prop-types';
+import { useMemo } from 'react';
 
+import DataTable from '@/components/ui/datatable';
+import { mapAntdColumnsToDataTable } from '@/lib/mapAntdTableColumns';
+
+/**
+ * Thin adapter: Ant Design column shape → shared DataTable (admin UI).
+ * Prefer importing DataTable directly for new code; AppTable exists for legacy antd column objects.
+ */
 export default function AppTable({
   columns,
   data,
   loading = false,
   rowKey = 'id',
-  pagination,
-  onChange,
-  scroll = { x: 800 },
   emptyText = 'No data',
+  minWidth = '800px',
+  className = '',
 }) {
-  if (loading) {
-    return (
-      <div className="p-6">
-        <Skeleton active paragraph={{ rows: 6 }} />
-      </div>
-    );
-  }
+  const mappedColumns = useMemo(() => mapAntdColumnsToDataTable(columns), [columns]);
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
+    <DataTable
+      columns={mappedColumns}
+      data={data}
+      loading={loading}
+      emptyText={emptyText}
+      minWidth={minWidth}
       rowKey={rowKey}
-      pagination={pagination}
-      onChange={onChange}
-      scroll={scroll}
-      rowClassName="hover:bg-gray-50/50 transition-colors"
-      locale={{
-        emptyText: (
-          <div className="py-10">
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={<span className="font-medium text-gray-400">{emptyText}</span>}
-            />
-          </div>
-        ),
-      }}
+      className={className}
     />
   );
 }
@@ -49,8 +39,7 @@ AppTable.propTypes = {
   data: PropTypes.array,
   loading: PropTypes.bool,
   rowKey: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
-  pagination: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  onChange: PropTypes.func,
-  scroll: PropTypes.object,
   emptyText: PropTypes.node,
+  minWidth: PropTypes.string,
+  className: PropTypes.string,
 };

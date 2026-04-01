@@ -65,9 +65,9 @@ const InternshipDashboard = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl space-y-8 p-8">
+      <div className="mx-auto w-full max-w-5xl space-y-6 py-2">
         {[1].map((i) => (
-          <div key={i} className="bg-surface rounded-3xl p-6 shadow-sm">
+          <div key={i} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <Skeleton active avatar paragraph={{ rows: 4 }} />
           </div>
         ))}
@@ -84,18 +84,18 @@ const InternshipDashboard = () => {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-12 px-6 py-16">
-      <header className="mb-12">
-        <h1 className="text-text text-4xl font-black tracking-tight sm:text-5xl">
+    <div className="mx-auto w-full max-w-5xl space-y-8">
+      <header className="border-b border-gray-100 pb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-800 sm:text-3xl">
           {INTERNSHIP_UI.TITLE.replace(INTERNSHIP_UI.JOURNEY_HIGHLIGHT, '')}
-          <span className="text-primary italic">{INTERNSHIP_UI.JOURNEY_HIGHLIGHT}</span>
+          <span className="text-primary">{INTERNSHIP_UI.JOURNEY_HIGHLIGHT}</span>
         </h1>
-        <p className="text-muted mt-4 text-lg font-medium leading-relaxed">
+        <p className="text-muted mt-2 text-sm font-medium leading-relaxed sm:text-base">
           {INTERNSHIP_UI.SUBTITLE}
         </p>
       </header>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         {internships.map((item) => (
           <InternshipCard key={item.clientKey ?? item.id} data={item}>
             <InternshipCard.Header

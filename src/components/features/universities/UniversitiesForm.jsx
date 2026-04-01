@@ -23,6 +23,9 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
     if (!payload.name) nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED;
     if (!payload.code) nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED;
     if (!payload.address) nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED;
+    if (payload.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.contactEmail)) {
+      nextErrors.contactEmail = UI_TEXT.UNIVERSITIES.ERR_INVALID_EMAIL;
+    }
     return nextErrors;
   };
 
@@ -36,6 +39,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
       name: String(formData.get('name') || '').trim(),
       code: String(formData.get('code') || '').trim(),
       address: String(formData.get('address') || '').trim(),
+      contactEmail: String(formData.get('contactEmail') || '').trim() || undefined,
     };
 
     const nextErrors = validate(payload);
@@ -125,6 +129,27 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
             placeholder={UI_TEXT.UNIVERSITIES.ADDRESS_PLACEHOLDER}
             className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.address}
+          />
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <label className="text-[11px] font-black uppercase tracking-widest text-muted/60 pl-1">
+            {UI_TEXT.UNIVERSITIES.CONTACT_EMAIL}{' '}
+            <span className="text-slate-400 normal-case font-medium">
+              (
+              {UI_TEXT.USER_MANAGEMENT.PHONE_OPTIONAL.includes('optional')
+                ? 'optional'
+                : 'tùy chọn'}
+              )
+            </span>
+          </label>
+          <Input
+            name="contactEmail"
+            type="email"
+            defaultValue={university?.contactEmail}
+            placeholder={UI_TEXT.UNIVERSITIES.EMAIL_PLACEHOLDER}
+            className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
+            error={errors.contactEmail}
           />
         </div>
       </div>

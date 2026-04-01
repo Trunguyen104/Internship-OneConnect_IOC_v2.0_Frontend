@@ -10,6 +10,11 @@ import UniversitiesDialog from './UniversitiesDialog';
 import UniversitiesTable from './UniversitiesTable';
 import { useUniversities } from './useUniversities';
 
+/**
+ * UniversitiesPage - High-level cockpit for educational institution governance.
+ *
+ * @returns {JSX.Element}
+ */
 export default function UniversitiesPage() {
   const {
     universities,
@@ -58,9 +63,9 @@ export default function UniversitiesPage() {
         </PageLayout.Content>
 
         {total > 0 && (
-          <div className="mt-4 border-t border-gray-100 pt-8 flex items-center justify-between">
-            <span className="text-[13px] font-bold text-muted/40 tracking-tight uppercase">
-              {UI_TEXT.COMMON.TOTAL_RECORDS}: <span className="text-text font-black">{total}</span>
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
             </span>
             <PageLayout.Pagination
               total={total}
@@ -70,7 +75,7 @@ export default function UniversitiesPage() {
               onPageSizeChange={setPageSize}
               className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
       </PageLayout.Card>
 

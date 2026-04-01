@@ -1,41 +1,19 @@
 'use client';
 
-import { EllipsisOutlined } from '@ant-design/icons';
 import { Dropdown } from 'antd';
-import { Edit3, ExternalLink, Trash2 } from 'lucide-react';
+import { Edit3, ExternalLink, MoreVertical, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
 import { UI_TEXT } from '@/lib/UI_Text';
-import { useToast } from '@/providers/ToastProvider';
-import { enterpriseService } from '@/services/enterprise.service';
-import { useEnterprisesStore } from '@/store/useEnterprisesStore';
 
+import EnterprisesDeleteModal from './EnterprisesDeleteModal';
 import EnterprisesDialog from './EnterprisesDialog';
 
 export default function EnterprisesAction({ enterprise }) {
-  const toast = useToast();
-  const [loading, setLoading] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+  const [open, setOpen] = useState({ isOpen: false, modal: null });
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        `${UI_TEXT.USER_MANAGEMENT.DELETE_CONFIRM} ${enterprise.name}? ${UI_TEXT.USER_MANAGEMENT.DELETE_HINT}`
-      )
-    )
-      return;
-
-    setLoading(true);
-    try {
-      await enterpriseService.delete(enterprise.enterpriseId || enterprise.id);
-      useEnterprisesStore.increment();
-      toast.success(UI_TEXT.ENTERPRISES.REMOVE_SUCCESS);
-    } catch (err) {
-      toast.error(err?.data?.message || err?.message || UI_TEXT.COMMON.ERROR);
-    } finally {
-      setLoading(false);
-    }
+  const handleAction = (modalType) => {
+    setOpen({ isOpen: !!modalType, modal: modalType });
   };
 
   const menuItems = [
@@ -44,16 +22,13 @@ export default function EnterprisesAction({ enterprise }) {
           {
             key: 'website',
             label: (
-              <div className="flex items-center gap-3 py-1 pr-4">
-                <div className="rounded-lg bg-blue-50 p-2">
+              <div className="flex items-center gap-4 pr-8">
+                <div className="rounded-xl bg-blue-50/50 p-2.5">
                   <ExternalLink className="size-4 text-blue-600" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-slate-700">
+                  <span className="text-sm font-black tracking-tight text-text">
                     {UI_TEXT.ENTERPRISES.WEBSITE_TITLE}
-                  </span>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-                    {UI_TEXT.ENTERPRISES.WEBSITE_DESCRIPTION}
                   </span>
                 </div>
               </div>
@@ -65,42 +40,35 @@ export default function EnterprisesAction({ enterprise }) {
     {
       key: 'edit',
       label: (
-        <div className="flex items-center gap-3 py-1 pr-4">
-          <div className="rounded-lg bg-amber-50 p-2">
+        <div className="flex items-center gap-4 pr-8">
+          <div className="rounded-xl bg-amber-50/50 p-2.5">
             <Edit3 className="size-4 text-amber-600" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-700">
+            <span className="text-sm font-black tracking-tight text-text">
               {UI_TEXT.ENTERPRISES.EDIT_TITLE}
-            </span>
-            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-              {UI_TEXT.ENTERPRISES.EDIT_DESCRIPTION}
             </span>
           </div>
         </div>
       ),
-      onClick: () => setOpenEdit(true),
+      onClick: () => handleAction('edit'),
     },
     { type: 'divider' },
     {
       key: 'delete',
-      danger: true,
       label: (
-        <div className="flex items-center gap-3 py-1 pr-4">
-          <div className="rounded-lg bg-rose-50 p-2">
+        <div className="flex items-center gap-4 pr-8">
+          <div className="rounded-xl bg-rose-50/50 p-2.5">
             <Trash2 className="size-4 text-rose-600" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-rose-600">
+            <span className="text-sm font-black tracking-tight text-rose-600">
               {UI_TEXT.ENTERPRISES.DELETE_TITLE}
-            </span>
-            <span className="text-[10px] font-medium text-rose-400 uppercase tracking-wider">
-              {UI_TEXT.ENTERPRISES.DELETE_DESCRIPTION}
             </span>
           </div>
         </div>
       ),
-      onClick: handleDelete,
+      onClick: () => handleAction('delete'),
     },
   ];
 
@@ -112,22 +80,25 @@ export default function EnterprisesAction({ enterprise }) {
         placement="bottomRight"
         classNames={{ root: 'premium-dropdown' }}
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-xl text-slate-400 hover:bg-white hover:shadow-lg transition-all active:scale-95 border border-transparent hover:border-slate-100"
-          disabled={loading}
-        >
-          <EllipsisOutlined className="rotate-90 text-[20px] text-slate-600" />
-        </Button>
+        <button className="flex h-8 w-8 items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+          <MoreVertical className="size-4" />
+        </button>
       </Dropdown>
 
-      {openEdit && (
+      {open.isOpen && open.modal === 'edit' && (
         <EnterprisesDialog
-          open={openEdit}
-          onOpenChange={setOpenEdit}
+          open={open.isOpen}
+          onOpenChange={() => handleAction(null)}
           enterprise={enterprise}
           controlled
+        />
+      )}
+
+      {open.isOpen && open.modal === 'delete' && (
+        <EnterprisesDeleteModal
+          open={open.isOpen}
+          onOpenChange={() => handleAction(null)}
+          enterprise={enterprise}
         />
       )}
     </>

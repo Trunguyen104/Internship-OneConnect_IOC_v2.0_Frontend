@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { userService } from '@/components/features/user/services/user.service';
-import { userManagementService } from '@/components/features/user-management/user-management.service';
 import { USER_ROLE } from '@/constants/user-management/enums';
 import { getErrorMessage } from '@/lib/error';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
+import { httpGet } from '@/services/http-client.service';
 import { universityService } from '@/services/university.service';
+import { userManagementService } from '@/services/user-management.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
 export function isUniversityRole(role) {
@@ -51,7 +52,10 @@ export function useUserManagementForm(onSuccess) {
   const [universities, setUniversities] = useState([]);
   const [enterprises, setEnterprises] = useState([]);
   const [unitId, setUnitId] = useState('');
+  const [termId, setTermId] = useState('');
+  const [terms, setTerms] = useState([]);
   const [fetchingUnits, setFetchingUnits] = useState(false);
+  const [fetchingTerms, setFetchingTerms] = useState(false);
 
   useEffect(() => {
     const initForm = async () => {
@@ -107,6 +111,32 @@ export function useUserManagementForm(onSuccess) {
     initForm();
   }, [toast]);
 
+  // Fetch terms when a University is selected for a Student
+  useEffect(() => {
+    if (!isUniversityRole(role) || !unitId) {
+      setTerms([]);
+      setTermId('');
+      return;
+    }
+    let alive = true;
+    setFetchingTerms(true);
+    httpGet('/terms', { UniversityId: unitId, PageNumber: 1, PageSize: 100 })
+      .then((res) => {
+        if (!alive) return;
+        const items = res?.data?.items ?? res?.items ?? [];
+        setTerms(items);
+      })
+      .catch(() => {
+        if (alive) setTerms([]);
+      })
+      .finally(() => {
+        if (alive) setFetchingTerms(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [role, unitId]);
+
   const allowedRoles = (() => {
     if (!currentUser) return [];
     const currRole = parseRole(currentUser.role || currentUser.Role);
@@ -150,6 +180,9 @@ export function useUserManagementForm(onSuccess) {
       if (unitRequired(payload.role) && !payload.unitId) {
         nextErrors.unitId = `Please select a ${unitLabel.toLowerCase()}`;
       }
+      if (payload.role === USER_ROLE.STUDENT && !payload.termId) {
+        nextErrors.termId = 'Please select an internship term';
+      }
       setErrors(nextErrors);
       return Object.keys(nextErrors).length === 0;
     },
@@ -168,6 +201,7 @@ export function useUserManagementForm(onSuccess) {
         role: Number(role),
         phoneNumber: String(formData.get('phoneNumber') || '').trim() || undefined,
         unitId: unitRequired(Number(role)) ? unitId : undefined,
+        termId: Number(role) === USER_ROLE.STUDENT && termId ? termId : undefined,
       };
 
       if (!validate(payload)) {
@@ -186,7 +220,7 @@ export function useUserManagementForm(onSuccess) {
         setLoading(false);
       }
     },
-    [role, unitId, onSuccess, toast, validate]
+    [role, unitId, termId, onSuccess, toast, validate]
   );
 
   return {
@@ -194,6 +228,10 @@ export function useUserManagementForm(onSuccess) {
     setRole,
     unitId,
     setUnitId,
+    termId,
+    setTermId,
+    terms,
+    fetchingTerms,
     currentUser,
     currentUnits,
     fetchingUnits,

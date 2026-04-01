@@ -1,4 +1,6 @@
 export const ENTERPRISE_PROFILE_UI = {
+  TITLE: 'Company Profile',
+  SUBTITLE: 'Your public organization overview, branding, and contact details for candidates.',
   LOADING: 'Loading profile...',
   LOADING_ERROR: 'Failed to load profile data',
   UPDATE_SUCCESS: 'Profile updated successfully',

@@ -117,8 +117,8 @@ const TermFormBody = ({
           viewOnly
             ? initialValues.name
             : initialValues
-              ? 'Update term details'
-              : 'Create a new internship semester'
+              ? FORM.UPDATE_SUBTITLE
+              : FORM.CREATE_SUBTITLE
         }
       />
 

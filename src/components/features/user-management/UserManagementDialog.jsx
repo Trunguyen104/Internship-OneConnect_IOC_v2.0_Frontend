@@ -1,10 +1,8 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { Drawer } from 'antd';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import CompoundModal from '@/components/ui/CompoundModal';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import UserManagementForm from './UserManagementForm';
@@ -13,33 +11,40 @@ export default function UserManagementDialog({
   open: controlledOpen,
   onOpenChange: setControlledOpen,
   controlled = false,
+  userId,
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
   const open = controlled ? controlledOpen : internalOpen;
   const setOpen = controlled ? setControlledOpen : setInternalOpen;
+  const isEdit = !!userId;
 
   return (
-    <>
-      {!controlled ? (
-        <Button
-          onClick={() => setOpen(true)}
-          className="bg-primary hover:bg-primary-hover ml-auto flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm transition-all active:scale-95"
-        >
-          <span>{UI_TEXT.USER_MANAGEMENT.ADD}</span>
-          <Plus className="size-4" />
-        </Button>
-      ) : null}
-
-      <CompoundModal open={open} onCancel={() => setOpen(false)} width={560}>
-        <CompoundModal.Header
-          title={UI_TEXT.USER_MANAGEMENT.ADD}
-          subtitle={UI_TEXT.USER_MANAGEMENT.CREATE_DESCRIPTION}
-        />
-
-        <CompoundModal.Content className="mt-4 overflow-y-auto pb-8">
-          <UserManagementForm onSuccess={() => setOpen(false)} onCancel={() => setOpen(false)} />
-        </CompoundModal.Content>
-      </CompoundModal>
-    </>
+    <Drawer
+      title={
+        <div className="flex flex-col gap-1">
+          <span className="text-lg font-black tracking-tight text-slate-900">
+            {isEdit ? UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE : UI_TEXT.USER_MANAGEMENT.ADD}
+          </span>
+          <span className="text-xs font-medium text-slate-400">
+            {isEdit
+              ? UI_TEXT.USER_MANAGEMENT.UPDATE_INFO
+              : UI_TEXT.USER_MANAGEMENT.CREATE_DESCRIPTION}
+          </span>
+        </div>
+      }
+      open={open}
+      onClose={() => setOpen(false)}
+      width={560}
+      headerStyle={{ borderBottom: '1px solid #f8fafc', padding: '24px' }}
+      bodyStyle={{ padding: '24px' }}
+      footer={null}
+      destroyOnClose
+    >
+      <UserManagementForm
+        userId={userId}
+        onSuccess={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+      />
+    </Drawer>
   );
 }

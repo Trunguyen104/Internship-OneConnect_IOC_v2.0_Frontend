@@ -1,5 +1,6 @@
 export const STUDENT_LIST_UI = {
   PAGE_TITLE: 'Student List',
+  PAGE_SUBTITLE: 'View and manage members in your internship group.',
   TABLE: {
     INDEX: '#',
     STUDENT: 'Student',

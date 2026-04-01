@@ -6,7 +6,7 @@ function CardRoot({ children, className = '', ...props }) {
   return (
     <div
       data-slot="card"
-      className={cn('flex min-h-[420px] flex-col rounded-2xl bg-white p-5 shadow-sm', className)}
+      className={cn('flex flex-col rounded-2xl bg-white p-5 shadow-sm', className)}
       {...props}
     >
       {children}

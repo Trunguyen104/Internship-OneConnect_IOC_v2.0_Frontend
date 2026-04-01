@@ -17,7 +17,12 @@ export function useStudentList() {
 
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSizeState] = useState(10);
+
+  const setPageSize = useCallback((size) => {
+    setPageSizeState(size);
+    setPage(1);
+  }, []);
 
   const debouncedSearch = useDebounce(searchText, 500);
 

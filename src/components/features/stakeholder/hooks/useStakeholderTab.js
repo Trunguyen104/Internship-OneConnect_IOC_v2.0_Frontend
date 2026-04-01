@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { ProjectService } from '@/components/features/project/services/project.service';
 import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder.service';
@@ -12,7 +12,12 @@ export function useStakeholderTab() {
   const toast = useToast();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSizeState] = useState(10);
+
+  const setPageSize = useCallback((size) => {
+    setPageSizeState(size);
+    setPage(1);
+  }, []);
 
   // 1. Fetch Project & Internship ID
   const { data: projectInfo } = useQuery({

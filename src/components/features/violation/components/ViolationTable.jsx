@@ -1,12 +1,14 @@
 'use client';
 
-import { EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Tooltip } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
 const ViolationTable = memo(function ViolationTable({ data, loading, page, pageSize, onView }) {
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
@@ -19,8 +21,9 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
         key: 'index',
         width: '60px',
         align: 'center',
-        render: (_, __, index) => (page - 1) * pageSize + index + 1,
-        className: 'text-muted font-semibold text-xs',
+        render: (_, __, index) => (
+          <span className={TABLE_CELL.rowIndex}>{(page - 1) * pageSize + index + 1}</span>
+        ),
       },
       {
         title: TABLE.COLUMNS.STUDENT_NAME,
@@ -29,7 +32,7 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
         width: '200px',
         render: (text) => (
           <div className="flex flex-col overflow-hidden">
-            <span className="text-text truncate text-sm font-bold">{text}</span>
+            <span className={`${TABLE_CELL.primary} truncate`}>{text}</span>
           </div>
         ),
       },
@@ -40,7 +43,7 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
         width: '150px',
         render: (text) => (
           <Tooltip title={text}>
-            <span className="text-text truncate text-sm block">
+            <span className={`${TABLE_CELL.secondary} block truncate`}>
               {text || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
             </span>
           </Tooltip>
@@ -52,7 +55,7 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
         key: 'createdAt',
         width: '150px',
         render: (text) => (
-          <span className="text-muted text-xs font-medium">
+          <span className={`${TABLE_CELL.secondary} text-xs`}>
             {text
               ? dayjs(text).format(VIOLATION_REPORT.DATE_FORMATS.UI)
               : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
@@ -65,7 +68,7 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
         key: 'violationTime',
         width: '150px',
         render: (text) => (
-          <span className="text-muted text-xs font-medium">
+          <span className={`${TABLE_CELL.secondary} text-xs`}>
             {text
               ? dayjs(text).format(VIOLATION_REPORT.DATE_FORMATS.UI)
               : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
@@ -79,37 +82,30 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
         width: '200px',
         render: (text) => (
           <Tooltip title={text}>
-            <span className="text-muted text-xs font-medium truncate block">
+            <span className={`${TABLE_CELL.secondary} block truncate text-xs`}>
               {text || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
             </span>
           </Tooltip>
         ),
       },
       {
-        title: TABLE.COLUMNS.ACTIONS,
+        title: '',
         key: 'actions',
-        width: '60px',
+        width: '48px',
         align: 'right',
         render: (_, record) => {
           const items = [
             {
               key: 'view',
               label: TABLE.ACTIONS.VIEW,
-              icon: <EyeOutlined className="text-primary" />,
+              icon: <EyeOutlined />,
               onClick: () => onView(record.id),
             },
           ];
 
           return (
-            <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-              <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<MoreOutlined className="rotate-90" />}
-                  className="hover:bg-primary-surface text-muted flex h-8 w-8 items-center justify-center rounded-lg"
-                />
-              </Dropdown>
+            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+              <TableRowDropdown items={items} />
             </div>
           );
         },
@@ -119,15 +115,16 @@ const ViolationTable = memo(function ViolationTable({ data, loading, page, pageS
   );
 
   return (
-    <DataTable
-      columns={columns}
-      data={data}
-      loading={loading}
-      rowKey="id"
-      minWidth="1000px"
-      className="mt-5 min-h-0 flex-1"
-      locale={{ emptyText: VIOLATION_REPORT.EMPTY_MESSAGE }}
-    />
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DataTable
+        columns={columns}
+        data={data}
+        loading={loading}
+        rowKey="id"
+        minWidth="auto"
+        emptyText={VIOLATION_REPORT.EMPTY_MESSAGE}
+      />
+    </div>
   );
 });
 

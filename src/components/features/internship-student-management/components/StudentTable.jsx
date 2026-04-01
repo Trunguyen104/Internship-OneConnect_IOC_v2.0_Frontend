@@ -5,15 +5,15 @@ import {
   CloseCircleFilled,
   EyeOutlined,
   MinusCircleFilled,
-  MoreOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
 const STATUS_CONFIG = {
   Pending: {
@@ -67,7 +67,7 @@ const StudentTable = memo(function StudentTable({
         width: 60,
         align: 'center',
         render: (_, __, index) => (
-          <span className="text-muted font-mono text-xs font-bold">
+          <span className={`${TABLE_CELL.mono} font-bold`}>
             {String((page - 1) * pageSize + index + 1).padStart(2, '0')}
           </span>
         ),
@@ -80,7 +80,7 @@ const StudentTable = memo(function StudentTable({
         width: '170px',
         render: (_, record) => (
           <div className="flex flex-col">
-            <span className="text-text text-sm font-semibold">{record.studentFullName}</span>
+            <span className={TABLE_CELL.primary}>{record.studentFullName}</span>
           </div>
         ),
       },
@@ -90,7 +90,7 @@ const StudentTable = memo(function StudentTable({
         sortKey: 'studentCode',
         width: '100px',
         render: (_, record) => (
-          <span className="text-muted font-mono text-xs font-semibold">{record.studentCode}</span>
+          <span className={`${TABLE_CELL.mono} font-semibold`}>{record.studentCode}</span>
         ),
       },
       {
@@ -182,6 +182,7 @@ const StudentTable = memo(function StudentTable({
                 key: 'createGroup',
                 label: ACTIONS.CREATE_GROUP,
                 icon: <UsergroupAddOutlined />,
+                variant: 'success',
                 onClick: () => onCreateGroup(record),
               });
 
@@ -190,6 +191,7 @@ const StudentTable = memo(function StudentTable({
                   key: 'changeGroup',
                   label: ACTIONS.CHANGE_GROUP,
                   icon: <UsergroupAddOutlined />,
+                  variant: 'neutral',
                   onClick: () => onChangeGroup(record),
                 });
               }
@@ -198,21 +200,13 @@ const StudentTable = memo(function StudentTable({
                 key: 'changeGroup',
                 label: ACTIONS.CHANGE_GROUP,
                 icon: <UsergroupAddOutlined />,
+                variant: 'neutral',
                 onClick: () => onChangeGroup(record),
               });
             }
           }
 
-          return (
-            <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
-              <Button
-                type="text"
-                size="small"
-                icon={<MoreOutlined />}
-                className="hover:bg-primary/10 hover:text-primary text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-              />
-            </Dropdown>
-          );
+          return <TableRowDropdown items={menuItems} />;
         },
       },
     ],

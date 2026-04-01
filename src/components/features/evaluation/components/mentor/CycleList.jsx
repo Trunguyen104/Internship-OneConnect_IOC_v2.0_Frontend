@@ -3,16 +3,15 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  MoreOutlined,
   SettingOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { Dropdown } from 'antd';
 import React, { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 import CriteriaSettings from './CriteriaSettings';
@@ -125,15 +124,15 @@ export default function CycleList({
         const menuItems = [
           {
             key: 'edit',
-            label: <span className="font-bold text-xs">{BUTTONS.EDIT}</span>,
-            icon: <EditOutlined className="text-blue-500" />,
+            label: BUTTONS.EDIT,
+            icon: <EditOutlined />,
             disabled: isTermPast,
             onClick: () => onEdit(record),
           },
           {
             key: 'delete',
-            label: <span className="font-bold text-xs">{BUTTONS.DELETE}</span>,
-            icon: <DeleteOutlined className="text-rose-500" />,
+            label: BUTTONS.DELETE,
+            icon: <DeleteOutlined />,
             danger: true,
             disabled: isTermPast,
             onClick: () => onDelete(record.cycleId),
@@ -141,20 +140,9 @@ export default function CycleList({
         ];
 
         return (
-          <Dropdown
-            menu={{ items: menuItems }}
-            trigger={['click']}
-            placement="bottomRight"
-            className="flex justify-center"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-10 w-10 rounded-full p-0 flex items-center justify-center transition-all hover:bg-gray-100 text-muted/30 hover:text-text"
-            >
-              <MoreOutlined className="text-lg" />
-            </Button>
-          </Dropdown>
+          <div className="flex justify-center">
+            <TableRowDropdown items={menuItems} />
+          </div>
         );
       },
     },

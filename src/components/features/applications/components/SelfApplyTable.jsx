@@ -1,12 +1,16 @@
 'use client';
 
-import { MoreOutlined } from '@ant-design/icons';
-import { Dropdown } from 'antd';
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  EyeOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React from 'react';
 
-import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { APPLICATION_STATUS } from '@/constants/applications/application.constants';
 import { APPLICATIONS_UI } from '@/constants/applications/uiText';
 
@@ -86,45 +90,53 @@ export const SelfApplyTable = ({ data = [], loading = false, pagination, onActio
       align: 'right',
       render: (_, record) => {
         const getMenuItems = () => {
-          const items = [{ key: 'details', label: 'View Details' }];
+          const items = [{ key: 'details', label: 'View Details', icon: <EyeOutlined /> }];
 
           if (record.status === APPLICATION_STATUS.APPLIED) {
-            items.push({ key: 'interview', label: 'Interviewing' });
+            items.push({
+              key: 'interview',
+              label: 'Interviewing',
+              icon: <SendOutlined />,
+              variant: 'neutral',
+            });
           }
           if (record.status === APPLICATION_STATUS.INTERVIEWING) {
-            items.push({ key: 'offer', label: 'Send Offer' });
+            items.push({
+              key: 'offer',
+              label: 'Send Offer',
+              icon: <SendOutlined />,
+              variant: 'warning',
+            });
           }
           if (record.status === APPLICATION_STATUS.OFFERED) {
-            items.push({ key: 'placed', label: 'Mark as Placed' });
+            items.push({
+              key: 'placed',
+              label: 'Mark as Placed',
+              icon: <CheckCircleOutlined />,
+              variant: 'success',
+            });
           }
 
           if (
             record.status < APPLICATION_STATUS.PLACED &&
             record.status !== APPLICATION_STATUS.REJECTED
           ) {
-            items.push({ key: 'reject', label: 'Reject Application', danger: true });
+            items.push({
+              key: 'reject',
+              label: 'Reject Application',
+              icon: <CloseCircleOutlined />,
+              danger: true,
+            });
           }
 
           return items;
         };
 
         return (
-          <Dropdown
-            menu={{
-              items: getMenuItems(),
-              onClick: ({ key }) => onAction(key, record),
-            }}
-            trigger={['click']}
-            placement="bottomRight"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full hover:bg-slate-100 text-slate-400"
-            >
-              <MoreOutlined className="rotate-90 text-lg" />
-            </Button>
-          </Dropdown>
+          <TableRowDropdown
+            items={getMenuItems()}
+            menuProps={{ onClick: ({ key }) => onAction(key, record) }}
+          />
         );
       },
     },

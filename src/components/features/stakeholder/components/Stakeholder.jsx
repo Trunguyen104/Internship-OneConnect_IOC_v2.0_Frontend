@@ -13,10 +13,14 @@ export default function StakeholderPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={STAKEHOLDER_UI.PAGE_TITLE} />
+      <PageLayout.Header
+        title={STAKEHOLDER_UI.PAGE_TITLE}
+        subtitle={STAKEHOLDER_UI.PAGE_SUBTITLE}
+      />
 
       <div className="mb-6 flex w-fit items-center gap-1 rounded-2xl bg-gray-100/50 p-1">
         <button
+          type="button"
           onClick={() => setTab('stakeholder')}
           className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-300 ${
             tab === 'stakeholder'
@@ -28,6 +32,7 @@ export default function StakeholderPage() {
         </button>
 
         <button
+          type="button"
           onClick={() => setTab('issue')}
           className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-300 ${
             tab === 'issue'
@@ -39,13 +44,13 @@ export default function StakeholderPage() {
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {tab === 'stakeholder' ? (
-          <div className="animate-in slide-in-from-left-4 flex flex-1 flex-col overflow-hidden duration-500">
+          <div className="animate-in slide-in-from-left-4 flex min-h-0 flex-1 flex-col overflow-hidden duration-500">
             <StakeholderTab />
           </div>
         ) : (
-          <div className="animate-in slide-in-from-right-4 flex flex-1 flex-col overflow-hidden duration-500">
+          <div className="animate-in slide-in-from-right-4 flex min-h-0 flex-1 flex-col overflow-hidden duration-500">
             <IssueTab />
           </div>
         )}

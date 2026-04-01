@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 
 import PageLayout from '@/components/ui/pagelayout';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useViolation } from '../hooks/useViolation';
 import ViolationModal from './ViolationModal';
@@ -52,20 +53,20 @@ export default function ViolationPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={VIOLATION_REPORT.TITLE} />
+      <PageLayout.Header title={VIOLATION_REPORT.TITLE} subtitle={VIOLATION_REPORT.SUBTITLE} />
 
-      <PageLayout.Card>
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <PageLayout.Toolbar
-            searchProps={{
-              placeholder: VIOLATION_REPORT.SEARCH_PLACEHOLDER,
-              value: search,
-              onChange: (e) => setSearch(e.target.value),
-            }}
-          >
-            <div className="relative">
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
+          searchProps={{
+            placeholder: VIOLATION_REPORT.SEARCH_PLACEHOLDER,
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
+          }}
+          filterContent={
+            <div className="relative shrink-0">
               <RangePicker
-                className="h-9 w-60"
+                className="h-11 w-full min-w-[240px] md:w-72"
                 status={dateError ? 'error' : ''}
                 value={dateRange}
                 onChange={onDateChange}
@@ -80,31 +81,34 @@ export default function ViolationPage() {
                 </span>
               )}
             </div>
-          </PageLayout.Toolbar>
+          }
+        />
 
-          <PageLayout.Content>
-            <ViolationTable
-              data={paginated}
-              loading={loading}
-              page={page}
-              pageSize={pageSize}
-              onView={handleView}
-            />
-          </PageLayout.Content>
+        <PageLayout.Content className="px-0">
+          <ViolationTable
+            data={paginated}
+            loading={loading}
+            page={page}
+            pageSize={pageSize}
+            onView={handleView}
+          />
+        </PageLayout.Content>
 
-          {total > 0 && (
+        {total > 0 && (
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
+            </span>
             <PageLayout.Pagination
               total={total}
               page={page}
               pageSize={pageSize}
               onPageChange={setPage}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPage(1);
-              }}
+              onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
             />
-          )}
-        </div>
+          </PageLayout.Footer>
+        )}
       </PageLayout.Card>
 
       <ViolationModal
