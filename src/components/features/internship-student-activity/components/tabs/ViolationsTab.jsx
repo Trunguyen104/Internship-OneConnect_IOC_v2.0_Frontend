@@ -7,6 +7,7 @@ import React from 'react';
 
 import Card from '@/components/ui/card';
 import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const ViolationCard = ({ violation }) => {
   return (

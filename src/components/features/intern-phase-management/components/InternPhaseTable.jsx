@@ -9,17 +9,17 @@ import {
   MoreOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import { Dropdown, Tooltip } from 'antd';
+import { Badge, Dropdown, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import StatusBadge from '@/components/ui/status-badge';
 import {
   INTERN_PHASE_MANAGEMENT,
+  INTERN_PHASE_STATUS,
   INTERN_PHASE_STATUS_LABELS,
-  INTERN_PHASE_STATUS_VARIANTS,
 } from '@/constants/intern-phase-management/intern-phase';
 
 export default function InternPhaseTable({
@@ -54,33 +54,49 @@ export default function InternPhaseTable({
       {
         title: TABLE.COLUMNS.MAJORS,
         key: 'majorFields',
-        width: '200px',
+        width: '190px',
         render: (text) => {
-          const majors = typeof text === 'string' ? text.split(',').filter(Boolean) : [];
-          const displayMajors = majors.slice(0, 2);
-          const remaining = majors.length - displayMajors.length;
+          const majors =
+            typeof text === 'string'
+              ? text
+                  .split(',')
+                  .map((m) => m.trim())
+                  .filter(Boolean)
+              : [];
+          if (!majors.length) return <span className="text-muted/40 italic">-</span>;
+
+          const firstMajor = majors[0];
+          const remainingCount = majors.length - 1;
+
+          // Simple hash-based color selection for a premium "vibrant" feel
+          const colors = [
+            'primary-soft',
+            'success-soft',
+            'warning-soft',
+            'info-soft',
+            'indigo-soft',
+          ];
+          const colorIndex =
+            Math.abs(firstMajor.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) %
+            colors.length;
+          const variant = colors[colorIndex];
 
           return (
-            <div className="flex items-center gap-1 overflow-hidden">
-              {displayMajors.map((m, i) => {
-                const majorName = m.trim();
-                return (
-                  <Tooltip key={i} title={majorName}>
-                    <Badge
-                      variant="primary-soft"
-                      size="xs"
-                      className="inline-block max-w-[100px] truncate"
-                    >
-                      {majorName}
-                    </Badge>
-                  </Tooltip>
-                );
-              })}
-              {remaining > 0 && (
-                <Tooltip title={majors.slice(2).join(', ')}>
-                  <Badge variant="default" size="xs" className="flex-shrink-0 cursor-help">
-                    +{remaining}
-                  </Badge>
+            <div className="flex items-center gap-2">
+              <Tooltip title={majors.join(', ')}>
+                <Badge
+                  variant={variant}
+                  size="sm"
+                  className="max-w-[150px] truncate font-bold tracking-tight"
+                >
+                  {firstMajor}
+                </Badge>
+              </Tooltip>
+              {remainingCount > 0 && (
+                <Tooltip title={majors.slice(1).join(', ')}>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-500 ring-4 ring-white shadow-sm transition-all hover:scale-110 hover:bg-slate-200 cursor-help">
+                    +{remainingCount}
+                  </div>
                 </Tooltip>
               )}
             </div>
@@ -90,7 +106,7 @@ export default function InternPhaseTable({
       {
         title: TABLE.COLUMNS.TIMELINE,
         key: 'timeline',
-        width: '180px',
+        width: '170px',
         render: (_, record) => (
           <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
             <span className="whitespace-nowrap">
@@ -106,23 +122,34 @@ export default function InternPhaseTable({
         key: 'computedStatus',
         width: '100px',
         align: 'center',
-        render: (status) => (
-          <Badge variant={INTERN_PHASE_STATUS_VARIANTS[status]} size="sm">
-            {INTERN_PHASE_STATUS_LABELS[status]}
-          </Badge>
-        ),
+        render: (status) => {
+          const variant =
+            status === INTERN_PHASE_STATUS.ACTIVE
+              ? 'success'
+              : status === INTERN_PHASE_STATUS.UPCOMING
+                ? 'warning'
+                : 'neutral';
+
+          return (
+            <StatusBadge
+              variant={variant}
+              label={INTERN_PHASE_STATUS_LABELS[status]}
+              pulseDot={status === INTERN_PHASE_STATUS.ACTIVE}
+            />
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.POSTINGS,
         key: 'jobPostingCount',
-        width: '80px',
+        width: '110px',
         align: 'center',
         render: (count) => <span className="font-medium">{count || 0}</span>,
       },
       {
         title: TABLE.COLUMNS.CAPACITY,
         key: 'capacity',
-        width: '110px',
+        width: '100px',
         align: 'center',
         render: (_, record) => {
           const total = record.capacity || 0;

@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import { USER_ROLE_LABEL, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 
@@ -104,24 +105,11 @@ export default function UserManagementTable({ users = [], loading = false }) {
         render: (status) => {
           const active = isStatusActive(status);
           return (
-            <div className="flex items-center gap-4">
-              <div
-                className={[
-                  'size-2.5 flex-shrink-0 rounded-full ring-4 transition-all duration-500',
-                  active
-                    ? 'bg-emerald-500 ring-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.5)] group-hover:scale-110'
-                    : 'bg-gray-300 ring-gray-300/5',
-                ].join(' ')}
-              />
-              <span
-                className={[
-                  'text-xs font-black uppercase tracking-widest transition-colors',
-                  active ? 'text-emerald-600 group-hover:text-emerald-500' : 'text-muted/60',
-                ].join(' ')}
-              >
-                {getStatusLabel(status)}
-              </span>
-            </div>
+            <StatusBadge
+              variant={active ? 'success' : 'neutral'}
+              label={getStatusLabel(status)}
+              className="group-hover:translate-x-1 transition-transform"
+            />
           );
         },
       },

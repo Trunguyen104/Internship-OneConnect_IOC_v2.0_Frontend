@@ -4,8 +4,8 @@ import { Empty, Skeleton } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 
 export default function InternPhaseJobPostingTab({ data, loading, DETAILS }) {
@@ -26,13 +26,17 @@ export default function InternPhaseJobPostingTab({ data, loading, DETAILS }) {
       align: 'center',
       render: (status) => {
         const displayStatus = typeof status === 'object' ? status?.name || status?.label : status;
-        const variant = TABLE.STATUS_VARIANTS[displayStatus] || 'default';
         const label = TABLE.STATUS_LABELS[displayStatus] || displayStatus || '-';
 
+        const variant =
+          displayStatus === 'Published'
+            ? 'success'
+            : displayStatus === 'Draft'
+              ? 'warning'
+              : 'neutral';
+
         return (
-          <Badge variant={variant} size="xs">
-            {label}
-          </Badge>
+          <StatusBadge variant={variant} label={label} pulseDot={displayStatus === 'Published'} />
         );
       },
     },

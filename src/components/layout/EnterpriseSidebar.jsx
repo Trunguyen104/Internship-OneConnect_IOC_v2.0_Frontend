@@ -20,11 +20,6 @@ import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 const enterpriseMenu = [
   { icon: <DashboardOutlined />, label: 'Dashboard', href: '/dashboard' },
   {
-    icon: <CalendarOutlined />,
-    label: 'Active Term',
-    href: '/active-internship-terms',
-  },
-  {
     icon: <BankOutlined />,
     label: 'My Company',
     href: '/company-profile',

@@ -9,15 +9,16 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Progress, Tabs, Tag } from 'antd';
+import { Button, Progress, Tabs } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
 import Badge from '@/components/ui/badge';
+import StatusBadge from '@/components/ui/status-badge';
 import {
   INTERN_PHASE_MANAGEMENT,
+  INTERN_PHASE_STATUS,
   INTERN_PHASE_STATUS_LABELS,
-  INTERN_PHASE_STATUS_VARIANTS,
 } from '@/constants/intern-phase-management/intern-phase';
 
 import { InternPhaseService } from '../services/intern-phase.service';
@@ -84,9 +85,17 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                 {METADATA.TITLE}
               </span>
             </div>
-            <Badge variant={INTERN_PHASE_STATUS_VARIANTS[phase?.computedStatus]} size="sm">
-              {INTERN_PHASE_STATUS_LABELS[phase?.computedStatus]}
-            </Badge>
+            <StatusBadge
+              variant={
+                phase?.computedStatus === INTERN_PHASE_STATUS.ACTIVE
+                  ? 'success'
+                  : phase?.computedStatus === INTERN_PHASE_STATUS.UPCOMING
+                    ? 'warning'
+                    : 'neutral'
+              }
+              label={INTERN_PHASE_STATUS_LABELS[phase?.computedStatus]}
+              pulseDot={phase?.computedStatus === INTERN_PHASE_STATUS.ACTIVE}
+            />
           </div>
 
           <div className="space-y-1">
@@ -211,20 +220,38 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                   <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
                   {METADATA.MAJORS}
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {(typeof phase?.majorFields === 'string'
                     ? phase?.majorFields.split(',')
                     : Array.isArray(phase?.majorFields)
                       ? phase?.majorFields
                       : []
-                  ).map((m, i) => (
-                    <Tag
-                      key={i}
-                      className="m-0 border-none bg-white px-3 py-1 text-xs font-bold text-slate-600 shadow-sm transition-all hover:bg-white/80"
-                    >
-                      {m.trim()}
-                    </Tag>
-                  ))}
+                  ).map((m, i) => {
+                    const majorName = m.trim();
+                    const colors = [
+                      'primary-soft',
+                      'success-soft',
+                      'warning-soft',
+                      'info-soft',
+                      'indigo-soft',
+                    ];
+                    const colorIndex =
+                      Math.abs(
+                        majorName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+                      ) % colors.length;
+                    const variant = colors[colorIndex];
+
+                    return (
+                      <Badge
+                        key={i}
+                        variant={variant}
+                        size="md"
+                        className="px-4 py-1.5 font-black tracking-tight shadow-sm transition-all hover:scale-105"
+                      >
+                        {majorName}
+                      </Badge>
+                    );
+                  })}
                 </div>
               </div>
             </div>
