@@ -18,6 +18,8 @@ import React, { useMemo } from 'react';
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import {
+  getOperationalStatus,
+  getVisibilityStatus,
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
@@ -25,6 +27,7 @@ import {
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
 } from '@/constants/project-management/project-management';
+import { cn } from '@/lib/cn';
 
 export default function ProjectTable({
   data,
@@ -57,10 +60,10 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
-        width: 140,
+        width: 160,
         render: (text, record) => (
           <div
-            className="font-semibold text-primary hover:underline cursor-pointer truncate max-w-[140px]"
+            className="font-semibold text-slate-900 hover:text-primary hover:underline cursor-pointer truncate max-w-[160px] transition-colors"
             title={record.projectName}
             onClick={() => onView(record)}
           >
@@ -68,19 +71,16 @@ export default function ProjectTable({
           </div>
         ),
       },
-      {
-        title: TABLE.COLUMNS.CODE,
-        key: 'code',
-        width: 110,
-        render: (_, record) => (
-          <div
-            className="text-gray-500 truncate w-[100px]"
-            title={record.projectCode || record.code}
-          >
-            {record.projectCode || record.code}
-          </div>
-        ),
-      },
+      // {
+      //   title: TABLE.COLUMNS.CODE,
+      //   key: 'code',
+      //   width: 120,
+      //   render: (_, record) => (
+      //     <code className="text-[11px] font-mono bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 uppercase">
+      //       {record.projectCode || record.code || PROJECT_MANAGEMENT.DETAIL.NO_CODE}
+      //     </code>
+      //   ),
+      // },
       {
         title: PROJECT_MANAGEMENT.FILTERS.GROUP_FILTER,
         key: 'group',
@@ -141,45 +141,71 @@ export default function ProjectTable({
             );
           }
 
+          const op = getOperationalStatus(record.operationalStatus ?? record.status);
+          const isReadOnly =
+            op === OPERATIONAL_STATUS.COMPLETED || op === OPERATIONAL_STATUS.ARCHIVED;
+
           return (
             <div
-              className="cursor-pointer hover:text-primary transition-colors group/cell"
+              className={cn(
+                'transition-colors group/cell',
+                !isReadOnly && 'cursor-pointer hover:text-primary'
+              )}
               onClick={(e) => {
+                if (isReadOnly) return;
                 e.stopPropagation();
                 onAssign?.(record);
               }}
             >
-              <div className="group-hover/cell:underline">{content}</div>
+              <div className={cn(!isReadOnly && 'group-hover/cell:underline')}>{content}</div>
             </div>
           );
         },
       },
-      {
-        title: TABLE.COLUMNS.FIELD,
-        key: 'field',
-        width: 100,
-        render: (text) => (
-          <div className="truncate w-[100px]" title={text}>
-            {text || PROJECT_MANAGEMENT.COMMON.N_A}
-          </div>
-        ),
-      },
+      // {
+      //   title: TABLE.COLUMNS.FIELD,
+      //   key: 'field',
+      //   width: 120,
+      //   render: (text) => (
+      //     <span className="text-xs font-medium text-slate-600 truncate block max-w-[120px]" title={text}>
+      //       {text || PROJECT_MANAGEMENT.COMMON.N_A}
+      //     </span>
+      //   ),
+      // },
       {
         title: TABLE.COLUMNS.TIMELINE,
         key: 'timeline',
-        width: 160,
+        width: 150,
         render: (_, record) => {
           if (record.isOrphaned) {
             return <div className="text-gray-400">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
           }
-          const start = record.startDate
-            ? dayjs(record.startDate).format('DD/MM/YYYY')
+
+          // AC-08 Fallback: Use group dates if project dates are null
+          const gid = record.internshipId || record.internshipGroupId || record.groupId;
+          const group =
+            gid && Array.isArray(groups)
+              ? groups.find(
+                  (g) =>
+                    (g.internshipId && g.internshipId.toLowerCase() === gid.toLowerCase()) ||
+                    (g.id && g.id.toLowerCase() === gid.toLowerCase())
+                )
+              : null;
+
+          const startSrc = record.startDate || group?.startDate;
+          const endSrc = record.endDate || group?.endDate;
+
+          if (!startSrc && !endSrc) {
+            return <div className="text-gray-600 font-medium">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
+          }
+
+          const start = startSrc
+            ? dayjs(startSrc).format('DD/MM/YYYY')
             : PROJECT_MANAGEMENT.COMMON.N_A;
-          const end = record.endDate
-            ? dayjs(record.endDate).format('DD/MM/YYYY')
-            : PROJECT_MANAGEMENT.COMMON.N_A;
+          const end = endSrc ? dayjs(endSrc).format('DD/MM/YYYY') : PROJECT_MANAGEMENT.COMMON.N_A;
+
           return (
-            <div className="text-gray-600 text-[11px] font-medium tracking-tight">
+            <div className="text-gray-600 text-[11px] font-medium tracking-tight whitespace-nowrap">
               {start} {PROJECT_MANAGEMENT.COMMON.DASH} {end}
             </div>
           );
@@ -188,10 +214,10 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.VISIBILITY,
         key: 'visibility',
-        width: 90,
+        width: 80,
         align: 'center',
         render: (_, record) => {
-          const vis = record.visibilityStatus ?? record.visibility ?? VISIBILITY_STATUS.DRAFT;
+          const vis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const label = VISIBILITY_LABELS[vis] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
           const variant = STATUS_VARIANTS[vis] || 'default';
           return (
@@ -204,10 +230,10 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.STATUS,
         key: 'operationalStatus',
-        width: 110,
+        width: 100,
         align: 'center',
         render: (_, record) => {
-          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const op = getOperationalStatus(record.operationalStatus ?? record.status);
           const label = OPERATIONAL_LABELS[op] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
           const variant = STATUS_VARIANTS[op] || 'default';
           return (
@@ -220,16 +246,17 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 80,
+        width: 60,
         align: 'center',
         render: (_, record) => {
+          const originalOp = getOperationalStatus(record.operationalStatus ?? record.status);
+          const originalVis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const vis =
-            record.visibilityStatus ??
-            record.visibility ??
-            (record.status === OPERATIONAL_STATUS.UNSTARTED
+            originalVis ??
+            (originalOp === OPERATIONAL_STATUS.UNSTARTED
               ? VISIBILITY_STATUS.DRAFT
               : VISIBILITY_STATUS.PUBLISHED);
-          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const op = originalOp;
 
           if (!isMentor) {
             return (
@@ -266,11 +293,6 @@ export default function ProjectTable({
                 key: 'archive',
                 label: TABLE.ACTIONS_LABEL.ARCHIVE,
                 onClick: () => onArchive?.(record.projectId),
-              },
-              {
-                key: 'change-group',
-                label: TABLE.ACTIONS_LABEL.CHANGE_GROUP,
-                onClick: () => onAssign?.(record),
               }
             );
           } else if (op === OPERATIONAL_STATUS.UNSTARTED || op === OPERATIONAL_STATUS.ACTIVE) {
@@ -364,7 +386,7 @@ export default function ProjectTable({
       onChange={onChange}
       rowKey="projectId"
       size="small"
-      minWidth="1000px"
+      minWidth="100%"
       className="project-table"
       locale={{
         emptyText: (

@@ -1,70 +1,61 @@
-import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 import { getErrorDetail } from '@/utils/errorUtils';
 
-import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
-export const useEnterpriseGroupActions = (onSuccess) => {
+export const useEnterpriseGroupActions = () => {
+  const queryClient = useQueryClient();
   const toast = useToast();
-  const [loading, setLoading] = useState(false);
-  const { MESSAGES } = ENTERPRISE_GROUP_UI;
+  const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
+  const { MESSAGES, REFRESH_EVENT } = GROUP_MANAGEMENT;
 
-  const handleAction = async (actionFn, successMessage) => {
-    try {
-      setLoading(true);
-      await actionFn();
-      toast.success(successMessage);
-      if (onSuccess) onSuccess();
-      window.dispatchEvent(
-        new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
-      );
-      return true;
-    } catch (error) {
-      toast.error(getErrorDetail(error, MESSAGES.ERROR));
-      return false;
-    } finally {
-      setLoading(false);
-    }
+  const handleSuccess = (message) => {
+    toast.success(message);
+    queryClient.invalidateQueries({ queryKey: ['enterprise-groups'] });
+    queryClient.invalidateQueries({ queryKey: ['enterprise-group-detail'] });
+    queryClient.invalidateQueries({ queryKey: ['internship-students'] });
+    queryClient.invalidateQueries({ queryKey: ['unassigned-students'] });
+    window.dispatchEvent(new CustomEvent(REFRESH_EVENT || 'INTERNSHIP_GROUP_REFRESH'));
   };
 
-  const createGroup = (data) =>
-    handleAction(() => EnterpriseGroupService.createGroup(data), MESSAGES.CREATE_SUCCESS);
+  const createMutation = useMutation({
+    mutationFn: (data) => EnterpriseGroupService.createGroup(data),
+    onSuccess: () => handleSuccess(MESSAGES.CREATE_SUCCESS),
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.ERROR)),
+  });
 
-  const updateGroup = (id, data) =>
-    handleAction(() => EnterpriseGroupService.updateGroup(id, data), MESSAGES.UPDATE_SUCCESS);
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => EnterpriseGroupService.updateGroup(id, data),
+    onSuccess: () => handleSuccess(MESSAGES.UPDATE_SUCCESS),
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.ERROR)),
+  });
 
-  const archiveGroup = (id) =>
-    handleAction(() => EnterpriseGroupService.archiveGroup(id), MESSAGES.ARCHIVE_SUCCESS);
+  const archiveMutation = useMutation({
+    mutationFn: (id) => EnterpriseGroupService.archiveGroup(id),
+    onSuccess: () => handleSuccess(MESSAGES.ARCHIVE_SUCCESS),
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.ERROR)),
+  });
 
-  const moveStudents = (data) =>
-    handleAction(() => EnterpriseGroupService.moveStudents(data), MESSAGES.UPDATE_SUCCESS);
+  const addStudentsMutation = useMutation({
+    mutationFn: ({ id, students }) => EnterpriseGroupService.addStudents(id, students),
+    onSuccess: () => handleSuccess(MESSAGES.ADD_STUDENT_SUCCESS || 'Students added successfully'),
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.ERROR)),
+  });
 
-  const addStudents = (id, students) =>
-    handleAction(
-      () => EnterpriseGroupService.addStudents(id, students),
-      MESSAGES.ADD_STUDENT_SUCCESS
-    );
+  const removeStudentsMutation = useMutation({
+    mutationFn: ({ id, studentIds }) => EnterpriseGroupService.removeStudents(id, studentIds),
+    onSuccess: () =>
+      handleSuccess(MESSAGES.REMOVE_STUDENT_SUCCESS || 'Students removed successfully'),
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.ERROR)),
+  });
 
-  const removeStudents = (id, studentIds) =>
-    handleAction(
-      () => EnterpriseGroupService.removeStudents(id, studentIds),
-      MESSAGES.REMOVE_STUDENT_SUCCESS
-    );
-
-  const deleteGroup = async (id) => {
-    try {
-      setLoading(true);
-      await EnterpriseGroupService.deleteGroup(id);
-      toast.success(MESSAGES.DELETE_SUCCESS);
-      if (onSuccess) onSuccess();
-      window.dispatchEvent(
-        new CustomEvent(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT)
-      );
-      return true;
-    } catch (error) {
+  const deleteMutation = useMutation({
+    mutationFn: (id) => EnterpriseGroupService.deleteGroup(id),
+    onSuccess: () => handleSuccess(MESSAGES.DELETE_SUCCESS),
+    onError: (error) => {
       const errorMsg = error?.message || '';
       if (
         error?.status === 400 ||
@@ -75,20 +66,22 @@ export const useEnterpriseGroupActions = (onSuccess) => {
       } else {
         toast.error(getErrorDetail(error, MESSAGES.ERROR));
       }
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
 
   return {
-    loading,
-    createGroup,
-    updateGroup,
-    archiveGroup,
-    moveStudents,
-    addStudents,
-    removeStudents,
-    deleteGroup,
+    loading:
+      createMutation.isPending ||
+      updateMutation.isPending ||
+      archiveMutation.isPending ||
+      addStudentsMutation.isPending ||
+      removeStudentsMutation.isPending ||
+      deleteMutation.isPending,
+    createGroup: createMutation.mutateAsync,
+    updateGroup: (id, data) => updateMutation.mutateAsync({ id, data }),
+    archiveGroup: archiveMutation.mutateAsync,
+    addStudents: (id, students) => addStudentsMutation.mutateAsync({ id, students }),
+    removeStudents: (id, studentIds) => removeStudentsMutation.mutateAsync({ id, studentIds }),
+    deleteGroup: deleteMutation.mutateAsync,
   };
 };

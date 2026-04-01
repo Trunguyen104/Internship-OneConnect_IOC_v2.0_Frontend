@@ -1,6 +1,11 @@
 'use client';
 
-import { CalendarOutlined, DashboardOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  BarChartOutlined,
+  CalendarOutlined,
+  DashboardOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 
 import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
@@ -9,6 +14,7 @@ const adminMenu = [
   { icon: <CalendarOutlined />, label: 'Internship Terms', href: '/internship-terms' },
   { icon: <TeamOutlined />, label: 'Enrollments', href: '/enrollments' },
   { icon: <TeamOutlined />, label: 'Student Management', href: '/student-management' },
+  { icon: <BarChartOutlined />, label: 'Internship Activity', href: '/internship/students' },
 ];
 
 export default function SidebarAdmin() {

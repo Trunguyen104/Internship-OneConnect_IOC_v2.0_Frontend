@@ -14,9 +14,9 @@ import React, { useMemo } from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import Badge from '@/components/ui/badge';
-import Card from '@/components/ui/card';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import {
   INTERNSHIP_MANAGEMENT_UI,
@@ -210,7 +210,8 @@ export default function InternshipTermManagement() {
       },
     ],
     [
-      pagination,
+      pagination.current,
+      pagination.pageSize,
       TABLE,
       STATUS_LABELS,
       ACTIONS,
@@ -222,10 +223,10 @@ export default function InternshipTermManagement() {
   );
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+    <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <StudentPageHeader title={TERM_MANAGEMENT.TITLE} />
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !rounded-3xl border-none !p-6 shadow-sm sm:!p-8">
+      <PageLayout.Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
         <DataTableToolbar className="mb-6 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={TERM_MANAGEMENT.SEARCH_PLACEHOLDER}
@@ -267,18 +268,16 @@ export default function InternshipTermManagement() {
           minWidth="800px"
         />
 
-        {data.length > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
-              total={pagination.total}
-              page={pagination.current}
-              pageSize={pagination.pageSize}
-              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
-              onPageChange={(page) => handleTableChange({ current: page })}
-            />
-          </div>
-        )}
-      </Card>
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+          <Pagination
+            total={pagination.total || 0}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            totalPages={Math.max(1, Math.ceil((pagination.total || 0) / pagination.pageSize))}
+            onPageChange={(page) => handleTableChange({ current: page })}
+          />
+        </div>
+      </PageLayout.Card>
 
       <TermFormModal
         visible={modalVisible}
@@ -307,6 +306,6 @@ export default function InternshipTermManagement() {
         onConfirm={handleDelete}
         loading={submitLoading}
       />
-    </section>
+    </PageLayout>
   );
 }

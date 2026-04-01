@@ -8,8 +8,8 @@ import {
 } from '@ant-design/icons';
 import React from 'react';
 
-import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
@@ -41,6 +41,8 @@ export default function InternshipManagement() {
     setDetailModal,
     setSelectedRowKeys,
     handleSearchChange,
+    handleGroupFilterChange,
+    handleMentorFilterChange,
     handleTableChange,
     handlePageSizeChange,
     handleGroupSubmit,
@@ -115,8 +117,8 @@ export default function InternshipManagement() {
     phaseId && phaseId !== 'ALL_VISIBLE' ? phaseOptions.find((p) => p.value === phaseId) : null;
 
   return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
+    <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+      <PageLayout.Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
         <DataTableToolbar className="mb-5 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={INTERNSHIP_LIST.FILTERS.SEARCH_PLACEHOLDER}
@@ -128,9 +130,9 @@ export default function InternshipManagement() {
             <div className="flex flex-wrap items-center gap-3">
               <StudentFilters
                 groupFilter={groupFilter}
-                setGroupFilter={setGroupFilter}
+                setGroupFilter={handleGroupFilterChange}
                 mentorFilter={mentorFilter}
-                setMentorFilter={setMentorFilter}
+                setMentorFilter={handleMentorFilterChange}
                 resetFilters={resetFilters}
               />
             </div>
@@ -187,19 +189,17 @@ export default function InternshipManagement() {
             setGroupModal({ open: true, students: [student], type: 'CHANGE' })
           }
         />
-        {total > 0 && (
-          <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
-            <Pagination
-              total={total}
-              page={pagination.current}
-              pageSize={pagination.pageSize}
-              totalPages={Math.ceil(total / pagination.pageSize)}
-              onPageChange={handleTableChange}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          </div>
-        )}
-      </Card>
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+          <Pagination
+            total={total || 0}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            totalPages={Math.max(1, Math.ceil((total || 0) / pagination.pageSize))}
+            onPageChange={handleTableChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </div>
+      </PageLayout.Card>
 
       <StudentDetailModal
         open={detailModal.open}
@@ -212,13 +212,6 @@ export default function InternshipManagement() {
         phase={phaseDetailModal.phase}
         onCancel={() => setPhaseDetailModal({ open: false, phase: null })}
       />
-
-      {/* <AssignMentorModal
-        open={assignModal.open}
-        student={assignModal.student}
-        onCancel={() => setAssignModal({ open: false, student: null })}
-        onConfirm={handleAssignMentor}
-      /> */}
 
       <GroupActionModal
         open={groupModal.open}
@@ -239,6 +232,6 @@ export default function InternshipManagement() {
         onCancel={() => setCreateModal({ open: false, students: [] })}
         onFinish={handleCreateGroup}
       />
-    </section>
+    </PageLayout>
   );
 }

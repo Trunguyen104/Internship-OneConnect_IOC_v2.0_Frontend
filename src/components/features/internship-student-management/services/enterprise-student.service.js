@@ -56,8 +56,7 @@ export const EnterpriseStudentService = {
       item.AssignedGroupId ||
       item.internshipGroupId ||
       item.InternshipGroupId ||
-      item.group_id ||
-      item.internshipId;
+      item.group_id;
 
     return {
       ...item,
@@ -95,11 +94,13 @@ export const EnterpriseStudentService = {
       phaseName: item.phaseName || item.PhaseName || item.internshipPhase?.name || item.phase?.name,
       startDate:
         item.startDate ||
+        item.phaseStartDate ||
         item.internshipStartDate ||
         item.internshipPhase?.startDate ||
         item.phase?.startDate,
       endDate:
         item.endDate ||
+        item.phaseEndDate ||
         item.internshipEndDate ||
         item.internshipPhase?.endDate ||
         item.phase?.endDate,

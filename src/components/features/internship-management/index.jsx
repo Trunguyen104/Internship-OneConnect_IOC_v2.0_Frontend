@@ -6,8 +6,8 @@ import React, { useState } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import GroupManagement from '../../internship-group-management/components';
-import InternshipManagement from '../../internship-student-management/components';
+import GroupManagement from '../internship-group-management/components';
+import InternshipManagement from '../internship-student-management/components';
 
 export default function InternshipManagementContainer() {
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
