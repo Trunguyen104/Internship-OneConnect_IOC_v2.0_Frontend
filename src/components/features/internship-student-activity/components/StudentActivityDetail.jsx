@@ -15,8 +15,8 @@ import { Button, Tabs } from 'antd';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
-import Badge from '@/components/ui/badge';
 import PageLayout from '@/components/ui/pagelayout';
+import StatusBadge from '@/components/ui/status-badge';
 import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
 import { UI_TEXT } from '@/lib/UI_Text';
 
@@ -117,7 +117,7 @@ export default function StudentActivityDetail() {
   return (
     <PageLayout className="gap-0! pt-0!">
       {/* Unified Header Card */}
-      <div className="bg-white overflow-hidden border-2 border-slate-900 rounded-[32px] transition-all duration-500 shadow-xl shadow-slate-200/40">
+      <div className="bg-white overflow-hidden border border-slate-200/60 rounded-[32px] transition-all duration-500 shadow-xl shadow-slate-200/40">
         {/* Profile Section */}
         <div className="p-8 pb-4 relative">
           {/* Prominent Back Button inside Card */}
@@ -126,7 +126,7 @@ export default function StudentActivityDetail() {
               type="text"
               icon={<ArrowLeftOutlined className="text-[10px]" />}
               onClick={() => router.back()}
-              className="group !inline-flex items-center gap-2.5 !bg-slate-50 hover:!bg-primary hover:!text-white !text-slate-500 !font-black !text-[8px] !tracking-[0.2em] !uppercase !px-4 !py-1 !h-8 !rounded-xl !transition-all !duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+              className="group !inline-flex items-center gap-2.5 !bg-slate-100/50 hover:!bg-primary hover:!text-white !text-slate-500 !font-black !text-[8px] !tracking-[0.2em] !uppercase !px-4 !py-1 !h-8 !rounded-xl !transition-all !duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
             >
               {STUDENT_ACTIVITY_UI.BACK_TO_LIST}
             </Button>
@@ -135,7 +135,7 @@ export default function StudentActivityDetail() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <div className="relative group">
-                <div className="size-20 rounded-[24px] bg-white border-2 border-slate-900 flex items-center justify-center text-primary overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                <div className="size-20 rounded-[24px] bg-white border border-slate-200/80 flex items-center justify-center text-primary overflow-hidden group-hover:scale-105 transition-transform duration-500 shadow-sm">
                   {student?.avatarUrl ? (
                     <img src={student.avatarUrl} alt="" className="size-full object-cover" />
                   ) : (
@@ -144,7 +144,7 @@ export default function StudentActivityDetail() {
                     </div>
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 size-6 bg-green-500 rounded-lg border-2 border-slate-900 shadow-sm" />
+                <div className="absolute -bottom-1 -right-1 size-6 bg-green-500 rounded-lg border-2 border-white shadow-md" />
               </div>
 
               <div className="flex flex-col">
@@ -153,22 +153,28 @@ export default function StudentActivityDetail() {
                     {STUDENT_ACTIVITY_UI.OVERVIEW.DETAIL_TITLE_PREFIX}{' '}
                     {student?.fullName || UI_TEXT.COMMON.EMPTY_VALUE}
                   </h1>
-                  <Badge
-                    variant={status.variant}
-                    className="font-bold text-[9px] uppercase tracking-widest px-3 py-1"
-                  >
-                    {status.label}
-                  </Badge>
+                  <StatusBadge
+                    variant={
+                      {
+                        success: 'success',
+                        warning: 'warning',
+                        info: 'info',
+                        danger: 'danger',
+                        default: 'neutral',
+                      }[status.variant] || 'neutral'
+                    }
+                    label={status.label}
+                  />
                 </div>
 
                 <div className="flex items-center gap-3 flex-wrap">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-900/5">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50/50 rounded-xl border border-slate-100/50 hover:border-primary/20 transition-colors">
                     <UserOutlined className="text-[10px] text-slate-500" />
                     <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">
                       {student?.studentCode || UI_TEXT.COMMON.EMPTY_VALUE}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-900/5">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50/50 rounded-xl border border-slate-100/50 hover:border-primary/20 transition-colors">
                     <TeamOutlined className="text-[10px] text-slate-500" />
                     <span
                       className="text-[10px] font-black uppercase tracking-wider text-slate-700 truncate max-w-[200px]"
@@ -177,7 +183,7 @@ export default function StudentActivityDetail() {
                       {student?.enterpriseName || STUDENT_ACTIVITY_UI.OVERVIEW.NO_BUSINESS}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-900/5">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50/50 rounded-xl border border-slate-100/50 hover:border-primary/20 transition-colors">
                     <SolutionOutlined className="text-[10px] text-slate-500" />
                     <span className="text-[10px] font-black tracking-wider whitespace-nowrap text-slate-500 uppercase">
                       {STUDENT_ACTIVITY_UI.OVERVIEW.INFO_FIELDS.MENTOR_LABEL}{' '}
@@ -202,7 +208,7 @@ export default function StudentActivityDetail() {
         </div>
 
         {/* Sticky Tab bar integrated into Card bottom */}
-        <div className="sticky top-0 z-30 bg-white border-b border-slate-900 px-8">
+        <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 px-8 shadow-sm">
           <Tabs
             activeKey={activeTab}
             onChange={setActiveTab}
@@ -210,10 +216,9 @@ export default function StudentActivityDetail() {
             className="student-activity-detail-tabs"
           />
         </div>
-        <div className="h-px bg-slate-200" />
 
         {/* Tab Content Seamlessly Integrated */}
-        <div className="p-8 pt-8 bg-slate-50/20 min-h-[500px]">
+        <div className="p-8 pt-8 bg-slate-50 min-h-[500px]">
           <div className="max-w-[1600px] mx-auto">
             {items.find((item) => item.key === activeTab)?.children}
           </div>

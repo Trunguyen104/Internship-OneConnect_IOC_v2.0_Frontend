@@ -16,11 +16,11 @@ export const TERM_STATUS_VARIANTS = {
   [TERM_STATUS.UPCOMING]: 'info',
   [TERM_STATUS.ACTIVE]: 'success',
   [TERM_STATUS.ENDED]: 'warning',
-  [TERM_STATUS.CLOSED]: 'default',
+  [TERM_STATUS.CLOSED]: 'neutral',
 };
 
 export const PHASE_STATUS_VARIANTS = {
-  [PHASE_STATUS.DRAFT]: 'default',
+  [PHASE_STATUS.DRAFT]: 'neutral',
   [PHASE_STATUS.OPEN]: 'info',
   [PHASE_STATUS.IN_PROGRESS]: 'success',
   [PHASE_STATUS.CLOSED]: 'warning',
@@ -45,7 +45,7 @@ export const GROUP_STATUS = {
 export const GROUP_STATUS_VARIANTS = {
   [GROUP_STATUS.ACTIVE]: 'success',
   [GROUP_STATUS.FINISHED]: 'info',
-  [GROUP_STATUS.ARCHIVED]: 'default',
+  [GROUP_STATUS.ARCHIVED]: 'neutral',
 };
 
 export const PHASE_STATUS_MAP = Object.fromEntries(

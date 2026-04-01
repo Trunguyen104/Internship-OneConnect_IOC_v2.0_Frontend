@@ -25,7 +25,12 @@ export default function InternPhaseJobPostingTab({ data, loading, DETAILS }) {
       width: '120px',
       align: 'center',
       render: (status) => {
-        const displayStatus = typeof status === 'object' ? status?.name || status?.label : status;
+        const statusMap = {
+          1: 'Draft',
+          2: 'Published',
+          3: 'Closed',
+        };
+        const displayStatus = statusMap[status] || status;
         const label = TABLE.STATUS_LABELS[displayStatus] || displayStatus || '-';
 
         const variant =
@@ -56,20 +61,31 @@ export default function InternPhaseJobPostingTab({ data, loading, DETAILS }) {
   ];
 
   if (loading) {
-    return <Skeleton active paragraph={{ rows: 5 }} className="mt-4" />;
+    return (
+      <div className="h-[400px] flex items-center justify-center">
+        <Skeleton active paragraph={{ rows: 8 }} />
+      </div>
+    );
   }
 
   if (!data?.length) {
     return (
-      <div className="flex flex-col items-center justify-center py-10">
+      <div className="flex h-[400px] flex-col items-center justify-center py-10">
         <Empty description={DETAILS.EMPTY_POSTINGS} />
       </div>
     );
   }
 
   return (
-    <div className="mt-4">
-      <DataTable columns={columns} data={data} rowKey="id" minWidth="500px" size="small" />
+    <div className="h-[400px] overflow-hidden flex flex-col">
+      <DataTable
+        columns={columns}
+        data={data}
+        rowKey="id"
+        minWidth="500px"
+        size="small"
+        className="mt-0"
+      />
     </div>
   );
 }
