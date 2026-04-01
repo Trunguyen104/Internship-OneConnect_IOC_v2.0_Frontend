@@ -6,36 +6,36 @@
  * 3: Closed - Internship cycle is closed.
  */
 export const INTERNSHIP_STATUS = {
-  UPCOMING: 1,
-  ACTIVE: 2,
-  ENDED: 3,
-  CLOSED: 4,
+  DRAFT: 0,
+  OPEN: 1,
+  IN_PROGRESS: 2,
+  CLOSED: 3,
 };
 
 export const INTERNSHIP_STATUS_CONFIG = {
-  [INTERNSHIP_STATUS.UPCOMING]: {
-    label: 'Upcoming',
+  [INTERNSHIP_STATUS.DRAFT]: {
+    label: 'Draft',
     color: 'default',
+    badge: 'default',
+    tagColor: 'slate',
+  },
+  [INTERNSHIP_STATUS.OPEN]: {
+    label: 'Open',
+    color: 'processing',
     badge: 'processing',
     tagColor: 'orange',
   },
-  [INTERNSHIP_STATUS.ACTIVE]: {
-    label: 'In progress',
+  [INTERNSHIP_STATUS.IN_PROGRESS]: {
+    label: 'In Progress',
     color: 'processing',
     badge: 'processing',
     tagColor: 'blue',
   },
-  [INTERNSHIP_STATUS.ENDED]: {
-    label: 'Ended',
+  [INTERNSHIP_STATUS.CLOSED]: {
+    label: 'Closed',
     color: 'success',
     badge: 'success',
     tagColor: 'green',
-  },
-  [INTERNSHIP_STATUS.CLOSED]: {
-    label: 'Closed',
-    color: 'error',
-    badge: 'default',
-    tagColor: 'slate',
   },
 };
 
@@ -48,16 +48,16 @@ export const INTERNSHIP_STEPS = [
 ];
 
 export const getStepStatus = (stepIndex, currentStatus) => {
-  if (currentStatus === INTERNSHIP_STATUS.ENDED || currentStatus === INTERNSHIP_STATUS.CLOSED) {
+  if (currentStatus === INTERNSHIP_STATUS.CLOSED) {
     return 'completed';
   }
 
-  if (currentStatus === INTERNSHIP_STATUS.UPCOMING) {
+  if (currentStatus === INTERNSHIP_STATUS.DRAFT || currentStatus === INTERNSHIP_STATUS.OPEN) {
     return stepIndex === 0 ? 'current' : 'upcoming';
   }
 
-  if (currentStatus === INTERNSHIP_STATUS.ACTIVE) {
-    // For Active status, we assume items are moving through (simplified for now)
+  if (currentStatus === INTERNSHIP_STATUS.IN_PROGRESS) {
+    // For In Progress status, we assume items are moving through (simplified for now)
     if (stepIndex < 3) return 'completed';
     if (stepIndex === 3) return 'current';
     return 'upcoming';

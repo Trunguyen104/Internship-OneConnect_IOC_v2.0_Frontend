@@ -41,7 +41,7 @@ const InternshipCard = ({ data, children, className = '' }) => {
 const Header = ({ title, isCurrent = false }) => {
   const { status, isPlaced } = useInternshipCard();
   const config =
-    INTERNSHIP_STATUS_CONFIG[status] || INTERNSHIP_STATUS_CONFIG[INTERNSHIP_STATUS.ACTIVE];
+    INTERNSHIP_STATUS_CONFIG[status] || INTERNSHIP_STATUS_CONFIG[INTERNSHIP_STATUS.IN_PROGRESS];
 
   return (
     <div className="mb-6 flex items-start justify-between">
@@ -59,7 +59,7 @@ const Header = ({ title, isCurrent = false }) => {
             </Tag>
           )}
           {!isPlaced &&
-            (status === INTERNSHIP_STATUS.UPCOMING || status === INTERNSHIP_STATUS.ACTIVE) && (
+            (status === INTERNSHIP_STATUS.OPEN || status === INTERNSHIP_STATUS.DRAFT) && (
               <Tag
                 color="error"
                 className="bg-danger-surface text-danger border-none px-3 py-1 font-sans text-[10px] font-bold"
@@ -95,7 +95,7 @@ const Stepper = () => {
 const BodyTitle = ({ title, href = null }) => {
   const { status, isPlaced } = useInternshipCard();
   const config =
-    INTERNSHIP_STATUS_CONFIG[status] || INTERNSHIP_STATUS_CONFIG[INTERNSHIP_STATUS.ACTIVE];
+    INTERNSHIP_STATUS_CONFIG[status] || INTERNSHIP_STATUS_CONFIG[INTERNSHIP_STATUS.IN_PROGRESS];
 
   return (
     <div className="border-border mt-8 mb-6 border-t pt-8">
@@ -187,7 +187,7 @@ const Action = ({ onDetailClick }) => {
   const { status, isPlaced } = useInternshipCard();
 
   if (!isPlaced) {
-    if (status === INTERNSHIP_STATUS.UPCOMING) {
+    if (status === INTERNSHIP_STATUS.OPEN) {
       return (
         <div className="mt-12 flex flex-col items-end gap-4">
           <p className="text-muted font-medium italic">{INTERNSHIP_UI.MESSAGES.APPLY_PROMPT}</p>
@@ -202,7 +202,7 @@ const Action = ({ onDetailClick }) => {
         </div>
       );
     }
-    if (status === INTERNSHIP_STATUS.ACTIVE) {
+    if (status === INTERNSHIP_STATUS.IN_PROGRESS) {
       return (
         <div className="bg-danger-surface border-danger/20 mt-12 rounded-[24px] border p-6 text-center">
           <p className="text-danger text-lg font-bold">
