@@ -37,6 +37,26 @@ export const OPERATIONAL_LABELS = {
   [OPERATIONAL_STATUS.ARCHIVED]: 'Archived',
 };
 
+export const getVisibilityStatus = (val) => {
+  if (val === undefined || val === null) return VISIBILITY_STATUS.DRAFT;
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') {
+    const key = Object.keys(VISIBILITY_STATUS).find((k) => k.toLowerCase() === val.toLowerCase());
+    if (key) return VISIBILITY_STATUS[key];
+  }
+  return VISIBILITY_STATUS.DRAFT;
+};
+
+export const getOperationalStatus = (val) => {
+  if (val === undefined || val === null) return OPERATIONAL_STATUS.UNSTARTED;
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') {
+    const key = Object.keys(OPERATIONAL_STATUS).find((k) => k.toLowerCase() === val.toLowerCase());
+    if (key) return OPERATIONAL_STATUS[key];
+  }
+  return OPERATIONAL_STATUS.UNSTARTED;
+};
+
 export const PROJECT_STATUS_VARIANTS = {
   [PROJECT_STATUS.DRAFT]: 'warning-soft',
   [PROJECT_STATUS.PUBLISHED]: 'primary',
@@ -58,11 +78,15 @@ export const STATUS_VARIANTS = {
 export const PROJECT_MANAGEMENT = {
   TITLE: 'Project Management',
   CREATE_BTN: 'Create Project',
+  NO_UNSTARTED_PROJECTS: '* No unstarted projects available to assign to {groupName}.',
   SEARCH_PLACEHOLDER: 'Search projects by name or code...',
   COMMON: {
-    N_A: 'N/A',
-    DASH: '—',
+    N_A: '-',
+    DASH: '-',
     UNKNOWN: 'Unknown',
+    LOADING: 'Loading...',
+    BACK_TO_LIST: 'Back to List',
+    ENTERPRISE: 'Enterprise',
   },
   TABS: {
     DETAIL: 'Project Details',
@@ -78,7 +102,7 @@ export const PROJECT_MANAGEMENT = {
       FIELD: 'FIELD',
       TIMELINE: 'TIMELINE',
       VISIBILITY: 'VISIBILITY',
-      STATUS: 'OPERATIONAL STATUS',
+      STATUS: 'OPERATIONAL',
       ACTIONS: 'ACTIONS',
     },
     EMPTY_MESSAGE: 'You have no projects yet. Create a new project to get started.',
@@ -205,6 +229,7 @@ export const PROJECT_MANAGEMENT = {
       DESCRIPTION_EMPTY: 'No description updated yet.',
       MENTOR: 'Project Mentor',
       FIELD_TEMPLATE: 'Field & Template',
+      FIELD: 'Field',
       TIMELINE: 'Project Timeline',
       GROUP_INFO: 'Intern Group Info',
       REQUIREMENTS: 'Technical Requirements',
@@ -241,6 +266,7 @@ export const PROJECT_MANAGEMENT = {
       ASSIGN_BTN: 'Assign Group',
     },
     STUDENTS: {
+      TITLE: 'Project Students',
       SEARCH_PLACEHOLDER: 'Search students by name or ID...',
       COUNT_LABEL: 'Total:',
       EMPTY_MESSAGE: 'No students in this group yet.',
@@ -259,6 +285,10 @@ export const PROJECT_MANAGEMENT = {
     },
   },
   MESSAGES: {
+    SUCCESS_SAVE_DRAFT: 'Draft saved automatically.',
+    SUCCESS_SAVE_PUBLISH: 'Project saved and published successfully.',
+    SUCCESS_UNPUBLISH: 'Project unpublished successfully.',
+    SUCCESS_ARCHIVE: 'Project archived successfully.',
     PUBLISH_SUCCESS: 'Project has been published successfully.',
     COMPLETE_SUCCESS: 'Project marked as completed successfully.',
     COMPLETE_CONFIRM: 'This project will be marked as completed. Are you sure?',
@@ -279,6 +309,8 @@ export const PROJECT_MANAGEMENT = {
     ORPHANED_GROUP_TOOLTIP: 'Intern group was deleted. A new group must be assigned to publish.',
     ORPHANED_GROUP_NOTIFY:
       'Intern group "{groupName}" has been disbanded. Project "{projectName}" has been moved to Draft. Please assign a new group.',
+    ORPHANED_PROJECTS_PLURAL:
+      'There are {count} projects whose intern groups have been disbanded and moved to Draft.',
     ORPHANED_GROUP_BADGE: 'No group assigned',
     ERROR_INACTIVE_GROUP: 'Cannot save project for a finished or archived group.',
     ERROR_PUBLISH_NO_GROUP:
@@ -286,13 +318,30 @@ export const PROJECT_MANAGEMENT = {
     ERROR_PUBLISH_NO_GROUP_VN: 'chưa được gắn với nhóm thực tập',
     ERROR_ALREADY_PUBLISHED_VN: 'Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp',
     ERROR_FETCH_DETAIL: 'Failed to fetch project details',
+    ERROR_FETCH_GROUPS: 'Failed to fetch supporting data',
+    ERROR_UPDATE_PREVALIDATE: 'Failed to pre-validate project save',
+    ERROR_CHECK_BOUNDS: 'Encountered error while checking group change constraints',
     ERROR_RESOURCE_ACCESS: 'Could not open file. Access denied or file removed.',
+    ERROR_PUBLISH: 'Failed to publish project',
+    ERROR_UNPUBLISH: 'Failed to unpublish project',
+    ERROR_ARCHIVE: 'Failed to archive project',
+    ERROR_COMPLETE: 'Failed to complete project',
+    ERROR_DELETE: 'Failed to delete project',
+    ERROR_HAS_DATA_BACKEND:
+      'This project cannot be moved because it already has operational data (work items or sprints).',
+    ERROR_GENERAL: 'An error occurred while processing your request',
   },
   MODALS: {
+    UPDATE_WARNING_TITLE: 'Project Update Warning',
+    COMPLETE_CONFIRM_TITLE: 'Confirm Project Completion',
+    DELETE_CONFIRM_TITLE: 'Confirm Delete Project',
+    DELETE_UNABLE_TITLE: 'Cannot Delete Project',
+    DELETE_OWNERSHIP_ERROR: 'You can only delete projects you created.',
     ASSIGN_GROUP: {
       TITLE: 'Assign / Change Intern Group',
       DESC: 'Select an active Intern Group to assign to project <b>{name}</b>:',
       PLACEHOLDER: 'Select an Intern Group',
+      CURRENT_GROUP: 'Current Group',
       CONFIRM: 'Confirm Assignment',
       SUCCESS_ASSIGN: 'Group assigned successfully.',
       SUCCESS_CHANGE: 'Group changed successfully.',
@@ -302,6 +351,10 @@ export const PROJECT_MANAGEMENT = {
       CONFIRM_CHANGE_TITLE: 'Confirm Group Change',
       CONFIRM_CHANGE_DESC:
         'Are you sure you want to change the group? Existing students will lose access to this project.',
+      SWAP_WARNING:
+        'Project <b>{projectName}</b> is currently assigned to <b>{groupName}</b>. Moving it will leave <b>{groupName}</b> without a project. Please select a replacement project for them below:',
+      REPLACEMENT_LABEL: 'Replacement Project for {groupName}',
+      REPLACEMENT_PLACEHOLDER: 'Select a replacement project (Unstarted only)',
       ERROR_BACKEND: 'Backend error during assignment',
       ERROR_FAILED: 'Assignment failed: ',
     },

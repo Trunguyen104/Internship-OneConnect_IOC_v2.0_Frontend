@@ -223,6 +223,7 @@ const TermFormBody = ({
         loading={loading}
         confirmIcon={!viewOnly && <SaveOutlined />}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SUBMIT}
+        showCancel={!viewOnly}
         className="!mt-0"
       />
     </>

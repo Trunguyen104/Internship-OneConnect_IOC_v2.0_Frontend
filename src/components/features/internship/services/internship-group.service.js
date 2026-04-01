@@ -10,11 +10,11 @@ export const InternshipGroupService = {
   },
 
   getMyPhases(params = {}, options = {}) {
-    return httpGet('/internship-groups/mine/internship-phases', params, options);
+    return httpGet('/internship-phases/me', params, options);
   },
 
-  getMyTerms(params = {}, options = {}) {
-    return httpGet('/internship-groups/mine/internship-terms', params, options);
+  getMyGroups(params = {}, options = {}) {
+    return httpGet('/internship-groups', params, options);
   },
 
   getById(id, params = {}) {

@@ -16,11 +16,11 @@ export const TERM_STATUS_VARIANTS = {
   [TERM_STATUS.UPCOMING]: 'info',
   [TERM_STATUS.ACTIVE]: 'success',
   [TERM_STATUS.ENDED]: 'warning',
-  [TERM_STATUS.CLOSED]: 'default',
+  [TERM_STATUS.CLOSED]: 'neutral',
 };
 
 export const PHASE_STATUS_VARIANTS = {
-  [PHASE_STATUS.DRAFT]: 'default',
+  [PHASE_STATUS.DRAFT]: 'neutral',
   [PHASE_STATUS.OPEN]: 'info',
   [PHASE_STATUS.IN_PROGRESS]: 'success',
   [PHASE_STATUS.CLOSED]: 'warning',
@@ -45,7 +45,7 @@ export const GROUP_STATUS = {
 export const GROUP_STATUS_VARIANTS = {
   [GROUP_STATUS.ACTIVE]: 'success',
   [GROUP_STATUS.FINISHED]: 'info',
-  [GROUP_STATUS.ARCHIVED]: 'default',
+  [GROUP_STATUS.ARCHIVED]: 'neutral',
 };
 
 export const PHASE_STATUS_MAP = Object.fromEntries(
@@ -67,9 +67,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     ACTIVE: 'Active',
     FINISHED: 'Finished',
     ARCHIVED: 'Archived',
-    SEARCH_PLACEHOLDER: 'Search groups...',
+    SEARCH_PLACEHOLDER: 'Search groups by name or description...',
     FILTERS: {
-      SEARCH_PLACEHOLDER: 'Search groups...',
+      SEARCH_PLACEHOLDER: 'Search groups by name or description...',
       STATUS_FILTER: 'Status',
       SELECT_PHASE: 'Select Phase',
       SELECT_TERM: 'Select Term',
@@ -99,7 +99,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         ACTION: 'ACTION',
       },
       NOT_ASSIGNED: 'Not Assigned',
-      EMPTY_TEXT: 'No groups match your search',
+      EMPTY_TEXT: 'No internship groups found for the selected term.',
     },
 
     CARD: {
@@ -122,6 +122,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         SUBTITLE_EDIT: 'Update group information and member list.',
         SUBMIT: 'Create Group',
         SUBMIT_EDIT: 'Update Group',
+        SUBMIT_ADD: 'Add Students',
         CANCEL: 'Cancel',
         NAME_LABEL: 'Group Name',
         NAME_PLACEHOLDER: 'Example: Group 01',
@@ -170,6 +171,16 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         PROJECT_NAME: 'Project Name',
         STUDENTS_SUFFIX: 'students',
         CLOSE: 'Close',
+        TARGET_GROUP_LABEL: 'Target Group',
+        ACTIVE_GROUP_LABEL: 'Active',
+        TABLE: {
+          CODE: 'Student ID',
+          FULL_NAME: 'Full name',
+          EMAIL: 'Email',
+          SCHOOL: 'School',
+          ACTION: 'Actions',
+          ADD_STUDENT: 'Add Student',
+        },
       },
     },
 
@@ -196,6 +207,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       ARCHIVE_GROUP: 'Archive Group',
       DELETE_GROUP: 'Delete Group',
       ADD_TO_GROUP: 'Add Students',
+      REMOVE_STUDENT: 'Remove Student',
+      BACK_TO_LIST: 'Back to List',
     },
   },
 
@@ -687,6 +700,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         IMPORT_BULK_SUCCESS: 'Successfully imported {count} students',
         ADD_SUCCESS: 'Student added successfully',
         ADD_ERROR: 'Failed to add student',
+        TERM_ID_REQUIRED: 'Term ID is required',
+        STUDENT_TERM_ID_REQUIRED: 'Student Term ID is required',
         UPDATE_SUCCESS: 'Information updated successfully',
         UPDATE_ERROR: 'Failed to update student',
         DELETE_CONFIRM_TITLE: 'Delete Student From This Term',
@@ -718,6 +733,102 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           ACTION_LABEL: 'Withdraw students',
         },
       },
+    },
+    STUDENT_ACTIVITY: {
+      LIST: {
+        TITLE: 'Student Internship Activity',
+        BREADCRUMB: [
+          { label: 'Home', href: '/' },
+          { label: 'Internship', href: '/internship' },
+          { label: 'Students', href: '/internship/students' },
+        ],
+        SUMMARY: {
+          TOTAL: 'Total',
+          INTERNING: 'Ongoing',
+          MISSING_LOGBOOK: 'Logbook',
+          UNPLACED: 'Placement',
+        },
+        FILTERS: {
+          SEARCH_PLACEHOLDER: 'Search students (Name, ID, Enterprise)...',
+          TERM: 'Internship Term',
+          ENTERPRISE: 'Enterprise',
+          STATUS: 'Status',
+          LOGBOOK: 'Logbook Status',
+          RESET: 'Reset',
+          CLEAR_FILTERS: 'Clear Filters',
+        },
+        TABLE: {
+          COLUMNS: {
+            STUDENT: 'Avatar + Name',
+            ENTERPRISE: 'Enterprise',
+            MENTOR: 'Mentor',
+            LOGBOOK: 'Logbook Progress',
+            STATUS: 'Status',
+            VIOLATIONS: 'Viol.',
+          },
+          EMPTY: 'No students found in this term.',
+          NO_RESULTS: 'No matching students found.',
+          NO_TERMS: 'No internship terms found. Please contact Admin.',
+        },
+        LOGBOOK_STATUS: [
+          { label: 'Sufficient (≥75%)', value: 'SUFFICIENT' },
+          { label: 'Moderate (50–74%)', value: 'MODERATE' },
+          { label: 'Critical (<50%)', value: 'CRITICAL' },
+        ],
+      },
+      DETAIL: {
+        BACK: 'Back to List',
+        TITLE: 'Intern – {name}',
+        SUMMARY: {
+          LOGBOOK: 'Logbook',
+          VIOLATIONS: 'Violations',
+          EVALUATION: 'Evaluations',
+          PUBLISHED_CYCLED: '{n} Cycles Published',
+          NO_EVALUATION: 'None',
+        },
+        TABS: {
+          OVERVIEW: 'Overview',
+          VIOLATIONS: 'Violations',
+          EVALUATION: 'Evaluations',
+        },
+        OVERVIEW: {
+          SECTION_PERSONAL: 'Basic Information',
+          NAME: 'Full Name',
+          CLASS: 'Class',
+          STUDENT_ID: 'Student ID',
+          MAJOR: 'Major',
+          YEAR: 'Academic Year',
+          ENTERPRISE: 'Enterprise',
+          DEPARTMENT: 'Department',
+          MENTOR: 'Mentor',
+          EMAIL: 'Email',
+          TERM: 'Term',
+          UNPLACED: 'Unplaced',
+          DIRECT_APPLY: 'Direct Apply — không qua duyệt trường',
+          LOGBOOK_SUBMITTED: 'Missing: {z} / Submitted: {x}',
+          LOGBOOK_PROGRESS: '{p}% Completed',
+          NO_EVALUATION: 'No evaluations published yet.',
+          NO_VIOLATION: 'No violations recorded.',
+        },
+        EVALUATION: {
+          TOTAL_SCORE: 'Total Result',
+          COMMENT: 'General Comment',
+          EVALUATOR: 'Evaluator',
+        },
+        VIOLATION: {
+          INCIDENT_DATE: 'Incident Date',
+          REPORT_DATE: 'Report Date',
+          TYPE: 'Violation Type',
+          DESCRIPTION: 'Detailed Description',
+        },
+      },
+    },
+    STUDENT_ACTIVITY_STATUS: {
+      INTERNING: { label: 'Đang thực tập', variant: 'success-soft', value: 'INTERNING' },
+      NO_GROUP: { label: 'Chưa có nhóm', variant: 'warning-soft', value: 'NO_GROUP' },
+      COMPLETED: { label: 'Hoàn tất', variant: 'default', value: 'COMPLETED' },
+      PENDING: { label: 'Chờ xác nhận', variant: 'info-soft', value: 'PENDING' },
+      UNPLACED: { label: 'Unplaced', variant: 'danger-soft', value: 'UNPLACED' },
     },
     DASHBOARD: {
       TITLE: 'University Dashboard',
@@ -857,6 +968,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         LEFT_PAREN: '(',
         RIGHT_PAREN: ')',
         REPORTER_DEFAULT: 'Reporter',
+        INVALID_RANGE: 'Invalid Date Range',
+        QUESTION_MARK: '?',
+        COLON: ': ',
       },
       LOGS: {
         FETCH_ERROR: 'Fetch violations failed:',

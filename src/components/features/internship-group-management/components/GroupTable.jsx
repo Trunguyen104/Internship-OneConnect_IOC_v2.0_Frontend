@@ -58,7 +58,7 @@ const GroupTable = memo(function GroupTable({
       },
       {
         title: TABLE.COLUMNS.PHASE,
-        key: 'phaseName',
+        key: 'phaseInfo',
         width: 200,
         render: (_, record) => (
           <div className="flex items-center gap-1.5">

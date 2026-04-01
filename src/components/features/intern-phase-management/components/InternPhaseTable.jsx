@@ -1,0 +1,261 @@
+'use client';
+
+import {
+  CheckSquareFilled,
+  CheckSquareOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  MoreOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
+import { Badge, Dropdown, Tooltip } from 'antd';
+import dayjs from 'dayjs';
+import React, { useMemo } from 'react';
+
+import DataTable from '@/components/ui/datatable';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
+import StatusBadge from '@/components/ui/status-badge';
+import {
+  INTERN_PHASE_MANAGEMENT,
+  INTERN_PHASE_STATUS,
+  INTERN_PHASE_STATUS_LABELS,
+} from '@/constants/intern-phase-management/intern-phase';
+
+export default function InternPhaseTable({
+  items,
+  loading,
+  search,
+  setSearch,
+  includeEnded,
+  setIncludeEnded,
+  onView,
+  onEdit,
+  onDelete,
+  onCreate,
+}) {
+  const { TABLE, SEARCH_PLACEHOLDER, FILTERS, CREATE_BTN } = INTERN_PHASE_MANAGEMENT;
+
+  const columns = useMemo(
+    () => [
+      {
+        title: TABLE.COLUMNS.NAME,
+        key: 'name',
+        width: '200px',
+        render: (text) => (
+          <span
+            className="block truncate font-semibold text-slate-800 whitespace-nowrap"
+            title={text}
+          >
+            {text}
+          </span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.MAJORS,
+        key: 'majorFields',
+        width: '190px',
+        render: (text) => {
+          const majors =
+            typeof text === 'string'
+              ? text
+                  .split(',')
+                  .map((m) => m.trim())
+                  .filter(Boolean)
+              : [];
+          if (!majors.length) return <span className="text-muted/40 italic">-</span>;
+
+          const firstMajor = majors[0];
+          const remainingCount = majors.length - 1;
+
+          // Simple hash-based color selection for a premium "vibrant" feel
+          const colors = [
+            'primary-soft',
+            'success-soft',
+            'warning-soft',
+            'info-soft',
+            'indigo-soft',
+          ];
+          const colorIndex =
+            Math.abs(firstMajor.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) %
+            colors.length;
+          const variant = colors[colorIndex];
+
+          return (
+            <div className="flex items-center gap-2">
+              <Tooltip title={majors.join(', ')}>
+                <Badge
+                  variant={variant}
+                  size="sm"
+                  className="max-w-[150px] truncate font-bold tracking-tight"
+                >
+                  {firstMajor}
+                </Badge>
+              </Tooltip>
+              {remainingCount > 0 && (
+                <Tooltip title={majors.slice(1).join(', ')}>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-500 ring-4 ring-white shadow-sm transition-all hover:scale-110 hover:bg-slate-200 cursor-help">
+                    +{remainingCount}
+                  </div>
+                </Tooltip>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        title: TABLE.COLUMNS.TIMELINE,
+        key: 'timeline',
+        width: '170px',
+        render: (_, record) => (
+          <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500">
+            <span className="whitespace-nowrap">
+              {dayjs(record.startDate).format('DD/MM/YYYY')}
+            </span>
+            <span className="opacity-40">-</span>
+            <span className="whitespace-nowrap">{dayjs(record.endDate).format('DD/MM/YYYY')}</span>
+          </div>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.STATUS,
+        key: 'computedStatus',
+        width: '100px',
+        align: 'center',
+        render: (status) => {
+          const variant =
+            status === INTERN_PHASE_STATUS.ACTIVE
+              ? 'success'
+              : status === INTERN_PHASE_STATUS.UPCOMING
+                ? 'warning'
+                : 'neutral';
+
+          return (
+            <StatusBadge
+              variant={variant}
+              label={INTERN_PHASE_STATUS_LABELS[status]}
+              pulseDot={status === INTERN_PHASE_STATUS.ACTIVE}
+            />
+          );
+        },
+      },
+      {
+        title: TABLE.COLUMNS.POSTINGS,
+        key: 'jobPostingCount',
+        width: '110px',
+        align: 'center',
+        render: (count) => <span className="font-medium">{count || 0}</span>,
+      },
+      {
+        title: TABLE.COLUMNS.CAPACITY,
+        key: 'capacity',
+        width: '100px',
+        align: 'center',
+        render: (_, record) => {
+          const total = record.capacity || 0;
+          const remaining = record.remainingCapacity ?? total;
+          return (
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-bold text-primary">
+                {TABLE.CAPACITY_FORMAT.replace('{remaining}', remaining).replace('{total}', total)}
+              </span>
+              <div className="mt-1 h-1 w-16 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${Math.min(100, Math.max(0, (remaining / total) * 100))}%` }}
+                />
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        title: TABLE.COLUMNS.ACTIONS,
+        key: 'actions',
+        width: '80px',
+        align: 'center',
+        render: (_, record) => {
+          const actionItems = [
+            {
+              key: 'view',
+              label: TABLE.ACTIONS.VIEW,
+              icon: <EyeOutlined />,
+              onClick: () => onView(record),
+            },
+            {
+              key: 'edit',
+              label: TABLE.ACTIONS.EDIT,
+              icon: <EditOutlined />,
+              disabled: record.computedStatus === 'ENDED',
+              onClick: () => onEdit(record),
+            },
+            {
+              key: 'delete',
+              label: TABLE.ACTIONS.DELETE,
+              icon: <DeleteOutlined />,
+              danger: true,
+              onClick: () => onDelete(record),
+            },
+          ];
+
+          return (
+            <Dropdown menu={{ items: actionItems }} trigger={['click']} placement="bottomRight">
+              <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full hover:bg-slate-100 italic font-bold text-xl leading-none">
+                <MoreOutlined />
+              </div>
+            </Dropdown>
+          );
+        },
+      },
+    ],
+    [TABLE, onView, onEdit, onDelete]
+  );
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DataTableToolbar>
+        <DataTableToolbar.Search
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={SEARCH_PLACEHOLDER}
+        />
+        <DataTableToolbar.Filters>
+          <Tooltip title={FILTERS.INCLUDE_ENDED}>
+            <div
+              onClick={() => setIncludeEnded(!includeEnded)}
+              className={`flex items-center gap-2 cursor-pointer transition-all px-3 py-1.5 rounded-full border ${
+                includeEnded
+                  ? 'bg-red-50 border-red-100 text-red-600'
+                  : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+              }`}
+            >
+              {includeEnded ? (
+                <CheckSquareFilled className="text-red-600" />
+              ) : (
+                <CheckSquareOutlined className="text-slate-300" />
+              )}
+              <span className="text-[11px] font-bold uppercase tracking-wider select-none">
+                {FILTERS.INCLUDE_ENDED}
+              </span>
+            </div>
+          </Tooltip>
+        </DataTableToolbar.Filters>
+        <DataTableToolbar.Actions
+          label={CREATE_BTN}
+          icon={<PlusOutlined />}
+          onClick={onCreate}
+          className="ml-auto"
+        />
+      </DataTableToolbar>
+
+      <DataTable
+        columns={columns}
+        data={items}
+        loading={loading}
+        rowKey="id"
+        size="small"
+        minWidth="950px"
+      />
+    </div>
+  );
+}

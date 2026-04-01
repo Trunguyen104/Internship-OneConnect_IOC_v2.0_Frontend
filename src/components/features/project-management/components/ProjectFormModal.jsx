@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Drawer, Form, Space } from 'antd';
+import { Button, Drawer, Form, Space, Spin } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -40,6 +40,13 @@ export default function ProjectFormModal({
   }, [userInfo]);
 
   const [dataLoading, setDataLoading] = useState(false);
+  const [deletedResourceIds, setDeletedResourceIds] = useState([]);
+  const [existingResources, setExistingResources] = useState([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -53,6 +60,10 @@ export default function ProjectFormModal({
         if (fullRecord) {
           const groupId = fullRecord.internshipId || fullRecord.internshipGroupId;
           const isEmptyGuid = groupId === '00000000-0000-0000-0000-000000000000';
+
+          // Track existing resources for UI management
+          setExistingResources(fullRecord.projectResources || []);
+          setDeletedResourceIds([]);
 
           form.setFieldsValue({
             ...fullRecord,
@@ -71,7 +82,12 @@ export default function ProjectFormModal({
             attachments: [
               ...(fullRecord.resources?.attachments || []),
               ...(fullRecord.projectResources || [])
-                .filter((r) => r.resourceType === 1)
+                .filter((r) => {
+                  const rType = String(r.resourceType || '')
+                    .toUpperCase()
+                    .trim();
+                  return rType === '1' || rType === 'FILE' || rType === 'ATTACHMENT';
+                })
                 .map((r) => ({
                   uid: r.projectId + r.resourceName + r.resourceType,
                   name: r.resourceName,
@@ -82,7 +98,14 @@ export default function ProjectFormModal({
             links: [
               ...(fullRecord.resources?.links || []),
               ...(fullRecord.projectResources || [])
-                .filter((r) => r.resourceType === 10)
+                .filter((r) => {
+                  const rType = String(r.resourceType || '')
+                    .toUpperCase()
+                    .trim();
+                  return (
+                    rType === '10' || rType === '8' || rType === 'LINK' || rType === 'EXTERNAL'
+                  );
+                })
                 .map((r) => ({
                   title: r.resourceName,
                   url: r.resourceUrl,
@@ -91,9 +114,7 @@ export default function ProjectFormModal({
           });
         }
       } catch (err) {
-        toast.error(
-          PROJECT_MANAGEMENT.MESSAGES?.ERROR_FETCH_DETAIL || 'Failed to fetch project details'
-        );
+        toast.error(PROJECT_MANAGEMENT.MESSAGES?.ERROR_FETCH_DETAIL);
       } finally {
         setDataLoading(false);
       }
@@ -104,6 +125,8 @@ export default function ProjectFormModal({
         fetchDetail();
       } else {
         form.resetFields();
+        setDeletedResourceIds([]);
+        setExistingResources([]);
       }
     }
   }, [visible, editingRecord, form, FORM.TEMPLATE_MAP, toast]);
@@ -162,7 +185,7 @@ export default function ProjectFormModal({
     form
       .validateFields()
       .then((values) => {
-        onSave(values, isDraft);
+        onSave({ ...values, resourceDeleteIds: deletedResourceIds }, isDraft);
       })
       .catch(() => {});
   };
@@ -196,63 +219,66 @@ export default function ProjectFormModal({
     onCancel();
   };
 
+  if (!mounted) return null;
+
   return (
     <Drawer
-      loading={dataLoading}
-      forceRender={true}
       title={
         <div>
           <h3 className="mb-0 text-lg font-bold">
-            {editingRecord
-              ? viewOnly
-                ? FORM.TITLE_VIEW || 'Project Details'
-                : FORM.TITLE_EDIT
-              : FORM.TITLE_ADD}
+            {editingRecord ? (viewOnly ? FORM.TITLE_VIEW : FORM.TITLE_EDIT) : FORM.TITLE_ADD}
           </h3>
           {!viewOnly && <p className="mt-1 text-xs font-normal text-gray-400">{FORM.DESC}</p>}
         </div>
       }
       open={visible}
       onClose={handleModalClose}
-      size={640}
+      size="large"
       footer={
         !viewOnly && (
           <div className="flex justify-between px-4 py-2">
             <Button onClick={onCancel}>{FORM.CANCEL_BTN}</Button>
             <Space>
               <Button type="primary" onClick={() => handleSubmit(false)} loading={loading}>
-                {editingRecord ? FORM.SAVE_CHANGES || 'Save Changes' : FORM.PUBLISH || 'Save'}
+                {editingRecord ? FORM.SAVE_CHANGES : FORM.PUBLISH}
               </Button>
             </Space>
           </div>
         )
       }
     >
-      <Form
-        form={form}
-        layout="vertical"
-        disabled={viewOnly}
-        initialValues={{
-          template: 'None',
-          links: [],
-          attachments: [],
-        }}
-        onValuesChange={handleValuesChange}
-        className="pb-10"
-      >
-        <ProjectBasicInfoFields
-          FORM={FORM}
-          groups={groups}
-          userInfo={userInfo}
-          editingRecord={editingRecord}
-        />
+      <Spin spinning={dataLoading} description={PROJECT_MANAGEMENT.COMMON.LOADING}>
+        <Form
+          form={form}
+          layout="vertical"
+          disabled={viewOnly || dataLoading}
+          initialValues={{
+            template: FORM.FIELD_OPTIONS?.TEMPLATE?.NONE,
+            field: FORM.FIELD_OPTIONS?.FIELD?.IT,
+            links: [],
+            attachments: [],
+          }}
+          onValuesChange={handleValuesChange}
+          className="pb-10"
+        >
+          <ProjectBasicInfoFields
+            FORM={FORM}
+            groups={groups}
+            userInfo={userInfo}
+            editingRecord={editingRecord}
+          />
 
-        <ProjectDescriptionFields FORM={FORM} />
+          <ProjectDescriptionFields FORM={FORM} />
 
-        {!editingRecord && (
-          <ProjectResourceFields FORM={FORM} PROJECT_MANAGEMENT={PROJECT_MANAGEMENT} />
-        )}
-      </Form>
+          <ProjectResourceFields
+            FORM={FORM}
+            PROJECT_MANAGEMENT={PROJECT_MANAGEMENT}
+            existingResources={existingResources}
+            deletedResourceIds={deletedResourceIds}
+            onDeleteExisting={(rid) => setDeletedResourceIds((prev) => [...prev, rid])}
+          />
+        </Form>
+      </Spin>
     </Drawer>
   );
 }

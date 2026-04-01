@@ -29,7 +29,7 @@ const REVERSE_PLACEMENT_MAP = {
 const cleanPayload = (obj) => {
   const newObj = { ...obj };
   Object.keys(newObj).forEach((key) => {
-    if (newObj[key] === undefined || newObj[key] === '') delete newObj[key];
+    if (newObj[key] === undefined || newObj[key] === '' || newObj[key] === null) delete newObj[key];
   });
   return newObj;
 };
@@ -65,35 +65,35 @@ const mapStudent = (item) => {
 
 const mapStudentForCreate = (values) => {
   return cleanPayload({
-    TermId: values.termId,
-    FullName: values.fullName,
-    StudentCode: values.studentCode,
-    Email: values.email,
-    Phone: values.phone || null,
-    DateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : null,
-    Major: values.major,
+    termId: values.termId,
+    fullName: values.fullName,
+    studentCode: values.studentCode,
+    email: values.email,
+    phone: values.phone || null,
+    dateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : null,
+    major: values.major,
   });
 };
 
 const mapStudentForUpdate = (values) => {
-  return {
-    StudentTermId: values.studentTermId,
-    FullName: values.fullName,
-    Email: values.email,
-    Phone: values.phone || null,
-    Major: values.major,
-    DateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : null,
-    EnrollmentDate: values.enrollmentDate
+  return cleanPayload({
+    studentTermId: values.studentTermId,
+    fullName: values.fullName,
+    email: values.email,
+    phone: values.phone || null,
+    major: values.major,
+    dateOfBirth: values.dateOfBirth ? dayjs(values.dateOfBirth).format('YYYY-MM-DD') : null,
+    enrollmentDate: values.enrollmentDate
       ? dayjs(values.enrollmentDate).format('YYYY-MM-DD')
       : null,
-    EnrollmentStatus:
+    enrollmentStatus:
       REVERSE_ENROLLMENT_MAP[values.status] ??
       REVERSE_ENROLLMENT_MAP[values.enrollmentStatus] ??
       ENROLLMENT_STATUS.ACTIVE,
-    EnrollmentNote: values.enrollmentNote || null,
-    PlacementStatus: REVERSE_PLACEMENT_MAP[values.placementStatus] ?? PLACEMENT_STATUS.UNPLACED,
-    EnterpriseId: values.enterpriseId || null,
-  };
+    enrollmentNote: values.enrollmentNote || null,
+    placementStatus: REVERSE_PLACEMENT_MAP[values.placementStatus] ?? PLACEMENT_STATUS.UNPLACED,
+    enterpriseId: values.enterpriseId || null,
+  });
 };
 
 export const StudentService = {
@@ -130,13 +130,13 @@ export const StudentService = {
   async importConfirm(termId, validRecords) {
     // Ensuring exact field naming matches the ImportStudentsConfirmCommand
     const payload = {
-      ValidRecords: validRecords.map((r) => ({
-        StudentCode: r.studentCode,
-        FullName: r.fullName,
-        Email: r.email,
-        Phone: r.phone,
-        DateOfBirth: r.dateOfBirth,
-        Major: r.major,
+      validRecords: validRecords.map((r) => ({
+        studentCode: r.studentCode,
+        fullName: r.fullName,
+        email: r.email,
+        phone: r.phone,
+        dateOfBirth: r.dateOfBirth,
+        major: r.major,
       })),
     };
     return httpPost(`/terms/${termId}/enrollments/import-confirm`, payload);

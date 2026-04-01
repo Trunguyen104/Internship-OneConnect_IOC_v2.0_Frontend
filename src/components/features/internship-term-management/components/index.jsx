@@ -13,9 +13,9 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import PageLayout from '@/components/ui/pagelayout';
+import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown from '@/components/ui/TableRowActions';
 import {
   INTERNSHIP_MANAGEMENT_UI,
@@ -137,7 +137,7 @@ export default function InternshipTermManagement() {
         render: (status) => {
           const variant = TERM_STATUS_VARIANTS[status] || 'default';
           const label = STATUS_LABELS[status] || status;
-          return <Badge variant={variant}>{label}</Badge>;
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {
@@ -208,6 +208,8 @@ export default function InternshipTermManagement() {
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps -- row index uses pagination.current/pageSize (React Compiler)
     [
+      pagination.current,
+      pagination.pageSize,
       pagination.current,
       pagination.pageSize,
       TABLE,

@@ -11,7 +11,6 @@ import { useToast } from '@/providers/ToastProvider';
 import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
 import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
 import { userService } from '../../user/services/user.service';
-import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { useEnterpriseGroupActions } from '../hooks/useEnterpriseGroupActions';
 import { useEnterpriseGroupFilters } from '../hooks/useEnterpriseGroupFilters';
 import { useEnterpriseGroups } from '../hooks/useEnterpriseGroups';
@@ -22,7 +21,8 @@ export const useGroupManagement = () => {
   const searchParams = useSearchParams();
   const urlGroupId = searchParams.get('groupId');
   const filters = useEnterpriseGroupFilters();
-  const { MESSAGES } = ENTERPRISE_GROUP_UI;
+  const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
+  const { MESSAGES } = GROUP_MANAGEMENT;
 
   // 1. Fetch Me Info
   const { data: enterpriseId } = useQuery({
@@ -36,10 +36,10 @@ export const useGroupManagement = () => {
         return null;
       }
     },
-    staleTime: Infinity, // User info doesn't change often
+    staleTime: Infinity,
   });
 
-  // 2. Main Group Data Fetching (Already refactored to React Query internally)
+  // 2. Main Group Data Fetching
   const { data, total, loading, refetch } = useEnterpriseGroups({
     phaseId: filters.phaseId,
     filters: filters.filters,
@@ -94,15 +94,22 @@ export const useGroupManagement = () => {
           PageIndex: 1,
           PageSize: 1000,
         });
+
         const items = res?.data?.items || res.items || [];
         const mappedItems = items.map(EnterpriseStudentService.mapApplication);
 
-        return mappedItems.filter((s) => {
-          if (s.groupId) return false;
-          const phase = filters.phaseOptions.find((p) => p.value === s.phaseId);
-          return phase ? phase.status === 1 : false;
+        const unassigned = mappedItems.filter((s) => {
+          if (s.isAssignedToGroup || s.groupId) return false;
+
+          // DO NOT filter by phase status STRICTLY here since the backend already
+          // provides the eligible students for placed-students!
+          // We just allow all students returned by the backend without assigned group.
+          return true;
         });
-      } catch {
+
+        return unassigned;
+      } catch (err) {
+        console.error('Failed to fetch unassigned students:', err);
         return [];
       }
     },
@@ -117,7 +124,7 @@ export const useGroupManagement = () => {
     addStudents: addGroupStudents,
     deleteGroup,
     loading: actionLoading,
-  } = useEnterpriseGroupActions(refetch);
+  } = useEnterpriseGroupActions();
 
   const [selectedGroupDetail, setSelectedGroupDetail] = useState(null);
   const [isAutoSelecting, setIsAutoSelecting] = useState(!!urlGroupId);
@@ -173,42 +180,45 @@ export const useGroupManagement = () => {
         const hasStudents = (group.memberCount || 0) > 0;
 
         if (hasData) {
-          toast.warning(ENTERPRISE_GROUP_UI.MESSAGES.DELETE_ERROR_HAS_DATA, { duration: 6 });
+          toast.warning(MESSAGES.DELETE_ERROR_HAS_DATA, { duration: 6 });
           return;
         }
 
         const content = hasStudents
-          ? ENTERPRISE_GROUP_UI.MESSAGES.DELETE_CONFIRM_HAS_STUDENTS
-          : ENTERPRISE_GROUP_UI.MODALS.DELETE.CONTENT;
+          ? MESSAGES.DELETE_ERROR_HAS_STUDENTS
+          : GROUP_MANAGEMENT.MODALS.DELETE?.CONTENT ||
+            'Are you sure you want to delete this group?';
 
         showDeleteConfirm({
-          title: ENTERPRISE_GROUP_UI.MODALS.DELETE.TITLE,
+          title: GROUP_MANAGEMENT.MODALS.DELETE?.TITLE || 'Delete Group',
           content,
-          okText: ENTERPRISE_GROUP_UI.MODALS.DELETE.SUBMIT,
+          okText: GROUP_MANAGEMENT.MODALS.DELETE?.SUBMIT || 'Delete',
           onOk: async () => {
             await deleteGroup(group.id);
           },
         });
       } catch {
-        toast.error(MESSAGES.CHECK_DATA_ERROR);
+        toast.error(MESSAGES.ERROR);
       }
     },
-    [deleteGroup, toast, MESSAGES.CHECK_DATA_ERROR]
+    [deleteGroup, toast, MESSAGES, GROUP_MANAGEMENT]
   );
 
   const handleArchiveGroup = useCallback(
     (group) => {
       showDeleteConfirm({
-        title: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.TITLE,
-        content: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.CONTENT,
-        okText: ENTERPRISE_GROUP_UI.MODALS.ARCHIVE.SUBMIT,
+        title: GROUP_MANAGEMENT.MESSAGES.ARCHIVE_CONFIRM_TITLE || 'Archive Group',
+        content:
+          GROUP_MANAGEMENT.MESSAGES.ARCHIVE_CONFIRM_TEXT ||
+          'Are you sure you want to archive this group?',
+        okText: 'Confirm',
         type: 'warning',
         onOk: async () => {
           await archiveGroup(group.id);
         },
       });
     },
-    [archiveGroup]
+    [archiveGroup, GROUP_MANAGEMENT]
   );
 
   const handleCreateGroup = useCallback(
@@ -261,27 +271,23 @@ export const useGroupManagement = () => {
             .map((m) => m.studentId || m.id || m.applicationId);
 
           if (toRemove.length > 0) {
-            await EnterpriseGroupService.removeStudents(groupId, toRemove);
-            toRemove.forEach((sid) => {
-              const student = oldMembers.find(
-                (m) => String(m.studentId || m.id || m.applicationId) === String(sid)
-              );
-              if (student) {
-                toast.info(
-                  `${student.fullName || student.studentFullName} đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.`,
-                  { duration: 5 }
-                );
-              }
-            });
+            await removeStudents(groupId, toRemove);
           }
           if (toAdd.length > 0) {
-            await EnterpriseGroupService.addStudents(groupId, toAdd);
+            await addGroupStudents(groupId, toAdd);
           }
         }
 
         if (editModal.isAddingStudents) {
-          if (values.studentIds?.length > 0) {
-            const studentsToUpdate = values.studentIds.map((id) => ({
+          const oldMembers = group.members || [];
+          const oldIds = new Set(
+            oldMembers.map((m) => String(m.studentId || m.id || m.applicationId))
+          );
+
+          const newIds = (values.studentIds || []).filter((id) => !oldIds.has(String(id)));
+
+          if (newIds.length > 0) {
+            const studentsToUpdate = newIds.map((id) => ({
               studentId: id,
               role: 1,
             }));
@@ -307,30 +313,21 @@ export const useGroupManagement = () => {
         // Handled
       }
     },
-    [editModal, updateGroup, addGroupStudents, enterpriseId, toast]
+    [editModal, updateGroup, addGroupStudents, removeStudents, enterpriseId]
   );
 
   const handleRemoveStudentFromGroup = useCallback(
     async (groupId, studentId) => {
       try {
-        const { MODALS } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
+        const { ACTIONS } = GROUP_MANAGEMENT;
         showDeleteConfirm({
-          title: MODALS.GROUP_ACTION.REMOVE_STUDENT_TITLE || 'Remove Student',
-          content:
-            MODALS.GROUP_ACTION.REMOVE_STUDENT_CONTENT ||
-            'Are you sure you want to remove this student from the group?',
-          okText: MODALS.GROUP_ACTION.REMOVE_CONFIRM || 'Remove',
+          title: ACTIONS.REMOVE_STUDENT || 'Remove Student',
+          content: 'Are you sure you want to remove this student from the group?',
+          okText: 'Remove',
           onOk: async () => {
-            const success = await removeStudents(groupId, [studentId]);
-            if (success) {
-              toast.info(
-                'Sinh viên đã bị xóa khỏi nhóm. Sinh viên không còn truy cập được các dự án của nhóm.',
-                { duration: 5 }
-              );
-
-              if (selectedGroupDetail?.id === groupId) {
-                handleViewGroup(selectedGroupDetail);
-              }
+            await removeStudents(groupId, [studentId]);
+            if (selectedGroupDetail?.id === groupId) {
+              handleViewGroup(selectedGroupDetail);
             }
           },
         });
@@ -338,7 +335,7 @@ export const useGroupManagement = () => {
         toast.error('Failed to remove student');
       }
     },
-    [removeStudents, selectedGroupDetail, handleViewGroup, toast]
+    [removeStudents, selectedGroupDetail, handleViewGroup, toast, GROUP_MANAGEMENT]
   );
 
   return {

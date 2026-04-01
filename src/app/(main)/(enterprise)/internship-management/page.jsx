@@ -1,4 +1,4 @@
-import InternshipManagementContainer from '@/components/features/internship-management/components';
+import InternshipManagementContainer from '@/components/features/internship-management';
 
 export const dynamic = 'force-dynamic';
 

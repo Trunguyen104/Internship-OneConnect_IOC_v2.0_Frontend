@@ -3,12 +3,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
 export function useGroupDetail(groupId) {
   const toast = useToast();
+  const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
 
   const {
     data: info,
@@ -62,7 +64,7 @@ export function useGroupDetail(groupId) {
         }
         return null;
       } catch (err) {
-        toast.error('Failed to load group details');
+        toast.error(GROUP_MANAGEMENT.MESSAGES.LOAD_ERROR || 'Failed to load group details');
         console.error(err);
         return null;
       }
@@ -75,10 +77,10 @@ export function useGroupDetail(groupId) {
     const handleRefresh = () => {
       refetch();
     };
-    const REFRESH_EVENT = 'internship-group-refresh';
-    window.addEventListener(REFRESH_EVENT, handleRefresh);
-    return () => window.removeEventListener(REFRESH_EVENT, handleRefresh);
-  }, [refetch]);
+
+    window.addEventListener(GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    return () => window.removeEventListener(GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+  }, [refetch, GROUP_MANAGEMENT.REFRESH_EVENT]);
 
   return {
     info,

@@ -1,7 +1,7 @@
 'use client';
 
 import { CarryOutOutlined } from '@ant-design/icons';
-import { App, Modal, Select } from 'antd';
+import { App, Select, Tooltip } from 'antd';
 import React, { useState } from 'react';
 
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/cn';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useProjectManagement } from '../hooks/useProjectManagement';
-import ProjectDetailDrawer from './ProjectDetailDrawer';
+import ProjectAssignGroupModal from './ProjectAssignGroupModal';
 import ProjectFormModal from './ProjectFormModal';
 import ProjectTable from './ProjectTable';
 
@@ -44,6 +44,7 @@ export default function ProjectManagement() {
     visibilityFilter,
     showArchived,
     pagination,
+    total,
     handleTableChange,
     handlePageSizeChange,
     modalVisible,
@@ -73,6 +74,21 @@ export default function ProjectManagement() {
     isMentor,
   } = useProjectManagement();
 
+  const sourceGroupId =
+    assigningProject?.internshipId ||
+    assigningProject?.internshipGroupId ||
+    assigningProject?.groupId;
+  const isMovingFromGroup =
+    sourceGroupId && sourceGroupId !== '00000000-0000-0000-0000-000000000000';
+  const sourceGroup = groups.find((g) => (g.internshipId || g.id) === sourceGroupId);
+
+  const [replacementProjectId, setReplacementProjectId] = useState(null);
+
+  const unstartedProjects = (data || []).filter((p) => {
+    const gid = p.internshipId || p.internshipGroupId || p.groupId;
+    return !gid || gid === '00000000-0000-0000-0000-000000000000';
+  });
+
   return (
     <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
       <PageTitle title={PROJECT_MANAGEMENT.TITLE} />
@@ -86,7 +102,7 @@ export default function ProjectManagement() {
           />
           <DataTableToolbar.Filters>
             <Select
-              className="h-9 w-44"
+              className="h-9 w-36"
               placeholder={FILTERS.GROUP_FILTER}
               allowClear
               value={groupIdFilter}
@@ -100,7 +116,7 @@ export default function ProjectManagement() {
             </Select>
             {isMentor && (
               <Select
-                className="h-9 w-40"
+                className="h-9 w-32"
                 placeholder={FILTERS.VISIBILITY_FILTER}
                 allowClear
                 value={visibilityFilter}
@@ -115,7 +131,7 @@ export default function ProjectManagement() {
               </Select>
             )}
             <Select
-              className="h-9 w-40"
+              className="h-9 w-32"
               placeholder={FILTERS.STATUS_FILTER}
               allowClear
               value={statusFilter}
@@ -131,22 +147,21 @@ export default function ProjectManagement() {
                 {OPERATIONAL_LABELS[OPERATIONAL_STATUS.COMPLETED]}
               </Option>
             </Select>
-            <div
-              onClick={() => handleShowArchivedChange(!showArchived)}
-              className={cn(
-                'flex cursor-pointer select-none items-center gap-1.5 rounded-lg border px-3 py-1.5 transition-all ml-2',
-                showArchived
-                  ? 'border-primary/20 bg-primary/10 text-primary shadow-sm'
-                  : 'border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-500'
-              )}
-            >
-              <CarryOutOutlined
-                className={cn('text-[14px]', showArchived ? 'text-primary' : 'text-slate-400')}
-              />
-              <span className="text-[10px] font-bold uppercase tracking-wider">
-                {FILTERS.SHOW_ARCHIVED}
-              </span>
-            </div>
+            <Tooltip title={FILTERS.SHOW_ARCHIVED}>
+              <div
+                onClick={() => handleShowArchivedChange(!showArchived)}
+                className={cn(
+                  'flex h-9 w-9 cursor-pointer select-none items-center justify-center rounded-lg border transition-all ml-2',
+                  showArchived
+                    ? 'border-primary/20 bg-primary/10 text-primary shadow-sm'
+                    : 'border-slate-200 bg-slate-50 text-slate-400 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-500'
+                )}
+              >
+                <CarryOutOutlined
+                  className={cn('text-[16px]', showArchived ? 'text-primary' : 'text-slate-400')}
+                />
+              </div>
+            </Tooltip>
           </DataTableToolbar.Filters>
           {isMentor && (
             <DataTableToolbar.Actions
@@ -171,6 +186,7 @@ export default function ProjectManagement() {
             setSelectedGroupId(
               record.internshipId || record.internshipGroupId || record.groupId || null
             );
+            setReplacementProjectId(null);
             setAssignModalVisible(true);
           }}
           onPublish={handlePublishProject}
@@ -180,18 +196,16 @@ export default function ProjectManagement() {
           onDelete={handleDeleteProject}
         />
 
-        {pagination.total > 0 && (
-          <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
-            <Pagination
-              total={pagination.total}
-              page={pagination.current}
-              pageSize={pagination.pageSize}
-              totalPages={Math.ceil(pagination.total / pagination.pageSize)}
-              onPageChange={(page) => handleTableChange({ ...pagination, current: page })}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          </div>
-        )}
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+          <Pagination
+            total={total}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            totalPages={Math.max(1, Math.ceil(total / pagination.pageSize))}
+            onPageChange={(page) => handleTableChange({ ...pagination, current: page })}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </div>
       </PageLayout.Card>
 
       <>
@@ -204,60 +218,27 @@ export default function ProjectManagement() {
           viewOnly={viewOnly}
           groups={groups}
         />
-
-        <ProjectDetailDrawer
-          visible={detailDrawerVisible}
-          onClose={() => setDetailDrawerVisible(false)}
-          project={editingRecord}
-          groups={groups}
-          onRefresh={fetchData}
-          onAssign={(record) => {
-            setAssigningProject(record);
-            setSelectedGroupId(
-              record.internshipId || record.internshipGroupId || record.groupId || null
-            );
-            setAssignModalVisible(true);
-          }}
-        />
-
-        <Modal
-          title={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.TITLE}
-          open={assignModalVisible}
-          onOk={() =>
-            handleAssignGroup(assigningProject, selectedGroupId, setAssignLoading, () =>
-              setAssignModalVisible(false)
+        <ProjectAssignGroupModal
+          visible={assignModalVisible}
+          onCancel={() => setAssignModalVisible(false)}
+          onConfirm={() =>
+            handleAssignGroup(
+              assigningProject,
+              selectedGroupId,
+              setAssignLoading,
+              () => setAssignModalVisible(false),
+              replacementProjectId
             )
           }
-          onCancel={() => setAssignModalVisible(false)}
-          confirmLoading={assignLoading}
-          okButtonProps={{ disabled: !selectedGroupId }}
-          okText={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM}
-        >
-          <div className="py-4">
-            <p
-              className="mb-2 text-sm text-gray-600"
-              dangerouslySetInnerHTML={{
-                __html: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.DESC.replace(
-                  '{name}',
-                  assigningProject?.projectName || ''
-                ),
-              }}
-            />
-            <Select
-              className="w-full"
-              placeholder={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.PLACEHOLDER}
-              value={selectedGroupId}
-              onChange={setSelectedGroupId}
-              allowClear
-            >
-              {groups.map((g) => (
-                <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
-                  {g.groupName}
-                </Option>
-              ))}
-            </Select>
-          </div>
-        </Modal>
+          loading={assignLoading}
+          assigningProject={assigningProject}
+          groups={groups}
+          unstartedProjects={unstartedProjects}
+          selectedGroupId={selectedGroupId}
+          setSelectedGroupId={setSelectedGroupId}
+          replacementProjectId={replacementProjectId}
+          setReplacementProjectId={setReplacementProjectId}
+        />
       </>
     </PageLayout>
   );

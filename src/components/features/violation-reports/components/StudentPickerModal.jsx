@@ -17,12 +17,24 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
   };
 
   const filteredStudents = useMemo(() => {
-    if (!search) return students;
+    // Sort students by groupName first, then by fullName
+    const sorted = [...students].sort((a, b) => {
+      const groupA = a.groupName || '';
+      const groupB = b.groupName || '';
+      if (groupA !== groupB) return groupA.localeCompare(groupB);
+      return (a.studentFullName || a.fullName || '').localeCompare(
+        b.studentFullName || b.fullName || ''
+      );
+    });
+
+    if (!search) return sorted;
     const lowerSearch = search.toLowerCase();
-    return students.filter(
+    return sorted.filter(
       (s) =>
         s.studentFullName?.toLowerCase().includes(lowerSearch) ||
-        s.studentCode?.toLowerCase().includes(lowerSearch)
+        s.fullName?.toLowerCase().includes(lowerSearch) ||
+        s.studentCode?.toLowerCase().includes(lowerSearch) ||
+        s.groupName?.toLowerCase().includes(lowerSearch)
     );
   }, [students, search]);
 
@@ -30,14 +42,20 @@ const StudentPickerModal = ({ visible, onCancel, onSelect, students = [], loadin
     {
       title: VIOLATION_REPORT.TABLE.COLUMNS.STUDENT_NAME,
       key: 'studentFullName',
-      width: '60%',
+      width: '40%',
       render: (_, record) => record.studentFullName || record.fullName,
     },
     {
       title: VIOLATION_REPORT.TABLE.COLUMNS.STUDENT_CODE,
       key: 'studentCode',
-      width: '40%',
+      width: '25%',
       render: (_, record) => record.studentCode || record.userCode,
+    },
+    {
+      title: VIOLATION_REPORT.DETAIL.INTERN_GROUP,
+      key: 'groupName',
+      width: '35%',
+      render: (_, record) => record.groupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE,
     },
   ];
 

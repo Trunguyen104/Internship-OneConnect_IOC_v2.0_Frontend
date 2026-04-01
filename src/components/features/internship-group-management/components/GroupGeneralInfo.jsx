@@ -3,7 +3,6 @@
 import {
   ArrowLeftOutlined,
   BankOutlined,
-  BlockOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
   MailOutlined,
@@ -11,7 +10,7 @@ import {
   SearchOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
-import { Button, Empty, Input, Spin, Typography } from 'antd';
+import { Button, Empty, Input, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 
@@ -21,13 +20,12 @@ import DataTable from '@/components/ui/datatable';
 import {
   GROUP_STATUS,
   GROUP_STATUS_VARIANTS,
+  INTERNSHIP_MANAGEMENT_UI,
 } from '@/constants/internship-management/internship-management';
 import { TABLE_CELL } from '@/lib/tableStyles';
 
-import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { useGroupDetail } from '../hooks/useGroupDetail';
-
-const { Text, Title } = Typography;
+import { GroupDetailOverview } from './GroupDetailOverview';
 
 export default function GroupGeneralInfo({
   groupId = null,
@@ -38,7 +36,9 @@ export default function GroupGeneralInfo({
   const { info, loading } = useGroupDetail(groupId);
   const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
-  const VIEW = ENTERPRISE_GROUP_UI.MODALS.VIEW;
+  const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
+  const { MODALS, ACTIONS } = GROUP_MANAGEMENT;
+  const VIEW = MODALS.VIEW;
 
   const members = info?.members || [];
 
@@ -53,6 +53,7 @@ export default function GroupGeneralInfo({
         m.email?.toLowerCase().includes(query)
     );
   }, [members, searchQuery]);
+
   const handleBack = () => {
     if (onBack) {
       onBack();
@@ -64,7 +65,7 @@ export default function GroupGeneralInfo({
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center py-20 min-h-[400px]">
-        <Spin size="large" description={ENTERPRISE_GROUP_UI.MESSAGES.LOAD_ERROR} />
+        <Spin size="large" description={GROUP_MANAGEMENT.MESSAGES.LOAD_ERROR} />
       </div>
     );
   }
@@ -72,7 +73,7 @@ export default function GroupGeneralInfo({
   if (!info) {
     return (
       <div className="flex flex-1 items-center justify-center py-12 min-h-[400px]">
-        <Empty description={ENTERPRISE_GROUP_UI.EMPTY_STATE.MESSAGE} />
+        <Empty description={GROUP_MANAGEMENT.TABLE.EMPTY_TEXT} />
       </div>
     );
   }
@@ -87,25 +88,15 @@ export default function GroupGeneralInfo({
           onClick={handleBack}
           className="flex items-center gap-2 text-slate-600 hover:text-primary font-bold text-xs hover:bg-primary/10 rounded-lg px-3 h-9 transition-all shadow-sm bg-slate-100/80 border border-slate-200/50"
         >
-          {ENTERPRISE_GROUP_UI.ACTIONS.BACK_TO_LIST}
+          {ACTIONS.BACK_TO_LIST}
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Detail Column (Left) */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <Card className="!p-6 border-none shadow-sm flex flex-col gap-6">
-            <div className="flex items-center justify-between border-b border-slate-50 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                  <BlockOutlined />
-                </div>
-                <h3 className="text-sm font-extrabold uppercase tracking-widest text-text/80 mb-0">
-                  {VIEW.TITLE}
-                </h3>
-              </div>
-            </div>
+      <GroupDetailOverview info={info} VIEW={VIEW} GROUP_MANAGEMENT={GROUP_MANAGEMENT} />
 
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex-[2]">
+          <Card className="!p-6 border-none shadow-sm flex flex-col gap-6 h-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
               {/* Group Metadata in vertical grid style */}
               <div className="flex flex-col gap-1.5">
@@ -123,7 +114,7 @@ export default function GroupGeneralInfo({
                 </span>
                 <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm min-h-[44px] flex items-center">
                   <StatusBadge variant={GROUP_STATUS_VARIANTS[info.status] || 'default'} size="sm">
-                    {ENTERPRISE_GROUP_UI.STATUS.LABELS[info.status] || info.status || '-'}
+                    {GROUP_MANAGEMENT.STATUS.LABELS[info.status] || info.status || '-'}
                   </StatusBadge>
                 </div>
               </div>
@@ -168,8 +159,7 @@ export default function GroupGeneralInfo({
           </Card>
         </div>
 
-        {/* Info Column (Right) */}
-        <div className="flex flex-col gap-6">
+        <div className="flex-1">
           <Card className="!p-6 border-none shadow-sm flex flex-col gap-4 h-full">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
               <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">

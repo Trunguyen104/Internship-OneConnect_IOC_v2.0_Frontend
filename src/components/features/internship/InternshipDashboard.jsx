@@ -21,34 +21,32 @@ const InternshipDashboard = () => {
       try {
         setLoading(true);
 
-        const termsResponse = await InternshipGroupService.getMyTerms();
+        const [phasesResponse, groupsResponse] = await Promise.all([
+          InternshipGroupService.getMyPhases(),
+          InternshipGroupService.getMyGroups(),
+        ]);
 
-        const isSuccess = termsResponse?.success === true || termsResponse?.isSuccess === true;
-        if (!termsResponse || !isSuccess || !termsResponse.data) {
-          setInternships([]);
-          return;
-        }
+        const phases = phasesResponse?.data?.items || phasesResponse?.data || [];
+        const groups = groupsResponse?.data?.items || groupsResponse?.data || [];
 
-        const termsData = termsResponse.data || [];
-        const enrichedInternships = termsData.map((termItem, index) => {
-          const clientKey = termItem.termId ?? `internship-${index}`;
+        const enrichedInternships = phases.map((phase, index) => {
+          const group = groups.find((g) => g.phaseId === phase.phaseId);
+          const clientKey = phase.phaseId ?? `phase-${index}`;
 
           return {
-            id: termItem.internshipGroupId || termItem.termId,
-            termId: termItem.termId,
+            id: group?.internshipGroupId || group?.id || phase.phaseId,
+            phaseId: phase.phaseId,
             clientKey,
-            displayName: termItem.termName,
-            groupName: termItem.projectName || termItem.termName,
-            status: termItem.status, // TermDisplayStatus (1: Upcoming, 2: Active, 3: Ended, 4: Closed)
-            enrollmentStatus: termItem.enrollmentStatus,
-            placementStatus: termItem.placementStatus,
-            isPlaced: termItem.isPlaced,
-            enterpriseName: termItem.enterpriseName,
-            mentorName: termItem.mentorName,
-            projectName: termItem.projectName,
-            journeyStep: termItem.journeyStep,
-            startDate: termItem.startDate,
-            endDate: termItem.endDate,
+            displayName: phase.name || phase.phaseName,
+            groupName: group?.groupName || group?.projectName || phase.name || phase.phaseName,
+            status: phase.status,
+            isPlaced: !!group,
+            enterpriseName: group?.enterpriseName || phase.enterpriseName,
+            mentorName: group?.mentorName || group?.mentor?.fullName,
+            projectName: group?.projectName,
+            journeyStep: group?.journeyStep || 0,
+            startDate: group?.startDate || phase.startDate,
+            endDate: group?.endDate || phase.endDate,
           };
         });
 
@@ -100,7 +98,7 @@ const InternshipDashboard = () => {
           <InternshipCard key={item.clientKey ?? item.id} data={item}>
             <InternshipCard.Header
               title={item.displayName}
-              isCurrent={item.status === INTERNSHIP_STATUS.ACTIVE}
+              isCurrent={item.status === INTERNSHIP_STATUS.IN_PROGRESS}
             />
             <InternshipCard.Stepper />
 

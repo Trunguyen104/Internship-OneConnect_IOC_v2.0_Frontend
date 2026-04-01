@@ -4,7 +4,6 @@ import {
   CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
-  ExclamationCircleOutlined,
   EyeOutlined,
   InboxOutlined,
   RollbackOutlined,
@@ -17,8 +16,11 @@ import React, { useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown, { TableRowIconButton } from '@/components/ui/TableRowActions';
 import {
+  getOperationalStatus,
+  getVisibilityStatus,
   OPERATIONAL_LABELS,
   OPERATIONAL_STATUS,
   PROJECT_MANAGEMENT,
@@ -26,6 +28,7 @@ import {
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
 } from '@/constants/project-management/project-management';
+import { cn } from '@/lib/cn';
 
 export default function ProjectTable({
   data,
@@ -58,10 +61,10 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
-        width: 140,
+        width: 160,
         render: (text, record) => (
           <div
-            className="font-semibold text-primary hover:underline cursor-pointer truncate max-w-[140px]"
+            className="font-semibold text-slate-900 hover:text-primary hover:underline cursor-pointer truncate max-w-[160px] transition-colors"
             title={record.projectName}
             onClick={() => onView(record)}
           >
@@ -105,24 +108,9 @@ export default function ProjectTable({
 
           let content = null;
           if (isMissing) {
-            if (record.isOrphaned) {
-              content = (
-                <div className="text-red-500 font-medium text-[10px] leading-tight flex flex-col gap-0.5 w-[150px]">
-                  <div className="flex items-center gap-1 font-bold">
-                    <ExclamationCircleOutlined /> {TABLE.STATUS_TEXT.ORPHANED_TITLE}
-                  </div>
-                  <span className="text-[9px] opacity-90 uppercase italic">
-                    {TABLE.STATUS_TEXT.ORPHANED_HINT}
-                  </span>
-                </div>
-              );
-            } else {
-              content = (
-                <span className="text-red-500 italic text-xs font-medium">
-                  {TABLE.STATUS_TEXT.NO_GROUP}
-                </span>
-              );
-            }
+            content = (
+              <span className="text-slate-400 italic text-xs">{TABLE.STATUS_TEXT.NO_GROUP}</span>
+            );
           } else {
             content = (
               <div className="flex flex-col gap-1 items-start max-w-[150px]">
@@ -142,43 +130,69 @@ export default function ProjectTable({
             );
           }
 
+          const op = getOperationalStatus(record.operationalStatus ?? record.status);
+          const isReadOnly =
+            op === OPERATIONAL_STATUS.COMPLETED || op === OPERATIONAL_STATUS.ARCHIVED;
+
           return (
             <div
-              className="cursor-pointer hover:text-primary transition-colors group/cell"
+              className={cn(
+                'transition-colors group/cell',
+                !isReadOnly && 'cursor-pointer hover:text-primary'
+              )}
               onClick={(e) => {
+                if (isReadOnly) return;
                 e.stopPropagation();
                 onAssign?.(record);
               }}
             >
-              <div className="group-hover/cell:underline">{content}</div>
+              <div className={cn(!isReadOnly && 'group-hover/cell:underline')}>{content}</div>
             </div>
           );
         },
       },
-      {
-        title: TABLE.COLUMNS.FIELD,
-        key: 'field',
-        width: 100,
-        render: (text) => (
-          <div className="truncate w-[100px]" title={text}>
-            {text || PROJECT_MANAGEMENT.COMMON.N_A}
-          </div>
-        ),
-      },
+      // {
+      //   title: TABLE.COLUMNS.FIELD,
+      //   key: 'field',
+      //   width: 120,
+      //   render: (text) => (
+      //     <span className="text-xs font-medium text-slate-600 truncate block max-w-[120px]" title={text}>
+      //       {text || PROJECT_MANAGEMENT.COMMON.N_A}
+      //     </span>
+      //   ),
+      // },
       {
         title: TABLE.COLUMNS.TIMELINE,
         key: 'timeline',
-        width: 160,
+        width: 150,
         render: (_, record) => {
           if (record.isOrphaned) {
             return <div className="text-slate-400">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
           }
-          const start = record.startDate
-            ? dayjs(record.startDate).format('DD/MM/YYYY')
+
+          // AC-08 Fallback: Use group dates if project dates are null
+          const gid = record.internshipId || record.internshipGroupId || record.groupId;
+          const group =
+            gid && Array.isArray(groups)
+              ? groups.find(
+                  (g) =>
+                    (g.internshipId && g.internshipId.toLowerCase() === gid.toLowerCase()) ||
+                    (g.id && g.id.toLowerCase() === gid.toLowerCase())
+                )
+              : null;
+
+          const startSrc = record.startDate || group?.startDate;
+          const endSrc = record.endDate || group?.endDate;
+
+          if (!startSrc && !endSrc) {
+            return <div className="text-gray-600 font-medium">{PROJECT_MANAGEMENT.COMMON.N_A}</div>;
+          }
+
+          const start = startSrc
+            ? dayjs(startSrc).format('DD/MM/YYYY')
             : PROJECT_MANAGEMENT.COMMON.N_A;
-          const end = record.endDate
-            ? dayjs(record.endDate).format('DD/MM/YYYY')
-            : PROJECT_MANAGEMENT.COMMON.N_A;
+          const end = endSrc ? dayjs(endSrc).format('DD/MM/YYYY') : PROJECT_MANAGEMENT.COMMON.N_A;
+
           return (
             <div className="text-[11px] font-medium tracking-tight text-slate-600">
               {start} {PROJECT_MANAGEMENT.COMMON.DASH} {end}
@@ -189,48 +203,41 @@ export default function ProjectTable({
       {
         title: TABLE.COLUMNS.VISIBILITY,
         key: 'visibility',
-        width: 90,
+        width: 80,
         align: 'center',
         render: (_, record) => {
-          const vis = record.visibilityStatus ?? record.visibility ?? VISIBILITY_STATUS.DRAFT;
+          const vis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const label = VISIBILITY_LABELS[vis] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
-          const variant = STATUS_VARIANTS[vis] || 'default';
-          return (
-            <Badge variant={variant} size="xs" className="uppercase tracking-tighter">
-              {label}
-            </Badge>
-          );
+          const variant = STATUS_VARIANTS[vis] || 'neutral';
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {
         title: TABLE.COLUMNS.STATUS,
         key: 'operationalStatus',
-        width: 110,
+        width: 100,
         align: 'center',
         render: (_, record) => {
-          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const op = getOperationalStatus(record.operationalStatus ?? record.status);
           const label = OPERATIONAL_LABELS[op] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
-          const variant = STATUS_VARIANTS[op] || 'default';
-          return (
-            <Badge variant={variant} size="xs" className="font-bold">
-              {label}
-            </Badge>
-          );
+          const variant = STATUS_VARIANTS[op] || 'neutral';
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {
         title: TABLE.COLUMNS.ACTIONS,
         key: 'actions',
-        width: 80,
+        width: 60,
         align: 'center',
         render: (_, record) => {
+          const originalOp = getOperationalStatus(record.operationalStatus ?? record.status);
+          const originalVis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const vis =
-            record.visibilityStatus ??
-            record.visibility ??
-            (record.status === OPERATIONAL_STATUS.UNSTARTED
+            originalVis ??
+            (originalOp === OPERATIONAL_STATUS.UNSTARTED
               ? VISIBILITY_STATUS.DRAFT
               : VISIBILITY_STATUS.PUBLISHED);
-          const op = record.operationalStatus ?? record.status ?? OPERATIONAL_STATUS.UNSTARTED;
+          const op = originalOp;
 
           if (!isMentor) {
             return (
@@ -368,7 +375,7 @@ export default function ProjectTable({
       loading={loading}
       rowKey="projectId"
       size="small"
-      minWidth="1000px"
+      minWidth="100%"
       className="project-table"
       emptyText={TABLE.EMPTY_MESSAGE}
     />

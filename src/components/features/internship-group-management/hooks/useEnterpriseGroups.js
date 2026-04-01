@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
-import { ENTERPRISE_GROUP_UI } from '../constants/enterprise-group.constants';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
 
 const DEFAULT_PHASE_OPTIONS = [];
@@ -20,6 +19,7 @@ export const useEnterpriseGroups = ({
   phaseOptions = DEFAULT_PHASE_OPTIONS,
 }) => {
   const toast = useToast();
+  const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
 
   const queryKey = [
     'enterprise-groups',
@@ -90,8 +90,7 @@ export const useEnterpriseGroups = ({
           total: isBulkPhase ? mapped.length : response?.data?.total || mapped.length,
         };
       } catch (error) {
-        console.error(error);
-        toast.error(ENTERPRISE_GROUP_UI.MESSAGES.ERROR);
+        toast.error(GROUP_MANAGEMENT.MESSAGES.ERROR);
         return { items: [], total: 0 };
       }
     },
@@ -99,24 +98,17 @@ export const useEnterpriseGroups = ({
     staleTime: 5 * 60 * 1000,
   });
 
-  /**
-   * Refresh event (after create/update/delete group)
-   * Giữ nguyên để component cha không bị ảnh hưởng
-   */
   useEffect(() => {
     const handleRefresh = () => {
       refetch();
     };
 
-    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    window.addEventListener(GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
 
     return () => {
-      window.removeEventListener(
-        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
-        handleRefresh
-      );
+      window.removeEventListener(GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
     };
-  }, [refetch]);
+  }, [refetch, GROUP_MANAGEMENT.REFRESH_EVENT]);
 
   return {
     data: queryResult?.items || [],

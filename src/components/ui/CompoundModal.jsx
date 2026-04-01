@@ -162,10 +162,30 @@ Footer.propTypes = {
 };
 
 const COLOR_MAP = {
-  primary: 'hover:border-primary/50',
-  danger: 'hover:border-danger/50',
-  success: 'hover:border-success/50',
-  warning: 'hover:border-warning/50',
+  primary: {
+    bg: 'bg-primary-surface',
+    border: 'border-primary-100',
+    dot: 'bg-primary',
+    text: 'text-primary-600',
+  },
+  danger: {
+    bg: 'bg-danger-surface',
+    border: 'border-danger-100',
+    dot: 'bg-danger',
+    text: 'text-danger-600',
+  },
+  success: {
+    bg: 'bg-success-surface',
+    border: 'border-success-100',
+    dot: 'bg-success',
+    text: 'text-success-600',
+  },
+  warning: {
+    bg: 'bg-warning-surface',
+    border: 'border-warning-border',
+    dot: 'bg-warning',
+    text: 'text-warning-text',
+  },
 };
 
 const InfoBox = ({ label, value, color = 'primary' }) => (
