@@ -1,6 +1,5 @@
 'use client';
 
-import { PlusOutlined } from '@ant-design/icons';
 import { App } from 'antd';
 import { FileText, Send, Trash2, XCircle } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
@@ -51,6 +50,37 @@ export default function JobPostings() {
     setIsModalOpen(true);
   };
 
+  const showConfirm = ({
+    title: confirmTitle,
+    content,
+    onOk,
+    confirmText = JOB_POSTING_UI.CONFIRM.BUTTONS.CONFIRM,
+    variant = 'default',
+  }) => {
+    modalApi.confirm({
+      title: (
+        <span className="text-lg font-black tracking-tight text-slate-800">{confirmTitle}</span>
+      ),
+      content: <p className="mt-2 font-medium text-slate-500">{content}</p>,
+      okText: confirmText,
+      cancelText: JOB_POSTING_UI.CONFIRM.BUTTONS.CANCEL,
+      centered: true,
+      width: 440,
+      className: 'premium-confirm-modal',
+      okButtonProps: {
+        className:
+          variant === 'danger'
+            ? 'bg-rose-500 hover:bg-rose-600 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]'
+            : 'bg-slate-900 hover:bg-slate-800 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]',
+      },
+      cancelButtonProps: {
+        className:
+          'rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px] border-slate-200 text-slate-500',
+      },
+      onOk,
+    });
+  };
+
   const onAction = (key, record) => {
     const title = record?.title || 'this job posting';
     const id = record.jobId;
@@ -64,7 +94,7 @@ export default function JobPostings() {
       title: confirmTitle,
       content,
       onOk,
-      confirmText = 'Confirm',
+      confirmText = JOB_POSTING_UI.CONFIRM.BUTTONS.CONFIRM,
       variant = 'default',
     }) => {
       modalApi.confirm({
@@ -97,7 +127,6 @@ export default function JobPostings() {
           title: JOB_POSTING_UI.CONFIRM.PUBLISH.TITLE,
           content: JOB_POSTING_UI.CONFIRM.PUBLISH.CONTENT(title),
           onOk: () => actions.publishDraft.mutate(id),
-          confirmText: JOB_POSTING_UI.CONFIRM.BUTTONS.CONFIRM,
         });
         break;
       case 'close': {
@@ -111,7 +140,6 @@ export default function JobPostings() {
           title: titleMsg,
           content,
           onOk: () => actions.closeJob.mutate(id),
-          confirmText: JOB_POSTING_UI.CONFIRM.BUTTONS.CONFIRM,
         });
         break;
       }
@@ -156,56 +184,54 @@ export default function JobPostings() {
         counts[job.status]++;
       }
     });
-
     return counts;
   }, [jobPostings]);
 
   return (
-    <PageLayout>
-      <div className="flex items-center justify-between gap-4">
-        <PageLayout.Header title={JOB_POSTING_UI.TITLE} subtitle={JOB_POSTING_UI.LIST.SUBTITLE} />
-        <Button
-          className="bg-slate-900 hover:bg-slate-800 flex h-11 items-center gap-2 rounded-2xl px-6 text-[11px] font-bold uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg"
-          onClick={openCreateModal}
-        >
-          <PlusOutlined className="text-lg" />
-          {JOB_POSTING_UI.CREATE_BUTTON}
-        </Button>
-      </div>
+    <div className="animate-in fade-in flex min-h-0 flex-1 flex-col overflow-hidden pb-10 duration-700">
+      <div className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 md:px-8">
+        <div className="mb-10 flex items-center justify-between gap-4">
+          <PageLayout.Header title={JOB_POSTING_UI.TITLE} subtitle={JOB_POSTING_UI.LIST.SUBTITLE} />
+          <Button
+            className="bg-slate-900 hover:bg-slate-800 flex h-11 items-center gap-2 rounded-2xl px-6 text-[11px] font-bold uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg"
+            onClick={openCreateModal}
+          >
+            {JOB_POSTING_UI.CREATE_BUTTON}
+          </Button>
+        </div>
 
-      <div className="grid grid-cols-1 gap-5 pb-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label={JOB_POSTING_UI.FILTERS.DRAFT}
-          value={statusCounts[JOB_STATUS.DRAFT]}
-          icon={<FileText className="h-5 w-5" />}
-          color="var(--color-warning)"
-          colorClass="text-warning-text bg-warning-surface shadow-warning/10"
-        />
-        <StatCard
-          label={JOB_POSTING_UI.FILTERS.PUBLISHED}
-          value={statusCounts[JOB_STATUS.PUBLISHED]}
-          icon={<Send className="h-5 w-5" />}
-          color="var(--color-success)"
-          colorClass="text-success bg-success-surface shadow-success/10"
-        />
-        <StatCard
-          label={JOB_POSTING_UI.FILTERS.CLOSED}
-          value={statusCounts[JOB_STATUS.CLOSED]}
-          icon={<XCircle className="h-5 w-5" />}
-          color="var(--color-danger)"
-          colorClass="text-danger bg-danger-surface shadow-danger/10"
-        />
-        <StatCard
-          label={JOB_POSTING_UI.FILTERS.ALL}
-          value={totalCount}
-          icon={<Trash2 className="h-5 w-5" />}
-          color="var(--color-primary)"
-          colorClass="text-primary bg-primary-surface shadow-primary/10"
-        />
-      </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label={JOB_POSTING_UI.FILTERS.DRAFT}
+            value={statusCounts[JOB_STATUS.DRAFT]}
+            icon={<FileText className="h-5 w-5" />}
+            color="var(--color-warning)"
+            colorClass="text-warning-text bg-warning-surface shadow-warning/10"
+          />
+          <StatCard
+            label={JOB_POSTING_UI.FILTERS.PUBLISHED}
+            value={statusCounts[JOB_STATUS.PUBLISHED]}
+            icon={<Send className="h-5 w-5" />}
+            color="var(--color-success)"
+            colorClass="text-success bg-success-surface shadow-success/10"
+          />
+          <StatCard
+            label={JOB_POSTING_UI.FILTERS.CLOSED}
+            value={statusCounts[JOB_STATUS.CLOSED]}
+            icon={<XCircle className="h-5 w-5" />}
+            color="var(--color-danger)"
+            colorClass="text-danger bg-danger-surface shadow-danger/10"
+          />
+          <StatCard
+            label={JOB_POSTING_UI.FILTERS.ALL}
+            value={totalCount}
+            icon={<Trash2 className="h-5 w-5" />}
+            color="var(--color-primary)"
+            colorClass="text-primary bg-primary-surface shadow-primary/10"
+          />
+        </div>
 
-      <div className="flex flex-col gap-6">
-        <JobPostingsFilters filters={filters} onFilterChange={handleFilterChange} />
+        <div className="h-10" />
 
         <PageLayout.Card className="border-border/60 bg-surface/70 flex flex-col overflow-hidden border p-0! shadow-xl backdrop-blur-sm">
           <div className="border-border/60 bg-surface/50 flex items-center justify-between border-b px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
@@ -216,28 +242,37 @@ export default function JobPostings() {
             </span>
           </div>
           <PageLayout.Content className="px-0">
+            <div className="px-8">
+              <JobPostingsFilters filters={filters} onFilterChange={handleFilterChange} />
+            </div>
             <JobPostingsTable
               data={jobPostings}
+              loading={isLoading}
+              onAction={onAction}
               pagination={{
                 current: filters.page,
                 pageSize: filters.size,
                 total: totalCount,
                 onChange: handlePageChange,
               }}
-              loading={isLoading || actions.isMutating}
-              onAction={onAction}
             />
           </PageLayout.Content>
         </PageLayout.Card>
-      </div>
 
-      <JobPostingModal
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        record={selectedRecord}
-        phases={phases}
-        onSuccess={() => setIsModalOpen(false)}
-      />
-    </PageLayout>
+        <JobPostingModal
+          open={isModalOpen}
+          record={selectedRecord}
+          phases={phases}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setSelectedRecord(null);
+          }}
+          onSuccess={() => {
+            setIsModalOpen(false);
+            setSelectedRecord(null);
+          }}
+        />
+      </div>
+    </div>
   );
 }

@@ -271,7 +271,7 @@ export default function JobPostingModal({ open, onCancel, record = null, phases 
                     <Form.Item name="requirements" className="mb-0 flex-1">
                       <Textarea
                         rows={6}
-                        placeholder={JOB_POSTING_UI.FORM.PLACEHOLDERS.REQUIREMENTS}
+                        placeholder={JOB_POSTING_UI.PLACEHOLDERS.REQUIREMENTS}
                         className="rounded-2xl border-slate-100 bg-slate-50/50"
                       />
                     </Form.Item>
@@ -295,7 +295,7 @@ export default function JobPostingModal({ open, onCancel, record = null, phases 
                     <Form.Item name="benefit" className="mb-0 flex-1">
                       <Textarea
                         rows={6}
-                        placeholder={JOB_POSTING_UI.FORM.PLACEHOLDERS.BENEFITS}
+                        placeholder={JOB_POSTING_UI.PLACEHOLDERS.BENEFITS}
                         className="rounded-2xl border-slate-100 bg-slate-50/50"
                       />
                     </Form.Item>
@@ -322,7 +322,7 @@ export default function JobPostingModal({ open, onCancel, record = null, phases 
                 >
                   <DatePicker
                     className="h-12 w-full rounded-xl bg-slate-50 border-none font-bold text-slate-700"
-                    placeholder={JOB_POSTING_UI.FORM.PLACEHOLDERS.SELECT_DATE}
+                    placeholder={JOB_POSTING_UI.PLACEHOLDERS.SELECT_DATE}
                   />
                 </Form.Item>
                 <div className="mt-3 flex items-start gap-2 text-[11px] text-rose-500 font-medium leading-tight">
@@ -410,7 +410,7 @@ export default function JobPostingModal({ open, onCancel, record = null, phases 
 
                 <div className="mt-2 text-center">
                   <span className="text-[10px] font-bold text-slate-300 italic">
-                    {JOB_POSTING_UI.FORM.PLACEHOLDERS.DRAFT_STATUS('2 minutes')}
+                    {JOB_POSTING_UI.PLACEHOLDERS.DRAFT_STATUS('2 minutes')}
                   </span>
                 </div>
               </div>

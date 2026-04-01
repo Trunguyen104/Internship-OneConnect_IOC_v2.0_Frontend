@@ -81,53 +81,53 @@ export const JOB_POSTING_UI = {
       TWO: 'SECTION TWO',
       THREE: 'SECTION THREE',
     },
-    PLACEHOLDERS: {
-      REQUIREMENTS: 'List key requirements...',
-      BENEFITS: 'List perks and benefits...',
-      SELECT_DATE: 'Select date',
-      DRAFT_STATUS: (time) => `Draft saved ${time} ago`,
-      EMPTY_TABLE: 'No job postings found.',
-      NOT_AVAILABLE: 'N/A',
-      DASH_FALLBACK: '—',
+  },
+  PLACEHOLDERS: {
+    REQUIREMENTS: 'List key requirements...',
+    BENEFITS: 'List perks and benefits...',
+    SELECT_DATE: 'Select date',
+    DRAFT_STATUS: (time) => `Draft saved ${time} ago`,
+    EMPTY_TABLE: 'No job postings found.',
+    NOT_AVAILABLE: 'N/A',
+    DASH_FALLBACK: '—',
+  },
+  MENU: {
+    EDIT: 'Edit Job Posting',
+    PUBLISH: 'Publish Job Posting',
+    CLOSE: 'Close Job Posting',
+    REPUBLISH: 'Re-Publish',
+    DELETE: 'Delete',
+  },
+  LIST: {
+    SUBTITLE: "Manage your company's internship opportunities and job postings.",
+    TITLE: 'Job Listing',
+    TOTAL: 'Total:',
+    ITEMS_COUNT: (count) => `${count} items`,
+  },
+  CONFIRM: {
+    PUBLISH: {
+      TITLE: 'Publish Job?',
+      CONTENT: (title) =>
+        `Are you sure you want to publish "${title}"? Students will be able to see and apply.`,
     },
-    MENU: {
-      EDIT: 'Edit Job Posting',
-      PUBLISH: 'Publish Job Posting',
-      CLOSE: 'Close Job Posting',
-      REPUBLISH: 'Re-Publish',
-      DELETE: 'Delete',
+    CLOSE: {
+      TITLE: 'Close Job Posting?',
+      CONTENT_ACTIVE: (title, count) =>
+        `Job Posting "${title}" has ${count} active applicant(s) being processed. If you close this, they will be notified and stay in the pipeline for further processing. New students won't be able to apply. Are you sure?`,
+      CONTENT_INACTIVE: (title) =>
+        `Are you sure you want to close "${title}"? Students will no longer be able to apply.`,
     },
-    LIST: {
-      SUBTITLE: "Manage your company's internship opportunities and job postings.",
-      TITLE: 'Job Listing',
-      TOTAL: 'Total:',
-      ITEMS_COUNT: (count) => `${count} items`,
+    DELETE: {
+      TITLE: 'Delete Job Posting?',
+      CONTENT_ACTIVE: (title, count) =>
+        `WARNING: This job has ${count} active applicant(s). Deleting will remove it from the list, but those applications will still be managed in the "All Applications" screen. This action cannot be undone.`,
+      CONTENT_INACTIVE: (title) =>
+        `Are you sure you want to delete "${title}"? This action cannot be undone.`,
+      BUTTON: 'Delete',
     },
-    CONFIRM: {
-      PUBLISH: {
-        TITLE: 'Publish Job?',
-        CONTENT: (title) =>
-          `Are you sure you want to publish "${title}"? Students will be able to see and apply.`,
-      },
-      CLOSE: {
-        TITLE: 'Close Job Posting?',
-        CONTENT_ACTIVE: (title, count) =>
-          `Job Posting "${title}" has ${count} active applicant(s) being processed. If you close this, they will be notified and stay in the pipeline for further processing. New students won't be able to apply. Are you sure?`,
-        CONTENT_INACTIVE: (title) =>
-          `Are you sure you want to close "${title}"? Students will no longer be able to apply.`,
-      },
-      DELETE: {
-        TITLE: 'Delete Job Posting?',
-        CONTENT_ACTIVE: (title, count) =>
-          `WARNING: This job has ${count} active applicant(s). Deleting will remove it from the list, but those applications will still be managed in the "All Applications" screen. This action cannot be undone.`,
-        CONTENT_INACTIVE: (title) =>
-          `Are you sure you want to delete "${title}"? This action cannot be undone.`,
-        BUTTON: 'Delete',
-      },
-      BUTTONS: {
-        CONFIRM: 'Confirm',
-        CANCEL: 'Cancel',
-      },
+    BUTTONS: {
+      CONFIRM: 'Confirm',
+      CANCEL: 'Cancel',
     },
   },
   STATUS_LABELS: {
