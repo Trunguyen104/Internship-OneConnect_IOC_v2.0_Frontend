@@ -29,12 +29,39 @@ export const useStudentDetail = (studentId, termId) => {
     select: (res) => res?.data?.violations || [],
   });
 
+  // 4. Fetch Student Logbook Total
+  const logbookTotalQuery = useQuery({
+    queryKey: ['student-logbook-total', studentId, resolvedDetailTermId],
+    queryFn: () => StudentActivityService.getStudentLogbookTotal(studentId, resolvedDetailTermId),
+    enabled: !!studentId && !!resolvedDetailTermId,
+    select: (res) => res?.data?.logbook || res?.logbook,
+  });
+
+  // 5. Fetch Student Logbook Weekly
+  const logbookWeeklyQuery = useQuery({
+    queryKey: ['student-logbook-weekly', studentId, resolvedDetailTermId],
+    queryFn: () => StudentActivityService.getStudentLogbookWeekly(studentId, resolvedDetailTermId),
+    enabled: !!studentId && !!resolvedDetailTermId,
+    select: (res) => res?.data?.weeks || [],
+  });
+
   return {
     student: studentDetailQuery.data,
     evaluations: evaluationsQuery.data || [],
     violations: violationsQuery.data || [],
+    logbookTotal: logbookTotalQuery.data,
+    logbookWeekly: logbookWeeklyQuery.data || [],
     loading:
-      studentDetailQuery.isLoading || evaluationsQuery.isLoading || violationsQuery.isLoading,
-    isError: studentDetailQuery.isError || evaluationsQuery.isError || violationsQuery.isError,
+      studentDetailQuery.isLoading ||
+      evaluationsQuery.isLoading ||
+      violationsQuery.isLoading ||
+      logbookTotalQuery.isLoading ||
+      logbookWeeklyQuery.isLoading,
+    isError:
+      studentDetailQuery.isError ||
+      evaluationsQuery.isError ||
+      violationsQuery.isError ||
+      logbookTotalQuery.isError ||
+      logbookWeeklyQuery.isError,
   };
 };

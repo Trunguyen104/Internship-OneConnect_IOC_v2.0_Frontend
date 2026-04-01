@@ -1,7 +1,7 @@
 'use client';
 
 import { CarryOutOutlined } from '@ant-design/icons';
-import { App, Modal, Select, Tooltip } from 'antd';
+import { App, Select, Tooltip } from 'antd';
 import React, { useState } from 'react';
 
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
@@ -19,7 +19,7 @@ import { cn } from '@/lib/cn';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useProjectManagement } from '../hooks/useProjectManagement';
-import ProjectDetailDrawer from './ProjectDetailDrawer';
+import ProjectAssignGroupModal from './ProjectAssignGroupModal';
 import ProjectFormModal from './ProjectFormModal';
 import ProjectTable from './ProjectTable';
 
@@ -73,6 +73,21 @@ export default function ProjectManagement() {
     fetchData,
     isMentor,
   } = useProjectManagement();
+
+  const sourceGroupId =
+    assigningProject?.internshipId ||
+    assigningProject?.internshipGroupId ||
+    assigningProject?.groupId;
+  const isMovingFromGroup =
+    sourceGroupId && sourceGroupId !== '00000000-0000-0000-0000-000000000000';
+  const sourceGroup = groups.find((g) => (g.internshipId || g.id) === sourceGroupId);
+
+  const [replacementProjectId, setReplacementProjectId] = useState(null);
+
+  const unstartedProjects = (data || []).filter((p) => {
+    const gid = p.internshipId || p.internshipGroupId || p.groupId;
+    return !gid || gid === '00000000-0000-0000-0000-000000000000';
+  });
 
   return (
     <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
@@ -171,6 +186,7 @@ export default function ProjectManagement() {
             setSelectedGroupId(
               record.internshipId || record.internshipGroupId || record.groupId || null
             );
+            setReplacementProjectId(null);
             setAssignModalVisible(true);
           }}
           onPublish={handlePublishProject}
@@ -202,60 +218,27 @@ export default function ProjectManagement() {
           viewOnly={viewOnly}
           groups={groups}
         />
-
-        <ProjectDetailDrawer
-          visible={detailDrawerVisible}
-          onClose={() => setDetailDrawerVisible(false)}
-          project={editingRecord}
-          groups={groups}
-          onRefresh={fetchData}
-          onAssign={(record) => {
-            setAssigningProject(record);
-            setSelectedGroupId(
-              record.internshipId || record.internshipGroupId || record.groupId || null
-            );
-            setAssignModalVisible(true);
-          }}
-        />
-
-        <Modal
-          title={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.TITLE}
-          open={assignModalVisible}
-          onOk={() =>
-            handleAssignGroup(assigningProject, selectedGroupId, setAssignLoading, () =>
-              setAssignModalVisible(false)
+        <ProjectAssignGroupModal
+          visible={assignModalVisible}
+          onCancel={() => setAssignModalVisible(false)}
+          onConfirm={() =>
+            handleAssignGroup(
+              assigningProject,
+              selectedGroupId,
+              setAssignLoading,
+              () => setAssignModalVisible(false),
+              replacementProjectId
             )
           }
-          onCancel={() => setAssignModalVisible(false)}
-          confirmLoading={assignLoading}
-          okButtonProps={{ disabled: !selectedGroupId }}
-          okText={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM}
-        >
-          <div className="py-4">
-            <p
-              className="mb-2 text-sm text-gray-600"
-              dangerouslySetInnerHTML={{
-                __html: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.DESC.replace(
-                  '{name}',
-                  assigningProject?.projectName || ''
-                ),
-              }}
-            />
-            <Select
-              className="w-full"
-              placeholder={PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.PLACEHOLDER}
-              value={selectedGroupId}
-              onChange={setSelectedGroupId}
-              allowClear
-            >
-              {groups.map((g) => (
-                <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
-                  {g.groupName}
-                </Option>
-              ))}
-            </Select>
-          </div>
-        </Modal>
+          loading={assignLoading}
+          assigningProject={assigningProject}
+          groups={groups}
+          unstartedProjects={unstartedProjects}
+          selectedGroupId={selectedGroupId}
+          setSelectedGroupId={setSelectedGroupId}
+          replacementProjectId={replacementProjectId}
+          setReplacementProjectId={setReplacementProjectId}
+        />
       </>
     </PageLayout>
   );

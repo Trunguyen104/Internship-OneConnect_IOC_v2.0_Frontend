@@ -1,11 +1,8 @@
-import { Col, DatePicker, Form, Input, Row, Select } from 'antd';
+import { Col, Form, Input, Row, Select } from 'antd';
 import React from 'react';
 
 import { USER_ROLE } from '@/constants/common/enums';
-import {
-  INTERN_GROUP_STATUS,
-  OPERATIONAL_STATUS,
-} from '@/constants/project-management/project-management';
+import { INTERN_GROUP_STATUS } from '@/constants/project-management/project-management';
 
 const { Option } = Select;
 
@@ -50,7 +47,7 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
           </Form.Item>
         </Col>
 
-        {/* AC-02: Only show Intern Group if the mentor manages at least 1 active group */}
+        {/* AC-08: Hides field if mentor has no active groups and project is unassigned */}
         <Col span={12}>
           <Form.Item
             noStyle
@@ -64,20 +61,14 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
 
               const showGroup =
                 (groups &&
+                  groups.length > 0 &&
                   groups.some((g) => (g.status || g.groupStatus) === INTERN_GROUP_STATUS.ACTIVE)) ||
                 (editingRecord &&
                   (editingRecord.internshipId ||
                     editingRecord.internshipGroupId ||
                     editingRecord.groupId));
 
-              const isOperationalActiveOrUnstarted =
-                !editingRecord ||
-                editingRecord.operationalStatus === OPERATIONAL_STATUS.UNSTARTED ||
-                editingRecord.operationalStatus === OPERATIONAL_STATUS.ACTIVE ||
-                editingRecord.status === OPERATIONAL_STATUS.UNSTARTED ||
-                editingRecord.status === OPERATIONAL_STATUS.ACTIVE;
-
-              if (!showGroup && !isOperationalActiveOrUnstarted) return null;
+              if (!showGroup) return null;
 
               return (
                 <Form.Item
@@ -87,8 +78,7 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
                   extra={
                     groupId && editingRecord ? (
                       <span className="text-[10px] text-primary/60 italic font-medium">
-                        {FORM.LABEL?.PHASE || 'Phase:'}{' '}
-                        {group?.phaseName || FORM.LABEL?.N_A || 'N/A'} (
+                        {FORM.LABEL?.PHASE} {group?.phaseName || FORM.LABEL?.N_A} (
                         {group?.startDate ? new Date(group.startDate).toLocaleDateString() : '?'} -{' '}
                         {group?.endDate ? new Date(group.endDate).toLocaleDateString() : '?'})
                       </span>
@@ -124,27 +114,6 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
                 </Form.Item>
               );
             }}
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16} hidden={!editingRecord}>
-        <Col span={12}>
-          <Form.Item name="startDate" label={FORM.LABEL?.START_DATE} rules={[{ required: false }]}>
-            <DatePicker
-              className="w-full"
-              format="DD/MM/YYYY"
-              placeholder={FORM.PLACEHOLDER?.DATE}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item name="endDate" label={FORM.LABEL?.END_DATE} rules={[{ required: false }]}>
-            <DatePicker
-              className="w-full"
-              format="DD/MM/YYYY"
-              placeholder={FORM.PLACEHOLDER?.DATE}
-            />
           </Form.Item>
         </Col>
       </Row>

@@ -126,9 +126,7 @@ export default function ProjectResourceFields({
                     <Form.Item
                       {...restField}
                       name={[name, 'url']}
-                      rules={[
-                        { required: true, message: FORM.VALIDATION?.MISSING_URL || 'Missing URL' },
-                      ]}
+                      rules={[{ required: true, message: FORM.VALIDATION?.MISSING_URL }]}
                     >
                       <Input placeholder={FORM.PLACEHOLDER.URL} className="w-64" />
                     </Form.Item>

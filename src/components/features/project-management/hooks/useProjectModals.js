@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export const useProjectModals = () => {
@@ -7,6 +8,8 @@ export const useProjectModals = () => {
   const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [viewOnly, setViewOnly] = useState(false);
+
+  const router = useRouter();
 
   const handleCreateNew = () => {
     setEditingRecord(null);
@@ -21,9 +24,8 @@ export const useProjectModals = () => {
   };
 
   const handleView = (record) => {
-    setEditingRecord(record);
-    setViewOnly(true);
-    setDetailDrawerVisible(true);
+    const id = record.projectId || record.id;
+    router.push(`/projects/${id}`);
   };
 
   return {

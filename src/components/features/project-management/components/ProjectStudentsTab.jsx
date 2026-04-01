@@ -27,7 +27,7 @@ export default function ProjectStudentsTab({
 }) {
   const studentColumns = [
     {
-      title: DETAIL.STUDENTS?.COLUMNS?.NAME || 'Full Name',
+      title: DETAIL.STUDENTS?.COLUMNS?.NAME,
       key: 'fullName',
       width: 220,
       render: (_, record) => (
@@ -47,14 +47,14 @@ export default function ProjectStudentsTab({
       ),
     },
     {
-      title: DETAIL.STUDENTS?.COLUMNS?.EMAIL || 'Email',
+      title: DETAIL.STUDENTS?.COLUMNS?.EMAIL,
       dataIndex: 'email',
       key: 'email',
       width: 240,
       render: (email) => <span className="text-xs text-slate-500 font-medium">{email}</span>,
     },
     {
-      title: DETAIL.STUDENTS?.COLUMNS?.STATUS || 'Status',
+      title: DETAIL.STUDENTS?.COLUMNS?.STATUS,
       key: 'status',
       width: 120,
       align: 'right',
@@ -63,7 +63,7 @@ export default function ProjectStudentsTab({
           currentProject?.groupInfo?.status === DETAIL.GROUP?.ARCHIVED_VALUE ||
           currentProject?.groupStatus === DETAIL.GROUP?.ARCHIVED_VALUE ||
           currentProject?.internshipGroup?.status === DETAIL.GROUP?.ARCHIVED_VALUE;
-        const status = record.termStatus || DETAIL.STUDENTS?.STATUS_ACTIVE || 'Active';
+        const status = record.termStatus || DETAIL.STUDENTS?.STATUS_ACTIVE;
 
         return (
           <div className="flex flex-col items-end gap-1">
@@ -75,7 +75,7 @@ export default function ProjectStudentsTab({
             </Badge>
             {isArchived && (
               <Badge variant="default" size="xs">
-                {DETAIL.GROUP?.ARCHIVED_LABEL || 'Group Archived'}
+                {DETAIL.GROUP?.ARCHIVED_LABEL}
               </Badge>
             )}
           </div>

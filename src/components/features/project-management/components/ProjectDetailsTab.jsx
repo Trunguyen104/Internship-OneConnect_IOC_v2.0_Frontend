@@ -17,6 +17,7 @@ import Card from '@/components/ui/card';
 import {
   getOperationalStatus,
   OPERATIONAL_STATUS,
+  PROJECT_MANAGEMENT,
 } from '@/constants/project-management/project-management';
 
 export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, onAssign }) {
@@ -51,7 +52,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
               </span>
             </div>
           </section>
-          <section className="min-w-[140px]">
+          <section className="min-w-fit">
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.FIELD}
             </h4>
@@ -153,6 +154,26 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 </div>
               </div>
             </div>
+
+            {/* AC-05: Change Group button when project is already assigned */}
+            {!isHR &&
+              onAssign &&
+              getOperationalStatus(currentProject?.operationalStatus) !==
+                OPERATIONAL_STATUS.COMPLETED &&
+              getOperationalStatus(currentProject?.operationalStatus) !==
+                OPERATIONAL_STATUS.ARCHIVED && (
+                <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+                  <Button
+                    size="xs"
+                    variant="ghost"
+                    className="text-primary hover:bg-primary/5 font-bold text-[10px] h-7 px-3 shadow-none border border-primary/10"
+                    onClick={() => onAssign(currentProject)}
+                    icon={<ArrowRightOutlined className="rotate-180 text-[9px]" />}
+                  >
+                    {PROJECT_MANAGEMENT.TABLE.ACTIONS_LABEL.CHANGE_GROUP}
+                  </Button>
+                </div>
+              )}
           </div>
         ) : (
           <div className="flex flex-col gap-3 p-5 bg-red-50/50 rounded-xl border border-red-100">

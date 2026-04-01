@@ -64,9 +64,9 @@ export const useStudentList = (filters) => {
   const summary = useMemo(
     () => ({
       total: stats.totalStudents || 0,
-      interning: stats.activeInternship || 0,
-      missingLogbook: stats.missingLogbook || 0,
+      interning: stats.placed || 0,
       unplaced: stats.unplaced || 0,
+      noMentor: stats.noMentor || 0,
     }),
     [stats]
   );
