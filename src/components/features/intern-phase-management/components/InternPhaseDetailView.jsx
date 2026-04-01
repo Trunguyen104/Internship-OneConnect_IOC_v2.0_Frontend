@@ -32,16 +32,18 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
 
   const phaseId = phase?.id || phase?.internPhaseId;
 
-  const { data: jobPostings, isLoading: loadingPostings } = useQuery({
+  const { data: jobPostings } = useQuery({
     queryKey: ['intern-phase-postings', phaseId],
     queryFn: () => InternPhaseService.getJobPostings(phaseId),
     enabled: !!phaseId,
+    initialData: { data: phase.jobPostings || [] },
   });
 
-  const { data: students, isLoading: loadingStudents } = useQuery({
+  const { data: students } = useQuery({
     queryKey: ['intern-phase-students', phaseId],
     queryFn: () => InternPhaseService.getStudents(phaseId),
     enabled: !!phaseId,
+    initialData: { data: phase.placedStudents || [] },
   });
 
   if (!phase) return null;
@@ -288,12 +290,8 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                     </div>
                   ),
                   children: (
-                    <div className="mt-8 bg-white rounded-3xl border border-slate-100 p-2 shadow-sm">
-                      <InternPhaseJobPostingTab
-                        data={jobPostings?.data || jobPostings}
-                        loading={loadingPostings}
-                        DETAILS={DETAILS}
-                      />
+                    <div className="mt-2 bg-white rounded-3xl border border-slate-100 p-2 shadow-sm">
+                      <InternPhaseJobPostingTab data={jobPostings?.data} DETAILS={DETAILS} />
                     </div>
                   ),
                 },
@@ -308,12 +306,8 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                     </div>
                   ),
                   children: (
-                    <div className="mt-8 bg-white rounded-3xl border border-slate-100 p-2 shadow-sm">
-                      <InternPhaseStudentTab
-                        data={students?.data || students}
-                        loading={loadingStudents}
-                        DETAILS={DETAILS}
-                      />
+                    <div className="mt-2 bg-white rounded-3xl border border-slate-100 p-2 shadow-sm">
+                      <InternPhaseStudentTab data={students?.data} DETAILS={DETAILS} />
                     </div>
                   ),
                 },

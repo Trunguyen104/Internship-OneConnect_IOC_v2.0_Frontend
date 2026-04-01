@@ -41,7 +41,7 @@ const InfoRow = ({ label, value, icon, className }) => (
 
 const SectionCard = ({ title, children, icon, className, accentColor = 'primary' }) => (
   <Card
-    className={`!p-8 !rounded-[32px] border-2 border-slate-900 shadow-xl shadow-slate-200/40 bg-white relative overflow-hidden group !min-h-0 ${className}`}
+    className={`!p-8 !rounded-[32px] border border-slate-100/80 shadow-md shadow-slate-200/40 bg-white relative overflow-hidden group !min-h-0 ${className}`}
   >
     <div className={`absolute top-0 left-0 w-full h-[4px] bg-slate-50`} />
     <div
@@ -51,7 +51,7 @@ const SectionCard = ({ title, children, icon, className, accentColor = 'primary'
     <div className="flex items-center justify-between mb-6 relative z-10">
       <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-3">
         <div
-          className={`size-9 rounded-xl bg-white flex items-center justify-center text-${accentColor} text-lg shadow-sm border-2 border-slate-900 transition-transform duration-500`}
+          className={`size-9 rounded-xl bg-white flex items-center justify-center text-${accentColor} text-lg shadow-sm border border-slate-100/50 transition-transform duration-500`}
         >
           {icon}
         </div>
@@ -73,7 +73,7 @@ const StatusMiniCard = ({
 }) => (
   <div
     className={cn(
-      'p-6 rounded-[32px] transition-all duration-500 group overflow-hidden relative border-2 border-slate-900 bg-white shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:-translate-y-1',
+      'p-6 rounded-[32px] transition-all duration-500 group overflow-hidden relative border border-slate-100 shadow-lg shadow-slate-200/40 bg-white hover:shadow-xl hover:border-primary/10 hover:-translate-y-1',
       className
     )}
   >
@@ -96,7 +96,7 @@ const StatusMiniCard = ({
       </div>
 
       <div className="flex items-baseline gap-2.5">
-        <span className="text-2xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">
+        <span className="text-xl font-black text-slate-900 tracking-tighter tabular-nums leading-none">
           {value}
         </span>
         {subValue && (

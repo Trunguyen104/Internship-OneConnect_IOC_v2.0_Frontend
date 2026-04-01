@@ -12,9 +12,9 @@ import { Button, Input, Progress, Select, Tooltip } from 'antd';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import PageLayout from '@/components/ui/pagelayout';
+import StatusBadge from '@/components/ui/status-badge';
 import { STUDENT_ACTIVITY_UI } from '@/constants/student-activity/student-activity';
 import { UI_TEXT } from '@/lib/UI_Text';
 
@@ -83,16 +83,14 @@ export default function StudentActivityList() {
       sortKey: 'FullName',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <div className="size-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 font-bold border border-slate-100 text-xs shrink-0 shadow-sm">
+          <div className="size-8 rounded-full bg-bg flex items-center justify-center text-muted font-bold border border-border text-xs shrink-0 shadow-sm">
             {record.fullName?.charAt(0)}
           </div>
           <div className="flex flex-col min-w-0 pr-2">
-            <span className="truncate text-sm font-bold text-slate-800 leading-tight mb-0.5">
+            <span className="truncate text-sm font-bold text-text leading-tight mb-0.5">
               {record.fullName}
             </span>
-            <span className="truncate text-[10px] font-bold text-slate-600">
-              {record.studentCode} {UI_TEXT.COMMON.BULLET} {record.className}
-            </span>
+            <span className="truncate text-[10px] font-bold text-muted">{record.className}</span>
           </div>
         </div>
       ),
@@ -103,11 +101,11 @@ export default function StudentActivityList() {
       width: 140,
       render: (_, record) => (
         <span
-          className="text-xs font-bold text-slate-700 truncate block max-w-[130px]"
+          className="text-xs font-bold text-[var(--gray-700)] truncate block max-w-[130px]"
           title={record.enterpriseName}
         >
           {record.enterpriseName || (
-            <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>
+            <span className="text-muted font-bold">{UI_TEXT.COMMON.EM_DASH}</span>
           )}
         </span>
       ),
@@ -118,11 +116,11 @@ export default function StudentActivityList() {
       width: 130,
       render: (_, record) => (
         <span
-          className="text-xs font-bold text-slate-700 truncate block max-w-[120px]"
+          className="text-xs font-bold text-[var(--gray-700)] truncate block max-w-[120px]"
           title={record.mentorName}
         >
           {record.mentorName || (
-            <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>
+            <span className="text-muted font-bold">{UI_TEXT.COMMON.EM_DASH}</span>
           )}
         </span>
       ),
@@ -140,29 +138,29 @@ export default function StudentActivityList() {
           record.internshipStatus === STUDENT_ACTIVITY_UI.MAPPING.STATUS.UNPLACED ||
           record.internshipStatus === 5
         )
-          return <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>;
+          return <span className="text-muted font-bold">{UI_TEXT.COMMON.EM_DASH}</span>;
 
         const { submitted, total: totalWorkDays, percentComplete: beProgress } = record.logbook;
 
         if (totalWorkDays === 0)
-          return <span className="text-slate-400 font-bold">{UI_TEXT.COMMON.EM_DASH}</span>;
+          return <span className="text-muted font-bold">{UI_TEXT.COMMON.EM_DASH}</span>;
 
         // Prioritize backend calculated value for filter consistency, fall back to manual ratio
         const rawProgress = beProgress ?? Math.round((submitted / totalWorkDays) * 100);
         const progress = Math.min(100, rawProgress);
 
-        let strokeColor = '#22c55e'; // success (green)
+        let strokeColor = 'var(--color-success)';
         if (progress < 50)
-          strokeColor = '#ec4899'; // serious concern (pink/red)
-        else if (progress < 75) strokeColor = '#f59e0b'; // warning (amber)
+          strokeColor = 'var(--color-danger)'; // pink/red
+        else if (progress < 75) strokeColor = 'var(--color-warning)'; // amber
 
         // Enhance color logic for 0%
-        if (progress === 0) strokeColor = '#ef4444'; // danger (red)
+        if (progress === 0) strokeColor = 'var(--color-danger)';
 
         return (
           <div className="flex w-full flex-col gap-1.5 py-1 pr-4">
             <div className="flex items-center justify-between text-[10px] font-bold">
-              <span className="text-slate-600">
+              <span className="text-[var(--gray-600)]">
                 {STUDENT_ACTIVITY_UI.LOGBOOK.REPORTS}: {submitted}/{totalWorkDays}
               </span>
               <span style={{ color: strokeColor }} className="font-extrabold">
@@ -174,7 +172,7 @@ export default function StudentActivityList() {
               size="small"
               showInfo={false}
               type="line"
-              className="m-0 !h-1.5 [&_.ant-progress-inner]:!bg-slate-50 shadow-sm"
+              className="m-0 !h-1.5 [&_.ant-progress-inner]:!bg-bg shadow-sm"
               strokeColor={strokeColor}
             />
           </div>
@@ -217,9 +215,22 @@ export default function StudentActivityList() {
 
         const status = statuses[record.internshipStatus] || {
           label: record.internshipStatus,
-          variant: 'default',
+          variant: 'neutral',
         };
-        return <Badge variant={status.variant}>{status.label}</Badge>;
+
+        // Map status variants to StatusBadge compatible variants
+        const variantMap = {
+          success: 'success',
+          'warning-soft': 'warning',
+          info: 'info',
+          warning: 'warning',
+          danger: 'danger',
+          default: 'neutral',
+        };
+
+        return (
+          <StatusBadge variant={variantMap[status.variant] || 'neutral'} label={status.label} />
+        );
       },
     },
     {
@@ -234,8 +245,8 @@ export default function StudentActivityList() {
         if (!count || count === 0) return null;
         return (
           <div className="flex items-center justify-center gap-1.5 py-1">
-            <ExclamationCircleFilled className="text-red-500 scale-110 drop-shadow-sm" />
-            <span className="text-xs font-black text-red-600">{count}</span>
+            <ExclamationCircleFilled className="!text-red-500 scale-110 drop-shadow-sm" />
+            <span className="text-xs font-black !text-red-500">{count}</span>
           </div>
         );
       },
@@ -293,11 +304,11 @@ export default function StudentActivityList() {
         <PageLayout.Toolbar>
           <div className="flex w-full flex-wrap items-center gap-3">
             <Input
-              prefix={<SearchOutlined className="text-slate-400" />}
+              prefix={<SearchOutlined className="text-muted" />}
               placeholder={STUDENT_ACTIVITY_UI.FILTERS.SEARCH_STUDENTS}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-56 rounded-full bg-slate-100/80 hover:bg-slate-200/50 border-transparent focus:bg-white px-4 py-1.5 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              className="w-full sm:w-56 rounded-full bg-bg/80 hover:bg-[var(--gray-200)]/50 border-transparent focus:bg-surface px-4 py-1.5 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
               allowClear
             />
             <Select
@@ -364,7 +375,7 @@ export default function StudentActivityList() {
                   danger
                   icon={<ClearOutlined />}
                   onClick={resetFilters}
-                  className="!h-8 !w-8 !rounded-full !flex !items-center !justify-center !bg-red-50 hover:!bg-red-100 !border-transparent text-red-500"
+                  className="!h-8 !w-8 !rounded-full !flex !items-center !justify-center !bg-danger-surface hover:!bg-[var(--primary-100)] !border-transparent text-danger"
                 />
               </Tooltip>
             </div>

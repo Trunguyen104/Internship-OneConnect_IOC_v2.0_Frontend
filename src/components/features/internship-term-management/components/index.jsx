@@ -13,11 +13,11 @@ import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
+import StatusBadge from '@/components/ui/status-badge';
 import {
   INTERNSHIP_MANAGEMENT_UI,
   TERM_STATUS,
@@ -129,7 +129,7 @@ export default function InternshipTermManagement() {
         render: (status) => {
           const variant = TERM_STATUS_VARIANTS[status] || 'default';
           const label = STATUS_LABELS[status] || status;
-          return <Badge variant={variant}>{label}</Badge>;
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {

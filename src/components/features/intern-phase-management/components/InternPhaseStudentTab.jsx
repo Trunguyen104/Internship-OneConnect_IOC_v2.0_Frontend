@@ -15,7 +15,7 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
   const columns = [
     {
       title: TABLE.COLUMNS.NAME,
-      key: 'studentName',
+      key: 'fullName',
       width: '180px',
       render: (text) => <span className="font-semibold text-slate-800">{text}</span>,
     },
@@ -23,7 +23,7 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
       title: TABLE.COLUMNS.UNIVERSITY,
       key: 'universityName',
       width: '150px',
-      render: (text) => <span className="text-slate-600 italic text-xs">{text}</span>,
+      render: (text) => <span className="text-slate-600 italic text-xs">{text || '-'}</span>,
     },
     {
       title: TABLE.COLUMNS.SOURCE,
@@ -31,7 +31,11 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
       width: '120px',
       align: 'center',
       render: (source) => {
-        const displaySource = typeof source === 'object' ? source?.name || source?.label : source;
+        const sourceMap = {
+          1: 'Self-apply',
+          2: 'Uni-assign',
+        };
+        const displaySource = sourceMap[source] || source;
         const variant = TABLE.SOURCE_VARIANTS[displaySource] || 'default';
         const label = TABLE.SOURCE_LABELS[displaySource] || displaySource || '-';
 
@@ -44,27 +48,38 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
     },
     {
       title: TABLE.COLUMNS.PLACED_DATE,
-      key: 'placedDate',
+      key: 'placedAt',
       width: '120px',
       render: (text) => (text ? dayjs(text).format('DD/MM/YYYY') : '-'),
     },
   ];
 
   if (loading) {
-    return <Skeleton active paragraph={{ rows: 5 }} className="mt-4" />;
+    return (
+      <div className="h-[400px] flex items-center justify-center">
+        <Skeleton active paragraph={{ rows: 8 }} />
+      </div>
+    );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-10">
+      <div className="flex h-[400px] flex-col items-center justify-center py-10">
         <Empty description={DETAILS.EMPTY_STUDENTS} />
       </div>
     );
   }
 
   return (
-    <div className="mt-4">
-      <DataTable columns={columns} data={data} rowKey="id" minWidth="500px" size="small" />
+    <div className="h-[400px] overflow-hidden flex flex-col">
+      <DataTable
+        columns={columns}
+        data={data}
+        rowKey="id"
+        minWidth="500px"
+        size="small"
+        className="mt-0"
+      />
     </div>
   );
 }

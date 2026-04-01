@@ -5,6 +5,8 @@ import { Button, Modal, Typography } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { cn } from '@/lib/cn';
+
 const { Text, Title } = Typography;
 
 const CompoundModal = ({
@@ -161,27 +163,62 @@ Footer.propTypes = {
 };
 
 const COLOR_MAP = {
-  primary: 'hover:border-primary/50',
-  danger: 'hover:border-danger/50',
-  success: 'hover:border-success/50',
-  warning: 'hover:border-warning/50',
+  primary: {
+    bg: 'bg-primary-surface',
+    border: 'border-primary-100',
+    dot: 'bg-primary',
+    text: 'text-primary-600',
+  },
+  danger: {
+    bg: 'bg-danger-surface',
+    border: 'border-danger-100',
+    dot: 'bg-danger',
+    text: 'text-danger-600',
+  },
+  success: {
+    bg: 'bg-success-surface',
+    border: 'border-success-100',
+    dot: 'bg-success',
+    text: 'text-success-600',
+  },
+  warning: {
+    bg: 'bg-warning-surface',
+    border: 'border-warning-border',
+    dot: 'bg-warning',
+    text: 'text-warning-text',
+  },
 };
 
-const InfoBox = ({ label, value, color = 'primary' }) => (
-  <div
-    className={`bg-slate-50/50 border-gray-100 rounded-xl border p-2.5 transition-colors ${COLOR_MAP[color] || COLOR_MAP.primary}`}
-  >
-    <Text
-      type="secondary"
-      className="text-muted mb-0.5 block text-[9px] font-bold tracking-wide opacity-70"
+const InfoBox = ({ label, value, color = 'primary' }) => {
+  const current = COLOR_MAP[color] || COLOR_MAP.primary;
+  return (
+    <div
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border p-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md',
+        current.bg,
+        current.border
+      )}
     >
-      {label}
-    </Text>
-    <Text strong className="text-text text-[13px] leading-tight block">
-      {value}
-    </Text>
-  </div>
-);
+      <div className="relative z-10">
+        <div className="mb-2 flex items-center gap-1.5">
+          <div className={cn('h-1 w-1 rounded-full', current.dot)} />
+          <Text
+            type="secondary"
+            className="text-muted block text-[9px] font-black uppercase tracking-wider opacity-60"
+          >
+            {label}
+          </Text>
+        </div>
+        <Text
+          strong
+          className={cn('block text-sm font-black leading-tight tracking-tight', current.text)}
+        >
+          {value}
+        </Text>
+      </div>
+    </div>
+  );
+};
 
 InfoBox.propTypes = {
   label: PropTypes.node.isRequired,

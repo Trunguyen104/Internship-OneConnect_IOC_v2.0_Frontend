@@ -2,7 +2,7 @@ import { DeleteOutlined, EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-
 import { Button, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 
-import Badge from '@/components/ui/badge';
+import StatusBadge from '@/components/ui/status-badge';
 
 export const useStudentColumns = ({
   pagination,
@@ -19,7 +19,7 @@ export const useStudentColumns = ({
   const STATUS_VARIANTS = {
     PLACED: 'success',
     ACTIVE: 'success',
-    UNPLACED: 'info',
+    UNPLACED: 'warning',
     WITHDRAWN: 'danger',
   };
 
@@ -105,7 +105,7 @@ export const useStudentColumns = ({
         render: (status) => {
           const variant = STATUS_VARIANTS[status] || 'default';
           const label = STATUS_LABELS[status] || status;
-          return <Badge variant={variant}>{label}</Badge>;
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {

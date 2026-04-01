@@ -67,6 +67,9 @@ export default function InternPhaseFormModal({
       });
     } else if (visible) {
       form.resetFields();
+      form.setFieldsValue({
+        majorFields: ['Software Engineering'],
+      });
     }
   }, [visible, editingRecord, form]);
 
@@ -143,7 +146,7 @@ export default function InternPhaseFormModal({
         </Row>
 
         <Row gutter={16}>
-          <Col span={8}>
+          <Col span={10}>
             <Form.Item
               name="startDate"
               label={FORM.LABEL.START_DATE}
@@ -160,7 +163,7 @@ export default function InternPhaseFormModal({
               />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={10}>
             <Form.Item
               name="endDate"
               label={FORM.LABEL.END_DATE}
@@ -198,7 +201,7 @@ export default function InternPhaseFormModal({
               />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={4}>
             <Form.Item
               name="capacity"
               label={FORM.LABEL.CAPACITY}

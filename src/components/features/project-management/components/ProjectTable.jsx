@@ -5,7 +5,6 @@ import {
   DeleteOutlined,
   EditOutlined,
   EllipsisOutlined,
-  ExclamationCircleOutlined,
   EyeOutlined,
   RollbackOutlined,
   SwapOutlined,
@@ -15,8 +14,8 @@ import { Dropdown, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import {
   getOperationalStatus,
   getVisibilityStatus,
@@ -104,24 +103,9 @@ export default function ProjectTable({
 
           let content = null;
           if (isMissing) {
-            if (record.isOrphaned) {
-              content = (
-                <div className="text-red-500 font-medium text-[10px] leading-tight flex flex-col gap-0.5 w-[150px]">
-                  <div className="flex items-center gap-1 font-bold">
-                    <ExclamationCircleOutlined /> {TABLE.STATUS_TEXT.ORPHANED_TITLE}
-                  </div>
-                  <span className="text-[9px] opacity-90 uppercase italic">
-                    {TABLE.STATUS_TEXT.ORPHANED_HINT}
-                  </span>
-                </div>
-              );
-            } else {
-              content = (
-                <span className="text-red-500 italic text-xs font-medium">
-                  {TABLE.STATUS_TEXT.NO_GROUP}
-                </span>
-              );
-            }
+            content = (
+              <span className="text-slate-400 italic text-xs">{TABLE.STATUS_TEXT.NO_GROUP}</span>
+            );
           } else {
             content = (
               <div className="flex flex-col gap-1 items-start max-w-[150px]">
@@ -129,13 +113,11 @@ export default function ProjectTable({
                   {groupName}
                 </div>
                 {record.isGroupArchived && (
-                  <Badge
-                    variant="default"
-                    size="xs"
-                    className="text-[9px] px-1.5 py-0 bg-gray-100 text-gray-500 border-gray-200"
-                  >
-                    {TABLE.STATUS_TEXT.GROUP_ARCHIVED}
-                  </Badge>
+                  <StatusBadge
+                    variant="neutral"
+                    label={TABLE.STATUS_TEXT.GROUP_ARCHIVED}
+                    className="mt-1"
+                  />
                 )}
               </div>
             );
@@ -219,12 +201,8 @@ export default function ProjectTable({
         render: (_, record) => {
           const vis = getVisibilityStatus(record.visibilityStatus ?? record.visibility);
           const label = VISIBILITY_LABELS[vis] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
-          const variant = STATUS_VARIANTS[vis] || 'default';
-          return (
-            <Badge variant={variant} size="xs" className="uppercase tracking-tighter">
-              {label}
-            </Badge>
-          );
+          const variant = STATUS_VARIANTS[vis] || 'neutral';
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {
@@ -235,12 +213,8 @@ export default function ProjectTable({
         render: (_, record) => {
           const op = getOperationalStatus(record.operationalStatus ?? record.status);
           const label = OPERATIONAL_LABELS[op] || PROJECT_MANAGEMENT.COMMON.UNKNOWN;
-          const variant = STATUS_VARIANTS[op] || 'default';
-          return (
-            <Badge variant={variant} size="xs" className="font-bold">
-              {label}
-            </Badge>
-          );
+          const variant = STATUS_VARIANTS[op] || 'neutral';
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {
