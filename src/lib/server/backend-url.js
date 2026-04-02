@@ -7,7 +7,10 @@ function normalizeBaseUrl(url) {
 
 export function resolveBackendBaseUrl() {
   const configuredUrl =
-    process.env.BE_URL?.trim() || process.env.BACKEND_URL?.trim() || process.env.API_URL?.trim();
+    process.env.BE_URL?.trim() ||
+    process.env.BACKEND_URL?.trim() ||
+    process.env.API_URL?.trim() ||
+    process.env.NEXT_PUBLIC_API_URL?.trim();
 
   if (configuredUrl) {
     return normalizeBaseUrl(configuredUrl);

@@ -26,6 +26,7 @@ export default function LoginPage() {
             <LoginForm
               form={form}
               errors={errors}
+              isLoading={isLoading}
               onChange={handleChange}
               onSubmit={handleSubmit}
             />

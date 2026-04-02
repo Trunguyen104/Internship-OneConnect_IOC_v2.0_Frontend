@@ -28,6 +28,7 @@ export function useLogin() {
     return { email: '', password: '', rememberMe: false };
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const validate = useCallback(() => {
@@ -43,9 +44,13 @@ export function useLogin() {
   }, [form]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
 
+    if (!validate() || isLoading) return;
+
+    setIsLoading(true);
     try {
       const auth = await login(form);
 
@@ -56,6 +61,7 @@ export function useLogin() {
       }
 
       toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
+      console.log('LOGIN SUCCESS:', auth);
 
       const rawRole = auth?.role;
       const role =
@@ -102,6 +108,8 @@ export function useLogin() {
     } catch (err) {
       setErrors({ password: err.message });
       toast.error(AUTH_MESSAGES.TOAST.LOGIN_FAILED);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,5 +127,5 @@ export function useLogin() {
     }));
   };
 
-  return { form, errors, handleChange, handleSubmit };
+  return { form, errors, isLoading, handleChange, handleSubmit };
 }

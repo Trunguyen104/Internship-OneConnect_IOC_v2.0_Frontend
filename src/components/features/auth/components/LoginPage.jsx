@@ -2,16 +2,25 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { useLogin } from '@/components/features/auth/hooks/useLogin';
 import Input from '@/components/ui/input';
 import { AUTH_UI } from '@/constants/auth/uiText';
 
 export default function LoginPage() {
-  const { form, errors, handleChange, handleSubmit } = useLogin();
+  const { form, errors, isLoading, handleChange, handleSubmit } = useLogin();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsHydrated(true);
+  }, []);
 
   return (
     <div
+      id="login-page-root"
+      data-hydrated={isHydrated}
       className="h-screen w-full overflow-hidden"
       style={{
         background:
@@ -75,9 +84,10 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover)"
+                disabled={isLoading}
+                className="h-11 w-full cursor-pointer rounded-xl bg-(--color-primary) font-semibold text-white hover:bg-(--color-primary-hover) disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {AUTH_UI.LOGIN.BUTTON}
+                {isLoading ? AUTH_UI.LOGIN.BUTTON_LOADING || 'Logging in...' : AUTH_UI.LOGIN.BUTTON}
               </button>
             </form>
 

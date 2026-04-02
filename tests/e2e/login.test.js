@@ -7,20 +7,23 @@ test.describe('Login Flow', () => {
   test.use({ storageState: { cookies: [], origins: [] } }); // Clear storage state for this specific test
 
   test('should login successfully with valid credentials', async ({ page }) => {
-    await page.goto('/login');
+    await page.goto('/login', { waitUntil: 'load' });
 
-    // Fill credentials
+    // Wait for hydration marker
+    await page.waitForSelector('#login-page-root[data-hydrated="true"]', { timeout: 30000 });
+    // Extra wait for network stability in dev mode
+    await page.waitForLoadState('networkidle');
+
     await page.fill('input[name="email"]', 'admin@iocv2.com');
     await page.fill('input[name="password"]', 'Admin@123');
 
-    // Click submit
-    await page.click('button[type="submit"]');
+    // Click and wait for navigation
+    await Promise.all([
+      page.waitForURL('**/user-management', { timeout: 20000 }),
+      page.click('button[type="submit"]'),
+    ]);
 
-    // Check if redirected to dashboard or home
-    await expect(page).toHaveURL('/');
-
-    // Optional: Verify presence of user profile or logout button
-    // await expect(page.locator('text=Logout')).toBeVisible();
+    await expect(page).toHaveURL(/user-management/);
   });
 
   test('should show error with invalid credentials', async ({ page }) => {
@@ -41,10 +44,10 @@ test.describe('Dashboard (Authenticated)', () => {
   // This test uses the storageState defined in playwright.config.js (from global.setup.js)
 
   test('should be able to access dashboard when authenticated', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/user-management');
 
     // Since we're using storageState, we should already be logged in
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL('/user-management');
 
     // verify some dashboard content
     // await expect(page.locator('h1')).toContainText('Dashboard');

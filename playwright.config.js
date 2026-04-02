@@ -73,9 +73,19 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run dev',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: [
+    {
+      command: 'npm run dev:test',
+      url: 'http://localhost:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+    {
+      command:
+        'dotnet run --project ../Internship-OneConnect_IOC_v2.0_Backend/IOCv2.API/IOCv2.API.csproj --launch-profile Test',
+      url: 'http://localhost:5050/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    },
+  ],
 });
