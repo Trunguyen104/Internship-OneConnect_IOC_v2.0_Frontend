@@ -78,6 +78,7 @@ export async function POST(req) {
       role: data.data?.role,
       unitId: data.data?.unitId,
       expiresIn: data.data?.expiresIn,
+      refreshTokenExpiresIn: data.data?.refreshTokenExpiresIn,
     });
 
     const isProd = process.env.NODE_ENV === 'production';
@@ -89,16 +90,18 @@ export async function POST(req) {
     };
 
     if (accessToken) {
+      const accessMaxAge = data.data?.expiresIn || 60 * 60 * 24;
       response.cookies.set('accessToken', accessToken, {
         ...cookieOptions,
-        maxAge: 60 * 60 * 24,
+        maxAge: accessMaxAge,
       });
     }
 
     if (refreshToken) {
+      const refreshMaxAge = data.data?.refreshTokenExpiresIn || 60 * 60 * 24 * 7;
       response.cookies.set('refreshToken', refreshToken, {
         ...cookieOptions,
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: refreshMaxAge,
       });
     }
 
