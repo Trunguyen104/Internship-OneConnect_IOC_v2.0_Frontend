@@ -12,10 +12,10 @@ export default function JobPostingFormModal({ visible, onCancel, phase }) {
 
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields();
+      await form.validateFields();
       onCancel();
       form.resetFields();
-    } catch (error) {}
+    } catch (_error) {}
   };
 
   return (

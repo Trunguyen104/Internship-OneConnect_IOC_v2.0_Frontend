@@ -64,13 +64,13 @@ export const InternPhaseService = {
     return httpClient.httpDelete(`${BASE_URL}/${id}`);
   },
 
-  async getJobPostings(phaseId, params) {
+  async getJobPostings(_phaseId, _params) {
     // Backend endpoint not yet implemented in provided C# controller
     // Returning empty array directly to avoid 404 errors in console/network tab
     return { data: [], totalCount: 0 };
   },
 
-  async getStudents(phaseId, params) {
+  async getStudents(_phaseId, _params) {
     // Backend endpoint not yet implemented in provided C# controller
     // Returning empty array directly to avoid 404 errors in console/network tab
     return { data: [], totalCount: 0 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 import { userService } from '@/components/features/user/services/user.service';
@@ -74,7 +74,6 @@ function toUpdatablePayload(values, profile) {
 }
 
 export function useEnterpriseProfile() {
-  const queryClient = useQueryClient();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
