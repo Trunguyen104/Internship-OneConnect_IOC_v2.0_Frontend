@@ -16,6 +16,7 @@ export default function StudentTabs() {
     { label: 'Summary', href: `${basePath}/space` },
     { label: 'Work Board', href: `${basePath}/work-board` },
     { label: 'Backlog Board', href: `${basePath}/backlog` },
+    { label: 'Projects', href: `${basePath}/project` },
   ];
 
   return (

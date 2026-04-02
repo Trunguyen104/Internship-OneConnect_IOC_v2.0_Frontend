@@ -1,166 +1,403 @@
 'use client';
 
-import { BookOutlined, FilterOutlined, UploadOutlined, UserAddOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
-import React from 'react';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  EyeOutlined,
+  FilterOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  UserDeleteOutlined,
+} from '@ant-design/icons';
+import { Button, Dropdown, Select, Space, Tooltip } from 'antd';
+import React, { useEffect, useState } from 'react';
 
-import StudentPageHeader from '@/components/layout/StudentPageHeader';
-import Card from '@/components/ui/card';
+import { TermService } from '@/components/features/internship-term-management/services/term.service';
+import Badge from '@/components/ui/badge';
+import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { UI_TEXT } from '@/lib/UI_Text';
 
-import { MOCK_STUDENTS } from '../constants/studentData';
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
-import DataGrid from './DataGrid';
 import ImportModal from './ImportModal';
 import StudentFormModal from './StudentFormModal';
 
-export default function StudentEnrollment() {
-  const { STUDENT_ENROLLMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+export default function TermStudentManagement() {
+  const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { MESSAGES, ACTIONS, SEARCH, STATUS_OPTIONS } = ENROLLMENT_MANAGEMENT;
+
+  const [terms, setTerms] = useState([]);
+  const [termsLoading, setTermsLoading] = useState(false);
 
   const {
+    termId,
     searchTerm,
     statusFilter,
-    majorFilter,
     pagination,
+    students,
+    loading,
+    submitLoading,
     importVisible,
     addVisible,
     editVisible,
     detailsVisible,
-    submitLoading,
     selectedStudent,
-    filteredStudents,
+    selectedIds,
+    onTermChange,
     onSearchChange,
     onStatusChange,
-    onMajorChange,
     onPageChange,
+    onPageSizeChange,
     setImportVisible,
     setAddVisible,
+    onAdd,
     setEditVisible,
     setDetailsVisible,
+    setSelectedIds,
     handleView,
     handleEdit,
     handleDelete,
+    handleRestore,
     handleUpdateStudent,
     handleAddStudent,
-    handleImportStudents,
-  } = useStudentEnrollment(MOCK_STUDENTS);
+    handleImportPreview,
+    handleImportConfirm,
+    handleBulkWithdraw,
+    handleDownloadTemplate,
+    sortBy,
+    sortOrder,
+    handleSortChange,
+  } = useStudentEnrollment();
 
-  const total = filteredStudents.length;
-  const paginatedData = filteredStudents.slice(
-    (pagination.current - 1) * pagination.pageSize,
-    pagination.current * pagination.pageSize
+  const activeTerm = terms.find((t) => t.termId === termId);
+  const isClosed = activeTerm?.status === 4;
+
+  const { TABLE, ACTIONS: ACTION_LABELS, STATUS_LABELS, PLACEMENT_LABELS } = ENROLLMENT_MANAGEMENT;
+
+  const STATUS_VARIANTS = {
+    PLACED: 'success',
+    ACTIVE: 'success',
+    UNPLACED: 'info',
+    WITHDRAWN: 'danger',
+  };
+
+  const columns = React.useMemo(
+    () => [
+      {
+        title: '#',
+        key: 'index',
+        width: 80,
+        align: 'center',
+        render: (_, __, index) => (
+          <span className="text-muted font-mono text-xs font-bold">
+            {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
+          </span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.FULL_NAME,
+        dataIndex: 'name',
+        key: 'name',
+        sorter: true,
+        sortKey: 'FullName',
+        render: (name) => (
+          <span className="text-text text-sm font-bold tracking-tight">{name}</span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.STUDENT_ID,
+        dataIndex: 'id',
+        key: 'id',
+        width: 140,
+        sorter: true,
+        sortKey: 'StudentId',
+        render: (id) => <span className="text-muted font-mono text-xs font-semibold">{id}</span>,
+      },
+      {
+        title: TABLE.COLUMNS.MAJOR,
+        dataIndex: 'major',
+        key: 'major',
+        render: (major) => (
+          <Tooltip title={major}>
+            <span className="text-text block max-w-[150px] truncate text-xs font-medium whitespace-nowrap">
+              {major}
+            </span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.PLACEMENT,
+        key: 'placement',
+        width: 200,
+        render: (_, record) => {
+          const isPlaced = record.placementStatus === 'PLACED';
+          return (
+            <div className="flex flex-col gap-0.5">
+              <Tooltip
+                title={
+                  isPlaced
+                    ? record.enterpriseName || PLACEMENT_LABELS.PLACED
+                    : PLACEMENT_LABELS.UNPLACED
+                }
+              >
+                <span
+                  className={`block truncate text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
+                    isPlaced ? 'text-text max-w-[180px]' : 'text-muted'
+                  }`}
+                >
+                  {isPlaced
+                    ? record.enterpriseName || PLACEMENT_LABELS.PLACED
+                    : PLACEMENT_LABELS.UNPLACED}
+                </span>
+              </Tooltip>
+            </div>
+          );
+        },
+      },
+      {
+        title: TABLE.COLUMNS.STATUS,
+        dataIndex: 'status',
+        key: 'status',
+        width: 140,
+        align: 'center',
+        render: (status) => {
+          const variant = STATUS_VARIANTS[status] || 'default';
+          const label = STATUS_LABELS[status] || status;
+          return <Badge variant={variant}>{label}</Badge>;
+        },
+      },
+      {
+        title: '',
+        key: 'actions',
+        width: 48,
+        align: 'right',
+        render: (_, record) => {
+          const isWithdrawn = record.status === 'WITHDRAWN';
+
+          const items = [
+            {
+              key: 'view',
+              label: ACTION_LABELS.VIEW,
+              icon: <EyeOutlined />,
+              onClick: () => handleView(record),
+            },
+          ];
+
+          if (!isClosed) {
+            if (!isWithdrawn) {
+              items.push(
+                { type: 'divider' },
+                {
+                  key: 'edit',
+                  label: ACTION_LABELS.EDIT,
+                  icon: <EditOutlined />,
+                  onClick: () => handleEdit(record),
+                },
+                {
+                  key: 'delete',
+                  label: ACTION_LABELS.DELETE,
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                  onClick: () => handleDelete(record),
+                }
+              );
+            } else {
+              items.push(
+                { type: 'divider' },
+                {
+                  key: 'recover',
+                  label: ACTION_LABELS.RECOVER,
+                  icon: <ReloadOutlined />,
+                  variant: 'success',
+                  onClick: () => handleRestore(record),
+                }
+              );
+            }
+          }
+
+          return (
+            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+              <TableRowDropdown items={items} />
+            </div>
+          );
+        },
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pagination.current, pagination.pageSize, isClosed, STATUS_LABELS, PLACEMENT_LABELS, TABLE]
   );
 
-  return (
-    <section className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <StudentPageHeader title={STUDENT_ENROLLMENT.TITLE} />
+  useEffect(() => {
+    const fetchTerms = async () => {
+      setTermsLoading(true);
+      try {
+        const response = await TermService.getAll({ pageSize: 100 });
+        if (response?.data?.items) {
+          const items = response.data.items;
+          setTerms(items);
+          if (!termId && items.length > 0) {
+            onTermChange(items[0].termId);
+          }
+        }
+      } catch (error) {
+        if (error?.status === 401 || error?.silent) return;
+        console.error('Fetch terms failed:', error);
+      } finally {
+        setTermsLoading(false);
+      }
+    };
+    fetchTerms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onTermChange]);
 
-      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar
-          className="mb-5 flex-shrink-0 !border-0 !p-0"
-          searchProps={{
-            placeholder: STUDENT_ENROLLMENT.SEARCH_PLACEHOLDER,
-            value: searchTerm,
-            onChange: (e) => onSearchChange(e.target.value),
-          }}
-          filterContent={
-            <div className="flex flex-wrap items-center gap-3">
+  return (
+    <PageLayout>
+      <PageLayout.Header
+        title={ENROLLMENT_MANAGEMENT.TITLE}
+        subtitle={ENROLLMENT_MANAGEMENT.PAGE_SUBTITLE}
+      />
+
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <DataTableToolbar className="mb-4 !border-0 !p-0">
+          <DataTableToolbar.Search
+            placeholder={SEARCH.PLACEHOLDER}
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="max-w-md"
+          />
+          <DataTableToolbar.Filters className="gap-0">
+            <Space.Compact className="w-full overflow-hidden rounded-xl border border-border shadow-sm sm:w-auto">
+              <Select
+                loading={termsLoading}
+                placeholder={SEARCH.TERM_PLACEHOLDER}
+                value={termId}
+                onChange={onTermChange}
+                className="!h-11 min-w-[150px] !border-0 focus:!ring-0"
+                variant="borderless"
+                options={terms.map((t) => ({ label: t.name, value: t.termId }))}
+                suffixIcon={<FilterOutlined className="text-muted/40" />}
+              />
+              <div className="bg-border h-6 w-px self-center opacity-50" />
               <Select
                 allowClear
-                placeholder={STUDENT_ENROLLMENT.STATUS_FILTER}
+                placeholder={ENROLLMENT_MANAGEMENT.STATUS_FILTER}
                 value={statusFilter || undefined}
                 onChange={onStatusChange}
-                className="h-9 min-w-[160px]"
-                options={STUDENT_ENROLLMENT.STATUS_OPTIONS}
-                suffixIcon={<FilterOutlined className="text-muted" />}
+                className="!h-11 min-w-[140px] !border-0 focus:!ring-0"
+                variant="borderless"
+                options={STATUS_OPTIONS}
+                suffixIcon={<FilterOutlined className="text-muted/40" />}
               />
-              <Select
-                allowClear
-                placeholder={STUDENT_ENROLLMENT.MAJOR_FILTER}
-                value={majorFilter || undefined}
-                onChange={onMajorChange}
-                className="h-9 min-w-[200px]"
-                options={STUDENT_ENROLLMENT.MAJOR_OPTIONS}
-                suffixIcon={<BookOutlined className="text-muted" />}
-              />
-            </div>
-          }
-          actionProps={{
-            label: STUDENT_ENROLLMENT.ACTIONS.ADD,
-            onClick: () => setAddVisible(true),
-            icon: <UserAddOutlined />,
-            menu: {
-              items: [
-                {
-                  key: 'add',
-                  label: STUDENT_ENROLLMENT.ACTIONS.ADD,
-                  icon: <UserAddOutlined />,
-                  onClick: () => setAddVisible(true),
-                },
-                {
-                  key: 'import',
-                  label: STUDENT_ENROLLMENT.ACTIONS.IMPORT,
-                  icon: <UploadOutlined />,
-                  onClick: () => setImportVisible(true),
-                },
-              ],
-            },
-          }}
-        />
+            </Space.Compact>
+          </DataTableToolbar.Filters>
+          <DataTableToolbar.Actions className="ml-auto gap-3">
+            <Button
+              danger
+              type="primary"
+              icon={<UserDeleteOutlined />}
+              onClick={handleBulkWithdraw}
+              disabled={selectedIds.length === 0 || isClosed}
+              className="!h-11 !rounded-xl shadow-md"
+            >
+              {MESSAGES.BULK_WITHDRAW.ACTION_LABEL}
+              {selectedIds.length > 0 && ` (${selectedIds.length})`}
+            </Button>
 
-        <DataGrid
-          students={paginatedData}
-          loading={false}
-          page={pagination.current}
-          pageSize={pagination.pageSize}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+            <Dropdown
+              disabled={isClosed}
+              trigger={['click']}
+              menu={{
+                items: [
+                  {
+                    key: 'add',
+                    icon: <PlusOutlined />,
+                    label: ACTIONS.ADD,
+                    onClick: onAdd,
+                  },
+                  {
+                    type: 'divider',
+                  },
+                  {
+                    key: 'import',
+                    icon: <DownloadOutlined />,
+                    label: ACTIONS.IMPORT,
+                    onClick: () => setImportVisible(true),
+                  },
+                ],
+              }}
+            >
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                className="!h-11 !rounded-xl px-4 font-semibold shadow-md"
+              >
+                {ACTIONS.ADD}
+              </Button>
+            </Dropdown>
+          </DataTableToolbar.Actions>
+        </DataTableToolbar>
 
-        {total > 0 && (
-          <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-            <Pagination
-              total={total}
+        <PageLayout.Content className="px-0">
+          <DataTable
+            columns={columns}
+            data={students}
+            loading={loading}
+            rowKey="studentTermId"
+            size="small"
+            minWidth="800px"
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSort={handleSortChange}
+            rowSelection={{
+              selectedRowKeys: selectedIds,
+              onChange: setSelectedIds,
+            }}
+          />
+        </PageLayout.Content>
+
+        {pagination.total > 0 && (
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}:{' '}
+              <span className="font-extrabold text-slate-800">{pagination.total}</span>
+            </span>
+            <PageLayout.Pagination
+              total={pagination.total}
               page={pagination.current}
               pageSize={pagination.pageSize}
-              totalPages={Math.ceil(total / pagination.pageSize)}
               onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
-      </Card>
+      </PageLayout.Card>
 
       <ImportModal
         visible={importVisible}
-        onClose={() => setImportVisible(false)}
-        onImport={handleImportStudents}
+        onCancel={() => setImportVisible(false)}
+        onImport={handleImportConfirm}
+        onPreview={handleImportPreview}
+        onDownloadTemplate={handleDownloadTemplate}
         loading={submitLoading}
       />
 
       <StudentFormModal
-        visible={addVisible}
-        onClose={() => setAddVisible(false)}
-        onSave={handleAddStudent}
-        loading={submitLoading}
-      />
-
-      <StudentFormModal
-        visible={editVisible}
-        onClose={() => setEditVisible(false)}
+        visible={addVisible || editVisible || detailsVisible}
+        viewOnly={detailsVisible}
         initialValues={selectedStudent}
-        onSave={handleUpdateStudent}
+        onCancel={() => {
+          setAddVisible(false);
+          setEditVisible(false);
+          setDetailsVisible(false);
+        }}
+        onSave={editVisible ? handleUpdateStudent : handleAddStudent}
         loading={submitLoading}
       />
-
-      <StudentFormModal
-        visible={detailsVisible}
-        onClose={() => setDetailsVisible(false)}
-        initialValues={selectedStudent}
-        viewOnly
-      />
-    </section>
+    </PageLayout>
   );
 }

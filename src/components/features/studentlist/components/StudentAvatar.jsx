@@ -1,17 +1,15 @@
 'use client';
 
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar } from 'antd';
+import React from 'react';
 
-export default function StudentAvatar({ name }) {
+import { Avatar } from '@/components/ui/avatar';
+
+export default function StudentAvatar({ name, size = 'large' }) {
   const firstLetter = name?.charAt(0)?.toUpperCase();
 
   return (
-    <Avatar
-      size="large"
-      icon={!firstLetter && <UserOutlined />}
-      className="border-primary/20 bg-primary-surface text-primary border font-semibold"
-    >
+    <Avatar size={size} icon={!firstLetter && <UserOutlined />}>
       {firstLetter}
     </Avatar>
   );

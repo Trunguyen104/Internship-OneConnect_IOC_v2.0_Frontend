@@ -1,7 +1,7 @@
 'use client';
 
 import { App, ConfigProvider } from 'antd';
-import { createContext, useContext, useLayoutEffect } from 'react';
+import React, { createContext, useContext, useLayoutEffect } from 'react';
 
 const ToastContext = createContext(null);
 
@@ -25,31 +25,67 @@ function AntdAppHookHelper() {
 
 export function ToastProvider({ children }) {
   const toast = {
-    success: (title, description) =>
+    success: (title, description, options = {}) => {
+      const isObject =
+        typeof description === 'object' &&
+        description !== null &&
+        !React.isValidElement(description);
+      const opt = isObject ? description : options;
+      const desc = isObject ? undefined : description;
+
       notificationApi?.success({
-        title: title,
-        description,
+        title,
+        description: desc,
         showProgress: true,
         duration: 5,
-      }),
-    error: (title, description) =>
+        ...opt,
+      });
+    },
+    error: (title, description, options = {}) => {
+      const isObject =
+        typeof description === 'object' &&
+        description !== null &&
+        !React.isValidElement(description);
+      const opt = isObject ? description : options;
+      const desc = isObject ? undefined : description;
+
       notificationApi?.error({
-        title: title,
-        description,
+        title,
+        description: desc,
         showProgress: true,
-      }),
-    info: (title, description) =>
+        ...opt,
+      });
+    },
+    info: (title, description, options = {}) => {
+      const isObject =
+        typeof description === 'object' &&
+        description !== null &&
+        !React.isValidElement(description);
+      const opt = isObject ? description : options;
+      const desc = isObject ? undefined : description;
+
       notificationApi?.info({
-        title: title,
-        description,
+        title,
+        description: desc,
         showProgress: true,
-      }),
-    warning: (title, description) =>
+        ...opt,
+      });
+    },
+    warning: (title, description, options = {}) => {
+      const isObject =
+        typeof description === 'object' &&
+        description !== null &&
+        !React.isValidElement(description);
+      const opt = isObject ? description : options;
+      const desc = isObject ? undefined : description;
+
       notificationApi?.warning({
-        title: title,
-        description,
+        title,
+        description: desc,
         showProgress: true,
-      }),
+        ...opt,
+      });
+    },
   };
 
   return (

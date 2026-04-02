@@ -1,9 +1,9 @@
-import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/httpClient';
+import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/http-client.service';
 
 export const EvaluationService = {
-  // --- Cycle Endpoints ---
-  getCycles(params = {}) {
-    return httpGet('/evaluations/cycles', params);
+  // --- CYCLES ---
+  getCycles(termId) {
+    return httpGet('/evaluations/cycles', { termId });
   },
 
   createCycle(data) {
@@ -22,13 +22,21 @@ export const EvaluationService = {
     return httpDelete(`/evaluations/cycles/${cycleId}`);
   },
 
-  // --- Criteria Endpoints ---
-  getCriteria(params = {}) {
-    return httpGet('/evaluations/criteria', params);
+  startCycle(cycleId) {
+    return httpPatch(`/evaluations/cycles/${cycleId}/start`);
   },
 
-  createCriteria(data) {
-    return httpPost('/evaluations/criteria', data);
+  completeCycle(cycleId) {
+    return httpPatch(`/evaluations/cycles/${cycleId}/complete`);
+  },
+
+  // --- CRITERIA ---
+  getCriteria(cycleId) {
+    return httpGet('/evaluations/criteria', { cycleId });
+  },
+
+  createCriteria(cycleId, data) {
+    return httpPost(`/evaluations/cycles/${cycleId}/criteria`, data);
   },
 
   updateCriteria(criteriaId, data) {
@@ -39,28 +47,30 @@ export const EvaluationService = {
     return httpDelete(`/evaluations/criteria/${criteriaId}`);
   },
 
-  // --- Evaluations Endpoints ---
-  getEvaluationsForInternship(cycleId, internshipId) {
+  // --- GRADING ---
+  getGradingGrid(cycleId, internshipId) {
     return httpGet(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations`);
   },
 
-  updateEvaluationsForInternship(cycleId, internshipId, data) {
+  batchGrade(cycleId, internshipId, data) {
     return httpPut(`/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations`, data);
   },
 
-  updateEvaluationById(evaluationId, data) {
-    return httpPut(`/evaluations/evaluations/${evaluationId}`, data);
+  individualGrade(cycleId, data) {
+    return httpPost(`/evaluations/cycles/${cycleId}/evaluations/individual`, data);
   },
 
-  submitEvaluations(cycleId, internshipId) {
+  submitEvaluations(cycleId, internshipId, data) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/submit`,
+      data
     );
   },
 
-  publishEvaluations(cycleId, internshipId) {
+  publishEvaluations(cycleId, internshipId, data) {
     return httpPatch(
-      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`
+      `/evaluations/cycles/${cycleId}/internships/${internshipId}/evaluations/publish`,
+      data
     );
   },
 

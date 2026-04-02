@@ -1,10 +1,11 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ProjectService } from '@/components/features/project/services/projectService';
-import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder';
-import StakeholderIssueService from '@/components/features/stakeholder/services/stakeholderIssue';
+import { ProjectService } from '@/components/features/project/services/project.service';
+import { StakeholderService } from '@/components/features/stakeholder/services/stakeholder.service';
+import StakeholderIssueService from '@/components/features/stakeholder/services/stakeholder-issue.service';
 import { ISSUE_MESSAGES } from '@/constants/stakeholderIssue/messages';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -12,19 +13,88 @@ import { ISSUE_STATUS } from '../constants/issueStatus';
 
 export function useIssueTab() {
   const toast = useToast();
-  const [internshipId, setInternshipId] = useState(null);
-  const [issues, setIssues] = useState([]);
-  const [stakeholders, setStakeholders] = useState([]);
-  const [loading, setLoading] = useState(false);
-
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [total, setTotal] = useState(0);
+  const [pageSize, setPageSizeState] = useState(10);
+
+  const setPageSize = useCallback((size) => {
+    setPageSizeState(size);
+    setPage(1);
+  }, []);
+
+  // 1. Fetch Project & Internship ID
+  const { data: projectInfo } = useQuery({
+    queryKey: ['active-project-info'],
+    queryFn: async () => {
+      try {
+        const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
+        if (res?.data?.items?.length > 0) {
+          return { internshipId: res.data.items[0].internshipId };
+        }
+        return null;
+      } catch (err) {
+        toast.error(ISSUE_MESSAGES.LOAD_PROJECT_FAILED);
+        return null;
+      }
+    },
+    staleTime: Infinity,
+  });
+
+  const internshipId = projectInfo?.internshipId;
+
+  // 2. Fetch Stakeholders for dropdown
+  const { data: stakeholders = [] } = useQuery({
+    queryKey: ['stakeholders', internshipId],
+    queryFn: async () => {
+      if (!internshipId) return [];
+      try {
+        const res = await StakeholderService.getByProject(internshipId);
+        return res?.data?.items || [];
+      } catch (err) {
+        return [];
+      }
+    },
+    enabled: !!internshipId,
+  });
+
+  // 3. Fetch Issues
+  const {
+    data: issueData,
+    isLoading: loading,
+    refetch: fetchIssues,
+  } = useQuery({
+    queryKey: ['stakeholder-issues', internshipId, page, pageSize, search],
+    queryFn: async () => {
+      if (!internshipId) return { items: [], total: 0 };
+      try {
+        const params = {
+          internshipId,
+          PageIndex: page,
+          PageSize: pageSize,
+          OrderBy: 'createdAt desc',
+          Search: search?.trim() || undefined,
+        };
+        const res = await StakeholderIssueService.getAll(params);
+        const normalizedItems = (res?.data?.items || []).map((item) => ({
+          ...item,
+          status:
+            typeof item.status === 'string'
+              ? (ISSUE_STATUS[item.status.toUpperCase()] ?? item.status)
+              : item.status,
+        }));
+        return {
+          items: normalizedItems,
+          total: res?.data?.totalCount || 0,
+        };
+      } catch (err) {
+        return { items: [], total: 0 };
+      }
+    },
+    enabled: !!internshipId,
+    staleTime: 2 * 60 * 1000,
+  });
 
   const [openIssueForm, setOpenIssueForm] = useState(false);
-
   const [issueForm, setIssueForm] = useState({
     title: '',
     description: '',
@@ -51,14 +121,6 @@ export function useIssueTab() {
       // toast.error('Failed to load detail');
     }
   };
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setDebouncedSearch(search);
-      setPage(1);
-    }, 500);
-    return () => clearTimeout(t);
-  }, [search]);
 
   const tableBodyRef = useRef(null);
 
@@ -153,93 +215,23 @@ export function useIssueTab() {
     }
   };
 
-  useEffect(() => {
-    const fetchProjectId = async () => {
-      try {
-        const res = await ProjectService.getAll({
-          PageNumber: 1,
-          PageSize: 1,
-        });
-
-        if (res?.data?.items?.length > 0) {
-          setInternshipId(res.data.items[0].internshipId);
-        }
-      } catch {
-        toast.error(ISSUE_MESSAGES.LOAD_PROJECT_FAILED);
-      }
-    };
-
-    fetchProjectId();
-  }, [toast]);
-
-  const fetchStakeholders = useCallback(async () => {
-    if (!internshipId) return;
-
-    try {
-      const res = await StakeholderService.getByProject(internshipId);
-      if (res?.data?.items) {
-        setStakeholders(res.data.items);
-      }
-    } catch {
-      // toast.error('Failed to load stakeholders');
-    }
-  }, [internshipId]);
-
-  const fetchIssues = useCallback(async () => {
-    if (!internshipId) return;
-
-    try {
-      setLoading(true);
-
-      const params = {
-        internshipId,
-        PageIndex: page,
-        PageSize: pageSize,
-        OrderBy: 'createdAt desc',
-      };
-
-      if (debouncedSearch) {
-        params.Search = debouncedSearch;
-      }
-
-      const res = await StakeholderIssueService.getAll(params);
-
-      if (res?.data?.items) {
-        const normalizedItems = res.data.items.map((item) => ({
-          ...item,
-          status:
-            typeof item.status === 'string'
-              ? (ISSUE_STATUS[item.status.toUpperCase()] ?? item.status)
-              : item.status,
-        }));
-        setIssues(normalizedItems);
-        setTotal(res.data.totalCount || 0);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [internshipId, page, pageSize, debouncedSearch]);
-
-  useEffect(() => {
-    fetchStakeholders();
-  }, [fetchStakeholders]);
-
-  useEffect(() => {
-    fetchIssues();
-  }, [fetchIssues]);
+  const handleSearchChange = (val) => {
+    setSearch(val);
+    setPage(1);
+  };
 
   return {
     internshipId,
-    issues,
+    issues: issueData?.items || [],
     stakeholders,
     loading,
     search,
-    setSearch,
+    setSearch: handleSearchChange, // Wrapped for page reset
     page,
     setPage,
     pageSize,
     setPageSize,
-    total,
+    total: issueData?.total || 0,
     openIssueForm,
     setOpenIssueForm,
     issueForm,

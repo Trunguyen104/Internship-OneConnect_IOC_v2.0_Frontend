@@ -1,5 +1,8 @@
+'use client';
+
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import React from 'react';
 
 import { PRIORITY_MAP, TYPE_MAP, WORK_ITEM_PRIORITY } from '@/constants/common/enums';
 
@@ -17,23 +20,23 @@ export function IssueCard({ task, isOverlay }) {
 
   return (
     <div
-      className={`border-border relative flex flex-col gap-3 rounded-[24px] border bg-white p-4 shadow-sm transition-all ${
+      className={`relative flex flex-col gap-3 rounded-[24px] border bg-white p-4 shadow-sm transition-all ${
         isOverlay
-          ? 'border-primary scale-105 cursor-grabbing shadow-xl'
-          : 'hover:border-border-hover cursor-grab hover:shadow-md'
+          ? 'border-primary border-2 scale-105 cursor-grabbing shadow-xl'
+          : 'border-border hover:border-border-hover cursor-grab hover:shadow-md'
       }`}
     >
       <div className="flex items-start justify-between">
-        <div className="text-muted-foreground bg-bg border-border rounded-full border px-3 py-1 text-[10px] font-bold uppercase">
+        <div className="bg-gray-50 text-gray-400 border-gray-100 rounded-full border px-3 py-1 text-[10px] font-bold uppercase">
           {TYPE_MAP[task.type] || task.type || 'User Story'}
         </div>
       </div>
       <div className="mt-0.5">
-        <div className="text-text mb-2 text-[18px] leading-none font-extrabold">
+        <div className="text-text mb-2 text-[18px] leading-none font-extrabold text-gray-900">
           {task.displayId}
         </div>
         <div
-          className="text-muted-foreground line-clamp-3 text-[14px] leading-snug font-medium"
+          className="text-muted line-clamp-3 text-[14px] leading-snug font-medium text-gray-600"
           dangerouslySetInnerHTML={{ __html: task.title }}
         />
       </div>
@@ -52,8 +55,8 @@ export function IssueCard({ task, isOverlay }) {
         )}
       </div>
       <div className="mt-1 flex items-center">
-        <div className="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold uppercase">
-          {task.assignee?.charAt(0).toUpperCase()}
+        <div className="bg-gray-100 text-gray-500 flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold uppercase border border-white shadow-sm">
+          {task.assignee?.charAt(0).toUpperCase() || '?'}
         </div>
       </div>
     </div>

@@ -1,4 +1,6 @@
 export const ENTERPRISE_PROFILE_UI = {
+  TITLE: 'Company Profile',
+  SUBTITLE: 'Your public organization overview, branding, and contact details for candidates.',
   LOADING: 'Loading profile...',
   LOADING_ERROR: 'Failed to load profile data',
   UPDATE_SUCCESS: 'Profile updated successfully',
@@ -46,7 +48,6 @@ export const ENTERPRISE_PROFILE_UI = {
       LOAD_FAILED_DESCRIPTION: 'We couldn’t load your company profile right now. Please try again.',
     },
     CHANGE_COVER: 'Change Cover',
-    VERIFIED: 'Verified',
     ADD_OVERVIEW_HINT: 'Add a short overview to make your company profile more complete.',
     TRUST_HINT: 'Keep your company information up to date to build trust with candidates.',
   },

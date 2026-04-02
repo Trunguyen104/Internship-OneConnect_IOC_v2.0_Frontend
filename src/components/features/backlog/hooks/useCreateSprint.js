@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useCreateSprint(projectId, open) {

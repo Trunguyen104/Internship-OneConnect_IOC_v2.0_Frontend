@@ -1,47 +1,37 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { PlayCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react';
 
+import CompoundModal from '@/components/ui/CompoundModal';
+import { DatePicker } from '@/components/ui/datepicker';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 function FieldLabel({ required, children }) {
   return (
-    <div className="mb-2 text-sm font-semibold text-gray-800">
+    <div className="text-[13px] font-bold tracking-wide text-text/80 uppercase mb-2 ml-1">
       {children}
-      {required ? <span className="text-danger">{UI_TEXT.BACKLOG.ASTERISK_SPACE}</span> : null}
+      {required ? <span className="text-rose-500">{UI_TEXT.BACKLOG.ASTERISK_SPACE}</span> : null}
     </div>
-  );
-}
-
-function TextInput({ value, onChange, placeholder = '', type = 'text', readOnly = false }) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      placeholder={placeholder}
-      readOnly={readOnly}
-      className={`focus:border-primary focus:ring-primary h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm transition-shadow outline-none focus:ring-1 ${readOnly ? 'cursor-not-allowed bg-gray-50 text-gray-500' : ''}`}
-    />
   );
 }
 
 export default function StartSprintModal({ open, sprint, issueCount, onClose, onSubmit }) {
   const initialData = useMemo(() => {
-    if (!sprint) return { name: '', goal: '', startDate: '', endDate: '' };
+    if (!sprint) return { name: '', goal: '', startDate: null, endDate: null };
     const sName = sprint.name || sprint.title || '';
     const sGoal = sprint.goal || '';
-    const sStart = sprint.startDate
-      ? new Date(sprint.startDate).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0];
+    const sStart = sprint.startDate ? dayjs(sprint.startDate) : dayjs();
 
-    let sEnd = '';
+    let sEnd = null;
     if (sprint.endDate) {
-      sEnd = new Date(sprint.endDate).toISOString().split('T')[0];
+      sEnd = dayjs(sprint.endDate);
     } else {
-      const twoWeeks = new Date();
-      twoWeeks.setDate(twoWeeks.getDate() + 14);
-      sEnd = twoWeeks.toISOString().split('T')[0];
+      sEnd = dayjs().add(14, 'day');
     }
 
     return { name: sName, goal: sGoal, startDate: sStart, endDate: sEnd };
@@ -66,82 +56,82 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
     [name, startDate, endDate]
   );
 
-  if (!open) return null;
-
   const handleSubmit = () => {
     if (!canSubmit) return;
     onSubmit?.({
       name: name.trim(),
       goal: goal.trim(),
-      startDate: startDate,
-      endDate: endDate,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
     });
   };
 
   return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity">
-      <div className="relative flex w-full max-w-[600px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex h-full max-h-[85vh] flex-col">
-          {/* Header */}
-          <div className="shrink-0 px-8 pt-8 pb-4">
-            <div className="text-2xl font-bold text-gray-900">{BACKLOG_UI.START_SPRINT}</div>
-            <div className="mt-2 text-sm font-medium text-gray-500">
-              {issueCount} {issueCount === 1 ? UI_TEXT.BACKLOG.ISSUE : UI_TEXT.BACKLOG.ISSUES}{' '}
-              {UI_TEXT.BACKLOG.INCLUDED_IN_SPRINT}
-            </div>
+    <CompoundModal open={open} onCancel={onClose} width={640}>
+      <CompoundModal.Header
+        title={BACKLOG_UI.START_SPRINT}
+        subtitle={`${issueCount} ${issueCount === 1 ? UI_TEXT.BACKLOG.ISSUE : UI_TEXT.BACKLOG.ISSUES} ${UI_TEXT.BACKLOG.INCLUDED_IN_SPRINT}`}
+        icon={<PlayCircleOutlined />}
+      />
+
+      <CompoundModal.Content className="px-6">
+        <div className="flex flex-col space-y-6 pb-2">
+          {/* Sprint Name */}
+          <div className="flex flex-col">
+            <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
+              className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+            />
           </div>
 
-          {/* Body */}
-          <div className="flex flex-1 flex-col space-y-5 overflow-y-auto px-8 py-2 pb-8">
-            <div>
-              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
-              <TextInput
-                value={name}
-                onChange={setName}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
-              />
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE}</FieldLabel>
-                <TextInput type="date" value={startDate} onChange={setStartDate} />
-              </div>
-              <div className="flex-1">
-                <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
-                <TextInput type="date" value={endDate} onChange={setEndDate} />
-              </div>
-            </div>
-
+          {/* Dates */}
+          <div className="flex gap-4">
             <div className="flex flex-1 flex-col">
-              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
-              <textarea
-                value={goal}
-                onChange={(e) => setGoal(e.target.value)}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
-                className="focus:border-primary focus:ring-primary min-h-[120px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 text-sm transition-shadow outline-none focus:ring-1"
+              <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE}</FieldLabel>
+              <DatePicker
+                value={startDate}
+                onChange={setStartDate}
+                format="YYYY-MM-DD"
+                placeholder="Chọn ngày bắt đầu"
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
+              />
+            </div>
+            <div className="flex flex-1 flex-col">
+              <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
+              <DatePicker
+                value={endDate}
+                onChange={setEndDate}
+                format="YYYY-MM-DD"
+                placeholder="Chọn ngày kết thúc"
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
               />
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="flex shrink-0 items-center justify-end gap-3 border-t border-gray-100 bg-gray-50/50 px-8 py-5">
-            <button
-              onClick={onClose}
-              className="h-11 rounded-full border border-gray-200 bg-white px-6 font-bold text-gray-600 transition-colors hover:bg-gray-50"
-            >
-              {BACKLOG_UI.CANCEL}
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white transition-opacity disabled:opacity-50"
-            >
-              {BACKLOG_UI.START_SPRINT}
-            </button>
+          {/* Sprint Goal */}
+          <div className="flex flex-col">
+            <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
+            <Textarea
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
+              className="min-h-[140px] rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+            />
           </div>
         </div>
-      </div>
-    </div>
+      </CompoundModal.Content>
+
+      <CompoundModal.Footer
+        onCancel={onClose}
+        onConfirm={handleSubmit}
+        cancelText={BACKLOG_UI.CANCEL}
+        confirmText={BACKLOG_UI.START_SPRINT}
+        disabled={!canSubmit}
+        className="px-6 py-4"
+      />
+    </CompoundModal>
   );
 }

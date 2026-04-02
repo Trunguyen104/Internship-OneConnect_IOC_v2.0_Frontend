@@ -1,7 +1,7 @@
 'use client';
 
 import { SaveOutlined } from '@ant-design/icons';
-import { Col, DatePicker, Form, Input, Row } from 'antd';
+import { Col, DatePicker, Form, Input, Row, Select } from 'antd';
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 
@@ -12,64 +12,82 @@ const TermStats = ({ initialValues }) => {
   if (!initialValues) return null;
 
   const { STATS } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
+
+  const totalEnrolled = Math.max(0, initialValues.totalEnrolled || initialValues.studentCount || 0);
+  const totalPlaced = Math.min(totalEnrolled, Math.max(0, initialValues.totalPlaced || 0));
+  const totalUnplaced = totalEnrolled - totalPlaced;
+
   const stats = [
     {
       label: STATS.TOTAL_ENROLLED,
-      value: initialValues.totalEnrolled || 0,
-      containerClass: 'bg-info-surface border-info/10',
-      textClass: 'text-info',
+      value: totalEnrolled,
+      variant: 'primary',
     },
     {
       label: STATS.TOTAL_PLACED,
-      value: initialValues.totalPlaced || 0,
-      containerClass: 'bg-success-surface border-success/10',
-      textClass: 'text-success',
+      value: totalPlaced,
+      variant: 'success',
     },
     {
       label: STATS.TOTAL_UNPLACED,
-      value: initialValues.totalUnplaced || 0,
-      containerClass: 'bg-warning-surface border-warning/10',
-      textClass: 'text-warning',
+      value: totalUnplaced,
+      variant: 'warning',
     },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3 py-2">
+    <div className="grid grid-cols-3 gap-3 pt-2 pb-6">
       {stats.map((stat, idx) => (
-        <div
+        <CompoundModal.InfoBox
           key={idx}
-          className={`rounded-lg border p-3 text-center transition-all ${stat.containerClass}`}
-        >
-          <div className="text-muted mb-1 text-[10px] font-bold tracking-wider uppercase">
-            {stat.label}
-          </div>
-          <div className={`text-lg font-bold ${stat.textClass}`}>{stat.value}</div>
-        </div>
+          label={stat.label}
+          value={stat.value}
+          color={stat.variant}
+        />
       ))}
     </div>
   );
 };
 
-const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) => {
+const TermFormBody = ({
+  initialValues,
+  onSave,
+  onCancel,
+  loading,
+  viewOnly,
+  isSuperAdmin,
+  universities,
+  userUniversity,
+}) => {
   const [form] = Form.useForm();
   const { FORM } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MODALS;
 
   useEffect(() => {
     if (initialValues) {
+      const name = initialValues.name || initialValues.Name;
+      const universityId = initialValues.universityId || initialValues.UniversityId;
+      const startDate = initialValues.startDate || initialValues.StartDate;
+      const endDate = initialValues.endDate || initialValues.EndDate;
+
       form.setFieldsValue({
         ...initialValues,
-        startDate: initialValues.startDate ? dayjs(initialValues.startDate) : null,
-        endDate: initialValues.endDate ? dayjs(initialValues.endDate) : null,
+        name,
+        universityId,
+        startDate: startDate ? dayjs(startDate) : null,
+        endDate: endDate ? dayjs(endDate) : null,
       });
     } else {
       form.resetFields();
+      if (!isSuperAdmin && userUniversity?.id) {
+        form.setFieldsValue({ universityId: userUniversity.id });
+      }
     }
-  }, [initialValues, form]);
+  }, [initialValues, form, isSuperAdmin, userUniversity]);
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      onSave({
+      await onSave({
         ...values,
         startDate: values.startDate ? values.startDate.format('YYYY-MM-DD') : null,
         endDate: values.endDate ? values.endDate.format('YYYY-MM-DD') : null,
@@ -85,14 +103,35 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
       : FORM.TITLE_EDIT
     : FORM.TITLE_ADD;
 
+  const modalSubtitle = viewOnly
+    ? initialValues.name
+    : initialValues
+      ? FORM.TITLE_EDIT
+      : FORM.TITLE_ADD;
+
   return (
     <>
-      <CompoundModal.Header title={modalTitle} />
+      <CompoundModal.Header
+        title={modalTitle}
+        subtitle={
+          viewOnly
+            ? initialValues.name
+            : initialValues
+              ? FORM.UPDATE_SUBTITLE
+              : FORM.CREATE_SUBTITLE
+        }
+      />
 
-      {viewOnly && <TermStats initialValues={initialValues} />}
+      <CompoundModal.Content className="!pb-0">
+        {viewOnly && <TermStats initialValues={initialValues} />}
 
-      <CompoundModal.Content>
-        <Form form={form} layout="vertical" disabled={viewOnly || loading} requiredMark={!viewOnly}>
+        <Form
+          form={form}
+          layout="vertical"
+          disabled={viewOnly || loading}
+          requiredMark={!viewOnly}
+          className="premium-form"
+        >
           <Form.Item
             name="name"
             label={FORM.NAME_LABEL}
@@ -101,8 +140,36 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
               { max: 100, message: FORM.NAME_MAX },
             ]}
           >
-            <Input placeholder={FORM.NAME_PLACEHOLDER} className="h-10" />
+            <Input placeholder={FORM.NAME_PLACEHOLDER} className="!h-11 !rounded-xl" />
           </Form.Item>
+
+          {isSuperAdmin && (
+            <Form.Item
+              name="universityId"
+              label={FORM.UNIVERSITY_LABEL}
+              rules={[{ required: true, message: FORM.UNIVERSITY_REQUIRED }]}
+            >
+              <Select
+                placeholder={FORM.UNIVERSITY_LABEL}
+                className="!h-11 w-full"
+                loading={loading}
+                showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                options={universities.map((uni) => ({
+                  value: uni.universityId,
+                  label: uni.name,
+                }))}
+              />
+            </Form.Item>
+          )}
+
+          {!isSuperAdmin && (
+            <Form.Item name="universityId" hidden>
+              <Input />
+            </Form.Item>
+          )}
 
           <Row gutter={16}>
             <Col span={12}>
@@ -112,7 +179,7 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
                 rules={[{ required: true, message: FORM.START_DATE_REQUIRED }]}
               >
                 <DatePicker
-                  className="h-10 w-full"
+                  className="!h-11 w-full !rounded-xl"
                   format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
@@ -140,7 +207,7 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
                 ]}
               >
                 <DatePicker
-                  className="h-10 w-full"
+                  className="!h-11 w-full !rounded-xl"
                   format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
                 />
@@ -156,6 +223,8 @@ const TermFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly }) =>
         loading={loading}
         confirmIcon={!viewOnly && <SaveOutlined />}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SUBMIT}
+        showCancel={!viewOnly}
+        className="!mt-0"
       />
     </>
   );

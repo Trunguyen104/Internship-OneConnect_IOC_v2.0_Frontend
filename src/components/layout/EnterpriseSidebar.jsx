@@ -1,53 +1,116 @@
 'use client';
 
-import { DashboardOutlined, SolutionOutlined, TeamOutlined } from '@ant-design/icons';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import {
+  BankOutlined,
+  CalendarOutlined,
+  DashboardOutlined,
+  ProjectOutlined,
+  SolutionOutlined,
+  TeamOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
+import React, { useMemo } from 'react';
+
+import { useProfile } from '@/components/features/user/hooks/useProfile';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { USER_ROLE } from '@/constants/user-management/enums';
+
+import ProfileAwareSidebar from './sidebars/ProfileAwareSidebar';
 
 const enterpriseMenu = [
   { icon: <DashboardOutlined />, label: 'Dashboard', href: '/dashboard' },
   {
+    icon: <BankOutlined />,
+    label: 'My Company',
+    href: '/company-profile',
+  },
+  {
+    icon: <CalendarOutlined />,
+    label: 'Intern Phases',
+    href: '/intern-phase-management',
+  },
+  {
     icon: <SolutionOutlined />,
-    label: 'Internship Students',
-    href: '/internship-student-management',
+    label: 'Internship Management',
+    href: '/internship-management',
+  },
+  {
+    icon: <ProjectOutlined />,
+    label: 'Project Management',
+    href: '/projects',
+  },
+  {
+    icon: <WarningOutlined />,
+    label: INTERNSHIP_MANAGEMENT_UI.ENTERPRISE.VIOLATION_REPORT.TITLE,
+    href: '/violation-reports',
+    role: [USER_ROLE.MENTOR, USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR],
   },
   {
     icon: <TeamOutlined />,
-    label: 'Internship Groups',
-    href: '/internship-group-management',
+    label: 'Staff Management',
+    href: '/staff-management',
+  },
+
+  {
+    icon: <SolutionOutlined />,
+    label: 'Application',
+    href: '/applications',
+  },
+  {
+    icon: <SolutionOutlined />,
+    label: 'Job Postings',
+    href: '/job-postings',
+  },
+  {
+    icon: <TeamOutlined />,
+    label: 'Evaluation Management',
+    href: '/evaluation',
   },
 ];
 
 export default function EnterpriseSidebar() {
-  const pathname = usePathname();
+  const { userInfo } = useProfile();
+
+  const filteredMenu = useMemo(() => {
+    const rawRole = userInfo?.roleId || userInfo?.RoleId || userInfo?.role || userInfo?.Role;
+    const roleId = rawRole ? Number(rawRole) : null;
+    const roleName = String(
+      userInfo?.roleName || userInfo?.RoleName || userInfo?.role || userInfo?.Role || ''
+    ).toLowerCase();
+
+    return enterpriseMenu.filter((item) => {
+      if (!item.role) return true;
+
+      const allowedRoles = item.role || [];
+
+      // 1. Check numeric match
+      if (roleId && allowedRoles.includes(roleId)) return true;
+
+      // 2. Check string match (if IDs are strings)
+      if (rawRole && allowedRoles.map(String).includes(String(rawRole))) return true;
+
+      // 3. Fallback: check role name strings for common enterprise roles
+      if (roleName.includes('mentor') && allowedRoles.includes(USER_ROLE.MENTOR)) return true;
+      if (
+        (roleName.includes('enterprise') || roleName.includes('admin')) &&
+        allowedRoles.includes(USER_ROLE.ENTERPRISE_ADMIN)
+      )
+        return true;
+      if (roleName.includes('hr') && allowedRoles.includes(USER_ROLE.HR)) return true;
+
+      return false;
+    });
+  }, [userInfo]);
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[15.1rem] flex-col border-r border-slate-200 bg-gray-50 md:flex">
-      <div className="flex justify-center px-14 py-6">
-        <Image src="/assets/images/logo.svg" alt="IOC Logo" width={120} height={40} priority />
-      </div>
-
-      <nav className="mt-4 flex-1 space-y-1">
-        {enterpriseMenu.map((item) => {
-          const isActive = pathname.startsWith(item.href);
-
-          return (
-            <Link key={item.href} href={item.href} className="block px-3">
-              <div
-                className={`flex items-center gap-3 rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-                  isActive
-                    ? 'bg-[#FEF2F2] text-[#B91C1C]'
-                    : 'text-gray-600 hover:bg-red-50 hover:text-red-700'
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                {item.label}
-              </div>
-            </Link>
-          );
-        })}
-      </nav>
-    </aside>
+    <ProfileAwareSidebar
+      defaultMenus={filteredMenu}
+      profilePrefix="/profile"
+      profileBackButton={{
+        href: '/dashboard',
+        label: 'Back',
+        className: 'text-primary hover:text-primary-hover',
+      }}
+    />
   );
 }

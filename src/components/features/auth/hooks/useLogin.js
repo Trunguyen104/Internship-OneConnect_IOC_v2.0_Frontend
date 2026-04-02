@@ -3,10 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
-import { login } from '@/components/features/auth/services/authService';
+import { login } from '@/components/features/auth/services/auth.service';
 import { AUTH_MESSAGES } from '@/constants/auth/uiText';
 import { USER_ROLE } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';
+import { useAuthStore } from '@/store/useAuthStore';
 import { validateLogin } from '@/validators/auth';
 
 export function useLogin() {
@@ -58,47 +59,38 @@ export function useLogin() {
       toast.success(AUTH_MESSAGES.TOAST.LOGIN_SUCCESS);
 
       const rawRole = auth?.role;
-      const role =
-        typeof rawRole === 'number'
-          ? rawRole
-          : typeof rawRole === 'string'
-            ? rawRole.trim().toLowerCase()
-            : undefined;
+      // Populate global RBAC state so AuthGuard doesn't kick the user out
+      useAuthStore.getState().setUser({
+        email: auth?.email,
+        role: rawRole,
+        unitId: auth?.unitId,
+      });
+      const role = Number(auth?.role);
 
-      if (
-        role === USER_ROLE.SUPER_ADMIN ||
-        role === 'superadmin' ||
-        role === 'super_admin' ||
-        role === USER_ROLE.MODERATOR ||
-        role === 'moderator'
-      ) {
-        router.push('/admin-users');
+      // 1. Super Admin & Moderator
+      if (role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.MODERATOR) {
+        router.push('/admin/dashboard');
         return;
       }
 
-      if (role === USER_ROLE.SCHOOL_ADMIN || role === 'schooladmin') {
-        router.push('/admin-dashboard');
+      // 2. University Admin
+      if (role === USER_ROLE.SCHOOL_ADMIN) {
+        router.push('/school/home');
         return;
       }
 
+      // 3. Enterprise / HR / Mentor
       if (
         role === USER_ROLE.ENTERPRISE_ADMIN ||
-        role === 'enterpriseadmin' ||
         role === USER_ROLE.HR ||
-        role === 'hr' ||
-        role === USER_ROLE.MENTOR ||
-        role === 'mentor'
+        role === USER_ROLE.MENTOR
       ) {
-        router.push('/dashboard');
+        router.push('/company/home');
         return;
       }
 
-      if (role === USER_ROLE.STUDENT || role === 'student') {
-        router.push('/internship-groups');
-        return;
-      }
-
-      router.push('/internship-groups');
+      // 4. Student & Others
+      router.push('/student/home');
     } catch (err) {
       setErrors({ password: err.message });
       toast.error(AUTH_MESSAGES.TOAST.LOGIN_FAILED);

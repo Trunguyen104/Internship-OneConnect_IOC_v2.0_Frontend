@@ -1,8 +1,16 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useRef, useState } from 'react';
+
+import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
+import { userService } from '@/components/features/user/services/user.service';
+import { USER_ROLE } from '@/constants/common/enums';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
+import { universityService } from '@/services/university.service';
+import { useTermsStore } from '@/store/useTermsStore';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { TermService } from '../services/term.service';
 import { useTermFilters } from './useTermFilters';
@@ -10,9 +18,8 @@ import { useTermModals } from './useTermModals';
 
 export const useTermManagement = () => {
   const toast = useToast();
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const { refreshCount } = useTermsStore();
   const knownVersions = useRef({});
 
   const {
@@ -24,6 +31,8 @@ export const useTermManagement = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handlePageSizeChange,
+    handleSortChange,
   } = useTermFilters();
 
   const {
@@ -41,62 +50,128 @@ export const useTermManagement = () => {
     handleRequestChangeStatus,
   } = useTermModals();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = {
-        pageNumber: pagination.current,
-        pageSize: pagination.pageSize,
-        searchTerm: searchTerm || undefined,
-        status: statusFilter ?? undefined,
-        sortColumn: sortConfig.column,
-        sortOrder: sortConfig.order,
-      };
+  // 1. Fetch User Role and Universities
+  const { data: roleData = { isSuperAdmin: false, universities: [], userUniversity: null } } =
+    useQuery({
+      queryKey: ['term-management-role-context'],
+      queryFn: async () => {
+        try {
+          const res = await userService.getMe();
+          const userData = res?.data || res;
+          const role = userData?.role;
+          const superAdmin =
+            role === USER_ROLE.SUPER_ADMIN || String(role).toLowerCase() === 'superadmin';
 
-      const response = await TermService.getAll(params);
+          let universities = [];
+          let userUniversity = null;
 
-      if (response?.data) {
-        // Apply version syncing if missing in list
-        const items = (response.data.items || []).map((item) => ({
-          ...item,
-          version: item.version || knownVersions.current[item.termId] || 1,
-        }));
+          if (superAdmin) {
+            const uniRes = await universityService.getAll({ pageNumber: 1, pageSize: 100 });
+            universities = uniRes?.data?.items || [];
+          } else {
+            const uniId = userData?.universityId || userData?.university?.id;
+            const uniName = userData?.universityName || userData?.university?.name;
+            userUniversity = { id: uniId, name: uniName };
 
-        setData(items);
-        setPagination((prev) => ({
-          ...prev,
-          total: response.data.totalCount || 0,
-        }));
+            if (uniId && !uniName) {
+              try {
+                const res = await universityService.getById(uniId);
+                if (res?.data?.name) userUniversity.name = res.data.name;
+              } catch (err) {}
+            }
+          }
+          return { isSuperAdmin: superAdmin, universities, userUniversity };
+        } catch (err) {
+          return { isSuperAdmin: false, universities: [], userUniversity: null };
+        }
+      },
+      staleTime: Infinity,
+    });
+
+  const { isSuperAdmin, universities, userUniversity } = roleData;
+
+  // 2. Fetch Terms List
+  const {
+    data: termsResult = { items: [], totalCount: 0 },
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      'terms-list',
+      pagination.current,
+      pagination.pageSize,
+      searchTerm,
+      statusFilter,
+      sortConfig,
+      refreshCount,
+    ],
+    queryFn: async () => {
+      try {
+        const params = {
+          pageNumber: pagination.current,
+          pageSize: pagination.pageSize,
+          searchTerm: searchTerm || undefined,
+          status: statusFilter ?? undefined,
+          sortColumn: sortConfig.column,
+          sortOrder: sortConfig.order,
+        };
+
+        const response = await TermService.getAll(params);
+        if (response?.data) {
+          const items = (response.data.items || []).map((item) => ({
+            ...item,
+            version: item.version || knownVersions.current[item.termId] || 1,
+          }));
+
+          setPagination((prev) => ({
+            ...prev,
+            total: response.data.totalCount || 0,
+          }));
+
+          return {
+            items,
+            totalCount: response.data.totalCount || 0,
+          };
+        }
+        return { items: [], totalCount: 0 };
+      } catch (error) {
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR
+          )
+        );
+        throw error;
       }
-    } catch (_error) {
-      toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.LOAD_ERROR);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    pagination.current,
-    pagination.pageSize,
-    searchTerm,
-    statusFilter,
-    sortConfig,
-    toast,
-    setPagination,
-  ]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    },
+    staleTime: 0,
+  });
 
   const handleEdit = useCallback(
     async (record) => {
       try {
-        const response = await TermService.getById(record.termId);
-        if (response?.data) {
-          openFormModal(response.data, false);
+        setSubmitLoading(true);
+        const [termRes, enrollmentRes] = await Promise.all([
+          TermService.getById(record.termId),
+          StudentService.getAll(record.termId, { pageSize: 1 }),
+        ]);
+
+        if (termRes?.data) {
+          const detailData = {
+            ...termRes.data,
+            totalEnrolled: enrollmentRes?.data?.totalCount ?? termRes.data.totalEnrolled,
+          };
+          openFormModal(detailData, false);
         }
       } catch (error) {
-        console.error('GetTermById failed:', error);
-        toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR
+          )
+        );
+      } finally {
+        setSubmitLoading(false);
       }
     },
     [openFormModal, toast]
@@ -105,13 +180,28 @@ export const useTermManagement = () => {
   const handleView = useCallback(
     async (record) => {
       try {
-        const response = await TermService.getById(record.termId);
-        if (response?.data) {
-          openFormModal(response.data, true);
+        setSubmitLoading(true);
+        const [termRes, enrollmentRes] = await Promise.all([
+          TermService.getById(record.termId),
+          StudentService.getAll(record.termId, { pageSize: 1 }),
+        ]);
+
+        if (termRes?.data) {
+          const detailData = {
+            ...termRes.data,
+            totalEnrolled: enrollmentRes?.data?.totalCount ?? termRes.data.totalEnrolled,
+          };
+          openFormModal(detailData, true);
         }
       } catch (error) {
-        console.error('GetTermById (View) failed:', error);
-        toast.error(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR);
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DETAILS_ERROR
+          )
+        );
+      } finally {
+        setSubmitLoading(false);
       }
     },
     [openFormModal, toast]
@@ -126,15 +216,19 @@ export const useTermManagement = () => {
       await TermService.delete(record.termId);
       toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_SUCCESS);
       setDeleteModalState({ open: false, record: null });
-      fetchData();
+      useTermsStore.increment();
+      refetch();
     } catch (error) {
       toast.error(
-        error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR
+        getErrorDetail(
+          error,
+          INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.DELETE_ERROR
+        )
       );
     } finally {
       setSubmitLoading(false);
     }
-  }, [deleteModalState, fetchData, toast, setDeleteModalState]);
+  }, [deleteModalState, refetch, toast, setDeleteModalState]);
 
   const handleChangeStatus = useCallback(
     async (reason) => {
@@ -144,37 +238,40 @@ export const useTermManagement = () => {
       setSubmitLoading(true);
       try {
         const response = await TermService.closeTerm(record.termId, {
-          Reason: reason || 'Term closed by Admin',
+          Reason:
+            reason ||
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.CLOSE_DEFAULT_REASON,
           Version: record.version || knownVersions.current[record.termId] || 1,
         });
 
         if (response?.data) {
           knownVersions.current[record.termId] = response.data.version;
-          setData((prev) =>
-            prev.map((item) =>
-              item.termId === record.termId ? { ...item, ...response.data } : item
-            )
-          );
         }
 
         toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.STATUS_SUCCESS);
         setStatusModalState({ open: false, record: null, newStatus: null });
-        fetchData();
+        useTermsStore.increment();
+        refetch();
       } catch (error) {
-        toast.error(error.message || 'Failed to update status');
+        toast.error(
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.STATUS_UPDATE_ERROR
+          )
+        );
       } finally {
         setSubmitLoading(false);
       }
     },
-    [statusModalState, fetchData, toast, setStatusModalState]
+    [statusModalState, refetch, toast, setStatusModalState]
   );
 
   const handleSaveModal = useCallback(
     async (payload) => {
       setSubmitLoading(true);
       try {
-        const isUpdate = !!editingRecord?.termId;
-        const termId = editingRecord?.termId;
+        const termId = editingRecord?.termId || editingRecord?.TermId;
+        const isUpdate = !!termId;
 
         const basePayload = {
           Name: payload.name,
@@ -182,19 +279,21 @@ export const useTermManagement = () => {
           EndDate: payload.endDate,
         };
 
+        if (isSuperAdmin && payload.universityId) {
+          basePayload.UniversityId = payload.universityId;
+        }
+
         if (isUpdate) {
           const updatePayload = {
             ...basePayload,
             TermId: termId,
-            Version: editingRecord.version || knownVersions.current[termId] || 1,
+            Version:
+              editingRecord.version || editingRecord.Version || knownVersions.current[termId] || 1,
           };
           const response = await TermService.update(termId, updatePayload);
 
           if (response?.data) {
             knownVersions.current[termId] = response.data.version;
-            setData((prev) =>
-              prev.map((item) => (item.termId === termId ? { ...item, ...response.data } : item))
-            );
           }
           toast.success(INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.UPDATE_SUCCESS);
         } else {
@@ -206,20 +305,24 @@ export const useTermManagement = () => {
         }
 
         setModalVisible(false);
-        fetchData();
+        useTermsStore.increment();
+        refetch();
       } catch (error) {
         toast.error(
-          error.message || INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR
+          getErrorDetail(
+            error,
+            INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.TERM_MANAGEMENT.MESSAGES.SAVE_ERROR
+          )
         );
       } finally {
         setSubmitLoading(false);
       }
     },
-    [editingRecord, fetchData, toast, setModalVisible]
+    [editingRecord, refetch, toast, setModalVisible, isSuperAdmin]
   );
 
   return {
-    data,
+    data: termsResult.items,
     loading,
     searchTerm,
     statusFilter,
@@ -238,6 +341,8 @@ export const useTermManagement = () => {
     handleSearchChange,
     handleStatusChange,
     handleTableChange,
+    handlePageSizeChange,
+    handleSortChange,
     handleCreateNew,
     handleEdit,
     handleView,
@@ -246,5 +351,9 @@ export const useTermManagement = () => {
     handleRequestChangeStatus,
     handleChangeStatus,
     handleSaveModal,
+    isSuperAdmin,
+    universities,
+    userUniversity,
+    fetchData: refetch,
   };
 };

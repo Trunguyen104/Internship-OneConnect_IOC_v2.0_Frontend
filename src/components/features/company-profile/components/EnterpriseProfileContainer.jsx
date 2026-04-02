@@ -1,17 +1,17 @@
-'use client';
-
-import { App } from 'antd';
+import { Spin } from 'antd';
 import { useCallback, useEffect } from 'react';
 
+import PageLayout from '@/components/ui/pagelayout';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+import { useToast } from '@/providers/ToastProvider';
 
 import { useEnterpriseProfile } from '../hooks/useEnterpriseProfile';
 import { EnterpriseProfile } from './EnterpriseProfile';
 import EnterpriseProfileEditDrawer from './EnterpriseProfileEditDrawer';
-import { ProfileEmpty, ProfileLoading } from './ProfileEmpty';
+import { ProfileEmpty } from './ProfileEmpty';
 
 export default function EnterpriseProfileContainer() {
-  const { message } = App.useApp();
+  const toast = useToast();
   const {
     loading,
     saving,
@@ -27,62 +27,85 @@ export default function EnterpriseProfileContainer() {
 
   useEffect(() => {
     if (!error) return;
-    message.error(error?.message || ENTERPRISE_PROFILE_UI.LOADING_ERROR);
-  }, [error, message]);
+    toast.error(error?.message || ENTERPRISE_PROFILE_UI.LOADING_ERROR);
+  }, [error, toast]);
 
   const handleSave = useCallback(
     async (updatedData) => {
       const result = await saveProfile(updatedData);
       if (result.ok) {
-        message.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
+        toast.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
         closeEdit();
       } else {
-        message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
+        toast.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
       }
     },
-    [closeEdit, message, saveProfile]
+    [closeEdit, toast, saveProfile]
   );
 
   const handleRetry = useCallback(async () => {
     const result = await refetch();
-    if (!result.ok) message.error(result.error?.message || ENTERPRISE_PROFILE_UI.LOADING_ERROR);
-  }, [message, refetch]);
+    if (!result.ok) toast.error(result.error?.message || ENTERPRISE_PROFILE_UI.LOADING_ERROR);
+  }, [toast, refetch]);
 
   const handleLogoChange = useCallback(
     async (file) => {
       const result = await saveProfile({ ...profile, logoUrl: file });
       if (result.ok) {
-        message.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
+        toast.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
       } else {
-        message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
+        toast.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
       }
     },
-    [message, profile, saveProfile]
+    [toast, profile, saveProfile]
   );
 
   const handleBannerChange = useCallback(
     async (file) => {
       const result = await saveProfile({ ...profile, backgroundUrl: file });
       if (result.ok) {
-        message.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
+        toast.success(ENTERPRISE_PROFILE_UI.UPDATE_SUCCESS);
       } else {
-        message.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
+        toast.error(result.error?.message || ENTERPRISE_PROFILE_UI.UPDATE_ERROR);
       }
     },
-    [message, profile, saveProfile]
+    [toast, profile, saveProfile]
   );
 
-  if (loading) return <ProfileLoading />;
-  if (!profile) return <ProfileEmpty onRetry={handleRetry} />;
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="flex flex-1 items-center justify-center p-20">
+          <Spin size="large" description="Loading profile..." />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <PageLayout>
+        <ProfileEmpty onRetry={handleRetry} />
+      </PageLayout>
+    );
+  }
 
   return (
-    <>
-      <EnterpriseProfile
-        profile={profile}
-        onEdit={canEdit ? openEdit : null}
-        onLogoChange={canEdit ? handleLogoChange : null}
-        onBannerChange={canEdit ? handleBannerChange : null}
+    <PageLayout>
+      <PageLayout.Header
+        title={ENTERPRISE_PROFILE_UI.TITLE}
+        subtitle={ENTERPRISE_PROFILE_UI.SUBTITLE}
       />
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Content className="px-0">
+          <EnterpriseProfile
+            profile={profile}
+            onEdit={canEdit ? openEdit : null}
+            onLogoChange={canEdit ? handleLogoChange : null}
+            onBannerChange={canEdit ? handleBannerChange : null}
+          />
+        </PageLayout.Content>
+      </PageLayout.Card>
       <EnterpriseProfileEditDrawer
         open={isEditOpen}
         saving={saving}
@@ -90,6 +113,6 @@ export default function EnterpriseProfileContainer() {
         onClose={closeEdit}
         onSave={handleSave}
       />
-    </>
+    </PageLayout>
   );
 }

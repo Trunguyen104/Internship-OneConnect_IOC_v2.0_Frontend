@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { WORK_ITEM_PRIORITY, WORK_ITEM_TYPE } from '@/constants/common/enums';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 import { useToast } from '@/providers/ToastProvider';

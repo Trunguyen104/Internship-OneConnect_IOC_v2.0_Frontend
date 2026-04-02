@@ -1,4 +1,5 @@
 'use client';
+
 import {
   closestCorners,
   DndContext,
@@ -7,9 +8,10 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import React from 'react';
 
 import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
-import PageShell from '@/components/layout/PageShell';
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import StudentTabs from '@/components/layout/StudentTabs';
 import SearchBar from '@/components/ui/searchbar';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
@@ -43,16 +45,19 @@ export default function Board() {
   } = useBoard();
 
   return (
-    <PageShell>
-      <div className="mb-4 flex flex-col gap-4">
+    <div className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+      <StudentPageHeader hidden />
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <StudentTabs />
         {activeSprint && (
-          <SearchBar
-            value={query}
-            onChange={setQuery}
-            placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
-            width="w-full max-w-sm"
-          />
+          <div className="ml-auto">
+            <SearchBar
+              value={query}
+              onChange={setQuery}
+              placeholder={WORK_BOARD_UI.SEARCH_PLACEHOLDER}
+              width="w-[320px]"
+            />
+          </div>
         )}
       </div>
 
@@ -87,17 +92,19 @@ export default function Board() {
         </DndContext>
       )}
 
-      <UpdateTaskModal
-        open={openUpdateTask}
-        epics={epics}
-        sprints={sprints}
-        initialData={selectedTask}
-        onClose={() => {
-          setOpenUpdateTask(false);
-          setSelectedTask(null);
-        }}
-        onSubmit={handleUpdateSubmit}
-      />
-    </PageShell>
+      {openUpdateTask && (
+        <UpdateTaskModal
+          open={openUpdateTask}
+          epics={epics}
+          sprints={sprints}
+          initialData={selectedTask}
+          onClose={() => {
+            setOpenUpdateTask(false);
+            setSelectedTask(null);
+          }}
+          onSubmit={handleUpdateSubmit}
+        />
+      )}
+    </div>
   );
 }

@@ -1,6 +1,9 @@
 import './globals.css';
 
+import { AntdConfigProvider } from '../providers/AntdConfigProvider';
+import { AuthEventsProvider } from '../providers/AuthEventsProvider';
 import { PageHeaderProvider } from '../providers/PageHeaderProvider';
+import { ReactQueryProvider } from '../providers/ReactQueryProvider';
 import { ToastProvider } from '../providers/ToastProvider';
 
 export const metadata = {
@@ -14,10 +17,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <PageHeaderProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </PageHeaderProvider>
+      <body className="antialiased">
+        <ReactQueryProvider>
+          <PageHeaderProvider>
+            <AuthEventsProvider>
+              <AntdConfigProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </AntdConfigProvider>
+            </AuthEventsProvider>
+          </PageHeaderProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

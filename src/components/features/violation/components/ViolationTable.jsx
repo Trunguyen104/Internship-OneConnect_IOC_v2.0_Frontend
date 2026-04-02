@@ -1,103 +1,131 @@
 'use client';
 
-import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
-import { Empty, Tag, Typography } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 import dayjs from 'dayjs';
+import React, { memo, useMemo } from 'react';
 
-import { VIOLATION_UI } from '@/constants/violation/uiText';
+import DataTable from '@/components/ui/datatable';
+import TableRowDropdown from '@/components/ui/TableRowActions';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
-const { Text } = Typography;
+const ViolationTable = memo(function ViolationTable({ data, loading, page, pageSize, onView }) {
+  const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
+  const { TABLE } = VIOLATION_REPORT;
 
-export default function ViolationTable({ data, page, pageSize, sortOrder, onSort }) {
+  const columns = useMemo(
+    () => [
+      {
+        title: TABLE.COLUMNS.INDEX,
+        key: 'index',
+        width: '60px',
+        align: 'center',
+        render: (_, __, index) => (
+          <span className={TABLE_CELL.rowIndex}>{(page - 1) * pageSize + index + 1}</span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.STUDENT_NAME,
+        dataIndex: 'name',
+        key: 'name',
+        width: '200px',
+        render: (text) => (
+          <div className="flex flex-col overflow-hidden">
+            <span className={`${TABLE_CELL.primary} truncate`}>{text}</span>
+          </div>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.CREATED_BY,
+        dataIndex: 'reporter',
+        key: 'reporter',
+        width: '150px',
+        render: (text) => (
+          <Tooltip title={text}>
+            <span className={`${TABLE_CELL.secondary} block truncate`}>
+              {text || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+            </span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.CREATE_TIME,
+        dataIndex: 'createdAt',
+        key: 'createdAt',
+        width: '150px',
+        render: (text) => (
+          <span className={`${TABLE_CELL.secondary} text-xs`}>
+            {text
+              ? dayjs(text).format(VIOLATION_REPORT.DATE_FORMATS.UI)
+              : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+          </span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.VIOLATION_TIME,
+        dataIndex: 'violationTime',
+        key: 'violationTime',
+        width: '150px',
+        render: (text) => (
+          <span className={`${TABLE_CELL.secondary} text-xs`}>
+            {text
+              ? dayjs(text).format(VIOLATION_REPORT.DATE_FORMATS.UI)
+              : VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+          </span>
+        ),
+      },
+      {
+        title: TABLE.COLUMNS.DESCRIPTION,
+        dataIndex: 'description',
+        key: 'description',
+        width: '200px',
+        render: (text) => (
+          <Tooltip title={text}>
+            <span className={`${TABLE_CELL.secondary} block truncate text-xs`}>
+              {text || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+            </span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: '',
+        key: 'actions',
+        width: '48px',
+        align: 'right',
+        render: (_, record) => {
+          const items = [
+            {
+              key: 'view',
+              label: TABLE.ACTIONS.VIEW,
+              icon: <EyeOutlined />,
+              onClick: () => onView(record.id),
+            },
+          ];
+
+          return (
+            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+              <TableRowDropdown items={items} />
+            </div>
+          );
+        },
+      },
+    ],
+    [page, pageSize, TABLE, onView, VIOLATION_REPORT]
+  );
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      {!data || data.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center py-12">
-          <Empty description={VIOLATION_UI.TABLE.EMPTY} />
-        </div>
-      ) : (
-        <div className="mt-5 flex min-h-0 flex-1 flex-col">
-          <div className="flex-1 overflow-auto">
-            <table className="w-full min-w-[1000px] table-fixed border-collapse text-left">
-              <thead className="border-border bg-bg sticky top-0 z-10 border-b">
-                <tr>
-                  <th className="text-muted w-[60px] px-6 py-5 text-xs font-semibold">
-                    {VIOLATION_UI.TABLE.INDEX}
-                  </th>
-                  <th className="text-muted w-[200px] px-6 py-5 text-xs font-semibold">
-                    {VIOLATION_UI.TABLE.TYPE}
-                  </th>
-                  <th className="text-muted w-[300px] px-6 py-5 text-xs font-semibold">
-                    {VIOLATION_UI.TABLE.DESCRIPTION}
-                  </th>
-                  <th className="text-muted w-[180px] px-6 py-5 text-xs font-semibold">
-                    {VIOLATION_UI.TABLE.TIME}
-                  </th>
-                  <th className="text-muted w-[150px] px-6 py-5 text-xs font-semibold">
-                    {VIOLATION_UI.TABLE.REPORTER}
-                  </th>
-                  <th className="text-muted w-[150px] px-6 py-5 text-xs font-semibold">
-                    <div
-                      className="hover:text-info flex cursor-pointer items-center gap-1 transition-colors"
-                      onClick={onSort}
-                    >
-                      {VIOLATION_UI.TABLE.CREATED_DATE}
-                      <div className="flex flex-col text-[10px]">
-                        <CaretUpOutlined
-                          className={sortOrder === 'asc' ? 'text-info' : 'text-border'}
-                        />
-                        <CaretDownOutlined
-                          className={sortOrder === 'desc' ? 'text-info' : 'text-border'}
-                        />
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-border/50 divide-y">
-                {data.map((record, index) => (
-                  <tr key={record.id} className="hover:bg-bg/80 h-[72px] transition-colors">
-                    <td className="text-muted px-6 py-4 text-sm font-semibold">
-                      {(page - 1) * pageSize + index + 1}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className="text-text flex items-center gap-2 text-[15px] font-bold tracking-tight">
-                        {record.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <Text
-                        className="text-muted text-sm italic"
-                        ellipsis={{ tooltip: record.description }}
-                      >
-                        {record.description}
-                      </Text>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-muted text-xs font-medium">
-                        {dayjs(record.violationTime).format('DD/MM/YYYY HH:mm')}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Tag
-                        color="cyan"
-                        className="rounded-full border-none px-3 text-[10px] font-bold uppercase"
-                      >
-                        {record.reporter}
-                      </Tag>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-text text-sm font-bold">
-                        {dayjs(record.createdAt).format('DD/MM/YYYY')}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={data}
+        loading={loading}
+        rowKey="id"
+        minWidth="auto"
+        emptyText={VIOLATION_REPORT.EMPTY_MESSAGE}
+      />
     </div>
   );
-}
+});
+
+export default ViolationTable;

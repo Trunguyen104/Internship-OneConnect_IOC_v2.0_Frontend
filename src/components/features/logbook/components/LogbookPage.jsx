@@ -5,12 +5,11 @@ import { Select } from 'antd';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 
-import { LogBookService } from '@/components/features/logbook/services/logBook.service';
-import { EmptyState } from '@/components/ui/emptystate';
+import { LogBookService } from '@/components/features/logbook/services/log-book.service';
 import PageLayout from '@/components/ui/pagelayout';
-import { Skeleton } from '@/components/ui/skeleton';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 import { useLogbook } from '../hooks/useLogbook';
@@ -18,6 +17,10 @@ import LogbookDetailModal from './LogbookDetailModal';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookTable from './LogbookTable';
 
+/**
+ * Daily Report / Logbook — same shell as SuperAdmin User Management:
+ * PageLayout.Header → Card → Toolbar (search + filters + primary Create) → Content px-0 → Footer + Pagination.
+ */
 export default function LogbookPage() {
   const {
     data,
@@ -100,8 +103,7 @@ export default function LogbookPage() {
           DAILY_REPORT_MESSAGES.ERROR.UNEXPECTED;
 
         if (res?.statusCode === 409 || res?.status === 409) {
-          errorMsg =
-            'Ngày này đã có báo cáo hoặc bị trùng lặp. Vui lòng kiểm tra lại hoặc xóa báo cáo cũ.';
+          errorMsg = DAILY_REPORT_MESSAGES.ERROR.DUPLICATE_REPORT;
         }
 
         toast.error(errorMsg);
@@ -131,7 +133,7 @@ export default function LogbookPage() {
         };
         setEditingId(fullData.logbookId);
         setCurrentRecord(fullData);
-      } catch (err) {
+      } catch {
         setEditingId(record.logbookId);
         setCurrentRecord(record);
       } finally {
@@ -156,7 +158,7 @@ export default function LogbookPage() {
       const res = await LogBookService.getById(record.logbookId);
       setViewRecord(res?.data || record);
       setIsDetailModalOpen(true);
-    } catch (err) {
+    } catch {
       setViewRecord(record);
       setIsDetailModalOpen(true);
     } finally {
@@ -171,14 +173,19 @@ export default function LogbookPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} />
+      <PageLayout.Header title={DAILY_REPORT_UI.TITLE} subtitle={DAILY_REPORT_UI.DESCRIPTION} />
 
-      <PageLayout.Card>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
         <PageLayout.Toolbar
           searchProps={{
             placeholder: DAILY_REPORT_UI.TABLE.SEARCH_PLACEHOLDER,
             value: search,
             onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
+          }}
+          actionProps={{
+            label: DAILY_REPORT_UI.CREATE_BUTTON,
+            onClick: () => openFormModal(),
           }}
           filterContent={
             <Select
@@ -189,62 +196,43 @@ export default function LogbookPage() {
                 setStatusFilter(val);
                 setPageNumber(1);
               }}
-              className="w-56 shadow-sm"
-              rootClassName="custom-select-premium"
-              suffixIcon={<FilterOutlined className="text-muted" />}
+              className="h-11 w-full md:w-64"
+              rootClassName="premium-select"
+              suffixIcon={<FilterOutlined className="text-primary" />}
               options={[
+                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
                 { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
                 { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
             />
           }
-          actionProps={{
-            label: DAILY_REPORT_UI.CREATE_BUTTON,
-            onClick: () => openFormModal(),
-          }}
         />
 
-        <PageLayout.Content>
-          {loading && data.length === 0 ? (
-            <div className="space-y-4 px-6 py-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex h-[72px] items-center gap-4 border-b border-slate-50">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-4 flex-1" />
-                  <Skeleton className="h-6 w-16 rounded-full" />
-                  <Skeleton className="h-8 w-16 rounded-lg" />
-                </div>
-              ))}
-            </div>
-          ) : data.length === 0 ? (
-            <EmptyState
-              title={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK || 'No logbooks found'}
-              description="Keep track of your learning journey! Start by adding your first daily report."
-            />
-          ) : (
-            <LogbookTable
-              data={data}
-              loading={loading}
-              userProfile={userProfile}
-              onView={openDetailModal}
-              onEdit={openFormModal}
-              onDelete={handleDelete}
-            />
-          )}
+        <PageLayout.Content className="px-0">
+          <LogbookTable
+            data={data}
+            loading={loading}
+            userProfile={userProfile}
+            onView={openDetailModal}
+            onEdit={openFormModal}
+            onDelete={handleDelete}
+          />
         </PageLayout.Content>
 
         {total > 0 && (
-          <PageLayout.Pagination
-            total={total}
-            page={pageNumber}
-            pageSize={pageSize}
-            onPageChange={setPageNumber}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
-              setPageNumber(1);
-            }}
-          />
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
+            </span>
+            <PageLayout.Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
+            />
+          </PageLayout.Footer>
         )}
       </PageLayout.Card>
 

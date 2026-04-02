@@ -80,7 +80,13 @@ describe('LoginForm Component', () => {
       const passwordInput = screen.getByLabelText(/password/i);
 
       await user.type(emailInput, 'a');
-      expect(mockProps.onChange).toHaveBeenCalled();
+      expect(mockProps.onChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target: expect.objectContaining({
+            value: 'a',
+          }),
+        })
+      );
 
       await user.type(passwordInput, 'p');
       expect(mockProps.onChange).toHaveBeenCalledTimes(2);
@@ -103,7 +109,7 @@ describe('LoginForm Component', () => {
       const submitButton = screen.getByRole('button', { name: /login/i });
       await user.click(submitButton);
 
-      expect(mockProps.onSubmit).toHaveBeenCalled();
+      expect(mockProps.onSubmit).toHaveBeenCalledTimes(1);
     });
   });
 

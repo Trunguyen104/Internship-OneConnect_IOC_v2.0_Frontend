@@ -1,7 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
-import { productBacklogService } from '@/components/features/backlog/services/productbacklog.service';
-import { ProjectService } from '@/components/features/project/services/projectService';
+import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import { SPRINT_STATUS } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -11,82 +12,93 @@ import { useToast } from '@/providers/ToastProvider';
 export function useBacklogData() {
   const toast = useToast();
 
-  const [projectId, setProjectId] = useState(null);
-  const [epics, setEpics] = useState([]);
-  const [sprints, setSprints] = useState([]);
-  const [backlogItems, setBacklogItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-
   const [selectedEpicId, setSelectedEpicId] = useState('ALL');
   const [searchText, setSearchText] = useState('');
   const deferredSearchText = useDeferredValue(searchText);
 
-  // Initialize Project
-  useEffect(() => {
-    const initProject = async () => {
+  const [sprints, setSprints] = useState([]);
+  const [backlogItems, setBacklogItems] = useState([]);
+
+  // 1. Initialize Project
+  const { data: projectId = null } = useQuery({
+    queryKey: ['backlog-project-init'],
+    queryFn: async () => {
       try {
         const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
-        if (res?.data?.items?.length > 0) {
-          setProjectId(res.data.items[0].projectId);
-        }
+        return res?.data?.items?.[0]?.projectId || null;
       } catch {
         toast.error('Unable to load project');
+        return null;
       }
-    };
-    initProject();
-  }, [toast]);
+    },
+    staleTime: Infinity,
+  });
 
-  // Fetch Data
-  const fetchData = useCallback(
-    async (id, showLoading = true) => {
-      if (!id) return;
+  // 2. Fetch Backlog Data (Epics, Sprints, Items)
+  const {
+    data: backlogData,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: ['backlog-board-data', projectId],
+    queryFn: async () => {
       try {
-        if (showLoading) setLoading(true);
-
         const [resEpics, resBacklog] = await Promise.all([
-          productBacklogService.getEpics(id),
-          productBacklogService.getWorkItemsBacklog(id),
+          productBacklogService.getEpics(projectId),
+          productBacklogService.getWorkItemsBacklog(projectId),
         ]);
 
         let epicsData =
           resEpics?.data?.items || resEpics?.data || (Array.isArray(resEpics) ? resEpics : []);
-        setEpics(epicsData.map((e) => ({ ...e, id: e.id || e.workItemId })));
+        epicsData = epicsData.map((e) => ({ ...e, id: e.id || e.workItemId }));
+
+        let sprintsData = [];
+        let backlogItemsData = [];
 
         if (resBacklog?.data) {
           const rawSprints = resBacklog.data.sprints || [];
-          setSprints(
-            rawSprints.map((s) => {
-              let st = s.status?.name || s.status;
-              if (typeof st === 'string') {
-                const upper = st.toUpperCase();
-                if (upper === 'PLANNED' || upper === 'PLANNING') st = SPRINT_STATUS.PLANNED;
-                else if (upper === 'ACTIVE') st = SPRINT_STATUS.ACTIVE;
-                else if (upper === 'COMPLETED' || upper === 'DONE') st = SPRINT_STATUS.COMPLETED;
-              }
-              return {
-                ...s,
-                status: st,
-                sprintId: s.sprintId || s.id,
-                items: (s.items || []).map((it) => ({ ...it, id: it.workItemId || it.id })),
-              };
-            })
-          );
+          sprintsData = rawSprints.map((s) => {
+            let st = s.status?.name || s.status;
+            if (typeof st === 'string') {
+              const upper = st.toUpperCase();
+              if (upper === 'PLANNED' || upper === 'PLANNING') st = SPRINT_STATUS.PLANNED;
+              else if (upper === 'ACTIVE') st = SPRINT_STATUS.ACTIVE;
+              else if (upper === 'COMPLETED' || upper === 'DONE') st = SPRINT_STATUS.COMPLETED;
+            }
+            return {
+              ...s,
+              status: st,
+              sprintId: s.sprintId || s.id,
+              items: (s.items || []).map((it) => ({ ...it, id: it.workItemId || it.id })),
+            };
+          });
 
           const bkItems = resBacklog.data.productBacklog?.items || resBacklog.data.items || [];
-          setBacklogItems(bkItems.map((it) => ({ ...it, id: it.workItemId || it.id })));
+          backlogItemsData = bkItems.map((it) => ({ ...it, id: it.workItemId || it.id }));
         }
-      } catch {
+
+        return { epics: epicsData, sprints: sprintsData, backlogItems: backlogItemsData };
+      } catch (err) {
         toast.error('Error loading backlog board data');
-      } finally {
-        setLoading(false);
+        throw err;
       }
     },
-    [toast]
-  );
+    enabled: !!projectId,
+    staleTime: 2 * 60 * 1000,
+  });
 
+  // Derived epics from query data (no local modification)
+  const epics = useMemo(() => backlogData?.epics || [], [backlogData?.epics]);
+
+  // Sync local state when query data changes
   useEffect(() => {
-    fetchData(projectId);
-  }, [projectId, fetchData]);
+    if (backlogData) {
+      setTimeout(() => {
+        setSprints(backlogData.sprints || []);
+        setBacklogItems(backlogData.backlogItems || []);
+      }, 0);
+    }
+  }, [backlogData?.sprints, backlogData?.backlogItems, backlogData]);
 
   // Derived Logic
   const appendEpicName = useCallback(
@@ -130,7 +142,6 @@ export function useBacklogData() {
   return {
     projectId,
     epics,
-    setEpics,
     sprints,
     setSprints,
     backlogItems,
@@ -142,6 +153,6 @@ export function useBacklogData() {
     setSearchText,
     filteredBacklogItems,
     filteredSprints,
-    fetchData,
+    fetchData: refetch,
   };
 }

@@ -1,28 +1,19 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { EditOutlined } from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 
+import CompoundModal from '@/components/ui/CompoundModal';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 function FieldLabel({ required, children }) {
   return (
-    <div className="mb-2 text-sm font-semibold text-gray-800">
+    <div className="text-[13px] font-bold tracking-wide text-text/80 uppercase mb-2 ml-1">
       {children}
-      {required ? <span className="text-danger"> *</span> : null}
+      {required ? <span className="text-rose-500"> *</span> : null}
     </div>
-  );
-}
-
-function TextInput({ value, onChange, placeholder = '', type = 'text', readOnly = false }) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      placeholder={placeholder}
-      readOnly={readOnly}
-      className={`focus:border-primary focus:ring-primary h-11 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm transition-shadow outline-none focus:ring-1 ${readOnly ? 'cursor-not-allowed bg-gray-50 text-gray-500' : ''}`}
-    />
   );
 }
 
@@ -31,8 +22,6 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
   const [goal, setGoal] = useState(() => sprint?.goal || '');
 
   const canSubmit = useMemo(() => name.trim() !== '', [name]);
-
-  if (!open) return null;
 
   const handleSubmit = () => {
     if (!canSubmit) return;
@@ -43,56 +32,47 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
   };
 
   return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity">
-      <div className="relative flex w-full max-w-[600px] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex h-full max-h-[85vh] flex-col">
-          {/* Header */}
-          <div className="shrink-0 px-8 pt-8 pb-4">
-            <div className="text-2xl font-bold text-gray-900">
-              {BACKLOG_UI.EDIT_SPRINT || 'Edit Sprint'}
-            </div>
+    <CompoundModal open={open} onCancel={onClose} width={600}>
+      <CompoundModal.Header
+        title={BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
+        subtitle="Cập nhật tên gọi và mục tiêu trọng tâm cho chu kỳ làm việc hiện tại"
+        icon={<EditOutlined />}
+      />
+
+      <CompoundModal.Content className="px-6">
+        <div className="flex flex-col space-y-6 pb-2">
+          {/* Sprint Name */}
+          <div className="flex flex-col">
+            <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
+              className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+            />
           </div>
 
-          {/* Body */}
-          <div className="flex flex-1 flex-col space-y-5 overflow-y-auto px-8 py-2 pb-8">
-            <div>
-              <FieldLabel required>{BACKLOG_UI.FIELD_SPRINT_NAME}</FieldLabel>
-              <TextInput
-                value={name}
-                onChange={setName}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
-              />
-            </div>
-
-            <div className="flex flex-1 flex-col">
-              <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
-              <textarea
-                value={goal}
-                onChange={(e) => setGoal(e.target.value)}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
-                className="focus:border-primary focus:ring-primary min-h-[120px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 text-sm transition-shadow outline-none focus:ring-1"
-              />
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex shrink-0 items-center justify-end gap-3 border-t border-gray-100 bg-gray-50/50 px-8 py-5">
-            <button
-              onClick={onClose}
-              className="h-11 rounded-full border border-gray-200 bg-white px-6 font-bold text-gray-600 transition-colors hover:bg-gray-50"
-            >
-              {BACKLOG_UI.CANCEL}
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              className="bg-primary hover:bg-primary-hover h-11 rounded-full px-8 font-bold text-white transition-opacity disabled:opacity-50"
-            >
-              {BACKLOG_UI.UPDATE || 'Update'}
-            </button>
+          {/* Sprint Goal */}
+          <div className="flex flex-col">
+            <FieldLabel>{BACKLOG_UI.FIELD_SPRINT_GOAL}</FieldLabel>
+            <Textarea
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_GOAL}
+              className="min-h-[160px] rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
+            />
           </div>
         </div>
-      </div>
-    </div>
+      </CompoundModal.Content>
+
+      <CompoundModal.Footer
+        onCancel={onClose}
+        onConfirm={handleSubmit}
+        cancelText={BACKLOG_UI.CANCEL}
+        confirmText={BACKLOG_UI.UPDATE || 'Update'}
+        disabled={!canSubmit}
+        className="px-6 py-4"
+      />
+    </CompoundModal>
   );
 }

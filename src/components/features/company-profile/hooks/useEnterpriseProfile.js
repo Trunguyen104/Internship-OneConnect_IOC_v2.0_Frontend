@@ -1,15 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 
-import { userService } from '@/components/features/user/services/userService';
+import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/common/enums';
 import { mediaService } from '@/services/media.service';
 
-import {
-  getMyEnterpriseProfile,
-  updateEnterpriseProfile,
-} from '../services/enterpriseProfile.service';
+import { getEnterpriseById, updateEnterpriseProfile } from '../services/enterprise-profile.service';
 
 function normalizeProfileResponse(response) {
   if (response?.data?.data) return response.data.data;
@@ -25,11 +23,22 @@ function normalizeEnterpriseProfile(profile) {
   const normalized = { ...profile };
 
   if (normalized.taxCode == null) {
-    normalized.taxCode = profile.taxcode ?? profile.tax_code ?? profile.taxCODE ?? null;
+    normalized.taxCode =
+      profile.taxcode ?? profile.tax_code ?? profile.taxCODE ?? profile.TaxCode ?? null;
   }
 
   if (normalized.enterpriseId == null) {
-    normalized.enterpriseId = profile.enterpriseID ?? profile.enterprise_id ?? null;
+    normalized.enterpriseId =
+      profile.enterpriseID ?? profile.enterprise_id ?? profile.EnterpriseId ?? null;
+  }
+
+  if (normalized.logoUrl == null) {
+    normalized.logoUrl = profile.LogoUrl ?? null;
+  }
+
+  if (normalized.backgroundUrl == null) {
+    normalized.backgroundUrl =
+      profile.BackgroundUrl ?? profile.backgroundUrl1 ?? profile.BackgroundUrl1 ?? null;
   }
 
   return normalized;
@@ -48,16 +57,12 @@ function toUpdatablePayload(values, profile) {
   if (nextTaxCode) payload.taxCode = nextTaxCode;
 
   const nextLogoUrl = values?.logoUrl;
-  if (nextLogoUrl && nextLogoUrl !== profile?.logoUrl && !String(nextLogoUrl).startsWith('data:')) {
+  if (nextLogoUrl && !String(nextLogoUrl).startsWith('data:')) {
     payload.logoUrl = nextLogoUrl;
   }
 
   const nextBackgroundUrl = values?.backgroundUrl;
-  if (
-    nextBackgroundUrl &&
-    nextBackgroundUrl !== profile?.backgroundUrl &&
-    !String(nextBackgroundUrl).startsWith('data:')
-  ) {
+  if (nextBackgroundUrl && !String(nextBackgroundUrl).startsWith('data:')) {
     payload.backgroundUrl = nextBackgroundUrl;
   }
 
@@ -69,42 +74,42 @@ function toUpdatablePayload(values, profile) {
 }
 
 export function useEnterpriseProfile() {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState(null);
-  const [userRole, setUserRole] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-  const fetchProfile = useCallback(async (showLoading = true) => {
-    try {
-      if (showLoading) setLoading(true);
-      const [response, meResponse] = await Promise.all([
-        getMyEnterpriseProfile(),
-        userService.getMe(),
-      ]);
-      const profileData = normalizeEnterpriseProfile(normalizeProfileResponse(response));
-      if (!profileData) throw new Error('Profile data format is invalid');
-      setProfile(profileData);
+  // 1. Fetch User Role & Enterprise Profile
+  const {
+    data: profileResult = { profile: null, userRole: null },
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['enterprise-profile-context'],
+    queryFn: async () => {
+      try {
+        const meResponse = await userService.getMe();
+        const meData = meResponse?.data || meResponse;
+        const userRole = meData?.role || null;
+        const enterpriseId = meData?.enterpriseId || meData?.enterprise_id || meData?.enterpriseID;
 
-      const meData = meResponse?.data || meResponse;
-      if (meData?.role) {
-        setUserRole(meData.role);
+        if (!enterpriseId) {
+          throw new Error('Unable to find enterprise ID for the current user');
+        }
+
+        const enterpriseResponse = await getEnterpriseById(enterpriseId);
+        const profile = normalizeEnterpriseProfile(normalizeProfileResponse(enterpriseResponse));
+
+        if (!profile) throw new Error('Profile data format is invalid');
+
+        return { profile, userRole };
+      } catch (err) {
+        throw err;
       }
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 
-      setError(null);
-      return { ok: true, data: profileData, error: null };
-    } catch (error) {
-      setError(error);
-      return { ok: false, data: null, error };
-    } finally {
-      if (showLoading) setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProfile(true);
-  }, [fetchProfile]);
+  const { profile, userRole } = profileResult;
 
   const openEdit = useCallback(() => setIsEditOpen(true), []);
   const closeEdit = useCallback(() => setIsEditOpen(false), []);
@@ -142,34 +147,18 @@ export function useEnterpriseProfile() {
         }
 
         const payload = toUpdatablePayload({ ...values, logoUrl, backgroundUrl }, profile);
-        const updateResponse = await updateEnterpriseProfile(enterpriseId, payload);
+        await updateEnterpriseProfile(enterpriseId, payload);
 
-        const updatedFromResponse = normalizeEnterpriseProfile(
-          normalizeProfileResponse(updateResponse)
-        );
-        if (updatedFromResponse) {
-          setProfile((prev) => {
-            if (!prev) return updatedFromResponse;
-            if (updatedFromResponse.taxCode == null && prev.taxCode != null) {
-              return { ...updatedFromResponse, taxCode: prev.taxCode };
-            }
-            return updatedFromResponse;
-          });
-        }
-
-        const refresh = await fetchProfile(false);
-        if (!refresh.ok) throw refresh.error;
+        await refetch();
         return { ok: true, error: null };
-      } catch (error) {
-        return { ok: false, error };
+      } catch (err) {
+        return { ok: false, error: err };
       } finally {
         setSaving(false);
       }
     },
-    [fetchProfile, profile]
+    [profile, refetch]
   );
-
-  const refetch = useCallback(() => fetchProfile(true), [fetchProfile]);
 
   return {
     loading,
@@ -181,7 +170,7 @@ export function useEnterpriseProfile() {
     closeEdit,
     saveProfile,
     refetch,
-    fetchProfile,
+    fetchProfile: refetch, // Aliased for compatibility
     canEdit: userRole !== USER_ROLE.HR,
   };
 }

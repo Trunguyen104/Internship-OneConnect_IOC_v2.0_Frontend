@@ -1,3 +1,6 @@
+'use client';
+
+import React from 'react';
 import {
   Area,
   AreaChart,
@@ -31,57 +34,69 @@ function formatFullDate(iso) {
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
+const TOOLTIP_STYLE = {
+  backgroundColor: '#fff',
+  border: '1px solid #f3f4f6',
+  borderRadius: '16px',
+  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+  padding: '12px 16px',
+};
+
 export function BurndownChart({ burndown }) {
   return (
-    <Card>
-      <CardHeader title={DASHBOARD_UI.BURNDOWN_CHART} />
-      <div className="h-80 p-4">
+    <Card className="rounded-[32px] border-gray-100 shadow-sm overflow-hidden">
+      <CardHeader
+        title={
+          <span className="text-gray-900 font-bold text-lg">{DASHBOARD_UI.BURNDOWN_CHART}</span>
+        }
+      />
+      <div className="h-80 p-6">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={burndown} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="burndownGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+                <stop offset="5%" stopColor="#b91c1c" stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#b91c1c" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="var(--color-border)" strokeDasharray="4 4" vertical={false} />
+            <CartesianGrid stroke="#f3f4f6" strokeDasharray="4 4" vertical={false} />
             <XAxis
               dataKey="date"
               tickFormatter={formatShortDate}
               minTickGap={20}
-              stroke="var(--color-muted)"
-              tick={{ fill: 'var(--color-muted)', fontSize: 12 }}
+              stroke="#9ca3af"
+              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke="var(--color-muted)"
-              tick={{ fill: 'var(--color-muted)', fontSize: 12 }}
+              stroke="#9ca3af"
+              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
               labelFormatter={formatFullDate}
-              contentStyle={{
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                color: 'var(--color-text)',
+              contentStyle={TOOLTIP_STYLE}
+              itemStyle={{ color: '#111827', fontWeight: 700, fontSize: '14px' }}
+              labelStyle={{
+                color: '#6b7280',
+                marginBottom: '4px',
+                fontSize: '12px',
+                fontWeight: 600,
               }}
-              itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
             />
             <Area
               type="monotone"
               dataKey="remaining"
               name={DASHBOARD_UI.REMAINING}
-              stroke="var(--color-primary)"
+              stroke="#b91c1c"
               fill="url(#burndownGrad)"
               strokeWidth={3}
               activeDot={{
                 r: 6,
-                fill: 'var(--color-surface)',
-                stroke: 'var(--color-primary)',
+                fill: '#fff',
+                stroke: '#b91c1c',
                 strokeWidth: 2,
               }}
             />
@@ -94,43 +109,51 @@ export function BurndownChart({ burndown }) {
 
 export function TaskStatusDistributionChart({ taskStatusDistribution }) {
   return (
-    <Card>
-      <CardHeader title={DASHBOARD_UI.TASK_STATUS_DISTRIBUTION} />
-      <div className="h-80 p-4">
+    <Card className="rounded-[32px] border-gray-100 shadow-sm overflow-hidden">
+      <CardHeader
+        title={
+          <span className="text-gray-900 font-bold text-lg">
+            {DASHBOARD_UI.TASK_STATUS_DISTRIBUTION}
+          </span>
+        }
+      />
+      <div className="h-80 p-6">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={taskStatusDistribution}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
-            <CartesianGrid stroke="var(--color-border)" strokeDasharray="4 4" vertical={false} />
+            <CartesianGrid stroke="#f3f4f6" strokeDasharray="4 4" vertical={false} />
             <XAxis
               dataKey="status"
-              stroke="var(--color-border)"
-              tick={{ fill: 'var(--color-muted)', fontSize: 12 }}
+              stroke="#e5e7eb"
+              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
               tickLine={false}
-              axisLine={{ stroke: 'var(--color-border)' }}
+              axisLine={{ stroke: '#e5e7eb' }}
             />
             <YAxis
-              stroke="var(--color-border)"
-              tick={{ fill: 'var(--color-muted)', fontSize: 12 }}
+              stroke="#e5e7eb"
+              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
-              cursor={{ fill: 'var(--color-border)', opacity: 0.4 }}
-              contentStyle={{
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              cursor={{ fill: '#f9fafb', opacity: 0.8 }}
+              contentStyle={TOOLTIP_STYLE}
+              itemStyle={{ color: '#111827', fontWeight: 700 }}
+              labelStyle={{
+                color: '#6b7280',
+                marginBottom: '4px',
+                fontSize: '12px',
+                fontWeight: 600,
               }}
-              itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
             />
             <Bar
               dataKey="count"
               name={DASHBOARD_UI.TASKS}
-              fill="var(--color-info)"
-              radius={[6, 6, 0, 0]}
+              fill="#0ea5e9"
+              radius={[8, 8, 0, 0]}
+              barSize={40}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -141,42 +164,50 @@ export function TaskStatusDistributionChart({ taskStatusDistribution }) {
 
 export function WorkloadDistributionChart({ workloadByPerson }) {
   return (
-    <Card>
-      <CardHeader title={DASHBOARD_UI.WORKLOAD_DISTRIBUTION} />
-      <div className="h-80 p-4">
+    <Card className="rounded-[32px] border-gray-100 shadow-sm overflow-hidden">
+      <CardHeader
+        title={
+          <span className="text-gray-900 font-bold text-lg">
+            {DASHBOARD_UI.WORKLOAD_DISTRIBUTION}
+          </span>
+        }
+      />
+      <div className="h-80 p-6">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={workloadByPerson} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
-            <CartesianGrid stroke="var(--color-border)" strokeDasharray="4 4" vertical={false} />
+            <CartesianGrid stroke="#f3f4f6" strokeDasharray="4 4" vertical={false} />
             <XAxis
               dataKey="name"
               angle={-30}
               textAnchor="end"
-              stroke="var(--color-border)"
-              tick={{ fill: 'var(--color-muted)', fontSize: 11 }}
+              stroke="#e5e7eb"
+              tick={{ fill: '#9ca3af', fontSize: 11, fontWeight: 500 }}
               tickLine={false}
-              axisLine={{ stroke: 'var(--color-border)' }}
+              axisLine={{ stroke: '#e5e7eb' }}
             />
             <YAxis
-              stroke="var(--color-border)"
-              tick={{ fill: 'var(--color-muted)', fontSize: 12 }}
+              stroke="#e5e7eb"
+              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 500 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
-              cursor={{ fill: 'var(--color-border)', opacity: 0.4 }}
-              contentStyle={{
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+              cursor={{ fill: '#f9fafb', opacity: 0.8 }}
+              contentStyle={TOOLTIP_STYLE}
+              itemStyle={{ color: '#111827', fontWeight: 700 }}
+              labelStyle={{
+                color: '#6b7280',
+                marginBottom: '4px',
+                fontSize: '12px',
+                fontWeight: 600,
               }}
-              itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
             />
             <Bar
               dataKey="count"
               name={DASHBOARD_UI.TASKS}
-              fill="var(--color-primary)"
-              radius={[6, 6, 0, 0]}
+              fill="#b91c1c"
+              radius={[8, 8, 0, 0]}
+              barSize={40}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -186,34 +217,40 @@ export function WorkloadDistributionChart({ workloadByPerson }) {
 }
 
 export function CompletionPieChart({ completionPie }) {
+  const COLORS = ['#22c55e', '#ef4444'];
   return (
-    <Card>
-      <CardHeader title={DASHBOARD_UI.COMPLETED_OVERDUE} />
-      <div className="flex h-[340px] items-center justify-center p-4">
+    <Card className="rounded-[32px] border-gray-100 shadow-sm overflow-hidden">
+      <CardHeader
+        title={
+          <span className="text-gray-900 font-bold text-lg">{DASHBOARD_UI.COMPLETED_OVERDUE}</span>
+        }
+      />
+      <div className="flex h-[340px] items-center justify-center p-6">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-              }}
-              itemStyle={{ color: 'var(--color-text)', fontWeight: 600 }}
+              contentStyle={TOOLTIP_STYLE}
+              itemStyle={{ color: '#111827', fontWeight: 700 }}
+              labelStyle={{ display: 'none' }}
             />
-            <Legend verticalAlign="bottom" height={36} iconType="circle" />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              wrapperStyle={{ paddingTop: '20px', fontSize: '13px', fontWeight: 600 }}
+            />
             <Pie
               data={completionPie}
               dataKey="value"
               nameKey="name"
-              innerRadius={60}
-              outerRadius={95}
-              stroke="var(--color-surface)"
-              strokeWidth={3}
-              paddingAngle={2}
+              innerRadius={70}
+              outerRadius={105}
+              stroke="#fff"
+              strokeWidth={4}
+              paddingAngle={4}
             >
-              {completionPie.map((_, idx) => (
-                <Cell key={idx} fill={idx === 0 ? 'var(--color-success)' : 'var(--color-danger)'} />
+              {completionPie.map((entry, idx) => (
+                <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
               ))}
             </Pie>
           </PieChart>

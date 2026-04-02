@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import LogoUploader from '@/components/ui/logouploader';
 import { Spinner } from '@/components/ui/spinner';
@@ -16,121 +15,150 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [formError, setFormError] = useState('');
   const [logoUrl, setLogoUrl] = useState(university?.logoUrl || '');
   const isEdit = !!university;
+
+  const validate = (payload) => {
+    const nextErrors = {};
+    if (!payload.name) nextErrors.name = UI_TEXT.UNIVERSITIES.NAME_REQUIRED;
+    if (!payload.code) nextErrors.code = UI_TEXT.UNIVERSITIES.CODE_REQUIRED;
+    if (!payload.address) nextErrors.address = UI_TEXT.UNIVERSITIES.ADDRESS_REQUIRED;
+    if (payload.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.contactEmail)) {
+      nextErrors.contactEmail = UI_TEXT.UNIVERSITIES.ERR_INVALID_EMAIL;
+    }
+    return nextErrors;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
 
     const formData = new FormData(e.currentTarget);
     const payload = {
       name: String(formData.get('name') || '').trim(),
       code: String(formData.get('code') || '').trim(),
       address: String(formData.get('address') || '').trim(),
+      contactEmail: String(formData.get('contactEmail') || '').trim() || undefined,
     };
 
-    const nextErrors = {};
-    if (!payload.name) nextErrors.name = 'University name is required';
-    if (!payload.code) nextErrors.code = 'University code is required';
-    if (!payload.address) nextErrors.address = 'Address is required';
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length) {
+    const nextErrors = validate(payload);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
       setLoading(false);
       return;
     }
 
     try {
-      setFormError('');
       if (isEdit) {
         await universityService.update(university.universityId, {
           ...payload,
           logoUrl: logoUrl.trim() || undefined,
           universityId: university.universityId,
         });
-        toast.success(`Updated ${payload.name}`);
+        toast.success(UI_TEXT.COMMON.UPDATE_SUCCESS);
       } else {
         await universityService.create(payload);
-        toast.success(`Created ${payload.name}`);
+        toast.success(UI_TEXT.COMMON.CREATE_SUCCESS);
       }
+
       useUniversitiesStore.increment();
       onSuccess?.();
     } catch (err) {
-      setFormError(err?.data?.message || err?.message || 'Submit failed');
+      if (err.data?.validationErrors) {
+        const backendErrors = {};
+        Object.entries(err.data.validationErrors).forEach(([field, msgs]) => {
+          backendErrors[field] = Array.isArray(msgs) ? msgs[0] : msgs;
+        });
+        setErrors(backendErrors);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto flex max-w-2xl flex-col gap-6">
-      {isEdit && (
-        <div className="mb-6 flex justify-center">
-          <LogoUploader
-            value={logoUrl}
-            onChange={setLogoUrl}
-            size={160}
-            label="University Logo"
-            folder="Universities"
-          />
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+      <div className="flex flex-col items-center gap-6">
+        <LogoUploader
+          value={logoUrl}
+          onChange={setLogoUrl}
+          size={120}
+          label={UI_TEXT.UNIVERSITIES.LOGO_LABEL}
+          folder="Universities"
+        />
+        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted/40 text-center">
+          {UI_TEXT.UNIVERSITIES.IDENTITY}
+        </p>
+      </div>
 
-      <FieldGroup className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="name">{UI_TEXT.UNIVERSITIES.NAME}</FieldLabel>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
+        <div className="md:col-span-2 space-y-2">
+          <label className="text-[11px] font-black uppercase tracking-widest text-muted/60 pl-1">
+            {UI_TEXT.UNIVERSITIES.NAME}
+          </label>
           <Input
-            id="name"
             name="name"
             defaultValue={university?.name}
-            required
-            placeholder="Enter official name"
-            className="focus:ring-primary/20 h-12 rounded-xl border-slate-200 shadow-inner"
+            placeholder={UI_TEXT.UNIVERSITIES.NAME_PLACEHOLDER}
+            className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.name}
           />
-        </Field>
+        </div>
 
-        <Field>
-          <FieldLabel htmlFor="code">{UI_TEXT.UNIVERSITIES.CODE}</FieldLabel>
+        <div className="space-y-2">
+          <label className="text-[11px] font-black uppercase tracking-widest text-muted/60 pl-1">
+            {UI_TEXT.UNIVERSITIES.CODE}
+          </label>
           <Input
-            id="code"
             name="code"
             defaultValue={university?.code}
-            required
-            placeholder="EX: BK-HN"
-            className="h-11 rounded-xl border-slate-200"
+            placeholder={UI_TEXT.UNIVERSITIES.CODE_PLACEHOLDER}
+            className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.code}
           />
-        </Field>
+        </div>
 
-        <Field className="md:col-span-2">
-          <FieldLabel htmlFor="address">{UI_TEXT.UNIVERSITIES.ADDRESS}</FieldLabel>
+        <div className="md:col-span-2 space-y-2">
+          <label className="text-[11px] font-black uppercase tracking-widest text-muted/60 pl-1">
+            {UI_TEXT.UNIVERSITIES.ADDRESS}
+          </label>
           <Input
-            id="address"
             name="address"
             defaultValue={university?.address}
-            required
-            placeholder="Enter headquarters address"
-            className="h-11 rounded-xl border-slate-200"
+            placeholder={UI_TEXT.UNIVERSITIES.ADDRESS_PLACEHOLDER}
+            className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
             error={errors.address}
           />
-        </Field>
-      </FieldGroup>
-
-      {formError && (
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-rose-100 bg-rose-50 p-4 text-center text-sm font-semibold text-rose-600">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-rose-600" />
-          {formError}
         </div>
-      )}
 
-      <div className="flex justify-end gap-3 border-t border-slate-100 pt-6">
+        <div className="md:col-span-2 space-y-2">
+          <label className="text-[11px] font-black uppercase tracking-widest text-muted/60 pl-1">
+            {UI_TEXT.UNIVERSITIES.CONTACT_EMAIL}{' '}
+            <span className="text-slate-400 normal-case font-medium">
+              (
+              {UI_TEXT.USER_MANAGEMENT.PHONE_OPTIONAL.includes('optional')
+                ? 'optional'
+                : 'tùy chọn'}
+              )
+            </span>
+          </label>
+          <Input
+            name="contactEmail"
+            type="email"
+            defaultValue={university?.contactEmail}
+            placeholder={UI_TEXT.UNIVERSITIES.EMAIL_PLACEHOLDER}
+            className="h-12 rounded-2xl border-gray-100 bg-gray-50/50 px-5 transition-all focus:border-primary/30 focus:bg-white"
+            error={errors.contactEmail}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3 pt-6 border-t border-gray-50">
         <Button
           type="button"
           variant="ghost"
-          className="h-11 rounded-full bg-slate-50 px-6 font-semibold text-slate-500 hover:bg-slate-100"
+          className="h-12 rounded-full px-8 font-black uppercase tracking-widest text-[11px] text-muted transition-all hover:bg-gray-100"
           onClick={() => onCancel?.()}
         >
           {UI_TEXT.BUTTON.CANCEL}
@@ -138,10 +166,10 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
         <Button
           type="submit"
           disabled={loading}
-          className="bg-primary hover:bg-primary/90 shadow-primary/20 h-11 min-w-[140px] rounded-full px-8 font-semibold text-white shadow-lg transition-all active:scale-[0.98]"
+          className="bg-primary/90 h-12 min-w-[160px] rounded-full px-10 text-[11px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-primary active:scale-[0.98] disabled:opacity-50"
         >
           {loading ? (
-            <Spinner className="mr-2" />
+            <Spinner className="size-4" />
           ) : isEdit ? (
             UI_TEXT.BUTTON.SAVE_CHANGES
           ) : (

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { ErrorState } from '@/components/ui/errorstate';
 import PageLayout from '@/components/ui/pagelayout';
 import { UI_TEXT } from '@/lib/UI_Text';
 
@@ -9,6 +10,11 @@ import EnterprisesDialog from './EnterprisesDialog';
 import EnterprisesTable from './EnterprisesTable';
 import { useEnterprises } from './useEnterprises';
 
+const E = UI_TEXT.ENTERPRISES;
+
+/**
+ * EnterprisesPage - Main organizational hub for managing enterprise partners.
+ */
 export default function EnterprisesPage() {
   const {
     enterprises,
@@ -27,35 +33,26 @@ export default function EnterprisesPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header
-        title="Strategic Corporate Partners"
-        description="Oversee corporate registration, tax compliance, and commercial sector alignment within the ecosystem."
-      />
+      <PageLayout.Header title={E.TITLE} subtitle={E.SUBTITLE} />
 
-      <PageLayout.Card>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
         <PageLayout.Toolbar
           searchProps={{
-            placeholder: 'Search by enterprise name, code, or tax ID...',
+            placeholder: E.SEARCH_PLACEHOLDER,
             value: search,
             onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
           }}
           actionProps={{
-            label: 'Add Enterprise',
+            label: E.ADD,
             onClick: () => setIsDialogOpen(true),
           }}
         />
 
-        <PageLayout.Content>
+        <PageLayout.Content className="px-0">
           {error ? (
-            <div className="animate-in zoom-in-95 flex h-64 flex-col items-center justify-center rounded-3xl border border-rose-100 bg-rose-50 p-8 text-rose-600 duration-300">
-              <p className="mb-2 font-bold">{UI_TEXT.ERROR.COMMUNICATION}</p>
-              <p className="text-sm opacity-80">{error}</p>
-              <button
-                onClick={refresh}
-                className="mt-4 rounded-full bg-rose-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-rose-700 active:scale-95"
-              >
-                {UI_TEXT.BUTTON.TRY_AGAIN}
-              </button>
+            <div className="flex items-center justify-center py-20">
+              <ErrorState error={error} onRetry={refresh} className="mx-auto" />
             </div>
           ) : (
             <EnterprisesTable enterprises={enterprises} loading={loading} />
@@ -63,13 +60,19 @@ export default function EnterprisesPage() {
         </PageLayout.Content>
 
         {total > 0 && (
-          <PageLayout.Pagination
-            total={total}
-            page={pageNumber}
-            pageSize={pageSize}
-            onPageChange={setPageNumber}
-            onPageSizeChange={setPageSize}
-          />
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
+            </span>
+            <PageLayout.Pagination
+              total={total}
+              page={pageNumber}
+              pageSize={pageSize}
+              onPageChange={setPageNumber}
+              onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
+            />
+          </PageLayout.Footer>
         )}
       </PageLayout.Card>
 

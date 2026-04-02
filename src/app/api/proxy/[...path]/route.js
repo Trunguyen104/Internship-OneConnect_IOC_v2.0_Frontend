@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 
-import { CONFIG } from '@/constants/common/config';
 import { resolveApiRoot } from '@/lib/server/backend-url';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const API_ROOT = resolveApiRoot();
 
@@ -18,14 +20,7 @@ async function handler(req, { params }) {
 
     const pathStr = path.join('/');
 
-    // Bypass v1 for specific routes (like student evaluations)
-    const isV1Bypass = CONFIG.V1_BYPASS_ROUTES.some((route) => pathStr.startsWith(route));
-
-    const url = isV1Bypass
-      ? `${API_ROOT}/${pathStr}${searchString}`
-      : `${API_ROOT}/v1/${pathStr}${searchString}`;
-
-    console.log(`PROXY TARGET: ${req.method} ${url}`);
+    const url = `${API_ROOT}/${pathStr}${searchString}`;
 
     const headers = new Headers();
     const contentType = req.headers.get('content-type');
@@ -61,7 +56,6 @@ async function handler(req, { params }) {
     }
 
     const res = await fetch(url, requestOptions);
-    console.log(`PROXY RESPONSE: ${res.status} from ${url}`);
 
     const contentTypeRes = res.headers.get('content-type');
     const contentDisposition = res.headers.get('content-disposition');
@@ -71,7 +65,12 @@ async function handler(req, { params }) {
       console.error(`PROXY BACKEND ERROR: ${res.status} - ${errorText}`);
       return new NextResponse(errorText, {
         status: res.status,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
       });
     }
 
@@ -79,6 +78,9 @@ async function handler(req, { params }) {
     const responseHeaders = new Headers();
     if (contentTypeRes) responseHeaders.set('Content-Type', contentTypeRes);
     if (contentDisposition) responseHeaders.set('Content-Disposition', contentDisposition);
+    responseHeaders.set('Cache-Control', 'no-store, max-age=0');
+    responseHeaders.set('Pragma', 'no-cache');
+    responseHeaders.set('Expires', '0');
 
     return new NextResponse(res.body, {
       status: res.status,
@@ -88,7 +90,12 @@ async function handler(req, { params }) {
     console.error(`PROXY EXCEPTION: ${error.message}`);
     return new NextResponse(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
     });
   }
 }

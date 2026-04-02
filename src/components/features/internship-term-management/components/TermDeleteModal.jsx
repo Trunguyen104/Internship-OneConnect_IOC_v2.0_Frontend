@@ -9,11 +9,16 @@ const TermDeleteModal = ({ open, onCancel, onConfirm, record, loading }) => {
 
   return (
     <CompoundModal open={open} onCancel={onCancel} width={480}>
-      <CompoundModal.Header title={DELETE.TITLE} />
+      <CompoundModal.Header
+        title={DELETE.TITLE}
+        subtitle={DELETE.SUBTITLE}
+        type="danger"
+        icon={<DeleteOutlined />}
+      />
 
-      <CompoundModal.Content>
-        <div className="flex flex-col gap-4">
-          <div className="text-muted text-sm">
+      <CompoundModal.Content className="!pb-0">
+        <div className="flex flex-col gap-5">
+          <div className="text-muted text-sm leading-relaxed">
             {DELETE.CONTENT_PREFIX} <span className="text-text font-bold">{record?.name}</span>
             {DELETE.CONTENT_SUFFIX}
           </div>

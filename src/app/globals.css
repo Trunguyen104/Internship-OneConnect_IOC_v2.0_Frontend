@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 html {
-  scrollbar-gutter: stable;
+  scrollbar-gutter: auto;
 }
 
 @font-face {
@@ -179,7 +179,7 @@ body {
 .ProseMirror blockquote {
   border-left: 3px solid var(--color-border);
   padding-left: 0.75rem;
-  color: #667085;
+  color: var(--color-muted);
   margin: 0.75rem 0;
 }
 
@@ -234,4 +234,62 @@ body {
 .ProseMirror th {
   background: rgb(0 0 0 / 3%);
   font-weight: 600;
+}
+
+/* Premium Utilities */
+@layer components {
+  .premium-select .ant-select-selector {
+    border-radius: 16px !important;
+    border-color: #f3f4f6 !important;
+    background: white !important;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+    padding: 0 16px !important;
+    font-weight: 700 !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .premium-select:hover .ant-select-selector {
+    border-color: var(--color-primary) !important;
+  }
+
+  .premium-select .ant-select-selection-placeholder {
+    font-weight: 600 !important;
+    color: #9ca3af !important;
+    font-size: 13px !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .premium-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .premium-glow-primary {
+    box-shadow: 0 0 20px rgba(185, 28, 28, 0.15);
+  }
+
+  .premium-border {
+    border: 1px solid rgba(0, 0, 0, 0.04);
+  }
+}
+
+/* Ant Design Table Premium Customization */
+.premium-table .ant-table {
+  background: transparent !important;
+}
+
+.premium-table .ant-table-thead > tr > th {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.premium-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.02) !important;
+  padding: 16px 8px !important;
+}
+
+.premium-table .ant-table-tbody > tr:hover > td {
+  background: rgba(0, 0, 0, 0.01) !important;
 }

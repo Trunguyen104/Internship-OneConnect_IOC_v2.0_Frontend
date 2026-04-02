@@ -1,6 +1,7 @@
 'use client';
 
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
+import { USER_ROLE } from '@/constants/common/enums';
 
 import { useProfile } from '../hooks/useProfile';
 import ProfileInfo from './ProfileInfo';
@@ -43,9 +44,12 @@ export default function ProfilePage() {
         isEditModalOpen={profile.isEditModalOpen}
         setIsEditModalOpen={profile.setIsEditModalOpen}
         onSaveProfile={profile.updateProfile}
+        onDownloadCV={profile.handleDownloadCV}
       />
 
-      {profile.userInfo?.role === 'Student' && <SkillList {...skillProps} />}
+      {[USER_ROLE.STUDENT, 'student'].includes(String(profile.userInfo?.role).toLowerCase()) && (
+        <SkillList {...skillProps} />
+      )}
     </section>
   );
 }

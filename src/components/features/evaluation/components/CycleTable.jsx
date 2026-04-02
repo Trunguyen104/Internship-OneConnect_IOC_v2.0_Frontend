@@ -65,7 +65,7 @@ const STATUS_CONFIG = {
 
 export default function CycleTable({ data, page, pageSize, onDetail }) {
   return (
-    <div className="mt-5 flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex-1 overflow-auto">
         <table className="w-full min-w-[1000px] table-fixed border-collapse text-left">
           <thead className="border-border bg-bg sticky top-0 z-10 border-b">

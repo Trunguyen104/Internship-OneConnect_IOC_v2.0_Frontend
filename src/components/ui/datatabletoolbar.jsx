@@ -2,6 +2,8 @@ import { DownOutlined, PlusCircleOutlined, SearchOutlined } from '@ant-design/ic
 import { Dropdown } from 'antd';
 import React from 'react';
 
+import { cn } from '@/lib/utils';
+
 const Search = ({ value, onChange, placeholder, width, className = '' }) => (
   <div className={`relative min-w-[200px] flex-1 sm:flex-initial ${width || 'sm:w-72'}`}>
     <input
@@ -18,13 +20,20 @@ const Filters = ({ children, className = '' }) => (
   <div className={`flex shrink-0 items-center gap-2 ${className}`}>{children}</div>
 );
 
-const Actions = ({ label, onClick, icon, menu, className = '' }) => {
+const Actions = ({ label, onClick, icon, menu, className = '', disabled, children }) => {
+  if (children) {
+    return <div className={`flex items-center gap-3 ${className}`}>{children}</div>;
+  }
+
   const renderButton = () => (
     <button
-      onClick={!menu ? onClick : undefined}
-      className={`bg-primary hover:bg-primary-hover ml-auto flex shrink-0 cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm transition-all active:scale-95 ${className}`}
+      onClick={!menu && !disabled ? onClick : undefined}
+      disabled={disabled}
+      className={`bg-primary hover:bg-primary-hover flex shrink-0 items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm transition-all ${
+        disabled ? 'cursor-not-allowed opacity-50 grayscale' : 'cursor-pointer active:scale-95'
+      } ${className}`}
     >
-      <span>{label}</span>
+      {label && <span>{label}</span>}
       {icon || <PlusCircleOutlined className="text-base" />}
       {menu && <DownOutlined className="ml-1 text-[10px]" />}
     </button>
@@ -50,20 +59,28 @@ export default function DataTableToolbar({
   // Backward compatibility: If no children, render the old way
   if (!children) {
     return (
-      <div className={`flex w-full flex-wrap items-center gap-4 ${className}`}>
-        {leftContent && (
-          <div className="flex min-w-0 shrink-0 items-center gap-4">{leftContent}</div>
-        )}
-        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+      <div
+        className={cn('flex h-14 w-full flex-nowrap items-center gap-4 overflow-hidden', className)}
+      >
+        {leftContent && <div className="flex shrink-0 items-center gap-4">{leftContent}</div>}
+        <div className="flex flex-1 items-center gap-3 overflow-hidden">
           {searchProps && <Search {...searchProps} />}
           {filterContent && <Filters>{filterContent}</Filters>}
-          {actionProps && <Actions {...actionProps} />}
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            {actionProps && <Actions {...actionProps} />}
+          </div>
         </div>
       </div>
     );
   }
 
-  return <div className={`flex w-full flex-wrap items-center gap-4 ${className}`}>{children}</div>;
+  return (
+    <div
+      className={cn('flex h-14 w-full flex-nowrap items-center gap-4 overflow-hidden', className)}
+    >
+      {children}
+    </div>
+  );
 }
 
 // Attach sub-components

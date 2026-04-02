@@ -7,6 +7,8 @@ export const DAILY_REPORT_MESSAGES = {
     DELETE_FAILED: 'Failed to delete logbook',
     UNEXPECTED: 'An unexpected error occurred',
     DELETE_ERROR: 'An error occurred during deletion',
+    DUPLICATE_REPORT:
+      'This date already has a report or is a duplicate. Please check again or delete the old report.',
   },
 
   SUCCESS: {

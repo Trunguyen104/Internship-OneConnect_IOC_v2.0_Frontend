@@ -2,155 +2,281 @@
 
 import {
   CheckCircleOutlined,
+  CloudUploadOutlined,
   DownloadOutlined,
   ExclamationCircleOutlined,
-  FileExcelOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { Button, Space, Table, Tag, Tooltip, Upload } from 'antd';
-import React, { memo, useState } from 'react';
+import { Button, Tooltip, Upload } from 'antd';
+import { useState } from 'react';
 
+import Badge from '@/components/ui/badge';
 import CompoundModal from '@/components/ui/CompoundModal';
+import DataTable from '@/components/ui/datatable';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { mapAntdColumnsToDataTable } from '@/lib/mapAntdTableColumns';
+import { useToast } from '@/providers/ToastProvider';
 
 const { Dragger } = Upload;
 
-const ImportModal = memo(function ImportModal({ visible, onClose, onImport, loading }) {
-  const { IMPORT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN.STUDENT_ENROLLMENT.MODALS;
+export default function ImportModal({
+  visible,
+  onCancel,
+  onImport,
+  onPreview,
+  onDownloadTemplate,
+  loading,
+}) {
+  const toast = useToast();
+  const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
+  const { MODALS } = ENROLLMENT_MANAGEMENT;
+  const { IMPORT } = MODALS;
+
   const [previewData, setPreviewData] = useState([]);
 
-  const uploadProps = {
-    multiple: false,
-    beforeUpload(file) {
-      handlePreview(file);
+  const beforeUpload = (file) => {
+    if (file.size / 1024 / 1024 > 5) {
+      toast.error(IMPORT.VALIDATION.FILE_SIZE_LIMIT);
       return false;
-    },
+    }
+    handlePreview(file);
+    return false; // Prevent auto upload
   };
 
-  const handlePreview = (file) => {
-    // Mock preview data
-    setPreviewData([
-      {
-        id: '1',
-        name: 'John Doe',
-        studentId: 'ST2024001',
-        email: 'john.doe@university.edu',
-        valid: true,
-      },
-      {
-        id: '2',
-        name: 'Jane Smith',
-        studentId: '---',
-        email: 'jane.smith@university.edu',
-        valid: false,
-        error: 'Missing Student ID',
-      },
-    ]);
+  const handlePreview = async (file) => {
+    if (!onPreview) return;
+    setPreviewData([]);
+
+    try {
+      const data = await onPreview?.(file);
+      const processed = (data?.previewData || []).map((row, idx) => ({
+        ...row,
+        id: row.id || row.studentCode || `preview-${idx}`,
+      }));
+      setPreviewData(processed);
+    } catch {
+      // Error is already toasted by the hook
+    }
   };
 
-  const previewColumns = [
+  const checkError = (record, field) => {
+    if (record.isValid) return false;
+    const errors = record.errors || [];
+    const fieldKeywords = {
+      studentCode: ['ID', 'Code', 'MSSV', 'mã'],
+      fullName: ['Name', 'Họ tên', 'tên'],
+      email: ['Email'],
+      phone: ['Phone', 'thoại', 'SĐT'],
+      dateOfBirth: ['Birth', 'Ngày sinh', 'ngày sinh'],
+      major: ['Major', 'ngành'],
+    };
+    const keywords = fieldKeywords[field] || [];
+    return errors.some((err) =>
+      keywords.some((kw) => err.toLowerCase().includes(kw.toLowerCase()))
+    );
+  };
+
+  const columns = [
     {
       title: IMPORT.PREVIEW_COLUMNS.FULL_NAME,
-      dataIndex: 'name',
-      render: (text) => <span className="text-sm font-bold">{text}</span>,
+      dataIndex: 'fullName',
+      render: (text, r) => (
+        <span
+          className="text-xs font-bold"
+          style={{ color: checkError(r, 'fullName') ? 'var(--color-danger)' : 'var(--color-text)' }}
+        >
+          {text}
+        </span>
+      ),
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.STUDENT_ID,
-      dataIndex: 'studentId',
-      render: (text) => <span className="font-mono text-xs">{text}</span>,
+      dataIndex: 'studentCode',
+      width: 100,
+      render: (text, r) => (
+        <span
+          className="font-mono text-[10px] font-bold"
+          style={{
+            color: checkError(r, 'studentCode') ? 'var(--color-danger)' : 'var(--color-muted)',
+          }}
+        >
+          {text}
+        </span>
+      ),
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.EMAIL,
       dataIndex: 'email',
-      render: (text) => <span className="text-muted text-xs">{text}</span>,
+      width: 150,
+      render: (text, r) => (
+        <span
+          className="text-[10px]"
+          style={{
+            color: checkError(r, 'email') ? 'var(--color-danger)' : 'var(--color-muted)',
+            fontWeight: checkError(r, 'email') ? 'bold' : 'normal',
+          }}
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
+      title: IMPORT.PREVIEW_COLUMNS.PHONE,
+      dataIndex: 'phone',
+      width: 100,
+      render: (text, r) => (
+        <span
+          className="text-[10px]"
+          style={{
+            color: checkError(r, 'phone') ? 'var(--color-danger)' : 'var(--color-muted)',
+            fontWeight: checkError(r, 'phone') ? 'bold' : 'normal',
+          }}
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
+      title: IMPORT.PREVIEW_COLUMNS.DOB,
+      dataIndex: 'dateOfBirth',
+      width: 100,
+      render: (text, r) => (
+        <span
+          className="text-[10px]"
+          style={{
+            color: checkError(r, 'dateOfBirth') ? 'var(--color-danger)' : 'var(--color-muted)',
+            fontWeight: checkError(r, 'dateOfBirth') ? 'bold' : 'normal',
+          }}
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
+      title: IMPORT.PREVIEW_COLUMNS.MAJOR,
+      dataIndex: 'major',
+      width: 120,
+      render: (text, r) => (
+        <span
+          className="truncate text-[10px]"
+          style={{
+            color: checkError(r, 'major') ? 'var(--color-danger)' : 'var(--color-muted)',
+            fontWeight: checkError(r, 'major') ? 'bold' : 'normal',
+          }}
+        >
+          {text}
+        </span>
+      ),
     },
     {
       title: IMPORT.PREVIEW_COLUMNS.VALIDITY,
+      key: 'validity',
       align: 'center',
       width: 80,
-      render: (_, record) =>
-        record.valid ? (
-          <Tooltip title={IMPORT.TOOLTIPS.VALID}>
-            <CheckCircleOutlined className="text-success text-lg" />
+      render: (_, r) =>
+        r.isValid ? (
+          <Tooltip title={IMPORT.TOOLTIP_VALID}>
+            <CheckCircleOutlined style={{ color: 'var(--color-success)' }} className="text-xl" />
           </Tooltip>
         ) : (
-          <Tooltip title={record.error || IMPORT.TOOLTIPS.ERROR}>
-            <ExclamationCircleOutlined className="text-danger text-lg" />
+          <Tooltip title={r.errors?.join(', ')}>
+            <ExclamationCircleOutlined
+              style={{ color: 'var(--color-danger)' }}
+              className="text-xl"
+            />
           </Tooltip>
         ),
     },
   ];
 
-  const validCount = previewData.filter((s) => s.valid).length;
+  const validCount = previewData.filter((x) => x.isValid).length;
   const invalidCount = previewData.length - validCount;
 
   return (
-    <CompoundModal open={visible} onCancel={onClose} width={720} destroyOnClose>
-      <CompoundModal.Header title={IMPORT.TITLE} subtitle={IMPORT.SUBTITLE} />
+    <CompoundModal open={visible} onCancel={onCancel} width={900}>
+      <CompoundModal.Header
+        title={IMPORT.TITLE}
+        subtitle={IMPORT.SUBTITLE}
+        icon={<CloudUploadOutlined />}
+      />
 
-      <CompoundModal.Content>
-        <Dragger
-          {...uploadProps}
-          className="bg-muted/5 border-border hover:border-primary group mb-6 rounded-2xl border-2 border-dashed transition-all"
-          disabled={loading}
-        >
-          <div className="py-8">
-            <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full transition-transform group-hover:scale-110">
-              <UploadOutlined className="text-primary text-3xl" />
+      <CompoundModal.Content className="!pb-0">
+        <div className="custom-scrollbar max-h-[65vh] overflow-y-auto pr-2 pb-4">
+          <div className="flex flex-col gap-4">
+            <div className="bg-primary/5 border-primary/20 flex items-center justify-between rounded-xl border p-3">
+              <div className="flex flex-col">
+                <span className="text-text text-xs font-bold leading-tight">
+                  {IMPORT.PREPARATION_TITLE}
+                </span>
+                <span className="text-muted text-[10px] opacity-70">{IMPORT.PREPARATION_HINT}</span>
+              </div>
+              <Button
+                icon={<DownloadOutlined className="text-xs" />}
+                type="primary"
+                ghost
+                onClick={onDownloadTemplate}
+                className="!h-8 !rounded-lg !border-primary/30 !px-3 !text-[10px] !font-bold"
+              >
+                {IMPORT.DOWNLOAD_TEMPLATE}
+              </Button>
             </div>
-            <p className="text-text text-lg font-bold">{IMPORT.DRAG_TEXT}</p>
-            <p className="text-muted text-sm">{IMPORT.HINT_TEXT}</p>
 
-            <Button
-              icon={<DownloadOutlined />}
-              type="link"
-              className="text-primary mt-4 font-semibold"
+            <Dragger
+              beforeUpload={beforeUpload}
+              onRemove={() => setPreviewData([])}
+              disabled={loading}
+              maxCount={1}
+              className="!bg-gray-50/20 hover:!bg-white !rounded-2xl !border-2 !border-dashed !border-gray-100 hover:!border-primary/30 transition-all !p-4"
             >
-              {IMPORT.DOWNLOAD_TEMPLATE}
-            </Button>
-          </div>
-        </Dragger>
+              <div className="flex flex-col items-center gap-2">
+                <div className="bg-primary/5 text-primary flex size-10 items-center justify-center rounded-xl">
+                  <UploadOutlined className="text-lg" />
+                </div>
+                <div className="flex flex-col text-center">
+                  <p className="text-text mb-0 text-xs font-bold leading-tight">
+                    {IMPORT.DRAG_TEXT}
+                  </p>
+                  <p className="text-muted mb-0 text-[10px] opacity-60">{IMPORT.HINT_TEXT}</p>
+                </div>
+              </div>
+            </Dragger>
 
-        {previewData.length > 0 && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 mt-8 duration-500">
-            <div className="mb-4 flex items-center justify-between">
-              <span className="text-text text-sm font-bold tracking-wider uppercase">
-                {IMPORT.PREVIEW_TITLE}
-              </span>
-              <Space className="text-xs">
-                <Tag color="success" className="border-none px-3 font-bold uppercase">
-                  {validCount} {IMPORT.VALID_TAG}
-                </Tag>
-                <Tag color="error" className="border-none px-3 font-bold uppercase">
-                  {invalidCount} {IMPORT.INVALID_TAG}
-                </Tag>
-              </Space>
-            </div>
+            {previewData.length > 0 && (
+              <div className="animate-in fade-in slide-in-from-bottom-1 space-y-3 duration-300">
+                <div className="flex items-center gap-2">
+                  <Badge variant="success" className="text-[10px]">
+                    {validCount} {IMPORT.VALID_TAG}
+                  </Badge>
+                  {invalidCount > 0 && (
+                    <Badge variant="danger" className="text-[10px]">
+                      {invalidCount} {IMPORT.INVALID_TAG}
+                    </Badge>
+                  )}
+                </div>
 
-            <div className="border-border overflow-hidden rounded-xl border">
-              <Table
-                dataSource={previewData}
-                columns={previewColumns}
-                pagination={false}
-                rowKey="id"
-                size="middle"
-                className="custom-table"
-              />
-            </div>
+                <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+                  <DataTable
+                    columns={mapAntdColumnsToDataTable(columns)}
+                    data={previewData}
+                    rowKey="id"
+                    minWidth="800px"
+                    size="small"
+                  />
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </CompoundModal.Content>
 
       <CompoundModal.Footer
-        onCancel={onClose}
-        onConfirm={() => onImport?.(previewData)}
+        onCancel={onCancel}
+        onConfirm={() => onImport?.(previewData.filter((r) => r.isValid))}
+        confirmDisabled={!validCount}
         loading={loading}
-        confirmDisabled={validCount === 0}
-        confirmText={IMPORT.SUBMIT}
-        confirmIcon={<FileExcelOutlined />}
+        confirmText={`${IMPORT.SUBMIT} (${validCount || 0})`}
+        className="!mt-2"
       />
     </CompoundModal>
   );
-});
-
-export default ImportModal;
+}

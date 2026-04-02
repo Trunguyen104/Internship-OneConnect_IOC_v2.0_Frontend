@@ -2,10 +2,9 @@
 
 import React, { memo } from 'react';
 
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useIssueTab } from '../hooks/useIssueTab';
 import IssueDetailModal from './IssueDetailModal';
@@ -38,17 +37,14 @@ const IssueTab = memo(function IssueTab() {
   } = useIssueTab();
 
   return (
-    <div className="animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500">
-      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
-        <DataTableToolbar
-          className="mb-6 !border-0 !p-0"
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
           searchProps={{
             placeholder: ISSUE_UI.SEARCH_PLACEHOLDER,
             value: search,
-            onChange: (e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            },
+            onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
           }}
           actionProps={{
             label: ISSUE_UI.ADD_BUTTON,
@@ -56,35 +52,36 @@ const IssueTab = memo(function IssueTab() {
           }}
         />
 
-        <IssueTable
-          issues={issues}
-          stakeholders={stakeholders}
-          loading={loading}
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          onToggleStatus={handleToggleStatus}
-          onDelete={handleDelete}
-          onView={handleViewDetail}
-          tableBodyRef={tableBodyRef}
-        />
+        <PageLayout.Content className="px-0">
+          <IssueTable
+            issues={issues}
+            stakeholders={stakeholders}
+            loading={loading}
+            page={page}
+            pageSize={pageSize}
+            onToggleStatus={handleToggleStatus}
+            onDelete={handleDelete}
+            onView={handleViewDetail}
+            tableBodyRef={tableBodyRef}
+          />
+        </PageLayout.Content>
 
         {total > 0 && (
-          <div className="border-border/50 mt-6 border-t pt-6">
-            <Pagination
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
+            </span>
+            <PageLayout.Pagination
               total={total}
               page={page}
               pageSize={pageSize}
-              totalPages={Math.ceil(total / pageSize)}
               onPageChange={setPage}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPage(1);
-              }}
+              onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
-      </Card>
+      </PageLayout.Card>
 
       <IssueFormModal
         isOpen={openIssueForm}

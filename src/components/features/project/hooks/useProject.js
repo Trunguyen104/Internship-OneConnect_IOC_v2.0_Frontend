@@ -3,7 +3,8 @@
 import { Form } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 
-import { InternshipGroupService } from '@/components/features/internship/services/internshipGroup.service';
+import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
+import { ProjectService } from '@/components/features/project/services/project.service';
 import {
   createProjectResource,
   deleteProjectResource,
@@ -11,17 +12,24 @@ import {
   getProjectResources,
   readProjectResource,
   updateProjectResource,
-} from '@/components/features/project/services/projectResources';
-import { ProjectService } from '@/components/features/project/services/projectService';
+} from '@/components/features/project/services/project-resources.service';
+import { useProfile } from '@/components/features/user/hooks/useProfile';
+import { USER_ROLE } from '@/constants/common/enums';
 import { PROJECT_MESSAGES } from '@/constants/project/messages';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
 import { useToast } from '@/providers/ToastProvider';
+import { downloadBlob } from '@/utils/common/fileUtils';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 export function useProject(initialProjectId = null) {
   const toast = useToast();
+  const { userInfo } = useProfile();
+
   const [projectId, setProjectId] = useState(initialProjectId);
   const [projectInfo, setProjectInfo] = useState(null);
+  const [projectList, setProjectList] = useState([]);
+  const [isReadOnly, setIsReadOnly] = useState(false);
+
   const [resources, setResources] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,6 +41,7 @@ export function useProject(initialProjectId = null) {
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
+  // ... (loadResources remains mostly same, just add check for id)
   const loadResources = useCallback(
     async (id) => {
       if (!id) return;
@@ -49,7 +58,6 @@ export function useProject(initialProjectId = null) {
         });
         setResources(items);
       } catch (err) {
-        console.error('Load resources error:', err);
         toast.error(PROJECT_MESSAGES.ERROR.LOAD_RESOURCES);
       } finally {
         setLoading(false);
@@ -59,38 +67,56 @@ export function useProject(initialProjectId = null) {
   );
 
   const initProject = useCallback(async () => {
+    if (!userInfo) return;
+
     try {
       setLoading(true);
+      const isStudent = Number(userInfo.roleId || userInfo.Role) === USER_ROLE.STUDENT;
+      setIsReadOnly(isStudent);
 
-      let targetProjectId = initialProjectId;
+      let targetProjectId = initialProjectId || projectId;
       let internshipId = null;
 
+      // 1. Fetch Internship Group / Terms for the current student
+      const mineRes = await InternshipGroupService.getAll({ PageSize: 1 });
+      const mineData = mineRes?.data?.items?.[0] || mineRes?.data?.[0] || null;
+      internshipId = mineData?.internshipId || mineData?.id;
+
+      if (internshipId) {
+        // 2. Fetch all projects linked to this internship group
+        const projectRes = await ProjectService.getAll({
+          InternshipId: internshipId,
+          PageSize: 10,
+        });
+        const allProjects = projectRes?.data?.items || projectRes?.data || [];
+
+        // 3. Filter projects for students (Only Published and Completed)
+        let filteredProjects = allProjects;
+        if (isStudent) {
+          filteredProjects = allProjects.filter((p) => p.status === 1 || p.status === 2);
+        }
+
+        setProjectList(filteredProjects);
+
+        // 4. Determine which project to show
+        if (!targetProjectId && filteredProjects.length > 0) {
+          targetProjectId = filteredProjects[0].projectId || filteredProjects[0].id;
+        }
+      }
+
       if (!targetProjectId) {
-        const mineRes = await InternshipGroupService.getAll({ PageSize: 1 });
-        const mineData = mineRes?.data?.items?.[0] || mineRes?.data?.[0] || null;
-        internshipId = mineData?.internshipId || mineData?.id;
-        targetProjectId =
-          mineData?.projectId || mineData?.project?.projectId || mineData?.project?.id;
-
-        if (!targetProjectId && internshipId) {
-          const projectRes = await ProjectService.getAll({
-            InternshipId: internshipId,
-            PageSize: 1,
-          });
-          const projectData =
-            projectRes?.data?.items?.[0] || projectRes?.data?.[0] || projectRes?.data || null;
-          targetProjectId = projectData?.projectId || projectData?.id;
-        }
-
-        if (!targetProjectId) {
+        if (isStudent) {
+          toast.info('No published projects available for your group.');
+        } else {
           toast.warning('No project assigned to your internship group.');
-          setLoading(false);
-          return;
         }
+        setLoading(false);
+        return;
       }
 
       setProjectId(targetProjectId);
 
+      // 5. Fetch specific project details
       const [detailRes] = await Promise.all([
         ProjectService.getById(targetProjectId),
         loadResources(targetProjectId),
@@ -100,12 +126,12 @@ export function useProject(initialProjectId = null) {
         setProjectInfo(detailRes.data);
       }
     } catch (error) {
-      console.error('Failed to init project', error);
+      console.error('Init project failed', error);
       toast.error(PROJECT_MESSAGES.ERROR.LOAD_PROJECT_FAILED);
     } finally {
       setLoading(false);
     }
-  }, [initialProjectId, loadResources, toast]);
+  }, [initialProjectId, projectId, userInfo, loadResources, toast]);
 
   useEffect(() => {
     initProject();
@@ -202,7 +228,6 @@ export function useProject(initialProjectId = null) {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
       }
     } catch (err) {
-      console.error('Upload error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.UPLOAD_FAILED);
       return false;
     } finally {
@@ -220,7 +245,6 @@ export function useProject(initialProjectId = null) {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.DELETE_FAILED);
       }
     } catch (err) {
-      console.error('Delete error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.DELETE_FAILED);
     }
   };
@@ -261,7 +285,6 @@ export function useProject(initialProjectId = null) {
         throw new Error(result?.message || PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
       }
     } catch (err) {
-      console.error('Update error:', err);
       toast.error(err.message || PROJECT_MESSAGES.ERROR.UPDATE_FAILED);
     }
   };
@@ -278,8 +301,6 @@ export function useProject(initialProjectId = null) {
     }
 
     try {
-      console.log('🚀 Authenticated Proxy Download:', resource.projectResourceId);
-
       const rawBlob = await downloadProjectResource(resource.projectResourceId);
 
       if (!rawBlob || rawBlob.size === 0) {
@@ -294,23 +315,14 @@ export function useProject(initialProjectId = null) {
         }
       }
 
-      const objectUrl = window.URL.createObjectURL(rawBlob);
-
       const actualExt = resource.resourceUrl?.split('?')[0]?.split('.').pop()?.toLowerCase();
-      let filename = resource.resourceName || 'download';
-      if (actualExt && !filename.toLowerCase().endsWith('.' + actualExt)) {
-        filename = `${filename}.${actualExt}`;
+      let defaultFileName = resource.resourceName || 'download';
+      if (actualExt && !defaultFileName.toLowerCase().endsWith('.' + actualExt)) {
+        defaultFileName = `${defaultFileName}.${actualExt}`;
       }
 
-      const link = document.createElement('a');
-      link.href = objectUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(objectUrl);
+      downloadBlob(rawBlob, defaultFileName);
     } catch (err) {
-      console.error('Download error:', err);
       toast.error(err.message || 'Could not download file.');
     }
   };
@@ -339,7 +351,10 @@ export function useProject(initialProjectId = null) {
 
   return {
     projectId,
+    setProjectId,
     projectInfo,
+    projectList,
+    isReadOnly,
     resources,
     fileList,
     setFileList,

@@ -1,8 +1,7 @@
 'use client';
 
-import { X } from 'lucide-react';
-import React, { createContext, useContext, useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import { Drawer as AntdDrawer } from 'antd';
+import React, { createContext, useContext, useMemo } from 'react';
 
 import { cn } from '@/lib/cn';
 
@@ -28,65 +27,37 @@ function SheetContent({
 }) {
   const { open, onOpenChange } = useSheet();
 
-  useEffect(() => {
-    if (!open) return;
+  const { width, size, ...restProps } = props;
 
-    const onKey = (e) => {
-      if (e.key === 'Escape') onOpenChange?.(false);
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, onOpenChange]);
-
-  if (!open) return null;
-
-  const sideClass = side === 'left' ? 'left-0' : side === 'right' ? 'right-0' : 'right-0';
-
-  return createPortal(
-    <>
-      <div
-        data-slot="sheet-overlay"
-        className="fixed inset-0 z-50 bg-black/40"
-        onMouseDown={() => onOpenChange?.(false)}
-      />
-      <div
-        data-slot="sheet-content"
-        role="dialog"
-        aria-modal="true"
-        className={cn(
-          'fixed top-0 z-50 h-full w-full max-w-[520px] border-l border-slate-100 bg-white shadow-2xl',
-          sideClass,
-          'animate-in duration-200',
-          className
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton ? (
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={() => onOpenChange?.(false)}
-            className="absolute top-4 right-4 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-          >
-            <X className="size-4" />
-          </button>
-        ) : null}
-      </div>
-    </>,
-    document.body
+  return (
+    <AntdDrawer
+      open={open}
+      onClose={() => onOpenChange?.(false)}
+      placement={side}
+      closable={showCloseButton}
+      destroyOnClose
+      size={size || 'default'}
+      className={cn('premium-drawer', className)}
+      styles={{
+        wrapper: { width: width || 520 },
+        body: { padding: 0 },
+      }}
+      {...restProps}
+    >
+      <div className="flex h-full flex-col">{children}</div>
+    </AntdDrawer>
   );
 }
 
 function SheetHeader({ className = '', ...props }) {
-  return <div data-slot="sheet-header" className={cn('space-y-2', className)} {...props} />;
+  return <div data-slot="sheet-header" className={cn('px-6 pt-6 pb-2', className)} {...props} />;
 }
 
 function SheetTitle({ className = '', ...props }) {
   return (
     <div
       data-slot="sheet-title"
-      className={cn('text-2xl font-semibold text-slate-900', className)}
+      className={cn('text-2xl font-bold tracking-tight text-slate-900', className)}
       {...props}
     />
   );
@@ -96,7 +67,7 @@ function SheetDescription({ className = '', ...props }) {
   return (
     <div
       data-slot="sheet-description"
-      className={cn('text-sm text-slate-500', className)}
+      className={cn('mt-1 text-sm text-slate-500', className)}
       {...props}
     />
   );

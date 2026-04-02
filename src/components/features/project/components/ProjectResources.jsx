@@ -8,9 +8,12 @@ import {
   FileTextOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';
-import { Button, Empty, Modal, Tag, Typography } from 'antd';
+import { Modal } from 'antd';
 import React from 'react';
 
+import { EmptyState } from '@/components/ui/atoms';
+import Badge from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { RESOURCE_TYPES } from '@/constants/project/resourceTypes';
@@ -18,8 +21,6 @@ import { PROJECT_UI } from '@/constants/project/uiText';
 
 import ProjectResourceEditModal from './ProjectResourceEditModal';
 import ProjectResourceUpload from './ProjectResourceUpload';
-
-const { Title, Text } = Typography;
 
 export default function ProjectResources({
   resources,
@@ -37,6 +38,7 @@ export default function ProjectResources({
   editForm,
   onDownload,
   onView,
+  isReadOnly = false,
 }) {
   const [isUploadModalVisible, setIsUploadModalVisible] = React.useState(false);
   const [mounted, setMounted] = React.useState(false);
@@ -63,125 +65,126 @@ export default function ProjectResources({
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Title level={5} className="m-0 font-bold!">
-              {PROJECT_UI.TITLE.RESOURCE_LIST}
-            </Title>
-            <Tag className="bg-info-surface text-info rounded-full border-none px-3 text-[10px] font-bold">
-              {resources.length} {PROJECT_UI.LABEL_FILES || 'FILES'}
-            </Tag>
-          </div>
-          <Button
-            type="primary"
-            onClick={handleOpenUpload}
-            className="flex items-center gap-2 rounded-full"
-          >
-            <span>{PROJECT_UI.BUTTON.ADD_RESOURCE || 'Add Resource'}</span>
-            <PlusCircleOutlined className="text-base" />
-          </Button>
+    <div className="flex min-h-0 flex-1 flex-col space-y-8">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h3 className="text-gray-900 m-0 text-lg font-black tracking-tight">
+            {PROJECT_UI.TITLE.RESOURCE_LIST}
+          </h3>
+          <Badge variant="info" size="sm" className="px-3 py-1 font-black shadow-sm">
+            {resources.length} {PROJECT_UI.LABEL_FILES || 'FILES'}
+          </Badge>
         </div>
+        {!isReadOnly && (
+          <Button
+            onClick={handleOpenUpload}
+            className="rounded-2xl px-6 font-black"
+            icon={<PlusCircleOutlined />}
+          >
+            {PROJECT_UI.BUTTON.ADD_RESOURCE || 'Add Resource'}
+          </Button>
+        )}
+      </div>
 
-        <div className="custom-scrollbar max-h-[350px] w-full overflow-x-hidden overflow-y-auto pr-2 pb-4">
-          <div className="flex min-w-[500px] flex-col gap-2">
-            {loading && resources.length === 0 ? (
-              <SkeletonTable rows={4} columns={2} />
-            ) : resources.length === 0 ? (
-              <div className="flex flex-1 items-center justify-center py-8">
-                <Empty description={PROJECT_UI.EMPTY.NO_RESOURCE} />
-              </div>
-            ) : (
-              resources.map((item) => (
-                <div
-                  key={item.projectResourceId || item.id}
-                  className="group border-border/50 hover:bg-bg-surface flex items-center justify-between rounded-xl border px-4 py-3 transition-all"
-                >
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <div className="bg-info-surface text-info flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110">
-                      <FileTextOutlined className="text-xl" />
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <Text
-                        strong
-                        className="text-text block truncate text-sm"
-                        title={item.resourceName}
-                      >
-                        {item.resourceName || PROJECT_UI.VALUES.UNTITLED || 'Untitled Resource'}
-                      </Text>
-                      <Text type="secondary" className="mt-1 text-[11px] leading-none font-medium">
-                        {RESOURCE_TYPES.find(
-                          (t) => t.value === item.resourceType || t.key === item.resourceType
-                        )?.label || PROJECT_UI.VALUES.OTHER}
-                      </Text>
-                    </div>
+      <div className="custom-scrollbar max-h-[400px] w-full overflow-x-hidden overflow-y-auto pr-2 pb-4">
+        <div className="flex min-w-[500px] flex-col gap-3">
+          {loading && resources.length === 0 ? (
+            <SkeletonTable rows={4} columns={2} />
+          ) : resources.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center py-10">
+              <EmptyState description={PROJECT_UI.EMPTY.NO_RESOURCE} />
+            </div>
+          ) : (
+            resources.map((item) => (
+              <div
+                key={item.projectResourceId || item.id}
+                className="group bg-white border-gray-100 hover:border-primary/20 hover:bg-gray-50 flex items-center justify-between rounded-2xl border px-5 py-4 transition-all duration-300 shadow-sm hover:shadow-md"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-4">
+                  <div className="bg-primary-surface text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    <FileTextOutlined className="text-2xl" />
                   </div>
-
-                  <div className="flex shrink-0 items-center gap-1">
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<EyeOutlined />}
-                      onClick={() => onView(item)}
-                      className="text-muted hover:text-info transition-colors"
-                      title={PROJECT_UI.BUTTON.VIEW}
-                      aria-label={PROJECT_UI.BUTTON.VIEW}
-                    />
-                    {Number(item.resourceType) !== 8 ? (
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<DownloadOutlined />}
-                        onClick={() => onDownload(item)}
-                        className="text-muted hover:text-info transition-colors"
-                        title={PROJECT_UI.BUTTON.DOWNLOAD}
-                        aria-label={PROJECT_UI.BUTTON.DOWNLOAD}
-                      />
-                    ) : null}
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<EditOutlined />}
-                      onClick={() => openEditModal(item)}
-                      className="text-muted hover:text-text transition-colors"
-                      title={PROJECT_UI.BUTTON.EDIT}
-                      aria-label={PROJECT_UI.BUTTON.EDIT}
-                    />
-                    <Button
-                      type="text"
-                      size="small"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() =>
-                        showDeleteConfirm({
-                          title: PROJECT_UI.CONFIRM.DELETE_TITLE || 'Delete Resource',
-                          content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
-                          onOk: () => onDelete(item.projectResourceId),
-                        })
-                      }
-                      className="text-muted/50 hover:text-danger transition-colors"
-                      title={PROJECT_UI.BUTTON.DELETE}
-                      aria-label={PROJECT_UI.BUTTON.DELETE}
-                    />
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span
+                      className="text-gray-900 block truncate text-[15px] font-black tracking-tight"
+                      title={item.resourceName}
+                    >
+                      {item.resourceName || PROJECT_UI.VALUES.UNTITLED || 'Untitled Resource'}
+                    </span>
+                    <span className="text-gray-400 mt-1 text-[10px] font-black tracking-widest uppercase">
+                      {RESOURCE_TYPES.find(
+                        (t) => t.value === item.resourceType || t.key === item.resourceType
+                      )?.label || PROJECT_UI.VALUES.OTHER}
+                    </span>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+
+                <div className="flex shrink-0 items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    icon={<EyeOutlined />}
+                    onClick={() => onView(item)}
+                    className="text-gray-400 hover:text-primary"
+                    title={PROJECT_UI.BUTTON.VIEW}
+                  />
+                  {Number(item.resourceType) !== 8 ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      icon={<DownloadOutlined />}
+                      onClick={() => onDownload(item)}
+                      className="text-gray-400 hover:text-primary"
+                      title={PROJECT_UI.BUTTON.DOWNLOAD}
+                    />
+                  ) : null}
+                  {!isReadOnly && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={<EditOutlined />}
+                        onClick={() => openEditModal(item)}
+                        className="text-gray-400 hover:text-primary"
+                        title={PROJECT_UI.BUTTON.EDIT}
+                      />
+                      <Button
+                        variant="danger-ghost"
+                        size="sm"
+                        icon={<DeleteOutlined />}
+                        onClick={() =>
+                          showDeleteConfirm({
+                            title: PROJECT_UI.CONFIRM.DELETE_TITLE || 'Delete Resource',
+                            content: PROJECT_UI.CONFIRM.DELETE_RESOURCE,
+                            onOk: () => onDelete(item.projectResourceId),
+                          })
+                        }
+                        className="text-gray-300 hover:text-danger"
+                        title={PROJECT_UI.BUTTON.DELETE}
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
       {!mounted ? null : (
         <>
           <Modal
-            title={PROJECT_UI.TITLE.ADD_RESOURCE}
+            title={
+              <span className="text-lg font-black tracking-tight">
+                {PROJECT_UI.TITLE.ADD_RESOURCE}
+              </span>
+            }
             open={isUploadModalVisible}
             onCancel={handleCloseUpload}
             footer={null}
-            destroyOnHidden
-            width={480}
+            width={520}
             centered
+            className="modern-modal"
           >
             <ProjectResourceUpload
               form={form}

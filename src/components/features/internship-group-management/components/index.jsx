@@ -1,136 +1,196 @@
 'use client';
 
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons';
-import { Select } from 'antd';
+import { FilterOutlined, InboxOutlined, PlusOutlined } from '@ant-design/icons';
+import { Select, Tooltip } from 'antd';
 import React from 'react';
 
-import Card from '@/components/ui/card';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import PageTitle from '@/components/ui/pagetitle';
+import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
+import { cn } from '@/lib/cn';
 
 import { useGroupManagement } from '../hooks/useGroupManagement';
-import { AssignMentorModal } from './AssignMentorModal';
 import { CreateGroupModal } from './CreateGroupModal';
+import GroupGeneralInfo from './GroupGeneralInfo';
 import GroupTable from './GroupTable';
-import { ViewGroupModal } from './ViewGroupModal';
 
-export default function GroupManagement() {
+export default function GroupManagement({ onDetailMode }) {
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
   const {
-    groups,
     activeTab,
     setActiveTab,
     search,
     setSearch,
-    assignModal,
     setAssignModal,
-    viewModal,
-    setViewModal,
     createModal,
     setCreateModal,
-    handleAssignSubmit,
+    editModal,
+    setEditModal,
     handleDeleteGroup,
     handleArchiveGroup,
     handleCreateGroup,
+    handleUpdateGroup,
+    handleViewGroup,
+    handleRemoveStudentFromGroup,
     pagination,
     handleTableChange,
     handlePageSizeChange,
-    paginatedGroups,
     filteredGroups,
+    total,
+    loading,
+    unassignedStudents,
+    fetchingStudents,
+    isPhaseEditable,
+    filters,
+    handleFilterChange,
+    selectedGroupDetail,
+    setSelectedGroupDetail,
+    mentors,
+    loadingMentors,
   } = useGroupManagement();
 
+  React.useEffect(() => {
+    if (onDetailMode) {
+      onDetailMode(!!selectedGroupDetail);
+    }
+  }, [selectedGroupDetail, onDetailMode]);
+
   const onViewDetailed = (group) => {
-    setViewModal({ open: true, group });
+    handleViewGroup(group);
+  };
+
+  const onEditGroup = (group) => {
+    setEditModal({ open: true, group, isAddingStudents: false });
+  };
+
+  const onAddStudents = (group) => {
+    setEditModal({ open: true, group, isAddingStudents: true });
   };
 
   return (
-    <>
-      <div className="mx-auto flex min-h-[420px] w-full max-w-full flex-1 flex-col">
-        <PageTitle title={GROUP_MANAGEMENT.TITLE} />
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-          <DataTableToolbar className="mb-6">
-            <DataTableToolbar.Search
-              placeholder={GROUP_MANAGEMENT.SEARCH_PLACEHOLDER}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+    <PageLayout
+      className={cn(
+        'animate-in fade-in flex flex-1 flex-col space-y-6 duration-500',
+        !selectedGroupDetail ? 'min-h-0' : ''
+      )}
+    >
+      <PageLayout.Card
+        className={cn(
+          'flex flex-col !p-4 sm:!p-8',
+          !selectedGroupDetail ? 'min-h-0 flex-1 overflow-hidden' : 'overflow-visible'
+        )}
+      >
+        {selectedGroupDetail ? (
+          <GroupGeneralInfo
+            groupId={selectedGroupDetail.id}
+            onBack={() => setSelectedGroupDetail(null)}
+            onRemoveStudent={handleRemoveStudentFromGroup}
+            onAddStudent={() => onAddStudents(selectedGroupDetail)}
+          />
+        ) : (
+          <>
+            <DataTableToolbar className="mb-5 !border-0 !p-0">
+              <DataTableToolbar.Search
+                placeholder={GROUP_MANAGEMENT.SEARCH_PLACEHOLDER}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
 
-            <DataTableToolbar.Filters>
-              <div className="flex flex-wrap items-center gap-3">
-                <Select
-                  allowClear
-                  placeholder={GROUP_MANAGEMENT.FILTERS.STATUS_FILTER}
-                  value={activeTab === 'ALL' ? undefined : activeTab}
-                  onChange={setActiveTab}
-                  className="h-9 min-w-[160px]"
-                  options={[
-                    {
-                      label: `${GROUP_MANAGEMENT.ACTIVE} (${groups.filter((g) => g.status === 'ACTIVE').length})`,
-                      value: 'ACTIVE',
-                    },
-                    {
-                      label: `${GROUP_MANAGEMENT.ARCHIVED} (${groups.filter((g) => g.status === 'ARCHIVED').length})`,
-                      value: 'ARCHIVED',
-                    },
-                  ]}
-                  suffixIcon={<FilterOutlined className="text-muted" />}
+              <DataTableToolbar.Filters>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select
+                    allowClear
+                    placeholder={GROUP_MANAGEMENT.FILTERS.SELECT_STATUS}
+                    value={activeTab === 'ALL' ? undefined : activeTab}
+                    onChange={setActiveTab}
+                    className="h-9 min-w-[140px]"
+                    options={GROUP_MANAGEMENT.FILTERS.STATUS_OPTIONS}
+                    suffixIcon={<FilterOutlined className="text-muted" />}
+                  />
+
+                  <Tooltip title={GROUP_MANAGEMENT.FILTERS.INCLUDE_ARCHIVED}>
+                    <div
+                      onClick={() =>
+                        handleFilterChange('includeArchived', !filters.includeArchived)
+                      }
+                      className={cn(
+                        'flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl transition-all',
+                        filters.includeArchived
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                      )}
+                    >
+                      <InboxOutlined
+                        className={filters.includeArchived ? 'text-lg' : 'text-base font-bold'}
+                      />
+                    </div>
+                  </Tooltip>
+                </div>
+              </DataTableToolbar.Filters>
+
+              {isPhaseEditable && (
+                <DataTableToolbar.Actions
+                  label={GROUP_MANAGEMENT.CREATE_BTN}
+                  onClick={() => setCreateModal({ open: true, group: null })}
+                  icon={<PlusOutlined />}
+                  className="ml-auto"
                 />
-              </div>
-            </DataTableToolbar.Filters>
+              )}
+            </DataTableToolbar>
 
-            <DataTableToolbar.Actions
-              label={GROUP_MANAGEMENT.CREATE_BTN}
-              onClick={() => setCreateModal(true)}
-              icon={<PlusOutlined />}
+            <GroupTable
+              data={filteredGroups}
+              loading={loading}
+              page={pagination.current}
+              pageSize={pagination.pageSize}
+              isPhaseEditable={isPhaseEditable}
+              onAssign={setAssignModal}
+              onDelete={handleDeleteGroup}
+              onArchive={handleArchiveGroup}
+              onView={onViewDetailed}
+              onEdit={onEditGroup}
+              onAddStudents={onAddStudents}
             />
-          </DataTableToolbar>
+          </>
+        )}
 
-          <GroupTable
-            data={filteredGroups}
-            loading={false}
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
+          <Pagination
+            total={total || 0}
             page={pagination.current}
             pageSize={pagination.pageSize}
-            onAssign={setAssignModal}
-            onDelete={handleDeleteGroup}
-            onArchive={handleArchiveGroup}
-            onView={onViewDetailed}
+            totalPages={Math.max(1, Math.ceil((total || 0) / pagination.pageSize))}
+            onPageChange={handleTableChange}
+            onPageSizeChange={handlePageSizeChange}
           />
+        </div>
+      </PageLayout.Card>
 
-          {filteredGroups.length > 0 && (
-            <div className="border-border/50 mt-6 flex-shrink-0 border-t pt-6">
-              <Pagination
-                total={filteredGroups.length}
-                page={pagination.current}
-                pageSize={pagination.pageSize}
-                totalPages={Math.ceil(filteredGroups.length / pagination.pageSize)}
-                onPageChange={handleTableChange}
-                onPageSizeChange={handlePageSizeChange}
-              />
-            </div>
-          )}
-        </Card>
-      </div>
-
-      <AssignMentorModal
-        open={assignModal.open}
-        group={assignModal.group}
-        onCancel={() => setAssignModal({ open: false, group: null })}
-        onFinish={handleAssignSubmit}
-      />
-
-      <ViewGroupModal
-        open={viewModal.open}
-        group={viewModal.group}
-        onCancel={() => setViewModal({ open: false, group: null })}
+      <CreateGroupModal
+        open={createModal.open}
+        students={unassignedStudents}
+        existingGroups={filteredGroups}
+        loadingStudents={fetchingStudents}
+        mentors={mentors}
+        loadingMentors={loadingMentors}
+        initialStudents={createModal.students || []}
+        onCancel={() => setCreateModal({ open: false, students: [] })}
+        onFinish={handleCreateGroup}
       />
 
       <CreateGroupModal
-        open={createModal}
-        onCancel={() => setCreateModal(false)}
-        onFinish={handleCreateGroup}
+        open={editModal.open}
+        group={editModal.group}
+        students={unassignedStudents}
+        existingGroups={filteredGroups}
+        loadingStudents={fetchingStudents}
+        mentors={mentors}
+        loadingMentors={loadingMentors}
+        isAddingStudents={editModal.isAddingStudents}
+        onCancel={() => setEditModal({ open: false, group: null, isAddingStudents: false })}
+        onFinish={handleUpdateGroup}
       />
-    </>
+    </PageLayout>
   );
 }

@@ -15,13 +15,13 @@ const MOCK_JOBS = Array(6).fill({
 
 export default function JobBoardPage() {
   return (
-    <div className="bg-bg min-h-screen">
+    <div className="flex min-h-0 w-full flex-1 flex-col">
       <SearchBar />
 
-      <div className="mx-auto mt-4 max-w-6xl px-4">
+      <div className="mx-auto mt-4 w-full max-w-6xl">
         <FilterBar />
 
-        <Row gutter={[16, 16]} className="mt-4 pb-20">
+        <Row gutter={[16, 16]} className="mt-4 pb-8">
           {MOCK_JOBS.map((job, index) => (
             <Col xs={24} md={12} lg={8} key={index}>
               <JobCard {...job} />

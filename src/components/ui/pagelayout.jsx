@@ -15,7 +15,7 @@ import Pagination from './pagination';
 const PageLayout = ({ children, className }) => (
   <section
     className={cn(
-      'animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 py-4 duration-500',
+      'animate-in fade-in flex min-h-0 flex-1 flex-col space-y-4 duration-500',
       className
     )}
   >
@@ -26,21 +26,30 @@ const PageLayout = ({ children, className }) => (
 const PageHeader = (props) => <StudentPageHeader {...props} />;
 
 const PageCard = ({ children, className }) => (
-  <Card className={cn('flex min-h-0 flex-1 flex-col overflow-hidden p-4! sm:p-8!', className)}>
+  <Card
+    className={cn(
+      'flex min-h-0 flex-1 flex-col overflow-hidden border-gray-100 p-5 shadow-sm border rounded-2xl bg-white',
+      className
+    )}
+  >
     {children}
   </Card>
 );
 
 const PageToolbar = (props) => (
-  <DataTableToolbar {...props} className={cn('mb-5 border-0! p-0!', props.className)} />
+  <DataTableToolbar {...props} className={cn('mb-4 border-0 p-0', props.className)} />
 );
 
 const PageContent = ({ children, className }) => (
   <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden', className)}>{children}</div>
 );
 
+const PageFooter = ({ children, className }) => (
+  <div className={cn('border-t border-gray-50', className)}>{children}</div>
+);
+
 const PagePagination = (props) => (
-  <div className="mt-5 border-t border-gray-300 pt-5">
+  <div className="border-t border-gray-50">
     <Pagination {...props} />
   </div>
 );
@@ -50,6 +59,7 @@ PageLayout.Header = PageHeader;
 PageLayout.Card = PageCard;
 PageLayout.Toolbar = PageToolbar;
 PageLayout.Content = PageContent;
+PageLayout.Footer = PageFooter;
 PageLayout.Pagination = PagePagination;
 
 export default PageLayout;

@@ -1,129 +1,145 @@
 'use client';
 
-import { DeleteOutlined, EditOutlined, FileTextOutlined } from '@ant-design/icons';
-import { Button, Tooltip } from 'antd';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 import dayjs from 'dayjs';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 
+import DataTable from '@/components/ui/datatable';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import { TABLE_CELL } from '@/lib/tableStyles';
 
 import LogbookStatusTag from './LogbookStatusTag';
 
-const LogbookTable = memo(function LogbookTable({ data, userProfile, onView, onEdit, onDelete }) {
+const LogbookTable = memo(function LogbookTable({
+  data,
+  loading,
+  userProfile,
+  onView,
+  onEdit,
+  onDelete,
+}) {
   const currentStudentId = userProfile?.studentId;
+  const { TABLE, DATE_FORMAT, VIEW_MODAL, DELETE_MODAL, MODAL } = DAILY_REPORT_UI;
+
+  const columns = useMemo(
+    () => [
+      {
+        title: TABLE.REPORT_DATE,
+        key: 'dateReport',
+        width: '180px',
+        render: (text) => (
+          <span className={`px-1 ${TABLE_CELL.primary}`}>
+            {text ? dayjs(text).format(DATE_FORMAT) : VIEW_MODAL.NA}
+          </span>
+        ),
+      },
+      {
+        title: TABLE.STUDENT,
+        key: 'studentName',
+        width: '240px',
+        render: (text) => <span className={TABLE_CELL.primary}>{text || VIEW_MODAL.NA}</span>,
+      },
+      {
+        title: TABLE.SUMMARY,
+        key: 'summary',
+        render: (text) => (
+          <Tooltip placement="topLeft" title={text}>
+            <div className={`max-w-[300px] truncate ${TABLE_CELL.secondary}`}>{text}</div>
+          </Tooltip>
+        ),
+      },
+      {
+        title: TABLE.ISSUE,
+        key: 'issue',
+        width: '220px',
+        render: (text) => (
+          <Tooltip placement="topLeft" title={text}>
+            <div className={`max-w-[200px] truncate italic ${TABLE_CELL.muted}`}>{text || '-'}</div>
+          </Tooltip>
+        ),
+      },
+      {
+        title: TABLE.STATUS,
+        key: 'status',
+        align: 'center',
+        width: '140px',
+        render: (status) => <LogbookStatusTag status={status} />,
+      },
+      {
+        title: '',
+        key: 'actions',
+        align: 'right',
+        width: '48px',
+        render: (_, record) => {
+          const isOwner = record.studentId === currentStudentId;
+
+          const items = [
+            {
+              key: 'view',
+              label: VIEW_MODAL.TITLE,
+              icon: <EyeOutlined />,
+              onClick: () => onView(record),
+            },
+          ];
+
+          if (isOwner) {
+            items.push(
+              { type: 'divider' },
+              {
+                key: 'edit',
+                label: MODAL.EDIT_TITLE,
+                icon: <EditOutlined />,
+                onClick: () => onEdit(record),
+              },
+              {
+                key: 'delete',
+                label: DELETE_MODAL.TITLE,
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: () =>
+                  showDeleteConfirm({
+                    title: DELETE_MODAL.TITLE,
+                    content: DELETE_MODAL.CONTENT,
+                    onOk: () => onDelete(record.logbookId),
+                  }),
+              }
+            );
+          }
+
+          return (
+            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
+              <TableRowDropdown items={items} />
+            </div>
+          );
+        },
+      },
+    ],
+    [
+      currentStudentId,
+      DATE_FORMAT,
+      MODAL,
+      TABLE,
+      VIEW_MODAL,
+      DELETE_MODAL,
+      onView,
+      onEdit,
+      onDelete,
+    ]
+  );
 
   return (
-    <div className="mt-5 flex min-h-0 flex-1 flex-col">
-      <div className="flex-1 overflow-auto">
-        <table className="w-full min-w-[1000px] table-fixed border-collapse text-left">
-          <thead className="border-border bg-bg sticky top-0 z-10 border-b">
-            <tr>
-              <th className="text-muted w-[140px] px-6 py-5 text-xs font-semibold">
-                {DAILY_REPORT_UI.TABLE.REPORT_DATE}
-              </th>
-
-              <th className="text-muted w-[200px] px-6 py-5 text-xs font-semibold">
-                {DAILY_REPORT_UI.TABLE.STUDENT}
-              </th>
-
-              <th className="text-muted px-6 py-5 text-xs font-semibold">
-                {DAILY_REPORT_UI.TABLE.SUMMARY}
-              </th>
-
-              <th className="text-muted px-6 py-5 text-xs font-semibold">
-                {DAILY_REPORT_UI.TABLE.ISSUE}
-              </th>
-
-              <th className="text-muted w-[120px] px-6 py-5 text-center text-xs font-semibold">
-                {DAILY_REPORT_UI.TABLE.STATUS}
-              </th>
-
-              <th className="text-muted w-[140px] px-6 py-5 text-center text-xs font-semibold">
-                {DAILY_REPORT_UI.TABLE.ACTION}
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-border/50 divide-y">
-            {data.map((record) => {
-              const isOwner = record.studentId === currentStudentId;
-
-              return (
-                <tr key={record.logbookId} className="hover:bg-bg/80 h-[72px] transition-colors">
-                  <td className="text-text px-6 py-4 align-middle text-[15px]">
-                    {record.dateReport
-                      ? dayjs(record.dateReport).format('DD/MM/YYYY')
-                      : DAILY_REPORT_UI.VIEW_MODAL.NA}
-                  </td>
-
-                  <td className="text-text px-6 py-4 align-middle text-[15px] font-bold whitespace-nowrap">
-                    {record.studentName || DAILY_REPORT_UI.VIEW_MODAL.NA}
-                  </td>
-
-                  <td className="px-6 py-4 align-middle text-sm">
-                    <Tooltip placement="topLeft" title={record.summary}>
-                      <div className="text-muted max-w-[260px] truncate">{record.summary}</div>
-                    </Tooltip>
-                  </td>
-
-                  <td className="px-6 py-4 align-middle text-sm">
-                    <Tooltip placement="topLeft" title={record.issue}>
-                      <div className="text-muted max-w-[220px] truncate">{record.issue || '-'}</div>
-                    </Tooltip>
-                  </td>
-
-                  <td className="px-6 py-4 text-center align-middle">
-                    <LogbookStatusTag status={record.status} />
-                  </td>
-
-                  <td className="px-6 py-4 align-middle">
-                    <div className="flex items-center justify-center gap-2">
-                      <Tooltip title={DAILY_REPORT_UI.VIEW_MODAL.TITLE}>
-                        <Button
-                          type="text"
-                          icon={<FileTextOutlined className="text-muted hover:text-info" />}
-                          onClick={() => onView(record)}
-                          className="hover:bg-info-surface flex h-8 w-8 items-center justify-center rounded-lg"
-                        />
-                      </Tooltip>
-
-                      {isOwner && (
-                        <>
-                          <Tooltip title={DAILY_REPORT_UI.MODAL.EDIT_TITLE}>
-                            <Button
-                              type="text"
-                              icon={<EditOutlined className="text-muted hover:text-warning" />}
-                              onClick={() => onEdit(record)}
-                              className="hover:bg-warning-surface flex h-8 w-8 items-center justify-center rounded-lg"
-                            />
-                          </Tooltip>
-
-                          <Tooltip title={DAILY_REPORT_UI.DELETE_MODAL.TITLE}>
-                            <Button
-                              type="text"
-                              danger
-                              icon={<DeleteOutlined className="text-muted hover:text-danger" />}
-                              onClick={() =>
-                                showDeleteConfirm({
-                                  title: DAILY_REPORT_UI.DELETE_MODAL.TITLE,
-                                  content: DAILY_REPORT_UI.DELETE_MODAL.CONTENT,
-                                  onOk: () => onDelete(record.logbookId),
-                                })
-                              }
-                              className="hover:bg-danger-surface flex h-8 w-8 items-center justify-center rounded-lg"
-                            />
-                          </Tooltip>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DataTable
+        columns={columns}
+        data={data}
+        loading={loading}
+        rowKey="logbookId"
+        emptyText={DAILY_REPORT_UI.EMPTY.NO_LOGBOOK}
+        minWidth="auto"
+      />
     </div>
   );
 });

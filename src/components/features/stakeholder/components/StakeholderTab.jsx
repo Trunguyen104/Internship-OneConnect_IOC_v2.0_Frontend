@@ -1,9 +1,8 @@
 import React, { memo } from 'react';
 
-import Card from '@/components/ui/card';
-import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import Pagination from '@/components/ui/pagination';
+import PageLayout from '@/components/ui/pagelayout';
 import { STAKEHOLDER_UI } from '@/constants/stakeholder/uiText';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useStakeholderTab } from '../hooks/useStakeholderTab';
 import StakeholderFormModal from './StakeholderFormModal';
@@ -30,18 +29,17 @@ const StakeholderTab = memo(function StakeholderTab() {
     pageSize,
     setPageSize,
     total,
-    totalPages,
   } = useStakeholderTab();
 
   return (
-    <div className="animate-in fade-in flex h-full flex-1 flex-col space-y-6 duration-500">
-      <Card className="flex min-h-0 flex-1 flex-col !p-4 sm:!p-8 2xl:h-auto">
-        <DataTableToolbar
-          className="mb-6 !border-0 !p-0"
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Toolbar
           searchProps={{
             placeholder: STAKEHOLDER_UI.SEARCH_PLACEHOLDER,
             value: search,
             onChange: (e) => setSearch(e.target.value),
+            className: 'max-w-md',
           }}
           actionProps={{
             label: STAKEHOLDER_UI.ADD_BUTTON,
@@ -60,40 +58,45 @@ const StakeholderTab = memo(function StakeholderTab() {
           }}
         />
 
-        <StakeholderList
-          stakeholders={stakeholders}
-          loading={stakeholderLoading}
-          page={page}
-          pageSize={pageSize}
-          onEdit={(s) => {
-            setEditingStakeholderId(s.id);
-            setStakeholderForm({
-              name: s.name || '',
-              type: s.type || 0,
-              role: s.role || '',
-              description: s.description || '',
-              email: s.email || '',
-              phoneNumber: s.phoneNumber || '',
-            });
-            setErrors({});
-            setOpenStakeholderForm(true);
-          }}
-          onDelete={handleDeleteStakeholder}
-        />
+        <PageLayout.Content className="px-0">
+          <StakeholderList
+            stakeholders={stakeholders}
+            loading={stakeholderLoading}
+            page={page}
+            pageSize={pageSize}
+            onEdit={(s) => {
+              setEditingStakeholderId(s.id);
+              setStakeholderForm({
+                name: s.name || '',
+                type: s.type || 0,
+                role: s.role || '',
+                description: s.description || '',
+                email: s.email || '',
+                phoneNumber: s.phoneNumber || '',
+              });
+              setErrors({});
+              setOpenStakeholderForm(true);
+            }}
+            onDelete={handleDeleteStakeholder}
+          />
+        </PageLayout.Content>
 
         {total > 0 && (
-          <div className="border-border/50 mt-6 border-t pt-6">
-            <Pagination
+          <PageLayout.Footer className="flex items-center justify-between">
+            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+              {UI_TEXT.COMMON.TOTAL}: <span className="font-extrabold text-slate-800">{total}</span>
+            </span>
+            <PageLayout.Pagination
               page={page}
               pageSize={pageSize}
               total={total}
-              totalPages={totalPages}
               onPageChange={setPage}
               onPageSizeChange={setPageSize}
+              className="mt-0 border-t-0 pt-0"
             />
-          </div>
+          </PageLayout.Footer>
         )}
-      </Card>
+      </PageLayout.Card>
       <StakeholderFormModal
         isOpen={openStakeholderForm}
         onClose={() => {

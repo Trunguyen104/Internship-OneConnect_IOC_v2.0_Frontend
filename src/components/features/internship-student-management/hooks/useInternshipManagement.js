@@ -1,223 +1,88 @@
-import { useCallback, useMemo, useState } from 'react';
+'use client';
 
-import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
+import { useEffect } from 'react';
+
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { useToast } from '@/providers/ToastProvider';
 
-import { MOCK_GROUPS, MOCK_MENTORS } from '../constants/internshipData';
+import { useStudentActions } from './useStudentActions';
+import { useStudentData } from './useStudentData';
+import { useStudentFilters } from './useStudentFilters';
 
-export const useInternshipManagement = (initialStudents) => {
-  const toast = useToast();
-  const { MESSAGES } = INTERNSHIP_MANAGEMENT_UI.INTERNSHIP_LIST;
-  const [students, setStudents] = useState(initialStudents || []);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [mentorFilter, setMentorFilter] = useState(undefined);
-  const [groupFilter, setGroupFilter] = useState('ALL');
-  const [assignmentFilter, setAssignmentFilter] = useState('ALL');
-  const [dateFilter, setDateFilter] = useState(null);
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
+export const useInternshipManagement = () => {
+  // 1. Initialize Filters State
+  const filters = useStudentFilters();
+
+  // 2. Fetch all Server State Data
+  const data = useStudentData(filters);
+
+  // 3. Initialize Modals and Actions
+  const actions = useStudentActions({
+    refetchStudents: data.refetchStudents,
+    phaseId: filters.phaseId,
+    enterpriseId: data.enterpriseId,
   });
 
-  const [rejectModal, setRejectModal] = useState({ open: false, student: null });
-  const [assignModal, setAssignModal] = useState({ open: false, student: null });
-  const [groupModal, setGroupModal] = useState({ open: false, student: null, type: 'ADD' });
-  const [detailModal, setDetailModal] = useState({ open: false, student: null });
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [createModal, setCreateModal] = useState(false);
-
-  const filteredData = useMemo(() => {
-    let data = [...students];
-    if (search) {
-      const s = search.toLowerCase();
-      data = data.filter(
-        (item) =>
-          (item.fullName || '').toLowerCase().includes(s) ||
-          (item.email || '').toLowerCase().includes(s) ||
-          (item.major || '').toLowerCase().includes(s)
+  // Listen for global group refresh events
+  useEffect(() => {
+    const handleRefresh = () => {
+      data.refetchStudents();
+    };
+    window.addEventListener(INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT, handleRefresh);
+    return () =>
+      window.removeEventListener(
+        INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.REFRESH_EVENT,
+        handleRefresh
       );
-    }
-    if (statusFilter !== 'ALL') data = data.filter((item) => item.status === statusFilter);
-    if (mentorFilter) data = data.filter((item) => item.mentorId === mentorFilter);
+  }, [data.refetchStudents]);
 
-    if (groupFilter === 'HAS_GROUP') data = data.filter((item) => item.groupId);
-    if (groupFilter === 'NO_GROUP') data = data.filter((item) => !item.groupId);
-
-    if (assignmentFilter === 'ASSIGNED') data = data.filter((item) => item.mentorId);
-    if (assignmentFilter === 'UNASSIGNED') data = data.filter((item) => !item.mentorId);
-
-    if (dateFilter) {
-      const filterMonth = dateFilter.month();
-      const filterYear = dateFilter.year();
-      data = data.filter((item) => {
-        const d = new Date(item.placedDate || item.id);
-        return d.getMonth() === filterMonth && d.getFullYear() === filterYear;
-      });
-    }
-
-    return data;
-  }, [students, search, statusFilter, mentorFilter, groupFilter, assignmentFilter, dateFilter]);
-
-  const paginatedData = useMemo(() => {
-    const start = (pagination.current - 1) * pagination.pageSize;
-    const end = start + pagination.pageSize;
-    return filteredData.slice(start, end);
-  }, [filteredData, pagination]);
-
-  const handleSearchChange = useCallback((value) => {
-    setSearch(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleStatusChange = useCallback((value) => {
-    setStatusFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleMentorChange = useCallback((value) => {
-    setMentorFilter(value);
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
-  const handleTableChange = useCallback((page) => {
-    setPagination((prev) => ({ ...prev, current: page }));
-  }, []);
-
-  const handleAcceptStudent = useCallback(
-    (student) => {
-      if (!student) return;
-      showDeleteConfirm({
-        title: MESSAGES.ACCEPT_CONFIRM_TITLE,
-        content: `${MESSAGES.ACCEPT_CONFIRM_CONTENT} ${student.fullName}?`,
-        okText: MESSAGES.ACCEPT_CONFIRM_OK,
-        type: 'warning',
-        onOk: () => {
-          setStudents((prev) =>
-            prev.map((s) => (s.id === student.id ? { ...s, status: 'ACCEPTED' } : s))
-          );
-          toast.success(MESSAGES.ACCEPT_SUCCESS);
-        },
-      });
-    },
-    [toast, MESSAGES]
-  );
-
-  const handleAddStudent = useCallback(
-    (values) => {
-      const newStudent = {
-        key: Date.now().toString(),
-        id: Date.now(),
-        fullName: values.fullName,
-        studentId: values.studentId,
-        email: values.email,
-        major: values.major,
-        status: 'PENDING',
-        mentorId: null,
-        avatar: (values.fullName || '')
-          .split(' ')
-          .map((n) => n[0])
-          .join('')
-          .toUpperCase(),
-      };
-      setStudents((prev) => [newStudent, ...prev]);
-      setIsAddModalOpen(false);
-      toast.success(MESSAGES.ADD_SUCCESS);
-    },
-    [toast, MESSAGES]
-  );
-
-  const handleRejectStudent = useCallback(
-    (studentId, reason) => {
-      setStudents((prev) =>
-        prev.map((s) => (s.id === studentId ? { ...s, status: 'REJECTED' } : s))
-      );
-      setRejectModal({ open: false, student: null });
-      toast.warning(MESSAGES.REJECT_SUCCESS);
-    },
-    [toast, MESSAGES]
-  );
-
-  const handleAssignMentor = useCallback(
-    (studentId, mentorId) => {
-      setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, mentorId } : s)));
-      setAssignModal({ open: false, student: null });
-      toast.success(MESSAGES.ASSIGN_SUCCESS);
-    },
-    [toast, MESSAGES]
-  );
-
-  const handleGroupSubmit = useCallback(
-    (values) => {
-      const { student, type } = groupModal;
-      if (!student) return;
-
-      const selectedGroup = MOCK_GROUPS.find((g) => g.id === values.groupId);
-
-      setStudents((prev) =>
-        prev.map((s) =>
-          s.id === student.id
-            ? {
-                ...s,
-                groupId: values.groupId,
-                mentorId: selectedGroup
-                  ? MOCK_MENTORS.find((m) => m.name === selectedGroup.mentor)?.id || null
-                  : null,
-              }
-            : s
-        )
-      );
-
-      if (type === 'ADD') {
-        toast.success(MESSAGES.GROUP_ADD_SUCCESS);
-      } else {
-        toast.success(MESSAGES.GROUP_CHANGE_SUCCESS);
-      }
-
-      setGroupModal({ open: false, student: null, type: 'ADD' });
-    },
-    [groupModal, toast, MESSAGES]
-  );
-
+  // Expose the EXACT same interface as before to avoid breaking UI components
   return {
-    students,
-    search,
-    statusFilter,
-    mentorFilter,
-    pagination,
-    filteredData,
-    paginatedData,
-    rejectModal,
-    assignModal,
-    groupModal,
-    detailModal,
-    isAddModalOpen,
-    selectedRowKeys,
-    setRejectModal,
-    setAssignModal,
-    setGroupModal,
-    setDetailModal,
-    setIsAddModalOpen,
-    setSelectedRowKeys,
-    setGroupFilter,
-    setAssignmentFilter,
-    setDateFilter,
-    handleSearchChange,
-    handleStatusChange,
-    handleTableChange,
-    handlePageSizeChange: (pageSize) => {
-      setPagination((prev) => ({ ...prev, pageSize, current: 1 }));
-    },
-    handleAcceptStudent,
-    handleAddStudent,
-    handleRejectStudent,
-    handleAssignMentor,
-    handleGroupSubmit,
-    setStatusFilter,
-    groupFilter,
-    assignmentFilter,
-    dateFilter,
+    search: filters.search,
+    groupFilter: filters.groupFilter,
+    setGroupFilter: filters.setGroupFilter,
+    pagination: filters.pagination,
+    filteredData: data.studentResult.students,
+    total: data.studentResult.total,
+    loading: data.loadingStudents || actions.viewLoading,
+    groupModal: actions.groupModal,
+    detailModal: actions.detailModal,
+    assignModal: actions.assignModal,
+    selectedRowKeys: actions.selectedRowKeys,
+    setGroupModal: actions.setGroupModal,
+    setDetailModal: actions.setDetailModal,
+    setAssignModal: actions.setAssignModal,
+    setSelectedRowKeys: actions.setSelectedRowKeys,
+    handleSearchChange: filters.handleSearchChange,
+    handleGroupFilterChange: filters.handleGroupFilterChange,
+    handleMentorFilterChange: filters.handleMentorFilterChange,
+    handleTableChange: filters.handleTableChange,
+    handlePageSizeChange: filters.handlePageSizeChange,
+    handleGroupSubmit: actions.handleGroupSubmit,
+    handleAssignMentor: actions.handleAssignMentor,
+    handleViewStudent: actions.handleViewStudent,
+    phaseId: filters.phaseId,
+    setPhaseId: filters.setPhaseId,
+    phaseOptions: data.phaseOptions,
+    fetchingPhases: data.fetchingPhases,
+    resetFilters: filters.resetFilters,
+    setCreateModal: actions.setCreateModal,
+    createModal: actions.createModal,
+    unassignedStudents: data.studentResult.unassigned,
+    fetchingStudents: data.loadingStudents,
+    mentors: data.mentors,
+    loadingMentors: data.loadingMentors,
+    handleCreateGroup: actions.handleCreateGroup,
+    mentorFilter: filters.mentorFilter,
+    setMentorFilter: filters.setMentorFilter,
+    isPhaseEditable:
+      filters.phaseId === 'ALL_VISIBLE' ||
+      (filters.phaseId &&
+        Array.isArray(data.phaseOptions) &&
+        data.phaseOptions.find((p) => p.value === filters.phaseId)?.status === 2),
+    hasGroups: data.studentResult.hasGroups,
+    existingGroups: data.studentResult.existingGroups,
+    sort: filters.sort,
+    setSort: filters.setSort,
+    fetchData: data.refetchStudents,
   };
 };

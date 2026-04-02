@@ -18,7 +18,7 @@ function normalizeProfileToForm(profile) {
     profile?.taxCode ?? profile?.taxcode ?? profile?.tax_code ?? profile?.taxCODE ?? '';
   return {
     logoUrl: profile?.logoUrl ?? '',
-    backgroundUrl: profile?.backgroundUrl ?? '',
+    backgroundUrl: profile?.backgroundUrl ?? profile?.backgroundUrl1 ?? '',
     name: profile?.name ?? '',
     website: profile?.website ?? '',
     industry: profile?.industry ?? '',
@@ -96,11 +96,11 @@ export default function EnterpriseProfileEditDrawer({ open, saving, profile, onC
                     </span>
                   </div>
 
-                  <Form.Item name="logoUrl" className="mb-0">
-                    <div className="flex justify-center">
+                  <div className="flex justify-center">
+                    <Form.Item name="logoUrl" className="mb-0">
                       <AvatarUploader size={100} fullName={initialValues?.name} />
-                    </div>
-                  </Form.Item>
+                    </Form.Item>
+                  </div>
                 </div>
               </Col>
 
