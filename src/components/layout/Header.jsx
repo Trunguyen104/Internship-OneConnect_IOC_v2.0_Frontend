@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  FileTextOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -67,6 +68,7 @@ export default function Header() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
@@ -77,6 +79,7 @@ export default function Header() {
         const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
         router.push(`/profile${query}`);
       }
+      if (key === 'my-applications') router.push('/my-applications');
       if (key === 'settings') router.push('/settings');
 
       if (key === 'logout') handleLogout();

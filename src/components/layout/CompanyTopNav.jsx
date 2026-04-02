@@ -2,7 +2,16 @@
 
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Briefcase, ChevronDown, FolderGit2, GraduationCap, Home, Layers } from 'lucide-react';
+import {
+  Briefcase,
+  ChevronDown,
+  FileText,
+  FolderGit2,
+  GraduationCap,
+  Home,
+  Layers,
+  Users,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -17,6 +26,8 @@ import { useToast } from '@/providers/ToastProvider';
 const NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
   { key: '/company/phases', label: 'Phases', icon: Layers },
+  { key: '/company/applications', label: 'Applications', icon: FileText },
+  { key: '/company/internships', label: 'Internships', icon: Users },
   { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
   { key: '/company/universities', label: 'Universities', icon: GraduationCap },
   { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
@@ -105,7 +116,7 @@ export default function CompanyTopNav() {
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="size-4" />
+                  {Icon ? <Icon className="size-4" /> : null}
                   {label}
                 </Link>
               );

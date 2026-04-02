@@ -103,20 +103,20 @@ const BodyTitle = ({ title, href = null }) => {
         {isPlaced && href ? (
           <Link
             href={href}
-            className="text-2xl font-black tracking-tight text-gray-900 no-underline transition-all hover:text-primary hover:underline"
+            className="!text-black inline-block border-b-2 border-transparent text-2xl font-black tracking-tight transition-all hover:border-black hover:!text-black hover:!opacity-100 pb-0 no-underline"
             title="Go to Space"
           >
             {title}
           </Link>
         ) : (
-          <h3 className="text-text text-2xl font-black tracking-tight">
+          <h3 className="!text-black text-2xl font-black tracking-tight">
             {title ||
               (isPlaced ? INTERNSHIP_UI.LABELS.PLACED_SUCCESS : INTERNSHIP_UI.LABELS.NO_GROUP)}
           </h3>
         )}
         {isPlaced && (
           <Tag
-            color="purple"
+            color="blue"
             className="bg-info-surface text-info border-none px-4 py-1 text-[10px] font-bold uppercase"
           >
             {config.label}

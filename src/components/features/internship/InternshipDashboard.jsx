@@ -1,18 +1,32 @@
 'use client';
 
-import { Empty, Skeleton } from 'antd';
+import { Skeleton } from 'antd';
 import React, { useEffect, useState } from 'react';
 
+import { userService } from '@/components/features/user/services/user.service';
+import { APPLICATION_STATUS } from '@/constants/applications/application.constants';
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
 import { useToast } from '@/providers/ToastProvider';
 
+import { ApplicationService } from '../applications/services/application.service';
 import InternshipCard from './components/InternshipCard';
-import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
+import {
+  ApplicationStatusCard,
+  CVUploadBanner,
+  PlacementInfoCard,
+  SearchJobsCTA,
+  StudentEmptyState,
+} from './components/StudentStatusComponents';
 import { InternshipGroupService } from './services/internship-group.service';
 
 const InternshipDashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [internships, setInternships] = useState([]);
+  const [data, setData] = useState({
+    phases: [],
+    groups: [],
+    studentApps: [],
+    userInfo: null,
+  });
 
   const toast = useToast();
 
@@ -21,37 +35,29 @@ const InternshipDashboard = () => {
       try {
         setLoading(true);
 
-        const [phasesResponse, groupsResponse] = await Promise.all([
+        const [phasesResponse, groupsResponse, studentAppsRes, userRes] = await Promise.all([
           InternshipGroupService.getMyPhases(),
           InternshipGroupService.getMyGroups(),
+          ApplicationService.getStudentApplications(),
+          userService.getMe(),
         ]);
 
-        const phases = phasesResponse?.data?.items || phasesResponse?.data || [];
-        const groups = groupsResponse?.data?.items || groupsResponse?.data || [];
+        const extractArray = (res) => {
+          if (Array.isArray(res)) return res;
+          if (Array.isArray(res?.items)) return res.items;
+          if (Array.isArray(res?.data?.items)) return res.data.items;
+          if (Array.isArray(res?.data)) return res.data;
+          return [];
+        };
 
-        const enrichedInternships = phases.map((phase, index) => {
-          const group = groups.find((g) => g.phaseId === phase.phaseId);
-          const clientKey = phase.phaseId ?? `phase-${index}`;
-
-          return {
-            id: group?.internshipGroupId || group?.id || phase.phaseId,
-            phaseId: phase.phaseId,
-            clientKey,
-            displayName: phase.name || phase.phaseName,
-            groupName: group?.groupName || group?.projectName || phase.name || phase.phaseName,
-            status: phase.status,
-            isPlaced: !!group,
-            enterpriseName: group?.enterpriseName || phase.enterpriseName,
-            mentorName: group?.mentorName || group?.mentor?.fullName,
-            projectName: group?.projectName,
-            journeyStep: group?.journeyStep || 0,
-            startDate: group?.startDate || phase.startDate,
-            endDate: group?.endDate || phase.endDate,
-          };
+        setData({
+          phases: extractArray(phasesResponse),
+          groups: extractArray(groupsResponse),
+          studentApps: extractArray(studentAppsRes),
+          userInfo: userRes?.data || userRes,
         });
-
-        setInternships(enrichedInternships);
       } catch (error) {
+        console.error('Dashboard error:', error);
         toast.error('Error', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
       } finally {
         setLoading(false);
@@ -63,57 +69,140 @@ const InternshipDashboard = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-5xl space-y-6 py-2">
-        {[1].map((i) => (
-          <div key={i} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <Skeleton active avatar paragraph={{ rows: 4 }} />
-          </div>
-        ))}
+      <div className="mx-auto w-full max-w-4xl space-y-8 py-10">
+        <Skeleton
+          active
+          avatar
+          paragraph={{ rows: 4 }}
+          className="rounded-[40px] border border-slate-100 bg-white p-10"
+        />
+        <Skeleton
+          active
+          paragraph={{ rows: 3 }}
+          className="rounded-[40px] border border-slate-100 bg-white p-10"
+        />
       </div>
     );
   }
 
-  if (internships.length === 0) {
+  const { phases, groups, studentApps, userInfo } = data;
+
+  const isEnrolled = phases.length > 0 || studentApps.length > 0;
+  const hasCv = !!(userInfo?.cvUrl || userInfo?.cvLocalPath);
+
+  const activeApp = studentApps.find((a) => {
+    const s = String(a.status);
     return (
-      <div className="flex flex-col items-center justify-center p-20">
-        <Empty description={INTERNSHIP_UI.LABELS.NO_DATA} />
+      s === String(APPLICATION_STATUS.APPLIED) ||
+      s === String(APPLICATION_STATUS.INTERVIEWING) ||
+      s === String(APPLICATION_STATUS.OFFERED) ||
+      s === String(APPLICATION_STATUS.PENDING_ASSIGNMENT)
+    );
+  });
+
+  const placedApp = studentApps.find((a) => String(a.status) === String(APPLICATION_STATUS.PLACED));
+  const hasGroup = groups.length > 0;
+  const isPlacedButNoGroup = placedApp && !hasGroup;
+
+  if (!isEnrolled) {
+    return (
+      <div className="mx-auto w-full max-w-4xl space-y-8 px-6 py-12">
+        <StudentEmptyState />
+        {!hasCv && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <CVUploadBanner variant="prepare" />
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-8">
-      <header className="border-b border-gray-100 pb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-800 sm:text-3xl">
+    <div className="mx-auto w-full max-w-5xl space-y-12 px-6 py-12">
+      <header className="relative">
+        <div className="absolute -left-12 top-0 h-24 w-1 bg-indigo-600 rounded-full hidden lg:block" />
+        <h1 className="text-4xl font-black tracking-tight text-slate-900 leading-[1.1]">
           {INTERNSHIP_UI.TITLE.replace(INTERNSHIP_UI.JOURNEY_HIGHLIGHT, '')}
-          <span className="text-primary">{INTERNSHIP_UI.JOURNEY_HIGHLIGHT}</span>
+          <span className="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+            {INTERNSHIP_UI.JOURNEY_HIGHLIGHT}
+          </span>
         </h1>
-        <p className="text-muted mt-2 text-sm font-medium leading-relaxed sm:text-base">
+        <p className="mt-3 text-base font-bold text-slate-400 max-w-2xl">
           {INTERNSHIP_UI.SUBTITLE}
         </p>
       </header>
 
-      <div className="flex flex-col gap-6">
-        {internships.map((item) => (
-          <InternshipCard key={item.clientKey ?? item.id} data={item}>
-            <InternshipCard.Header
-              title={item.displayName}
-              isCurrent={item.status === INTERNSHIP_STATUS.IN_PROGRESS}
-            />
-            <InternshipCard.Stepper />
+      <div className="flex flex-col gap-10">
+        {/* Term Section */}
+        {phases.length > 0 && (
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
+                {INTERNSHIP_UI.SECTIONS.CURRENT_PHASE}
+              </h2>
+              <div className="h-px flex-1 bg-slate-100" />
+            </div>
+            <div className="space-y-6">
+              {phases.map((phase) => {
+                const group = groups.find((g) => (g.internshipPhaseId || g.phaseId) === phase.id);
+                return (
+                  <InternshipCard
+                    key={phase.id}
+                    data={{
+                      ...phase,
+                      displayName: phase.name || phase.phaseName,
+                      groupName: group?.groupName || phase.name,
+                      isPlaced: !!group,
+                      journeyStep: group ? 4 : activeApp ? 2 : 0,
+                    }}
+                  >
+                    <InternshipCard.Header
+                      title={phase.name || phase.phaseName}
+                      isCurrent={phase.status === 'InProgress'}
+                    />
+                    <InternshipCard.Stepper />
+                  </InternshipCard>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
-            <InternshipCard.BodyTitle
-              title={item.groupName}
-              href={`/internship-groups/${item.id}/space`}
-            />
+        {/* Dynamic Status Section */}
+        <section className="space-y-8">
+          <div className="flex items-center gap-4">
+            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
+              {INTERNSHIP_UI.SECTIONS.ACTION_CENTER}
+            </h2>
+            <div className="h-px flex-1 bg-slate-100" />
+          </div>
 
-            <InternshipCard.Info
-              enterprise={item.enterpriseName}
-              mentor={item.mentorName}
-              project={item.projectName}
-            />
-          </InternshipCard>
-        ))}
+          <div className="grid grid-cols-1 gap-8">
+            {!hasCv && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <CVUploadBanner variant="urgent" />
+              </div>
+            )}
+
+            {!hasGroup && activeApp && (
+              <div className="animate-in fade-in slide-in-from-bottom-6 duration-600">
+                <ApplicationStatusCard app={activeApp} />
+              </div>
+            )}
+
+            {isPlacedButNoGroup && (
+              <div className="animate-in fade-in slide-in-from-bottom-6 duration-600">
+                <PlacementInfoCard enterpriseName={placedApp.enterpriseName} />
+              </div>
+            )}
+
+            {!hasGroup && !activeApp && !placedApp && hasCv && (
+              <div className="animate-in zoom-in duration-700">
+                <SearchJobsCTA />
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

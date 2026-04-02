@@ -16,6 +16,7 @@ export const useApplicationActions = (id) => {
 
   const invalidateQueries = () => {
     queryClient.invalidateQueries({ queryKey: ['applications'] });
+    if (id) queryClient.invalidateQueries({ queryKey: ['applications', 'detail', id] });
   };
 
   const handleError = (error) => {

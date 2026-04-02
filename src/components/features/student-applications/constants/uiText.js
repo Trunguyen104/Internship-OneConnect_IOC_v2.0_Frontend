@@ -1,0 +1,85 @@
+export const STUDENT_APPLICATIONS_UI = {
+  TITLE: 'My Applications',
+  SUBTITLE: 'Track your internship applications and manage your current placements in one place.',
+  SEARCH_PLACEHOLDER: 'Search job title, enterprise...',
+  INCLUDE_TERMINAL: 'Include Terminal:',
+  EMPTY_STATE: {
+    TITLE: 'No Applications Found',
+    DESCRIPTION: "You haven't applied to any internships yet.",
+    FILTERED_DESCRIPTION: 'Try adjusting your search or filters.',
+  },
+  COLUMNS: {
+    JOB_ENTERPRISE: 'Job Title & Enterprise',
+    APPLIED_DATE: 'Applied Date',
+    SOURCE: 'Source',
+    STATUS: 'Status',
+    ACTIONS: 'Actions',
+  },
+  STATUS_LABELS: {
+    UNI_ASSIGNED: 'Uni Assigned',
+    PENDING_REVIEW: 'Pending Review',
+  },
+  MODAL: {
+    DETAIL_TITLE: 'Application Detail',
+    WITHDRAW_TITLE: 'Withdraw Application',
+    WITHDRAW_CONTENT:
+      'Are you sure you want to withdraw your application at {enterpriseName}? This action cannot be undone.',
+    HIDE_TITLE: 'Hide Application',
+    HIDE_CONTENT: 'Hide this application from your list?',
+    CANCEL: 'Cancel',
+    WITHDRAW: 'Confirm Withdrawal',
+    HIDE: 'Hide Record',
+    CLOSE: 'Close',
+  },
+  MESSAGES: {
+    // Localized messages (Translated to English as requested)
+    INTERVIEWING:
+      'Your application is in the interviewing process. Please check your email for interview schedule details. For support, contact the enterprise directly.',
+    OFFERED:
+      'The enterprise has sent you an offer. Please check your email for details. For support, contact the enterprise directly.',
+    PLACED:
+      'Congratulations! You have been officially accepted for an internship at {enterpriseName}.',
+    REJECTED_UNI:
+      "The enterprise has declined the university's assignment. Please contact the school for support.",
+    REJECTED_SELF: 'The enterprise has not selected you. You can continue applying elsewhere.',
+    PENDING_ASSIGNMENT_UNI:
+      'The school has assigned you to intern at {enterpriseName}. Your application is waiting for enterprise review.',
+    WITHDRAW_SUCCESS: 'Application withdrawn successfully.',
+    HIDE_SUCCESS: 'Application hidden from list.',
+    WITHDRAW_ERROR: 'Failed to withdraw application. Please try again.',
+    HIDE_ERROR: 'Failed to hide application. Please try again.',
+    REJECT_REASON_TITLE: 'Rejection Reason:',
+  },
+  ACTIONS: {
+    VIEW_DETAILS: 'View Details',
+    WITHDRAW: 'Withdraw Application',
+    HIDE: 'Hide Record',
+    NO_ACTIONS: 'No Actions',
+  },
+  SOURCE: {
+    UNI_ASSIGN: 'Uni Assign',
+    SELF_APPLY: 'Self-Applied',
+    PUBLIC: 'Public',
+    TARGETED: 'Targeted',
+  },
+  COMMON: {
+    GENERAL_APP: 'General Application',
+    UNKNOWN: 'UNKNOWN',
+    CURRENT_STATUS: 'Current Status',
+    APPLIED_ON: 'Applied On',
+    ASSIGNED_ON: 'Assigned On',
+    INTERN_PHASE: 'Internship Phase',
+    DEPARTMENT: 'Department',
+    VIEW_CV: 'View Submitted CV',
+    TIMELINE: 'Status Timeline',
+    CLOSE: 'Close Window',
+    NO_HISTORY: 'No history recorded yet.',
+    ERROR: 'Error:',
+    LOADING: '...',
+    CLOSED: 'Closed',
+    DELETED: 'Deleted',
+    DATE_ARROW: ' → ',
+    N_A: '—',
+    UPDATED: 'Updated',
+  },
+};

@@ -48,7 +48,10 @@ export default function DataTable({
   const getRowKey = useCallback(
     (record, index) => {
       if (typeof rowKey === 'function') return rowKey(record, index);
-      return record?.[rowKey] || record?.id || record?.key || index;
+      const val = record?.[rowKey] || record?.id || record?.key;
+      // Fallback to index if no valid key is found, but append it if value exists to ensure uniqueness
+      // in case of duplicate data items (e.g. backend inconsistencies)
+      return val !== undefined && val !== null ? String(val) : `row-${index}`;
     },
     [rowKey]
   );
