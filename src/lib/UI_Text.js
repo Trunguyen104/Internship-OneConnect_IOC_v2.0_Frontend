@@ -51,6 +51,8 @@ export const UI_TEXT = {
     BULLET: '•',
     TOTAL: 'Total records',
     VERIFY_SESSION: 'Verifying secure session...',
+    COLON: ':',
+    BAR: '|',
   },
   USER_MANAGEMENT: {
     TITLE: 'User Management',
@@ -280,6 +282,11 @@ export const UI_TEXT = {
   ENTERPRISE: {
     DASHBOARD_TITLE: 'Enterprise Dashboard',
     DASHBOARD_WELCOME: 'Welcome to the Enterprise Dashboard. Select an option from the sidebar.',
+  },
+  INTERNSHIP: {
+    UNIVERSITY_PREFIX: 'University',
+    CLASS_PREFIX: 'Class',
+    MAJOR_PREFIX: 'Major',
   },
   ERROR: {
     COMMUNICATION: 'Communication Error',

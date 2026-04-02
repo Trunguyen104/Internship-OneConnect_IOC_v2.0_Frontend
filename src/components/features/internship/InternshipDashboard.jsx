@@ -4,15 +4,15 @@ import { Empty, Skeleton } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
+import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 import InternshipCard from './components/InternshipCard';
-import { INTERNSHIP_STATUS } from './constants/internshipStatus.js';
-import { InternshipGroupService } from './services/internship-group.service';
+import { mineService } from './services/mine.service';
 
 const InternshipDashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [internships, setInternships] = useState([]);
+  const [contextData, setContextData] = useState(null);
 
   const toast = useToast();
 
@@ -21,37 +21,11 @@ const InternshipDashboard = () => {
       try {
         setLoading(true);
 
-        const [phasesResponse, groupsResponse] = await Promise.all([
-          InternshipGroupService.getMyPhases(),
-          InternshipGroupService.getMyGroups(),
-        ]);
+        const response = await mineService.getMyContext();
+        const data = response?.data;
 
-        const phases = phasesResponse?.data?.items || phasesResponse?.data || [];
-        const groups = groupsResponse?.data?.items || groupsResponse?.data || [];
-
-        const enrichedInternships = phases.map((phase, index) => {
-          const group = groups.find((g) => g.phaseId === phase.phaseId);
-          const clientKey = phase.phaseId ?? `phase-${index}`;
-
-          return {
-            id: group?.internshipGroupId || group?.id || phase.phaseId,
-            phaseId: phase.phaseId,
-            clientKey,
-            displayName: phase.name || phase.phaseName,
-            groupName: group?.groupName || group?.projectName || phase.name || phase.phaseName,
-            status: phase.status,
-            isPlaced: !!group,
-            enterpriseName: group?.enterpriseName || phase.enterpriseName,
-            mentorName: group?.mentorName || group?.mentor?.fullName,
-            projectName: group?.projectName,
-            journeyStep: group?.journeyStep || 0,
-            startDate: group?.startDate || phase.startDate,
-            endDate: group?.endDate || phase.endDate,
-          };
-        });
-
-        setInternships(enrichedInternships);
-      } catch (error) {
+        setContextData(data);
+      } catch (_error) {
         toast.error('Error', INTERNSHIP_UI.MESSAGES.ERROR_FETCH);
       } finally {
         setLoading(false);
@@ -73,13 +47,38 @@ const InternshipDashboard = () => {
     );
   }
 
-  if (internships.length === 0) {
+  if (!contextData || (!contextData.currentTerm && !contextData.internship)) {
     return (
       <div className="flex flex-col items-center justify-center p-20">
         <Empty description={INTERNSHIP_UI.LABELS.NO_DATA} />
       </div>
     );
   }
+
+  // Map the new context data to the format expected by the UI.
+  const { currentTerm, internship, university, studentInfo } = contextData;
+  const isPlaced = !!internship?.group;
+
+  // Calculate a basic journey step based on data presence
+  let journeyStep = 1;
+  if (currentTerm?.enrollmentStatus === 'Enrolled') journeyStep = 2;
+  if (internship?.enterprise) journeyStep = 3;
+  if (isPlaced) journeyStep = 4;
+
+  const mappedInternship = {
+    id: internship?.group?.groupId || currentTerm?.termId,
+    clientKey: currentTerm?.termId || 'context',
+    displayName: currentTerm?.termName || 'Current Term',
+    groupName: internship?.group?.groupName || 'No Group Assigned',
+    status: currentTerm?.status,
+    isPlaced: isPlaced,
+    enterpriseName: internship?.enterprise?.name || 'No Enterprise',
+    mentorName: internship?.mentor?.name || 'No Mentor',
+    projectName: internship?.project?.name || 'No Project',
+    journeyStep: journeyStep,
+    startDate: currentTerm?.startDate,
+    endDate: currentTerm?.endDate,
+  };
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -94,26 +93,43 @@ const InternshipDashboard = () => {
       </header>
 
       <div className="flex flex-col gap-6">
-        {internships.map((item) => (
-          <InternshipCard key={item.clientKey ?? item.id} data={item}>
-            <InternshipCard.Header
-              title={item.displayName}
-              isCurrent={item.status === INTERNSHIP_STATUS.IN_PROGRESS}
-            />
-            <InternshipCard.Stepper />
+        {/* Render University and Student context header info if needed */}
+        <div className="mb-4 text-sm text-slate-500">
+          <strong>
+            {UI_TEXT.INTERNSHIP.UNIVERSITY_PREFIX}
+            {UI_TEXT.COMMON.COLON}
+          </strong>{' '}
+          {university?.name} {UI_TEXT.COMMON.BAR}{' '}
+          <strong>
+            {UI_TEXT.INTERNSHIP.CLASS_PREFIX}
+            {UI_TEXT.COMMON.COLON}
+          </strong>{' '}
+          {studentInfo?.className} {UI_TEXT.COMMON.BAR}{' '}
+          <strong>
+            {UI_TEXT.INTERNSHIP.MAJOR_PREFIX}
+            {UI_TEXT.COMMON.COLON}
+          </strong>{' '}
+          {studentInfo?.major}
+        </div>
 
-            <InternshipCard.BodyTitle
-              title={item.groupName}
-              href={`/internship-groups/${item.id}/space`}
-            />
+        <InternshipCard data={mappedInternship}>
+          <InternshipCard.Header
+            title={mappedInternship.displayName}
+            isCurrent={mappedInternship.status === 'Active'}
+          />
+          <InternshipCard.Stepper />
 
-            <InternshipCard.Info
-              enterprise={item.enterpriseName}
-              mentor={item.mentorName}
-              project={item.projectName}
-            />
-          </InternshipCard>
-        ))}
+          <InternshipCard.BodyTitle
+            title={mappedInternship.groupName}
+            href={`/internship-groups/${mappedInternship.id}/space`}
+          />
+
+          <InternshipCard.Info
+            enterprise={mappedInternship.enterpriseName}
+            mentor={mappedInternship.mentorName}
+            project={mappedInternship.projectName}
+          />
+        </InternshipCard>
       </div>
     </div>
   );
