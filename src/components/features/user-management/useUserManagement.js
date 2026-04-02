@@ -8,11 +8,17 @@ import { userManagementService } from '@/services/user-management.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
 export function useUserManagement() {
-  const refreshCount = useAdminUsersStore((s) => s.refreshCount);
+  const { refreshCount, currentFilter } = useAdminUsersStore((s) => ({
+    refreshCount: s.refreshCount,
+    currentFilter: s.currentFilter,
+  }));
 
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
+
+  // Reset page when filter or search changes
+  const resetPage = () => setPageNumber(1);
 
   // 1. Fetch User Data with useQuery
   const {
@@ -21,12 +27,13 @@ export function useUserManagement() {
     error: queryError,
     refetch,
   } = useQuery({
-    queryKey: ['users', refreshCount, pageNumber, pageSize, search],
+    queryKey: ['users', refreshCount, pageNumber, pageSize, search, currentFilter],
     queryFn: async () => {
       const params = {
         PageNumber: pageNumber,
         PageSize: pageSize,
         SearchTerm: search || undefined,
+        Role: currentFilter.role === 'all' ? undefined : Number(currentFilter.role),
       };
       const res = await userManagementService.getList(params);
       const data = res?.data ?? res;
@@ -49,10 +56,13 @@ export function useUserManagement() {
     pageSize,
     setPageSize: (size) => {
       setPageSize(size);
-      setPageNumber(1);
+      resetPage();
     },
     search,
-    setSearch,
+    setSearch: (val) => {
+      setSearch(val);
+      resetPage();
+    },
     refresh: refetch,
   };
 }

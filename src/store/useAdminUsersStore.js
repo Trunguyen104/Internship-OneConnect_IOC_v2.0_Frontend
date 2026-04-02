@@ -7,6 +7,9 @@ const store = {
     refreshCount: 0,
     users: [],
     totalCount: 0,
+    currentFilter: {
+      role: 'all',
+    },
   },
   listeners: new Set(),
 };
@@ -35,3 +38,5 @@ export function useAdminUsersStore(selector = (s) => s) {
 useAdminUsersStore.setUsers = (users, totalCount = 0) =>
   setState((s) => ({ ...s, users, totalCount }));
 useAdminUsersStore.increment = () => setState((s) => ({ ...s, refreshCount: s.refreshCount + 1 }));
+useAdminUsersStore.setFilter = (filter) =>
+  setState((s) => ({ ...s, currentFilter: { ...s.currentFilter, ...filter } }));

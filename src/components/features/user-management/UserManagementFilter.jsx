@@ -1,31 +1,19 @@
 'use client';
 
-import { Filter } from 'lucide-react';
-
 import Select from '@/components/ui/select';
 import { USER_ROLE, USER_ROLE_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
-import { userManagementService } from '@/services/user-management.service';
 import { useAdminUsersStore } from '@/store/useAdminUsersStore';
 
 export default function UserManagementFilter() {
-  const handleSelectedRole = async (value) => {
-    try {
-      const params = {
-        PageNumber: 1,
-        PageSize: 100,
-        Role: value === 'all' ? undefined : Number(value),
-      };
-      const res = await userManagementService.getList(params);
-      const data = res?.data ?? res;
-      useAdminUsersStore.setUsers(data?.items ?? data?.Items ?? []);
-    } catch {
-      useAdminUsersStore.setUsers([]);
-    }
+  const currentFilter = useAdminUsersStore((s) => s.currentFilter);
+
+  const handleRoleChange = (role) => {
+    useAdminUsersStore.setFilter({ role });
   };
 
-  const options = [
-    { label: UI_TEXT.COMMON.ALL, value: 'all' },
+  const roleOptions = [
+    { label: UI_TEXT.USER_MANAGEMENT.ALL_USERS, value: 'all' },
     ...Object.values(USER_ROLE).map((v) => ({
       label: USER_ROLE_LABEL[v] || String(v),
       value: String(v),
@@ -33,14 +21,13 @@ export default function UserManagementFilter() {
   ];
 
   return (
-    <div className="flex items-center gap-2">
-      <Filter className="h-2 w-4 text-muted md:hidden" />
+    <div className="flex items-center gap-3">
       <Select
-        defaultValue="all"
-        onChange={handleSelectedRole}
-        options={options}
-        className="!w-40 !rounded-2xl"
-        placeholder={UI_TEXT.COMMON.FILTER}
+        value={currentFilter.role}
+        onChange={handleRoleChange}
+        options={roleOptions}
+        className="!w-36 !rounded-xl !h-9 text-xs"
+        placeholder={UI_TEXT.USER_MANAGEMENT.ROLE}
       />
     </div>
   );

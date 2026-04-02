@@ -1,7 +1,9 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { userService } from '@/components/features/user/services/user.service';
 import UserManagementDialog from '@/components/features/user-management/UserManagementDialog';
 import UserManagementFilter from '@/components/features/user-management/UserManagementFilter';
 import UserManagementTable from '@/components/features/user-management/UserManagementTable';
@@ -25,7 +27,6 @@ export default function UserManagementPage({
   const {
     users,
     loading,
-    error,
     total,
     pageNumber,
     setPageNumber,
@@ -33,8 +34,16 @@ export default function UserManagementPage({
     setPageSize,
     search,
     setSearch,
-    refresh,
   } = useUserManagement();
+
+  const { data: meRes } = useQuery({
+    queryKey: ['auth-me'],
+    queryFn: async () => userService.getMe(),
+    staleTime: 0,
+  });
+
+  const meData = meRes?.data ?? meRes?.Data ?? meRes;
+  const currentUserId = meData?.userId ?? meData?.UserId ?? null;
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -58,7 +67,7 @@ export default function UserManagementPage({
         />
 
         <PageLayout.Content className="px-0">
-          <UserManagementTable users={users} loading={loading} />
+          <UserManagementTable users={users} loading={loading} currentUserId={currentUserId} />
         </PageLayout.Content>
 
         {total > 0 && (

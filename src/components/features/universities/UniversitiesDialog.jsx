@@ -33,9 +33,11 @@ export default function UniversitiesDialog({
       }
       open={open}
       onClose={() => setOpen(false)}
-      width={560}
-      headerStyle={{ borderBottom: '1px solid #f8fafc', padding: '24px' }}
-      bodyStyle={{ padding: '24px' }}
+      size={560}
+      styles={{
+        header: { borderBottom: '1px solid #f8fafc', padding: '24px' },
+        body: { padding: '24px' },
+      }}
       footer={null}
       destroyOnClose
     >

@@ -215,10 +215,17 @@ function DeleteDrawer({ open, userId, label, onClose }) {
   );
 }
 
-export default function UserManagementAction({ user }) {
+export default function UserManagementAction({ user, currentUserId }) {
   const [open, setOpen] = useState({ isOpen: false, modal: null });
 
   const closeAll = () => setOpen({ isOpen: false, modal: null });
+
+  const targetUserId = user?.userId || user?.UserId;
+  const isSelf = !!(
+    currentUserId &&
+    targetUserId &&
+    String(targetUserId) === String(currentUserId)
+  );
 
   const menuItems = [
     {
@@ -250,22 +257,26 @@ export default function UserManagementAction({ user }) {
       onClick: () => setOpen({ isOpen: true, modal: 'reset' }),
     },
     { type: 'divider' },
-    {
-      key: 'delete',
-      label: (
-        <div className="flex items-center gap-4 pr-8">
-          <div className="rounded-xl bg-rose-50/50 p-2.5">
-            <Trash2 className="size-4 text-rose-600" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-black tracking-tight text-rose-600">
-              {UI_TEXT.BUTTON.DELETE}
-            </span>
-          </div>
-        </div>
-      ),
-      onClick: () => setOpen({ isOpen: true, modal: 'delete' }),
-    },
+    ...(isSelf
+      ? []
+      : [
+          {
+            key: 'delete',
+            label: (
+              <div className="flex items-center gap-4 pr-8">
+                <div className="rounded-xl bg-rose-50/50 p-2.5">
+                  <Trash2 className="size-4 text-rose-600" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-black tracking-tight text-rose-600">
+                    {UI_TEXT.BUTTON.DELETE}
+                  </span>
+                </div>
+              </div>
+            ),
+            onClick: () => setOpen({ isOpen: true, modal: 'delete' }),
+          },
+        ]),
   ];
 
   return (

@@ -3,13 +3,19 @@
 import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
 
+import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
-import { USER_ROLE_LABEL, USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
+import {
+  USER_ROLE,
+  USER_ROLE_LABEL,
+  USER_STATUS,
+  USER_STATUS_LABEL,
+} from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import UserManagementAction from './UserManagementAction';
 
-export default function UserManagementTable({ users = [], loading = false }) {
+export default function UserManagementTable({ users = [], loading = false, currentUserId = null }) {
   const getRoleLabel = (role) => USER_ROLE_LABEL[role] || role || UI_TEXT.COMMON.NULL;
   const isActive = (status) => status === USER_STATUS.ACTIVE;
   const getStatusLabel = (status) => USER_STATUS_LABEL[status] || status || UI_TEXT.COMMON.NULL;
@@ -32,6 +38,13 @@ export default function UserManagementTable({ users = [], loading = false }) {
         render: (name, record) => (
           <span className="text-[13px] font-semibold text-slate-800">
             {name || record.FullName || UI_TEXT.COMMON.MINUS}
+            {currentUserId &&
+              (record?.userId || record?.UserId) &&
+              String(record.userId || record.UserId) === String(currentUserId) && (
+                <span className="ml-2 text-[12px] font-bold text-sky-600">
+                  {UI_TEXT.USER_MANAGEMENT.YOU_BADGE}
+                </span>
+              )}
           </span>
         ),
       },
@@ -56,9 +69,26 @@ export default function UserManagementTable({ users = [], loading = false }) {
         title: UI_TEXT.USER_MANAGEMENT.ROLE,
         key: 'role',
         width: '140px',
-        render: (role) => (
-          <span className="text-[12px] font-medium text-primary">{getRoleLabel(role)}</span>
-        ),
+        render: (role) => {
+          let variant = 'default';
+          if (role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.MODERATOR) {
+            variant = 'primary-soft';
+          } else if (role === USER_ROLE.SCHOOL_ADMIN || role === USER_ROLE.STUDENT) {
+            variant = 'success-soft';
+          } else if (
+            role === USER_ROLE.ENTERPRISE_ADMIN ||
+            role === USER_ROLE.HR ||
+            role === USER_ROLE.MENTOR
+          ) {
+            variant = 'warning-soft';
+          }
+
+          return (
+            <Badge variant={variant} size="sm" className="min-w-[80px] justify-center">
+              {getRoleLabel(role)}
+            </Badge>
+          );
+        },
       },
       {
         title: UI_TEXT.USER_MANAGEMENT.STATUS,
@@ -80,10 +110,10 @@ export default function UserManagementTable({ users = [], loading = false }) {
         key: 'action',
         align: 'right',
         width: '48px',
-        render: (_, record) => <UserManagementAction user={record} />,
+        render: (_, record) => <UserManagementAction user={record} currentUserId={currentUserId} />,
       },
     ],
-    []
+    [currentUserId]
   );
 
   return (
@@ -103,4 +133,5 @@ export default function UserManagementTable({ users = [], loading = false }) {
 UserManagementTable.propTypes = {
   users: PropTypes.arrayOf(PropTypes.object),
   loading: PropTypes.bool,
+  currentUserId: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
 };

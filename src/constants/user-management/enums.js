@@ -17,7 +17,7 @@ export const USER_STATUS = {
 };
 
 export const USER_ROLE_LABEL = {
-  [USER_ROLE.SUPER_ADMIN]: 'SuperAdmin',
+  [USER_ROLE.SUPER_ADMIN]: 'Super Admin',
   [USER_ROLE.MODERATOR]: 'Moderator',
   [USER_ROLE.SCHOOL_ADMIN]: 'Uni Admin',
   [USER_ROLE.ENTERPRISE_ADMIN]: 'Ent Admin',
