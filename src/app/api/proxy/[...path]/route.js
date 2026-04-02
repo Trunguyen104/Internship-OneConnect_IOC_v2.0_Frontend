@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 
-import { CONFIG } from '@/constants/common/config';
 import { resolveApiRoot } from '@/lib/server/backend-url';
 
 export const dynamic = 'force-dynamic';
@@ -21,12 +20,7 @@ async function handler(req, { params }) {
 
     const pathStr = path.join('/');
 
-    // Bypass v1 for specific routes (like student evaluations)
-    const isV1Bypass = CONFIG.V1_BYPASS_ROUTES.some((route) => pathStr.startsWith(route));
-
-    const url = isV1Bypass
-      ? `${API_ROOT}/${pathStr}${searchString}`
-      : `${API_ROOT}/v1/${pathStr}${searchString}`;
+    const url = `${API_ROOT}/${pathStr}${searchString}`;
 
     const headers = new Headers();
     const contentType = req.headers.get('content-type');

@@ -178,6 +178,8 @@ export const UI_TEXT = {
     INVALID_EMAIL: 'Please enter a valid email address',
     INITIALIZE: 'Initialize Enterprise',
     DELETE_SUBTITLE: 'Remove enterprise account',
+    DELETE_DEPENDENCY_WARNING:
+      'If there are students currently interning under this enterprise, the system will reject deletion.',
     INDUSTRY_PREFIX: 'Industry',
   },
   UNIVERSITIES: {
