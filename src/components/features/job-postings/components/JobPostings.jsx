@@ -1,29 +1,28 @@
 'use client';
 
-import { App } from 'antd';
-import { FileText, Send, Trash2, XCircle } from 'lucide-react';
+import { Archive, Briefcase, FileEdit, Globe } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
 import { StatCard } from '@/components/ui/atoms';
-import { Button } from '@/components/ui/button';
 import PageLayout from '@/components/ui/pagelayout';
+import Pagination from '@/components/ui/pagination';
 
 import { JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
 import { useInternshipPhases, useJobPostingActions, useJobPostings } from '../hooks/useJobPostings';
-import JobPostingModal from './JobPostingModal';
+import { useJobPostingsActionsHandler } from '../hooks/useJobPostingsActionsHandler';
+import JobPostingDrawer from './JobPostingDrawer';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsTable from './JobPostingsTable';
 
 /**
  * Main logical container for Enterprise Job Postings.
+ * Orchestrates layout and interaction between sub-components.
  */
 export default function JobPostings() {
-  const { modal: modalApi } = App.useApp();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     status: undefined,
+    includeDeleted: false,
     page: 1,
     size: 10,
   });
@@ -32,6 +31,10 @@ export default function JobPostings() {
   const { jobPostings, totalCount, isLoading } = useJobPostings(filters);
   const { phases } = useInternshipPhases();
   const actions = useJobPostingActions();
+
+  // Action Handling Logic (Extracted)
+  const { isDrawerOpen, selectedRecord, onAction, openCreateDrawer, closeDrawer } =
+    useJobPostingsActionsHandler({ actions });
 
   const handleFilterChange = (newFilters) => {
     setFilters((prev) => ({
@@ -45,130 +48,7 @@ export default function JobPostings() {
     setFilters((prev) => ({ ...prev, page, size }));
   };
 
-  const openCreateModal = () => {
-    setSelectedRecord(null);
-    setIsModalOpen(true);
-  };
-
-  const showConfirm = ({
-    title: confirmTitle,
-    content,
-    onOk,
-    confirmText = JOB_POSTING_UI.CONFIRM.BUTTONS.CONFIRM,
-    variant = 'default',
-  }) => {
-    modalApi.confirm({
-      title: (
-        <span className="text-lg font-black tracking-tight text-slate-800">{confirmTitle}</span>
-      ),
-      content: <p className="mt-2 font-medium text-slate-500">{content}</p>,
-      okText: confirmText,
-      cancelText: JOB_POSTING_UI.CONFIRM.BUTTONS.CANCEL,
-      centered: true,
-      width: 440,
-      className: 'premium-confirm-modal',
-      okButtonProps: {
-        className:
-          variant === 'danger'
-            ? 'bg-rose-500 hover:bg-rose-600 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]'
-            : 'bg-slate-900 hover:bg-slate-800 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]',
-      },
-      cancelButtonProps: {
-        className:
-          'rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px] border-slate-200 text-slate-500',
-      },
-      onOk,
-    });
-  };
-
-  const onAction = (key, record) => {
-    const title = record?.title || 'this job posting';
-    const id = record.jobId;
-
-    // Compute active applications count
-    const activeAppCount = (record.applicationStatusCounts || [])
-      .filter((item) => [1, 2, 3].includes(item.status)) // Applied, Interviewing, Offered
-      .reduce((sum, item) => sum + item.count, 0);
-
-    const showConfirm = ({
-      title: confirmTitle,
-      content,
-      onOk,
-      confirmText = JOB_POSTING_UI.CONFIRM.BUTTONS.CONFIRM,
-      variant = 'default',
-    }) => {
-      modalApi.confirm({
-        title: (
-          <span className="text-lg font-black tracking-tight text-slate-800">{confirmTitle}</span>
-        ),
-        content: <p className="mt-2 font-medium text-slate-500">{content}</p>,
-        okText: confirmText,
-        cancelText: JOB_POSTING_UI.CONFIRM.BUTTONS.CANCEL,
-        centered: true,
-        width: 440,
-        className: 'premium-confirm-modal',
-        okButtonProps: {
-          className:
-            variant === 'danger'
-              ? 'bg-rose-500 hover:bg-rose-600 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]'
-              : 'bg-slate-900 hover:bg-slate-800 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]',
-        },
-        cancelButtonProps: {
-          className:
-            'rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px] border-slate-200 text-slate-500',
-        },
-        onOk,
-      });
-    };
-
-    switch (key) {
-      case 'publish':
-        showConfirm({
-          title: JOB_POSTING_UI.CONFIRM.PUBLISH.TITLE,
-          content: JOB_POSTING_UI.CONFIRM.PUBLISH.CONTENT(title),
-          onOk: () => actions.publishDraft.mutate(id),
-        });
-        break;
-      case 'close': {
-        const titleMsg = JOB_POSTING_UI.CONFIRM.CLOSE.TITLE;
-        const content =
-          activeAppCount > 0
-            ? JOB_POSTING_UI.CONFIRM.CLOSE.CONTENT_ACTIVE(title, activeAppCount)
-            : JOB_POSTING_UI.CONFIRM.CLOSE.CONTENT_INACTIVE(title);
-
-        showConfirm({
-          title: titleMsg,
-          content,
-          onOk: () => actions.closeJob.mutate(id),
-        });
-        break;
-      }
-      case 'delete': {
-        const titleMsg = JOB_POSTING_UI.CONFIRM.DELETE.TITLE;
-        const content =
-          activeAppCount > 0
-            ? JOB_POSTING_UI.CONFIRM.DELETE.CONTENT_ACTIVE(title, activeAppCount)
-            : JOB_POSTING_UI.CONFIRM.DELETE.CONTENT_INACTIVE(title);
-
-        showConfirm({
-          title: titleMsg,
-          content,
-          onOk: () => actions.deleteJob.mutate(id),
-          confirmText: JOB_POSTING_UI.CONFIRM.DELETE.BUTTON,
-          variant: 'danger',
-        });
-        break;
-      }
-      case 'edit':
-        setSelectedRecord(record);
-        setIsModalOpen(true);
-        break;
-      default:
-        break;
-    }
-  };
-
-  // Status Summary Stats logic from real data
+  // derived state for StatCards
   const statusCounts = useMemo(() => {
     const counts = {
       [JOB_STATUS.DRAFT]: 0,
@@ -176,103 +56,88 @@ export default function JobPostings() {
       [JOB_STATUS.CLOSED]: 0,
       [JOB_STATUS.DELETED]: 0,
     };
-
-    // Use jobPostings for current view counts or a separate summary API if available.
-    // For now, derive from current page data or previous fetch.
     jobPostings.forEach((job) => {
-      if (counts[job.status] !== undefined) {
-        counts[job.status]++;
-      }
+      if (counts[job.status] !== undefined) counts[job.status]++;
     });
     return counts;
   }, [jobPostings]);
 
   return (
-    <div className="animate-in fade-in flex min-h-0 flex-1 flex-col overflow-hidden pb-10 duration-700">
-      <div className="mx-auto w-full max-w-[1600px] flex-1 px-4 py-8 md:px-8">
-        <div className="mb-10 flex items-center justify-between gap-4">
-          <PageLayout.Header title={JOB_POSTING_UI.TITLE} subtitle={JOB_POSTING_UI.LIST.SUBTITLE} />
-          <Button
-            className="bg-slate-900 hover:bg-slate-800 flex h-11 items-center gap-2 rounded-2xl px-6 text-[11px] font-bold uppercase tracking-widest text-white shadow-md transition-all hover:shadow-lg"
-            onClick={openCreateModal}
-          >
-            {JOB_POSTING_UI.CREATE_BUTTON}
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={JOB_POSTING_UI.FILTERS.DRAFT}
-            value={statusCounts[JOB_STATUS.DRAFT]}
-            icon={<FileText className="h-5 w-5" />}
-            color="var(--color-warning)"
-            colorClass="text-warning-text bg-warning-surface shadow-warning/10"
-          />
-          <StatCard
-            label={JOB_POSTING_UI.FILTERS.PUBLISHED}
-            value={statusCounts[JOB_STATUS.PUBLISHED]}
-            icon={<Send className="h-5 w-5" />}
-            color="var(--color-success)"
-            colorClass="text-success bg-success-surface shadow-success/10"
-          />
-          <StatCard
-            label={JOB_POSTING_UI.FILTERS.CLOSED}
-            value={statusCounts[JOB_STATUS.CLOSED]}
-            icon={<XCircle className="h-5 w-5" />}
-            color="var(--color-danger)"
-            colorClass="text-danger bg-danger-surface shadow-danger/10"
-          />
-          <StatCard
-            label={JOB_POSTING_UI.FILTERS.ALL}
-            value={totalCount}
-            icon={<Trash2 className="h-5 w-5" />}
-            color="var(--color-primary)"
-            colorClass="text-primary bg-primary-surface shadow-primary/10"
-          />
-        </div>
-
-        <div className="h-10" />
-
-        <PageLayout.Card className="border-border/60 bg-surface/70 flex flex-col overflow-hidden border p-0! shadow-xl backdrop-blur-sm">
-          <div className="border-border/60 bg-surface/50 flex items-center justify-between border-b px-8 py-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-            <span>{JOB_POSTING_UI.LIST.TITLE}</span>
-            <span className="text-[12px] font-bold normal-case tracking-normal text-slate-400">
-              {JOB_POSTING_UI.LIST.TOTAL}{' '}
-              <span className="text-slate-900">{JOB_POSTING_UI.LIST.ITEMS_COUNT(totalCount)}</span>
-            </span>
-          </div>
-          <PageLayout.Content className="px-0">
-            <div className="px-8">
-              <JobPostingsFilters filters={filters} onFilterChange={handleFilterChange} />
-            </div>
-            <JobPostingsTable
-              data={jobPostings}
-              loading={isLoading}
-              onAction={onAction}
-              pagination={{
-                current: filters.page,
-                pageSize: filters.size,
-                total: totalCount,
-                onChange: handlePageChange,
-              }}
-            />
-          </PageLayout.Content>
-        </PageLayout.Card>
-
-        <JobPostingModal
-          open={isModalOpen}
-          record={selectedRecord}
-          phases={phases}
-          onCancel={() => {
-            setIsModalOpen(false);
-            setSelectedRecord(null);
-          }}
-          onSuccess={() => {
-            setIsModalOpen(false);
-            setSelectedRecord(null);
-          }}
+    <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 px-4 md:px-8">
+        <StatCard
+          label={JOB_POSTING_UI.FILTERS.DRAFT}
+          value={statusCounts[JOB_STATUS.DRAFT]}
+          icon={<FileEdit className="h-5 w-5" />}
+          color="var(--color-warning)"
+          colorClass="text-warning-text bg-warning-surface shadow-warning/5"
+          className="!p-4.5 overflow-hidden border-warning/10"
+        />
+        <StatCard
+          label={JOB_POSTING_UI.FILTERS.PUBLISHED}
+          value={statusCounts[JOB_STATUS.PUBLISHED]}
+          icon={<Globe className="h-5 w-5" />}
+          color="var(--color-success)"
+          colorClass="text-success bg-success-surface shadow-success/5"
+          className="!p-4.5 overflow-hidden border-success/10"
+        />
+        <StatCard
+          label={JOB_POSTING_UI.FILTERS.CLOSED}
+          value={statusCounts[JOB_STATUS.CLOSED]}
+          icon={<Archive className="h-5 w-5" />}
+          color="var(--color-danger)"
+          colorClass="text-danger bg-danger-surface shadow-danger/5"
+          className="!p-4.5 overflow-hidden border-danger/10"
+        />
+        <StatCard
+          label={JOB_POSTING_UI.FILTERS.ALL}
+          value={totalCount}
+          icon={<Briefcase className="h-5 w-5" />}
+          color="var(--color-primary)"
+          colorClass="text-primary bg-primary-surface shadow-primary/5"
+          className="!p-4.5 overflow-hidden border-primary/10"
         />
       </div>
-    </div>
+
+      <PageLayout.Card className="flex min-h-[500px] flex-1 flex-col overflow-hidden !p-4 sm:!p-8 mx-4 md:mx-8 mb-6">
+        <JobPostingsFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onCreate={openCreateDrawer}
+        />
+
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <JobPostingsTable
+            data={jobPostings}
+            loading={isLoading}
+            onAction={onAction}
+            pagination={{
+              current: filters.page,
+              pageSize: filters.size,
+              total: totalCount,
+            }}
+          />
+        </div>
+
+        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6 text-muted">
+          <Pagination
+            total={totalCount}
+            page={filters.page}
+            pageSize={filters.size}
+            totalPages={Math.max(1, Math.ceil(totalCount / filters.size))}
+            onPageChange={(page) => handlePageChange(page, filters.size)}
+            onPageSizeChange={(size) => handlePageChange(1, size)}
+          />
+        </div>
+      </PageLayout.Card>
+
+      <JobPostingDrawer
+        open={isDrawerOpen}
+        record={selectedRecord}
+        phases={phases}
+        onCancel={closeDrawer}
+        onSuccess={closeDrawer}
+      />
+    </PageLayout>
   );
 }

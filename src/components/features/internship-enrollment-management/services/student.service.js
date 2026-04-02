@@ -48,7 +48,14 @@ const mapStudent = (item) => {
     email: item.email || student.email,
     phone: item.phone || student.phone,
     major: item.major || student.major,
-    status: ENROLLMENT_STATUS_MAP[item.enrollmentStatus || student.enrollmentStatus] || 'ACTIVE',
+    status:
+      item.enrollmentStatus === ENROLLMENT_STATUS.WITHDRAWN ||
+      student.enrollmentStatus === ENROLLMENT_STATUS.WITHDRAWN
+        ? 'WITHDRAWN'
+        : item.placementStatus === PLACEMENT_STATUS.PLACED ||
+            student.placementStatus === PLACEMENT_STATUS.PLACED
+          ? 'PLACED'
+          : 'UNPLACED',
     placementStatus:
       PLACEMENT_STATUS_MAP[item.placementStatus || student.placementStatus] || 'UNPLACED',
     enterpriseId: item.enterpriseId || student.enterpriseId,
@@ -98,7 +105,7 @@ const mapStudentForUpdate = (values) => {
 
 export const StudentService = {
   async getAll(termId, params = {}) {
-    return httpGet(`/terms/${termId}/enrollments`, params);
+    return httpGet(`/terms/${termId}/enrollments`, cleanPayload(params));
   },
 
   async getById(id) {
@@ -113,12 +120,8 @@ export const StudentService = {
     return httpPut(`/student-terms/${id}`, data);
   },
 
-  async withdraw(id) {
-    return httpPatch(`/student-terms/${id}/withdraw`);
-  },
-
-  async restore(id) {
-    return httpPatch(`/student-terms/${id}/restore`);
+  async withdraw(termId, id) {
+    return this.bulkWithdraw(termId, [id]);
   },
 
   async importPreview(termId, file) {
@@ -143,7 +146,7 @@ export const StudentService = {
   },
 
   async bulkWithdraw(termId, studentTermIds) {
-    return httpPatch(`/terms/${termId}/enrollments/bulk-withdraw`, { studentTermIds });
+    return httpPatch(`/terms/${termId}/enrollments/bulk-withdraw`, { termId, studentTermIds });
   },
 
   async getTemplate(termId) {

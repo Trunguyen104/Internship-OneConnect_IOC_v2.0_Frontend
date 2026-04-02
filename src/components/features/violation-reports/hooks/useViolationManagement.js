@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 import { useCallback } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -16,6 +17,7 @@ import { useViolationModals } from './useViolationModals';
 export const useViolationManagement = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { phaseId } = useParams();
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
 
   const {
@@ -35,7 +37,7 @@ export const useViolationManagement = () => {
     handleDateRangeChange,
     handleTableChange,
     resetFilters,
-  } = useViolationFilters();
+  } = useViolationFilters(phaseId);
 
   const {
     modalVisible,
@@ -50,11 +52,15 @@ export const useViolationManagement = () => {
   } = useViolationModals();
 
   // 1. Fetch User Profile (Me)
-  const { data: me = null } = useQuery({
-    queryKey: ['me'],
+  const { data: me } = useQuery({
+    queryKey: ['violation-user-profile'],
     queryFn: async () => {
-      const res = await userService.getMe();
-      return res?.data || res;
+      try {
+        const res = await userService.getMe();
+        return res?.data || res || null;
+      } catch (err) {
+        return null;
+      }
     },
     staleTime: Infinity,
   });
