@@ -11,22 +11,22 @@ import {
   INTERN_PHASE_MANAGEMENT,
   INTERN_PHASE_STATUS,
   INTERN_PHASE_STATUS_LABELS,
+  INTERN_PHASE_STATUS_VARIANTS,
 } from '@/constants/intern-phase-management/intern-phase';
 
+import PhasePostingCell from './PhasePostingCell';
+
 export default function InternPhaseTable({ items, loading, onView, onEdit, onDelete }) {
-  const { TABLE, SEARCH_PLACEHOLDER, FILTERS, CREATE_BTN } = INTERN_PHASE_MANAGEMENT;
+  const { TABLE } = INTERN_PHASE_MANAGEMENT;
 
   const columns = useMemo(
     () => [
       {
         title: TABLE.COLUMNS.NAME,
         key: 'name',
-        width: '200px',
+        width: '240px',
         render: (text) => (
-          <span
-            className="block truncate font-semibold text-slate-800 whitespace-nowrap"
-            title={text}
-          >
+          <span className="font-bold text-slate-800 tracking-tight hover:text-primary transition-colors cursor-default">
             {text}
           </span>
         ),
@@ -34,17 +34,10 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
       {
         title: TABLE.COLUMNS.MAJORS,
         key: 'majorFields',
-        width: '190px',
+        width: '220px',
         render: (text) => {
-          const majors =
-            typeof text === 'string'
-              ? text
-                  .split(',')
-                  .map((m) => m.trim())
-                  .filter(Boolean)
-              : [];
-          if (!majors.length) return <span className="text-muted/40 italic">-</span>;
-
+          if (!text) return INTERN_PHASE_MANAGEMENT.MESSAGES.DASH;
+          const majors = typeof text === 'string' ? text.split(',') : text;
           const firstMajor = majors[0];
           const remainingCount = majors.length - 1;
 
@@ -75,7 +68,8 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
               {remainingCount > 0 && (
                 <Tooltip title={majors.slice(1).join(', ')}>
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-[10px] font-black text-slate-500 ring-4 ring-white shadow-sm transition-all hover:scale-110 hover:bg-slate-200 cursor-help">
-                    +{remainingCount}
+                    {INTERN_PHASE_MANAGEMENT.MESSAGES.PLUS}
+                    {remainingCount}
                   </div>
                 </Tooltip>
               )}
@@ -92,28 +86,25 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
             <span className="whitespace-nowrap">
               {dayjs(record.startDate).format('DD/MM/YYYY')}
             </span>
-            <span className="opacity-40">-</span>
+            <span className="opacity-40">{INTERN_PHASE_MANAGEMENT.MESSAGES.DASH}</span>
             <span className="whitespace-nowrap">{dayjs(record.endDate).format('DD/MM/YYYY')}</span>
           </div>
         ),
       },
       {
         title: TABLE.COLUMNS.STATUS,
-        key: 'computedStatus',
+        key: 'status',
         width: '100px',
         align: 'center',
         render: (status) => {
-          const variant =
-            status === INTERN_PHASE_STATUS.ACTIVE
-              ? 'success'
-              : status === INTERN_PHASE_STATUS.UPCOMING
-                ? 'warning'
-                : 'neutral';
+          const variant = INTERN_PHASE_STATUS_VARIANTS[status] || 'default';
+          const label =
+            INTERN_PHASE_STATUS_LABELS[status] || INTERN_PHASE_MANAGEMENT.MESSAGES.UNKNOWN;
 
           return (
             <StatusBadge
               variant={variant}
-              label={INTERN_PHASE_STATUS_LABELS[status]}
+              label={label}
               pulseDot={status === INTERN_PHASE_STATUS.ACTIVE}
             />
           );
@@ -124,7 +115,26 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
         key: 'jobPostingCount',
         width: '110px',
         align: 'center',
-        render: (count) => <span className="font-medium">{count || 0}</span>,
+        render: (_, record) => {
+          const initialCount =
+            record.jobPostingCount ??
+            record.jobPostingsCount ??
+            record.totalJobPostings ??
+            record.totalJobPosting ??
+            record.postingsCount ??
+            record.postingCount ??
+            record.jobCount ??
+            record.totalJobs ??
+            record.jobPostings?.length ??
+            0;
+
+          return (
+            <PhasePostingCell
+              initialCount={initialCount}
+              phaseId={record.id || record.phaseId || record.internPhaseId}
+            />
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.CAPACITY,
@@ -166,7 +176,7 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
               key: 'edit',
               label: TABLE.ACTIONS.EDIT,
               icon: <EditOutlined />,
-              disabled: record.computedStatus === 'ENDED',
+              disabled: record.status === INTERN_PHASE_STATUS.ENDED,
               onClick: () => onEdit(record),
             },
             {
@@ -192,7 +202,7 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
   );
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col h-full">
       <DataTable
         columns={columns}
         data={items}

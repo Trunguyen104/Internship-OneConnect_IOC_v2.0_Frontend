@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
+import { EnterpriseGroupService } from '@/components/features/internship-management/internship-group-management/services/enterprise-group.service';
 import { ProjectService } from '@/components/features/project/services/project.service';
 import { SPRINT_STATUS } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';
@@ -11,11 +13,13 @@ import { useToast } from '@/providers/ToastProvider';
  */
 export function useBacklogData() {
   const toast = useToast();
+  const { internshipGroupId } = useParams();
 
   const [selectedEpicId, setSelectedEpicId] = useState('ALL');
   const [searchText, setSearchText] = useState('');
   const deferredSearchText = useDeferredValue(searchText);
 
+  const [epics, setEpics] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [backlogItems, setBacklogItems] = useState([]);
 
@@ -32,6 +36,27 @@ export function useBacklogData() {
       }
     },
     staleTime: Infinity,
+  });
+
+  // 1.5 Fetch Group Members
+  const { data: members = [] } = useQuery({
+    queryKey: ['backlog-group-members', internshipGroupId],
+    queryFn: async () => {
+      if (!internshipGroupId) return [];
+      try {
+        const res = await EnterpriseGroupService.getGroupDetail(internshipGroupId);
+        const rawData = res?.data || res;
+        return (rawData?.members || rawData?.students || []).map((s) => ({
+          id: s.studentId || s.id || s.applicationId,
+          fullName: s.studentFullName || s.fullName || s.name || 'Unknown',
+        }));
+      } catch (err) {
+        console.error('Error loading group members:', err);
+        return [];
+      }
+    },
+    enabled: !!internshipGroupId,
+    staleTime: 5 * 60 * 1000,
   });
 
   // 2. Fetch Backlog Data (Epics, Sprints, Items)
@@ -87,18 +112,16 @@ export function useBacklogData() {
     staleTime: 2 * 60 * 1000,
   });
 
-  // Derived epics from query data (no local modification)
-  const epics = useMemo(() => backlogData?.epics || [], [backlogData?.epics]);
-
   // Sync local state when query data changes
   useEffect(() => {
     if (backlogData) {
       setTimeout(() => {
+        setEpics(backlogData.epics || []);
         setSprints(backlogData.sprints || []);
         setBacklogItems(backlogData.backlogItems || []);
       }, 0);
     }
-  }, [backlogData?.sprints, backlogData?.backlogItems, backlogData]);
+  }, [backlogData?.epics, backlogData?.sprints, backlogData?.backlogItems, backlogData]);
 
   // Derived Logic
   const appendEpicName = useCallback(
@@ -142,11 +165,13 @@ export function useBacklogData() {
   return {
     projectId,
     epics,
+    setEpics,
     sprints,
     setSprints,
     backlogItems,
     setBacklogItems,
     loading,
+    members,
     selectedEpicId,
     setSelectedEpicId,
     searchText,

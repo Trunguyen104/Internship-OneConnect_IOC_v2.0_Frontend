@@ -1,11 +1,9 @@
 'use client';
 
 import { FlagOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
-import { DatePicker } from '@/components/ui/datepicker';
 import { Input } from '@/components/ui/input';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
@@ -22,14 +20,12 @@ function FieldLabel({ required, children }) {
 export default function CreateEpicModal({ open, onClose, onSubmit }) {
   const [epicName, setEpicName] = useState('');
   const [desc, setDesc] = useState('');
-  const [endDate, setEndDate] = useState('');
 
   const canSubmit = useMemo(() => epicName.trim() !== '', [epicName]);
 
   function reset() {
     setEpicName('');
     setDesc('');
-    setEndDate('');
   }
 
   function handleClose() {
@@ -41,17 +37,16 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
     onSubmit?.({
       name: epicName.trim(),
       description: desc,
-      endDate,
     });
     reset();
     onClose?.();
   }
 
   return (
-    <CompoundModal open={open} onCancel={handleClose} width={800}>
+    <CompoundModal open={open} onCancel={handleClose} width={700}>
       <CompoundModal.Header
         title={BACKLOG_UI.MODAL_CREATE_EPIC}
-        subtitle="Thiết lập các mục tiêu lớn và lộ trình dài hạn cho dự án"
+        subtitle={BACKLOG_UI.MODAL_CREATE_EPIC_SUBTITLE}
         icon={<FlagOutlined />}
       />
 
@@ -69,27 +64,13 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
           </div>
 
           {/* Description */}
-          <div className="flex min-h-[400px] flex-col">
+          <div className="flex min-h-[250px] flex-col">
             <FieldLabel>{BACKLOG_UI.FIELD_DESCRIPTION}</FieldLabel>
             <div className="flex-1 rounded-xl border border-gray-100 overflow-hidden bg-gray-50/20 shadow-inner">
               <TiptapEditor
                 value={desc}
                 onChange={setDesc}
                 placeholder={BACKLOG_UI.PLACEHOLDER_DESC}
-              />
-            </div>
-          </div>
-
-          {/* End date */}
-          <div className="flex flex-col">
-            <FieldLabel>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
-            <div className="w-[320px]">
-              <DatePicker
-                value={endDate ? dayjs(endDate) : null}
-                onChange={(date) => setEndDate(date ? date.toISOString() : '')}
-                format="YYYY-MM-DD"
-                placeholder="Chọn ngày kết thúc"
-                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
               />
             </div>
           </div>

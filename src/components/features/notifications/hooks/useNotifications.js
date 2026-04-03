@@ -1,78 +1,101 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
-import { httpGet, httpPatch } from '@/services/http-client.service';
+import { useAuthStore } from '@/store/useAuthStore';
 
+import { NotificationService } from '../services/notification.service';
+
+/**
+ * Hook to manage fetching, marking as read, and deleting notifications.
+ * Uses useInfiniteQuery for the list and standard useQuery for unread count.
+ */
 export const useNotifications = () => {
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+  const userId = user?.id || user?.sub || user?.email;
 
-  // 1. Fetch Unread Count
-  const { data: unreadCount = 0 } = useQuery({
-    queryKey: ['notifications-unread-count'],
-    queryFn: async () => {
-      try {
-        const response = await httpGet('/notifications/notifications/unread-count');
-        return response?.data?.unreadCount || 0;
-      } catch (error) {
-        if (error?.status === 401 || error?.silent) return 0;
-        console.error('Failed to fetch unread count:', error);
-        return 0;
-      }
-    },
-    staleTime: 30 * 1000, // Check every 30s
+  // 1. Fetch unread count (cached/invalidated on changes)
+  const { data: unreadData, refetch: refreshUnreadCount } = useQuery({
+    queryKey: ['notifications', userId, 'unread-count'],
+    queryFn: () => NotificationService.getUnreadCount(),
+    enabled: !!userId,
+    // Keep count relatively fresh via polling (AC-01/02 legacy)
+    staleTime: 15 * 1000,
+    refetchInterval: 30 * 1000, // Poll every 30 seconds (replaces SignalR)
   });
 
-  // 2. Fetch Notifications List
+  const unreadCount = useMemo(() => unreadData?.data?.unreadCount || 0, [unreadData]);
+
+  // 2. Fetch paginated notifications list (using infinite query for cuộn vô tận)
   const {
-    data: notifications = [],
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     isLoading: loading,
     refetch: fetchNotifications,
-  } = useQuery({
-    queryKey: ['notifications-list'],
-    queryFn: async () => {
-      try {
-        const response = await httpGet('/notifications/notifications');
-        return response?.data?.items || [];
-      } catch (error) {
-        if (error?.status === 401 || error?.silent) return [];
-        console.error('Failed to fetch notifications:', error);
-        return [];
-      }
+  } = useInfiniteQuery({
+    queryKey: ['notifications', userId, 'list'],
+    queryFn: ({ pageParam = 1 }) =>
+      NotificationService.getNotifications({ pageIndex: pageParam, pageSize: 15 }),
+    enabled: !!userId,
+    getNextPageParam: (lastPage) => {
+      const { pageIndex, totalPages } = lastPage?.data || {};
+      return pageIndex < totalPages ? pageIndex + 1 : undefined;
     },
-    staleTime: 2 * 60 * 1000,
+    initialPageParam: 1,
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000, // Background refresh the list every 60 seconds
   });
 
-  const markAsRead = async (notificationId) => {
-    try {
-      const response = await httpPatch(`/notifications/notifications/${notificationId}/read`);
-      if (response?.success) {
-        queryClient.invalidateQueries({ queryKey: ['notifications-list'] });
-        queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
-      }
-    } catch (error) {
-      if (error?.status === 401 || error?.silent) return;
-      console.error('Failed to mark notification as read:', error);
-    }
-  };
+  const notifications = useMemo(() => {
+    return data?.pages?.flatMap((page) => page?.data?.items || []) || [];
+  }, [data]);
 
-  const markAllAsRead = async () => {
-    try {
-      const response = await httpPatch('/notifications/notifications/read-all');
-      if (response?.success) {
-        queryClient.invalidateQueries({ queryKey: ['notifications-list'] });
-        queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
-      }
-    } catch (error) {
-      if (error?.status === 401 || error?.silent) return;
-      console.error('Failed to mark all as read:', error);
-    }
-  };
+  // 3. Mutation: Mark as read
+  const markAsReadMutation = useMutation({
+    mutationFn: (id) => NotificationService.markAsRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
+  // 4. Mutation: Mark all as read
+  const markAllAsReadMutation = useMutation({
+    mutationFn: () => NotificationService.markAllAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
+  // 5. Mutation: Delete one
+  const deleteMutation = useMutation({
+    mutationFn: (id) => NotificationService.deleteNotification(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
+  // 6. Mutation: Bulk delete
+  const bulkDeleteMutation = useMutation({
+    mutationFn: (ids) => NotificationService.bulkDeleteNotifications(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
 
   return {
     notifications,
     unreadCount,
     loading,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
     fetchNotifications,
-    markAsRead,
-    markAllAsRead,
+    refreshUnreadCount,
+    markAsRead: markAsReadMutation.mutate,
+    markAllAsRead: markAllAsReadMutation.mutate,
+    deleteNotification: deleteMutation.mutate,
+    bulkDeleteNotifications: bulkDeleteMutation.mutate,
   };
 };

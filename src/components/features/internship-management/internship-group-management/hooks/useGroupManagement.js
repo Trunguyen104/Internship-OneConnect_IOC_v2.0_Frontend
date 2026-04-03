@@ -36,7 +36,7 @@ export const useGroupManagement = () => {
         return null;
       }
     },
-    staleTime: Infinity,
+    staleTime: 0, // Always check user identity on mount
   });
 
   // 2. Main Group Data Fetching

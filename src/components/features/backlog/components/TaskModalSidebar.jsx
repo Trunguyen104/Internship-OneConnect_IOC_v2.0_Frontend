@@ -31,6 +31,7 @@ export function TaskModalSidebar({
   setDueDate,
   points,
   setPoints,
+  members = [],
 }) {
   return (
     <div className="flex w-full shrink-0 flex-col lg:w-[360px]">
@@ -38,14 +39,14 @@ export function TaskModalSidebar({
         className="border-border/50 h-full overflow-y-auto rounded-3xl border bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
         style={{ scrollbarWidth: 'none' }}
       >
-        <h3 className="text-text mb-5 text-[17px] font-bold text-gray-800">
+        <h3 className="mb-5 text-[17px] font-bold text-gray-800">
           {BACKLOG_UI.DETAILS || 'Details'}
         </h3>
 
         <div className="space-y-5">
           {/* Status */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[130px] text-[13.5px] font-semibold text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_STATUS || 'Status'} <span className="text-danger">*</span>
             </span>
             <div className="flex-1">
@@ -65,7 +66,7 @@ export function TaskModalSidebar({
 
           {/* Type */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_TYPE || 'Type'} <span className="text-danger">*</span>
             </span>
             <div className="flex-1">
@@ -84,7 +85,7 @@ export function TaskModalSidebar({
 
           {/* Epic */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.TYPE_EPIC || 'Epic'}
             </span>
             <div className="flex-1">
@@ -102,7 +103,7 @@ export function TaskModalSidebar({
 
           {/* Sprint */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_SPRINT || 'Sprint'}
             </span>
             <div className="flex-1">
@@ -120,7 +121,7 @@ export function TaskModalSidebar({
 
           {/* Assignee */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_ASSIGNEE || 'Assignee'}
             </span>
             <div className="flex-1">
@@ -128,17 +129,17 @@ export function TaskModalSidebar({
                 value={assignee}
                 onChange={setAssignee}
                 placeholder={BACKLOG_UI.SELECT || 'Select'}
-                options={[
-                  { value: 'dev1', label: 'Nguyen Van A' },
-                  { value: 'dev2', label: 'Tran Thi B' },
-                ]}
+                options={(members || []).map((m) => ({
+                  value: m.id,
+                  label: m.fullName || m.name || 'Unknown',
+                }))}
               />
             </div>
           </div>
 
           {/* Priority */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_PRIORITY || 'Priority'} <span className="text-danger">*</span>
             </span>
             <div className="flex-1">
@@ -157,7 +158,7 @@ export function TaskModalSidebar({
 
           {/* Due Date */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
             </span>
             <div className="flex-1">
@@ -173,7 +174,7 @@ export function TaskModalSidebar({
 
           {/* Story Points */}
           <div className="flex items-center justify-between gap-4">
-            <span className="text-muted min-w-[120px] text-sm font-medium text-gray-500">
+            <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_STORY_POINTS || 'Story Points'}
             </span>
             <div className="flex-1">

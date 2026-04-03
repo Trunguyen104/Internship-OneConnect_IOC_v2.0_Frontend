@@ -1,11 +1,12 @@
 'use client';
 
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { BankOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import {
   AlertOctagon,
   Briefcase,
   ChevronDown,
+  FileText,
   FolderGit2,
   GraduationCap,
   Home,
@@ -31,10 +32,12 @@ export default function CompanyTopNav() {
 
   const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
   const isMentor = roleId === 6;
+  const isEnterpriseManager = [4, 5, 6].includes(roleId);
 
   const NAV_TABS = [
     { key: '/company/home', label: 'Home', icon: Home },
     { key: '/company/phases', label: 'Phases', icon: Layers },
+    { key: '/company/applications', label: 'Applications', icon: FileText },
     { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
     { key: '/company/internships', label: 'Internships', icon: Users },
     { key: '/company/universities', label: 'Universities', icon: GraduationCap },
@@ -80,12 +83,16 @@ export default function CompanyTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      ...(isEnterpriseManager
+        ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
+        : []),
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
+      if (key === 'my-company') router.push('/company/my-company');
       if (key === 'settings') router.push('/settings');
       if (key === 'logout') handleLogout();
     },
@@ -122,7 +129,7 @@ export default function CompanyTopNav() {
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="size-4" />
+                  {Icon ? <Icon className="size-4" /> : null}
                   {label}
                 </Link>
               );

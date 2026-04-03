@@ -90,6 +90,7 @@ Content.propTypes = {
 };
 
 const Footer = ({
+  children,
   onCancel,
   onConfirm,
   onSubmit,
@@ -114,31 +115,37 @@ const Footer = ({
 
   return (
     <div className={`mt-6 flex justify-end gap-3 border-t border-gray-50 pt-5 ${className}`}>
-      {showCancel && (
-        <Button
-          onClick={onCancel}
-          disabled={loading}
-          variant="ghost"
-          className="h-11 rounded-full px-6 text-[13px] font-bold text-muted/60 transition-all hover:bg-gray-50 hover:text-text"
-        >
-          {cancelText}
-        </Button>
+      {children ? (
+        children
+      ) : (
+        <>
+          {showCancel && (
+            <Button
+              onClick={onCancel}
+              disabled={loading}
+              variant="ghost"
+              className="h-11 rounded-full px-6 text-[13px] font-bold text-muted/60 transition-all hover:bg-gray-50 hover:text-text"
+            >
+              {cancelText}
+            </Button>
+          )}
+          <Button
+            type="primary"
+            danger={finalDanger}
+            loading={loading}
+            onClick={finalOnConfirm}
+            icon={finalIcon}
+            disabled={finalDisabled}
+            className={`h-11 min-w-[120px] rounded-full px-6 text-[12px] font-black uppercase tracking-widest shadow-lg transition-all hover:scale-105 active:scale-95 ${
+              !finalDanger
+                ? 'bg-primary shadow-primary/20 hover:bg-primary-hover hover:shadow-primary/30'
+                : 'bg-rose-500 shadow-rose-500/20 hover:bg-rose-600 hover:shadow-rose-500/30'
+            }`}
+          >
+            {finalConfirmText}
+          </Button>
+        </>
       )}
-      <Button
-        type="primary"
-        danger={finalDanger}
-        loading={loading}
-        onClick={finalOnConfirm}
-        icon={finalIcon}
-        disabled={finalDisabled}
-        className={`h-11 min-w-[120px] rounded-full px-6 text-[12px] font-black uppercase tracking-widest shadow-lg transition-all hover:scale-105 active:scale-95 ${
-          !finalDanger
-            ? 'bg-primary shadow-primary/20 hover:bg-primary-hover hover:shadow-primary/30'
-            : 'bg-rose-500 shadow-rose-500/20 hover:bg-rose-600 hover:shadow-rose-500/30'
-        }`}
-      >
-        {finalConfirmText}
-      </Button>
     </div>
   );
 };
