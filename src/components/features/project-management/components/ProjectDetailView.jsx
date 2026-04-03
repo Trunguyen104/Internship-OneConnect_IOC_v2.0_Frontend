@@ -49,7 +49,6 @@ export default function ProjectDetailView({ id }) {
   const [assignLoading, setAssignLoading] = useState(false);
   const [assigningProject, setAssigningProject] = useState(null);
   const [selectedGroupId, setSelectedGroupId] = useState(null);
-  const [replacementProjectId, setReplacementProjectId] = useState(null);
 
   // Determine if user is HR/Admin
   const isHR = useMemo(() => {
@@ -88,23 +87,6 @@ export default function ProjectDetailView({ id }) {
     staleTime: 10 * 60 * 1000,
   });
 
-  // Fetch all projects to find unstarted ones for replacement
-  const { data: allProjects = [] } = useQuery({
-    queryKey: ['unstarted-projects'],
-    queryFn: async () => {
-      try {
-        const res = await ProjectService.getAll({ PageSize: 100 });
-        const items = res?.data?.items || res?.items || [];
-        return items.filter((p) => {
-          const gid = p.internshipId || p.internshipGroupId || p.groupId;
-          return !gid || gid === '00000000-0000-0000-0000-000000000000';
-        });
-      } catch {
-        return [];
-      }
-    },
-  });
-
   // Fetch project details
   const { project, loading: projectLoading, refresh } = useProjectDetail(id, null, true);
 
@@ -118,7 +100,6 @@ export default function ProjectDetailView({ id }) {
   const handleOnAssign = (record) => {
     setAssigningProject(record);
     setSelectedGroupId(record.internshipId || record.internshipGroupId || record.groupId || null);
-    setReplacementProjectId(null);
     setAssignModalVisible(true);
   };
 
@@ -330,22 +311,15 @@ export default function ProjectDetailView({ id }) {
         visible={assignModalVisible}
         onCancel={() => setAssignModalVisible(false)}
         onConfirm={() =>
-          handleAssignGroup(
-            assigningProject,
-            selectedGroupId,
-            setAssignLoading,
-            () => setAssignModalVisible(false),
-            replacementProjectId
+          handleAssignGroup(assigningProject, selectedGroupId, setAssignLoading, () =>
+            setAssignModalVisible(false)
           )
         }
         loading={assignLoading}
         assigningProject={assigningProject}
         groups={groups}
-        unstartedProjects={allProjects}
         selectedGroupId={selectedGroupId}
         setSelectedGroupId={setSelectedGroupId}
-        replacementProjectId={replacementProjectId}
-        setReplacementProjectId={setReplacementProjectId}
       />
     </PageLayout>
   );

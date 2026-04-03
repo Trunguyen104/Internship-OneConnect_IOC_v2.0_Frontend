@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, EyeOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import React, { useMemo } from 'react';
 
@@ -9,8 +9,8 @@ export const useStudentColumns = ({
   isClosed,
   handleView,
   handleEdit,
+  handleEdit,
   handleDelete,
-  handleRestore,
   TABLE,
   ACTION_LABELS,
   STATUS_LABELS,
@@ -132,7 +132,7 @@ export const useStudentColumns = ({
               </Tooltip>
               {!isClosed && (
                 <>
-                  {!isWithdrawn ? (
+                  {!isWithdrawn && (
                     <>
                       <Tooltip title={ACTION_LABELS.EDIT}>
                         <Button
@@ -160,19 +160,6 @@ export const useStudentColumns = ({
                         />
                       </Tooltip>
                     </>
-                  ) : (
-                    <Tooltip title={ACTION_LABELS.RECOVER}>
-                      <Button
-                        type="text"
-                        size="small"
-                        icon={<ReloadOutlined />}
-                        className="hover:bg-success/10 hover:text-success text-muted flex size-8 items-center justify-center !rounded-xl transition-all"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRestore(record);
-                        }}
-                      />
-                    </Tooltip>
                   )}
                 </>
               )}

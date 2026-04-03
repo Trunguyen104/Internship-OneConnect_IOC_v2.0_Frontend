@@ -25,7 +25,7 @@ export const useProjectModals = () => {
 
   const handleView = (record) => {
     const id = record.projectId || record.id;
-    router.push(`/projects/${id}`);
+    router.push(`/company/projects/${id}`);
   };
 
   return {

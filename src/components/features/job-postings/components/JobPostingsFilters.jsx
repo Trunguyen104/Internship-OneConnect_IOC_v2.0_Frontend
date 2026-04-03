@@ -1,46 +1,59 @@
 'use client';
 
-import { SearchOutlined } from '@ant-design/icons';
+import { Switch } from 'antd';
 import React from 'react';
 
-import Input from '@/components/ui/input';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import Select from '@/components/ui/select';
 
-import { JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
+import { JOB_POSTING_UI } from '../constants/job-postings.constant';
 
-export const JobPostingsFilters = ({ filters, onFilterChange }) => {
-  const statusOptions = [
-    { label: JOB_POSTING_UI.FILTERS.ALL, value: undefined },
-    { label: JOB_POSTING_UI.FILTERS.DRAFT, value: JOB_STATUS.DRAFT },
-    { label: JOB_POSTING_UI.FILTERS.PUBLISHED, value: JOB_STATUS.PUBLISHED },
-    { label: JOB_POSTING_UI.FILTERS.CLOSED, value: JOB_STATUS.CLOSED },
-  ];
-
+export const JobPostingsFilters = ({ filters, onFilterChange, onCreate }) => {
   return (
-    <div className="flex flex-col gap-4 py-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex min-w-[300px] flex-1 items-center gap-3">
-          <Input
-            placeholder={JOB_POSTING_UI.SEARCH_PLACEHOLDER}
-            prefix={<SearchOutlined className="text-slate-400" />}
-            value={filters.search}
-            onChange={(e) => onFilterChange({ search: e.target.value })}
-            className="rounded-2xl border-slate-200 bg-slate-50/50 hover:bg-white focus:bg-white focus:shadow-sm h-10"
-          />
-        </div>
+    <DataTableToolbar className="mb-6">
+      <DataTableToolbar.Search
+        placeholder={JOB_POSTING_UI.SEARCH_PLACEHOLDER}
+        value={filters.search}
+        onChange={(e) => onFilterChange({ search: e.target.value })}
+        className="rounded-full"
+      />
 
-        <div className="w-[200px]">
-          <Select
-            placeholder="Select Status"
-            className="rounded-2xl! h-10"
-            allowClear
-            value={filters.status}
-            options={statusOptions}
-            onChange={(val) => onFilterChange({ status: val })}
+      <DataTableToolbar.Filters>
+        <Select
+          value={filters.status}
+          onChange={(val) => onFilterChange({ status: val })}
+          placeholder={JOB_POSTING_UI.TABLE.COLUMNS.STATUS}
+          className="!h-9 min-w-[160px] custom-select-toolbar"
+          allowClear
+          options={[
+            { label: JOB_POSTING_UI.FILTERS.ALL, value: undefined },
+            { label: JOB_POSTING_UI.FILTERS.DRAFT, value: 1 },
+            { label: JOB_POSTING_UI.FILTERS.PUBLISHED, value: 2 },
+            { label: JOB_POSTING_UI.FILTERS.CLOSED, value: 3 },
+          ]}
+        />
+
+        <div className="flex items-center gap-2 px-2 py-1 bg-bg border border-border rounded-lg hover:border-border/80 transition-all cursor-default select-none shrink-0 border-dashed">
+          <span className="text-[11px] font-bold text-muted uppercase tracking-wider">
+            {JOB_POSTING_UI.FILTERS.INCLUDE_DELETED}
+          </span>
+          <Switch
+            size="small"
+            checked={filters.includeDeleted}
+            onChange={(val) => onFilterChange({ includeDeleted: val })}
+            className="hover:shadow-sm transition-shadow"
           />
         </div>
-      </div>
-    </div>
+      </DataTableToolbar.Filters>
+
+      {onCreate && (
+        <DataTableToolbar.Actions
+          label={JOB_POSTING_UI.CREATE_BUTTON}
+          onClick={onCreate}
+          className="ml-auto"
+        />
+      )}
+    </DataTableToolbar>
   );
 };
 

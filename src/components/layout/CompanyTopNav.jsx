@@ -2,7 +2,16 @@
 
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Briefcase, ChevronDown, FolderGit2, GraduationCap, Home, Layers } from 'lucide-react';
+import {
+  AlertOctagon,
+  Briefcase,
+  ChevronDown,
+  FolderGit2,
+  GraduationCap,
+  Home,
+  Layers,
+  Users,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -14,19 +23,27 @@ import NotificationBell from '@/components/features/notifications/components/Not
 import { userService } from '@/components/features/user/services/user.service';
 import { useToast } from '@/providers/ToastProvider';
 
-const NAV_TABS = [
-  { key: '/company/home', label: 'Home', icon: Home },
-  { key: '/company/phases', label: 'Phases', icon: Layers },
-  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
-  { key: '/company/universities', label: 'Universities', icon: GraduationCap },
-  { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
-];
-
 export default function CompanyTopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const toast = useToast();
   const [userInfo, setUserInfo] = useState(null);
+
+  const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
+  const isMentor = roleId === 6;
+
+  const NAV_TABS = [
+    { key: '/company/home', label: 'Home', icon: Home },
+    { key: '/company/phases', label: 'Phases', icon: Layers },
+    { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+    { key: '/company/internships', label: 'Internships', icon: Users },
+    { key: '/company/universities', label: 'Universities', icon: GraduationCap },
+    { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
+  ];
+
+  if (isMentor) {
+    NAV_TABS.push({ key: '/company/violation', label: 'Violations', icon: AlertOctagon });
+  }
 
   useEffect(() => {
     userService

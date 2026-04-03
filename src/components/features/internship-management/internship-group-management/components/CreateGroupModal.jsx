@@ -1,13 +1,12 @@
 import { InfoCircleOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Form, Select, Typography } from 'antd';
-import dayjs from 'dayjs';
 import React, { memo, useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
+import { EnterpriseStudentService } from '../../../internship-student-management/services/enterprise-student.service';
 import { AddStudentsTable } from './AddStudentsTable';
 import { GroupFormFields } from './GroupFormFields';
 
@@ -57,8 +56,6 @@ export const CreateGroupModal = memo(
           form.setFieldsValue({
             groupName: defaultName,
             studentIds: ids,
-            startDate: undefined,
-            endDate: undefined,
           });
         } else if (group) {
           form.setFieldsValue({
@@ -68,8 +65,6 @@ export const CreateGroupModal = memo(
             studentIds: (group.members || []).map((s) =>
               String(s.studentId || s.id || s.applicationId || s.StudentId)
             ),
-            startDate: group.startDate ? dayjs(group.startDate) : undefined,
-            endDate: group.endDate ? dayjs(group.endDate) : undefined,
           });
         }
       }
@@ -117,8 +112,6 @@ export const CreateGroupModal = memo(
               return { studentId: id, role: roleInt };
             })
           : undefined,
-        startDate: values.startDate?.toISOString(),
-        endDate: values.endDate?.toISOString(),
       };
 
       if (!isAddingStudents) {
