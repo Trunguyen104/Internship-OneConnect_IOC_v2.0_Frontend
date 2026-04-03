@@ -8,22 +8,27 @@ import React from 'react';
  * Custom Select bọc từ Ant Design.
  * Tự động bo góc 12px và h-11 để khớp với bộ UI.
  */
-export const Select = ({ className, ...props }) => {
+export const Select = ({ className, error, ...props }) => {
   return (
-    <AntdSelect
-      className={`h-11 w-full ${className || ''}`}
-      classNames={{
-        popup: {
-          root: 'rounded-xl shadow-lg',
-        },
-      }}
-      {...props}
-    />
+    <div className="flex w-full flex-col gap-1.5">
+      <AntdSelect
+        className={`h-11 w-full ${className || ''}`}
+        status={error ? 'error' : undefined}
+        classNames={{
+          popup: {
+            root: 'rounded-xl shadow-lg',
+          },
+        }}
+        {...props}
+      />
+      {error && <p className="text-xs font-medium text-red-500">{error}</p>}
+    </div>
   );
 };
 
 Select.propTypes = {
   className: PropTypes.string,
+  error: PropTypes.node,
 };
 
 export default Select;
