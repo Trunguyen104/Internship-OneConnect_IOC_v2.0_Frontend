@@ -18,6 +18,7 @@ export default function CreateTaskModal({
   epics = [],
   sprints = [],
   initialSprintId = '',
+  members = [],
 }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
@@ -129,6 +130,7 @@ export default function CreateTaskModal({
               setDueDate={setDueDate}
               points={points}
               setPoints={setPoints}
+              members={members}
             />
           </div>
         </div>

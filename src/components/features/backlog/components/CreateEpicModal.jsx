@@ -46,7 +46,7 @@ export default function CreateEpicModal({ open, onClose, onSubmit }) {
     <CompoundModal open={open} onCancel={handleClose} width={700}>
       <CompoundModal.Header
         title={BACKLOG_UI.MODAL_CREATE_EPIC}
-        subtitle="Thiết lập các mục tiêu lớn và lộ trình dài hạn cho dự án"
+        subtitle={BACKLOG_UI.MODAL_CREATE_EPIC_SUBTITLE}
         icon={<FlagOutlined />}
       />
 

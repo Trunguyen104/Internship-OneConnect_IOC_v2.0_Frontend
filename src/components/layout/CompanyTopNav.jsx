@@ -1,6 +1,6 @@
 'use client';
 
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { BankOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import {
   AlertOctagon,
@@ -32,6 +32,7 @@ export default function CompanyTopNav() {
 
   const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
   const isMentor = roleId === 6;
+  const isEnterpriseManager = [4, 5, 6].includes(roleId);
 
   const NAV_TABS = [
     { key: '/company/home', label: 'Home', icon: Home },
@@ -82,12 +83,16 @@ export default function CompanyTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      ...(isEnterpriseManager
+        ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
+        : []),
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
+      if (key === 'my-company') router.push('/company/my-company');
       if (key === 'settings') router.push('/settings');
       if (key === 'logout') handleLogout();
     },

@@ -86,7 +86,8 @@ const InternshipDashboard = () => {
     };
 
     fetchDashboardData();
-  }, [toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -138,31 +139,6 @@ const InternshipDashboard = () => {
     );
   }
 
-  // Map the new context data to the format expected by the UI.
-  const { currentTerm, internship, university, studentInfo } = contextData;
-  const isPlaced = !!internship?.group;
-
-  // Calculate a basic journey step based on data presence
-  let journeyStep = 1;
-  if (currentTerm?.enrollmentStatus === 'Enrolled') journeyStep = 2;
-  if (internship?.enterprise) journeyStep = 3;
-  if (isPlaced) journeyStep = 4;
-
-  const mappedInternship = {
-    id: internship?.group?.groupId || currentTerm?.termId,
-    clientKey: currentTerm?.termId || 'context',
-    displayName: currentTerm?.termName || 'Current Term',
-    groupName: internship?.group?.groupName || 'No Group Assigned',
-    status: currentTerm?.status,
-    isPlaced: isPlaced,
-    enterpriseName: internship?.enterprise?.name || 'No Enterprise',
-    mentorName: internship?.mentor?.name || 'No Mentor',
-    projectName: internship?.project?.name || 'No Project',
-    journeyStep: journeyStep,
-    startDate: currentTerm?.startDate,
-    endDate: currentTerm?.endDate,
-  };
-
   return (
     <div className="mx-auto w-full max-w-5xl space-y-12 px-6 py-12">
       <header className="relative">
@@ -186,6 +162,18 @@ const InternshipDashboard = () => {
           const allPhases = [...phases];
 
           studentApps.forEach((app) => {
+            // Only add phase from application if it's active/placed and not already in the list
+            const statusVal = parseInt(app.status, 10);
+            const isActiveStatus = [
+              APPLICATION_STATUS.APPLIED,
+              APPLICATION_STATUS.INTERVIEWING,
+              APPLICATION_STATUS.OFFERED,
+              APPLICATION_STATUS.PENDING_ASSIGNMENT,
+              APPLICATION_STATUS.PLACED,
+            ].some((s) => String(s) === String(statusVal));
+
+            if (!isActiveStatus) return;
+
             const phaseIdCandidate = String(
               app.internshipPhaseId ||
                 app.phaseId ||
@@ -202,23 +190,35 @@ const InternshipDashboard = () => {
                   app.phaseName ||
                   app.internshipPhase?.name ||
                   'Active Internship',
-                status: 'InProgress',
+                status: app.internshipPhase?.status || 'InProgress',
               });
             }
           });
 
-          // Special fallback if no phase matches but we have applications:
-          // We must show the journey for the active application
-          if (allPhases.length === 0 && studentApps.length > 0) {
-            const firstApp = studentApps[0];
-            allPhases.push({
-              id: 'fallback-stage',
-              name: firstApp.internPhaseName || firstApp.phaseName || 'Active Internship',
-              status: 'InProgress',
-            });
-          }
-
           if (allPhases.length === 0) return null;
+
+          // NEW LOGIC: If there are multiple phases, but some have groups and some don't,
+          // prioritize the ones with groups to prevent duplicate "ghost" cards from old applications.
+          const phasesWithGroupMeta = allPhases.map((phase) => {
+            const currentPhaseId = String(phase.id || phase.phaseId || '');
+            const hasGroupAssign = groups.some((g) => {
+              const gid = String(g.internshipPhaseId || g.phaseId || g.internshipId || g.id || '');
+              return gid && (gid === currentPhaseId || currentPhaseId === 'fallback-stage');
+            });
+
+            // Also check if any application for this phase already has a groupName
+            const hasAppGroup = studentApps.some((a) => {
+              const aid = String(a.internshipPhaseId || a.phaseId || a.internshipId || a.id || '');
+              return aid === currentPhaseId && (a.groupName || a.internshipGroupId);
+            });
+
+            return { ...phase, hasActualGroup: hasGroupAssign || hasAppGroup };
+          });
+
+          const someHaveGroups = phasesWithGroupMeta.some((p) => p.hasActualGroup);
+          const finalPhasesToRender = someHaveGroups
+            ? phasesWithGroupMeta.filter((p) => p.hasActualGroup)
+            : phasesWithGroupMeta;
 
           return (
             <section className="space-y-6">
@@ -229,7 +229,7 @@ const InternshipDashboard = () => {
                 <div className="h-px flex-1 bg-slate-100" />
               </div>
               <div className="space-y-6">
-                {allPhases.map((phase, index) => {
+                {finalPhasesToRender.map((phase, index) => {
                   const currentPhaseId = String(phase.id || phase.phaseId || '');
 
                   const groupFromService = groups.find((g) => {

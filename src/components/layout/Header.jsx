@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BankOutlined,
   FileTextOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -71,6 +72,9 @@ export default function Header() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      ...([4, 5, 6].includes(userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role))
+        ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
+        : []),
       { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
@@ -82,6 +86,7 @@ export default function Header() {
         const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
         router.push(`/profile${query}`);
       }
+      if (key === 'my-company') router.push('/company/my-company');
       if (key === 'my-applications') router.push('/my-applications');
       if (key === 'settings') router.push('/settings');
 

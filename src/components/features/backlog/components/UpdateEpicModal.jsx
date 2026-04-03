@@ -38,8 +38,8 @@ export default function UpdateEpicModal({ open, onClose, onSubmit, initialData }
   return (
     <CompoundModal open={open} onCancel={handleClose} width={700}>
       <CompoundModal.Header
-        title={`${BACKLOG_UI.UPDATE || 'Cập nhật'} ${BACKLOG_UI.TYPE_EPIC || 'Epic'}`}
-        subtitle="Chỉnh sửa thông tin chi tiết và thời hạn hoàn thành cho mục tiêu lớn"
+        title={`${BACKLOG_UI.UPDATE || 'Update'} ${BACKLOG_UI.TYPE_EPIC || 'Epic'}`}
+        subtitle={BACKLOG_UI.MODAL_UPDATE_EPIC_SUBTITLE}
         icon={<EditOutlined />}
       />
 

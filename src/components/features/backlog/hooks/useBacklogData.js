@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
+import { EnterpriseGroupService } from '@/components/features/internship-management/internship-group-management/services/enterprise-group.service';
 import { ProjectService } from '@/components/features/project/services/project.service';
 import { SPRINT_STATUS } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';
@@ -11,6 +13,7 @@ import { useToast } from '@/providers/ToastProvider';
  */
 export function useBacklogData() {
   const toast = useToast();
+  const { internshipGroupId } = useParams();
 
   const [selectedEpicId, setSelectedEpicId] = useState('ALL');
   const [searchText, setSearchText] = useState('');
@@ -33,6 +36,27 @@ export function useBacklogData() {
       }
     },
     staleTime: Infinity,
+  });
+
+  // 1.5 Fetch Group Members
+  const { data: members = [] } = useQuery({
+    queryKey: ['backlog-group-members', internshipGroupId],
+    queryFn: async () => {
+      if (!internshipGroupId) return [];
+      try {
+        const res = await EnterpriseGroupService.getGroupDetail(internshipGroupId);
+        const rawData = res?.data || res;
+        return (rawData?.members || rawData?.students || []).map((s) => ({
+          id: s.studentId || s.id || s.applicationId,
+          fullName: s.studentFullName || s.fullName || s.name || 'Unknown',
+        }));
+      } catch (err) {
+        console.error('Error loading group members:', err);
+        return [];
+      }
+    },
+    enabled: !!internshipGroupId,
+    staleTime: 5 * 60 * 1000,
   });
 
   // 2. Fetch Backlog Data (Epics, Sprints, Items)
@@ -147,6 +171,7 @@ export function useBacklogData() {
     backlogItems,
     setBacklogItems,
     loading,
+    members,
     selectedEpicId,
     setSelectedEpicId,
     searchText,
