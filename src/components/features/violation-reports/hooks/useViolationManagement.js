@@ -56,7 +56,7 @@ export const useViolationManagement = () => {
       const res = await userService.getMe();
       return res?.data || res;
     },
-    staleTime: Infinity,
+    staleTime: 0, // Always check user identity on mount
   });
 
   // 2. Initial Data: Fetch Groups to extract Term Options

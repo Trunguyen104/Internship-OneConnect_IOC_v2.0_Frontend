@@ -54,7 +54,7 @@ export function useInternshipStatus() {
   const { data: userInfo } = useQuery({
     queryKey: ['me'],
     queryFn: () => userService.getMe().then((res) => res?.data || res),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 0, // Always check user identity on mount
   });
 
   const isEnrolled = phases.length > 0 || apps.length > 0;

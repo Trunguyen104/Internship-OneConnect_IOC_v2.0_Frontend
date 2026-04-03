@@ -1,7 +1,7 @@
 'use client';
 
 import { FileTextOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
 import { Briefcase, ChevronDown, Home } from 'lucide-react';
 import Image from 'next/image';
@@ -20,17 +20,20 @@ export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const toast = useToast();
+  const queryClient = useQueryClient();
   const { isEnrolled, isPlaced, hasCv } = useInternshipStatus();
 
   const { data: userInfo } = useQuery({
     queryKey: ['me'],
     queryFn: () => userService.getMe().then((res) => res?.data || res),
+    staleTime: 0, // Always verify user identity on mount
   });
 
   const handleLogout = async () => {
     try {
       await logout();
       clearAuth();
+      queryClient.clear(); // Clear all cached data to prevent cross-user leak
       toast.success('Logout successfully');
     } finally {
       router.push('/login');

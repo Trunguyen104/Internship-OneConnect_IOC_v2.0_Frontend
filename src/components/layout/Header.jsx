@@ -8,6 +8,7 @@ import {
   SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ export default function Header() {
   const groupId = params?.groupId || params?.internshipGroupId;
   const toast = useToast();
   const { isSidebarCollapsed } = useLayoutStore();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -46,6 +48,7 @@ export default function Header() {
     try {
       await logout();
       clearAuth();
+      queryClient.clear();
       toast.success('Logout successfully');
     } finally {
       router.refresh();

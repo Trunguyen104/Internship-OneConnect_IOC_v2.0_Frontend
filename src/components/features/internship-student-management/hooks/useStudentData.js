@@ -24,7 +24,7 @@ export const useStudentData = (filters) => {
         return null;
       }
     },
-    staleTime: Infinity,
+    staleTime: 0, // Always check user identity on mount
   });
 
   // 2. Fetch Mentors
