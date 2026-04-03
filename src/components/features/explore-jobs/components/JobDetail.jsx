@@ -92,11 +92,9 @@ export default function JobDetail() {
               </div>
               <div className="text-left">
                 <h4 className="text-sm font-bold text-text mb-0.5">
-                  {EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV_TITLE || 'Chưa có CV trong hệ thống'}
+                  {EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV_TITLE}
                 </h4>
-                <p className="text-xs text-muted">
-                  {EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV || 'Vui lòng upload CV của bạn để nộp đơn.'}
-                </p>
+                <p className="text-xs text-muted">{EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV}</p>
               </div>
             </div>
             <Link
@@ -230,7 +228,9 @@ export default function JobDetail() {
                     <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-0.5">
                       {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.AUDIENCE}
                     </p>
-                    <p className="text-text font-bold text-xs">{job.audienceType || 'Public'}</p>
+                    <p className="text-text font-bold text-xs">
+                      {job.audienceType || EXPLORE_JOBS_UI.DETAIL.SIDEBAR.AUDIENCE_PUBLIC}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -258,9 +258,9 @@ export default function JobDetail() {
                 <div className="w-full">
                   <button
                     onClick={() => setIsModalOpen(true)}
-                    disabled={(!hasCV ? false : !eligibility.eligible) || isApplying}
+                    disabled={!eligibility.eligible || isApplying}
                     className={`w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-lg transition-all duration-300 ${
-                      eligibility.eligible || !hasCV
+                      eligibility.eligible
                         ? 'bg-primary hover:bg-primary-hover shadow-primary/10 active:scale-[0.98]'
                         : 'bg-muted/30 cursor-not-allowed'
                     }`}

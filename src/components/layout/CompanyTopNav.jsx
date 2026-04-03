@@ -3,6 +3,7 @@
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import {
+  AlertOctagon,
   Briefcase,
   ChevronDown,
   FileText,

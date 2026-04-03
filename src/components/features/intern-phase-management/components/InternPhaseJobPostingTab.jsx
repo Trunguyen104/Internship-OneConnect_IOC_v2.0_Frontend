@@ -25,31 +25,19 @@ export default function InternPhaseJobPostingTab({ data, loading, DETAILS }) {
       width: '120px',
       align: 'center',
       render: (status) => {
-        const statusMap = {
-          1: 'Draft',
-          2: 'Published',
-          3: 'Closed',
-        };
-        const displayStatus = statusMap[status] || status;
-        const label = TABLE.STATUS_LABELS[displayStatus] || displayStatus || '-';
+        const label =
+          TABLE.STATUS_LABELS[status] || status || INTERN_PHASE_MANAGEMENT.MESSAGES.DASH;
+        const variant = TABLE.STATUS_VARIANTS[status] || 'neutral';
 
-        const variant =
-          displayStatus === 'Published'
-            ? 'success'
-            : displayStatus === 'Draft'
-              ? 'warning'
-              : 'neutral';
-
-        return (
-          <StatusBadge variant={variant} label={label} pulseDot={displayStatus === 'Published'} />
-        );
+        return <StatusBadge variant={variant} label={label} pulseDot={status === 2} />;
       },
     },
     {
       title: TABLE.COLUMNS.DEADLINE,
       key: 'deadline',
       width: '120px',
-      render: (text) => (text ? dayjs(text).format('DD/MM/YYYY') : '-'),
+      render: (text) =>
+        text ? dayjs(text).format('DD/MM/YYYY') : INTERN_PHASE_MANAGEMENT.MESSAGES.DASH,
     },
     {
       title: TABLE.COLUMNS.APPLICATIONS,

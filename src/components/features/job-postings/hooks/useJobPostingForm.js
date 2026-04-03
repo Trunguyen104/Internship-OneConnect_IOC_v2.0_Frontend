@@ -64,12 +64,14 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
   }, [phases, isEdit, record]);
 
   const handlePhaseChange = (value) => {
-    if (isEdit && activeAppCount > 0 && value !== record.internshipPhaseId) {
+    const currentPhaseId = record?.internshipPhaseId || record?.phaseId;
+
+    if (isEdit && activeAppCount > 0 && value !== currentPhaseId) {
       toast.error(
         JOB_POSTING_UI.FORM.MESSAGES.HEADERS.ERROR,
         JOB_POSTING_UI.FORM.MODALS.CHANGE_BLOCKED.CONTENT(activeAppCount)
       );
-      form.setFieldsValue({ internshipPhaseId: record.internshipPhaseId });
+      form.setFieldsValue({ internshipPhaseId: currentPhaseId });
       return;
     }
 
@@ -183,16 +185,12 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
           if (selectedPhase && expireDate) {
             const startDate = dayjs(selectedPhase.startDate);
             const today = dayjs().startOf('day');
-
-            // AC-07: Deadline >= Today AND <= Phase StartDate
-            const isStarted = today.isAfter(startDate);
-            const endDate = dayjs(selectedPhase.endDate);
-            const deadlineBound = isStarted ? endDate : startDate;
+            const deadlineBound = startDate;
 
             if (dayjs(expireDate).isBefore(today) || dayjs(expireDate).isAfter(deadlineBound)) {
               toast.error(
                 JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
-                JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_FOR_REOPEN
+                JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_REOPEN_ERROR
               );
               return;
             }
@@ -204,15 +202,29 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
           onSuccess?.();
           form.resetFields();
         } else {
-          // AC-02: Normal Publish for DRAFT
-          // 1. Double check deadline
           const expireDate = values.expireDate;
+          const phaseId = values.internshipPhaseId;
+          const selectedPhase = phases?.find(
+            (p) => (p.internshipPhaseId || p.phaseId || p.id) === phaseId
+          );
+
           if (expireDate && dayjs(expireDate).isBefore(dayjs().startOf('day'))) {
             toast.error(
               JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
               JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_EXPIRED
             );
             return;
+          }
+
+          if (selectedPhase && expireDate) {
+            const startDate = dayjs(selectedPhase.startDate);
+            if (dayjs(expireDate).isAfter(startDate)) {
+              toast.error(
+                JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
+                `${JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_ERROR_PREFIX} (${dayjs(startDate).format('DD/MM/YYYY')}).`
+              );
+              return;
+            }
           }
 
           setLastAutoSaved(null);
@@ -236,8 +248,9 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
         form.resetFields();
       }
     } catch (err) {
-      console.error('Submit failed:', err);
-      // No manual toast here - mutations in useJobPostingActions already handle this!
+      if (err.errorFields) {
+      } else {
+      }
     }
   };
 
@@ -259,7 +272,11 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
         form.resetFields();
       }
     } catch (err) {
-      console.error('Auto-save failed:', err);
+      if (err.errorFields) {
+        console.warn('Draft validation failed:', err.errorFields);
+      } else {
+        console.error('Auto-save failed:', err);
+      }
     } finally {
       if (silent) setIsAutoSaving(false);
     }

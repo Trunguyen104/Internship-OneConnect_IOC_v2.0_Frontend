@@ -1,7 +1,7 @@
 'use client';
 
 import { UserOutlined } from '@ant-design/icons';
-import { Empty, Skeleton, Tooltip } from 'antd';
+import { Empty, Skeleton } from 'antd';
 import React from 'react';
 
 import Badge from '@/components/ui/badge';
@@ -26,24 +26,13 @@ export default function InternPhaseGroupTab({ data, loading }) {
       ),
     },
     {
-      title: TABLE.COLUMNS.PROJECT,
-      dataIndex: 'projectTitle',
-      key: 'projectTitle',
-      width: '200px',
-      render: (text) => (
-        <Tooltip title={text}>
-          <span className={`${TABLE_CELL.secondary} text-xs truncate block`}>{text || '-'}</span>
-        </Tooltip>
-      ),
-    },
-    {
       title: TABLE.COLUMNS.MENTOR,
       dataIndex: 'mentorName',
       key: 'mentorName',
       width: '150px',
       render: (text) => (
         <span className="text-slate-600 text-xs font-medium">
-          {text && text !== '-' ? (
+          {text && text !== INTERN_PHASE_MANAGEMENT.MESSAGES.DASH ? (
             text
           ) : (
             <span className="opacity-40 italic">{TABLE.NOT_ASSIGNED}</span>
@@ -70,15 +59,9 @@ export default function InternPhaseGroupTab({ data, loading }) {
       width: '120px',
       align: 'center',
       render: (status) => {
-        const statusMap = {
-          1: { label: 'Active', variant: 'success-soft' },
-          2: { label: 'Inactive', variant: 'default' },
-          3: { label: 'Archived', variant: 'warning-soft' },
-        };
-        const { label, variant } = statusMap[status] || {
-          label: status || '-',
-          variant: 'default',
-        };
+        const label =
+          TABLE.STATUS_LABELS[status] || status || INTERN_PHASE_MANAGEMENT.MESSAGES.DASH;
+        const variant = TABLE.STATUS_VARIANTS[status] || 'default';
         return (
           <Badge variant={variant} size="xs">
             {label}
@@ -111,7 +94,7 @@ export default function InternPhaseGroupTab({ data, loading }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white p-1 shadow-sm">
+    <div className="flex-1 flex flex-col">
       <DataTable
         columns={columns}
         data={data}

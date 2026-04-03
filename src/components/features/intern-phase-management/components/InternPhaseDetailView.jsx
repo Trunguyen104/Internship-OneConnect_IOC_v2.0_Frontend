@@ -12,6 +12,7 @@ import {
   INTERN_PHASE_MANAGEMENT,
   INTERN_PHASE_STATUS,
   INTERN_PHASE_STATUS_LABELS,
+  INTERN_PHASE_STATUS_VARIANTS,
 } from '@/constants/intern-phase-management/intern-phase';
 
 import { InternPhaseService } from '../services/intern-phase.service';
@@ -71,15 +72,9 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
               </span>
             </div>
             <StatusBadge
-              variant={
-                phase?.computedStatus === INTERN_PHASE_STATUS.ACTIVE
-                  ? 'success'
-                  : phase?.computedStatus === INTERN_PHASE_STATUS.UPCOMING
-                    ? 'warning'
-                    : 'neutral'
-              }
-              label={INTERN_PHASE_STATUS_LABELS[phase?.computedStatus]}
-              pulseDot={phase?.computedStatus === INTERN_PHASE_STATUS.ACTIVE}
+              variant={INTERN_PHASE_STATUS_VARIANTS[phase?.status]}
+              label={INTERN_PHASE_STATUS_LABELS[phase?.status]}
+              pulseDot={phase?.status === INTERN_PHASE_STATUS.ACTIVE}
             />
           </div>
 
@@ -178,7 +173,9 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                 <div className="flex flex-col">
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-slate-800">{used}</span>
-                    <span className="text-lg font-bold text-slate-300">/ {total}</span>
+                    <span className="text-lg font-bold text-slate-300">
+                      {INTERN_PHASE_MANAGEMENT.MESSAGES.SLASH} {total}
+                    </span>
                   </div>
                   <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 mt-1">
                     {remaining} {METADATA.LEFT} {METADATA.APPLICATIONS_REMAINING}

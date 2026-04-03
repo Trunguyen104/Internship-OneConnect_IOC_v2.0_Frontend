@@ -50,7 +50,7 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
       const messages = Object.values(data.validationErrors).flat();
       if (messages.length > 0) return messages[0];
     }
-    return data?.message || err?.message || 'An error occurred';
+    return data?.message || err?.message || MESSAGES.ERROR_GENERAL;
   };
 
   const saveMutation = useMutation({

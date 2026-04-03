@@ -1,3 +1,4 @@
+import { Tooltip } from 'antd';
 import { Calendar, MapPin } from 'lucide-react';
 import React from 'react';
 
@@ -5,7 +6,7 @@ import { Card } from '@/components/ui/atoms';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 
-export default function JobCard({ job, onClick }) {
+export default function JobCard({ job, onClick, eligibility }) {
   const { title, enterprise, location, deadline, salary, type } = job;
   const [logoError, setLogoError] = React.useState(false);
 
@@ -49,7 +50,7 @@ export default function JobCard({ job, onClick }) {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="bg-primary/5 text-primary text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
-              {type || 'Full-time'}
+              {type || EXPLORE_JOBS_UI.CARD.TYPE_FALLBACK}
             </span>
             <span className="bg-success/5 text-success text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
               {salary || EXPLORE_JOBS_UI.CARD.SALARY_FALLBACK}
@@ -68,6 +69,34 @@ export default function JobCard({ job, onClick }) {
                 {deadline || EXPLORE_JOBS_UI.CARD.NOT_AVAILABLE}
               </span>
             </div>
+          </div>
+
+          {/* Apply Button Section - AC-03 Requirement */}
+          <div className="mt-4 pt-4 border-t border-border/20">
+            <Tooltip
+              title={!eligibility?.eligible ? eligibility?.reason : ''}
+              placement="top"
+              className="w-full"
+            >
+              <div className="w-full">
+                <button
+                  disabled={!eligibility?.eligible}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (eligibility?.eligible) {
+                      onClick?.(job.jobId, true);
+                    }
+                  }}
+                  className={`w-full py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 ${
+                    eligibility?.eligible
+                      ? 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white'
+                      : 'bg-muted/10 text-muted border border-border/40 cursor-not-allowed grayscale'
+                  }`}
+                >
+                  {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLY_NOW}
+                </button>
+              </div>
+            </Tooltip>
           </div>
         </div>
       </Card>

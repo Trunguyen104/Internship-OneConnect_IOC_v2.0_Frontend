@@ -13,7 +13,9 @@ export default function ApplyModal({ open, onCancel, onConfirm, job, cvUrl, isAp
 
   const hasCV = !!cvUrl;
   // Extract filename from URL or use default
-  const cvFilename = cvUrl ? cvUrl.split('/').pop().split('?')[0] : 'MyCV.pdf';
+  const cvFilename = cvUrl
+    ? cvUrl.split('/').pop().split('?')[0]
+    : EXPLORE_JOBS_UI.APPLY_MODAL.DEFAULT_CV_FILENAME;
 
   return (
     <Modal

@@ -27,7 +27,7 @@ const enterpriseMenu = [
   {
     icon: <CalendarOutlined />,
     label: 'Intern Phases',
-    href: '/intern-phase-management',
+    href: '/company/phases',
   },
   {
     icon: <SolutionOutlined />,

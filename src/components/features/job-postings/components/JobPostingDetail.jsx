@@ -203,16 +203,16 @@ export default function JobPostingDetail() {
         </div>
 
         {isPhaseFull && (
-          <div className="mb-8 p-4 md:p-6 bg-warning/5 border border-warning/10 rounded-[2rem] flex flex-col md:flex-row items-center gap-4 md:gap-6 animate-in slide-in-from-top duration-500 shadow-sm shadow-warning/5 ring-1 ring-warning/20">
-            <div className="bg-warning/10 p-3 rounded-2xl shrink-0">
-              <AlertTriangle className="h-6 w-6 text-warning" />
+          <div className="mb-8 p-4 md:p-6 bg-orange-50 border border-orange-200 rounded-[2rem] flex flex-col md:flex-row items-center gap-4 md:gap-6 animate-in slide-in-from-top duration-500 shadow-sm shadow-orange-100 ring-1 ring-orange-400/20">
+            <div className="bg-orange-100 p-3 rounded-2xl shrink-0">
+              <AlertTriangle className="h-6 w-6 text-orange-600" />
             </div>
             <div className="space-y-1 text-center md:text-left">
-              <p className="text-sm font-black text-text uppercase tracking-widest opacity-80">
+              <p className="text-sm font-black text-slate-800 uppercase tracking-widest opacity-80">
                 {JOB_POSTING_UI.DETAIL.PHASE_CAPACITY_REACHED}
               </p>
-              <p className="text-muted text-xs md:text-sm font-medium leading-relaxed">
-                {JOB_POSTING_UI.FORM.MESSAGES.CAPACITY_WARNING(
+              <p className="text-slate-600 text-xs md:text-sm font-medium leading-relaxed">
+                {JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.CAPACITY_WARNING(
                   displayPhaseName,
                   placedCount,
                   totalCapacity
@@ -222,7 +222,8 @@ export default function JobPostingDetail() {
             <div className="md:ml-auto shrink-0">
               <Button
                 onClick={() => handleAction('close')}
-                className="rounded-xl h-10 px-6 font-bold text-xs uppercase tracking-widest border-warning/30 text-warning hover:bg-warning/5"
+                className="rounded-xl h-10 px-6 font-bold text-xs uppercase tracking-widest border-orange-300 text-orange-600 hover:bg-orange-100 transition-colors"
+                type="dashed"
               >
                 {JOB_POSTING_UI.MENU.CLOSE}
               </Button>

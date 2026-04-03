@@ -9,10 +9,14 @@ import Pagination from '@/components/ui/pagination';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 import { useExploreJobs } from '../hooks/useExploreJobs';
+import ApplyModal from './ApplyModal';
 import JobCard from './JobCard';
 
 export default function ExploreJobs() {
   const router = useRouter();
+  const [selectedJobId, setSelectedJobId] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const {
     jobs,
     total,
@@ -24,11 +28,25 @@ export default function ExploreJobs() {
     setPageSize,
     searchTerm,
     setSearchTerm,
+    isApplying,
+    applyJob,
+    cvUrl,
+    getEligibility,
   } = useExploreJobs();
 
-  const handleJobClick = (id) => {
+  const handleCardClick = (id, isApplyRequested) => {
+    if (isApplyRequested) {
+      setSelectedJobId(id);
+      setIsModalOpen(true);
+      return;
+    }
     router.push(`/explore-jobs/${id}`);
   };
+
+  const selectedJob = React.useMemo(
+    () => jobs.find((j) => (j.jobId || j.id) === selectedJobId),
+    [jobs, selectedJobId]
+  );
 
   if (isPlaced) {
     return (
@@ -42,7 +60,7 @@ export default function ExploreJobs() {
         </p>
         <button
           onClick={() => router.push('/student/home')}
-          className="mt-8 bg-primary text-white px-8 py-3 rounded-2xl font-bold font-sm shadow-xl shadow-primary/20 hover:scale-105 transition-all"
+          className="mt-8 bg-primary text-white px-8 py-3 rounded-2xl font-bold font-sm shadow-xl shadow-primary/20 hover:scale-105 transition-all text-[13px]"
         >
           {EXPLORE_JOBS_UI.PLACED_STATE.BACK_TO_DASHBOARD}
         </button>
@@ -53,8 +71,9 @@ export default function ExploreJobs() {
   return (
     <PageLayout className="animate-in fade-in duration-700 bg-[#f8f9fa]">
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 w-full">
-        {/* Hero Header - Balanced Scaling */}
+        {/* ... (Header section) ... */}
         <div className="relative overflow-hidden bg-white border border-border/40 rounded-[2.5rem] p-6 md:p-9 mb-8 shadow-sm transition-all hover:shadow-md">
+          {/* Header content unchanged */}
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-primary/5 text-primary text-[9px] font-black px-2.5 py-1 rounded-full mb-4 uppercase tracking-widest leading-none">
               <Sparkles className="h-3 w-3" />
@@ -81,13 +100,11 @@ export default function ExploreJobs() {
               />
             </div>
           </div>
-
-          {/* Background Decorative Element */}
           <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none hidden md:block" />
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
         </div>
 
-        {/* Main Grid Section Header */}
+        {/* ... (Grid Header) ... */}
         <div className="flex items-center justify-between mb-5 px-1">
           <div className="flex items-center gap-2.5">
             <div className="bg-primary/10 p-1.5 rounded-lg">
@@ -104,14 +121,19 @@ export default function ExploreJobs() {
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-44 bg-white rounded-[1.5rem] border border-border/40" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-56 bg-white rounded-[1.5rem] border border-border/40" />
             ))}
           </div>
         ) : jobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {jobs.map((job) => (
-              <JobCard key={job.jobId} job={job} onClick={handleJobClick} />
+              <JobCard
+                key={job.jobId}
+                job={job}
+                onClick={handleCardClick}
+                eligibility={getEligibility(job.jobId)}
+              />
             ))}
           </div>
         ) : (
@@ -138,6 +160,18 @@ export default function ExploreJobs() {
           </div>
         )}
       </div>
+
+      <ApplyModal
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        job={selectedJob}
+        cvUrl={cvUrl}
+        isApplying={isApplying}
+        onConfirm={async () => {
+          await applyJob({ jobId: selectedJobId });
+          setIsModalOpen(false);
+        }}
+      />
     </PageLayout>
   );
 }

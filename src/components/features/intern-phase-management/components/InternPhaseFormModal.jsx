@@ -16,7 +16,10 @@ import {
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo } from 'react';
 
-import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
+import {
+  INTERN_PHASE_MANAGEMENT,
+  INTERN_PHASE_STATUS,
+} from '@/constants/intern-phase-management/intern-phase';
 
 const { TextArea } = Input;
 
@@ -68,7 +71,7 @@ export default function InternPhaseFormModal({
     } else if (visible) {
       form.resetFields();
       form.setFieldsValue({
-        majorFields: ['Software Engineering'],
+        majorFields: FORM.DEFAULT_MAJORS,
       });
     }
   }, [visible, editingRecord, form]);
@@ -116,7 +119,7 @@ export default function InternPhaseFormModal({
       <Form
         form={form}
         layout="vertical"
-        disabled={loading || editingRecord?.computedStatus === 'ENDED'}
+        disabled={loading || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
         className="px-2"
         requiredMark={true}
       >
@@ -156,7 +159,7 @@ export default function InternPhaseFormModal({
                 format="DD/MM/YYYY"
                 className="w-full h-10 rounded-lg"
                 placeholder={FORM.PLACEHOLDER.DATE}
-                disabled={isBlocked || editingRecord?.computedStatus === 'ENDED'}
+                disabled={isBlocked || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
                 onChange={() => {
                   if (endDateValue) form.validateFields(['endDate']);
                 }}
@@ -197,7 +200,7 @@ export default function InternPhaseFormModal({
                 format="DD/MM/YYYY"
                 className="w-full h-10 rounded-lg"
                 placeholder={FORM.PLACEHOLDER.DATE}
-                disabled={isBlocked || editingRecord?.computedStatus === 'ENDED'}
+                disabled={isBlocked || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
               />
             </Form.Item>
           </Col>
@@ -213,7 +216,7 @@ export default function InternPhaseFormModal({
               <InputNumber
                 className="w-full h-10 flex items-center rounded-lg"
                 placeholder={FORM.PLACEHOLDER.CAPACITY}
-                disabled={isBlocked || editingRecord?.computedStatus === 'ENDED'}
+                disabled={isBlocked || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
                 min={1}
               />
             </Form.Item>

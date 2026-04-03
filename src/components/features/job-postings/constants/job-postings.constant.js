@@ -71,9 +71,11 @@ export const JOB_POSTING_UI = {
         LOCATION: 'Please enter a location.',
         DEADLINE: 'Please select an application deadline.',
         DEADLINE_EXPIRED: 'The deadline has expired. Please update it before publishing.',
-        DEADLINE_FOR_REOPEN:
-          'Invalid deadline. Please choose a future date before the internship starts.',
-        DEADLINE_TOOLTIP: 'The deadline must be on or before the internship start date.',
+        DEADLINE_ERROR_PREFIX: 'Application deadline cannot be after the internship start date',
+        DEADLINE_REOPEN_ERROR:
+          'Invalid deadline. Please select a future date before the internship start date.',
+        DEADLINE_TOOLTIP: 'Application deadline cannot be after the internship start date',
+        DEADLINE_TOOLTIP_DEFAULT: 'The deadline must be on or before the internship start date.',
         DEADLINE_TOO_LATE: (date) =>
           `The deadline must not be later than the internship start date (${date}).`,
         SCHOOLS_REQUIRED: 'Please select at least one school.',

@@ -1,6 +1,5 @@
 'use client';
 
-import { UserOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import React from 'react';
@@ -25,24 +24,10 @@ export default function PhaseStudentsPage() {
   });
 
   return (
-    <div className="flex-1 overflow-auto p-4 2xl:p-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm">
-            <UserOutlined className="text-2xl" />
-          </div>
-          <div>
-            <h1 className="mb-0.5 text-2xl font-black tracking-tight text-slate-800">
-              {COPY.TITLE}
-            </h1>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{COPY.SUB}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white rounded-3xl border border-slate-100 p-2 shadow-sm">
+    <div className="flex-1 overflow-auto p-4 2xl:p-8 flex flex-col">
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white rounded-[32px] border border-slate-100 p-6 shadow-sm flex-1 flex flex-col">
         <InternPhaseStudentTab
-          data={students?.items || students?.data}
+          data={students?.data || students?.items || (Array.isArray(students) ? students : [])}
           loading={isLoading}
           DETAILS={DETAILS}
         />

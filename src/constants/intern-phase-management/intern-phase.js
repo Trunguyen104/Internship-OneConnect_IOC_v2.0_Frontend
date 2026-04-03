@@ -1,40 +1,19 @@
 export const INTERN_PHASE_STATUS = {
-  DRAFT: 0,
-  OPEN: 1,
-  IN_PROGRESS: 2,
-  CLOSED: 3,
-};
-
-export const INTERN_PHASE_STATUS_LABELS = {
-  [INTERN_PHASE_STATUS.DRAFT]: 'Draft',
-  [INTERN_PHASE_STATUS.OPEN]: 'Open',
-  [INTERN_PHASE_STATUS.IN_PROGRESS]: 'In Progress',
-  [INTERN_PHASE_STATUS.CLOSED]: 'Closed',
-};
-
-export const INTERN_PHASE_LIFECYCLE_STATUS = {
   UPCOMING: 1,
   ACTIVE: 2,
   ENDED: 3,
 };
 
-export const INTERN_PHASE_LIFECYCLE_LABELS = {
-  [INTERN_PHASE_LIFECYCLE_STATUS.UPCOMING]: 'Upcoming',
-  [INTERN_PHASE_LIFECYCLE_STATUS.ACTIVE]: 'Active',
-  [INTERN_PHASE_LIFECYCLE_STATUS.ENDED]: 'Ended',
-};
-
-export const INTERN_PHASE_LIFECYCLE_VARIANTS = {
-  [INTERN_PHASE_LIFECYCLE_STATUS.UPCOMING]: 'warning',
-  [INTERN_PHASE_LIFECYCLE_STATUS.ACTIVE]: 'success',
-  [INTERN_PHASE_LIFECYCLE_STATUS.ENDED]: 'default',
+export const INTERN_PHASE_STATUS_LABELS = {
+  [INTERN_PHASE_STATUS.UPCOMING]: 'Upcoming',
+  [INTERN_PHASE_STATUS.ACTIVE]: 'Active',
+  [INTERN_PHASE_STATUS.ENDED]: 'Ended',
 };
 
 export const INTERN_PHASE_STATUS_VARIANTS = {
-  [INTERN_PHASE_STATUS.DRAFT]: 'neutral',
-  [INTERN_PHASE_STATUS.OPEN]: 'warning',
-  [INTERN_PHASE_STATUS.IN_PROGRESS]: 'success',
-  [INTERN_PHASE_STATUS.CLOSED]: 'default',
+  [INTERN_PHASE_STATUS.UPCOMING]: 'warning',
+  [INTERN_PHASE_STATUS.ACTIVE]: 'success',
+  [INTERN_PHASE_STATUS.ENDED]: 'default',
 };
 
 export const INTERN_PHASE_MANAGEMENT = {
@@ -164,6 +143,7 @@ export const INTERN_PHASE_MANAGEMENT = {
       TO: 'to',
       APPLICATIONS_REMAINING: 'APPLICATIONS REMAINING',
       FILLED: 'filled',
+      EMPTY_STUDENTS: 'No students placed in this phase yet.',
     },
     NO_DESCRIPTION: 'No description provided for this internship phase.',
     TABS: {
@@ -171,7 +151,6 @@ export const INTERN_PHASE_MANAGEMENT = {
       STUDENTS: 'Students',
     },
     EMPTY_POSTINGS: 'No job postings yet. Create a job posting to start receiving candidates.',
-    EMPTY_STUDENTS: 'No students placed in this phase yet.',
     CREATE_POSTING: 'Create Job Posting',
   },
 
@@ -184,10 +163,14 @@ export const INTERN_PHASE_MANAGEMENT = {
         PLACED_DATE: 'PLACED DATE',
       },
       SOURCE_LABELS: {
+        1: 'Self-apply',
+        2: 'Uni-assign',
         'Self-apply': 'Self-apply',
         'Uni-assign': 'University assigned',
       },
       SOURCE_VARIANTS: {
+        1: 'info-soft',
+        2: 'primary-soft',
         'Self-apply': 'info-soft',
         'Uni-assign': 'primary-soft',
       },
@@ -202,6 +185,16 @@ export const INTERN_PHASE_MANAGEMENT = {
         MEMBERS: 'MEMBERS',
         PROJECT: 'PROJECT',
         STATUS: 'STATUS',
+      },
+      STATUS_LABELS: {
+        1: 'Active',
+        2: 'Inactive',
+        3: 'Archived',
+      },
+      STATUS_VARIANTS: {
+        1: 'success-soft',
+        2: 'default',
+        3: 'warning-soft',
       },
       NOT_ASSIGNED: 'Not Assigned',
     },
@@ -224,6 +217,13 @@ export const INTERN_PHASE_MANAGEMENT = {
     ERROR_DELETE_TITLE: 'Cannot Delete',
     DELETE_TITLE: 'Delete Intern Phase',
     DELETE_OK: 'Delete',
+    UNKNOWN: 'Unknown',
+    ERROR_GENERAL: 'An error occurred',
+    ERROR_NO_STUDENTS: 'No students array found',
+    LOADING_DOTS: '...',
+    DASH: '-',
+    PLUS: '+',
+    SLASH: '/',
   },
   PAGE: {
     ERROR: {
@@ -232,5 +232,50 @@ export const INTERN_PHASE_MANAGEMENT = {
       BACK_BTN: 'Return to List',
       LOADING: 'Loading phase details...',
     },
+  },
+  FORM: {
+    DEFAULT_MAJORS: ['Software Engineering'],
+    TITLE_ADD: 'Create Intern Phase',
+    TITLE_EDIT: 'Edit Intern Phase',
+    TITLE_VIEW: 'Intern Phase Details',
+    DESC: 'Phases define the recruitment periods and capacity for your enterprise.',
+    CANCEL_BTN: 'Cancel',
+    LABEL: {
+      NAME: 'Phase Name',
+      START_DATE: 'Start Date',
+      END_DATE: 'End Date',
+      MAJORS: 'Accepted Majors',
+      CAPACITY: 'Capacity',
+      DESCRIPTION: 'Description',
+      REMAINING: 'Remaining Slots',
+    },
+
+    PLACEHOLDER: {
+      NAME: 'e.g. Summer 2025, Q3 2025 Recruitment',
+      DATE: 'Select date',
+      MAJORS: 'Type and press enter (e.g. IT, Marketing)',
+      CAPACITY: 'Enter total capacity',
+      DESCRIPTION: 'Additional information about this phase...',
+    },
+
+    VALIDATION: {
+      NAME_REQUIRED: 'Phase name is required.',
+      START_DATE_REQUIRED: 'Start date is required.',
+      END_DATE_REQUIRED: 'End date is required.',
+      MAJORS_REQUIRED: 'At least one major field is required.',
+      CAPACITY_REQUIRED: 'Capacity is required.',
+      CAPACITY_MIN: 'Capacity must be at least 1.',
+      END_AFTER_START: 'End date must be after start date.',
+      MIN_DURATION: 'Intern Phase must be at least 4 weeks (28 days).',
+      MAX_DURATION: 'Intern Phase must not exceed 12 months (365 days).',
+      NAME_EXISTS: 'An Intern Phase with this name already exists. You can still proceed.',
+      DEADLINE_VIOLATION:
+        '{count} job postings have deadlines exceeding the new end date. Please adjust them first.',
+    },
+
+    BLOCK_MESSAGE:
+      'This Intern Phase already has students placed or assigned groups. Dates and capacity cannot be changed. Please resolve associated students before making changes.',
+    SAVE_BTN: 'Create',
+    SAVE_CHANGES_BTN: 'Save Changes',
   },
 };

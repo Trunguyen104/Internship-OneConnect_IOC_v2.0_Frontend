@@ -143,11 +143,12 @@ const InternshipDashboard = () => {
               <div className="h-px flex-1 bg-slate-100" />
             </div>
             <div className="space-y-6">
-              {phases.map((phase) => {
-                const group = groups.find((g) => (g.internshipPhaseId || g.phaseId) === phase.id);
+              {phases.map((phase, index) => {
+                const phaseId = phase.id || phase.internshipPhaseId;
+                const group = groups.find((g) => (g.internshipPhaseId || g.phaseId) === phaseId);
                 return (
                   <InternshipCard
-                    key={phase.id}
+                    key={phaseId || `phase-${index}`}
                     data={{
                       ...phase,
                       displayName: phase.name || phase.phaseName,
