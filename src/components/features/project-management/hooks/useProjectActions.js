@@ -96,10 +96,8 @@ export const useProjectActions = ({
 
         await ProjectService.update(editingRecord.projectId, updateForm);
 
-        if (isAssigning) {
+        if (isAssigning || (newGroupId && newGroupId !== oldGroupId)) {
           await ProjectService.assignGroup(editingRecord.projectId, newGroupId);
-        } else if (isSwapping) {
-          await ProjectService.changeGroup(editingRecord.projectId, newGroupId);
         }
 
         const currentVis = Number(editingRecord.visibilityStatus ?? editingRecord.visibility ?? 0);
@@ -225,26 +223,11 @@ export const useProjectActions = ({
 
   const assignGroupMutation = useMutation({
     mutationFn: async ({ assigningProject, selectedGroupId }) => {
-      const oldGroupId =
-        assigningProject.internshipId ||
-        assigningProject.internshipGroupId ||
-        assigningProject.groupId;
-
-      if (!oldGroupId || oldGroupId === '00000000-0000-0000-0000-000000000000') {
-        await ProjectService.assignGroup(assigningProject.projectId, selectedGroupId);
-        return { type: 'ASSIGN' };
-      } else if (oldGroupId !== selectedGroupId) {
-        await ProjectService.changeGroup(assigningProject.projectId, selectedGroupId);
-        return { type: 'CHANGE' };
-      }
-      return { type: 'NONE' };
+      await ProjectService.assignGroup(assigningProject.projectId, selectedGroupId);
+      return { type: 'ASSIGN' };
     },
-    onSuccess: ({ type }) => {
-      if (type === 'ASSIGN') {
-        toast.success(PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SUCCESS_ASSIGN);
-      } else if (type === 'CHANGE') {
-        toast.success(PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SUCCESS_CHANGE);
-      }
+    onSuccess: () => {
+      toast.success(PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.SUCCESS_ASSIGN);
       onSuccessAction();
     },
     onError: (e) => {
@@ -277,36 +260,6 @@ export const useProjectActions = ({
       );
       const isOperationalActive = opStatus === OPERATIONAL_STATUS.ACTIVE;
 
-      const oldGroupId = editingRecord?.internshipId || editingRecord?.internshipGroupId;
-      const isGroupChanged = selectedGroupId && oldGroupId && selectedGroupId !== oldGroupId;
-
-      if (editingRecord && isOperationalActive) {
-        const res = await ProjectService.getAssignedStudents(editingRecord.projectId).catch(
-          () => null
-        );
-        const studentCount = res?.data?.length || 0;
-
-        // AC-05: If group is CHANGED and has student data -> BLOCK
-        if (isGroupChanged && studentCount > 0) {
-          modal.error({
-            title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_NO_CHANGE,
-            content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_HAS_DATA,
-          });
-          return;
-        }
-
-        // AC-08 Case 3: If just EDITING content and has students -> WARN
-        if (studentCount > 0) {
-          modal.confirm({
-            title: PROJECT_MANAGEMENT.MODALS?.UPDATE_WARNING_TITLE,
-            content: PROJECT_MANAGEMENT.MESSAGES.EDIT_WARNING.replace('{count}', studentCount),
-            okText: 'Confirm',
-            cancelText: 'Cancel',
-            onOk: () => saveMutation.mutateAsync({ values, isDraft }),
-          });
-          return;
-        }
-      }
       return saveMutation.mutateAsync({ values, isDraft });
     } catch (err) {
       toast.error(MESSAGES.ERROR_UPDATE_PREVALIDATE);
@@ -450,87 +403,21 @@ export const useProjectActions = ({
     assigningProject,
     selectedGroupId,
     setLocalLoading,
-    closeLocalModal,
-    replacementProjectId // AC-05: Atomic Swap
+    closeLocalModal
   ) => {
     if (!selectedGroupId || !assigningProject) return;
 
-    const oldGroupId =
-      assigningProject.internshipId ||
-      assigningProject.internshipGroupId ||
-      assigningProject.groupId;
-
-    const isSwapping =
-      oldGroupId &&
-      oldGroupId !== '00000000-0000-0000-0000-000000000000' &&
-      oldGroupId !== selectedGroupId;
-
-    const doMutate = async () => {
-      if (setLocalLoading) setLocalLoading(true);
-      try {
-        // 1. Assign primary project to target group
-        await assignGroupMutation.mutateAsync({ assigningProject, selectedGroupId });
-
-        // 2. AC-05 Case B: If it's a swap and we have a replacement, assign it to old group
-        if (isSwapping && replacementProjectId) {
-          try {
-            await ProjectService.assignGroup(replacementProjectId, oldGroupId);
-          } catch (swapErr) {
-            console.error('Replacement assignment failed:', swapErr);
-            toast.warning('Primary assignment succeeded, but replacement assignment failed.');
-          }
-        }
-
-        if (closeLocalModal) closeLocalModal();
-        return true; // Resolve for antd modal
-      } catch (e) {
-        // Error toast is handled by assignGroupMutation.onError
-        // When an error occurs (e.g. "has data"), we close the modals so the user can return to a stable state
-        if (closeLocalModal) closeLocalModal();
-        return true; // Resolve for antd modal.confirm to close the small confirmation modal
-      } finally {
-        if (setLocalLoading) setLocalLoading(false);
-      }
-    };
-
-    if (isSwapping) {
-      const opStatus = getOperationalStatus(
-        assigningProject.operationalStatus ?? assigningProject.status
-      );
-      if (opStatus === OPERATIONAL_STATUS.ACTIVE) {
-        // Check student data before allowing swap
-        try {
-          const studentsRes = await ProjectService.getAssignedStudents(
-            assigningProject.projectId
-          ).catch(() => null);
-          const students = studentsRes?.data || studentsRes || [];
-
-          if (students.length > 0) {
-            modal.error({
-              title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_NO_CHANGE,
-              content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.ERROR_HAS_DATA,
-            });
-            return;
-          }
-        } catch (checkErr) {
-          toast.error(PROJECT_MANAGEMENT.MESSAGES.ERROR_CHECK_BOUNDS);
-          return;
-        }
-
-        // Show confirmation
-        modal.confirm({
-          title: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM_CHANGE_TITLE,
-          content: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM_CHANGE_DESC,
-          okText: PROJECT_MANAGEMENT.MODALS?.ASSIGN_GROUP?.CONFIRM || 'Confirm',
-          cancelText: 'Cancel',
-          onOk: doMutate,
-        });
-        return;
-      }
+    if (setLocalLoading) setLocalLoading(true);
+    try {
+      await assignGroupMutation.mutateAsync({ assigningProject, selectedGroupId });
+      if (closeLocalModal) closeLocalModal();
+      return true;
+    } catch (e) {
+      if (closeLocalModal) closeLocalModal();
+      return true;
+    } finally {
+      if (setLocalLoading) setLocalLoading(false);
     }
-
-    // No confirmation needed for new assign
-    return await doMutate();
   };
 
   const submitLoading =

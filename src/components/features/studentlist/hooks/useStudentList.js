@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
-import { useDebounce } from '@/components/features/internship-group-management/hooks/useDebounce';
+import { useDebounce } from '@/components/features/internship-management/internship-group-management/hooks/useDebounce';
 import { STUDENT_LIST_MESSAGES } from '@/constants/studentList/messages';
 import { useToast } from '@/providers/ToastProvider';
 

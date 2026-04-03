@@ -293,3 +293,23 @@ body {
 .premium-table .ant-table-tbody > tr:hover > td {
   background: rgba(0, 0, 0, 0.01) !important;
 }
+
+/* Compact DatePicker Popup */
+.compact-datepicker-popup .ant-picker-panel-container {
+  transform: scale(0.9) !important;
+  transform-origin: top left !important;
+}
+
+.compact-datepicker-popup .ant-picker-content th,
+.compact-datepicker-popup .ant-picker-content td {
+  padding: 2px !important;
+  font-size: 13px !important;
+}
+
+.compact-datepicker-popup .ant-picker-header {
+  padding: 4px 8px !important;
+}
+
+.compact-datepicker-popup .ant-picker-body {
+  padding: 4px 8px !important;
+}

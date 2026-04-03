@@ -14,8 +14,6 @@ import {
   Info,
   LayoutDashboard,
   Lock,
-  Settings,
-  UserCheck,
   UserCircle,
   Users,
 } from 'lucide-react';
@@ -65,8 +63,7 @@ export default function AppSidebar() {
           { key: 'back-to-terms', icon: <ArrowLeft className="size-4" />, label: 'Back to Terms' },
           { type: 'divider' },
           { key: `${p}/overview`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
-          { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
-          { key: `${p}/enrollments`, icon: <UserCheck className="size-4" />, label: 'Enrollments' },
+          { key: `${p}/enrollments`, icon: <Users className="size-4" />, label: 'Students' },
           { key: `${p}/groups`, icon: <Briefcase className="size-4" />, label: 'Groups' },
         ];
       }
@@ -175,7 +172,6 @@ export default function AppSidebar() {
             label: 'Enterprises',
           },
           { key: '/admin/users', icon: <Users className="size-4" />, label: 'Users' },
-          { key: '/admin/settings', icon: <Settings className="size-4" />, label: 'Settings' },
         ];
       }
 

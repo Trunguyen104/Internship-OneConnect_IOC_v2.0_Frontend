@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useToast } from '@/providers/ToastProvider';
 
-import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
+import { EnterpriseGroupService } from '../../internship-management/internship-group-management/services/enterprise-group.service';
 import { userService } from '../../user/services/user.service';
 import { EnterpriseMentorService } from '../services/enterprise-mentor.service';
 import { EnterprisePhaseService } from '../services/enterprise-phase.service';
@@ -68,7 +68,7 @@ export const useStudentData = (filters) => {
           const phases = res?.data?.items || res?.data || [];
 
           const openPhases = phases
-            .filter((p) => p.status === 1)
+            .filter((p) => p.status === 1 || p.status === 0)
             .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
           const options = openPhases.map((p) => ({
@@ -158,26 +158,9 @@ export const useStudentData = (filters) => {
               .map((p) => String(p.value))
           : [];
 
-        let items = [];
-        let totalCount = 0;
-
-        if (isAllVisible && openPhaseIds.length > 0) {
-          const promises = openPhaseIds.map(async (pId) => {
-            const res = await EnterpriseGroupService.getPlacedStudents({
-              ...params,
-              PhaseId: pId,
-              TermId: pId,
-            });
-            return res?.data?.items || res?.items || [];
-          });
-          const results = await Promise.all(promises);
-          items = results.flat();
-          totalCount = items.length;
-        } else {
-          const res = await EnterpriseGroupService.getPlacedStudents(params);
-          items = res?.data?.items || res?.items || [];
-          totalCount = res?.data?.totalCount || res?.totalCount || items.length;
-        }
+        const res = await EnterpriseGroupService.getPlacedStudents(params);
+        const items = res?.data?.items || res?.items || [];
+        let totalCount = res?.data?.totalCount || res?.totalCount || items.length;
 
         const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
         const rawMappedStudents = (items || []).map((item) => {

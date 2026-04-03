@@ -63,8 +63,10 @@ function ResetPasswordDrawer({ open, userId, email, onClose }) {
       open={open}
       onClose={onClose}
       width={480}
-      headerStyle={{ borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' }}
-      bodyStyle={{ padding: '24px' }}
+      styles={{
+        header: { borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' },
+        body: { padding: '24px' },
+      }}
       footer={
         <div className="flex justify-end gap-3 border-t border-gray-50 p-6 bg-white">
           <Button
@@ -153,8 +155,10 @@ function DeleteDrawer({ open, userId, label, onClose }) {
       open={open}
       onClose={onClose}
       width={480}
-      headerStyle={{ borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' }}
-      bodyStyle={{ padding: '24px' }}
+      styles={{
+        header: { borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' },
+        body: { padding: '24px' },
+      }}
       footer={
         <div className="flex justify-end gap-3 border-t border-gray-50 p-6 bg-white">
           <Button
