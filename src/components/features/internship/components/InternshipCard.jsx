@@ -87,9 +87,9 @@ const Header = ({ title, isCurrent = false }) => {
 };
 
 const Stepper = () => {
-  const { status, journeyStep } = useInternshipCard();
+  const { status, journeyStep, steps } = useInternshipCard();
   // Using journeyStep directly if available, else fallback to status-based
-  return <ProgressStepper currentStatus={status} journeyStep={journeyStep} />;
+  return <ProgressStepper currentStatus={status} journeyStep={journeyStep} steps={steps} />;
 };
 
 const BodyTitle = ({ title, href = null }) => {

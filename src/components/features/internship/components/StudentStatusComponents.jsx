@@ -84,16 +84,13 @@ export const CVUploadBanner = ({ variant = 'prepare' }) => (
     <Button
       asChild
       className={cn(
-        'h-12 rounded-xl px-8 font-black uppercase tracking-widest text-white shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0',
+        'h-12 rounded-xl px-8 font-black tracking-widest text-white shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0',
         variant === 'urgent'
           ? 'bg-amber-600 shadow-amber-200 hover:bg-amber-700 hover:shadow-amber-300'
           : 'bg-indigo-600 shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300'
       )}
     >
-      <Link href="/profile">
-        {INTERNSHIP_UI.BANNERS.UPLOAD_CV_BTN}
-        <Sparkles className="ml-2 size-4" />
-      </Link>
+      <Link href="/profile">{INTERNSHIP_UI.BANNERS.UPLOAD_CV_BTN}</Link>
     </Button>
   </div>
 );

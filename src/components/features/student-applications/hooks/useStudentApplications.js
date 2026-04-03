@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useToast } from '@/providers/ToastProvider';
 
+import { STUDENT_APPLICATIONS_UI } from '../constants/uiText';
 import { studentApplicationService } from '../services/student-application.service';
 
 export const useMyApplications = (params = {}) => {

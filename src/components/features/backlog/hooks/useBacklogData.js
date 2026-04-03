@@ -16,6 +16,7 @@ export function useBacklogData() {
   const [searchText, setSearchText] = useState('');
   const deferredSearchText = useDeferredValue(searchText);
 
+  const [epics, setEpics] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [backlogItems, setBacklogItems] = useState([]);
 
@@ -87,18 +88,16 @@ export function useBacklogData() {
     staleTime: 2 * 60 * 1000,
   });
 
-  // Derived epics from query data (no local modification)
-  const epics = useMemo(() => backlogData?.epics || [], [backlogData?.epics]);
-
   // Sync local state when query data changes
   useEffect(() => {
     if (backlogData) {
       setTimeout(() => {
+        setEpics(backlogData.epics || []);
         setSprints(backlogData.sprints || []);
         setBacklogItems(backlogData.backlogItems || []);
       }, 0);
     }
-  }, [backlogData?.sprints, backlogData?.backlogItems, backlogData]);
+  }, [backlogData?.epics, backlogData?.sprints, backlogData?.backlogItems, backlogData]);
 
   // Derived Logic
   const appendEpicName = useCallback(
@@ -142,6 +141,7 @@ export function useBacklogData() {
   return {
     projectId,
     epics,
+    setEpics,
     sprints,
     setSprints,
     backlogItems,

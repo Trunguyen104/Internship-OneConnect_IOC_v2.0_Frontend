@@ -197,7 +197,7 @@ export default function AppSidebar() {
       if (info.key === 'back-to-app') return router.push(getDashboardHref(role));
       if (info.key === 'back-to-terms') return router.push('/school/terms');
       if (info.key === 'back-to-phases') return router.push('/company/phases');
-      if (info.key === 'back-to-home') router.push('/student/home');
+      if (info.key === 'back-to-home') return router.push(getDashboardHref(role));
       if (info.key) router.push(info.key);
     },
     [role, router, getDashboardHref]

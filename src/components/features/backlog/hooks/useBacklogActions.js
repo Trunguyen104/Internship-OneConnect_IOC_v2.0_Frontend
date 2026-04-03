@@ -39,7 +39,6 @@ export function useBacklogActions({
         name: payload.name,
         title: payload.name,
         description: payload.description,
-        endDate: payload.endDate,
       };
       const res = await productBacklogService.createEpic(projectId, apiPayload);
       if (res && res.isSuccess === false) {
@@ -71,7 +70,6 @@ export function useBacklogActions({
         name: payload.name,
         title: payload.name,
         description: payload.description,
-        endDate: payload.endDate,
       };
       const res = await productBacklogService.updateEpic(projectId, epicId, apiPayload);
       if (res && res.isSuccess === false) {
