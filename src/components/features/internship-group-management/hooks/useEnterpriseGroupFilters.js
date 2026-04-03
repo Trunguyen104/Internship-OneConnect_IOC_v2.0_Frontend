@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { EnterprisePhaseService } from '../../../internship-student-management/services/enterprise-phase.service';
+import { EnterprisePhaseService } from '../../internship-student-management/services/enterprise-phase.service';
 import { useDebounce } from './useDebounce';
 
 const DEFAULT_PAGINATION = {
@@ -12,52 +12,43 @@ const DEFAULT_PAGINATION = {
 export const useEnterpriseGroupFilters = () => {
   const [phaseId, setPhaseId] = useState('ALL_VISIBLE');
 
-  const allPhasesOption = {
-    label: 'All Phases',
-    value: 'ALL_VISIBLE',
-    status: undefined,
-  };
-
-  const { data: rawOptions = [], isLoading: fetchingPhases } = useQuery({
-    queryKey: ['enterprise-phases-list'],
+  const { data: phaseOptions = [], isLoading: fetchingPhases } = useQuery({
+    queryKey: ['enterprise-phases'],
     queryFn: async () => {
       try {
         const res = await EnterprisePhaseService.getPhases();
-        const dataArr =
-          res?.data?.data?.items ||
-          res?.data?.items ||
-          res?.items ||
-          res?.data ||
-          res?.result?.items ||
-          res?.value?.items ||
-          (Array.isArray(res) ? res : []);
-        const phases = Array.isArray(dataArr) ? dataArr : [];
-
-        return phases.map((p) => {
+        const phases = (res?.data?.items || res?.data || []).map((p) => {
           let s = p.status;
           if (typeof s === 'string') {
             const statusMap = { open: 1, inprogress: 2, completed: 3, closed: 4 };
             s = statusMap[s.toLowerCase()] || s;
           }
-
-          return {
-            label: p.name || p.phaseName || 'Unnamed Phase',
-            value: p.phaseId || p.id || p.PhaseId || p.Id,
-            status: s,
-            startDate: p.startDate,
-            endDate: p.endDate,
-            enterpriseId: p.enterpriseId,
-          };
+          return { ...p, status: s };
         });
+
+        if (phases.length > 0) {
+          const options = phases.map((p) => ({
+            label: p.name || p.phaseName || 'Unnamed Phase',
+            value: p.id || p.phaseId,
+            status: p.status,
+          }));
+
+          return [
+            {
+              label: 'All Phases',
+              value: 'ALL_VISIBLE',
+              status: undefined,
+            },
+            ...options,
+          ];
+        }
+        return [];
       } catch (err) {
-        console.error('Failed to fetch phases:', err);
         return [];
       }
     },
-    staleTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // Phases don't change often
   });
-
-  const phaseOptions = useMemo(() => [allPhasesOption, ...rawOptions], [rawOptions]);
 
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 300);

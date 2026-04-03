@@ -39,22 +39,22 @@ export const JobPostingsService = {
   /**
    * Delete job posting (soft delete)
    */
-  delete(id, data = { confirmWhenHasActiveApplications: true }) {
-    return httpDelete(`/jobs/${id}`, data);
+  delete(id) {
+    return httpDelete(`/jobs/${id}`);
   },
 
   /**
    * Publish a draft job posting
    */
   publish(id) {
-    return httpPost(`/jobs/${id}/publish`, {});
+    return httpPost(`/jobs/${id}/publish`);
   },
 
   /**
    * Close a job posting
    */
-  close(id, data = { confirmWhenHasActiveApplications: false }) {
-    return httpPatch(`/jobs/${id}/close`, data);
+  close(id) {
+    return httpPatch(`/jobs/${id}/close`);
   },
 
   /**

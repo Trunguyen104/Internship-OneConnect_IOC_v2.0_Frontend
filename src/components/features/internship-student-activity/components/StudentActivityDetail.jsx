@@ -117,7 +117,7 @@ export default function StudentActivityDetail() {
   return (
     <PageLayout className="gap-0! pt-0!">
       {/* Unified Header Card */}
-      <div className="flex-1 min-h-0 flex flex-col bg-white overflow-y-auto border border-slate-200/60 rounded-[32px] transition-all duration-500 shadow-xl shadow-slate-200/40">
+      <div className="bg-white overflow-hidden border border-slate-200/60 rounded-[32px] transition-all duration-500 shadow-xl shadow-slate-200/40">
         {/* Profile Section */}
         <div className="p-8 pb-4 relative">
           {/* Prominent Back Button inside Card */}

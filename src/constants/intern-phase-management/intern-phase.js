@@ -1,7 +1,7 @@
 export const INTERN_PHASE_STATUS = {
-  UPCOMING: 1, // Open
-  ACTIVE: 2, // InProgress
-  ENDED: 3, // Closed
+  UPCOMING: 'UPCOMING',
+  ACTIVE: 'ACTIVE',
+  ENDED: 'ENDED',
 };
 
 export const INTERN_PHASE_STATUS_LABELS = {

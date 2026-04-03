@@ -50,9 +50,9 @@ export default function EvaluationContainer() {
                   ? LABELS.NO_GROUPS
                   : LABELS.SELECT_GROUP_PROMPT}
             </h3>
-            {/* <p className="text-sm font-medium text-muted/60 max-w-sm">
+            <p className="text-sm font-medium text-muted/60 max-w-sm">
               {LABELS.SELECT_GROUP_PROMPT_DETAIL}
-            </p> */}
+            </p>
           </div>
         ) : (
           <MentorEvaluationPage

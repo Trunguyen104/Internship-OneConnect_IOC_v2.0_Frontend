@@ -10,7 +10,7 @@ const VARIANT_MAP = {
   primary: 'border-primary bg-primary text-white', // Use solid by default for primary
   success: 'border-success bg-success text-white', // Use solid by default for success
   warning: 'border-warning bg-warning text-white', // Use solid by default for warning
-  danger: 'border-danger bg-danger text-white',
+  danger: 'border-error bg-error text-white',
   info: 'border-info bg-info text-white',
   // Soft variants
   'primary-soft': 'border-primary/20 bg-primary-surface text-primary',

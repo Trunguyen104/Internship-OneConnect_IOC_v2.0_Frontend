@@ -18,8 +18,8 @@ export default function PhaseWorkspaceLayout({ children }) {
       <AppSidebar />
       <Layout className="flex h-full flex-1 flex-col overflow-hidden">
         <Header />
-        <Content className="flex flex-1 flex-col overflow-auto bg-gray-50 p-4 2xl:p-6">
-          <div className="flex w-full flex-1 flex-col">{children}</div>
+        <Content className="flex flex-1 flex-col overflow-hidden bg-gray-50 p-4 2xl:p-6">
+          <div className="flex w-full flex-1 flex-col overflow-hidden">{children}</div>
         </Content>
       </Layout>
     </Layout>

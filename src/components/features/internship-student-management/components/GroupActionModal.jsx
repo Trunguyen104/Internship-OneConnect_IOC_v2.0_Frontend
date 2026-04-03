@@ -11,7 +11,7 @@ import {
   INTERNSHIP_MANAGEMENT_UI,
 } from '@/constants/internship-management/internship-management';
 
-import { useEnterpriseGroups } from '../../internship-management/internship-group-management/hooks/useEnterpriseGroups';
+import { useEnterpriseGroups } from '../../internship-group-management/hooks/useEnterpriseGroups';
 
 const GroupActionModal = ({ open, students = [], type, onCancel, onConfirm }) => {
   const [form] = Form.useForm();

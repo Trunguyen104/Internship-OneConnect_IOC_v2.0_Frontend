@@ -1,11 +1,20 @@
 'use client';
 
-import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  CheckSquareFilled,
+  CheckSquareOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  MoreOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { Badge, Dropdown, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import StatusBadge from '@/components/ui/status-badge';
 import {
   INTERN_PHASE_MANAGEMENT,
@@ -13,7 +22,18 @@ import {
   INTERN_PHASE_STATUS_LABELS,
 } from '@/constants/intern-phase-management/intern-phase';
 
-export default function InternPhaseTable({ items, loading, onView, onEdit, onDelete }) {
+export default function InternPhaseTable({
+  items,
+  loading,
+  search,
+  setSearch,
+  includeEnded,
+  setIncludeEnded,
+  onView,
+  onEdit,
+  onDelete,
+  onCreate,
+}) {
   const { TABLE, SEARCH_PLACEHOLDER, FILTERS, CREATE_BTN } = INTERN_PHASE_MANAGEMENT;
 
   const columns = useMemo(
@@ -192,7 +212,42 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
   );
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DataTableToolbar>
+        <DataTableToolbar.Search
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={SEARCH_PLACEHOLDER}
+        />
+        <DataTableToolbar.Filters>
+          <Tooltip title={FILTERS.INCLUDE_ENDED}>
+            <div
+              onClick={() => setIncludeEnded(!includeEnded)}
+              className={`flex items-center gap-2 cursor-pointer transition-all px-3 py-1.5 rounded-full border ${
+                includeEnded
+                  ? 'bg-red-50 border-red-100 text-red-600'
+                  : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+              }`}
+            >
+              {includeEnded ? (
+                <CheckSquareFilled className="text-red-600" />
+              ) : (
+                <CheckSquareOutlined className="text-slate-300" />
+              )}
+              <span className="text-[11px] font-bold uppercase tracking-wider select-none">
+                {FILTERS.INCLUDE_ENDED}
+              </span>
+            </div>
+          </Tooltip>
+        </DataTableToolbar.Filters>
+        <DataTableToolbar.Actions
+          label={CREATE_BTN}
+          icon={<PlusOutlined />}
+          onClick={onCreate}
+          className="ml-auto"
+        />
+      </DataTableToolbar>
+
       <DataTable
         columns={columns}
         data={items}

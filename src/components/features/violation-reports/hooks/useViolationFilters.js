@@ -1,20 +1,8 @@
 'use client';
 import { useCallback, useState } from 'react';
 
-export const useViolationFilters = (initialTermId) => {
-  // const [termId, setTermId] = useState(initialTermId || null);
-  const [termId, setTermId] = useState(() => initialTermId ?? null);
-
-  // useEffect(() => {
-  //   if (initialTermId) {
-  //     setTermId(initialTermId);
-  //   }
-  // }, [initialTermId]);
-  // useEffect(() => {
-  //   if (initialTermId && initialTermId !== termId) {
-  //     setTermId(initialTermId);
-  //   }
-  // }, [initialTermId, termId]);
+export const useViolationFilters = () => {
+  const [termId, setTermId] = useState(null);
   const [termOptions, setTermOptions] = useState([]);
   const [fetchingTerms, setFetchingTerms] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');

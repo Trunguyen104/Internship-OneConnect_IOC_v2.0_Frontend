@@ -8,19 +8,19 @@ import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
-import { EnterpriseMentorService } from '../../../internship-student-management/services/enterprise-mentor.service';
-import { EnterpriseStudentService } from '../../../internship-student-management/services/enterprise-student.service';
-import { userService } from '../../../user/services/user.service';
+import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
+import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
+import { userService } from '../../user/services/user.service';
+import { useEnterpriseGroupActions } from '../hooks/useEnterpriseGroupActions';
+import { useEnterpriseGroupFilters } from '../hooks/useEnterpriseGroupFilters';
+import { useEnterpriseGroups } from '../hooks/useEnterpriseGroups';
 import { EnterpriseGroupService } from '../services/enterprise-group.service';
-import { useEnterpriseGroupActions } from './useEnterpriseGroupActions';
-import { useEnterpriseGroupFilters } from './useEnterpriseGroupFilters';
-import { useEnterpriseGroups } from './useEnterpriseGroups';
 
 export const useGroupManagement = () => {
   const toast = useToast();
   const searchParams = useSearchParams();
   const urlGroupId = searchParams.get('groupId');
-  const groupFilters = useEnterpriseGroupFilters();
+  const filters = useEnterpriseGroupFilters();
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
   const { MESSAGES } = GROUP_MANAGEMENT;
 
@@ -41,27 +41,22 @@ export const useGroupManagement = () => {
 
   // 2. Main Group Data Fetching
   const { data, total, loading, refetch } = useEnterpriseGroups({
-    phaseId: groupFilters.phaseId,
-    filters: groupFilters.filters,
-    search: groupFilters.debouncedSearch,
-    pagination: groupFilters.pagination,
-    sort: groupFilters.sort,
-    phaseOptions: groupFilters.phaseOptions,
+    phaseId: filters.phaseId,
+    filters: filters.filters,
+    search: filters.debouncedSearch,
+    pagination: filters.pagination,
+    sort: filters.sort,
+    phaseOptions: filters.phaseOptions,
   });
 
-  // 3. Fetch Mentors - Aligned with Backend (Self-identifies enterprise via HR login)
+  // 3. Fetch Mentors
   const { data: mentors = [], isLoading: loadingMentors } = useQuery({
     queryKey: ['enterprise-mentors'],
     queryFn: async () => {
       try {
-        const roles = [6]; // Using Role 6 as standard for Mentors
+        const roles = [6];
         const results = await Promise.allSettled(
-          roles.map((r) =>
-            EnterpriseMentorService.getMentors({
-              Role: r,
-              PageSize: 100,
-            })
-          )
+          roles.map((r) => EnterpriseMentorService.getMentors({ Role: r, PageSize: 100 }))
         );
 
         const allItems = results
@@ -88,9 +83,9 @@ export const useGroupManagement = () => {
 
   // 4. Fetch Unassigned Students
   const { data: unassignedStudents = [], isLoading: fetchingStudents } = useQuery({
-    queryKey: ['unassigned-students', groupFilters.phaseId],
+    queryKey: ['unassigned-students', filters.phaseId],
     queryFn: async () => {
-      let targetPhaseId = groupFilters.phaseId;
+      let targetPhaseId = filters.phaseId;
       const isAllVisible = targetPhaseId === 'ALL_VISIBLE' || !targetPhaseId;
 
       try {
@@ -105,6 +100,10 @@ export const useGroupManagement = () => {
 
         const unassigned = mappedItems.filter((s) => {
           if (s.isAssignedToGroup || s.groupId) return false;
+
+          // DO NOT filter by phase status STRICTLY here since the backend already
+          // provides the eligible students for placed-students!
+          // We just allow all students returned by the backend without assigned group.
           return true;
         });
 
@@ -224,7 +223,7 @@ export const useGroupManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (payload) => {
-      let targetPhaseId = groupFilters.phaseId;
+      let targetPhaseId = filters.phaseId;
 
       if (targetPhaseId === 'ALL_VISIBLE' || !targetPhaseId) {
         targetPhaseId = payload.phaseId || payload.termId;
@@ -232,28 +231,21 @@ export const useGroupManagement = () => {
 
       if (!targetPhaseId && payload.students?.[0]?.studentId) {
         const firstStudentId = payload.students[0].studentId;
-        const studentInfo = (unassignedStudents || []).find(
+        const studentInfo = unassignedStudents.find(
           (s) => String(s.studentId || s.id || s.applicationId) === String(firstStudentId)
         );
         targetPhaseId = studentInfo?.phaseId || studentInfo?.termId;
       }
 
-      const safeOptions = Array.isArray(groupFilters.phaseOptions) ? groupFilters.phaseOptions : [];
-      const selectedPhase = safeOptions.find(
-        (p) => String(p.value).toLowerCase() === String(targetPhaseId).toLowerCase()
-      );
-
       await createGroup({
         ...payload,
         phaseId: targetPhaseId,
         internshipPhaseId: targetPhaseId,
-        enterpriseId: enterpriseId || selectedPhase?.enterpriseId,
-        startDate: payload.startDate || selectedPhase?.startDate,
-        endDate: payload.endDate || selectedPhase?.endDate,
+        enterpriseId: enterpriseId,
       });
       setCreateModal({ open: false, group: null });
     },
-    [createGroup, groupFilters.phaseId, groupFilters.phaseOptions, enterpriseId, unassignedStudents]
+    [createGroup, filters.phaseId, enterpriseId, unassignedStudents]
   );
 
   const handleUpdateGroup = useCallback(
@@ -303,38 +295,25 @@ export const useGroupManagement = () => {
           }
         } else {
           const targetPhaseId = group.phaseId || group.termId || group.internshipPhaseId;
-          const safeOptions = Array.isArray(groupFilters.phaseOptions)
-            ? groupFilters.phaseOptions
-            : [];
-          const selectedPhase = safeOptions.find(
-            (p) => String(p.value).toLowerCase() === String(targetPhaseId).toLowerCase()
-          );
 
           await updateGroup(groupId, {
             groupName: values.groupName,
             description: values.description,
             mentorId: values.mentorId,
-            enterpriseId: enterpriseId || group.enterpriseId || selectedPhase?.enterpriseId,
-            startDate: values.startDate || group.startDate || selectedPhase?.startDate,
-            endDate: values.endDate || group.endDate || selectedPhase?.endDate,
+            enterpriseId: enterpriseId || group.enterpriseId,
+            startDate: values.startDate || group.startDate,
+            endDate: values.endDate || group.endDate,
             phaseId: targetPhaseId,
             internshipPhaseId: targetPhaseId,
           });
         }
 
         setEditModal({ open: false, group: null, isAddingStudents: false });
-      } catch (err) {
-        console.error('Failed to update group:', err);
+      } catch {
+        // Handled
       }
     },
-    [
-      editModal,
-      updateGroup,
-      addGroupStudents,
-      removeStudents,
-      enterpriseId,
-      groupFilters.phaseOptions,
-    ]
+    [editModal, updateGroup, addGroupStudents, removeStudents, enterpriseId]
   );
 
   const handleRemoveStudentFromGroup = useCallback(
@@ -361,10 +340,10 @@ export const useGroupManagement = () => {
 
   return {
     filteredGroups: data,
-    activeTab: groupFilters.filters.status !== null ? groupFilters.filters.status : 'ALL',
-    setActiveTab: (val) => groupFilters.handleFilterChange('status', val === 'ALL' ? null : val),
-    search: groupFilters.searchValue,
-    setSearch: groupFilters.handleSearch,
+    activeTab: filters.filters.status !== null ? filters.filters.status : 'ALL',
+    setActiveTab: (val) => filters.handleFilterChange('status', val === 'ALL' ? null : val),
+    search: filters.searchValue,
+    setSearch: filters.handleSearch,
     total,
     loading: loading || actionLoading,
     assignModal,
@@ -384,24 +363,19 @@ export const useGroupManagement = () => {
     handleRemoveStudentFromGroup,
     mentors,
     loadingMentors,
-    phaseId: groupFilters.phaseId,
-    setPhaseId: groupFilters.setPhaseId,
-    phaseOptions: groupFilters.phaseOptions,
-    fetchingPhases: groupFilters.fetchingPhases,
-    pagination: groupFilters.pagination,
-    handleTableChange: (page, filter, sorter) =>
-      groupFilters.handleTableChange(page, filter, sorter),
-    handlePageSizeChange: (size) => groupFilters.handleTableChange({ current: 1, pageSize: size }),
+    phaseId: filters.phaseId,
+    setPhaseId: filters.setPhaseId,
+    phaseOptions: filters.phaseOptions,
+    fetchingPhases: filters.fetchingPhases,
+    pagination: filters.pagination,
+    handleTableChange: (page, filter, sorter) => filters.handleTableChange(page, filter, sorter),
+    handlePageSizeChange: (size) => filters.handleTableChange({ current: 1, pageSize: size }),
     isPhaseEditable:
-      groupFilters.phaseId === 'ALL_VISIBLE' ||
-      (groupFilters.phaseId &&
-        [1, 2].includes(
-          (Array.isArray(groupFilters.phaseOptions) ? groupFilters.phaseOptions : []).find(
-            (p) => p.value === groupFilters.phaseId
-          )?.status
-        )),
-    filters: groupFilters.filters,
-    handleFilterChange: groupFilters.handleFilterChange,
+      filters.phaseId === 'ALL_VISIBLE' ||
+      (filters.phaseId &&
+        [1, 2].includes(filters.phaseOptions.find((p) => p.value === filters.phaseId)?.status)),
+    filters: filters.filters,
+    handleFilterChange: filters.handleFilterChange,
     selectedGroupDetail,
     setSelectedGroupDetail,
     isAutoSelecting,

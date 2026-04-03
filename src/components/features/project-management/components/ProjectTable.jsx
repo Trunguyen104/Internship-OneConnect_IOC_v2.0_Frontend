@@ -7,6 +7,7 @@ import {
   EyeOutlined,
   InboxOutlined,
   RollbackOutlined,
+  SwapOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
@@ -276,6 +277,13 @@ export default function ProjectTable({
                 icon: <InboxOutlined />,
                 variant: 'warning',
                 onClick: () => onArchive?.(record.projectId),
+              },
+              {
+                key: 'change-group',
+                label: TABLE.ACTIONS_LABEL.CHANGE_GROUP,
+                icon: <SwapOutlined />,
+                variant: 'neutral',
+                onClick: () => onAssign?.(record),
               }
             );
           } else if (op === OPERATIONAL_STATUS.UNSTARTED || op === OPERATIONAL_STATUS.ACTIVE) {
@@ -299,16 +307,18 @@ export default function ProjectTable({
               });
             }
 
-            // Group Management (Only for Unstarted)
-            if (op === OPERATIONAL_STATUS.UNSTARTED) {
-              items.push({
-                key: 'assign',
-                label: TABLE.ACTIONS_LABEL.ASSIGN_GROUP,
-                icon: <UsergroupAddOutlined />,
-                variant: 'success',
-                onClick: () => onAssign?.(record),
-              });
-            }
+            // Group Management
+            items.push({
+              key: 'assign',
+              label:
+                op === OPERATIONAL_STATUS.UNSTARTED
+                  ? TABLE.ACTIONS_LABEL.ASSIGN_GROUP
+                  : TABLE.ACTIONS_LABEL.CHANGE_GROUP,
+              icon:
+                op === OPERATIONAL_STATUS.UNSTARTED ? <UsergroupAddOutlined /> : <SwapOutlined />,
+              variant: op === OPERATIONAL_STATUS.UNSTARTED ? 'success' : 'neutral',
+              onClick: () => onAssign?.(record),
+            });
 
             // Transition actions
             if (op === OPERATIONAL_STATUS.ACTIVE) {

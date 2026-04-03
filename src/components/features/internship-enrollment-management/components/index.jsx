@@ -7,10 +7,10 @@ import {
   EyeOutlined,
   FilterOutlined,
   PlusOutlined,
+  ReloadOutlined,
   UserDeleteOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, Select, Space, Tooltip } from 'antd';
-import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
@@ -27,8 +27,6 @@ import ImportModal from './ImportModal';
 import StudentFormModal from './StudentFormModal';
 
 export default function TermStudentManagement() {
-  const params = useParams();
-  const isTermScoped = !!params?.termId;
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
   const { MESSAGES, ACTIONS, SEARCH, STATUS_OPTIONS } = ENROLLMENT_MANAGEMENT;
 
@@ -63,6 +61,7 @@ export default function TermStudentManagement() {
     handleView,
     handleEdit,
     handleDelete,
+    handleRestore,
     handleUpdateStudent,
     handleAddStudent,
     handleImportPreview,
@@ -206,6 +205,17 @@ export default function TermStudentManagement() {
                   onClick: () => handleDelete(record),
                 }
               );
+            } else {
+              items.push(
+                { type: 'divider' },
+                {
+                  key: 'recover',
+                  label: ACTION_LABELS.RECOVER,
+                  icon: <ReloadOutlined />,
+                  variant: 'success',
+                  onClick: () => handleRestore(record),
+                }
+              );
             }
           }
 
@@ -251,7 +261,7 @@ export default function TermStudentManagement() {
         subtitle={ENROLLMENT_MANAGEMENT.PAGE_SUBTITLE}
       />
 
-      <PageLayout.Card className="flex flex-1 flex-col overflow-hidden min-h-[500px] max-h-[calc(100vh-160px)]">
+      <PageLayout.Card className="flex flex-col overflow-hidden">
         <DataTableToolbar className="mb-4 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={SEARCH.PLACEHOLDER}
@@ -266,11 +276,10 @@ export default function TermStudentManagement() {
                 placeholder={SEARCH.TERM_PLACEHOLDER}
                 value={termId}
                 onChange={onTermChange}
-                disabled={isTermScoped}
-                className="!h-11 min-w-[150px] !border-0 focus:!ring-0 disabled:bg-transparent"
+                className="!h-11 min-w-[150px] !border-0 focus:!ring-0"
                 variant="borderless"
                 options={terms.map((t) => ({ label: t.name, value: t.termId }))}
-                suffixIcon={!isTermScoped && <FilterOutlined className="text-muted/40" />}
+                suffixIcon={<FilterOutlined className="text-muted/40" />}
               />
               <div className="bg-border h-6 w-px self-center opacity-50" />
               <Select

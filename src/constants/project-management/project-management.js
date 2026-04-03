@@ -78,6 +78,7 @@ export const STATUS_VARIANTS = {
 export const PROJECT_MANAGEMENT = {
   TITLE: 'Project Management',
   CREATE_BTN: 'Create Project',
+  NO_UNSTARTED_PROJECTS: '* No unstarted projects available to assign to {groupName}.',
   SEARCH_PLACEHOLDER: 'Search projects by name or code...',
   COMMON: {
     N_A: '-',
@@ -120,6 +121,7 @@ export const PROJECT_MANAGEMENT = {
       ARCHIVE: 'Archive',
       DELETE: 'Delete Project',
       ASSIGN_GROUP: 'Assign Group',
+      CHANGE_GROUP: 'Change Group',
     },
   },
   FILTERS: {
@@ -336,12 +338,23 @@ export const PROJECT_MANAGEMENT = {
     DELETE_UNABLE_TITLE: 'Cannot Delete Project',
     DELETE_OWNERSHIP_ERROR: 'You can only delete projects you created.',
     ASSIGN_GROUP: {
-      TITLE: 'Assign Intern Group',
+      TITLE: 'Assign / Change Intern Group',
       DESC: 'Select an active Intern Group to assign to project <b>{name}</b>:',
       PLACEHOLDER: 'Select an Intern Group',
       CURRENT_GROUP: 'Current Group',
       CONFIRM: 'Confirm Assignment',
       SUCCESS_ASSIGN: 'Group assigned successfully.',
+      SUCCESS_CHANGE: 'Group changed successfully.',
+      ERROR_NO_CHANGE: 'Cannot Change Group',
+      ERROR_HAS_DATA:
+        'Project has student interaction data (logbook/eval/violation) and cannot change group. Please mark as completed instead.',
+      CONFIRM_CHANGE_TITLE: 'Confirm Group Change',
+      CONFIRM_CHANGE_DESC:
+        'Are you sure you want to change the group? Existing students will lose access to this project.',
+      SWAP_WARNING:
+        'Project <b>{projectName}</b> is currently assigned to <b>{groupName}</b>. Moving it will leave <b>{groupName}</b> without a project. Please select a replacement project for them below:',
+      REPLACEMENT_LABEL: 'Replacement Project for {groupName}',
+      REPLACEMENT_PLACEHOLDER: 'Select a replacement project (Unstarted only)',
       ERROR_BACKEND: 'Backend error during assignment',
       ERROR_FAILED: 'Assignment failed: ',
     },

@@ -58,8 +58,8 @@ export default function StudentActivityList() {
     const id = record.studentId || record.id;
     const url =
       termId && termId !== 'ALL'
-        ? `/school/activity/${id}?termId=${termId}`
-        : `/school/activity/${id}`;
+        ? `/internship/students/${id}?termId=${termId}`
+        : `/internship/students/${id}`;
     router.push(url);
   };
 
@@ -393,7 +393,8 @@ export default function StudentActivityList() {
             size="small"
             sortBy={sortBy}
             sortOrder={sortOrder}
-            className="flex-1 min-h-0"
+            onSort={onSort}
+            className="flex-none h-[350px]"
             emptyText={
               terms.length === 0 && !loading ? (
                 <div className="flex flex-col items-center justify-center gap-2 py-8">

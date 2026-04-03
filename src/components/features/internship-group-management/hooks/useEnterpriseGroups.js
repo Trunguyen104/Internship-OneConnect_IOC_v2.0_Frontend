@@ -81,8 +81,6 @@ export const useEnterpriseGroups = ({
                   phaseMatch?.label ||
                   phaseMatch?.name ||
                   '-',
-                startDate: item.startDate || item.phaseStartDate || phaseMatch?.startDate,
-                endDate: item.endDate || item.phaseEndDate || phaseMatch?.endDate,
               };
             })
           : [];

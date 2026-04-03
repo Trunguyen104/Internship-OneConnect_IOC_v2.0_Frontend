@@ -1,10 +1,8 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { App } from 'antd';
 import { useMemo } from 'react';
-
-import { useToast } from '@/providers/ToastProvider';
-import { universityService } from '@/services/university.service';
 
 import { JOB_POSTING_UI } from '../constants/job-postings.constant';
 import { JobPostingsService } from '../services/job-postings.service';
@@ -55,29 +53,9 @@ export const useInternshipPhases = () => {
     queryFn: () => JobPostingsService.getMyPhases(),
   });
 
-  const phases = useMemo(() => {
-    return query.data?.data?.items || [];
-  }, [query.data]);
-
   return {
     ...query,
-    phases: phases,
-  };
-};
-
-/**
- * Hook to fetch all universities for school selection.
- */
-export const useUniversities = () => {
-  const query = useQuery({
-    queryKey: ['universities', 'all'],
-    queryFn: () => universityService.getAll({ PageNumber: 1, PageSize: 1000 }),
-    staleTime: 1000 * 60 * 30, // 30 minutes
-  });
-
-  return {
-    ...query,
-    universities: query.data?.data?.items || [],
+    phases: query.data?.data?.items || [],
   };
 };
 
@@ -86,33 +64,15 @@ export const useUniversities = () => {
  */
 export const useJobPostingActions = () => {
   const queryClient = useQueryClient();
-  const toast = useToast();
+  const { message } = App.useApp();
 
   const handleSuccess = (msg) => {
     queryClient.invalidateQueries({ queryKey: ['job-postings'] });
-    toast.success('Success', msg);
+    message.success(msg);
   };
 
   const handleError = (err) => {
-    const data = err?.data || err?.response?.data || {};
-
-    // 1. Check for specific backend error structure (Result<T>)
-    if (data.errors && Array.isArray(data.errors)) {
-      return toast.error('Validation Error', data.errors[0]);
-    }
-
-    // 2. Check for ValidationErrors dictionary (ASP.NET Core default)
-    if (data.validationErrors) {
-      const firstKey = Object.keys(data.validationErrors)[0];
-      const firstError = data.validationErrors[firstKey]?.[0];
-      if (firstError) return toast.error('Validation Error', firstError);
-    }
-
-    // 3. Skip standard toast for 409 Conflict (handled manually for Close warnings)
-    if (data.status === 409 || err?.status === 409) return;
-
-    // 4. Fallback to generic message or error object message
-    toast.error('Error', err?.message || JOB_POSTING_UI.FORM.MESSAGES.GENERAL_ERROR);
+    message.error(err?.message || 'Something went wrong.');
   };
 
   const publishDraftMutation = useMutation({
@@ -122,20 +82,20 @@ export const useJobPostingActions = () => {
   });
 
   const closeJobMutation = useMutation({
-    mutationFn: ({ id, data }) => JobPostingsService.close(id, data),
-    onSuccess: () => handleSuccess(JOB_POSTING_UI.FORM.MESSAGES.CLOSE_SUCCESS),
+    mutationFn: (id) => JobPostingsService.close(id),
+    onSuccess: () => handleSuccess('Job posting closed successfully.'),
     onError: handleError,
   });
 
   const deleteJobMutation = useMutation({
-    mutationFn: ({ id, data }) => JobPostingsService.delete(id, data),
-    onSuccess: () => handleSuccess(JOB_POSTING_UI.FORM.MESSAGES.DELETE_SUCCESS),
+    mutationFn: (id) => JobPostingsService.delete(id),
+    onSuccess: () => handleSuccess('Job posting deleted successfully.'),
     onError: handleError,
   });
 
   const createMutation = useMutation({
     mutationFn: (data) => JobPostingsService.create(data),
-    onSuccess: () => handleSuccess(JOB_POSTING_UI.FORM.MESSAGES.CREATE_SUCCESS),
+    onSuccess: () => handleSuccess(JOB_POSTING_UI.FORM.MESSAGES.PUBLISH_SUCCESS),
     onError: handleError,
   });
 
@@ -151,11 +111,6 @@ export const useJobPostingActions = () => {
     onError: handleError,
   });
 
-  const getJobDetailMutation = useMutation({
-    mutationFn: (id) => JobPostingsService.getById(id),
-    onError: handleError,
-  });
-
   return {
     publishDraft: publishDraftMutation,
     closeJob: closeJobMutation,
@@ -163,7 +118,6 @@ export const useJobPostingActions = () => {
     createJob: createMutation,
     updateJob: updateMutation,
     saveDraft: draftMutation,
-    getJobDetail: getJobDetailMutation,
     isMutating:
       publishDraftMutation.isPending ||
       closeJobMutation.isPending ||

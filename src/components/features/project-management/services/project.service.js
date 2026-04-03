@@ -5,13 +5,8 @@ const BASE_URL = '/projects';
 export const ProjectService = {
   async getAll(params) {
     // If internshipId is provided, fetch specifically for that group
-    const groupId = params.InternshipId || params.internshipId;
-    if (groupId) {
-      // Ensure we pass groupId consistently to this specialized endpoint
-      return httpClient.httpGet(`${BASE_URL}/internship-group`, {
-        ...params,
-        internshipId: groupId,
-      });
+    if (params.internshipId) {
+      return httpClient.httpGet(`${BASE_URL}/internship-group`, params);
     }
     // Otherwise fetch all projects for the mentor/enterprise
     return httpClient.httpGet(BASE_URL, params);
@@ -65,5 +60,9 @@ export const ProjectService = {
 
   async assignGroup(projectId, internshipId) {
     return httpClient.httpPost(`${BASE_URL}/${projectId}/assign-group`, { internshipId });
+  },
+
+  async changeGroup(projectId, newInternshipId) {
+    return httpClient.httpPatch(`${BASE_URL}/${projectId}/change-group`, { newInternshipId });
   },
 };

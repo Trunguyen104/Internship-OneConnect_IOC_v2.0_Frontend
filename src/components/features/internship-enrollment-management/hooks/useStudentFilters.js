@@ -24,17 +24,10 @@ export const useStudentFilters = () => {
     total: 0,
   });
 
-  // Sync selected term with route term when in a term-scoped workspace
-  useEffect(() => {
-    if (routeTermId && routeTermId !== selectedTermId) {
-      setSelectedTermId(routeTermId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeTermId]);
-
   // Reset to page 1 when the route-driven term changes (sidebar navigation)
   useEffect(() => {
     if (!routeTermId) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- term scope from URL; reset list page when it changes
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, [routeTermId]);
 

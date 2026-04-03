@@ -98,7 +98,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         STATUS: 'STATUS',
         ACTION: 'ACTION',
       },
-      MORE: 'more',
       NOT_ASSIGNED: 'Not Assigned',
       EMPTY_TEXT: 'No internship groups found for the selected term.',
     },
@@ -165,9 +164,6 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         TITLE: 'Group Details:',
         DEFAULT_SUBTITLE: 'Internship Group Information',
         STATUS: 'Status',
-        GROUP_NAME: 'Group Name',
-        ENTERPRISE: 'Associated Enterprise',
-        DESCRIPTION: 'Group Description',
         MEMBERS: 'Team Members',
         TERM: 'Term / Semester',
         TOTAL_MEMBERS: 'Total Members',
@@ -554,20 +550,20 @@ export const INTERNSHIP_MANAGEMENT_UI = {
     PHASE_MANAGEMENT: null,
     ENROLLMENT_MANAGEMENT: {
       TITLE: 'Student Enrollment Management',
-      PAGE_SUBTITLE: 'Enroll students, track placement, and manage deletions per term.',
+      PAGE_SUBTITLE: 'Enroll students, track placement, and manage withdrawals per term.',
       SEARCH_PLACEHOLDER: 'Search by name or student ID...',
       STATUS_FILTER: 'Status: All',
       MAJOR_FILTER: 'Major: All',
       STATUS_OPTIONS: [
         { label: 'Placed', value: 'PLACED' },
         { label: 'Unplaced', value: 'UNPLACED' },
-        { label: 'Deleted', value: 'WITHDRAWN' },
+        { label: 'Withdrawn', value: 'WITHDRAWN' },
       ],
       STATUS_LABELS: {
         ACTIVE: 'Active',
         PLACED: 'Placed',
         UNPLACED: 'Unplaced',
-        WITHDRAWN: 'Deleted',
+        WITHDRAWN: 'Withdrawn',
       },
       PLACEMENT_LABELS: {
         PLACED: 'Placed',
@@ -581,8 +577,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         ADD: 'Add Student',
         IMPORT: 'Import from Excel',
         EDIT: 'Edit',
-        DELETE: 'Delete',
+        DELETE: 'Withdraw',
         VIEW: 'View Details',
+        RECOVER: 'Re-enroll',
       },
       TABLE: {
         COLUMNS: {
@@ -707,31 +704,33 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         STUDENT_TERM_ID_REQUIRED: 'Student Term ID is required',
         UPDATE_SUCCESS: 'Information updated successfully',
         UPDATE_ERROR: 'Failed to update student',
-        DELETE_CONFIRM_TITLE: 'Delete Student',
+        DELETE_CONFIRM_TITLE: 'Delete Student From This Term',
         DELETE_CONFIRM_TEXT:
-          'Are you sure you want to delete student "{name}"? This will permanently REMOVE them from the system if they have no other terms. This action cannot be undone.',
+          'Are you sure you want to delete student "{name}" from this internship term? This action cannot be undone.',
         DELETE_SUCCESS: 'Student deleted successfully',
         DELETE_ERROR: 'Failed to delete student',
         LOAD_ERROR: 'Failed to load students',
+        RESTORE_SUCCESS: 'Student re-enrolled successfully',
+        RESTORE_ERROR: 'Failed to re-enroll student',
         DOWNLOAD_TEMPLATE_ERROR: 'Failed to download template',
         DETAIL_LOAD_ERROR: 'Failed to load student details',
-        BULK_WITHDRAW_SUCCESS: 'Successfully deleted selected students',
+        BULK_WITHDRAW_SUCCESS: 'Successfully withdrawn selected students',
         WITHDRAW_PLACED_ERROR:
-          'Cannot delete a student who is already PLACED. Please cancel their placement first.',
+          'Cannot withdraw a student who is already PLACED. Please cancel their placement first.',
         BULK_WITHDRAW_PLACED_ERROR:
-          '{count} student(s) are already PLACED. Please cancel their placement before deleting.',
+          '{count} student(s) are already PLACED. Please cancel their placement before withdrawing.',
         BULK_WITHDRAW: {
           CONFIRM_ALL_UNPLACED:
-            'Are you sure you want to delete {count} students? This will permanently REMOVE them from the system if they have no other terms. This action cannot be undone.',
+            'Are you sure you want to withdraw {count} students from this internship term?',
           CONFIRM_MIXED:
-            '{placedCount} placed students will be skipped. Are you sure you want to delete the remaining {unplacedCount} students? This will permanently remove them from the system.',
-          SUCCESS_ALL_UNPLACED: 'Successfully deleted {count} students',
+            '{placedCount} placed students will be skipped. Are you sure you want to withdraw the remaining {unplacedCount} students?',
+          SUCCESS_ALL_UNPLACED: 'Successfully withdrawn {count} students',
           SUCCESS_MIXED:
-            'Successfully deleted {unplacedCount} students. {placedCount} placed students were skipped.',
+            'Successfully withdrawn {unplacedCount} students. {placedCount} placed students were skipped.',
           ERROR_ALL_PLACED:
-            'All selected students are placed and cannot be deleted. Please cancel placement first.',
+            'All selected students are placed and cannot be withdrawn. Please cancel placement first.',
           ERROR_GENERIC: 'An error occurred, please try again',
-          ACTION_LABEL: 'Delete students',
+          ACTION_LABEL: 'Withdraw students',
         },
       },
     },

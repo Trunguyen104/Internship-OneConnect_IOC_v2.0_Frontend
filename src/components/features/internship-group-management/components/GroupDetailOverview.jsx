@@ -66,14 +66,7 @@ export const GroupDetailOverview = ({ info, VIEW, GROUP_MANAGEMENT }) => {
               <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold text-text shadow-sm min-h-[44px] flex items-center">
                 <div className="flex items-center gap-2">
                   <ProjectOutlined className="text-primary/40" />
-                  <span className="truncate flex items-center gap-2">
-                    {info.projectName || GROUP_MANAGEMENT.TABLE.NOT_ASSIGNED}
-                    {info.projectCount > 1 && (
-                      <span className="bg-primary/10 text-primary text-[10px] px-1.5 py-0.5 rounded-full border border-primary/20 whitespace-nowrap">
-                        +{info.projectCount - 1} {GROUP_MANAGEMENT.TABLE.MORE}
-                      </span>
-                    )}
-                  </span>
+                  <span className="truncate">{info.project?.name || VIEW.NOT_ASSIGNED}</span>
                 </div>
               </div>
             </div>

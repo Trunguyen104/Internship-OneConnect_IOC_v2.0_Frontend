@@ -13,7 +13,7 @@ export default function Pagination({
   pageSizeOptions = [10, 20, 50, 100],
 }) {
   return (
-    <div className="flex items-center justify-end">
+    <div className="flex items-center">
       <AntdPagination
         current={page}
         pageSize={pageSize}

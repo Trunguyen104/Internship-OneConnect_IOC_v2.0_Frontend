@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-import { ProjectService } from '@/components/features/project-management/services/project.service';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -22,14 +21,8 @@ export function useGroupDetail(groupId) {
     queryFn: async () => {
       if (!groupId) return null;
       try {
-        const [res, projectsRes] = await Promise.all([
-          EnterpriseGroupService.getGroupDetail(groupId),
-          ProjectService.getAll({ internshipId: groupId }).catch(() => null),
-        ]);
-
+        const res = await EnterpriseGroupService.getGroupDetail(groupId);
         const rawData = res?.data || res;
-        const projectItems = projectsRes?.data?.items || projectsRes?.items || [];
-        const firstProject = projectItems[0];
 
         if (rawData) {
           // Map data to the format expected by GroupGeneralInfo
@@ -51,13 +44,7 @@ export function useGroupDetail(groupId) {
               rawData.termName || rawData.internshipTermName || rawData.term?.name || '-',
             enterpriseName: rawData.enterpriseName || rawData.enterprise?.name || '-',
             project:
-              rawData.project ||
-              (rawData.projectName || rawData.ProjectName || firstProject?.projectName
-                ? { name: rawData.projectName || rawData.ProjectName || firstProject?.projectName }
-                : null),
-            projectName: rawData.projectName || rawData.ProjectName || firstProject?.projectName,
-            projectCount: projectItems.length,
-            projects: projectItems,
+              rawData.project || (rawData.projectName ? { name: rawData.projectName } : null),
             startDate: rawData.startDate,
             endDate: rawData.endDate,
             members: (rawData.members || rawData.students || []).map((s) => ({
