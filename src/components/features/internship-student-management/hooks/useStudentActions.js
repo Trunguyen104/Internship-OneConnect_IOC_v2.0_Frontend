@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
-import { EnterpriseGroupService } from '../../internship-group-management/services/enterprise-group.service';
+import { EnterpriseGroupService } from '../../internship-management/internship-group-management/services/enterprise-group.service';
 import { EnterpriseStudentService } from '../services/enterprise-student.service';
 
 export const useStudentActions = ({ refetchStudents, phaseId, enterpriseId }) => {

@@ -9,11 +9,10 @@ import {
 import React from 'react';
 
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
-import PageLayout from '@/components/ui/pagelayout';
 import Pagination from '@/components/ui/pagination';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 
-import CreateGroupModal from '../../internship-group-management/components/CreateGroupModal';
+import CreateGroupModal from '../../internship-management/internship-group-management/components/CreateGroupModal';
 import { useInternshipManagement } from '../hooks/useInternshipManagement';
 import GroupActionModal from './GroupActionModal';
 import PhaseDetailModal from './PhaseDetailModal';
@@ -117,89 +116,85 @@ export default function InternshipManagement() {
     phaseId && phaseId !== 'ALL_VISIBLE' ? phaseOptions.find((p) => p.value === phaseId) : null;
 
   return (
-    <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
-      <PageLayout.Card className="flex min-h-0 flex-1 flex-col overflow-hidden !p-4 sm:!p-8">
-        <DataTableToolbar className="mb-5 !border-0 !p-0">
-          <DataTableToolbar.Search
-            placeholder={INTERNSHIP_LIST.FILTERS.SEARCH_PLACEHOLDER}
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-          />
+    <>
+      <DataTableToolbar className="mb-5 !border-0 !p-0">
+        <DataTableToolbar.Search
+          placeholder={INTERNSHIP_LIST.FILTERS.SEARCH_PLACEHOLDER}
+          value={search}
+          onChange={(e) => handleSearchChange(e.target.value)}
+        />
 
-          <DataTableToolbar.Filters>
-            <div className="flex flex-wrap items-center gap-3">
-              <StudentFilters
-                groupFilter={groupFilter}
-                setGroupFilter={handleGroupFilterChange}
-                mentorFilter={mentorFilter}
-                setMentorFilter={handleMentorFilterChange}
-                resetFilters={resetFilters}
-              />
-            </div>
-          </DataTableToolbar.Filters>
-
-          {selectedRowKeys.length > 0 && bulkItems.length > 0 && (
-            <DataTableToolbar.Actions className="ml-auto">
-              <DataTableToolbar.Actions
-                label={INTERNSHIP_LIST.ACTIONS.BULK_ACTIONS || 'Bulk Actions'}
-                icon={<DownOutlined />}
-                menu={{ items: bulkItems }}
-                className="bg-slate-800 hover:bg-slate-900"
-              />
-            </DataTableToolbar.Actions>
-          )}
-        </DataTableToolbar>
-
-        {selectedPhase && (
-          <div className="flex items-center gap-2 mb-1">
-            <button
-              type="button"
-              onClick={handleViewPhaseDetail}
-              className="flex items-center gap-1.5 text-[11px] text-primary/70 hover:text-primary font-semibold transition-colors cursor-pointer bg-transparent border-0 p-0"
-            >
-              <InfoCircleOutlined className="text-[11px]" />
-              {PHASE_DETAIL.VIEW_PHASE_DETAIL}
-            </button>
+        <DataTableToolbar.Filters>
+          <div className="flex flex-wrap items-center gap-3">
+            <StudentFilters
+              groupFilter={groupFilter}
+              setGroupFilter={handleGroupFilterChange}
+              mentorFilter={mentorFilter}
+              setMentorFilter={handleMentorFilterChange}
+              resetFilters={resetFilters}
+            />
           </div>
-        )}
+        </DataTableToolbar.Filters>
 
-        <StudentTable
-          data={filteredData}
+        {selectedRowKeys.length > 0 && bulkItems.length > 0 && (
+          <DataTableToolbar.Actions className="ml-auto">
+            <DataTableToolbar.Actions
+              label={INTERNSHIP_LIST.ACTIONS.BULK_ACTIONS || 'Bulk Actions'}
+              icon={<DownOutlined />}
+              menu={{ items: bulkItems }}
+              className="bg-slate-800 hover:bg-slate-900"
+            />
+          </DataTableToolbar.Actions>
+        )}
+      </DataTableToolbar>
+
+      {selectedPhase && (
+        <div className="flex items-center gap-2 mb-1">
+          <button
+            type="button"
+            onClick={handleViewPhaseDetail}
+            className="flex items-center gap-1.5 text-[11px] text-primary/70 hover:text-primary font-semibold transition-colors cursor-pointer bg-transparent border-0 p-0"
+          >
+            <InfoCircleOutlined className="text-[11px]" />
+            {PHASE_DETAIL.VIEW_PHASE_DETAIL}
+          </button>
+        </div>
+      )}
+
+      <StudentTable
+        data={filteredData}
+        page={pagination.current}
+        pageSize={pagination.pageSize}
+        loading={loading}
+        isPhaseEditable={isPhaseEditable}
+        hasGroups={hasGroups}
+        emptyText={
+          phaseOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Open Phases'
+            ? INTERNSHIP_LIST.TABLE.EMPTY_TEXT_UPCOMING
+            : INTERNSHIP_LIST.TABLE.EMPTY_TEXT_ACTIVE
+        }
+        sortBy={sort.column}
+        sortOrder={sort.order}
+        onSort={(key, order) => setSort({ column: key, order })}
+        selectedRowKeys={selectedRowKeys}
+        onSelectRowChange={setSelectedRowKeys}
+        onView={handleViewStudent}
+        onCreateGroup={(student) => setCreateModal({ open: true, students: [student] })}
+        onAddToGroup={(student) => setGroupModal({ open: true, students: [student], type: 'ADD' })}
+        onChangeGroup={(student) =>
+          setGroupModal({ open: true, students: [student], type: 'CHANGE' })
+        }
+      />
+      <div className="border-border/50 mt-auto flex flex-shrink-0 justify-end border-t pt-6">
+        <Pagination
+          total={total || 0}
           page={pagination.current}
           pageSize={pagination.pageSize}
-          loading={loading}
-          isPhaseEditable={isPhaseEditable}
-          hasGroups={hasGroups}
-          emptyText={
-            phaseOptions.find((o) => o.value === 'ALL_VISIBLE')?.label === 'All Open Phases'
-              ? INTERNSHIP_LIST.TABLE.EMPTY_TEXT_UPCOMING
-              : INTERNSHIP_LIST.TABLE.EMPTY_TEXT_ACTIVE
-          }
-          sortBy={sort.column}
-          sortOrder={sort.order}
-          onSort={(key, order) => setSort({ column: key, order })}
-          selectedRowKeys={selectedRowKeys}
-          onSelectRowChange={setSelectedRowKeys}
-          onView={handleViewStudent}
-          onCreateGroup={(student) => setCreateModal({ open: true, students: [student] })}
-          onAddToGroup={(student) =>
-            setGroupModal({ open: true, students: [student], type: 'ADD' })
-          }
-          onChangeGroup={(student) =>
-            setGroupModal({ open: true, students: [student], type: 'CHANGE' })
-          }
+          totalPages={Math.max(1, Math.ceil((total || 0) / pagination.pageSize))}
+          onPageChange={handleTableChange}
+          onPageSizeChange={handlePageSizeChange}
         />
-        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6">
-          <Pagination
-            total={total || 0}
-            page={pagination.current}
-            pageSize={pagination.pageSize}
-            totalPages={Math.max(1, Math.ceil((total || 0) / pagination.pageSize))}
-            onPageChange={handleTableChange}
-            onPageSizeChange={handlePageSizeChange}
-          />
-        </div>
-      </PageLayout.Card>
+      </div>
 
       <StudentDetailModal
         open={detailModal.open}
@@ -232,6 +227,6 @@ export default function InternshipManagement() {
         onCancel={() => setCreateModal({ open: false, students: [] })}
         onFinish={handleCreateGroup}
       />
-    </PageLayout>
+    </>
   );
 }

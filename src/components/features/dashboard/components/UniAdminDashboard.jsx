@@ -33,7 +33,6 @@ export default function UniAdminDashboard() {
     <div className="no-scrollbar animate-in fade-in flex h-full flex-col space-y-8 overflow-x-hidden overflow-y-auto pb-10 duration-700">
       <StudentPageHeader title={DASHBOARD.TITLE} />
 
-      {/* Metrics Row - Modern Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* <MetricCard
           // title={DASHBOARD.METRICS.TOTAL_STUDENTS}

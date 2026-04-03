@@ -60,7 +60,10 @@ export default function DataTableToolbar({
   if (!children) {
     return (
       <div
-        className={cn('flex h-14 w-full flex-nowrap items-center gap-4 overflow-hidden', className)}
+        className={cn(
+          'flex min-h-[3.5rem] h-auto w-full flex-wrap items-center gap-4 py-2',
+          className
+        )}
       >
         {leftContent && <div className="flex shrink-0 items-center gap-4">{leftContent}</div>}
         <div className="flex flex-1 items-center gap-3 overflow-hidden">
@@ -76,7 +79,10 @@ export default function DataTableToolbar({
 
   return (
     <div
-      className={cn('flex h-14 w-full flex-nowrap items-center gap-4 overflow-hidden', className)}
+      className={cn(
+        'flex min-h-[3.5rem] h-auto w-full flex-wrap items-center gap-4 py-2',
+        className
+      )}
     >
       {children}
     </div>

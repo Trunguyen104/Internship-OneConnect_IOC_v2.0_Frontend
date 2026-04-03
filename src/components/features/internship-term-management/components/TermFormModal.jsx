@@ -140,7 +140,7 @@ const TermFormBody = ({
               { max: 100, message: FORM.NAME_MAX },
             ]}
           >
-            <Input placeholder={FORM.NAME_PLACEHOLDER} className="!h-11 !rounded-xl" />
+            <Input placeholder={FORM.NAME_PLACEHOLDER} className="!h-10 !rounded-xl" />
           </Form.Item>
 
           {isSuperAdmin && (
@@ -151,7 +151,7 @@ const TermFormBody = ({
             >
               <Select
                 placeholder={FORM.UNIVERSITY_LABEL}
-                className="!h-11 w-full"
+                className="!h-10 w-full"
                 loading={loading}
                 showSearch
                 filterOption={(input, option) =>
@@ -179,9 +179,12 @@ const TermFormBody = ({
                 rules={[{ required: true, message: FORM.START_DATE_REQUIRED }]}
               >
                 <DatePicker
-                  className="!h-11 w-full !rounded-xl"
+                  className="!h-10 w-full !rounded-xl"
                   format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
+                  getPopupContainer={(trigger) => trigger.parentElement}
+                  classNames={{ popup: 'compact-datepicker-popup' }}
+                  placement="bottomLeft"
                 />
               </Form.Item>
             </Col>
@@ -207,9 +210,12 @@ const TermFormBody = ({
                 ]}
               >
                 <DatePicker
-                  className="!h-11 w-full !rounded-xl"
+                  className="!h-10 w-full !rounded-xl"
                   format="DD/MM/YYYY"
                   placeholder={FORM.DATE_PLACEHOLDER}
+                  getPopupContainer={(trigger) => trigger.parentElement}
+                  classNames={{ popup: 'compact-datepicker-popup' }}
+                  placement="bottomLeft"
                 />
               </Form.Item>
             </Col>

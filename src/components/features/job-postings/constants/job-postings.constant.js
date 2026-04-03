@@ -17,10 +17,13 @@ export const JOB_POSTING_UI = {
     DRAFT: 'Draft',
     PUBLISHED: 'Published',
     CLOSED: 'Closed',
+    INCLUDE_DELETED: 'Include Deleted',
   },
   FORM: {
     CREATE_TITLE: 'Create New Job Posting',
+    CREATE_SUBTITLE: 'Define the scope and requirements for this job posting.',
     EDIT_TITLE: 'Edit Job Posting',
+    EDIT_SUBTITLE: 'Update job details and requirements',
     FIELDS: {
       JOB_TITLE: 'Job Title',
       JOB_TITLE_PLACEHOLDER: 'e.g. Senior .NET Developer',
@@ -32,43 +35,72 @@ export const JOB_POSTING_UI = {
       END_DATE: 'End Date',
       LOCATION: 'Location',
       LOCATION_PLACEHOLDER: 'e.g. Ho Chi Minh City',
+      LOCATION_PLACEHOLDER: 'e.g. Ho Chi Minh City',
       APPLICATION_DEADLINE: 'Application Deadline',
       DESCRIPTION: 'Job Description',
       REQUIREMENTS: 'Requirements',
       BENEFITS: 'Benefits',
       AUDIENCE: 'Audience',
-      TARGETED_SCHOOLS: 'Targeted Schools',
+      TARGET_SCHOOLS: 'Target Schools',
+      TARGET_SCHOOLS_PLACEHOLDER: 'Search and select schools...',
+      ROLE_DESCRIPTION: 'Role Description',
+      ROLE_DESCRIPTION_PLACEHOLDER: 'Describe roles A, B, C and their requirements...',
+      START_DATE_LABEL: 'Internship Start',
+      END_DATE_LABEL: 'Internship End',
     },
     MESSAGES: {
-      SAVE_DRAFT_SUCCESS: 'Job posting saved as draft.',
-      PUBLISH_SUCCESS: 'Job posting published successfully.',
-      UPDATE_SUCCESS: 'Job posting updated successfully.',
+      SAVE_DRAFT_SUCCESS: 'Draft saved successfully.',
+      PUBLISH_SUCCESS: 'Job posting has been published.',
+      CREATE_SUCCESS: 'Job posting created successfully.',
+      UPDATE_SUCCESS: 'Job posting has been updated.',
+      DELETE_SUCCESS: 'Job posting deleted successfully.',
+      CLOSE_SUCCESS: 'Job Posting closed.',
+      REOPEN_SUCCESS: 'Job posting has been reopened and published.',
+      GENERAL_ERROR: 'An error occurred. Please try again.',
+      HEADERS: {
+        SUCCESS: 'Success',
+        ERROR: 'Error',
+        WARNING: 'Warning',
+        INFO: 'Information',
+        VALIDATION: 'Validation Error',
+      },
       VALIDATION: {
-        TITLE: 'Job title is required',
-        POSITION: 'Position is required',
-        PHASE: 'Please select an intern phase',
-        LOCATION: 'Location is required',
-        DEADLINE: 'Application deadline is required',
-        DEADLINE_TOOLTIP: 'Deadline must be on or before the internship start date.',
+        TITLE: 'Please enter a job title.',
+        POSITION: 'Please enter a job position.',
+        PHASE: 'Please select an intern phase before publishing.',
+        LOCATION: 'Please enter a location.',
+        DEADLINE: 'Please select an application deadline.',
+        DEADLINE_EXPIRED: 'The deadline has expired. Please update it before publishing.',
+        DEADLINE_FOR_REOPEN:
+          'Invalid deadline. Please choose a future date before the internship starts.',
+        DEADLINE_TOOLTIP: 'The deadline must be on or before the internship start date.',
+        DEADLINE_TOO_LATE: (date) =>
+          `The deadline must not be later than the internship start date (${date}).`,
+        SCHOOLS_REQUIRED: 'Please select at least one school.',
         DEADLINE_BULLET: '●',
+        JOB_ROLE_DESCRIPTION_LABEL: 'Role Description',
+        CAPACITY_WARNING: (phaseName, placed, total) =>
+          `Intern Phase [${phaseName}] is full (${placed}/${total} students already Placed). You may want to close job postings in this phase.`,
       },
     },
     BUTTONS: {
       CANCEL: 'Cancel',
       SAVE_DRAFT: 'Save Draft',
       PUBLISH: 'Publish Now',
+      SAVE_CHANGES: 'Save Changes',
       PROCESSING: 'Processing...',
+      AUTO_SAVING: 'Auto-saving...',
     },
     MODALS: {
       CHANGE_BLOCKED: {
-        TITLE: 'Change Blocked',
+        TITLE: 'Change Intern Phase Blocked',
         CONTENT: (count) =>
-          `This job posting has ${count} active applicant(s). You cannot change the Intern Phase while students are being processed. Please close the job and handle existing applications first.`,
+          `This posting has [${count}] active candidate(s). You cannot change the Intern Phase while applications are being processed. Please close the posting and handle current candidates first.`,
       },
       CONFIRM_UPDATE: {
-        TITLE: 'Confirm Update',
+        TITLE: 'Confirm Information Update',
         CONTENT: (count) =>
-          `This job has ${count} active application(s). Changing information might affect their expectations. Are you sure you want to proceed?`,
+          `This posting has [${count}] active candidate(s). Changing job information may affect their expectations. Are you sure you want to continue?`,
       },
     },
     REACH: {
@@ -76,25 +108,46 @@ export const JOB_POSTING_UI = {
       TARGETED_TITLE: 'Targeted (Specific Schools)',
       COMING_SOON: 'COMING SOON',
     },
-    SECTIONS: {
-      ONE: 'SECTION ONE',
-      TWO: 'SECTION TWO',
-      THREE: 'SECTION THREE',
+  },
+  DETAIL: {
+    NOT_FOUND: 'Job information not found',
+    BACK_TO_LIST: 'Back to Job Listing',
+    APPLICANTS_SUMMARY: 'Applicants Summary',
+    MANAGE_ALL_APPLICANTS: 'Manage All Applicants',
+    JOB_DETAILS: 'Job Details',
+    PHASE_CAPACITY_REACHED: 'Phase Capacity Reached',
+    NO_INFO: 'No information provided.',
+    SCHOOL_ID: 'School ID:',
+    STATS: {
+      APPLIED: 'Applied',
+      INTERVIEWING: 'Interviewing',
+      OFFERED: 'Offered',
+      PLACED: 'Placed',
+      TOTAL_ACTIVE: 'Total Applications',
+    },
+    FACT_LABELS: {
+      PHASE: 'Internship Phase',
+      DEADLINE: 'Application Deadline',
+      AUDIENCE: 'Reach / Audience',
+      LOCATION: 'Location',
+      POSITION: 'Position',
     },
   },
   PLACEHOLDERS: {
     REQUIREMENTS: 'List key requirements...',
     BENEFITS: 'List perks and benefits...',
     SELECT_DATE: 'Select date',
-    DRAFT_STATUS: (time) => `Draft saved ${time} ago`,
+    DRAFT_STATUS: (time) => `Auto-saved at ${time}`,
+    SAVED_AT: (time) => `Saved at ${time}`,
     EMPTY_TABLE: 'No job postings found.',
     NOT_AVAILABLE: 'N/A',
     DASH_FALLBACK: '—',
   },
   MENU: {
-    EDIT: 'Edit Job Posting',
-    PUBLISH: 'Publish Job Posting',
-    CLOSE: 'Close Job Posting',
+    VIEW: 'View Details',
+    EDIT: 'Edit',
+    PUBLISH: 'Publish',
+    CLOSE: 'Close',
     REPUBLISH: 'Re-Publish',
     DELETE: 'Delete',
   },
@@ -113,9 +166,9 @@ export const JOB_POSTING_UI = {
     CLOSE: {
       TITLE: 'Close Job Posting?',
       CONTENT_ACTIVE: (title, count) =>
-        `Job Posting "${title}" has ${count} active applicant(s) being processed. If you close this, they will be notified and stay in the pipeline for further processing. New students won't be able to apply. Are you sure?`,
+        `This posting has [${count}] candidate(s) being reviewed. After closing, new students won't be able to apply, but current candidates will still be processed. Are you sure you want to close?`,
       CONTENT_INACTIVE: (title) =>
-        `Are you sure you want to close "${title}"? Students will no longer be able to apply.`,
+        `Are you sure you want to close this Job Posting? Students will no longer be able to apply.`,
     },
     DELETE: {
       TITLE: 'Delete Job Posting?',
@@ -143,6 +196,13 @@ export const JOB_STATUS = {
   PUBLISHED: 2,
   CLOSED: 3,
   DELETED: 4,
+};
+
+export const JOB_STATUS_VARIANTS = {
+  [JOB_STATUS.DRAFT]: 'warning',
+  [JOB_STATUS.PUBLISHED]: 'success',
+  [JOB_STATUS.CLOSED]: 'danger',
+  [JOB_STATUS.DELETED]: 'neutral',
 };
 
 export const JOB_AUDIENCE = {

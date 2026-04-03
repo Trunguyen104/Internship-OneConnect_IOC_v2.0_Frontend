@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
@@ -93,6 +93,8 @@ export const useProjectManagement = () => {
   } = useQuery({
     queryKey: [
       'projects',
+      userInfo?.id,
+      isMentor,
       searchTerm,
       groupIdFilter,
       statusFilter,
@@ -101,16 +103,21 @@ export const useProjectManagement = () => {
       pagination.current,
       pagination.pageSize,
     ],
+    enabled: !!userInfo,
     queryFn: async () => {
       try {
         const params = {
           PageNumber: pagination.current,
           PageSize: pagination.pageSize,
           SearchTerm: searchTerm,
-          internshipId: groupIdFilter,
-          Status: statusFilter,
+          InternshipId: groupIdFilter,
+          OperationalStatus: statusFilter,
           // AC-14: HR and Uni Admin only see Published (1)
-          Visibility: !isMentor ? 1 : visibilityFilter !== undefined ? visibilityFilter : undefined,
+          VisibilityStatus: !isMentor
+            ? VISIBILITY_STATUS.PUBLISHED
+            : visibilityFilter !== undefined
+              ? visibilityFilter
+              : undefined,
           showArchived: showArchived,
         };
         const res = await ProjectService.getAll(params);
@@ -121,27 +128,6 @@ export const useProjectManagement = () => {
         const totalCount =
           apiData.totalCount || apiData.total || apiData.total_count || items.length || 0;
 
-        // AC-16: Notify Mentor about orphaned projects (once)
-        if (items.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
-          const orphanedList = items.filter((p) => p.isOrphaned || p.isOrphan);
-          if (orphanedList.length > 0) {
-            const firstName = orphanedList[0].projectName || orphanedList[0].name;
-            const message =
-              orphanedList.length === 1
-                ? PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_NOTIFY.replace(
-                    '{projectName}',
-                    firstName
-                  )
-                : PROJECT_MANAGEMENT.MESSAGES.ORPHANED_PROJECTS_PLURAL.replace(
-                    '{count}',
-                    orphanedList.length
-                  );
-
-            toast.warning(message, { duration: 10 });
-            hasNotifiedOrphaned.current = true;
-          }
-        }
-
         return { items, total: totalCount };
       } catch (err) {
         return { items: [], total: 0 };
@@ -149,6 +135,31 @@ export const useProjectManagement = () => {
     },
     staleTime: 2 * 60 * 1000,
   });
+
+  // AC-16: Notify Mentor about orphaned projects (once per session)
+  useEffect(() => {
+    if (projectsData?.items?.length > 0 && !hasNotifiedOrphaned.current && isMentor) {
+      const orphanedList = projectsData.items.filter((p) => p.isOrphaned || p.isOrphan);
+      if (orphanedList.length > 0) {
+        let message = '';
+        if (orphanedList.length === 1) {
+          const p = orphanedList[0];
+          message = PROJECT_MANAGEMENT.MESSAGES.ORPHANED_GROUP_NOTIFY.replace(
+            '{projectName}',
+            p.projectName || p.name || 'Unknown Project'
+          ).replace('{groupName}', p.groupName || 'N/A');
+        } else {
+          message = PROJECT_MANAGEMENT.MESSAGES.ORPHANED_PROJECTS_PLURAL.replace(
+            '{count}',
+            orphanedList.length
+          );
+        }
+
+        toast.warning(message, { duration: 10 });
+        hasNotifiedOrphaned.current = true;
+      }
+    }
+  }, [projectsData, isMentor, toast]);
 
   const projectsResult = projectsData?.items || [];
   const totalRecords = projectsData?.total || 0;

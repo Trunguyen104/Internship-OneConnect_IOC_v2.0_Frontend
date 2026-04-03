@@ -9,6 +9,7 @@ export const APPLICATIONS_UI = {
   PERIOD_PLACEHOLDER: 'Month — Year',
   EMPTY_STATE: 'No applications found.',
   JOB_CLOSED: 'Closed',
+  JOB_DELETED: 'Deleted',
   TABS: {
     SELF_APPLY: 'Self-apply',
     UNI_ASSIGN: 'Uni Assign',

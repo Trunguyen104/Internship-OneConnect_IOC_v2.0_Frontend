@@ -1,5 +1,5 @@
 import { EditOutlined, UserOutlined } from '@ant-design/icons';
-import { DatePicker, Form, Input, Select, Typography } from 'antd';
+import { Form, Input, Select, Typography } from 'antd';
 import React from 'react';
 
 const { Text } = Typography;
@@ -64,34 +64,6 @@ export const GroupFormFields = ({ CREATE, mentorOptions, loadingMentors }) => {
           autoSize={{ minRows: 1, maxRows: 2 }}
         />
       </Form.Item>
-
-      <div className="grid grid-cols-2 gap-3 mb-2">
-        <Form.Item
-          label={
-            <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-              {CREATE.START_DATE_LABEL}
-            </span>
-          }
-          name="startDate"
-          rules={[{ required: true, message: CREATE.START_DATE_REQUIRED }]}
-          className="mb-0"
-        >
-          <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
-        </Form.Item>
-
-        <Form.Item
-          label={
-            <span className="text-muted/60 text-[10px] font-bold tracking-widest uppercase ml-1">
-              {CREATE.END_DATE_LABEL}
-            </span>
-          }
-          name="endDate"
-          rules={[{ required: true, message: CREATE.END_DATE_REQUIRED }]}
-          className="mb-0"
-        >
-          <DatePicker className="h-9 w-full rounded-lg bg-slate-50/50 border-slate-100 text-xs font-semibold" />
-        </Form.Item>
-      </div>
     </>
   );
 };
