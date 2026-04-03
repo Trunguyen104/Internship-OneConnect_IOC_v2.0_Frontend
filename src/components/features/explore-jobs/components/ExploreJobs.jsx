@@ -41,7 +41,7 @@ export default function ExploreJobs() {
           {EXPLORE_JOBS_UI.PLACED_STATE.SUBTITLE}
         </p>
         <button
-          onClick={() => router.push('/dashboard')}
+          onClick={() => router.push('/student/home')}
           className="mt-8 bg-primary text-white px-8 py-3 rounded-2xl font-bold font-sm shadow-xl shadow-primary/20 hover:scale-105 transition-all"
         >
           {EXPLORE_JOBS_UI.PLACED_STATE.BACK_TO_DASHBOARD}

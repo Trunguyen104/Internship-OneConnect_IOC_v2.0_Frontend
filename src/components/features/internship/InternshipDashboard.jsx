@@ -117,31 +117,6 @@ const InternshipDashboard = () => {
     );
   }
 
-  // Map the new context data to the format expected by the UI.
-  const { currentTerm, internship, university, studentInfo } = contextData;
-  const isPlaced = !!internship?.group;
-
-  // Calculate a basic journey step based on data presence
-  let journeyStep = 1;
-  if (currentTerm?.enrollmentStatus === 'Enrolled') journeyStep = 2;
-  if (internship?.enterprise) journeyStep = 3;
-  if (isPlaced) journeyStep = 4;
-
-  const mappedInternship = {
-    id: internship?.group?.groupId || currentTerm?.termId,
-    clientKey: currentTerm?.termId || 'context',
-    displayName: currentTerm?.termName || 'Current Term',
-    groupName: internship?.group?.groupName || 'No Group Assigned',
-    status: currentTerm?.status,
-    isPlaced: isPlaced,
-    enterpriseName: internship?.enterprise?.name || 'No Enterprise',
-    mentorName: internship?.mentor?.name || 'No Mentor',
-    projectName: internship?.project?.name || 'No Project',
-    journeyStep: journeyStep,
-    startDate: currentTerm?.startDate,
-    endDate: currentTerm?.endDate,
-  };
-
   return (
     <div className="mx-auto w-full max-w-5xl space-y-12 px-6 py-12">
       <header className="relative">
