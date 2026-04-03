@@ -5,7 +5,7 @@ const BASE_URL = '/internship-phases';
 export const EnterprisePhaseService = {
   async getPhases(params = {}) {
     return httpGet(BASE_URL, {
-      PageIndex: params.PageIndex || 1,
+      PageNumber: params.PageNumber || params.page || 1,
       PageSize: params.PageSize || 50,
       ...params,
     });

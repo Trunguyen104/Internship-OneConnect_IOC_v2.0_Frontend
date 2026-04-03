@@ -8,7 +8,7 @@ export default function CompanyPhasesPage() {
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <CompanyTopNav />
-      <main className="flex-1 overflow-auto bg-gray-50 p-4 2xl:p-6">
+      <main className="flex-1 overflow-hidden flex flex-col bg-gray-50 p-4 2xl:p-6">
         <InternPhaseManagementContainer />
       </main>
     </div>

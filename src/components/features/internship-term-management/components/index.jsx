@@ -226,7 +226,7 @@ export default function InternshipTermManagement() {
     <PageLayout>
       <PageLayout.Header title={TERM_MANAGEMENT.TITLE} subtitle={TERM_MANAGEMENT.PAGE_SUBTITLE} />
 
-      <PageLayout.Card className="flex flex-col overflow-hidden">
+      <PageLayout.Card className="flex flex-1 flex-col overflow-hidden min-h-[500px] max-h-[calc(100vh-160px)]">
         <PageLayout.Toolbar
           searchProps={{
             placeholder: TERM_MANAGEMENT.SEARCH_PLACEHOLDER,

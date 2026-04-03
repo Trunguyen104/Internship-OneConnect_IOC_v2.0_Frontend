@@ -1,21 +1,18 @@
 'use client';
 
 import { SaveOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input } from 'antd';
+import { DatePicker, Form, Input, Select } from 'antd';
 import dayjs from 'dayjs';
-import React, { startTransition, useEffect, useState } from 'react';
+import React, { startTransition, useEffect, useMemo, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-
-import StudentPickerModal from './StudentPickerModal';
 
 const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly, students }) => {
   const [form] = Form.useForm();
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const { FORM, DETAIL } = VIOLATION_REPORT;
 
-  const [pickerVisible, setPickerVisible] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   useEffect(() => {
@@ -55,10 +52,23 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
     return dayjs(dateOnly).startOf('day');
   };
 
-  const handleStudentSelect = (student) => {
-    setSelectedStudent(student);
-    form.setFieldsValue({ studentId: student.id || student.studentId });
-    setPickerVisible(false);
+  const studentOptions = useMemo(() => {
+    return students.map((s) => ({
+      label: `${s.studentFullName || s.fullName} (${s.studentCode || s.userCode}) - ${s.groupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}`,
+      value: s.studentId || s.id,
+      student: s,
+    }));
+  }, [students, VIOLATION_REPORT]);
+
+  const handleStudentChange = (value) => {
+    const option = studentOptions.find((opt) => opt.value === value);
+    if (option) {
+      setSelectedStudent(option.student);
+      form.setFieldsValue({ studentId: value });
+    } else {
+      setSelectedStudent(null);
+      form.setFieldsValue({ studentId: undefined });
+    }
   };
 
   const handleSubmit = async () => {
@@ -88,85 +98,68 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
 
       <CompoundModal.Content>
         <Form form={form} layout="vertical" disabled={viewOnly || loading} requiredMark={!viewOnly}>
-          <Form.Item label={FORM.STUDENT} required>
-            <div className="flex items-center gap-2">
-              <Input
-                placeholder={FORM.PLACEHOLDERS.STUDENT}
-                className="h-10 flex-1 cursor-default bg-bg"
-                value={
-                  selectedStudent
-                    ? `${selectedStudent.studentFullName || selectedStudent.fullName} ${VIOLATION_REPORT.COMMON.LEFT_PAREN}${selectedStudent.studentCode || selectedStudent.userCode}${VIOLATION_REPORT.COMMON.RIGHT_PAREN}`
-                    : ''
-                }
-                readOnly
-              />
-              {!initialValues && !viewOnly && (
-                <Button
-                  type="primary"
-                  onClick={() => setPickerVisible(true)}
-                  className="h-10 rounded-lg px-4"
-                  disabled={viewOnly || loading}
-                >
-                  {FORM.STUDENT}
-                </Button>
-              )}
-            </div>
-            <Form.Item
-              name="studentId"
-              noStyle
-              rules={[{ required: true, message: FORM.VALIDATION.STUDENT_REQUIRED }]}
-            >
-              <Input type="hidden" />
-            </Form.Item>
-
-            {/* INTERNSHIP PERIOD INFO DISPLAY */}
-            {selectedStudent &&
-              (selectedStudent.groupStartDate || selectedStudent.groupEndDate) && (
-                <div
-                  className={`mt-2 rounded-lg border px-3 py-2 text-xs transition-all ${
-                    getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
-                      getCalendarDate(selectedStudent.groupEndDate),
-                      'day'
-                    )
-                      ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
-                      : 'border-blue-100 bg-blue-50/50 text-blue-700'
-                  }`}
-                >
-                  <p className="flex items-center gap-1.5 font-medium">
-                    {VIOLATION_REPORT.DETAIL.INTERN_GROUP}
-                    {VIOLATION_REPORT.COMMON.COLON}
-                    {selectedStudent.groupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
-                  </p>
-                  <p className="mt-0.5 opacity-90">
-                    {VIOLATION_REPORT.FILTERS.DATE_RANGE}
-                    {VIOLATION_REPORT.COMMON.COLON}{' '}
-                    <span className="font-semibold">
-                      {selectedStudent.groupStartDate
-                        ? dayjs(selectedStudent.groupStartDate.split('T')[0]).format(
-                            VIOLATION_REPORT.DATE_FORMATS.UI
-                          )
-                        : VIOLATION_REPORT.COMMON.QUESTION_MARK}
-                      {VIOLATION_REPORT.COMMON.DASH_SEPARATOR}
-                      {selectedStudent.groupEndDate
-                        ? dayjs(selectedStudent.groupEndDate.split('T')[0]).format(
-                            VIOLATION_REPORT.DATE_FORMATS.UI
-                          )
-                        : VIOLATION_REPORT.COMMON.QUESTION_MARK}
-                    </span>
-                    {getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
-                      getCalendarDate(selectedStudent.groupEndDate),
-                      'day'
-                    ) && (
-                      <span className="ml-1 text-[10px] italic">
-                        {VIOLATION_REPORT.COMMON.LEFT_PAREN}
-                        {VIOLATION_REPORT.COMMON.INVALID_RANGE}
-                        {VIOLATION_REPORT.COMMON.RIGHT_PAREN}
-                      </span>
-                    )}
-                  </p>
-                </div>
-              )}
+          <Form.Item
+            name="studentId"
+            label={FORM.STUDENT}
+            rules={[{ required: true, message: FORM.VALIDATION.STUDENT_REQUIRED }]}
+          >
+            <Select
+              showSearch
+              placeholder={FORM.PLACEHOLDERS.STUDENT}
+              className="h-10 w-full"
+              optionFilterProp="label"
+              options={studentOptions}
+              onChange={handleStudentChange}
+              disabled={!!initialValues || viewOnly || loading}
+            />
           </Form.Item>
+
+          {/* INTERNSHIP PERIOD INFO DISPLAY */}
+          {selectedStudent && (selectedStudent.groupStartDate || selectedStudent.groupEndDate) && (
+            <div
+              className={`mt-2 rounded-lg border px-3 py-2 text-xs transition-all ${
+                getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
+                  getCalendarDate(selectedStudent.groupEndDate),
+                  'day'
+                )
+                  ? 'border-yellow-200 bg-yellow-50 text-yellow-700'
+                  : 'border-blue-100 bg-blue-50/50 text-blue-700'
+              }`}
+            >
+              <p className="flex items-center gap-1.5 font-medium">
+                {VIOLATION_REPORT.DETAIL.INTERN_GROUP}
+                {VIOLATION_REPORT.COMMON.COLON}
+                {selectedStudent.groupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
+              </p>
+              <p className="mt-0.5 opacity-90">
+                {VIOLATION_REPORT.FILTERS.DATE_RANGE}
+                {VIOLATION_REPORT.COMMON.COLON}{' '}
+                <span className="font-semibold">
+                  {selectedStudent.groupStartDate
+                    ? dayjs(selectedStudent.groupStartDate.split('T')[0]).format(
+                        VIOLATION_REPORT.DATE_FORMATS.UI
+                      )
+                    : VIOLATION_REPORT.COMMON.QUESTION_MARK}
+                  {VIOLATION_REPORT.COMMON.DASH_SEPARATOR}
+                  {selectedStudent.groupEndDate
+                    ? dayjs(selectedStudent.groupEndDate.split('T')[0]).format(
+                        VIOLATION_REPORT.DATE_FORMATS.UI
+                      )
+                    : VIOLATION_REPORT.COMMON.QUESTION_MARK}
+                </span>
+                {getCalendarDate(selectedStudent.groupStartDate)?.isAfter(
+                  getCalendarDate(selectedStudent.groupEndDate),
+                  'day'
+                ) && (
+                  <span className="ml-1 text-[10px] italic">
+                    {VIOLATION_REPORT.COMMON.LEFT_PAREN}
+                    {VIOLATION_REPORT.COMMON.INVALID_RANGE}
+                    {VIOLATION_REPORT.COMMON.RIGHT_PAREN}
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
 
           {viewOnly && (
             <>
@@ -266,7 +259,6 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
               </Form.Item>
             )}
           </div>
-
           <Form.Item
             name="description"
             label={FORM.DESCRIPTION}
@@ -289,13 +281,6 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
         confirmIcon={!viewOnly && <SaveOutlined />}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SAVE}
         showCancel={!viewOnly}
-      />
-      <StudentPickerModal
-        visible={pickerVisible}
-        onCancel={() => setPickerVisible(false)}
-        onSelect={handleStudentSelect}
-        students={students}
-        loading={loading}
       />
     </>
   );

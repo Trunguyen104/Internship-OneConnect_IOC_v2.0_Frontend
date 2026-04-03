@@ -7,6 +7,7 @@ import {
   InboxOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
 import Badge from '@/components/ui/badge';
@@ -60,13 +61,25 @@ const GroupTable = memo(function GroupTable({
         title: TABLE.COLUMNS.PHASE,
         key: 'phaseInfo',
         width: 200,
-        render: (_, record) => (
-          <div className="flex items-center gap-1.5">
-            <span className={`${TABLE_CELL.meta} truncate font-bold`}>
-              {record.phaseName || record.phase?.name || record.termName || TABLE.NOT_ASSIGNED}
-            </span>
-          </div>
-        ),
+        render: (_, record) => {
+          const name =
+            record.phaseName || record.phase?.name || record.termName || TABLE.NOT_ASSIGNED;
+          const start = record.startDate || record.phase?.startDate;
+          const end = record.endDate || record.phase?.endDate;
+
+          return (
+            <div className="flex flex-col leading-tight grow overflow-hidden">
+              <span className={`${TABLE_CELL.meta} truncate font-bold`}>{name}</span>
+              {(start || end) && (
+                <div className="text-muted text-[10px] font-medium opacity-60 flex items-center gap-1 mt-0.5">
+                  <span className="truncate">{start ? dayjs(start).format('MMM DD') : '??'}</span>
+                  <span>-</span>
+                  <span className="truncate">{end ? dayjs(end).format('MMM DD, YYYY') : '??'}</span>
+                </div>
+              )}
+            </div>
+          );
+        },
       },
       {
         title: TABLE.COLUMNS.MENTOR,
