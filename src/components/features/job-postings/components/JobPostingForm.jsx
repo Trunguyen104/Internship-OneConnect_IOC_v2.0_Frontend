@@ -12,9 +12,6 @@ import Textarea from '@/components/ui/textarea';
 
 import { JOB_AUDIENCE, JOB_POSTING_UI } from '../constants/job-postings.constant';
 
-/**
- * Pure UI component for Job Posting Form fields.
- */
 export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, onPhaseChange }) => {
   const selectedPhaseId = Form.useWatch('internshipPhaseId', form);
   const selectedPhase = phaseOptions.find((o) => o.value === selectedPhaseId);
@@ -29,7 +26,6 @@ export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, on
       className="px-2"
     >
       <Row gutter={24}>
-        {/* Basic Information */}
         <Col span={12}>
           <Form.Item
             label={JOB_POSTING_UI.FORM.FIELDS.JOB_TITLE}

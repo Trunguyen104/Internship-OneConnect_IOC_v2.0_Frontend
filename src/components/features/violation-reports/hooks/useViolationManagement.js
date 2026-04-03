@@ -7,9 +7,9 @@ import { useCallback } from 'react';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { USER_ROLE } from '@/constants/user-management/enums';
 import { useToast } from '@/providers/ToastProvider';
+import { useAuthStore } from '@/store/useAuthStore';
 import { getErrorDetail } from '@/utils/errorUtils';
 
-import { userService } from '../../user/services/user.service';
 import { ViolationService } from '../services/violation.service';
 import { useViolationFilters } from './useViolationFilters';
 import { useViolationModals } from './useViolationModals';
@@ -51,19 +51,8 @@ export const useViolationManagement = () => {
     handleRequestDelete,
   } = useViolationModals();
 
-  // 1. Fetch User Profile (Me)
-  const { data: me } = useQuery({
-    queryKey: ['violation-user-profile'],
-    queryFn: async () => {
-      try {
-        const res = await userService.getMe();
-        return res?.data || res || null;
-      } catch (err) {
-        return null;
-      }
-    },
-    staleTime: Infinity,
-  });
+  // 1. Get User Profile from Store (Instant)
+  const user = useAuthStore((state) => state.user);
 
   // 2. Initial Data: Fetch Groups to extract Term Options
   useQuery({
@@ -102,9 +91,9 @@ export const useViolationManagement = () => {
   // 3. Supporting Data: Fetch Groups and Students for the selected Term
   const { data: supportingData = { groups: [], students: [] }, isLoading: loadingSupporting } =
     useQuery({
-      queryKey: ['violation-supporting-data', termId, me?.userId],
+      queryKey: ['violation-supporting-data', termId, user?.userId || user?.id],
       queryFn: async () => {
-        if (!termId || !me) return { groups: [], students: [] };
+        if (!termId || !user) return { groups: [], students: [] };
 
         const groupsRes = await ViolationService.getGroups({ termId, pageSize: 100 });
         const groupsData = (
@@ -155,7 +144,7 @@ export const useViolationManagement = () => {
 
         return { groups: groupsData, students: allMembers };
       },
-      enabled: !!termId && !!me,
+      enabled: !!termId && !!user,
       staleTime: 5 * 60 * 1000,
     });
 
@@ -327,10 +316,10 @@ export const useViolationManagement = () => {
     fetchingTerms: false,
     studentOptions,
     isMentor: (() => {
-      const rawRole = me?.roleId || me?.RoleId || me?.role || me?.Role;
+      const rawRole = user?.roleId || user?.RoleId || user?.role || user?.Role;
       const roleId = rawRole ? Number(rawRole) : null;
       const roleName = String(
-        me?.roleName || me?.RoleName || me?.role || me?.Role || ''
+        user?.roleName || user?.RoleName || user?.role || user?.Role || ''
       ).toLowerCase();
 
       // Check numeric IDs

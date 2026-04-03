@@ -14,10 +14,6 @@ import JobPostingDrawer from './JobPostingDrawer';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsTable from './JobPostingsTable';
 
-/**
- * Main logical container for Enterprise Job Postings.
- * Orchestrates layout and interaction between sub-components.
- */
 export default function JobPostings() {
   const [filters, setFilters] = useState({
     search: '',

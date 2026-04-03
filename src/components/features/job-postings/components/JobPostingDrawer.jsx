@@ -9,10 +9,6 @@ import { JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
 import { useJobPostingForm } from '../hooks/useJobPostingForm';
 import { JobPostingForm } from './JobPostingForm';
 
-/**
- * Main Drawer container for creating/editing job postings.
- * Orchestrates logic (useJobPostingForm) and UI (JobPostingForm).
- */
 export default function JobPostingDrawer({
   open,
   onCancel,

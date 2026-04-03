@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Clock,
   Edit,
-  ExternalLink,
   FileText,
   MapPin,
   Send,
@@ -107,7 +106,7 @@ export default function JobPostingDetail() {
   if (isLoading) {
     return (
       <PageLayout className="animate-pulse bg-[#f8f9fa]">
-        <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
+        <div className="max-w-[1800px] mx-auto px-6 2xl:px-12 py-10 space-y-8">
           <Skeleton.Button active size="small" shape="round" className="mb-4" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
@@ -142,7 +141,7 @@ export default function JobPostingDetail() {
 
   return (
     <PageLayout className="pb-20 bg-[#f8f9fa]">
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-6 w-full animate-in slide-in-from-bottom duration-700">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-8 2xl:px-12 py-6 w-full animate-in slide-in-from-bottom duration-700">
         {/* Navigation & Header Actions */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <button
@@ -231,9 +230,9 @@ export default function JobPostingDetail() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 2xl:grid-cols-4 gap-8 2xl:gap-12">
           {/* Main Information */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 2xl:col-span-3 space-y-6 2xl:space-y-8">
             {/* Header Card */}
             <div className="bg-surface border border-border/40 rounded-[2.5rem] p-8 md:p-10 shadow-sm relative overflow-hidden ring-1 ring-white/50">
               <div className="relative z-10">
@@ -241,7 +240,7 @@ export default function JobPostingDetail() {
                   <JobPostingStatusBadge status={job.status} />
                 </div>
 
-                <h1 className="text-3xl md:text-4xl font-black text-text mb-4 tracking-tight leading-tight">
+                <h1 className="text-4xl md:text-5xl 2xl:text-6xl font-black text-text mb-6 2xl:mb-8 tracking-tight leading-tight">
                   {job.title}
                 </h1>
 
@@ -266,7 +265,7 @@ export default function JobPostingDetail() {
             </div>
 
             {/* Content Details */}
-            <div className="bg-surface border border-border/40 rounded-[2.5rem] p-8 md:p-10 shadow-sm space-y-12">
+            <div className="bg-surface border border-border/40 rounded-[2.5rem] p-10 md:p-12 2xl:p-16 shadow-sm space-y-16 2xl:space-y-20">
               <DetailSection
                 title={JOB_POSTING_UI.FORM.FIELDS.DESCRIPTION}
                 content={job.description}
@@ -301,7 +300,7 @@ export default function JobPostingDetail() {
                   color="bg-primary/5 text-primary"
                   isMain
                 />
-                <div className="grid grid-cols-1 gap-3 pt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4 pt-2">
                   <StatItem
                     label={JOB_POSTING_UI.DETAIL.STATS.APPLIED}
                     value={applicationsSummary[1] || 0}
@@ -324,16 +323,6 @@ export default function JobPostingDetail() {
                   />
                 </div>
               </div>
-
-              {totalApplications > 0 && (
-                <Button
-                  type="link"
-                  className="w-full mt-6 text-primary font-bold text-[11px] uppercase tracking-widest p-0 flex items-center justify-center gap-2"
-                  onClick={() => router.push(`/applications?jobId=${job.jobId}`)}
-                >
-                  {JOB_POSTING_UI.DETAIL.MANAGE_ALL_APPLICANTS} <ExternalLink className="h-3 w-3" />
-                </Button>
-              )}
 
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                 <Users className="h-20 w-20" />
@@ -414,12 +403,12 @@ function DetailSection({ title, content, icon }) {
         <div className="bg-surface p-2.5 rounded-2xl border border-border/40 shadow-sm ring-4 ring-bg/50">
           {icon}
         </div>
-        <h2 className="text-xl font-black text-text tracking-tight uppercase tracking-widest text-sm">
+        <h2 className="text-xl font-black text-text tracking-tight uppercase tracking-widest">
           {title}
         </h2>
       </div>
       <div
-        className="text-muted text-sm leading-relaxed prose prose-slate max-w-none prose-sm whitespace-pre-wrap pl-1"
+        className="text-muted text-base 2xl:text-lg leading-relaxed prose prose-slate max-w-none prose-sm whitespace-pre-wrap pl-1"
         dangerouslySetInnerHTML={{ __html: content || `<em>${JOB_POSTING_UI.DETAIL.NO_INFO}</em>` }}
       />
     </section>
