@@ -29,7 +29,7 @@ export default function ImportModal({
 }) {
   const toast = useToast();
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
-  const { MODALS, MESSAGES } = ENROLLMENT_MANAGEMENT;
+  const { MODALS } = ENROLLMENT_MANAGEMENT;
   const { IMPORT } = MODALS;
 
   const [previewData, setPreviewData] = useState([]);

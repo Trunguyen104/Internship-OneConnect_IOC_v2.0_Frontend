@@ -39,8 +39,7 @@ export const BACKLOG_UI = {
   // Modal Titles
   MODAL_CREATE_EPIC: 'Create Epic',
   MODAL_CREATE_TASK: 'Create Task',
-  MODAL_CREATE_TASK_SUBTITLE:
-    'Khởi tạo công việc mới và thiết lập các thông tin chi tiết cho kế hoạch sprint',
+  MODAL_CREATE_TASK_SUBTITLE: 'Create new tasks and configure details for your sprint plan',
   MODAL_UPDATE_TASK: 'Update Task',
 
   // Field Labels (English forms in some components)

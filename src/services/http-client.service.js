@@ -1,4 +1,4 @@
-const API_BASE = '/api/proxy';
+const API_BASE = '/api/proxy/v1';
 
 /**
  * Triggers a global redirect to the login page when a 401 Unauthorized response is received.

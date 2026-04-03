@@ -127,6 +127,13 @@ export default function EnterprisesDeleteModal({ enterprise, open, onOpenChange 
             </p>
           </div>
         </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-amber-50/30 p-4 text-[12px] font-medium leading-relaxed text-amber-900/80">
+          <p className="font-black tracking-tight text-amber-900/80 mb-1">
+            {UI_TEXT.ENTERPRISES.DELETE_HINT || UI_TEXT.COMMON.INFO_ICON}
+          </p>
+          <p>{UI_TEXT.ENTERPRISES.DELETE_DEPENDENCY_WARNING}</p>
+        </div>
       </div>
     </Drawer>
   );

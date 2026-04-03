@@ -51,6 +51,8 @@ export const UI_TEXT = {
     BULLET: '•',
     TOTAL: 'Total records',
     VERIFY_SESSION: 'Verifying secure session...',
+    COLON: ':',
+    BAR: '|',
   },
   USER_MANAGEMENT: {
     TITLE: 'User Management',
@@ -178,6 +180,8 @@ export const UI_TEXT = {
     INVALID_EMAIL: 'Please enter a valid email address',
     INITIALIZE: 'Initialize Enterprise',
     DELETE_SUBTITLE: 'Remove enterprise account',
+    DELETE_DEPENDENCY_WARNING:
+      'If there are students currently interning under this enterprise, the system will reject deletion.',
     INDUSTRY_PREFIX: 'Industry',
   },
   UNIVERSITIES: {
@@ -278,6 +282,11 @@ export const UI_TEXT = {
   ENTERPRISE: {
     DASHBOARD_TITLE: 'Enterprise Dashboard',
     DASHBOARD_WELCOME: 'Welcome to the Enterprise Dashboard. Select an option from the sidebar.',
+  },
+  INTERNSHIP: {
+    UNIVERSITY_PREFIX: 'University',
+    CLASS_PREFIX: 'Class',
+    MAJOR_PREFIX: 'Major',
   },
   ERROR: {
     COMMUNICATION: 'Communication Error',

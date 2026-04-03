@@ -2,6 +2,7 @@ export async function login(data) {
   const payload = {
     email: data?.email,
     password: data?.password,
+    rememberMe: data?.rememberMe || false,
   };
 
   const res = await fetch('/api/auth', {

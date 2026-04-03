@@ -6,7 +6,6 @@ import AppSidebar from '@/components/layout/AppSidebar';
 import Header from '@/components/layout/Header';
 import AuthGuard from '@/components/shared/AuthGuard';
 import { USER_ROLE } from '@/constants/user-management/enums';
-import { usePageHeader } from '@/providers/PageHeaderProvider';
 
 const { Content } = Layout;
 
@@ -17,8 +16,7 @@ const ALLOWED_ROLES = [USER_ROLE.STUDENT, USER_ROLE.HR, USER_ROLE.MENTOR];
  * AppSidebar (Ant Sider + Menu) + Header + Content (bg-gray-50, same padding as /admin).
  */
 export default function InternshipGroupLayout({ children }) {
-  const { headerConfig } = usePageHeader();
-
+  // No-op - moved logic or unused
   return (
     <AuthGuard allowedRoles={ALLOWED_ROLES}>
       <Layout className="h-screen overflow-hidden">

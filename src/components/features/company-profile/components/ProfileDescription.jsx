@@ -1,12 +1,11 @@
 'use client';
 
-import { Typography } from 'antd';
 import { memo } from 'react';
 
 import { EmptyState } from '@/components/ui/atoms';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
 
-const { Paragraph } = Typography;
+// Unused Typography parts removed
 
 export const ProfileDescription = memo(function ProfileDescription({ profile }) {
   if (!profile?.description) {
