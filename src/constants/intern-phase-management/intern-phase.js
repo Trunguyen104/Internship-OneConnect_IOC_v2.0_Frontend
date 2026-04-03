@@ -1,19 +1,40 @@
 export const INTERN_PHASE_STATUS = {
-  UPCOMING: 1, // Open
-  ACTIVE: 2, // InProgress
-  ENDED: 3, // Closed
+  DRAFT: 0,
+  OPEN: 1,
+  IN_PROGRESS: 2,
+  CLOSED: 3,
 };
 
 export const INTERN_PHASE_STATUS_LABELS = {
-  [INTERN_PHASE_STATUS.UPCOMING]: 'Upcoming',
-  [INTERN_PHASE_STATUS.ACTIVE]: 'Active',
-  [INTERN_PHASE_STATUS.ENDED]: 'Ended',
+  [INTERN_PHASE_STATUS.DRAFT]: 'Draft',
+  [INTERN_PHASE_STATUS.OPEN]: 'Open',
+  [INTERN_PHASE_STATUS.IN_PROGRESS]: 'In Progress',
+  [INTERN_PHASE_STATUS.CLOSED]: 'Closed',
+};
+
+export const INTERN_PHASE_LIFECYCLE_STATUS = {
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
+};
+
+export const INTERN_PHASE_LIFECYCLE_LABELS = {
+  [INTERN_PHASE_LIFECYCLE_STATUS.UPCOMING]: 'Upcoming',
+  [INTERN_PHASE_LIFECYCLE_STATUS.ACTIVE]: 'Active',
+  [INTERN_PHASE_LIFECYCLE_STATUS.ENDED]: 'Ended',
+};
+
+export const INTERN_PHASE_LIFECYCLE_VARIANTS = {
+  [INTERN_PHASE_LIFECYCLE_STATUS.UPCOMING]: 'warning',
+  [INTERN_PHASE_LIFECYCLE_STATUS.ACTIVE]: 'success',
+  [INTERN_PHASE_LIFECYCLE_STATUS.ENDED]: 'default',
 };
 
 export const INTERN_PHASE_STATUS_VARIANTS = {
-  [INTERN_PHASE_STATUS.UPCOMING]: 'warning',
-  [INTERN_PHASE_STATUS.ACTIVE]: 'success',
-  [INTERN_PHASE_STATUS.ENDED]: 'default',
+  [INTERN_PHASE_STATUS.DRAFT]: 'neutral',
+  [INTERN_PHASE_STATUS.OPEN]: 'warning',
+  [INTERN_PHASE_STATUS.IN_PROGRESS]: 'success',
+  [INTERN_PHASE_STATUS.CLOSED]: 'default',
 };
 
 export const INTERN_PHASE_MANAGEMENT = {
@@ -170,6 +191,19 @@ export const INTERN_PHASE_MANAGEMENT = {
         'Self-apply': 'info-soft',
         'Uni-assign': 'primary-soft',
       },
+    },
+  },
+  GROUPS: {
+    EMPTY_STATE: 'No groups assigned to this phase yet.',
+    TABLE: {
+      COLUMNS: {
+        NAME: 'GROUP NAME',
+        MENTOR: 'MENTOR',
+        MEMBERS: 'MEMBERS',
+        PROJECT: 'PROJECT',
+        STATUS: 'STATUS',
+      },
+      NOT_ASSIGNED: 'Not Assigned',
     },
   },
 

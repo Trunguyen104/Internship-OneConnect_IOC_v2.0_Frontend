@@ -52,30 +52,30 @@ export default function ExploreJobs() {
 
   return (
     <PageLayout className="animate-in fade-in duration-700 bg-[#f8f9fa]">
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-4 w-full">
-        {/* Hero Header - Ultra Compact & Elegant */}
-        <div className="relative overflow-hidden bg-white border border-border/40 rounded-[2rem] p-5 md:p-7 mb-7 shadow-sm">
-          <div className="relative z-10 max-w-lg">
-            <div className="inline-flex items-center gap-1.5 bg-primary/5 text-primary text-[8px] font-bold px-2 py-0.5 rounded-full mb-3 uppercase tracking-widest">
-              <Sparkles className="h-2.5 w-2.5" />
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 w-full">
+        {/* Hero Header - Balanced Scaling */}
+        <div className="relative overflow-hidden bg-white border border-border/40 rounded-[2.5rem] p-6 md:p-9 mb-8 shadow-sm transition-all hover:shadow-md">
+          <div className="relative z-10 max-w-2xl">
+            <div className="inline-flex items-center gap-2 bg-primary/5 text-primary text-[9px] font-black px-2.5 py-1 rounded-full mb-4 uppercase tracking-widest leading-none">
+              <Sparkles className="h-3 w-3" />
               <span>{EXPLORE_JOBS_UI.HEADER.DISCOVER}</span>
             </div>
-            <h1 className="text-xl md:text-2xl font-extrabold text-text mb-2 leading-tight">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-text mb-3 leading-tight tracking-tight">
               {EXPLORE_JOBS_UI.HEADER.TITLE}{' '}
               <span className="text-primary italic">{EXPLORE_JOBS_UI.HEADER.TITLE_ITALIC}</span>.
             </h1>
-            <p className="text-muted text-[13px] leading-relaxed mb-5 max-w-sm opacity-80">
+            <p className="text-muted text-sm md:text-base leading-relaxed mb-6 max-w-lg opacity-80">
               {EXPLORE_JOBS_UI.HEADER.SUBTITLE}
             </p>
 
             <div className="relative max-w-sm group">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors">
-                <Search className="h-3.5 w-3.5" />
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors">
+                <Search className="h-4 w-4" />
               </div>
               <input
                 type="text"
                 placeholder={EXPLORE_JOBS_UI.HEADER.SEARCH_PLACEHOLDER}
-                className="w-full bg-bg border border-border/60 rounded-lg py-2 pl-9 pr-3 text-[12px] text-text placeholder:text-muted/60 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm"
+                className="w-full bg-bg border border-border/60 rounded-xl py-3 pl-11 pr-4 text-[14px] text-text placeholder:text-muted/60 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -87,15 +87,17 @@ export default function ExploreJobs() {
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
         </div>
 
-        {/* Main Grid Section */}
-        <div className="flex items-center justify-between mb-4 px-1">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 p-1 rounded-md">
-              <Briefcase className="h-3 w-3 text-primary" />
+        {/* Main Grid Section Header */}
+        <div className="flex items-center justify-between mb-5 px-1">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-primary/10 p-1.5 rounded-lg">
+              <Briefcase className="h-4 w-4 text-primary" />
             </div>
-            <h2 className="text-base font-bold text-text">{EXPLORE_JOBS_UI.HEADER.FOR_YOU}</h2>
+            <h2 className="text-xl font-bold text-text tracking-tight">
+              {EXPLORE_JOBS_UI.HEADER.FOR_YOU}
+            </h2>
           </div>
-          <span className="text-muted text-[9px] font-bold uppercase tracking-widest opacity-50">
+          <span className="text-muted text-[10px] font-bold uppercase tracking-widest opacity-60">
             {EXPLORE_JOBS_UI.HEADER.RESULTS_COUNT(total)}
           </span>
         </div>

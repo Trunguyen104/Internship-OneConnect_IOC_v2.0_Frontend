@@ -44,6 +44,15 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
     return null;
   };
 
+  const parseError = (err) => {
+    const data = err?.data || err?.response?.data;
+    if (data?.validationErrors) {
+      const messages = Object.values(data.validationErrors).flat();
+      if (messages.length > 0) return messages[0];
+    }
+    return data?.message || err?.message || 'An error occurred';
+  };
+
   const saveMutation = useMutation({
     mutationFn: async (values) => {
       const dateError = validateDates(values.startDate, values.endDate);
@@ -80,7 +89,7 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
       onSuccessAction();
     },
     onError: (err) => {
-      toast.error(err.data?.message || err.message || 'An error occurred');
+      toast.error(parseError(err));
     },
   });
 
@@ -91,7 +100,7 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
       onSuccessAction();
     },
     onError: (err) => {
-      toast.error(err.data?.message || err.message || MESSAGES.ERROR_DELETE);
+      toast.error(parseError(err));
     },
   });
 

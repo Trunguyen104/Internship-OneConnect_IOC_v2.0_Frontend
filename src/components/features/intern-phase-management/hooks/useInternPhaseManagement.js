@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
 
-import { INTERN_PHASE_STATUS } from '@/constants/intern-phase-management/intern-phase';
+import { INTERN_PHASE_LIFECYCLE_STATUS } from '@/constants/intern-phase-management/intern-phase';
 
 import { InternPhaseService } from '../services/intern-phase.service';
 import { usePhaseEnterprise } from './usePhaseEnterprise';
@@ -14,9 +14,9 @@ export const calculatePhaseStatus = (start, end) => {
   const startDate = dayjs(start).startOf('day');
   const endDate = dayjs(end).startOf('day');
 
-  if (startDate.isAfter(today)) return INTERN_PHASE_STATUS.UPCOMING;
-  if (endDate.isBefore(today)) return INTERN_PHASE_STATUS.ENDED;
-  return INTERN_PHASE_STATUS.ACTIVE;
+  if (startDate.isAfter(today)) return INTERN_PHASE_LIFECYCLE_STATUS.UPCOMING;
+  if (endDate.isBefore(today)) return INTERN_PHASE_LIFECYCLE_STATUS.ENDED;
+  return INTERN_PHASE_LIFECYCLE_STATUS.ACTIVE;
 };
 
 export const useInternPhaseManagement = () => {
@@ -48,19 +48,16 @@ export const useInternPhaseManagement = () => {
 
       const res = await InternPhaseService.getAll(params);
       const items = (res?.items || []).map((item) => {
-        // Favor backend status (Enum) if available
-        let status;
-        if (item.status !== undefined) {
-          if (item.status === 0) status = INTERN_PHASE_STATUS.UPCOMING;
-          else if (item.status === 1) status = INTERN_PHASE_STATUS.ACTIVE;
-          else status = INTERN_PHASE_STATUS.ENDED;
-        } else {
-          status = calculatePhaseStatus(item.startDate, item.endDate);
-        }
+        const lifecycleStatus =
+          item.lifecycleStatus !== undefined
+            ? item.lifecycleStatus
+            : calculatePhaseStatus(item.startDate, item.endDate);
 
         return {
           ...item,
-          computedStatus: status,
+          lifecycleStatus,
+          manualStatus: item.status, // 0:Draft, 1:Open, 2:InProgress, 3:Closed
+          computedStatus: lifecycleStatus, // UI display uses Lifecycle
           remainingCapacity: item.remainingCapacity ?? item.capacity - (item.placedCount || 0),
         };
       });

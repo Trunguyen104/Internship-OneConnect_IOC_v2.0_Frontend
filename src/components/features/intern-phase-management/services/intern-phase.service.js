@@ -1,5 +1,8 @@
 import httpClient from '@/services/http-client.service';
 
+import { EnterpriseGroupService } from '../../internship-management/internship-group-management/services/enterprise-group.service';
+import { EnterpriseStudentService } from '../../internship-student-management/services/enterprise-student.service';
+
 const BASE_URL = '/internship-phases';
 
 const mapPhase = (item) => {
@@ -64,15 +67,32 @@ export const InternPhaseService = {
     return httpClient.httpDelete(`${BASE_URL}/${id}`);
   },
 
-  async getJobPostings(_phaseId, _params) {
-    // Backend endpoint not yet implemented in provided C# controller
-    // Returning empty array directly to avoid 404 errors in console/network tab
-    return { data: [], totalCount: 0 };
+  async getJobPostings(phaseId, params) {
+    const res = await httpClient.httpGet('/job-postings', {
+      phaseId,
+      ...params,
+    });
+    return res?.data || res || { items: [], totalCount: 0 };
   },
 
-  async getStudents(_phaseId, _params) {
-    // Backend endpoint not yet implemented in provided C# controller
-    // Returning empty array directly to avoid 404 errors in console/network tab
-    return { data: [], totalCount: 0 };
+  async getStudents(phaseId, params) {
+    // Correct service and endpoint for placed students
+    const res = await EnterpriseGroupService.getPlacedStudents({
+      PhaseId: phaseId,
+      ...params,
+    });
+    const responseData = res?.data || res || { items: [], totalCount: 0 };
+    if (responseData.items) {
+      responseData.items = responseData.items.map(EnterpriseStudentService.mapApplication);
+    }
+    return responseData;
+  },
+
+  async getGroups(phaseId, params) {
+    const res = await httpClient.httpGet('/internship-groups', {
+      phaseId,
+      ...params,
+    });
+    return res?.data || res || { items: [], totalCount: 0 };
   },
 };

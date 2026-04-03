@@ -45,13 +45,13 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
 
     return phases
       .filter((p) => {
-        const isUpcomingOrActive = [
-          INTERN_PHASE_STATUS.UPCOMING,
-          INTERN_PHASE_STATUS.ACTIVE,
-        ].includes(p.status);
+        const isEnded =
+          p.status === INTERN_PHASE_STATUS.CLOSED || p.status === 3 || p.status === '3';
+
         const isCurrentPhase =
           isEdit && (p.internshipPhaseId || p.phaseId || p.id) === currentPhaseId;
-        return isUpcomingOrActive || isCurrentPhase;
+
+        return !isEnded || isCurrentPhase;
       })
       .map((p) => ({
         label: `${p.name} [${dayjs(p.startDate).format('DD/MM')} — ${dayjs(p.endDate).format('DD/MM/YYYY')}] ${p.majors ? `— ${p.majors}` : ''}`,
@@ -134,13 +134,14 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
     if (effectiveId) {
       // UPDATE existing
       const res = await actions.updateJob.mutateAsync({ id: effectiveId, data: payload });
-      return res;
+      return res?.data || res;
     } else {
       // CREATE new
       const publishAction = isDraft ? actions.saveDraft : actions.createJob;
       const res = await publishAction.mutateAsync(payload);
-      if (isDraft && res?.data?.jobId) setCurrentJobId(res.data.jobId);
-      return res;
+      const data = res?.data || res;
+      if (isDraft && data?.jobId) setCurrentJobId(data.jobId);
+      return data;
     }
   };
 
@@ -169,7 +170,7 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
         return;
       }
 
-      // Case: Publish a DRAFT or Reopen a CLOSED job
+      // Normal Publish for DRAFT or update a already published job
       if ((isDraft || isClosed) && effectiveId) {
         if (isClosed) {
           // AC-07 Validation for Reopening
@@ -199,15 +200,27 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
 
           // AC-07: For CLOSED jobs, we simply update with status = PUBLISHED to reopen
           setLastAutoSaved(null);
-          // Mutation 'updateJob' will show the success toast automatically
           await submitData(values, false);
           onSuccess?.();
           form.resetFields();
         } else {
-          // Normal Publish for DRAFT: Save as Draft first then trigger Publish endpoint
+          // AC-02: Normal Publish for DRAFT
+          // 1. Double check deadline
+          const expireDate = values.expireDate;
+          if (expireDate && dayjs(expireDate).isBefore(dayjs().startOf('day'))) {
+            toast.error(
+              JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
+              JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_EXPIRED
+            );
+            return;
+          }
+
           setLastAutoSaved(null);
-          await submitData(values, true); // This will show "updated" toast
-          await actions.publishDraft.mutateAsync(effectiveId); // This will show "published" toast
+          // 2. Submit changes first and GET the most FRESH ID (crucial to avoid 404)
+          const submitResult = await submitData(values, true);
+          const freshId = submitResult?.jobId || effectiveId;
+
+          await actions.publishDraft.mutateAsync(freshId);
           onSuccess?.();
           form.resetFields();
         }
@@ -224,10 +237,7 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
       }
     } catch (err) {
       console.error('Submit failed:', err);
-      // Use standard error extractor logic if possible
-      const errorMsg =
-        err?.data?.errors?.[0] || err?.message || JOB_POSTING_UI.FORM.MESSAGES.GENERAL_ERROR;
-      toast.error(JOB_POSTING_UI.FORM.MESSAGES.HEADERS.ERROR, errorMsg);
+      // No manual toast here - mutations in useJobPostingActions already handle this!
     }
   };
 

@@ -52,7 +52,7 @@ export const useJobPostingDetail = (id) => {
 export const useInternshipPhases = () => {
   const query = useQuery({
     queryKey: ['internship-phases', 'my-phases'],
-    queryFn: () => JobPostingsService.getMyPhases(),
+    queryFn: () => JobPostingsService.getMyPhases({ IncludeEnded: true }),
   });
 
   const phases = useMemo(() => {
@@ -96,22 +96,26 @@ export const useJobPostingActions = () => {
   const handleError = (err) => {
     const data = err?.data || err?.response?.data || {};
 
-    // 1. Check for specific backend error structure (Result<T>)
-    if (data.errors && Array.isArray(data.errors)) {
-      return toast.error('Validation Error', data.errors[0]);
-    }
-
-    // 2. Check for ValidationErrors dictionary (ASP.NET Core default)
+    // 1. Check for ValidationErrors dictionary (ASP.NET Core default)
     if (data.validationErrors) {
-      const firstKey = Object.keys(data.validationErrors)[0];
-      const firstError = data.validationErrors[firstKey]?.[0];
-      if (firstError) return toast.error('Validation Error', firstError);
+      const messages = Object.values(data.validationErrors).flat();
+      if (messages.length > 0) return toast.error('Validation Error', messages[0]);
     }
 
-    // 3. Skip standard toast for 409 Conflict (handled manually for Close warnings)
+    // 2. Check for specific backend error structure (Result<T>)
+    if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+      return toast.error('Error', data.errors[0]);
+    }
+
+    // 3. Check for top-level message (common for 500 errors)
+    if (data.message) {
+      return toast.error('Server Error', data.message);
+    }
+
+    // 4. Skip standard toast for 409 Conflict (handled manually for Close warnings)
     if (data.status === 409 || err?.status === 409) return;
 
-    // 4. Fallback to generic message or error object message
+    // 5. Fallback to generic message or error object message
     toast.error('Error', err?.message || JOB_POSTING_UI.FORM.MESSAGES.GENERAL_ERROR);
   };
 

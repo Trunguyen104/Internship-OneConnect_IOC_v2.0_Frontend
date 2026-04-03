@@ -15,7 +15,8 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
   const columns = [
     {
       title: TABLE.COLUMNS.NAME,
-      key: 'fullName',
+      key: 'studentFullName',
+      dataIndex: 'studentFullName',
       width: '180px',
       render: (text) => <span className="font-semibold text-slate-800">{text}</span>,
     },
@@ -48,7 +49,8 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
     },
     {
       title: TABLE.COLUMNS.PLACED_DATE,
-      key: 'placedAt',
+      key: 'appliedAt',
+      dataIndex: 'appliedAt',
       width: '120px',
       render: (text) => (text ? dayjs(text).format('DD/MM/YYYY') : '-'),
     },

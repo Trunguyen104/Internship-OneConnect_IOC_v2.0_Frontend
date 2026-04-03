@@ -41,7 +41,7 @@ export function useLogbook() {
       try {
         const res = await userService.getMe();
         return res?.data || null;
-      } catch (err) {
+      } catch (_err) {
         return null;
       }
     },
@@ -55,7 +55,7 @@ export function useLogbook() {
       try {
         const res = await InternshipGroupService.getAll();
         return res?.data?.items || res?.data || [];
-      } catch (err) {
+      } catch (_err) {
         return [];
       }
     },
@@ -129,11 +129,14 @@ export function useLogbook() {
         }
 
         const res = await LogBookService.getAll(internshipId, params);
+        const weeks = res?.data?.weeks || [];
+        const allItems = weeks.flatMap((w) => w.items || []);
+
         return {
-          items: res?.data?.items || [],
+          items: allItems,
           totalCount: res?.data?.totalCount || 0,
         };
-      } catch (err) {
+      } catch (_err) {
         return { items: [], totalCount: 0 };
       }
     },
@@ -158,7 +161,7 @@ export function useLogbook() {
         toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.DELETE_FAILED);
         return false;
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
       return false;
     }

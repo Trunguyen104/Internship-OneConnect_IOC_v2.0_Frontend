@@ -129,8 +129,12 @@ export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, on
               }),
             ]}
             extra={
-              <span className="text-[10px] text-muted">
-                {JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_TOOLTIP}
+              <span className="text-[10px] text-muted leading-tight block mt-1">
+                {selectedPhase
+                  ? dayjs().isAfter(dayjs(selectedPhase.startDate))
+                    ? `For this active phase, the deadline must be on or before the internship end date (${dayjs(selectedPhase.endDate).format('MMM D, YYYY')}).`
+                    : `For this upcoming phase, the deadline must be on or before the internship start date (${dayjs(selectedPhase.startDate).format('MMM D, YYYY')}).`
+                  : JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_TOOLTIP}
               </span>
             }
           >

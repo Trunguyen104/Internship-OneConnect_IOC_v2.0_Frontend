@@ -8,13 +8,15 @@ import React, { useMemo } from 'react';
 import DataTable from '@/components/ui/datatable';
 import StatusBadge from '@/components/ui/status-badge';
 import {
+  INTERN_PHASE_LIFECYCLE_LABELS,
+  INTERN_PHASE_LIFECYCLE_STATUS,
+  INTERN_PHASE_LIFECYCLE_VARIANTS,
   INTERN_PHASE_MANAGEMENT,
   INTERN_PHASE_STATUS,
-  INTERN_PHASE_STATUS_LABELS,
 } from '@/constants/intern-phase-management/intern-phase';
 
 export default function InternPhaseTable({ items, loading, onView, onEdit, onDelete }) {
-  const { TABLE, SEARCH_PLACEHOLDER, FILTERS, CREATE_BTN } = INTERN_PHASE_MANAGEMENT;
+  const { TABLE } = INTERN_PHASE_MANAGEMENT;
 
   const columns = useMemo(
     () => [
@@ -103,18 +105,14 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
         width: '100px',
         align: 'center',
         render: (status) => {
-          const variant =
-            status === INTERN_PHASE_STATUS.ACTIVE
-              ? 'success'
-              : status === INTERN_PHASE_STATUS.UPCOMING
-                ? 'warning'
-                : 'neutral';
+          const variant = INTERN_PHASE_LIFECYCLE_VARIANTS[status] || 'default';
+          const label = INTERN_PHASE_LIFECYCLE_LABELS[status] || 'Unknown';
 
           return (
             <StatusBadge
               variant={variant}
-              label={INTERN_PHASE_STATUS_LABELS[status]}
-              pulseDot={status === INTERN_PHASE_STATUS.ACTIVE}
+              label={label}
+              pulseDot={status === INTERN_PHASE_LIFECYCLE_STATUS.ACTIVE}
             />
           );
         },
@@ -166,7 +164,7 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
               key: 'edit',
               label: TABLE.ACTIONS.EDIT,
               icon: <EditOutlined />,
-              disabled: record.computedStatus === 'ENDED',
+              disabled: record.manualStatus === INTERN_PHASE_STATUS.CLOSED,
               onClick: () => onEdit(record),
             },
             {
@@ -192,7 +190,7 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
   );
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col">
+    <div className="flex flex-1 min-h-0 flex-col h-full">
       <DataTable
         columns={columns}
         data={items}

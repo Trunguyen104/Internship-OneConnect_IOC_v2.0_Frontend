@@ -79,7 +79,6 @@ export default function ProjectOverview({ project }) {
       <div className="space-y-6">
         <section className="border-gray-50 bg-gray-50/30 p-8 rounded-[32px] border transition-all duration-700 hover:bg-white hover:shadow-xl hover:border-gray-100">
           <div className="mb-6 flex items-center gap-4">
-            <div className="bg-primary/10 h-2 w-2 rounded-full" />
             <h3 className="text-gray-900 m-0 text-xl font-black tracking-tight">
               {PROJECT_UI.LABELS.DESCRIPTION}
             </h3>

@@ -4,7 +4,6 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
@@ -67,7 +66,6 @@ export default function Header() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
-      { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
@@ -77,7 +75,6 @@ export default function Header() {
         const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
         router.push(`/profile${query}`);
       }
-      if (key === 'settings') router.push('/settings');
 
       if (key === 'logout') handleLogout();
     },
