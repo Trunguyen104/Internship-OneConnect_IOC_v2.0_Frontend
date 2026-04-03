@@ -1,5 +1,7 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import {
@@ -22,6 +24,11 @@ export function useBacklogActions({
   ui, // Should contain setters for closing modals
 }) {
   const toast = useToast();
+  const queryClient = useQueryClient();
+
+  const handleSyncBoard = () => {
+    queryClient.invalidateQueries({ queryKey: ['work-board-data', projectId] });
+  };
 
   const formatToDateOnly = (dateString) => {
     if (!dateString) return null;
@@ -39,7 +46,6 @@ export function useBacklogActions({
         name: payload.name,
         title: payload.name,
         description: payload.description,
-        endDate: payload.endDate,
       };
       const res = await productBacklogService.createEpic(projectId, apiPayload);
       if (res && res.isSuccess === false) {
@@ -59,6 +65,7 @@ export function useBacklogActions({
       } else {
         fetchData(projectId);
       }
+      handleSyncBoard();
     } catch {
       toast.error(BACKLOG_UI.ERROR_CREATE_EPIC || 'Network error while creating epic');
     }
@@ -71,7 +78,6 @@ export function useBacklogActions({
         name: payload.name,
         title: payload.name,
         description: payload.description,
-        endDate: payload.endDate,
       };
       const res = await productBacklogService.updateEpic(projectId, epicId, apiPayload);
       if (res && res.isSuccess === false) {
@@ -82,6 +88,7 @@ export function useBacklogActions({
       ui.setOpenUpdateEpic(false);
       ui.setSelectedEpic(null);
       fetchData(projectId);
+      handleSyncBoard();
     } catch {
       toast.error('Error updating epic');
     }
@@ -96,6 +103,7 @@ export function useBacklogActions({
       }
       toast.success('Epic deleted successfully');
       fetchData(projectId);
+      handleSyncBoard();
     } catch {
       toast.error('Error deleting epic');
     }
@@ -125,6 +133,7 @@ export function useBacklogActions({
         );
         ui.setOpenStartSprint(false);
         fetchData(projectId);
+        handleSyncBoard();
       }
     } catch {
       toast.error(BACKLOG_UI.ERROR_START_SPRINT || 'Error starting sprint');
@@ -166,6 +175,7 @@ export function useBacklogActions({
 
       const sid = selectedSprintAction.sprintId || selectedSprintAction.id;
       setSprints((prev) => prev.filter((s) => (s.sprintId || s.id) !== sid));
+      handleSyncBoard();
 
       setTimeout(() => fetchData(projectId, false), 500);
     } catch {
@@ -234,6 +244,7 @@ export function useBacklogActions({
       );
       ui.setOpenCreateTask(false);
       ui.setActiveSprintForTask(null);
+      handleSyncBoard();
 
       setTimeout(() => fetchData(projectId, false), 800);
     } catch {
@@ -277,6 +288,7 @@ export function useBacklogActions({
       ui.setOpenUpdateTask(false);
       ui.setSelectedTask(null);
       fetchData(projectId, false);
+      handleSyncBoard();
     } catch {
       toast.error(BACKLOG_UI.ERROR_UPDATE_TASK || 'Error updating task');
     }
@@ -292,6 +304,7 @@ export function useBacklogActions({
       toast.success(BACKLOG_UI.SUCCESS_CREATE_SPRINT || 'Sprint created successfully!');
       ui.setOpenCreateSprint(false);
       fetchData(projectId, false);
+      handleSyncBoard();
     } catch {
       toast.error(BACKLOG_UI.ERROR_CREATE_SPRINT || 'Server error while creating sprint');
     }
@@ -319,6 +332,7 @@ export function useBacklogActions({
       toast.success('Sprint updated successfully!');
       ui.setOpenUpdateSprint(false);
       fetchData(projectId, false);
+      handleSyncBoard();
     } catch {
       toast.error('Error updating sprint');
     }

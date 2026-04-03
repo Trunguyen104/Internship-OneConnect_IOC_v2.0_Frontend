@@ -33,7 +33,7 @@ export function useStakeholderTab() {
           };
         }
         return null;
-      } catch (err) {
+      } catch {
         toast.error(STAKEHOLDER_MESSAGES.PROJECT_NOT_FOUND);
         return null;
       }
@@ -65,7 +65,7 @@ export function useStakeholderTab() {
           total: res?.data?.totalCount || 0,
           totalPages: res?.data?.totalPages || 1,
         };
-      } catch (err) {
+      } catch {
         toast.error(STAKEHOLDER_MESSAGES.LOAD_FAILED);
         return { items: [], total: 0, totalPages: 1 };
       }
@@ -154,7 +154,14 @@ export function useStakeholderTab() {
         res = await StakeholderService.create(payload);
       }
 
-      if (res && res.isSuccess !== false && res.statusCode !== 403) {
+      const isSuccess =
+        res &&
+        res.isSuccess !== false &&
+        res.statusCode !== 403 &&
+        res.statusCode !== 400 &&
+        res.statusCode !== 409;
+
+      if (isSuccess) {
         toast.success(
           editingStakeholderId
             ? STAKEHOLDER_MESSAGES.UPDATE_SUCCESS
@@ -173,23 +180,33 @@ export function useStakeholderTab() {
         setErrors({});
         fetchStakeholders();
       } else {
+        // Handle 200 responses with error body
         const errorMsg =
           res?.data?.errors?.[0] ||
           res?.errors?.[0] ||
           res?.message ||
           STAKEHOLDER_MESSAGES.SAVE_FAILED;
 
-        if (res?.status === 403 || res?.statusCode === 403) {
-          toast.error(errorMsg || STAKEHOLDER_MESSAGES.FORBIDDEN);
-        } else if (res?.status === 409 || res?.statusCode === 409) {
-          toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
-        } else {
-          toast.error(errorMsg);
-        }
+        toast.error(errorMsg);
       }
     } catch (err) {
+      // Handle non-2xx responses thrown by httpClient
       console.error('Error saving stakeholder:', err);
-      toast.error(STAKEHOLDER_MESSAGES.SAVE_FAILED);
+
+      const errorData = err.data;
+      const errorMsg =
+        errorData?.errors?.[0] ||
+        errorData?.message ||
+        err.message ||
+        STAKEHOLDER_MESSAGES.SAVE_FAILED;
+
+      if (err.status === 409) {
+        toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
+      } else if (err.status === 403) {
+        toast.error(STAKEHOLDER_MESSAGES.FORBIDDEN);
+      } else {
+        toast.error(errorMsg);
+      }
     }
   };
 

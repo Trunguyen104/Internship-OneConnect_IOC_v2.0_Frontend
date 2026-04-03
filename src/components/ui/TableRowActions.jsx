@@ -70,7 +70,7 @@ export function enrichTableMenuItems(items = []) {
 }
 
 const TRIGGER_CLASS =
-  'flex h-8 w-8 items-center justify-center text-slate-400 transition-colors hover:text-slate-600';
+  'inline-flex h-8 w-8 items-center justify-center text-slate-400 transition-colors hover:text-slate-600';
 
 /**
  * @param {object} props

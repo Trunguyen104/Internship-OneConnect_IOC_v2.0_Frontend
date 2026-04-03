@@ -60,7 +60,7 @@ export const JobPostingsService = {
   /**
    * Get internship phases for selection
    */
-  getMyPhases() {
-    return httpGet('/internship-phases');
+  getMyPhases(params = {}) {
+    return httpGet('/internship-phases', params);
   },
 };

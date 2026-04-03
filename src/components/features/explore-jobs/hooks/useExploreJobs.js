@@ -28,7 +28,7 @@ const mapJob = (job) => {
         job.enterpriseName ||
         job.enterprise?.fullName ||
         job.enterprise?.name ||
-        'Enterprise',
+        EXPLORE_JOBS_UI.CARD.ENTERPRISE_FALLBACK,
       logoUrl: job.companyLogoUrl || job.enterpriseLogoUrl || job.enterprise?.logoUrl,
     },
     // Map singular benefit from API to plural expected by UI
@@ -40,11 +40,16 @@ const mapJob = (job) => {
       ? new Date(job.expireDate).toLocaleDateString('en-GB')
       : EXPLORE_JOBS_UI.CARD.NOT_AVAILABLE,
     startDate: isDefaultDate(job.startDate)
-      ? 'TBD'
+      ? EXPLORE_JOBS_UI.CARD.DATE_TBD
       : new Date(job.startDate).toLocaleDateString('en-GB'),
-    endDate: isDefaultDate(job.endDate) ? 'TBD' : new Date(job.endDate).toLocaleDateString('en-GB'),
+    endDate: isDefaultDate(job.endDate)
+      ? EXPLORE_JOBS_UI.CARD.DATE_TBD
+      : new Date(job.endDate).toLocaleDateString('en-GB'),
     // Status mapping (AC-01)
-    statusLabel: job.status === 2 ? 'Closing Soon' : EXPLORE_JOBS_UI.CARD.STATUS_OPEN,
+    statusLabel:
+      job.status === 2
+        ? EXPLORE_JOBS_UI.CARD.STATUS_CLOSING_SOON
+        : EXPLORE_JOBS_UI.CARD.STATUS_OPEN,
   };
 };
 
@@ -138,8 +143,11 @@ export function useExploreJobs() {
       );
     },
     onError: (err) => {
-      const errorMsg = err?.data?.message || err?.message || 'Application failed';
-      toast.error('Error', errorMsg);
+      const errorMsg =
+        err?.data?.message ||
+        err?.message ||
+        EXPLORE_JOBS_UI.APPLY_MODAL.ERROR_MESSAGES.SUBMIT_FAILED;
+      toast.error(EXPLORE_JOBS_UI.APPLY_MODAL.ERROR_MESSAGES.TITLE, errorMsg);
     },
   });
 
@@ -154,7 +162,7 @@ export function useExploreJobs() {
     hasCV,
     cvUrl,
     page: currentPage,
-    pageSize,
+    pageSize: pageSize,
     setPage: setCurrentPage,
     setPageSize,
     searchTerm,
@@ -177,14 +185,12 @@ export function useExploreJobs() {
           const reasons = {
             'JobPosting.AlreadyHaveActiveApplication':
               EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS,
-            'JobPosting.ApplicationLimitReached': EXPLORE_JOBS_UI.ELIGIBILITY.REAPPLY_LIMIT,
             'JobPosting.ApplicationDeadlinePassed': EXPLORE_JOBS_UI.ELIGIBILITY.EXPIRED,
             'JobPosting.CannotApplyWhenPlaced': EXPLORE_JOBS_UI.ELIGIBILITY.PLACED,
             'JobPosting.UploadCVRequired': EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV,
             'JobPosting.NoActiveInternshipPeriod': EXPLORE_JOBS_UI.ELIGIBILITY.NO_ACTIVE_PHASE,
             // Legacy/Mapping fallbacks
             ACTIVE_APP_EXISTS: EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS,
-            REAPPLY_LIMIT: EXPLORE_JOBS_UI.ELIGIBILITY.REAPPLY_LIMIT,
             EXPIRED: EXPLORE_JOBS_UI.ELIGIBILITY.EXPIRED,
           };
 
@@ -198,7 +204,8 @@ export function useExploreJobs() {
 
           return {
             eligible: false,
-            reason: serverEligibility.message || errorList[0] || 'Not eligible',
+            reason:
+              serverEligibility.message || errorList[0] || EXPLORE_JOBS_UI.ELIGIBILITY.NOT_ELIGIBLE,
           };
         }
       }

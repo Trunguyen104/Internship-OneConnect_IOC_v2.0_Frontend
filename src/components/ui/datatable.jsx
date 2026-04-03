@@ -48,7 +48,10 @@ export default function DataTable({
   const getRowKey = useCallback(
     (record, index) => {
       if (typeof rowKey === 'function') return rowKey(record, index);
-      return record?.[rowKey] || record?.id || record?.key || index;
+      const val = record?.[rowKey] || record?.id || record?.key;
+      // Fallback to index if no valid key is found, but append it if value exists to ensure uniqueness
+      // in case of duplicate data items (e.g. backend inconsistencies)
+      return val !== undefined && val !== null ? String(val) : `row-${index}`;
     },
     [rowKey]
   );
@@ -116,7 +119,7 @@ export default function DataTable({
 
   return (
     <div className={`flex min-h-0 flex-1 flex-col overflow-hidden ${className}`}>
-      <div className="flex-1 overflow-auto scrollbar-none">
+      <div className="flex-1 overflow-auto">
         <table className="w-full border-collapse text-left" style={{ minWidth }}>
           {/* ── Header ── */}
           <thead className="sticky top-0 z-10 bg-white border-b border-gray-100">

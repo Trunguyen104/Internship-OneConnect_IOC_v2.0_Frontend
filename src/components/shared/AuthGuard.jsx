@@ -52,7 +52,7 @@ export default function AuthGuard({ children, allowedRoles = [] }) {
 
         if (res.success && res.role) {
           if (!cancelled) {
-            setUser({ role: res.role });
+            setUser({ ...useAuthStore.getState().user, role: res.role });
 
             // RBAC Check
             if (allowedRoles.length > 0) {

@@ -1,3 +1,4 @@
+import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 import httpClient from '@/services/http-client.service';
 
 const BASE_URL = '/internship-phases';
@@ -9,6 +10,12 @@ const mapPhase = (item) => {
     id: item.phaseId || item.id, // Support both formats
     internPhaseId: item.phaseId || item.id,
     capacity: item.capacity !== undefined ? item.capacity : item.maxStudents,
+    jobPostingCount: item.jobPostingCount ?? item.jobPostingsCount ?? item.jobPostings?.length ?? 0,
+    placedCount:
+      item.placedCount ??
+      (item.capacity !== undefined && item.remainingCapacity !== undefined
+        ? item.capacity - item.remainingCapacity
+        : 0),
     // Add other mappings if necessary in the future
   };
 };
@@ -64,15 +71,57 @@ export const InternPhaseService = {
     return httpClient.httpDelete(`${BASE_URL}/${id}`);
   },
 
-  async getJobPostings(_phaseId, _params) {
-    // Backend endpoint not yet implemented in provided C# controller
-    // Returning empty array directly to avoid 404 errors in console/network tab
-    return { data: [], totalCount: 0 };
+  async getJobPostings(phaseId, params) {
+    try {
+      const res = await httpClient.httpGet(`${BASE_URL}/${phaseId}/job-postings`, params);
+      return res?.data || res;
+    } catch {
+      // Fallback: This endpoint might not exist yet, DetailView uses initialData from getById
+      return { data: [], totalCount: 0 };
+    }
   },
 
-  async getStudents(_phaseId, _params) {
-    // Backend endpoint not yet implemented in provided C# controller
-    // Returning empty array directly to avoid 404 errors in console/network tab
-    return { data: [], totalCount: 0 };
+  async getGroups(phaseId, params) {
+    try {
+      const res = await httpClient.httpGet('/internship-groups', {
+        ...params,
+        phaseId: phaseId,
+      });
+      const responseData = res?.data || res;
+      // Backend might return array directly or wrapped in items
+      const items = responseData?.items || (Array.isArray(responseData) ? responseData : []);
+      return {
+        items: items,
+        totalCount: responseData?.totalCount || items.length || 0,
+      };
+    } catch {
+      return { items: [], totalCount: 0 };
+    }
+  },
+
+  async getStudents(phaseId, params) {
+    try {
+      const res = await httpClient.httpGet(`${BASE_URL}/${phaseId}/students`, params);
+      const responseData = res?.data || res;
+      // If backend returns students directly as data property or root
+      const studentsArr =
+        responseData?.data || (Array.isArray(responseData) ? responseData : responseData?.items);
+
+      if (studentsArr) {
+        return {
+          data: studentsArr,
+          totalCount: responseData?.totalCount || studentsArr.length || 0,
+        };
+      }
+      throw new Error(INTERN_PHASE_MANAGEMENT.MESSAGES.ERROR_NO_STUDENTS);
+    } catch {
+      // Fallback: If specific endpoint fails, try to get from phase detail
+      const phase = await this.getById(phaseId);
+      const students = phase?.placedStudents || [];
+      return {
+        data: students,
+        totalCount: students.length || 0,
+      };
+    }
   },
 };

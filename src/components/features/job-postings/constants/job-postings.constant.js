@@ -71,9 +71,11 @@ export const JOB_POSTING_UI = {
         LOCATION: 'Please enter a location.',
         DEADLINE: 'Please select an application deadline.',
         DEADLINE_EXPIRED: 'The deadline has expired. Please update it before publishing.',
-        DEADLINE_FOR_REOPEN:
-          'Invalid deadline. Please choose a future date before the internship starts.',
-        DEADLINE_TOOLTIP: 'The deadline must be on or before the internship start date.',
+        DEADLINE_ERROR_PREFIX: 'Application deadline cannot be after the internship start date',
+        DEADLINE_REOPEN_ERROR:
+          'Invalid deadline. Please select a future date before the internship start date.',
+        DEADLINE_TOOLTIP: 'Application deadline cannot be after the internship start date',
+        DEADLINE_TOOLTIP_DEFAULT: 'The deadline must be on or before the internship start date.',
         DEADLINE_TOO_LATE: (date) =>
           `The deadline must not be later than the internship start date (${date}).`,
         SCHOOLS_REQUIRED: 'Please select at least one school.',
@@ -167,12 +169,12 @@ export const JOB_POSTING_UI = {
       TITLE: 'Close Job Posting?',
       CONTENT_ACTIVE: (title, count) =>
         `This posting has [${count}] candidate(s) being reviewed. After closing, new students won't be able to apply, but current candidates will still be processed. Are you sure you want to close?`,
-      CONTENT_INACTIVE: (title) =>
+      CONTENT_INACTIVE: (_title) =>
         `Are you sure you want to close this Job Posting? Students will no longer be able to apply.`,
     },
     DELETE: {
       TITLE: 'Delete Job Posting?',
-      CONTENT_ACTIVE: (title, count) =>
+      CONTENT_ACTIVE: (_title, count) =>
         `WARNING: This job has ${count} active applicant(s). Deleting will remove it from the list, but those applications will still be managed in the "All Applications" screen. This action cannot be undone.`,
       CONTENT_INACTIVE: (title) =>
         `Are you sure you want to delete "${title}"? This action cannot be undone.`,

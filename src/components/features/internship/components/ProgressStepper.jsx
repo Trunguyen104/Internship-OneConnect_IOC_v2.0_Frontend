@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, FileText, GraduationCap, MapPin, Search } from 'lucide-react';
+import { Briefcase, Check, FileText, GraduationCap, MapPin, Search } from 'lucide-react';
 import React from 'react';
 
 import { getStepStatus, INTERNSHIP_STEPS } from '../constants/internshipStatus.js';
@@ -11,13 +11,14 @@ const STEP_ICONS = {
   offered: FileText,
   placed: MapPin,
   finalizing: Check,
+  pending: Briefcase,
 };
 
-const ProgressStepper = ({ currentStatus, journeyStep }) => {
+const ProgressStepper = ({ currentStatus, journeyStep, steps = INTERNSHIP_STEPS }) => {
   return (
     <div className="w-full py-8">
       <div className="relative flex items-start justify-between">
-        {INTERNSHIP_STEPS.map((step, index) => {
+        {steps.map((step, index) => {
           // Use journeyStep (1-indexed) if provided, otherwise fallback to old logic
           let status = 'upcoming';
           if (journeyStep) {
@@ -57,7 +58,7 @@ const ProgressStepper = ({ currentStatus, journeyStep }) => {
               </div>
 
               {/* Progress Line (Connecting to next) */}
-              {index < INTERNSHIP_STEPS.length - 1 && (
+              {index < steps.length - 1 && (
                 <div className="bg-border relative mt-6 h-0.5 min-w-[20px] flex-1 self-start overflow-hidden">
                   <div
                     className={`absolute inset-0 transition-transform duration-700 ease-in-out ${

@@ -40,7 +40,12 @@ export const BACKLOG_UI = {
   MODAL_CREATE_EPIC: 'Create Epic',
   MODAL_CREATE_TASK: 'Create Task',
   MODAL_CREATE_TASK_SUBTITLE: 'Create new tasks and configure details for your sprint plan',
-  MODAL_UPDATE_TASK: 'Update Task',
+  UPDATE_TASK: 'Update Task',
+  UPDATE_TASK_SUBTITLE: 'Refine task details, status, and progression for your team',
+  MODAL_CREATE_EPIC_SUBTITLE: 'Define major objectives and long-term project roadmap',
+  MODAL_UPDATE_EPIC_SUBTITLE: 'Update detailed information and deadlines for major goals',
+  MODAL_CREATE_SPRINT_SUBTITLE: 'Plan your next sprint and select priority items from the backlog',
+  MODAL_UPDATE_SPRINT_SUBTITLE: 'Update names and core objectives for the current work cycle',
 
   // Field Labels (English forms in some components)
   FIELD_EPIC_NAME: 'Epic Name',

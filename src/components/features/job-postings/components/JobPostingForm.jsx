@@ -115,12 +115,12 @@ export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, on
 
                   if (selectedPhase) {
                     const startDate = dayjs(selectedPhase.startDate);
-                    const endDate = dayjs(selectedPhase.endDate);
-                    const isStarted = today.isAfter(startDate);
-                    const deadlineBound = isStarted ? endDate : startDate;
+                    const deadlineBound = startDate;
                     if (value.isAfter(deadlineBound)) {
                       return Promise.reject(
-                        new Error(JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_FOR_REOPEN)
+                        new Error(
+                          `${JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_ERROR_PREFIX} (${dayjs(deadlineBound).format('DD/MM/YYYY')}).`
+                        )
                       );
                     }
                   }
@@ -129,8 +129,10 @@ export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, on
               }),
             ]}
             extra={
-              <span className="text-[10px] text-muted">
-                {JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_TOOLTIP}
+              <span className="text-[10px] text-muted leading-tight block mt-1">
+                {selectedPhase
+                  ? `${JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_TOOLTIP} (${dayjs(selectedPhase.startDate).format('DD/MM/YYYY')}).`
+                  : JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_TOOLTIP_DEFAULT}
               </span>
             }
           >
@@ -145,9 +147,7 @@ export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, on
 
                 if (selectedPhase) {
                   const startDate = dayjs(selectedPhase.startDate);
-                  const endDate = dayjs(selectedPhase.endDate);
-                  const isStarted = today.isAfter(startDate);
-                  const deadlineBound = isStarted ? endDate : startDate;
+                  const deadlineBound = startDate;
                   if (current && current.isAfter(deadlineBound)) return true;
                 }
 

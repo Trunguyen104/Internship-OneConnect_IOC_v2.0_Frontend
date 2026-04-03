@@ -41,6 +41,7 @@ export const BacklogModals = ({
   selectedSprintAction,
   activeSprintForTask,
   setActiveSprintForTask,
+  members = [],
 }) => {
   const actions = useBacklogActions({
     projectId,
@@ -112,6 +113,7 @@ export const BacklogModals = ({
           setActiveSprintForTask(null);
         }}
         onSubmit={(payload) => actions.handleCreateTask(payload, activeSprintForTask)}
+        members={members}
       />
 
       <UpdateTaskModal
@@ -124,6 +126,7 @@ export const BacklogModals = ({
           setSelectedTask(null);
         }}
         onSubmit={(payload) => actions.handleUpdateTask(selectedTask, payload)}
+        members={members}
       />
 
       <CreateSprintModal

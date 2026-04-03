@@ -32,26 +32,26 @@ const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {
         <Form form={form} layout="vertical" disabled={viewOnly || loading}>
           <div className="grid grid-cols-2 gap-x-4">
             <Form.Item label={DETAIL.STUDENT_NAME} name="name">
-              <Input className="h-10 cursor-default bg-bg" readOnly />
+              <Input className="h-10 cursor-default bg-bg !text-slate-900 font-medium" readOnly />
             </Form.Item>
             <Form.Item label={DETAIL.STUDENT_CODE} name="studentCode">
-              <Input className="h-10 cursor-default bg-bg" readOnly />
+              <Input className="h-10 cursor-default bg-bg !text-slate-900 font-medium" readOnly />
             </Form.Item>
           </div>
 
           <div className="grid grid-cols-2 gap-x-4">
             <Form.Item label={DETAIL.INTERN_GROUP} name="internshipGroupName">
-              <Input className="h-10 cursor-default bg-bg" readOnly />
+              <Input className="h-10 cursor-default bg-bg !text-slate-900 font-medium" readOnly />
             </Form.Item>
             <Form.Item label={DETAIL.CREATED_BY} name="reporter">
-              <Input className="h-10 cursor-default bg-bg" readOnly />
+              <Input className="h-10 cursor-default bg-bg !text-slate-900 font-medium" readOnly />
             </Form.Item>
           </div>
 
           <div className="grid grid-cols-2 gap-x-4">
             <Form.Item label={DETAIL.INCIDENT_DATE}>
               <DatePicker
-                className="h-10 w-full"
+                className="h-10 w-full !text-slate-900 font-medium !opacity-100"
                 format={VIOLATION_REPORT.DATE_FORMATS.UI}
                 placeholder={FORM.PLACEHOLDERS.INCIDENT_DATE}
                 showTime={false}
@@ -63,7 +63,7 @@ const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {
             </Form.Item>
             <Form.Item label={DETAIL.CREATED_TIME}>
               <DatePicker
-                className="h-10 w-full"
+                className="h-10 w-full !text-slate-900 font-medium !opacity-100"
                 format={VIOLATION_REPORT.DATE_FORMATS.UI}
                 showTime={false}
                 disabled
@@ -76,7 +76,7 @@ const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {
             <Input.TextArea
               placeholder={FORM.PLACEHOLDERS.DESCRIPTION}
               rows={4}
-              className="resize-none"
+              className="resize-none !text-slate-900 font-medium"
               readOnly
             />
           </Form.Item>

@@ -70,7 +70,7 @@ export const DAILY_REPORT_UI = {
 
   EMPTY: {
     NO_PROJECT: 'You have not been assigned to any project.',
-    NO_LOGBOOK: 'No logbook found in this group',
+    NO_LOGBOOK: 'No daily reports found in this group',
     DESCRIPTION: 'Keep track of your learning journey! Start by adding your first daily report.',
   },
 
