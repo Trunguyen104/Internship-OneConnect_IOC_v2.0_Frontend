@@ -4,7 +4,6 @@ import { Layout, Menu } from 'antd';
 import {
   AlertOctagon,
   ArrowLeft,
-  Bell,
   Briefcase,
   Building2,
   CalendarCheck,
@@ -15,7 +14,6 @@ import {
   Info,
   LayoutDashboard,
   Lock,
-  Settings,
   UserCircle,
   Users,
 } from 'lucide-react';
@@ -229,12 +227,6 @@ export default function AppSidebar() {
             label: 'Enterprises',
           },
           { key: '/admin/users', icon: <Users className="size-4" />, label: 'Users' },
-          {
-            key: '/admin/notifications',
-            icon: <Bell className="size-4" />,
-            label: 'Notifications',
-          },
-          { key: '/admin/settings', icon: <Settings className="size-4" />, label: 'Settings' },
         ];
       }
 
