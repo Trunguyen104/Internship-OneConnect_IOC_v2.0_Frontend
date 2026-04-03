@@ -102,6 +102,40 @@ export default function AppSidebar() {
       }
 
       // ══════════════════════════════════════════════════════
+      // CONTEXT — PHASE WORKSPACE (Enterprise)
+      // ══════════════════════════════════════════════════════
+      const phaseWorkspaceMatch = pathname.match(/^\/company\/phases\/([^/]+)/);
+      if (phaseWorkspaceMatch) {
+        const p = `/company/phases/${phaseWorkspaceMatch[1]}`;
+        return [
+          {
+            key: 'back-to-phases',
+            icon: <ArrowLeft className="size-4" />,
+            label: 'Back to Phases',
+          },
+          { type: 'divider' },
+          { key: `${p}/overview`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
+          {
+            key: `${p}/applications`,
+            icon: <FileText className="size-4" />,
+            label: 'Applications',
+          },
+          { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
+          { key: `${p}/groups`, icon: <FolderKanban className="size-4" />, label: 'Groups' },
+          {
+            key: `${p}/evaluation`,
+            icon: <ClipboardCheck className="size-4" />,
+            label: 'Evaluations',
+          },
+          {
+            key: `${p}/violations`,
+            icon: <AlertOctagon className="size-4" />,
+            label: 'Violation Reports',
+          },
+        ];
+      }
+
+      // ══════════════════════════════════════════════════════
       // CONTEXT 3 — GROUP WORKSPACE
       // ══════════════════════════════════════════════════════
       const groupWorkspaceMatch = pathname.match(/^\/internship-groups\/([^/]+)/);

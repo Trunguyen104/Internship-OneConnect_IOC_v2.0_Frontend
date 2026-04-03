@@ -45,13 +45,13 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
 
     return phases
       .filter((p) => {
-        const isUpcomingOrActive = [
-          INTERN_PHASE_STATUS.UPCOMING,
-          INTERN_PHASE_STATUS.ACTIVE,
-        ].includes(p.status);
+        const isEnded =
+          p.status === INTERN_PHASE_STATUS.CLOSED || p.status === 3 || p.status === '3';
+
         const isCurrentPhase =
           isEdit && (p.internshipPhaseId || p.phaseId || p.id) === currentPhaseId;
-        return isUpcomingOrActive || isCurrentPhase;
+
+        return !isEnded || isCurrentPhase;
       })
       .map((p) => ({
         label: `${p.name} [${dayjs(p.startDate).format('DD/MM')} — ${dayjs(p.endDate).format('DD/MM/YYYY')}] ${p.majors ? `— ${p.majors}` : ''}`,
@@ -64,12 +64,14 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
   }, [phases, isEdit, record]);
 
   const handlePhaseChange = (value) => {
-    if (isEdit && activeAppCount > 0 && value !== record.internshipPhaseId) {
+    const currentPhaseId = record?.internshipPhaseId || record?.phaseId;
+
+    if (isEdit && activeAppCount > 0 && value !== currentPhaseId) {
       toast.error(
         JOB_POSTING_UI.FORM.MESSAGES.HEADERS.ERROR,
         JOB_POSTING_UI.FORM.MODALS.CHANGE_BLOCKED.CONTENT(activeAppCount)
       );
-      form.setFieldsValue({ internshipPhaseId: record.internshipPhaseId });
+      form.setFieldsValue({ internshipPhaseId: currentPhaseId });
       return;
     }
 
@@ -134,13 +136,14 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
     if (effectiveId) {
       // UPDATE existing
       const res = await actions.updateJob.mutateAsync({ id: effectiveId, data: payload });
-      return res;
+      return res?.data || res;
     } else {
       // CREATE new
       const publishAction = isDraft ? actions.saveDraft : actions.createJob;
       const res = await publishAction.mutateAsync(payload);
-      if (isDraft && res?.data?.jobId) setCurrentJobId(res.data.jobId);
-      return res;
+      const data = res?.data || res;
+      if (isDraft && data?.jobId) setCurrentJobId(data.jobId);
+      return data;
     }
   };
 
@@ -169,7 +172,7 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
         return;
       }
 
-      // Case: Publish a DRAFT or Reopen a CLOSED job
+      // Normal Publish for DRAFT or update a already published job
       if ((isDraft || isClosed) && effectiveId) {
         if (isClosed) {
           // AC-07 Validation for Reopening
@@ -182,16 +185,12 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
           if (selectedPhase && expireDate) {
             const startDate = dayjs(selectedPhase.startDate);
             const today = dayjs().startOf('day');
-
-            // AC-07: Deadline >= Today AND <= Phase StartDate
-            const isStarted = today.isAfter(startDate);
-            const endDate = dayjs(selectedPhase.endDate);
-            const deadlineBound = isStarted ? endDate : startDate;
+            const deadlineBound = startDate;
 
             if (dayjs(expireDate).isBefore(today) || dayjs(expireDate).isAfter(deadlineBound)) {
               toast.error(
                 JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
-                JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_FOR_REOPEN
+                JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_REOPEN_ERROR
               );
               return;
             }
@@ -199,15 +198,41 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
 
           // AC-07: For CLOSED jobs, we simply update with status = PUBLISHED to reopen
           setLastAutoSaved(null);
-          // Mutation 'updateJob' will show the success toast automatically
           await submitData(values, false);
           onSuccess?.();
           form.resetFields();
         } else {
-          // Normal Publish for DRAFT: Save as Draft first then trigger Publish endpoint
+          const expireDate = values.expireDate;
+          const phaseId = values.internshipPhaseId;
+          const selectedPhase = phases?.find(
+            (p) => (p.internshipPhaseId || p.phaseId || p.id) === phaseId
+          );
+
+          if (expireDate && dayjs(expireDate).isBefore(dayjs().startOf('day'))) {
+            toast.error(
+              JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
+              JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_EXPIRED
+            );
+            return;
+          }
+
+          if (selectedPhase && expireDate) {
+            const startDate = dayjs(selectedPhase.startDate);
+            if (dayjs(expireDate).isAfter(startDate)) {
+              toast.error(
+                JOB_POSTING_UI.FORM.MESSAGES.HEADERS.VALIDATION,
+                `${JOB_POSTING_UI.FORM.MESSAGES.VALIDATION.DEADLINE_ERROR_PREFIX} (${dayjs(startDate).format('DD/MM/YYYY')}).`
+              );
+              return;
+            }
+          }
+
           setLastAutoSaved(null);
-          await submitData(values, true); // This will show "updated" toast
-          await actions.publishDraft.mutateAsync(effectiveId); // This will show "published" toast
+          // 2. Submit changes first and GET the most FRESH ID (crucial to avoid 404)
+          const submitResult = await submitData(values, true);
+          const freshId = submitResult?.jobId || effectiveId;
+
+          await actions.publishDraft.mutateAsync(freshId);
           onSuccess?.();
           form.resetFields();
         }
@@ -223,11 +248,9 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
         form.resetFields();
       }
     } catch (err) {
-      console.error('Submit failed:', err);
-      // Use standard error extractor logic if possible
-      const errorMsg =
-        err?.data?.errors?.[0] || err?.message || JOB_POSTING_UI.FORM.MESSAGES.GENERAL_ERROR;
-      toast.error(JOB_POSTING_UI.FORM.MESSAGES.HEADERS.ERROR, errorMsg);
+      if (err.errorFields) {
+      } else {
+      }
     }
   };
 
@@ -249,7 +272,11 @@ export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess })
         form.resetFields();
       }
     } catch (err) {
-      console.error('Auto-save failed:', err);
+      if (err.errorFields) {
+        console.warn('Draft validation failed:', err.errorFields);
+      } else {
+        console.error('Auto-save failed:', err);
+      }
     } finally {
       if (silent) setIsAutoSaving(false);
     }

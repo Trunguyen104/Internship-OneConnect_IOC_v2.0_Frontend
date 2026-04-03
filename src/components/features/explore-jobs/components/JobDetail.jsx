@@ -2,12 +2,12 @@
 
 import { Tooltip } from 'antd';
 import {
+  AlertCircle,
   Building2,
   Calendar,
   ChevronLeft,
   Globe,
   MapPin,
-  Share2,
   Sparkles,
   Timer,
 } from 'lucide-react';
@@ -82,6 +82,29 @@ export default function JobDetail() {
             {EXPLORE_JOBS_UI.DETAIL.BACK_LINK}
           </span>
         </button>
+
+        {/* Missing CV Prominent Header - Direct guidance */}
+        {!hasCV && (
+          <div className="mb-6 bg-warning/5 border border-warning/20 rounded-[1.5rem] p-4 flex flex-col md:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-500">
+            <div className="flex items-center gap-3">
+              <div className="bg-warning/10 p-2 rounded-xl">
+                <AlertCircle className="h-5 w-5 text-warning" />
+              </div>
+              <div className="text-left">
+                <h4 className="text-sm font-bold text-text mb-0.5">
+                  {EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV_TITLE}
+                </h4>
+                <p className="text-xs text-muted">{EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV}</p>
+              </div>
+            </div>
+            <Link
+              href="/student/profile"
+              className="bg-warning text-white px-5 py-2 rounded-xl font-bold text-[13px] hover:bg-warning-hover transition-all shadow-lg shadow-warning/10 whitespace-nowrap"
+            >
+              {EXPLORE_JOBS_UI.APPLY_MODAL.UPDATE_CV_NOW}
+            </Link>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -205,7 +228,9 @@ export default function JobDetail() {
                     <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-0.5">
                       {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.AUDIENCE}
                     </p>
-                    <p className="text-text font-bold text-xs">{job.audienceType || 'Public'}</p>
+                    <p className="text-text font-bold text-xs">
+                      {job.audienceType || EXPLORE_JOBS_UI.DETAIL.SIDEBAR.AUDIENCE_PUBLIC}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -246,17 +271,6 @@ export default function JobDetail() {
                   </button>
                 </div>
               </Tooltip>
-            </div>
-
-            <div className="bg-surface border border-border/40 border-dashed rounded-[2rem] p-6 text-center">
-              <p className="text-muted text-xs font-bold uppercase tracking-widest mb-4">
-                {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.SHARE}
-              </p>
-              <div className="flex items-center justify-center gap-3">
-                <div className="h-9 w-9 rounded-xl bg-muted/5 hover:bg-primary/10 transition-colors cursor-pointer flex items-center justify-center">
-                  <Share2 className="h-4 w-4 text-muted" />
-                </div>
-              </div>
             </div>
           </div>
         </div>

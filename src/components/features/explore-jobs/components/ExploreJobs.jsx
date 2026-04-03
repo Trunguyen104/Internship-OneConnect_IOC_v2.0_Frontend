@@ -9,10 +9,14 @@ import Pagination from '@/components/ui/pagination';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 import { useExploreJobs } from '../hooks/useExploreJobs';
+import ApplyModal from './ApplyModal';
 import JobCard from './JobCard';
 
 export default function ExploreJobs() {
   const router = useRouter();
+  const [selectedJobId, setSelectedJobId] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const {
     jobs,
     total,
@@ -24,11 +28,25 @@ export default function ExploreJobs() {
     setPageSize,
     searchTerm,
     setSearchTerm,
+    isApplying,
+    applyJob,
+    cvUrl,
+    getEligibility,
   } = useExploreJobs();
 
-  const handleJobClick = (id) => {
+  const handleCardClick = (id, isApplyRequested) => {
+    if (isApplyRequested) {
+      setSelectedJobId(id);
+      setIsModalOpen(true);
+      return;
+    }
     router.push(`/explore-jobs/${id}`);
   };
+
+  const selectedJob = React.useMemo(
+    () => jobs.find((j) => (j.jobId || j.id) === selectedJobId),
+    [jobs, selectedJobId]
+  );
 
   if (isPlaced) {
     return (
@@ -41,8 +59,8 @@ export default function ExploreJobs() {
           {EXPLORE_JOBS_UI.PLACED_STATE.SUBTITLE}
         </p>
         <button
-          onClick={() => router.push('/dashboard')}
-          className="mt-8 bg-primary text-white px-8 py-3 rounded-2xl font-bold font-sm shadow-xl shadow-primary/20 hover:scale-105 transition-all"
+          onClick={() => router.push('/student/home')}
+          className="mt-8 bg-primary text-white px-8 py-3 rounded-2xl font-bold font-sm shadow-xl shadow-primary/20 hover:scale-105 transition-all text-[13px]"
         >
           {EXPLORE_JOBS_UI.PLACED_STATE.BACK_TO_DASHBOARD}
         </button>
@@ -52,64 +70,70 @@ export default function ExploreJobs() {
 
   return (
     <PageLayout className="animate-in fade-in duration-700 bg-[#f8f9fa]">
-      <div className="max-w-6xl mx-auto px-6 md:px-8 py-4 w-full">
-        {/* Hero Header - Ultra Compact & Elegant */}
-        <div className="relative overflow-hidden bg-white border border-border/40 rounded-[2rem] p-5 md:p-7 mb-7 shadow-sm">
-          <div className="relative z-10 max-w-lg">
-            <div className="inline-flex items-center gap-1.5 bg-primary/5 text-primary text-[8px] font-bold px-2 py-0.5 rounded-full mb-3 uppercase tracking-widest">
-              <Sparkles className="h-2.5 w-2.5" />
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 w-full">
+        {/* ... (Header section) ... */}
+        <div className="relative overflow-hidden bg-white border border-border/40 rounded-[2.5rem] p-6 md:p-9 mb-8 shadow-sm transition-all hover:shadow-md">
+          {/* Header content unchanged */}
+          <div className="relative z-10 max-w-2xl">
+            <div className="inline-flex items-center gap-2 bg-primary/5 text-primary text-[9px] font-black px-2.5 py-1 rounded-full mb-4 uppercase tracking-widest leading-none">
+              <Sparkles className="h-3 w-3" />
               <span>{EXPLORE_JOBS_UI.HEADER.DISCOVER}</span>
             </div>
-            <h1 className="text-xl md:text-2xl font-extrabold text-text mb-2 leading-tight">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-text mb-3 leading-tight tracking-tight">
               {EXPLORE_JOBS_UI.HEADER.TITLE}{' '}
               <span className="text-primary italic">{EXPLORE_JOBS_UI.HEADER.TITLE_ITALIC}</span>.
             </h1>
-            <p className="text-muted text-[13px] leading-relaxed mb-5 max-w-sm opacity-80">
+            <p className="text-muted text-sm md:text-base leading-relaxed mb-6 max-w-lg opacity-80">
               {EXPLORE_JOBS_UI.HEADER.SUBTITLE}
             </p>
 
             <div className="relative max-w-sm group">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors">
-                <Search className="h-3.5 w-3.5" />
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors">
+                <Search className="h-4 w-4" />
               </div>
               <input
                 type="text"
                 placeholder={EXPLORE_JOBS_UI.HEADER.SEARCH_PLACEHOLDER}
-                className="w-full bg-bg border border-border/60 rounded-lg py-2 pl-9 pr-3 text-[12px] text-text placeholder:text-muted/60 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm"
+                className="w-full bg-bg border border-border/60 rounded-xl py-3 pl-11 pr-4 text-[14px] text-text placeholder:text-muted/60 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
-
-          {/* Background Decorative Element */}
           <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none hidden md:block" />
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
         </div>
 
-        {/* Main Grid Section */}
-        <div className="flex items-center justify-between mb-4 px-1">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary/10 p-1 rounded-md">
-              <Briefcase className="h-3 w-3 text-primary" />
+        {/* ... (Grid Header) ... */}
+        <div className="flex items-center justify-between mb-5 px-1">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-primary/10 p-1.5 rounded-lg">
+              <Briefcase className="h-4 w-4 text-primary" />
             </div>
-            <h2 className="text-base font-bold text-text">{EXPLORE_JOBS_UI.HEADER.FOR_YOU}</h2>
+            <h2 className="text-xl font-bold text-text tracking-tight">
+              {EXPLORE_JOBS_UI.HEADER.FOR_YOU}
+            </h2>
           </div>
-          <span className="text-muted text-[9px] font-bold uppercase tracking-widest opacity-50">
+          <span className="text-muted text-[10px] font-bold uppercase tracking-widest opacity-60">
             {EXPLORE_JOBS_UI.HEADER.RESULTS_COUNT(total)}
           </span>
         </div>
 
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-44 bg-white rounded-[1.5rem] border border-border/40" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="h-56 bg-white rounded-[1.5rem] border border-border/40" />
             ))}
           </div>
         ) : jobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {jobs.map((job) => (
-              <JobCard key={job.jobId} job={job} onClick={handleJobClick} />
+              <JobCard
+                key={job.jobId}
+                job={job}
+                onClick={handleCardClick}
+                eligibility={getEligibility(job.jobId)}
+              />
             ))}
           </div>
         ) : (
@@ -136,6 +160,18 @@ export default function ExploreJobs() {
           </div>
         )}
       </div>
+
+      <ApplyModal
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        job={selectedJob}
+        cvUrl={cvUrl}
+        isApplying={isApplying}
+        onConfirm={async () => {
+          await applyJob({ jobId: selectedJobId });
+          setIsModalOpen(false);
+        }}
+      />
     </PageLayout>
   );
 }

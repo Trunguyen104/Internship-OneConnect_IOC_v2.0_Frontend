@@ -1,6 +1,6 @@
 'use client';
 
-import { EditOutlined, PlusCircleOutlined, SendOutlined } from '@ant-design/icons';
+import { EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { DatePicker, Form, Input } from 'antd';
 import dayjs from 'dayjs';
 import React, { memo } from 'react';
@@ -153,7 +153,6 @@ const LogbookFormModal = memo(function LogbookFormModal({
             loading={submitting}
             className="rounded-full h-12 px-10 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
           >
-            <SendOutlined className="text-xs" />
             {editingId ? DAILY_REPORT_UI.MODAL.SAVE : DAILY_REPORT_UI.MODAL.SUBMIT}
           </Button>
         </div>

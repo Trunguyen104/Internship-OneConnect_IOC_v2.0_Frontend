@@ -8,6 +8,7 @@ import TableRowDropdown from '@/components/ui/TableRowActions';
 import { ISSUE_UI } from '@/constants/stakeholderIssue/uiText';
 import { TABLE_CELL } from '@/lib/tableStyles';
 
+import { ISSUE_STATUS } from '../constants/issueStatus';
 import IssueStatusTag from './IssueStatusTag';
 
 const IssueTable = memo(function IssueTable({
@@ -77,7 +78,7 @@ const IssueTable = memo(function IssueTable({
       align: 'right',
       width: '48px',
       render: (_, record) => {
-        const isResolved = Number(record.status) === 2;
+        const isResolved = Number(record.status) === ISSUE_STATUS.RESOLVED;
         const items = [
           {
             key: 'toggle',

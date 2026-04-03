@@ -6,7 +6,6 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
@@ -76,7 +75,6 @@ export default function Header() {
         ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
         : []),
       { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
-      { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
