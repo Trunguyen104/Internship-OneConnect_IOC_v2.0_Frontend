@@ -2,6 +2,7 @@ import './globals.css';
 
 import { AntdConfigProvider } from '../providers/AntdConfigProvider';
 import { AuthEventsProvider } from '../providers/AuthEventsProvider';
+import { NotificationProvider } from '../providers/NotificationProvider';
 import { PageHeaderProvider } from '../providers/PageHeaderProvider';
 import { ReactQueryProvider } from '../providers/ReactQueryProvider';
 import { ToastProvider } from '../providers/ToastProvider';
@@ -22,7 +23,9 @@ export default function RootLayout({ children }) {
           <PageHeaderProvider>
             <AuthEventsProvider>
               <AntdConfigProvider>
-                <ToastProvider>{children}</ToastProvider>
+                <ToastProvider>
+                  <NotificationProvider>{children}</NotificationProvider>
+                </ToastProvider>
               </AntdConfigProvider>
             </AuthEventsProvider>
           </PageHeaderProvider>

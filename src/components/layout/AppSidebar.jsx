@@ -22,33 +22,24 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useMemo } from 'react';
 
 import { USER_ROLE } from '@/constants/user-management/enums';
+import { useInternshipStatus } from '@/hooks/useInternshipStatus';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLayoutStore } from '@/store/useLayoutStore';
 
 const { Sider } = Layout;
 
-/**
- * AppSidebar — Unified, context-aware sidebar.
- *
- * Context switching priority (first match wins):
- *  1. /school/terms/[termId]/*   → Term workspace sidebar (UniAdmin)
- *  2. /company/phases/[phaseId]/* → Phase workspace sidebar (HR/Mentor/EntAdmin)
- *  3. /internship-groups/[internshipGroupId]/* → Group workspace sidebar (Student/HR/Mentor)
- *  4. /profile                    → Profile sub-navigation
- *  5. role-based main menu        → SuperAdmin only (other roles use TopNav)
- */
 export default function AppSidebar() {
   const user = useAuthStore((state) => state.user);
-  const { isSidebarCollapsed } = useLayoutStore();
+  const isSidebarCollapsed = useLayoutStore((s) => s.isSidebarCollapsed);
   const router = useRouter();
   const pathname = usePathname();
+  const { isEnrolled, isPlaced, hasCv, hasActiveApp } = useInternshipStatus();
 
   const role = user?.role;
 
-  // ─── Helper: home URL per role ───────────────────────────────────────────
   const getDashboardHref = useCallback((userRole) => {
     const nRole = Number(userRole);
-    if (nRole === USER_ROLE.SUPER_ADMIN || nRole === USER_ROLE.MODERATOR) return '/admin/dashboard';
+    if (nRole === USER_ROLE.SUPER_ADMIN) return '/admin/dashboard';
     if (nRole === USER_ROLE.SCHOOL_ADMIN) return '/school/home';
     if (
       nRole === USER_ROLE.ENTERPRISE_ADMIN ||
@@ -60,16 +51,14 @@ export default function AppSidebar() {
     return '/';
   }, []);
 
-  // ─── Menu builder ────────────────────────────────────────────────────────
   const getRoutes = useCallback(
     (userRole) => {
       // ══════════════════════════════════════════════════════
-      // CONTEXT 1 — TERM WORKSPACE  /school/terms/[termId]/*
+      // CONTEXT 1 — TERM WORKSPACE
       // ══════════════════════════════════════════════════════
       const termWorkspaceMatch = pathname.match(/^\/school\/terms\/([^/]+)/);
       if (termWorkspaceMatch) {
-        const termId = termWorkspaceMatch[1];
-        const p = `/school/terms/${termId}`;
+        const p = `/school/terms/${termWorkspaceMatch[1]}`;
         return [
           { key: 'back-to-terms', icon: <ArrowLeft className="size-4" />, label: 'Back to Terms' },
           { type: 'divider' },
@@ -80,79 +69,46 @@ export default function AppSidebar() {
       }
 
       // ══════════════════════════════════════════════════════
-      // CONTEXT 2 — PHASE WORKSPACE  /company/phases/[phaseId]/*
+      // CONTEXT — STUDENT PORTAL (AC Logic)
       // ══════════════════════════════════════════════════════
-      const phaseWorkspaceMatch = pathname.match(/^\/company\/phases\/([^/]+)/);
-      if (phaseWorkspaceMatch) {
-        const phaseId = phaseWorkspaceMatch[1];
-        const p = `/company/phases/${phaseId}`;
-        return [
-          {
-            key: 'back-to-phases',
-            icon: <ArrowLeft className="size-4" />,
-            label: 'Back to Phases',
-          },
-          { type: 'divider' },
-          { key: `${p}/overview`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
-          {
-            key: `${p}/applications`,
-            icon: <FileText className="size-4" />,
-            label: 'Applications',
-          },
-          { key: `${p}/groups`, icon: <Briefcase className="size-4" />, label: 'Groups' },
-          { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
-          {
-            key: `${p}/evaluation`,
-            icon: <ClipboardCheck className="size-4" />,
-            label: 'Evaluation',
-          },
-          {
-            key: `${p}/violations`,
-            icon: <AlertOctagon className="size-4" />,
-            label: 'Violations',
-          },
-        ];
-      }
-
-      // ══════════════════════════════════════════════════════
-      // Internship groups list (no group id in URL)
-      // ══════════════════════════════════════════════════════
-      if (pathname === '/internship-groups') {
-        const nRole = Number(userRole);
-        const homeHref =
-          nRole === USER_ROLE.STUDENT || userRole === 'student' ? '/student/home' : '/company/home';
-        return [
-          { key: homeHref, icon: <ArrowLeft className="size-4" />, label: 'Back to dashboard' },
-        ];
-      }
-
-      // ══════════════════════════════════════════════════════
-      // CONTEXT — STUDENT PORTAL  /student/*
-      // (Same Ant Design Sider + Menu chrome as SuperAdmin /admin/*)
-      // ══════════════════════════════════════════════════════
-      if (pathname.startsWith('/student')) {
-        const nRole = Number(userRole);
+      if (pathname.startsWith('/student') || pathname === '/my-applications') {
         const isStudent =
-          nRole === USER_ROLE.STUDENT ||
-          userRole === 'student' ||
-          String(userRole).toLowerCase() === 'student';
+          Number(userRole) === USER_ROLE.STUDENT || String(userRole).toLowerCase() === 'student';
         if (isStudent) {
-          return [
+          const menu = [
             { key: '/student/home', icon: <LayoutDashboard className="size-4" />, label: 'Home' },
-            { key: '/student/jobs', icon: <Briefcase className="size-4" />, label: 'Jobs' },
           ];
+
+          // AC logic: My Applications
+          if (isEnrolled && (hasActiveApp || isPlaced)) {
+            menu.push({
+              key: '/my-applications',
+              icon: <FileText className="size-4" />,
+              label: 'My Applications',
+            });
+          }
+
+          // AC logic: Explore Jobs
+          if (isEnrolled && hasCv && !isPlaced) {
+            menu.push({
+              key: '/student/jobs',
+              icon: <Briefcase className="size-4" />,
+              label: 'Explore Jobs',
+            });
+          }
+
+          return menu;
         }
       }
 
       // ══════════════════════════════════════════════════════
-      // CONTEXT 3 — GROUP WORKSPACE  /internship-groups/[internshipGroupId]/*
+      // CONTEXT 3 — GROUP WORKSPACE
       // ══════════════════════════════════════════════════════
       const groupWorkspaceMatch = pathname.match(/^\/internship-groups\/([^/]+)/);
       if (groupWorkspaceMatch) {
-        const groupId = groupWorkspaceMatch[1];
-        const p = `/internship-groups/${groupId}`;
+        const p = `/internship-groups/${groupWorkspaceMatch[1]}`;
         return [
-          { key: 'back-to-home', icon: <ArrowLeft className="size-4" />, label: 'Back to Groups' },
+          { key: 'back-to-home', icon: <ArrowLeft className="size-4" />, label: 'Back to Home' },
           { type: 'divider' },
           { key: `${p}/space`, icon: <LayoutDashboard className="size-4" />, label: 'Space' },
           { key: `${p}/general-info`, icon: <Info className="size-4" />, label: 'General Info' },
@@ -197,19 +153,8 @@ export default function AppSidebar() {
         ];
       }
 
-      // ══════════════════════════════════════════════════════
-      // CONTEXT 5 — SUPER ADMIN MAIN MENU  /admin/*
-      // (only role that uses sidebar for home navigation)
-      // ══════════════════════════════════════════════════════
       const nRole = Number(userRole);
-      const isSuperAdmin =
-        userRole === 'superadmin' ||
-        userRole === 'super_admin' ||
-        nRole === USER_ROLE.SUPER_ADMIN ||
-        userRole === 'moderator' ||
-        nRole === USER_ROLE.MODERATOR;
-
-      if (isSuperAdmin) {
+      if (nRole === USER_ROLE.SUPER_ADMIN || nRole === USER_ROLE.MODERATOR) {
         return [
           {
             key: '/admin/dashboard',
@@ -230,15 +175,12 @@ export default function AppSidebar() {
         ];
       }
 
-      // Other roles (school/company/student) use TopNav for home — no sidebar here
       return [];
     },
-    [pathname]
+    [pathname, isEnrolled, isPlaced, hasCv, hasActiveApp]
   );
 
   const menuItems = useMemo(() => getRoutes(role), [role, getRoutes]);
-
-  // ─── Selected key detection ───────────────────────────────────────────────
   const selectedKeys = useMemo(() => {
     const active = menuItems.find(
       (item) => item.key && (pathname === item.key || pathname.startsWith(item.key + '/'))
@@ -246,18 +188,13 @@ export default function AppSidebar() {
     return active ? [active.key] : [];
   }, [pathname, menuItems]);
 
-  // ─── onClick handler ─────────────────────────────────────────────────────
   const handleMenuClick = useCallback(
     (info) => {
       if (info.key === 'back-to-app') return router.push(getDashboardHref(role));
       if (info.key === 'back-to-terms') return router.push('/school/terms');
       if (info.key === 'back-to-phases') return router.push('/company/phases');
-      if (info.key === 'back-to-home') {
-        const nRole = Number(role);
-        if (nRole === USER_ROLE.STUDENT || role === 'student') return router.push('/student/home');
-        return router.push('/company/home'); // HR, Mentor
-      }
-      router.push(info.key);
+      if (info.key === 'back-to-home') router.push('/student/home');
+      if (info.key) router.push(info.key);
     },
     [role, router, getDashboardHref]
   );
@@ -267,51 +204,28 @@ export default function AppSidebar() {
       trigger={null}
       collapsible
       collapsed={isSidebarCollapsed}
-      onCollapse={(collapsed) => useLayoutStore.setSidebarCollapsed(collapsed)}
       theme="light"
       width={260}
-      collapsedWidth={80}
-      className="border-r border-gray-100 sticky top-0 h-screen flex flex-col"
+      className="border-r border-gray-100 h-screen sticky top-0"
+      onCollapse={(collapsed) => useLayoutStore.setSidebarCollapsed(collapsed)}
     >
-      {/* LOGO */}
-      <div
-        className={`flex flex-col items-center border-b border-gray-50 transition-all duration-300 ${isSidebarCollapsed ? 'py-4 px-2' : 'py-6 px-8'}`}
-      >
-        {isSidebarCollapsed ? (
-          <div className="relative size-10 m-2 flex items-center justify-center animate-in fade-in zoom-in duration-300">
-            <Image
-              src="/assets/images/logo.png"
-              alt="IOC Mini"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-          </div>
-        ) : (
-          <div className="relative flex h-10 w-32 items-center justify-center overflow-hidden transition-all duration-300">
-            <Image
-              src="/assets/images/logo.svg"
-              alt="IOC Logo"
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
-        )}
-      </div>
-
-      {/* NAVIGATION */}
-      <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-1 scrollbar-none">
-        <Menu
-          mode="inline"
-          theme="light"
-          selectedKeys={selectedKeys}
-          items={menuItems}
-          inlineIndent={12}
-          onClick={handleMenuClick}
-          className="border-none px-1 space-y-0.5 font-semibold"
+      <div className={isSidebarCollapsed ? 'p-4' : 'p-6'}>
+        <Image
+          src={isSidebarCollapsed ? '/assets/images/logo-mini.png' : '/assets/images/logo.svg'}
+          alt="Logo"
+          width={isSidebarCollapsed ? 32 : 120}
+          height={32}
+          className="object-contain"
         />
       </div>
+      <Menu
+        mode="inline"
+        theme="light"
+        selectedKeys={selectedKeys}
+        items={menuItems}
+        onClick={handleMenuClick}
+        className="border-none font-semibold px-2"
+      />
     </Sider>
   );
 }

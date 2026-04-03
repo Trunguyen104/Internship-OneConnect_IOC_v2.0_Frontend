@@ -3,9 +3,9 @@
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import {
-  AlertOctagon,
   Briefcase,
   ChevronDown,
+  FileText,
   FolderGit2,
   GraduationCap,
   Home,
@@ -22,6 +22,16 @@ import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
 import { useToast } from '@/providers/ToastProvider';
+
+const NAV_TABS = [
+  { key: '/company/home', label: 'Home', icon: Home },
+  { key: '/company/phases', label: 'Phases', icon: Layers },
+  { key: '/company/applications', label: 'Applications', icon: FileText },
+  { key: '/company/internships', label: 'Internships', icon: Users },
+  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/universities', label: 'Universities', icon: GraduationCap },
+  { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
+];
 
 export default function CompanyTopNav() {
   const pathname = usePathname();
@@ -122,7 +132,7 @@ export default function CompanyTopNav() {
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="size-4" />
+                  {Icon ? <Icon className="size-4" /> : null}
                   {label}
                 </Link>
               );

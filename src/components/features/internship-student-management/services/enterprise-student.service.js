@@ -11,14 +11,6 @@ export const EnterpriseStudentService = {
       item.StudentTermId ||
       item.id;
 
-    const personId = item.studentId || item.StudentId || item.userId;
-
-    const studentCode = item.studentCode || item.StudentCode || item.code || 'NO_CODE';
-
-    const uniqueId = applicationId || `${personId}-${studentCode}`;
-
-    const studentIdForPayLoad = personId || applicationId;
-
     const phaseId =
       item.phaseId ||
       item.PhaseId ||
@@ -27,6 +19,11 @@ export const EnterpriseStudentService = {
       item.phase?.id ||
       item.termId ||
       item.TermId;
+
+    const personId = item.studentId || item.StudentId || item.userId;
+    const studentCode = item.studentCode || item.StudentCode || item.code || 'NO_CODE';
+    const uniqueId = applicationId || `${personId}-${studentCode}-${phaseId}`;
+    const studentIdForPayLoad = personId || applicationId;
 
     let rawStatus = item.status !== undefined ? item.status : item.Status;
     if (typeof rawStatus === 'string') {

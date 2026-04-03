@@ -20,11 +20,11 @@ export const useStudentData = (filters) => {
         const res = await userService.getMe();
         const data = res?.data || res;
         return data?.enterpriseId || data?.enterprise_id || data?.enterpriseID;
-      } catch (err) {
+      } catch {
         return null;
       }
     },
-    staleTime: Infinity,
+    staleTime: 0, // Always check user identity on mount
   });
 
   // 2. Fetch Mentors
@@ -50,7 +50,7 @@ export const useStudentData = (filters) => {
         ).filter(Boolean);
 
         return uniqueItems;
-      } catch (err) {
+      } catch {
         toast.error('Không thể tải danh sách Mentor');
         return [];
       }
@@ -100,7 +100,7 @@ export const useStudentData = (filters) => {
             options: [allOption, ...options],
             universityOptions: uniqueUniversities.map((name) => ({ label: name, value: name })),
           };
-        } catch (err) {
+        } catch {
           return { options: [], universityOptions: [] };
         }
       },
@@ -163,7 +163,7 @@ export const useStudentData = (filters) => {
         let totalCount = res?.data?.totalCount || res?.totalCount || items.length;
 
         const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
-        let mappedStudents = (items || []).map((item) => {
+        const rawMappedStudents = (items || []).map((item) => {
           const mapped = EnterpriseStudentService.mapApplication(item);
           if (mapped.phaseStatus === 0 || mapped.phaseStatus === undefined) {
             const studentPhase = safePhaseOptions.find((o) => o.value === mapped.phaseId);
@@ -176,6 +176,9 @@ export const useStudentData = (filters) => {
           }
           return mapped;
         });
+
+        // Unique deduplication by ID (uniqueId)
+        let mappedStudents = Array.from(new Map(rawMappedStudents.map((s) => [s.id, s])).values());
 
         // Client-side filtering as fallback for Backend inconsistencies
         if (groupFilter === 'HAS_GROUP') {
@@ -243,7 +246,7 @@ export const useStudentData = (filters) => {
           existingGroups: allGroups,
           hasGroups: allGroups.some((g) => g.status === 1),
         };
-      } catch (err) {
+      } catch {
         return { students: [], total: 0, unassigned: [], existingGroups: [], hasGroups: false };
       }
     },

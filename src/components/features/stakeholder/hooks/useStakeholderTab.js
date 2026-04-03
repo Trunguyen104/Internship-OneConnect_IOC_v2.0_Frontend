@@ -33,7 +33,7 @@ export function useStakeholderTab() {
           };
         }
         return null;
-      } catch (_err) {
+      } catch {
         toast.error(STAKEHOLDER_MESSAGES.PROJECT_NOT_FOUND);
         return null;
       }
@@ -65,7 +65,7 @@ export function useStakeholderTab() {
           total: res?.data?.totalCount || 0,
           totalPages: res?.data?.totalPages || 1,
         };
-      } catch (_err) {
+      } catch {
         toast.error(STAKEHOLDER_MESSAGES.LOAD_FAILED);
         return { items: [], total: 0, totalPages: 1 };
       }

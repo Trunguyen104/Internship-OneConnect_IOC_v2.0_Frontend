@@ -1,11 +1,13 @@
 'use client';
 
 import {
+  FileTextOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -26,6 +28,7 @@ export default function Header() {
   const groupId = params?.groupId || params?.internshipGroupId;
   const toast = useToast();
   const { isSidebarCollapsed } = useLayoutStore();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -44,6 +47,7 @@ export default function Header() {
     try {
       await logout();
       clearAuth();
+      queryClient.clear();
       toast.success('Logout successfully');
     } finally {
       router.refresh();
@@ -66,6 +70,7 @@ export default function Header() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
@@ -75,6 +80,8 @@ export default function Header() {
         const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
         router.push(`/profile${query}`);
       }
+      if (key === 'my-applications') router.push('/my-applications');
+      if (key === 'settings') router.push('/settings');
 
       if (key === 'logout') handleLogout();
     },

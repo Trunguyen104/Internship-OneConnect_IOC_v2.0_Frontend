@@ -53,8 +53,8 @@ const enterpriseMenu = [
 
   {
     icon: <SolutionOutlined />,
-    label: 'Application',
-    href: '/applications',
+    label: 'Applications',
+    href: '/company/applications',
   },
   {
     icon: <SolutionOutlined />,

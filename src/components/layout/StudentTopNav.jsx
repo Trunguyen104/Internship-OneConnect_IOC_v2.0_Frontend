@@ -1,48 +1,55 @@
 'use client';
 
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { FileTextOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
 import { Briefcase, ChevronDown, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { clearAuth } from '@/components/features/auth/lib/auth-storage';
 import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { useInternshipStatus } from '@/hooks/useInternshipStatus';
 import { useToast } from '@/providers/ToastProvider';
-
-const NAV_TABS = [
-  { key: '/student/home', label: 'Home', icon: Home },
-  { key: '/student/jobs', label: 'Jobs', icon: Briefcase },
-];
 
 export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const toast = useToast();
-  const [userInfo, setUserInfo] = useState(null);
+  const queryClient = useQueryClient();
+  const { isEnrolled, isPlaced, hasCv } = useInternshipStatus();
 
-  useEffect(() => {
-    userService
-      .getMe()
-      .then((res) => setUserInfo(res?.data || res))
-      .catch((err) => {
-        if (err?.status !== 401) console.error(err);
-      });
-  }, []);
+  const { data: userInfo } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => userService.getMe().then((res) => res?.data || res),
+    staleTime: 0, // Always verify user identity on mount
+  });
 
   const handleLogout = async () => {
     try {
       await logout();
       clearAuth();
+      queryClient.clear(); // Clear all cached data to prevent cross-user leak
       toast.success('Logout successfully');
     } finally {
       router.push('/login');
     }
   };
+
+  const navTabs = useMemo(() => {
+    const tabs = [{ key: '/student/home', label: 'Home', icon: Home }];
+
+    // AC Logic: Explore Jobs visible if Enrolled AND has CV AND NOT placed
+    if (isEnrolled && hasCv && !isPlaced) {
+      tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
+    }
+
+    return tabs;
+  }, [isEnrolled, isPlaced, hasCv]);
 
   const avatarMenu = {
     items: [
@@ -51,7 +58,7 @@ export default function StudentTopNav() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Sinh viên'}
+              {userInfo?.fullName || userInfo?.FullName || 'Student'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>
@@ -60,32 +67,32 @@ export default function StudentTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
+      if (key === 'my-applications') router.push('/my-applications');
       if (key === 'logout') handleLogout();
     },
   };
 
   return (
     <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
-      {/* LEFT — Logo */}
       <div className="flex items-center gap-8">
         <Link href="/student/home" className="relative flex h-8 w-28 items-center cursor-pointer">
           <Image
             src="/assets/images/logo.svg"
-            alt="IOC Logo"
+            alt="Logo"
             fill
             className="object-contain"
             priority
           />
         </Link>
 
-        {/* TAB NAV */}
         <nav className="flex items-center gap-1">
-          {NAV_TABS.map(({ key, label, icon: Icon }) => {
+          {navTabs.map(({ key, label, icon: Icon }) => {
             const isActive = pathname === key || pathname.startsWith(key + '/');
             return (
               <Link
@@ -105,7 +112,6 @@ export default function StudentTopNav() {
         </nav>
       </div>
 
-      {/* RIGHT — Notifications + Avatar */}
       <div className="flex items-center gap-3">
         <NotificationBell />
         <Dropdown
@@ -115,16 +121,11 @@ export default function StudentTopNav() {
           classNames={{ root: 'min-w-[180px]' }}
         >
           <div className="flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white p-1 pr-3 transition-all hover:bg-slate-50">
-            <Avatar
-              size={28}
-              src={userInfo?.avatarUrl || userInfo?.AvatarUrl}
-              icon={<UserOutlined />}
-            >
-              {!(userInfo?.avatarUrl || userInfo?.AvatarUrl) &&
-                (userInfo?.fullName || userInfo?.FullName || 'S').charAt(0).toUpperCase()}
+            <Avatar size={28} src={userInfo?.avatarUrl} icon={<UserOutlined />}>
+              {!userInfo?.avatarUrl && (userInfo?.fullName || 'S').charAt(0).toUpperCase()}
             </Avatar>
             <span className="hidden text-sm font-semibold text-slate-700 md:block">
-              {(userInfo?.fullName || userInfo?.FullName || 'S').split(' ').pop()}
+              {(userInfo?.fullName || 'Student').split(' ').pop()}
             </span>
             <ChevronDown className="h-4 w-4 text-slate-400" />
           </div>
