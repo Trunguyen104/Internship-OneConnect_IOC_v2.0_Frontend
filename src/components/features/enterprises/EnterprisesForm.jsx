@@ -200,7 +200,17 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
               <Input size="large" placeholder={UI_TEXT.ENTERPRISES.INDUSTRY_PLACEHOLDER} />
             </Form.Item>
 
-            <Form.Item name="taxCode" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.TAX_CODE}>
+            <Form.Item
+              name="taxCode"
+              label={ENTERPRISE_PROFILE_UI.ENTERPRISE.TAX_CODE}
+              rules={[
+                { required: true, message: UI_TEXT.ENTERPRISES.TAX_CODE_REQUIRED },
+                {
+                  pattern: /^\d{10}$|^\d{10}-\d{3}$|^\d{10}-\d{2}-\d{3}$/,
+                  message: UI_TEXT.ENTERPRISES.TAX_CODE_INVALID,
+                },
+              ]}
+            >
               <Input size="large" placeholder={UI_TEXT.ENTERPRISES.TAX_CODE_PLACEHOLDER} />
             </Form.Item>
 

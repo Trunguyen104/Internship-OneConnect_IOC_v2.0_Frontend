@@ -195,6 +195,8 @@ export const UI_TEXT = {
     WEBSITE_PLACEHOLDER: 'Website',
     INDUSTRY_PLACEHOLDER: 'Industry',
     TAX_CODE_PLACEHOLDER: 'Tax Code',
+    TAX_CODE_REQUIRED: 'Tax Code is required',
+    TAX_CODE_INVALID: 'Invalid Tax Code format (e.g. 10 digits or 10 digits followed by suffix)',
     ADDRESS_PLACEHOLDER: 'Address',
     OVERVIEW_PLACEHOLDER: 'Company Overview',
   },

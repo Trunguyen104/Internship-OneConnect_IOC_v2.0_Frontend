@@ -19,28 +19,28 @@ export default function QuickActions() {
       description: DASHBOARD.DESC_ADD_UNI,
       icon: GraduationCap,
       color: 'bg-emerald-500',
-      href: '/super-admin/universities',
+      href: '/admin/universities',
     },
     {
       label: DASHBOARD.ACTION_ADD_ENT,
       description: DASHBOARD.DESC_ADD_ENT,
       icon: Building2,
       color: 'bg-violet-500',
-      href: '/super-admin/enterprises',
+      href: '/admin/enterprises',
     },
     {
       label: DASHBOARD.ACTION_MANAGE_USERS,
       description: DASHBOARD.DESC_MANAGE_USERS,
       icon: Users,
       color: 'bg-blue-500',
-      href: '/super-admin/users',
+      href: '/admin/users',
     },
     {
       label: DASHBOARD.ACTION_VIEW_REPORTS,
       description: DASHBOARD.DESC_VIEW_REPORTS,
       icon: TrendingUp,
       color: 'bg-rose-500',
-      href: '/super-admin/dashboard',
+      href: '/admin/dashboard',
     },
   ];
 

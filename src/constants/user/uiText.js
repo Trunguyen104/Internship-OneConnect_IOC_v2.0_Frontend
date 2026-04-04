@@ -37,6 +37,7 @@ export const PROFILE_UI = {
   PLACEHOLDERS: {
     PHONE: 'Enter your phone number',
     ADDRESS: 'House number, street name, district, city/province',
+    PASSWORD: '••••••••',
   },
   LABELS: {
     FULL_NAME: 'Full Name',

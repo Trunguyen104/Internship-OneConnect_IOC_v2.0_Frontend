@@ -42,23 +42,31 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
   }
 
   const roleValue = userInfo?.role ?? userInfo?.Role;
+  const roleStr = String(roleValue).toLowerCase();
+
   const isStudent = [USER_ROLE.STUDENT, String(USER_ROLE.STUDENT), '7', 'student'].includes(
-    String(roleValue).toLowerCase()
+    roleStr
   );
 
   const isProfessional =
     [USER_ROLE.MENTOR, USER_ROLE.HR, USER_ROLE.ENTERPRISE_ADMIN, 6, 5, 4].includes(roleValue) ||
-    ['mentor', 'hr', 'enterpriseadmin'].includes(String(roleValue).toLowerCase());
+    ['mentor', 'hr', 'enterpriseadmin'].includes(roleStr);
 
   const isSchoolAdmin =
-    roleValue === USER_ROLE.SCHOOL_ADMIN ||
-    3 === roleValue ||
-    String(roleValue).toLowerCase() === 'schooladmin';
+    roleValue === USER_ROLE.SCHOOL_ADMIN || 3 === roleValue || roleStr === 'schooladmin';
+
+  const isInternal =
+    roleValue === USER_ROLE.SUPER_ADMIN ||
+    roleValue === USER_ROLE.MODERATOR ||
+    roleStr === 'superadmin' ||
+    roleStr === 'moderator' ||
+    1 === roleValue ||
+    2 === roleValue;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       {/* Main Column: Personal Details */}
-      <div className="space-y-6 lg:col-span-8">
+      <div className={`space-y-6 ${isInternal ? 'lg:col-span-12' : 'lg:col-span-8'}`}>
         <Card className="rounded-2xl border-none shadow-sm overflow-hidden h-full">
           <Card.Content className="p-8">
             <SectionTitle icon={User}>{PROFILE_UI.PERSONAL_INFO}</SectionTitle>
@@ -110,6 +118,15 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
                 icon={MapPin}
               />
 
+              {/* For Internal roles, put User Code here */}
+              {isInternal && (
+                <InfoItem
+                  label={PROFILE_UI.LABELS.USER_CODE}
+                  value={userInfo?.userCode || userInfo?.UserCode || PROFILE_UI.EMPTY.NOT_AVAILABLE}
+                  icon={ShieldCheck}
+                />
+              )}
+
               {/* Portfolio & CV Unified Style */}
               {isStudent && (
                 <>
@@ -151,36 +168,26 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
             </div>
           </Card.Content>
         </Card>
-
-        {/* Bio for Professional Roles */}
-        {(isProfessional || isSchoolAdmin) && (
-          <Card className="rounded-2xl border-none shadow-sm overflow-hidden">
-            <Card.Content className="p-8">
-              <SectionTitle icon={User}>{PROFILE_UI.LABELS.BIO}</SectionTitle>
-              <p className="text-sm leading-relaxed text-slate-600 font-medium bg-slate-50/50 p-6 rounded-xl border border-slate-100 italic">
-                {userInfo?.bio || userInfo?.Bio || PROFILE_UI.EMPTY.NO_DATA}
-              </p>
-            </Card.Content>
-          </Card>
-        )}
       </div>
 
-      {/* Side Column: Work/Study Info */}
-      <div className="space-y-6 lg:col-span-4">
-        <Card className="rounded-2xl border-none shadow-sm overflow-hidden h-full">
-          <Card.Content className="p-8">
-            <SectionTitle icon={Building2}>
-              {isStudent ? PROFILE_UI.LABELS.UNIVERSITY : PROFILE_UI.LABELS.ENTERPRISE}
-            </SectionTitle>
+      {/* Side Column: Only for non-internal roles */}
+      {!isInternal && (
+        <div className="space-y-6 lg:col-span-4">
+          <Card className="rounded-2xl border-none shadow-sm overflow-hidden h-full">
+            <Card.Content className="p-8">
+              <SectionTitle icon={Building2}>
+                {isStudent || isSchoolAdmin
+                  ? PROFILE_UI.LABELS.UNIVERSITY
+                  : PROFILE_UI.LABELS.ENTERPRISE}
+              </SectionTitle>
 
-            <div className="space-y-8">
-              <InfoItem
-                label={isStudent ? PROFILE_UI.LABELS.STUDENT_CODE : PROFILE_UI.LABELS.USER_CODE}
-                value={userInfo?.userCode || userInfo?.UserCode || PROFILE_UI.EMPTY.NOT_AVAILABLE}
-                icon={ShieldCheck}
-              />
+              <div className="space-y-8">
+                <InfoItem
+                  label={isStudent ? PROFILE_UI.LABELS.STUDENT_CODE : PROFILE_UI.LABELS.USER_CODE}
+                  value={userInfo?.userCode || userInfo?.UserCode || PROFILE_UI.EMPTY.NOT_AVAILABLE}
+                  icon={ShieldCheck}
+                />
 
-              {!['superadmin', 'moderator'].includes(String(roleValue).toLowerCase()) && (
                 <InfoItem
                   label={
                     isProfessional ? PROFILE_UI.LABELS.ENTERPRISE : PROFILE_UI.LABELS.UNIVERSITY
@@ -188,36 +195,38 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
                   value={userInfo?.unitName || userInfo?.UnitName || PROFILE_UI.EMPTY.NOT_AVAILABLE}
                   icon={Building2}
                 />
-              )}
 
-              {isStudent && (
-                <>
+                {isStudent && (
+                  <>
+                    <InfoItem
+                      label={PROFILE_UI.LABELS.MAJOR}
+                      value={userInfo?.major || userInfo?.Major || PROFILE_UI.EMPTY.NOT_AVAILABLE}
+                      icon={GraduationCap}
+                    />
+                    <InfoItem
+                      label={PROFILE_UI.LABELS.CLASS}
+                      value={
+                        userInfo?.className || userInfo?.ClassName || PROFILE_UI.EMPTY.NOT_AVAILABLE
+                      }
+                      icon={GraduationCap}
+                    />
+                  </>
+                )}
+
+                {(isProfessional || isSchoolAdmin) && (
                   <InfoItem
-                    label={PROFILE_UI.LABELS.MAJOR}
-                    value={userInfo?.major || userInfo?.Major || PROFILE_UI.EMPTY.NOT_AVAILABLE}
-                    icon={GraduationCap}
-                  />
-                  <InfoItem
-                    label={PROFILE_UI.LABELS.CLASS}
+                    label={PROFILE_UI.LABELS.POSITION}
                     value={
-                      userInfo?.className || userInfo?.ClassName || PROFILE_UI.EMPTY.NOT_AVAILABLE
+                      userInfo?.position || userInfo?.Position || PROFILE_UI.EMPTY.NOT_AVAILABLE
                     }
-                    icon={GraduationCap}
+                    icon={User}
                   />
-                </>
-              )}
-
-              {(isProfessional || isSchoolAdmin) && (
-                <InfoItem
-                  label={PROFILE_UI.LABELS.POSITION}
-                  value={userInfo?.position || userInfo?.Position || PROFILE_UI.EMPTY.NOT_AVAILABLE}
-                  icon={ShieldCheck}
-                />
-              )}
-            </div>
-          </Card.Content>
-        </Card>
-      </div>
+                )}
+              </div>
+            </Card.Content>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

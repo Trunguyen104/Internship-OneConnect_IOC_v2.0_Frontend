@@ -41,7 +41,7 @@ function ResetPasswordDrawer({ open, userId, email, onClose }) {
       useAdminUsersStore.increment();
       onClose();
     } catch (err) {
-      toast.error(err?.message || UI_TEXT.USER_MANAGEMENT.RESET_FAILED);
+      toast.error(err?.data?.message || err?.message || UI_TEXT.USER_MANAGEMENT.RESET_FAILED);
     } finally {
       setBusy(false);
     }
@@ -131,7 +131,7 @@ function DeleteModal({ open, userId, label, onClose }) {
       useAdminUsersStore.increment();
       onClose();
     } catch (err) {
-      toast.error(err?.message || UI_TEXT.COMMON.ERROR);
+      toast.error(err?.data?.message || err?.message || UI_TEXT.COMMON.ERROR);
     } finally {
       setBusy(false);
     }

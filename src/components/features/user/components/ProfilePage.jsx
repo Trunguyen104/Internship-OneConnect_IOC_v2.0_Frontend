@@ -12,17 +12,18 @@ import ProfileEditModal from './ProfileEditModal';
 import ProfileHeader from './ProfileHeader';
 
 export default function ProfilePage() {
-  const { userInfo, loadingUser, avatarUrl, setAvatarUrl, updateProfile } = useProfile();
+  const {
+    userInfo,
+    loadingUser,
+    avatarUrl,
+    setAvatarUrl,
+    updateProfile,
+    updatingProfile,
+    handleDownloadCV,
+  } = useProfile();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isChangePassOpen, setIsChangePassOpen] = useState(false);
-
-  const handleDownloadCV = () => {
-    const cvUrl = userInfo?.cvUrl || userInfo?.CvUrl;
-    if (cvUrl) {
-      window.open(cvUrl, '_blank');
-    }
-  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -48,6 +49,8 @@ export default function ProfilePage() {
         onCancel={() => setIsEditModalOpen(false)}
         userInfo={userInfo}
         onSave={updateProfile}
+        loading={updatingProfile}
+        onDownloadCV={handleDownloadCV}
       />
 
       {/* Modal: Change Password */}
