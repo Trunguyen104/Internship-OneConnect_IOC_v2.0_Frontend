@@ -152,7 +152,10 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         TITLE_ASSIGN: 'Assign Mentor',
         TITLE_CHANGE: 'Change Mentor',
         MENTOR_LABEL: 'Select Mentor',
+        SELECT_NEW_MENTOR: 'Select New Mentor',
         MENTOR_REQUIRED: 'Please select a mentor',
+        MENTOR_PLACEHOLDER: 'Search by name or email...',
+        NO_MENTORS_AVAILABLE: 'No mentors available',
         PROJECT_LABEL: 'Assign Project',
         PROJECT_REQUIRED: 'Please enter the project name',
         REASON_LABEL: 'Reason for change',
@@ -161,6 +164,17 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         GROUP_LABEL: 'Group:',
         CANCEL: 'Cancel',
         CONFIRM: 'Confirm',
+        CONFIRM_CHANGE: 'Confirm Change',
+        MANAGING_PREFIX: 'Managing',
+        GROUPS_SUFFIX: 'groups',
+        TARGET_GROUP: 'Target Group',
+        REPLACEMENT_WARNING: 'Replacement Warning',
+        REPLACEMENT_CONTENT:
+          'The old mentor will lose access to this group. Existing projects, evaluations, and violations created will remain — ownership will be transferred to the new mentor.',
+        FETCHING_MENTORS: 'Fetching mentors...',
+        NO_MENTORS_FOUND: 'No active mentors found',
+        NO_MENTORS_ERROR:
+          "* The enterprise doesn't have any active mentors. Please add at least one mentor to the system first.",
       },
       VIEW: {
         TITLE: 'Group Details:',

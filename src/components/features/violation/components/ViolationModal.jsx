@@ -88,6 +88,7 @@ const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {
         confirmText={FORM.CLOSE}
         showConfirm={true}
         showCancel={false}
+        className="mt-[-20px]"
       />
     </>
   );

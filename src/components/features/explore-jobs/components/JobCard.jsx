@@ -16,7 +16,7 @@ export default function JobCard({ job, onClick, eligibility }) {
         {/* Status Tag - AC-01 Requirement */}
         <div className="absolute top-0 right-0 z-20">
           <div
-            className={`${job.status === 2 ? 'bg-danger' : 'bg-success'} text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl shadow-sm`}
+            className={`${job.status === 2 ? 'bg-danger shadow-danger/20' : 'bg-success shadow-success/20'} text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-bl-xl shadow-sm`}
           >
             {job.statusLabel}
           </div>
@@ -90,10 +90,14 @@ export default function JobCard({ job, onClick, eligibility }) {
                   className={`w-full py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all duration-300 shadow-sm active:scale-95 ${
                     eligibility?.eligible
                       ? 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white'
-                      : 'bg-muted/10 text-muted border border-border/40 cursor-not-allowed grayscale'
+                      : eligibility?.reason === EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS
+                        ? 'bg-success/10 text-success border border-success/20 cursor-default'
+                        : 'bg-muted/10 text-muted border border-border/40 cursor-not-allowed grayscale'
                   }`}
                 >
-                  {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLY_NOW}
+                  {eligibility?.reason === EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS
+                    ? EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLIED
+                    : EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLY_NOW}
                 </button>
               </div>
             </Tooltip>

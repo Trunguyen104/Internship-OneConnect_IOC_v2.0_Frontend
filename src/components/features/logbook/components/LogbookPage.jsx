@@ -156,7 +156,12 @@ export default function LogbookPage() {
     try {
       setSubmitting(true);
       const res = await LogBookService.getById(record.logbookId);
-      setViewRecord(res?.data || record);
+      const detailData = res?.data || {};
+      setViewRecord({
+        ...record,
+        ...detailData,
+        dateReport: detailData.dateReport || record.dateReport,
+      });
       setIsDetailModalOpen(true);
     } catch {
       setViewRecord(record);
@@ -200,9 +205,8 @@ export default function LogbookPage() {
               rootClassName="premium-select"
               suffixIcon={<FilterOutlined className="text-primary" />}
               options={[
-                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+                { value: 4, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 5, label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
             />
           }

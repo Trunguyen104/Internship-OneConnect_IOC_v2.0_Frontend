@@ -151,7 +151,7 @@ export default function AppSidebar() {
           {
             key: `${p}/daily-report`,
             icon: <CalendarCheck className="size-4" />,
-            label: 'Daily Report',
+            label: 'Logbook',
           },
           {
             key: `${p}/evaluate`,

@@ -13,12 +13,10 @@ import NotificationBell from '@/components/features/notifications/components/Not
 import { userService } from '@/components/features/user/services/user.service';
 import { useInternshipStatus } from '@/hooks/useInternshipStatus';
 import { useLogout } from '@/hooks/useLogout';
-import { useToast } from '@/providers/ToastProvider';
 
 export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const { logout: handleLogout } = useLogout();
   const { isEnrolled, isPlaced, hasCv } = useInternshipStatus();
 
@@ -31,10 +29,7 @@ export default function StudentTopNav() {
   const navTabs = useMemo(() => {
     const tabs = [{ key: '/student/home', label: 'Home', icon: Home }];
 
-    // AC Logic: Explore Jobs visible if Enrolled AND has CV AND NOT placed
-    if (isEnrolled && hasCv && !isPlaced) {
-      tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
-    }
+    tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
 
     return tabs;
   }, [isEnrolled, isPlaced, hasCv]);

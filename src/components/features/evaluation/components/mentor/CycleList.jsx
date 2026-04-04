@@ -8,9 +8,9 @@ import {
 } from '@ant-design/icons';
 import React, { useState } from 'react';
 
-import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown from '@/components/ui/TableRowActions';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
@@ -63,20 +63,13 @@ export default function CycleList({
       width: '140px',
       render: (status) => {
         const labels = [STATUS.UPCOMING, STATUS.ONGOING, STATUS.COMPLETED];
-        const variants = ['secondary', 'primary', 'success'];
-        const colors = [
-          'bg-blue-50 text-blue-600 border-blue-100',
-          'bg-rose-50 text-rose-600 border-rose-100',
-          'bg-emerald-50 text-emerald-600 border-emerald-100',
-        ];
+        const variants = ['info', 'primary', 'success'];
 
         return (
-          <Badge
-            variant={variants[status]}
-            className={`rounded-full px-4 h-6 text-[10px] font-black uppercase tracking-[0.15em] border ${colors[status] || 'bg-gray-50 text-gray-500 border-gray-100'}`}
-          >
-            {labels[status] || STATUS.UNKNOWN}
-          </Badge>
+          <StatusBadge
+            variant={variants[status] || 'neutral'}
+            label={labels[status] || STATUS.UNKNOWN}
+          />
         );
       },
     },

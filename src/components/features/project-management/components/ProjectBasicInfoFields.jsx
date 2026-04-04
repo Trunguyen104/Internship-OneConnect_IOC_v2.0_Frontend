@@ -25,7 +25,7 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
             label={FORM.LABEL?.CODE}
             rules={[{ required: true, message: FORM.VALIDATION?.CODE_REQUIRED }]}
           >
-            <Input placeholder={FORM.PLACEHOLDER?.CODE} />
+            <Input placeholder={FORM.PLACEHOLDER?.CODE} disabled />
           </Form.Item>
         </Col>
       </Row>

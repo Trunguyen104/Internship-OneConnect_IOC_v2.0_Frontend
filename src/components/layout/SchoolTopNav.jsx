@@ -2,7 +2,7 @@
 
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Activity, Building2, CalendarDays, ChevronDown, Home } from 'lucide-react';
+import { Activity, Building2, CalendarDays, ChevronDown, ClipboardCheck, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -11,11 +11,11 @@ import { useEffect, useState } from 'react';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
 import { useLogout } from '@/hooks/useLogout';
-import { useToast } from '@/providers/ToastProvider';
 
 const NAV_TABS = [
   { key: '/school/home', label: 'Home', icon: Home },
   { key: '/school/terms', label: 'Terms', icon: CalendarDays },
+  { key: '/school/placements', label: 'Placements', icon: ClipboardCheck },
   { key: '/school/activity', label: 'Activity', icon: Activity },
   { key: '/school/enterprises', label: 'Enterprises', icon: Building2 },
 ];
@@ -23,7 +23,6 @@ const NAV_TABS = [
 export default function SchoolTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {

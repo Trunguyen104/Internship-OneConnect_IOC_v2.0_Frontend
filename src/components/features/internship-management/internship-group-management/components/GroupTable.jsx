@@ -10,8 +10,8 @@ import {
 import dayjs from 'dayjs';
 import React, { memo, useMemo } from 'react';
 
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown from '@/components/ui/TableRowActions';
 import {
   GROUP_STATUS_VARIANTS,
@@ -84,15 +84,42 @@ const GroupTable = memo(function GroupTable({
       {
         title: TABLE.COLUMNS.MENTOR,
         key: 'mentorName',
-        width: 160,
+        width: 180,
         render: (_, record) => {
           const name = record.mentorName;
-          return name && name !== '-' ? (
-            <div className="flex items-center gap-1.5 overflow-hidden">
-              <span className={`${TABLE_CELL.primary} truncate text-xs font-bold`}>{name}</span>
+          const isActive = record.status === 1;
+          const hasMentor = name && name !== '-';
+
+          if (!hasMentor && isActive && isPhaseEditable) {
+            return (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAssign({ open: true, group: record });
+                }}
+                className="flex items-center gap-1 text-primary hover:text-primary-hover font-extrabold text-[10px] uppercase tracking-wider transition-all hover:scale-105"
+              >
+                <UserOutlined className="text-xs" />
+                {INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.CARD.ASSIGN_MENTOR}
+              </button>
+            );
+          }
+
+          return hasMentor ? (
+            <div className="flex flex-col group/mentor cursor-default">
+              <span
+                className={`${TABLE_CELL.primary} truncate text-xs font-extrabold text-slate-700`}
+              >
+                {name}
+              </span>
+              {record.mentorEmail && (
+                <span className="text-[9px] text-slate-400 font-bold truncate opacity-0 group-hover/mentor:opacity-100 transition-opacity">
+                  {record.mentorEmail}
+                </span>
+              )}
             </div>
           ) : (
-            <span className="text-muted text-[10px] font-medium tracking-wider uppercase italic opacity-40">
+            <span className="text-muted text-[10px] font-bold tracking-wider uppercase italic opacity-30">
               {TABLE.NOT_ASSIGNED}
             </span>
           );
@@ -101,7 +128,7 @@ const GroupTable = memo(function GroupTable({
       {
         title: TABLE.COLUMNS.MEMBERS,
         key: 'members',
-        width: 120,
+        width: 100,
         align: 'center',
         render: (_, record) => (
           <div className="flex items-center justify-center gap-2">
@@ -117,15 +144,11 @@ const GroupTable = memo(function GroupTable({
         width: 110,
         align: 'center',
         render: (status) => {
-          const variant = GROUP_STATUS_VARIANTS[status] || 'default';
+          const variant = GROUP_STATUS_VARIANTS[status] || 'neutral';
           const label =
             INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT.STATUS.LABELS[status] || status || '-';
 
-          return (
-            <Badge variant={variant} size="sm">
-              {label}
-            </Badge>
-          );
+          return <StatusBadge variant={variant} label={label} />;
         },
       },
       {
@@ -134,9 +157,9 @@ const GroupTable = memo(function GroupTable({
         width: 60,
         align: 'center',
         render: (_, record) => {
-          const isArchived = record.status === 3;
           const isActive = record.status === 1;
           const { ACTIONS } = INTERNSHIP_MANAGEMENT_UI.GROUP_MANAGEMENT;
+          const hasMentor = record.mentorName && record.mentorName !== '-';
 
           const items = [
             {
@@ -147,6 +170,13 @@ const GroupTable = memo(function GroupTable({
             },
             ...(isActive && isPhaseEditable
               ? [
+                  {
+                    key: 'assign-mentor',
+                    label: hasMentor ? 'Change Mentor' : 'Assign Mentor',
+                    icon: <UserOutlined />,
+                    onClick: () => onAssign({ open: true, group: record }),
+                  },
+                  { type: 'divider' },
                   {
                     key: 'edit',
                     label: ACTIONS.EDIT_GROUP,

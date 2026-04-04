@@ -1,5 +1,5 @@
 export const DAILY_REPORT_UI = {
-  TITLE: 'Daily Report',
+  TITLE: 'Logbook',
   DESCRIPTION: 'Manage and submit your daily internship logbook',
 
   CREATE_BUTTON: 'Create Report',

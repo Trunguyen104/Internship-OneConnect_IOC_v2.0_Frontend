@@ -26,6 +26,7 @@ export default function ProjectAssignGroupModal({
       onOk={onConfirm}
       onCancel={onCancel}
       confirmLoading={loading}
+      centered
       zIndex={2000}
       okButtonProps={{
         disabled: !canConfirm,

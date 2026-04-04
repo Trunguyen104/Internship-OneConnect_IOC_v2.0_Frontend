@@ -1,11 +1,11 @@
 import { BlockOutlined, InfoCircleOutlined, ProjectOutlined } from '@ant-design/icons';
 import React from 'react';
 
-import StatusBadge from '@/components/ui/badge';
 import Card from '@/components/ui/card';
+import StatusBadge from '@/components/ui/status-badge';
 import { GROUP_STATUS_VARIANTS } from '@/constants/internship-management/internship-management';
 
-export const GroupDetailOverview = ({ info, VIEW, GROUP_MANAGEMENT }) => {
+export const GroupDetailOverview = ({ info, VIEW, GROUP_MANAGEMENT, onAssignMentor }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Detail Column (Left) */}
@@ -37,9 +37,10 @@ export const GroupDetailOverview = ({ info, VIEW, GROUP_MANAGEMENT }) => {
                 {VIEW.STATUS}
               </span>
               <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm min-h-[44px] flex items-center">
-                <StatusBadge variant={GROUP_STATUS_VARIANTS[info.status] || 'default'} size="sm">
-                  {GROUP_MANAGEMENT.STATUS.LABELS[info.status] || info.status || '-'}
-                </StatusBadge>
+                <StatusBadge
+                  variant={GROUP_STATUS_VARIANTS[info.status] || 'neutral'}
+                  label={GROUP_MANAGEMENT.STATUS.LABELS[info.status] || info.status || '-'}
+                />
               </div>
             </div>
 
@@ -47,15 +48,24 @@ export const GroupDetailOverview = ({ info, VIEW, GROUP_MANAGEMENT }) => {
               <span className="text-muted/60 text-[10px] font-bold uppercase tracking-widest ml-1">
                 {VIEW.MENTOR}
               </span>
-              <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-bold text-text shadow-sm min-h-[44px] flex items-center">
-                <div className="flex flex-col">
-                  <span>{info.mentorName || VIEW.NOT_ASSIGNED}</span>
+              <div className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-sm font-bold text-text shadow-sm min-h-[44px] flex items-center justify-between group">
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate">{info.mentorName || VIEW.NOT_ASSIGNED}</span>
                   {info.mentorEmail && (
-                    <span className="text-[10px] text-muted/60 font-medium">
+                    <span className="text-[10px] text-muted/60 font-medium truncate">
                       {info.mentorEmail}
                     </span>
                   )}
                 </div>
+
+                {info.status === 1 && (
+                  <button
+                    onClick={() => onAssignMentor && onAssignMentor({ open: true, group: info })}
+                    className="ml-2 flex h-7 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 px-3 text-[10px] font-extrabold uppercase tracking-wider text-primary shadow-sm hover:bg-primary hover:text-white hover:border-primary transition-all active:scale-95 cursor-pointer"
+                  >
+                    {info.mentorName && info.mentorName !== '-' ? 'Change' : 'Assign'}
+                  </button>
+                )}
               </div>
             </div>
 
