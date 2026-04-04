@@ -34,7 +34,7 @@ export function ToastProvider({ children }) {
       const desc = isObject ? undefined : description;
 
       return notificationApi?.success({
-        message: title,
+        title: title,
         description: desc,
         showProgress: true,
         duration: 5,
@@ -50,7 +50,7 @@ export function ToastProvider({ children }) {
       const desc = isObject ? undefined : description;
 
       return notificationApi?.error({
-        message: title,
+        title: title,
         description: desc,
         showProgress: true,
         ...opt,
@@ -65,7 +65,7 @@ export function ToastProvider({ children }) {
       const desc = isObject ? undefined : description;
 
       return notificationApi?.info({
-        message: title,
+        title: title,
         description: desc,
         showProgress: true,
         ...opt,
@@ -80,7 +80,7 @@ export function ToastProvider({ children }) {
       const desc = isObject ? undefined : description;
 
       return notificationApi?.warning({
-        message: title,
+        title: title,
         description: desc,
         showProgress: true,
         ...opt,

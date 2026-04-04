@@ -246,7 +246,7 @@ export default function ProfileEditModal({
           </Button>
         </div>
       }
-      width={600}
+      size={600}
       styles={{
         header: { borderBottom: '1px solid #f8fafc', padding: '24px 32px' },
         body: { padding: '32px' },

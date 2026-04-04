@@ -61,7 +61,7 @@ function ResetPasswordDrawer({ open, userId, email, onClose }) {
       }
       open={open}
       onClose={onClose}
-      width={480}
+      size={480}
       styles={{
         header: { borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' },
         body: { padding: '24px' },
