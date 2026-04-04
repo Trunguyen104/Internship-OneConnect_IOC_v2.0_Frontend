@@ -14,6 +14,7 @@ export function useProfile() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [cvUrl, setCvUrl] = useState(null);
+  const [updatingProfile, setUpdatingProfile] = useState(false);
 
   const [skills, setSkills] = useState([
     { name: 'HTML', level: 'Advanced' },
@@ -33,25 +34,28 @@ export function useProfile() {
   const [editingSkill, setEditingSkill] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', level: '' });
 
-  const fetchMe = useCallback(async () => {
-    try {
-      setLoadingUser(true);
-      const res = await userService.getMe();
-      const userData = res?.data || res;
-      if (userData) {
-        setUserInfo(userData);
-        const aUrl = userData.avatarUrl || userData.AvatarUrl;
-        if (aUrl) setAvatarUrl(aUrl);
-        const cUrl = userData.cvUrl || userData.CvUrl;
-        if (cUrl) setCvUrl(cUrl);
+  const fetchMe = useCallback(
+    async (silent = false) => {
+      try {
+        if (!silent) setLoadingUser(true);
+        const res = await userService.getMe();
+        const userData = res?.data || res;
+        if (userData) {
+          setUserInfo(userData);
+          const aUrl = userData.avatarUrl || userData.AvatarUrl;
+          if (aUrl) setAvatarUrl(aUrl);
+          const cUrl = userData.cvUrl || userData.CvUrl;
+          if (cUrl) setCvUrl(cUrl);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user info', err);
+        toast.error('Failed to load profile information');
+      } finally {
+        if (!silent) setLoadingUser(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch user info', err);
-      toast.error('Failed to load profile information');
-    } finally {
-      setLoadingUser(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
   useEffect(() => {
     fetchMe();
@@ -96,7 +100,8 @@ export function useProfile() {
 
   const updateProfile = async (data) => {
     try {
-      setLoadingUser(true);
+      setUpdatingProfile(true);
+      // We don't set loadingUser = true here because the modal has its own loading
 
       const formData = new FormData();
 
@@ -141,14 +146,14 @@ export function useProfile() {
       // 4. Submit update
       await userService.updateMe(formData);
       toast.success('Update successful');
-      await fetchMe();
+      await fetchMe(true); // Silent refresh to update UI without full page spinner
       return true;
     } catch (err) {
       console.error('Failed to update profile', err);
       toast.error('Failed to update profile information');
       return false;
     } finally {
-      setLoadingUser(false);
+      setUpdatingProfile(false);
     }
   };
 
@@ -156,7 +161,9 @@ export function useProfile() {
     if (!cvUrl) return;
 
     try {
-      setLoadingUser(true);
+      // Use a persistent notification (duration: 0) while downloading
+      const downloadToastKey = toast.info('Downloading CV...', { duration: 0 });
+
       const blob = await userService.downloadCV();
 
       if (!blob || blob.size === 0) {
@@ -168,11 +175,11 @@ export function useProfile() {
       const defaultFilename = `CV_${userInfo?.fullName?.replace(/\s+/g, '_') || 'Profile'}.${extension}`;
 
       downloadBlob(blob, defaultFilename);
+      toast.dismiss(downloadToastKey);
+      toast.success('Download complete');
     } catch (err) {
       console.error('Download CV error:', err);
       toast.error('Could not download CV. Please try again later.');
-    } finally {
-      setLoadingUser(false);
     }
   };
 
@@ -200,6 +207,7 @@ export function useProfile() {
     handleDeleteSelected,
     setSelectedSkills,
     updateProfile,
+    updatingProfile,
     handleDownloadCV, // Added
     isEditModalOpen: editMode,
     setIsEditModalOpen: setEditMode,

@@ -19,6 +19,7 @@ import ProfileEditModal from './ProfileEditModal';
 export default function ProfileInfo({
   userInfo,
   loadingUser,
+  updatingProfile,
   avatarUrl,
   onAvatarChange,
   isEditModalOpen,
@@ -142,9 +143,10 @@ export default function ProfileInfo({
               <InfoItem
                 label={PROFILE_UI.LABELS.GENDER}
                 value={
-                  PROFILE_UI.GENDER_LABELS[userInfo?.gender || userInfo?.Gender] ||
-                  userInfo?.gender ||
-                  userInfo?.Gender ||
+                  PROFILE_UI.GENDER_LABELS[userInfo?.gender] ||
+                  PROFILE_UI.GENDER_LABELS[userInfo?.Gender] ||
+                  PROFILE_UI.GENDER_LABELS[String(userInfo?.gender)] ||
+                  PROFILE_UI.GENDER_LABELS[String(userInfo?.Gender)] ||
                   '—'
                 }
               />
@@ -264,7 +266,7 @@ export default function ProfileInfo({
         onCancel={() => setIsEditModalOpen(false)}
         userInfo={userInfo}
         onSave={onSaveProfile}
-        loading={loadingUser}
+        loading={updatingProfile}
         avatarUrl={avatarUrl}
         onDownloadCV={onDownloadCV}
       />

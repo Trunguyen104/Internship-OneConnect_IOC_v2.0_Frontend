@@ -39,6 +39,7 @@ export default function ProfilePage() {
       <ProfileInfo
         userInfo={profile.userInfo}
         loadingUser={profile.loadingUser}
+        updatingProfile={profile.updatingProfile}
         avatarUrl={profile.avatarUrl}
         onAvatarChange={profile.setAvatarUrl}
         isEditModalOpen={profile.isEditModalOpen}

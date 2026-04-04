@@ -1,7 +1,7 @@
 'use client';
 
 import { UploadOutlined } from '@ant-design/icons';
-import { DatePicker, Form, message, Modal, Select, Upload } from 'antd';
+import { DatePicker, Drawer, Form, message, Select, Upload } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
@@ -107,13 +107,28 @@ export default function ProfileEditModal({
     if (rawRole === 'student' || rawRole === String(USER_ROLE.STUDENT)) {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
-          <Form.Item label={PROFILE_UI.LABELS.MAJOR} name="major">
+          <Form.Item
+            label={PROFILE_UI.LABELS.MAJOR}
+            name="major"
+            rules={[{ required: true, message: PROFILE_UI.VALIDATION.REQUIRED_MAJOR }]}
+            validateTrigger={['onChange', 'onBlur']}
+          >
             <Input className="h-11" />
           </Form.Item>
-          <Form.Item label={PROFILE_UI.LABELS.CLASS} name="className">
+          <Form.Item
+            label={PROFILE_UI.LABELS.CLASS}
+            name="className"
+            rules={[{ required: true, message: PROFILE_UI.VALIDATION.REQUIRED_CLASS }]}
+            validateTrigger={['onChange', 'onBlur']}
+          >
             <Input className="h-11" />
           </Form.Item>
-          <Form.Item label={PROFILE_UI.LABELS.PORTFOLIO} name="portfolioUrl">
+          <Form.Item
+            label={PROFILE_UI.LABELS.PORTFOLIO}
+            name="portfolioUrl"
+            rules={[{ type: 'url', message: PROFILE_UI.VALIDATION.INVALID_URL }]}
+            validateTrigger={['onChange', 'onBlur']}
+          >
             <Input placeholder="https://github.com/..." className="h-11" />
           </Form.Item>
           <Form.Item label={PROFILE_UI.LABELS.CV}>
@@ -193,17 +208,23 @@ export default function ProfileEditModal({
   };
 
   return (
-    <Modal
+    <Drawer
       open={open}
-      title={<div className="text-center w-full text-xl font-bold">{PROFILE_UI.BUTTONS.EDIT}</div>}
-      onCancel={onCancel}
-      footer={[
-        <div key="footer" className="flex justify-center gap-4 pb-4">
+      title={
+        <div className="flex flex-col gap-1">
+          <span className="text-xl font-black tracking-tight text-slate-800">
+            {PROFILE_UI.BUTTONS.EDIT}
+          </span>
+        </div>
+      }
+      onClose={onCancel}
+      footer={
+        <div key="footer" className="flex justify-end gap-3 px-6 py-4 border-t border-slate-50">
           <Button
             key="cancel"
             variant="ghost"
             onClick={onCancel}
-            className="rounded-xl px-12 border-none bg-slate-100 text-slate-700 font-semibold h-12"
+            className="rounded-xl px-8 h-10 font-semibold text-slate-600 hover:text-slate-900 border-none bg-slate-100"
           >
             {PROFILE_UI.BUTTONS.CANCEL}
           </Button>
@@ -211,25 +232,36 @@ export default function ProfileEditModal({
             key="save"
             variant="default"
             onClick={handleSubmit}
-            className="rounded-xl px-12 font-semibold h-12 min-w-[160px]"
+            className="rounded-xl px-10 h-10 font-bold bg-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-white"
             disabled={loading}
           >
-            {loading ? PROFILE_UI.BUTTONS.SAVING : PROFILE_UI.BUTTONS.SAVE_CHANGES}
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                {PROFILE_UI.BUTTONS.SAVING}
+              </div>
+            ) : (
+              PROFILE_UI.BUTTONS.SAVE_CHANGES
+            )}
           </Button>
-        </div>,
-      ]}
-      width={700}
-      centered
-      className="profile-edit-modal"
+        </div>
+      }
+      width={600}
+      styles={{
+        header: { borderBottom: '1px solid #f8fafc', padding: '24px 32px' },
+        body: { padding: '32px' },
+        footer: { padding: 0 },
+      }}
+      destroyOnClose
     >
-      <div className="flex flex-col items-center mb-8 border-b pb-8 border-border">
+      <div className="flex gap-3 items-center mb-10 pb-10 border-b border-slate-50">
         <AvatarUploader
           value={tempAvatar}
           onChange={handleAvatarChange}
           fullName={userInfo?.fullName || userInfo?.FullName}
           size={120}
         />
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center flex flex-col gap-2">
           <input
             type="file"
             id="avatar-upload"
@@ -245,18 +277,19 @@ export default function ProfileEditModal({
             onClick={() => document.getElementById('avatar-upload')?.click()}
             className="rounded-xl font-bold border-2 border-[var(--primary-600)] text-[var(--primary-600)] hover:bg-[var(--primary-50)]"
           >
-            {PROFILE_UI.AVATAR.UPLOAD_NEW || 'Tải lên ảnh mới'}
+            {PROFILE_UI.AVATAR.UPLOAD_NEW}
           </Button>
           <p className="mt-2 text-xs text-muted">{PROFILE_UI.AVATAR.HINT}</p>
         </div>
       </div>
 
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" validateTrigger={['onChange', 'onBlur']}>
         <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
           <Form.Item
             label={PROFILE_UI.LABELS.FULL_NAME}
             name="fullName"
             rules={[{ required: true, message: PROFILE_UI.VALIDATION.REQUIRED_FULL_NAME }]}
+            validateTrigger={['onChange', 'onBlur']}
           >
             <Input maxLength={150} className="h-11" />
           </Form.Item>
@@ -268,21 +301,40 @@ export default function ProfileEditModal({
               { pattern: /^\d+$/, message: PROFILE_UI.VALIDATION.PHONE_DIGITS },
               { max: 15, message: PROFILE_UI.VALIDATION.PHONE_MAX },
             ]}
+            validateTrigger={['onChange', 'onBlur']}
           >
             <Input placeholder={PROFILE_UI.PLACEHOLDERS.PHONE} className="h-11" />
           </Form.Item>
 
-          <Form.Item label={PROFILE_UI.LABELS.DATE_OF_BIRTH} name="dateOfBirth">
-            <DatePicker className="w-full rounded-xl h-11" format="DD/MM/YYYY" />
+          <Form.Item
+            label={PROFILE_UI.LABELS.DATE_OF_BIRTH}
+            name="dateOfBirth"
+            rules={[
+              {
+                validator: (_, value) => {
+                  if (value && value.isAfter(dayjs())) {
+                    return Promise.reject(new Error(PROFILE_UI.VALIDATION.DOB_FUTURE_ERROR));
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+            validateTrigger={['onChange', 'onBlur']}
+          >
+            <DatePicker
+              className="w-full rounded-xl h-11"
+              format="DD/MM/YYYY"
+              disabledDate={(current) => current && current > dayjs().endOf('day')}
+            />
           </Form.Item>
 
           <Form.Item label={PROFILE_UI.LABELS.GENDER} name="gender">
             <Select
               className="w-full h-11"
               options={[
-                { value: 'Male', label: PROFILE_UI.GENDER_LABELS.Male },
-                { value: 'Female', label: PROFILE_UI.GENDER_LABELS.Female },
-                { value: 'Other', label: PROFILE_UI.GENDER_LABELS.Other },
+                { value: 1, label: PROFILE_UI.GENDER_LABELS[1] },
+                { value: 2, label: PROFILE_UI.GENDER_LABELS[2] },
+                { value: 3, label: PROFILE_UI.GENDER_LABELS[3] },
               ]}
               classNames={{ popup: { root: 'rounded-xl' } }}
             />
@@ -295,6 +347,6 @@ export default function ProfileEditModal({
 
         {renderRoleSpecificFields()}
       </Form>
-    </Modal>
+    </Drawer>
   );
 }
