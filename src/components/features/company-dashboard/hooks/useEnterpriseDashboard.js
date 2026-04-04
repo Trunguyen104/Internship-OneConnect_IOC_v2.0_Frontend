@@ -3,44 +3,54 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { ENTERPRISE_DASHBOARD_UI } from '@/constants/enterprise-dashboard/uiText';
+import { useAuthStore } from '@/store/useAuthStore';
 
 import { DashboardService } from '../services/dashboard.service';
 
 export const useEnterpriseDashboard = () => {
+  const user = useAuthStore((s) => s.user);
+  const isEnabled = !!user?.role;
+
   // Query Projects
   const { data: projectsData, isLoading: loadingProjects } = useQuery({
     queryKey: ['dashboard-projects'],
     queryFn: () => DashboardService.getProjects(),
+    enabled: isEnabled,
   });
 
   // Query Self-Apply
   const { data: selfApplyData, isLoading: loadingSelf } = useQuery({
     queryKey: ['dashboard-self-apply'],
     queryFn: () => DashboardService.getSelfApplyApplications(),
+    enabled: isEnabled,
   });
 
   // Query Uni-Assign
   const { data: uniAssignData, isLoading: loadingUni } = useQuery({
     queryKey: ['dashboard-uni-assign'],
     queryFn: () => DashboardService.getUniAssignApplications(),
+    enabled: isEnabled,
   });
 
   // Query Placed Students (Real Interns count)
   const { data: internsData, isLoading: loadingInterns } = useQuery({
     queryKey: ['dashboard-interns'],
     queryFn: () => DashboardService.getPlacedStudents(),
+    enabled: isEnabled,
   });
 
   // Query Phases Status
   const { data: phasesData, isLoading: loadingPhases } = useQuery({
     queryKey: ['dashboard-phases'],
     queryFn: () => DashboardService.getInternshipPhases(),
+    enabled: isEnabled,
   });
 
   // Query Notifications for Activities
   const { data: notificationsData, isLoading: loadingNotifications } = useQuery({
     queryKey: ['dashboard-activities'],
     queryFn: () => DashboardService.getNotifications(),
+    enabled: isEnabled,
   });
 
   const stats = {

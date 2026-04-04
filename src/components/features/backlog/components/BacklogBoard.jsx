@@ -1,5 +1,7 @@
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import React from 'react';
 
+import { EmptyState } from '@/components/ui/emptystate';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
 
 import { useBacklogBoard } from '../hooks/useBacklogBoard';
@@ -18,6 +20,7 @@ export default function BacklogBoard() {
     setSprints,
     setBacklogItems,
     loading,
+    loadingProjectId,
     selectedEpicId,
     setSelectedEpicId,
     searchText,
@@ -73,65 +76,77 @@ export default function BacklogBoard() {
 
   return (
     <div className="relative flex h-[calc(100vh-140px)] w-full gap-6">
-      {/* Sidebar Epics */}
-      <EpicSidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        epics={epics}
-        selectedEpicId={selectedEpicId}
-        setSelectedEpicId={setSelectedEpicId}
-        setOpenCreateEpic={setOpenCreateEpic}
-        setOpenUpdateEpic={setOpenUpdateEpic}
-        setSelectedEpic={setSelectedEpic}
-        handleDeleteEpic={handleDeleteEpic}
-      />
+      {!loadingProjectId && !projectId ? (
+        <div className="flex flex-1 w-full items-center justify-center p-14 bg-white rounded-[40px] border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden min-h-[600px]">
+          <EmptyState
+            title={BACKLOG_UI.NO_PROJECT_TITLE}
+            description={BACKLOG_UI.NO_PROJECT_DESC}
+            className="py-10"
+          />
+        </div>
+      ) : (
+        <>
+          {/* Sidebar Epics */}
+          <EpicSidebar
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            epics={epics}
+            selectedEpicId={selectedEpicId}
+            setSelectedEpicId={setSelectedEpicId}
+            setOpenCreateEpic={setOpenCreateEpic}
+            setOpenUpdateEpic={setOpenUpdateEpic}
+            setSelectedEpic={setSelectedEpic}
+            handleDeleteEpic={handleDeleteEpic}
+          />
 
-      {/* Main Board */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto pr-2 pb-10">
-        <BoardHeader searchText={searchText} setSearchText={setSearchText} />
+          {/* Main Board */}
+          <div className="flex min-w-0 flex-1 flex-col overflow-y-auto pr-2 pb-10">
+            <BoardHeader searchText={searchText} setSearchText={setSearchText} />
 
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          {loading ? (
-            <div className="text-muted py-10 text-center">{BACKLOG_UI.LOADING}</div>
-          ) : (
-            <div className="overflow-x-auto pb-4">
-              <div className="min-w-[850px] pr-2">
-                {/* SPRINTS */}
-                {filteredSprints.map((sprint) => (
-                  <SprintSection
-                    key={sprint.sprintId}
-                    sprint={sprint}
-                    projectId={projectId}
-                    itemOrders={itemOrders}
-                    handleSprintActionClick={handleSprintActionClick}
-                    handleDeleteSprint={handleDeleteSprint}
-                    setSelectedSprintAction={setSelectedSprintAction}
-                    setSelectedTask={setSelectedTask}
-                    setOpenUpdateTask={setOpenUpdateTask}
-                    setOpenUpdateSprint={setOpenUpdateSprint}
-                    setActiveSprintForTask={setActiveSprintForTask}
-                    setOpenCreateTask={setOpenCreateTask}
-                    handleDeleteWorkItem={handleDeleteWorkItem}
-                  />
-                ))}
+            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+              {loading ? (
+                <div className="text-muted py-10 text-center">{BACKLOG_UI.LOADING}</div>
+              ) : (
+                <div className="overflow-x-auto pb-4">
+                  <div className="min-w-[850px] pr-2">
+                    {/* SPRINTS */}
+                    {filteredSprints.map((sprint) => (
+                      <SprintSection
+                        key={sprint.sprintId}
+                        sprint={sprint}
+                        projectId={projectId}
+                        itemOrders={itemOrders}
+                        handleSprintActionClick={handleSprintActionClick}
+                        handleDeleteSprint={handleDeleteSprint}
+                        setSelectedSprintAction={setSelectedSprintAction}
+                        setSelectedTask={setSelectedTask}
+                        setOpenUpdateTask={setOpenUpdateTask}
+                        setOpenUpdateSprint={setOpenUpdateSprint}
+                        setActiveSprintForTask={setActiveSprintForTask}
+                        setOpenCreateTask={setOpenCreateTask}
+                        handleDeleteWorkItem={handleDeleteWorkItem}
+                      />
+                    ))}
 
-                {/* BACKLOG (Unassigned) */}
-                <BacklogSection
-                  filteredBacklogItems={filteredBacklogItems}
-                  projectId={projectId}
-                  itemOrders={itemOrders}
-                  handleQuickCreateSprint={handleQuickCreateSprint}
-                  setSelectedTask={setSelectedTask}
-                  setOpenUpdateTask={setOpenUpdateTask}
-                  setActiveSprintForTask={setActiveSprintForTask}
-                  setOpenCreateTask={setOpenCreateTask}
-                  handleDeleteWorkItem={handleDeleteWorkItem}
-                />
-              </div>
-            </div>
-          )}
-        </DndContext>
-      </div>
+                    {/* BACKLOG (Unassigned) */}
+                    <BacklogSection
+                      filteredBacklogItems={filteredBacklogItems}
+                      projectId={projectId}
+                      itemOrders={itemOrders}
+                      handleQuickCreateSprint={handleQuickCreateSprint}
+                      setSelectedTask={setSelectedTask}
+                      setOpenUpdateTask={setOpenUpdateTask}
+                      setActiveSprintForTask={setActiveSprintForTask}
+                      setOpenCreateTask={setOpenCreateTask}
+                      handleDeleteWorkItem={handleDeleteWorkItem}
+                    />
+                  </div>
+                </div>
+              )}
+            </DndContext>
+          </div>
+        </>
+      )}
 
       <BacklogModals
         projectId={projectId}

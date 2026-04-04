@@ -1,27 +1,25 @@
 'use client';
 
-import { FileTextOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
-import { Briefcase, ChevronDown, Home } from 'lucide-react';
+import { Briefcase, ChevronDown, FileText, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { useInternshipStatus } from '@/hooks/useInternshipStatus';
-import { useToast } from '@/providers/ToastProvider';
+import { useLogout } from '@/hooks/useLogout';
 
 export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
-  const queryClient = useQueryClient();
-  const { isEnrolled, isPlaced, hasCv } = useInternshipStatus();
+  const { logout: handleLogout } = useLogout();
+  const { isEnrolled, isPlaced, hasCv, hasActiveApp } = useInternshipStatus();
 
   const { data: userInfo } = useQuery({
     queryKey: ['me'],
@@ -29,27 +27,24 @@ export default function StudentTopNav() {
     staleTime: 0, // Always verify user identity on mount
   });
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      queryClient.clear(); // Clear all cached data to prevent cross-user leak
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
+  const userRoleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
 
   const navTabs = useMemo(() => {
     const tabs = [{ key: '/student/home', label: 'Home', icon: Home }];
 
-    // AC Logic: Explore Jobs visible if Enrolled AND has CV AND NOT placed
+    // Logic: Explore Jobs visible if Enrolled AND has CV AND NOT placed
     if (isEnrolled && hasCv && !isPlaced) {
       tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
     }
 
+    // Logic: My Applications (Student Only)
+    // Sidebar logic: isEnrolled && (hasActiveApp || isPlaced)
+    if (userRoleId === USER_ROLE.STUDENT && isEnrolled && (hasActiveApp || isPlaced)) {
+      tabs.push({ key: '/my-applications', label: 'My Applications', icon: FileText });
+    }
+
     return tabs;
-  }, [isEnrolled, isPlaced, hasCv]);
+  }, [isEnrolled, isPlaced, hasCv, hasActiveApp, userRoleId]);
 
   const avatarMenu = {
     items: [
@@ -67,19 +62,17 @@ export default function StudentTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
-      { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
-      if (key === 'my-applications') router.push('/my-applications');
       if (key === 'logout') handleLogout();
     },
   };
 
   return (
-    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
+    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
       <div className="flex items-center gap-8">
         <Link href="/student/home" className="relative flex h-8 w-28 items-center cursor-pointer">
           <Image

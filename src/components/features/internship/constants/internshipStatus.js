@@ -29,7 +29,7 @@ export const INTERNSHIP_STATUS_CONFIG = {
     label: 'In Progress',
     color: 'processing',
     badge: 'processing',
-    tagColor: 'blue',
+    tagColor: 'volcano',
   },
   [INTERNSHIP_STATUS.CLOSED]: {
     label: 'Closed',

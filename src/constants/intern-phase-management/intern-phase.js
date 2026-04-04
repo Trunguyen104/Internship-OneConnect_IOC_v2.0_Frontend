@@ -115,11 +115,17 @@ export const INTERN_PHASE_MANAGEMENT = {
         APPLICATIONS: 'APPLICATIONS',
       },
       STATUS_LABELS: {
+        1: 'Draft',
+        2: 'Published',
+        3: 'Closed',
         Published: 'Published',
         Draft: 'Draft',
         Closed: 'Closed',
       },
       STATUS_VARIANTS: {
+        1: 'warning-soft',
+        2: 'success-soft',
+        3: 'default',
         Published: 'success-soft',
         Draft: 'warning-soft',
         Closed: 'default',

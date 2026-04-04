@@ -8,10 +8,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { useLogout } from '@/hooks/useLogout';
 import { useToast } from '@/providers/ToastProvider';
 
 const NAV_TABS = [
@@ -36,15 +35,7 @@ export default function SchoolTopNav() {
       });
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const avatarMenu = {
     items: [

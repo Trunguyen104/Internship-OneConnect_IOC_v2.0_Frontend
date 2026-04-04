@@ -1,7 +1,7 @@
 'use client';
 
 import { PlusCircleOutlined } from '@ant-design/icons';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
@@ -16,7 +16,6 @@ export default function CreateTaskModal({
   onClose,
   onSubmit,
   epics = [],
-  sprints = [],
   initialSprintId = '',
   members = [],
 }) {
@@ -33,10 +32,12 @@ export default function CreateTaskModal({
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
 
-  const canSubmit = useMemo(
-    () => summary.trim() && type && status && priority,
-    [summary, type, status, priority]
-  );
+  // Sync sprintId when initialSprintId changes
+  const [prevInitialSprintId, setPrevInitialSprintId] = useState(initialSprintId);
+  if (initialSprintId !== prevInitialSprintId) {
+    setPrevInitialSprintId(initialSprintId);
+    setSprintId(initialSprintId || '');
+  }
 
   function reset() {
     setSummary('');
@@ -72,6 +73,8 @@ export default function CreateTaskModal({
     });
     handleClose();
   }
+
+  const canSubmit = !!(summary?.trim() && type && status && priority);
 
   return (
     <CompoundModal open={open} onCancel={handleClose} width={1200}>
@@ -119,9 +122,6 @@ export default function CreateTaskModal({
               epic={epic}
               setEpic={setEpic}
               epics={epics}
-              sprintId={sprintId}
-              setSprintId={setSprintId}
-              sprints={sprints}
               assignee={assignee}
               setAssignee={setAssignee}
               priority={priority}

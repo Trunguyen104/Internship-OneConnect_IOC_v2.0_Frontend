@@ -28,19 +28,19 @@ export function BacklogSection({
   return (
     <div
       ref={setNodeRef}
-      className={`mt-8 rounded-3xl border bg-white p-6 shadow-sm transition-colors ${
-        isOver ? 'border-primary border-dashed bg-blue-50/50' : 'border-gray-100'
+      className={`mt-8 rounded-[32px] border bg-white p-6 shadow-sm transition-colors ${
+        isOver ? 'border-primary border-dashed bg-primary-surface/50' : 'border-slate-100'
       }`}
     >
       <div className="mb-6 flex items-center pr-1 pl-2">
-        <div className="mr-4 h-4 w-4 flex-shrink-0 rounded border border-gray-300" />
-        <h3 className="text-[16px] font-bold text-gray-900">{BACKLOG_UI.BACKLOG_TITLE}</h3>
+        <div className="mr-4 h-4 w-4 shrink-0 rounded border border-slate-300" />
+        <h3 className="text-[16px] font-bold text-slate-900">{BACKLOG_UI.BACKLOG_TITLE}</h3>
         <div className="flex-1" />
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
             onClick={handleQuickCreateSprint}
-            className="h-[34px] rounded-full border border-gray-200 bg-white px-5 text-[13px] font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            className="h-[34px] rounded-full border border-slate-200 bg-white px-5 text-[13px] font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
           >
             {BACKLOG_UI.CREATE_SPRINT}
           </Button>

@@ -33,4 +33,11 @@ export const ENTERPRISE_DASHBOARD_UI = {
   TOTAL: 'Total',
   WELCOME_MESSAGE: 'Welcome to your enterprise workspace',
   LOADING_ANALYZING: 'Analyzing dashboard data...',
+  MENTOR: {
+    GREETING: 'Xin chào,',
+    WELCOME: 'Chào mừng bạn quay trở lại hệ thống quản lý thực tập.',
+    PLACEHOLDER: 'Chức năng Dashboard dành riêng cho Mentor đang được cập nhật.',
+    EMOJI: '👋',
+    EXCLAMATION: '!',
+  },
 };

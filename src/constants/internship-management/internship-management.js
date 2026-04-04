@@ -143,6 +143,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         UNKNOWN_STUDENT: 'Unknown Student',
         NO_CODE: 'No Code',
         NO_MAJOR: 'No Major',
+        PHASE_PREFIX: 'Phase: ',
         CONFLICT_DETECTED: 'Conflict Detected',
         MULTI_TERM_ERROR:
           'Selected students belong to different internship terms/phases. A group must consist of students from the same term.',

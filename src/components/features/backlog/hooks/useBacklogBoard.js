@@ -103,9 +103,11 @@ export function useBacklogBoard() {
 
       toast.success('Work item deleted successfully');
       fetchData(projectId, false);
+      queryClient.invalidateQueries({ queryKey: ['all-tasks-history'] });
     } catch {
       toast.error('Server error while deleting work item');
       fetchData(projectId, false);
+      queryClient.invalidateQueries({ queryKey: ['all-tasks-history'] });
     }
   };
 
