@@ -6,7 +6,6 @@ import {
   AlertOctagon,
   Briefcase,
   ChevronDown,
-  FileText,
   FolderGit2,
   GraduationCap,
   Home,
@@ -16,13 +15,26 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { useLogout } from '@/hooks/useLogout';
 import { useToast } from '@/providers/ToastProvider';
+
+const ALL_NAV_TABS = [
+  { key: '/company/home', label: 'Home', icon: Home },
+  { key: '/company/phases', label: 'Phases', icon: Layers },
+  { key: '/company/internships', label: 'Internships', icon: Users },
+  { key: '/company/universities', label: 'Universities', icon: GraduationCap },
+  { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
+];
+
+const MENTOR_NAV_TABS = [
+  { key: '/company/home', label: 'Home', icon: Home },
+  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/violation', label: 'Violations', icon: AlertOctagon },
+];
 
 export default function CompanyTopNav() {
   const pathname = usePathname();
@@ -34,19 +46,9 @@ export default function CompanyTopNav() {
   const isMentor = roleId === 6;
   const isEnterpriseManager = [4, 5, 6].includes(roleId);
 
-  const NAV_TABS = [
-    { key: '/company/home', label: 'Home', icon: Home },
-    { key: '/company/phases', label: 'Phases', icon: Layers },
-    { key: '/company/applications', label: 'Applications', icon: FileText },
-    { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
-    { key: '/company/internships', label: 'Internships', icon: Users },
-    { key: '/company/universities', label: 'Universities', icon: GraduationCap },
-    { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
-  ];
-
-  if (isMentor) {
-    NAV_TABS.push({ key: '/company/violation', label: 'Violations', icon: AlertOctagon });
-  }
+  const navTabs = useMemo(() => {
+    return isMentor ? MENTOR_NAV_TABS : ALL_NAV_TABS;
+  }, [isMentor]);
 
   useEffect(() => {
     userService
@@ -57,15 +59,7 @@ export default function CompanyTopNav() {
       });
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const avatarMenu = {
     items: [
@@ -117,7 +111,7 @@ export default function CompanyTopNav() {
 
         {!isPhaseWorkspace && (
           <nav className="flex items-center gap-1">
-            {NAV_TABS.map(({ key, label, icon: Icon }) => {
+            {navTabs.map(({ key, label, icon: Icon }) => {
               const isActive = pathname === key || pathname.startsWith(key + '/');
               return (
                 <Link

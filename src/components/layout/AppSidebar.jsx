@@ -127,11 +127,11 @@ export default function AppSidebar() {
             icon: <ClipboardCheck className="size-4" />,
             label: 'Evaluations',
           },
-          {
-            key: `${p}/violations`,
-            icon: <AlertOctagon className="size-4" />,
-            label: 'Violation Reports',
-          },
+          // {
+          //   key: `${p}/violations`,
+          //   icon: <AlertOctagon className="size-4" />,
+          //   label: 'Violation Reports',
+          // },
         ];
       }
 

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { USER_ROLE } from '@/constants/user-management/enums';
@@ -30,6 +30,7 @@ export const useViolationManagement = () => {
     setTermId,
     termOptions,
     setTermOptions,
+    fetchingTerms,
     setFetchingTerms,
     setPagination,
     handleSearchChange,
@@ -54,39 +55,45 @@ export const useViolationManagement = () => {
   // 1. Get User Profile from Store (Instant)
   const user = useAuthStore((state) => state.user);
 
-  // 2. Initial Data: Fetch Groups to extract Term Options
-  useQuery({
-    queryKey: ['violation-initial-groups'],
+  const { data: initialGroupsData } = useQuery({
+    queryKey: ['violation-initial-groups', user?.userId || user?.id],
     queryFn: async () => {
+      setFetchingTerms(true);
       try {
-        setFetchingTerms(true);
         const groupsRes = await ViolationService.getGroups({ pageSize: 100 });
-        const groupsData = groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || [];
-
-        const termMap = new Map();
-        groupsData.forEach((g) => {
-          const tId = g.termId || g.internshipTermId || g.internshipId;
-          const tName = g.term || g.termName || g.internshipTermName || g.groupName;
-          if (tId && !termMap.has(tId)) {
-            termMap.set(tId, tName || `${VIOLATION_REPORT.FILTERS.TERM} ${termMap.size + 1}`);
-          }
-        });
-
-        const extractedTerms = Array.from(termMap.entries())
-          .map(([value, label]) => ({ value, label }))
-          .sort((a, b) => b.label.localeCompare(a.label));
-
-        setTermOptions(extractedTerms);
-        if (extractedTerms.length > 0 && !termId) {
-          setTermId(extractedTerms[0].value);
-        }
-        return groupsData;
+        return groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || [];
       } finally {
         setFetchingTerms(false);
       }
     },
+    enabled: !!user,
     staleTime: 30 * 60 * 1000,
   });
+
+  // AC: Robustly initialize terms and the first selected term even if data is from cache
+  useEffect(() => {
+    if (initialGroupsData && Array.isArray(initialGroupsData) && initialGroupsData.length > 0) {
+      const termMap = new Map();
+      initialGroupsData.forEach((g) => {
+        const tId = g.termId || g.internshipTermId || g.internshipId;
+        const tName = g.term || g.termName || g.internshipTermName || g.groupName;
+        if (tId && !termMap.has(tId)) {
+          termMap.set(tId, tName || `${VIOLATION_REPORT.FILTERS.TERM} ${termMap.size + 1}`);
+        }
+      });
+
+      const extractedTerms = Array.from(termMap.entries())
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => b.label.localeCompare(a.label));
+
+      setTermOptions(extractedTerms);
+
+      // Auto-select the first term if none is selected
+      if (extractedTerms.length > 0 && !termId) {
+        setTermId(extractedTerms[0].value);
+      }
+    }
+  }, [initialGroupsData, termId, setTermId, setTermOptions, VIOLATION_REPORT]);
 
   // 3. Supporting Data: Fetch Groups and Students for the selected Term
   const { data: supportingData = { groups: [], students: [] }, isLoading: loadingSupporting } =
@@ -313,7 +320,7 @@ export const useViolationManagement = () => {
     termId,
     setTermId,
     termOptions,
-    fetchingTerms: false,
+    fetchingTerms,
     studentOptions,
     isMentor: (() => {
       const rawRole = user?.roleId || user?.RoleId || user?.role || user?.Role;

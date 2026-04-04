@@ -6,7 +6,8 @@ const cleanPayload = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
   const newObj = { ...obj };
   Object.keys(newObj).forEach((key) => {
-    if (newObj[key] === undefined || newObj[key] === '' || newObj[key] === null) {
+    // Keep null for optional fields to avoid missing key errors in some backends
+    if (newObj[key] === undefined || newObj[key] === '') {
       delete newObj[key];
     }
   });
@@ -23,11 +24,11 @@ export const EnterpriseGroupService = {
   },
 
   async createGroup(data) {
-    return httpPost(BASE_URL, data);
+    return httpPost(BASE_URL, cleanPayload(data));
   },
 
   async updateGroup(id, data) {
-    return httpPut(`${BASE_URL}/${id}`, data);
+    return httpPut(`${BASE_URL}/${id}`, cleanPayload(data));
   },
 
   async moveStudents(data) {
