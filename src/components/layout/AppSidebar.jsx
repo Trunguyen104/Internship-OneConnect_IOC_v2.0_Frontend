@@ -22,7 +22,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useMemo } from 'react';
 
 import { USER_ROLE } from '@/constants/user-management/enums';
-import { useInternshipStatus } from '@/hooks/useInternshipStatus';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLayoutStore } from '@/store/useLayoutStore';
 
@@ -33,7 +32,6 @@ export default function AppSidebar() {
   const isSidebarCollapsed = useLayoutStore((s) => s.isSidebarCollapsed);
   const router = useRouter();
   const pathname = usePathname();
-  const { isEnrolled, isPlaced, hasCv, hasActiveApp } = useInternshipStatus();
 
   const role = user?.role;
 
@@ -75,29 +73,15 @@ export default function AppSidebar() {
         const isStudent =
           Number(userRole) === USER_ROLE.STUDENT || String(userRole).toLowerCase() === 'student';
         if (isStudent) {
-          const menu = [
+          return [
             { key: '/student/home', icon: <LayoutDashboard className="size-4" />, label: 'Home' },
-          ];
-
-          // AC logic: My Applications
-          if (isEnrolled && (hasActiveApp || isPlaced)) {
-            menu.push({
+            {
               key: '/my-applications',
               icon: <FileText className="size-4" />,
               label: 'My Applications',
-            });
-          }
-
-          // AC logic: Explore Jobs
-          if (isEnrolled && hasCv && !isPlaced) {
-            menu.push({
-              key: '/student/jobs',
-              icon: <Briefcase className="size-4" />,
-              label: 'Explore Jobs',
-            });
-          }
-
-          return menu;
+            },
+            { key: '/student/jobs', icon: <Briefcase className="size-4" />, label: 'Explore Jobs' },
+          ];
         }
       }
 
@@ -211,7 +195,7 @@ export default function AppSidebar() {
 
       return [];
     },
-    [pathname, isEnrolled, isPlaced, hasCv, hasActiveApp]
+    [pathname]
   );
 
   const menuItems = useMemo(() => getRoutes(role), [role, getRoutes]);

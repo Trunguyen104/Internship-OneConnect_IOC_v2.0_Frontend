@@ -116,8 +116,8 @@ const BodyTitle = ({ title, href = null }) => {
         )}
         {isPlaced && (
           <Tag
-            color="blue"
-            className="bg-info-surface text-info border-none px-4 py-1 text-[10px] font-bold uppercase"
+            color="red"
+            className="bg-primary-surface text-primary border-none px-4 py-1 text-[10px] font-bold uppercase"
           >
             {config.label}
           </Tag>
@@ -166,7 +166,7 @@ const Info = ({ enterprise, mentor, project }) => {
 
       {/* Project Info */}
       <div className="flex items-center gap-5">
-        <div className="bg-info-surface text-info flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-transform hover:scale-105">
+        <div className="bg-primary-surface text-primary flex h-14 w-14 items-center justify-center rounded-2xl shadow-sm transition-transform hover:scale-105">
           <BookOpen size={28} />
         </div>
         <div className="flex flex-col">

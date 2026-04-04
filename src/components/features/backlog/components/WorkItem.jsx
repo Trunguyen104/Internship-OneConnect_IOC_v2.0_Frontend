@@ -71,7 +71,7 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
       ref={setNodeRef}
       style={style}
       onClick={() => onClick?.(it)}
-      className={`group mb-2 flex cursor-pointer items-center justify-between rounded-xl border border-transparent bg-white py-3 transition-colors hover:border-gray-100 hover:bg-gray-50/50 ${
+      className={`group mb-2 flex cursor-pointer items-center justify-between rounded-xl border border-transparent bg-white py-3 transition-colors hover:border-slate-100 hover:bg-slate-50/50 ${
         isDragging ? 'border-primary/20 z-50 shadow-lg' : ''
       }`}
     >
@@ -96,13 +96,13 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
           </div>
         </div>
 
-        <div className="flex w-32 shrink-0 justify-center">
+        <div className="hidden w-32 shrink-0 justify-center md:flex">
           <span className={`${statusConfig} rounded-lg px-2.5 py-0.5 text-[12px] font-semibold`}>
             {getStatusLabel(currentStatus)}
           </span>
         </div>
 
-        <div className="flex w-32 min-w-0 shrink-0 justify-center px-2">
+        <div className="hidden w-32 min-w-0 shrink-0 justify-center px-2 lg:flex">
           {it.epicName ? (
             <span
               className="bg-primary-surface text-primary block w-full truncate rounded-lg px-2.5 py-0.5 text-center text-xs font-semibold"
@@ -115,25 +115,25 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
           )}
         </div>
 
-        <div className="text-muted w-24 shrink-0 text-center text-[13px] font-medium text-gray-500">
+        <div className="text-muted hidden w-24 shrink-0 text-center text-[13px] font-medium md:block">
           {it.dueDate ? new Date(it.dueDate).toLocaleDateString('vi-VN') : '-'}
         </div>
 
-        <div className="text-primary w-24 shrink-0 text-center text-[13px] font-bold">
+        <div className="text-primary hidden w-24 shrink-0 text-center text-[13px] font-bold sm:block">
           {it.storyPoint || it.points || '-'}
         </div>
 
-        <div className="flex w-20 shrink-0 justify-center">
+        <div className="hidden w-20 shrink-0 justify-center sm:flex">
           <span
             className={`rounded-lg px-2.5 py-0.5 text-[12px] font-semibold ${isHigh ? 'bg-danger-surface text-danger' : isLow ? 'bg-success-surface text-success' : 'bg-info-surface text-info'}`}
           >
             {isHigh
               ? currentPriority === WORK_ITEM_PRIORITY.CRITICAL
-                ? BACKLOG_UI.PRIORITY_CRITICAL || 'Critical'
-                : BACKLOG_UI.PRIORITY_HIGH || 'High'
+                ? BACKLOG_UI.PRIORITY_CRITICAL
+                : BACKLOG_UI.PRIORITY_HIGH
               : isLow
-                ? BACKLOG_UI.PRIORITY_LOW || 'Low'
-                : BACKLOG_UI.PRIORITY_MEDIUM || 'Medium'}
+                ? BACKLOG_UI.PRIORITY_LOW
+                : BACKLOG_UI.PRIORITY_MEDIUM}
           </span>
         </div>
 
@@ -195,30 +195,30 @@ export function ColumnHeaders() {
     <div className="mb-2 flex items-center justify-between rounded-lg border-b border-gray-100/50 bg-gray-50/80 px-2 py-2">
       <div className="mr-2 w-8 shrink-0" />
 
-      <div className="flex flex-1 items-center text-gray-500">
+      <div className="flex flex-1 items-center text-slate-500">
         <div className="text-muted w-20 shrink-0 pl-1 text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
-          {BACKLOG_UI.ISSUE || 'Issue'}
+          {BACKLOG_UI.ISSUE}
         </div>
         <div className="text-muted min-w-0 flex-1 truncate text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
-          {BACKLOG_UI.FIELD_SUMMARY || 'Summary'}
+          {BACKLOG_UI.FIELD_SUMMARY}
         </div>
-        <div className="text-muted w-32 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
-          {BACKLOG_UI.FIELD_STATUS || 'Status'}
+        <div className="text-muted hidden w-32 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase md:block">
+          {BACKLOG_UI.FIELD_STATUS}
         </div>
-        <div className="text-muted w-32 shrink-0 px-2 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
-          {BACKLOG_UI.TYPE_EPIC || 'Epic'}
+        <div className="text-muted hidden w-32 shrink-0 px-2 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase lg:block">
+          {BACKLOG_UI.TYPE_EPIC}
         </div>
-        <div className="text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
-          {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
+        <div className="text-muted hidden w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase md:block">
+          {BACKLOG_UI.FIELD_DUE_DATE}
         </div>
-        <div className="text-muted w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase">
-          {BACKLOG_UI.FIELD_STORY_POINTS || 'Pts'}
+        <div className="text-muted hidden w-24 shrink-0 text-center text-xs font-semibold tracking-wider whitespace-nowrap uppercase sm:block">
+          {BACKLOG_UI.FIELD_STORY_POINTS}
         </div>
-        <div className="text-muted w-20 shrink-0 text-center text-xs font-semibold tracking-wider uppercase">
-          {BACKLOG_UI.FIELD_PRIORITY || 'Priority'}
+        <div className="text-muted hidden w-20 shrink-0 text-center text-xs font-semibold tracking-wider uppercase sm:block">
+          {BACKLOG_UI.FIELD_PRIORITY}
         </div>
         <div className="text-muted w-12 shrink-0 text-center text-xs font-semibold tracking-wider uppercase">
-          {BACKLOG_UI.FIELD_ASSIGNEE || 'User'}
+          {BACKLOG_UI.FIELD_ASSIGNEE}
         </div>
       </div>
 

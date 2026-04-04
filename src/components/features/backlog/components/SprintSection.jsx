@@ -34,21 +34,21 @@ export function SprintSection({
   return (
     <div
       ref={setNodeRef}
-      className={`mb-6 rounded-3xl border bg-white p-6 shadow-sm transition-colors ${
-        isOver ? 'border-primary border-dashed bg-blue-50/50' : 'border-gray-100'
+      className={`mb-6 rounded-[32px] border bg-white p-6 shadow-sm transition-colors ${
+        isOver ? 'border-primary border-dashed bg-primary-surface/50' : 'border-slate-100'
       }`}
     >
       {/* Header */}
       <div className="mb-6 flex items-center pr-1 pl-2">
-        <div className="mr-4 h-4 w-4 flex-shrink-0 rounded border border-gray-300" />
-        <h3 className="text-[16px] font-bold text-gray-900">{sprint.name || sprint.title}</h3>
+        <div className="mr-4 h-4 w-4 shrink-0 rounded border border-slate-300" />
+        <h3 className="text-[16px] font-bold text-slate-900">{sprint.name || sprint.title}</h3>
         <div className="flex-1" />
 
         {/* Dynamic Start/Complete Sprint button based on status */}
         {sprint.status === SPRINT_STATUS.ACTIVE || sprint.status === 'ACTIVE' ? (
           <Button
             onClick={() => handleSprintActionClick(sprint, false)}
-            className="flex h-[34px] items-center rounded-full border border-green-200 bg-green-50 px-5 text-[13px] font-medium text-green-700 shadow-sm transition-colors hover:bg-green-100"
+            className="flex h-[34px] items-center rounded-full border border-success-border bg-success-surface px-5 text-[13px] font-medium text-success-text shadow-sm transition-colors hover:bg-success-surface/80"
           >
             {BACKLOG_UI.COMPLETE_SPRINT}
           </Button>
@@ -56,7 +56,7 @@ export function SprintSection({
           <Button
             variant="outline"
             onClick={() => handleSprintActionClick(sprint, true)}
-            className="flex h-[34px] items-center rounded-full border border-gray-200 bg-white px-5 text-[13px] font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            className="flex h-[34px] items-center rounded-full border border-slate-200 bg-white px-5 text-[13px] font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
           >
             {BACKLOG_UI.START_SPRINT}
           </Button>

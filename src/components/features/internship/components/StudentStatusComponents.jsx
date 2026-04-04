@@ -17,15 +17,15 @@ import { cn } from '@/lib/cn';
 
 // AC-01 Hero Empty State (Premium Glassmorphism Style)
 export const StudentEmptyState = () => (
-  <div className="relative overflow-hidden rounded-[40px] border border-slate-100 bg-white p-16 text-center shadow-2xl shadow-indigo-100/20">
-    <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-indigo-50/50 blur-3xl" />
-    <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-blue-50/50 blur-3xl" />
+  <div className="relative overflow-hidden rounded-[40px] border border-slate-100 bg-white p-16 text-center shadow-2xl shadow-primary-100/20">
+    <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary-50/50 blur-3xl" />
+    <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-primary-100/30 blur-3xl" />
 
     <div className="relative flex flex-col items-center">
       <div className="relative mb-8 h-28 w-28 animate-bounce duration-3000">
-        <div className="absolute inset-0 animate-pulse rounded-full bg-indigo-100/50" />
-        <div className="relative flex h-full w-full items-center justify-center rounded-full bg-linear-to-tr from-indigo-50 via-white to-white shadow-inner">
-          <Building2 className="size-12 text-indigo-400" />
+        <div className="absolute inset-0 animate-pulse rounded-full bg-primary-100/50" />
+        <div className="relative flex h-full w-full items-center justify-center rounded-full bg-linear-to-tr from-primary-50 via-white to-white shadow-inner">
+          <Building2 className="size-12 text-primary-400" />
         </div>
       </div>
 
@@ -46,14 +46,14 @@ export const CVUploadBanner = ({ variant = 'prepare' }) => (
       'group flex flex-wrap items-center justify-between gap-6 rounded-[24px] border p-6 transition-all duration-300 hover:shadow-lg',
       variant === 'urgent'
         ? 'border-amber-100 bg-linear-to-r from-amber-50 to-white shadow-amber-100/20'
-        : 'border-indigo-100 bg-linear-to-r from-indigo-50 to-white shadow-indigo-100/20'
+        : 'border-primary-100 bg-linear-to-r from-primary-50 to-white shadow-primary-100/20'
     )}
   >
     <div className="flex items-center gap-5">
       <div
         className={cn(
           'flex h-12 w-12 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-110',
-          variant === 'urgent' ? 'bg-amber-100 text-amber-600' : 'bg-indigo-600 text-white'
+          variant === 'urgent' ? 'bg-amber-100 text-amber-600' : 'bg-primary text-white'
         )}
       >
         <FileText className="size-6" />
@@ -62,7 +62,7 @@ export const CVUploadBanner = ({ variant = 'prepare' }) => (
         <span
           className={cn(
             'text-[10px] font-black uppercase tracking-[0.2em]',
-            variant === 'urgent' ? 'text-amber-500' : 'text-indigo-500'
+            variant === 'urgent' ? 'text-amber-500' : 'text-primary-500'
           )}
         >
           {variant === 'urgent'
@@ -72,7 +72,7 @@ export const CVUploadBanner = ({ variant = 'prepare' }) => (
         <p
           className={cn(
             'text-[15px] font-black',
-            variant === 'urgent' ? 'text-amber-900' : 'text-indigo-900'
+            variant === 'urgent' ? 'text-amber-900' : 'text-primary-900'
           )}
         >
           {variant === 'urgent'
@@ -87,7 +87,7 @@ export const CVUploadBanner = ({ variant = 'prepare' }) => (
         'h-12 rounded-xl px-8 font-black tracking-widest text-white shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0',
         variant === 'urgent'
           ? 'bg-amber-600 shadow-amber-200 hover:bg-amber-700 hover:shadow-amber-300'
-          : 'bg-indigo-600 shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300'
+          : 'bg-primary shadow-primary-200 hover:bg-primary-600 hover:shadow-primary-300'
       )}
     >
       <Link href="/profile">{INTERNSHIP_UI.BANNERS.UPLOAD_CV_BTN}</Link>
@@ -115,8 +115,8 @@ export const ApplicationStatusCard = ({ app }) => {
     },
     4: {
       label: INTERNSHIP_UI.LABELS.PENDING_ASSIGNMENT,
-      variant: 'info-soft',
-      className: 'bg-indigo-100/50 text-indigo-700 border-indigo-200',
+      variant: 'primary-soft',
+      className: 'bg-primary-100/50 text-primary-700 border-primary-200',
     },
   };
   const config = statusMap[app.status] || {
@@ -125,7 +125,7 @@ export const ApplicationStatusCard = ({ app }) => {
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-[32px] border border-slate-100 bg-white p-2 shadow-2xl shadow-slate-200/40 transition-all duration-300 hover:shadow-indigo-100">
+    <div className="group relative overflow-hidden rounded-[32px] border border-slate-100 bg-white p-2 shadow-2xl shadow-slate-200/40 transition-all duration-300 hover:shadow-primary-100">
       <div className="flex flex-col gap-1 p-6 pb-2">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
@@ -171,7 +171,7 @@ export const ApplicationStatusCard = ({ app }) => {
         <Button
           asChild
           variant="ghost"
-          className="h-12 w-full rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] text-slate-600 transition-all hover:bg-white hover:text-indigo-600 hover:shadow-sm active:scale-95"
+          className="h-12 w-full rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] text-slate-600 transition-all hover:bg-white hover:text-primary hover:shadow-sm active:scale-95"
         >
           <Link href="/my-applications" className="flex items-center justify-center gap-2">
             {INTERNSHIP_UI.LABELS.VIEW_DETAIL}
@@ -205,8 +205,8 @@ export const PlacementInfoCard = ({ enterpriseName }) => (
 
 // Search Jobs CTA (Minimalist & Modern)
 export const SearchJobsCTA = () => (
-  <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-[40px] border border-dashed border-slate-200 bg-white p-12 transition-all hover:border-indigo-400 hover:bg-slate-50/50">
-    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-[24px] bg-slate-50 text-slate-300 transition-all group-hover:bg-indigo-50 group-hover:text-indigo-500 group-hover:scale-110">
+  <div className="group relative flex flex-col items-center justify-center overflow-hidden rounded-[40px] border border-dashed border-slate-200 bg-white p-12 transition-all hover:border-primary-400 hover:bg-slate-50/50">
+    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-[24px] bg-slate-50 text-slate-300 transition-all group-hover:bg-primary-50 group-hover:text-primary-500 group-hover:scale-110">
       <Briefcase className="size-10" />
     </div>
     <p className="mb-6 text-base font-bold text-slate-500 text-center max-w-xs">
@@ -214,7 +214,7 @@ export const SearchJobsCTA = () => (
     </p>
     <Button
       asChild
-      className="h-12 rounded-xl bg-slate-900 px-10 font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:bg-indigo-600 hover:shadow-indigo-200 hover:-translate-y-1"
+      className="h-12 rounded-xl bg-slate-900 px-10 font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 transition-all hover:bg-primary hover:shadow-primary-200 hover:-translate-y-1"
     >
       <Link href="/student/jobs">{INTERNSHIP_UI.LABELS.VIEW_JOB_POSTINGS}</Link>
     </Button>

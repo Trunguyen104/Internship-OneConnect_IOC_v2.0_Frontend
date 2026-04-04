@@ -20,9 +20,6 @@ export function TaskModalSidebar({
   epic,
   setEpic,
   epics = [],
-  sprintId,
-  setSprintId,
-  sprints = [],
   assignee,
   setAssignee,
   priority,
@@ -35,31 +32,28 @@ export function TaskModalSidebar({
 }) {
   return (
     <div className="flex w-full shrink-0 flex-col lg:w-[360px]">
-      <div
-        className="border-border/50 h-full overflow-y-auto rounded-3xl border bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
-        style={{ scrollbarWidth: 'none' }}
-      >
-        <h3 className="mb-5 text-[17px] font-bold text-gray-800">
+      <div className="rounded-3xl border border-gray-100 bg-gray-50/20 p-6 shadow-sm ring-1 ring-white/50 backdrop-blur-sm">
+        <h3 className="mb-6 text-base font-bold text-gray-800">
           {BACKLOG_UI.DETAILS || 'Details'}
         </h3>
 
-        <div className="space-y-5">
+        <div className="flex flex-col gap-5">
           {/* Status */}
           <div className="flex items-center justify-between gap-4">
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_STATUS || 'Status'} <span className="text-danger">*</span>
+              {BACKLOG_UI.FIELD_STATUS}
+              <span className="text-danger"> *</span>
             </span>
             <div className="flex-1">
               <Select
                 value={status}
                 onChange={setStatus}
-                options={[
-                  { value: WORK_ITEM_STATUS.TODO, label: 'To Do' },
-                  { value: WORK_ITEM_STATUS.IN_PROGRESS, label: 'In Progress' },
-                  { value: WORK_ITEM_STATUS.REVIEW, label: 'Review' },
-                  { value: WORK_ITEM_STATUS.DONE, label: 'Done' },
-                  { value: WORK_ITEM_STATUS.CANCELLED, label: 'Cancelled' },
-                ]}
+                options={Object.values(WORK_ITEM_STATUS)
+                  .filter((s) => s !== WORK_ITEM_STATUS.CANCELLED)
+                  .map((s) => ({
+                    value: s,
+                    label: Object.keys(WORK_ITEM_STATUS).find((key) => WORK_ITEM_STATUS[key] === s),
+                  }))}
               />
             </div>
           </div>
@@ -67,18 +61,17 @@ export function TaskModalSidebar({
           {/* Type */}
           <div className="flex items-center justify-between gap-4">
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_TYPE || 'Type'} <span className="text-danger">*</span>
+              {BACKLOG_UI.FIELD_TYPE}
+              <span className="text-danger"> *</span>
             </span>
             <div className="flex-1">
               <Select
                 value={type}
                 onChange={setType}
-                options={[
-                  { value: WORK_ITEM_TYPE.EPIC, label: 'Epic' },
-                  { value: WORK_ITEM_TYPE.USER_STORY, label: 'User Story' },
-                  { value: WORK_ITEM_TYPE.TASK, label: 'Task' },
-                  { value: WORK_ITEM_TYPE.SUBTASK, label: 'Subtask' },
-                ]}
+                options={Object.values(WORK_ITEM_TYPE).map((t) => ({
+                  value: t,
+                  label: Object.keys(WORK_ITEM_TYPE).find((key) => WORK_ITEM_TYPE[key] === t),
+                }))}
               />
             </div>
           </div>
@@ -86,35 +79,20 @@ export function TaskModalSidebar({
           {/* Epic */}
           <div className="flex items-center justify-between gap-4">
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.TYPE_EPIC || 'Epic'}
+              {BACKLOG_UI.FIELD_EPIC || 'Epic'}
             </span>
             <div className="flex-1">
               <Select
                 value={epic}
                 onChange={setEpic}
-                placeholder={BACKLOG_UI.SELECT || 'Select'}
-                options={epics.map((e) => ({
-                  value: e.id,
-                  label: e.title || e.name || 'Untitled',
-                }))}
-              />
-            </div>
-          </div>
-
-          {/* Sprint */}
-          <div className="flex items-center justify-between gap-4">
-            <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_SPRINT || 'Sprint'}
-            </span>
-            <div className="flex-1">
-              <Select
-                value={sprintId}
-                onChange={setSprintId}
-                placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_OPTIONAL || 'Select Sprint (Optional)'}
-                options={sprints.map((s) => ({
-                  value: s.sprintId || s.id,
-                  label: s.name || s.title || 'Untitled Sprint',
-                }))}
+                placeholder="Epic"
+                options={[
+                  { value: '', label: 'None' },
+                  ...epics.map((e) => ({
+                    value: e.id || e.workItemId,
+                    label: e.summary || e.title,
+                  })),
+                ]}
               />
             </div>
           </div>
@@ -122,17 +100,19 @@ export function TaskModalSidebar({
           {/* Assignee */}
           <div className="flex items-center justify-between gap-4">
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_ASSIGNEE || 'Assignee'}
+              {BACKLOG_UI.FIELD_ASSIGNEE}
             </span>
             <div className="flex-1">
               <Select
                 value={assignee}
                 onChange={setAssignee}
-                placeholder={BACKLOG_UI.SELECT || 'Select'}
-                options={(members || []).map((m) => ({
-                  value: m.id,
-                  label: m.fullName || m.name || 'Unknown',
-                }))}
+                options={[
+                  { value: '', label: 'Unassigned' },
+                  ...members.map((m) => ({
+                    value: m.id,
+                    label: m.fullName,
+                  })),
+                ]}
               />
             </div>
           </div>
@@ -140,18 +120,19 @@ export function TaskModalSidebar({
           {/* Priority */}
           <div className="flex items-center justify-between gap-4">
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_PRIORITY || 'Priority'} <span className="text-danger">*</span>
+              {BACKLOG_UI.FIELD_PRIORITY}
+              <span className="text-danger"> *</span>
             </span>
             <div className="flex-1">
               <Select
                 value={priority}
                 onChange={setPriority}
-                options={[
-                  { value: WORK_ITEM_PRIORITY.LOW, label: 'Low' },
-                  { value: WORK_ITEM_PRIORITY.MEDIUM, label: 'Medium' },
-                  { value: WORK_ITEM_PRIORITY.HIGH, label: 'High' },
-                  { value: WORK_ITEM_PRIORITY.CRITICAL, label: 'Critical' },
-                ]}
+                options={Object.values(WORK_ITEM_PRIORITY).map((p) => ({
+                  value: p,
+                  label: Object.keys(WORK_ITEM_PRIORITY).find(
+                    (key) => WORK_ITEM_PRIORITY[key] === p
+                  ),
+                }))}
               />
             </div>
           </div>
@@ -159,15 +140,14 @@ export function TaskModalSidebar({
           {/* Due Date */}
           <div className="flex items-center justify-between gap-4">
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_DUE_DATE || 'Due Date'}
+              {BACKLOG_UI.FIELD_DUE_DATE}
             </span>
             <div className="flex-1">
               <DatePicker
                 value={dueDate ? dayjs(dueDate) : null}
-                onChange={(date) => setDueDate(date ? date.toISOString() : '')}
-                format="YYYY-MM-DD"
+                onChange={(date) => setDueDate(date ? date.toISOString() : null)}
                 placeholder="Select date"
-                className="h-10 rounded-2xl"
+                className="w-full rounded-2xl h-10"
               />
             </div>
           </div>

@@ -6,6 +6,7 @@ import {
   AlertOctagon,
   Briefcase,
   ChevronDown,
+  FileText,
   FolderGit2,
   GraduationCap,
   Home,
@@ -20,7 +21,6 @@ import { useEffect, useMemo, useState } from 'react';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
 import { useLogout } from '@/hooks/useLogout';
-import { useToast } from '@/providers/ToastProvider';
 
 const ALL_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
@@ -39,7 +39,6 @@ const MENTOR_NAV_TABS = [
 export default function CompanyTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const [userInfo, setUserInfo] = useState(null);
 
   const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
@@ -47,8 +46,18 @@ export default function CompanyTopNav() {
   const isEnterpriseManager = [4, 5, 6].includes(roleId);
 
   const navTabs = useMemo(() => {
-    return isMentor ? MENTOR_NAV_TABS : ALL_NAV_TABS;
-  }, [isMentor]);
+    if (isMentor) return MENTOR_NAV_TABS;
+
+    const tabs = [...ALL_NAV_TABS];
+    if ([4, 5].includes(roleId)) {
+      tabs.push({
+        key: '/company/applications',
+        label: 'Applications',
+        icon: FileText,
+      });
+    }
+    return tabs;
+  }, [isMentor, roleId]);
 
   useEffect(() => {
     userService
@@ -96,7 +105,7 @@ export default function CompanyTopNav() {
   const isPhaseWorkspace = /^\/company\/phases\/[^/]+/.test(pathname);
 
   return (
-    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
+    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
       {/* LEFT — Logo + Tabs */}
       <div className="flex items-center gap-8">
         <Link href="/company/home" className="relative flex h-8 w-28 items-center">

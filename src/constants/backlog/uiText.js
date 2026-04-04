@@ -130,4 +130,15 @@ export const BACKLOG_UI = {
   ERROR_UPDATE_TASK: 'Error updating task',
   SUCCESS_CREATE_SPRINT: 'Sprint created successfully!',
   ERROR_CREATE_SPRINT: 'Error creating sprint',
+
+  // No Project State
+  NO_PROJECT_TITLE: 'No Project Assigned',
+  NO_PROJECT_DESC:
+    'This internship group has not been linked to a project yet. Please contact your mentor or administrator to get started.',
+
+  // Task History
+  COMPILING_HISTORY: 'Compiling Task History...',
+  NO_TASK_HISTORY: 'No Task History',
+  NO_TASK_HISTORY_DESC:
+    "We couldn't find any tasks associated with your projects in the system history.",
 };
