@@ -1,7 +1,7 @@
 'use client';
 
 import { FileTextOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
 import { Briefcase, ChevronDown, Home } from 'lucide-react';
 import Image from 'next/image';
@@ -9,18 +9,17 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
 import { useInternshipStatus } from '@/hooks/useInternshipStatus';
+import { useLogout } from '@/hooks/useLogout';
 import { useToast } from '@/providers/ToastProvider';
 
 export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const toast = useToast();
-  const queryClient = useQueryClient();
+  const { logout: handleLogout } = useLogout();
   const { isEnrolled, isPlaced, hasCv } = useInternshipStatus();
 
   const { data: userInfo } = useQuery({
@@ -28,17 +27,6 @@ export default function StudentTopNav() {
     queryFn: () => userService.getMe().then((res) => res?.data || res),
     staleTime: 0, // Always verify user identity on mount
   });
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      queryClient.clear(); // Clear all cached data to prevent cross-user leak
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
 
   const navTabs = useMemo(() => {
     const tabs = [{ key: '/student/home', label: 'Home', icon: Home }];

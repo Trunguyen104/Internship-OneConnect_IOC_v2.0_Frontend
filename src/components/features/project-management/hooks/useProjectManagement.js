@@ -63,7 +63,7 @@ export const useProjectManagement = () => {
 
   // 1. Fetch Supporting Data (Groups)
   const { data: groups = [] } = useQuery({
-    queryKey: ['groups-for-mentor'],
+    queryKey: ['groups-for-mentor', userInfo?.id],
     queryFn: async () => {
       try {
         const res = await ProjectService.getGroupsForMentor();
