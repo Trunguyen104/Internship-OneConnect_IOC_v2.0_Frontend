@@ -15,7 +15,7 @@ const { Content } = Layout;
 export default function ProfileLayout({ children }) {
   return (
     <AuthGuard allowedRoles={[]}>
-      <Layout className="flex min-h-screen">
+      <Layout className="flex h-screen">
         <AppSidebar />
         <Layout className="flex h-full flex-1 flex-col overflow-hidden">
           <Header />

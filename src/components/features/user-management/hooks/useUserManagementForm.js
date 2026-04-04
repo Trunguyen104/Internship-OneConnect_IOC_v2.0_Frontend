@@ -178,6 +178,9 @@ export function useUserManagementForm(onSuccess) {
       if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
         nextErrors.email = UI_TEXT.USER_MANAGEMENT.ERR_INVALID_EMAIL;
       }
+      if (payload.phoneNumber && !/^0[0-9]{9,10}$/.test(payload.phoneNumber)) {
+        nextErrors.phoneNumber = UI_TEXT.USER_MANAGEMENT.ERR_PHONE_INVALID;
+      }
       if (!payload.role) {
         nextErrors.role = 'Please select an assigned role';
       }

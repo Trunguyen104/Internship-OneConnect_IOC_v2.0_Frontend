@@ -148,6 +148,7 @@ export const UI_TEXT = {
     SUCCESS_UPDATED: 'User information updated successfully',
     ERR_DOB_FORMAT: 'Date of birth must be in YYYY-MM-DD format',
     ERR_GPA_NUMBER: 'Student GPA must be a number',
+    ERR_PHONE_INVALID: 'Phone number must be digits (10-11) starting with 0.',
     INTERNSHIP_TERM_LABEL: 'Internship Term',
     TERM_PLACEHOLDER_LOADING: 'Loading terms...',
     TERM_PLACEHOLDER_SELECT: 'Select internship term',

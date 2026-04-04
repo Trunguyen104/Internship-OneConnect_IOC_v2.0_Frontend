@@ -284,6 +284,8 @@ function UpdateForm({ userId, onSuccess, onCancel }) {
       nextErrors.dateOfBirth = UI_TEXT.USER_MANAGEMENT.ERR_DOB_FORMAT;
     if (editForm.studentGpa !== '' && Number.isNaN(Number(editForm.studentGpa)))
       nextErrors.studentGpa = UI_TEXT.USER_MANAGEMENT.ERR_GPA_NUMBER;
+    if (editForm.phoneNumber && !/^0[0-9]{9,10}$/.test(editForm.phoneNumber.trim()))
+      nextErrors.phoneNumber = UI_TEXT.USER_MANAGEMENT.ERR_PHONE_INVALID;
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
 

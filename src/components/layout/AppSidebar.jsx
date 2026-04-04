@@ -13,7 +13,6 @@ import {
   GraduationCap,
   Info,
   LayoutDashboard,
-  Lock,
   UserCircle,
   Users,
 } from 'lucide-react';
@@ -179,11 +178,6 @@ export default function AppSidebar() {
           },
           { type: 'divider' },
           { key: '/profile', icon: <UserCircle className="size-4" />, label: 'My Profile' },
-          {
-            key: '/profile/change-password',
-            icon: <Lock className="size-4" />,
-            label: 'Change Password',
-          },
         ];
       }
 

@@ -112,11 +112,9 @@ export function useStakeholderTab() {
     }
 
     if (stakeholderForm.phoneNumber) {
-      const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+      const phoneRegex = /^0[0-9]{9,10}$/;
       if (!phoneRegex.test(stakeholderForm.phoneNumber)) {
         newErrors.phoneNumber = STAKEHOLDER_MESSAGES.REQUIRED_FIELDS.PHONE_INVALID;
-      } else if (stakeholderForm.phoneNumber.length > 15) {
-        newErrors.phoneNumber = STAKEHOLDER_MESSAGES.REQUIRED_FIELDS.PHONE_MAX_LENGTH;
       }
     }
 

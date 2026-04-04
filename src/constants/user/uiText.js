@@ -32,6 +32,7 @@ export const PROFILE_UI = {
     REQUIRED_MAJOR: 'Major is required',
     REQUIRED_CLASS: 'Class name is required',
     DOB_FUTURE_ERROR: 'Date of birth cannot be in the future',
+    PHONE_INVALID: 'Invalid phone format (0xxxxxxxxx)',
   },
   PLACEHOLDERS: {
     PHONE: 'Enter your phone number',
@@ -98,6 +99,7 @@ export const PROFILE_UI = {
   UPDATE_ERROR: 'Failed to update profile',
   EMPTY: {
     NO_DATA: 'No profile data found.',
+    NOT_AVAILABLE: '—',
   },
   ROLE_LABELS: {
     1: 'Super Admin',

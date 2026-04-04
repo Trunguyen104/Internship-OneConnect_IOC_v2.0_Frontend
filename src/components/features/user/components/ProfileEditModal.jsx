@@ -297,10 +297,7 @@ export default function ProfileEditModal({
           <Form.Item
             label={PROFILE_UI.LABELS.PHONE}
             name="phoneNumber"
-            rules={[
-              { pattern: /^\d+$/, message: PROFILE_UI.VALIDATION.PHONE_DIGITS },
-              { max: 15, message: PROFILE_UI.VALIDATION.PHONE_MAX },
-            ]}
+            rules={[{ pattern: /^0[0-9]{9,10}$/, message: PROFILE_UI.VALIDATION.PHONE_INVALID }]}
             validateTrigger={['onChange', 'onBlur']}
           >
             <Input placeholder={PROFILE_UI.PLACEHOLDERS.PHONE} className="h-11" />
