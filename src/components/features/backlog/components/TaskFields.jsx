@@ -11,7 +11,7 @@ import { Select as CustomSelect } from '@/components/ui/select';
 
 export function FieldLabel({ required, children }) {
   return (
-    <div className="text-text mb-[6px] text-sm font-semibold text-gray-800">
+    <div className="mb-[6px] text-sm font-semibold text-gray-800">
       {children}
       {required ? <span className="text-danger"> *</span> : null}
     </div>

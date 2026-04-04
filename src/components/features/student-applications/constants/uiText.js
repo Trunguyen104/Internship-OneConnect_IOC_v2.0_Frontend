@@ -10,6 +10,7 @@ export const STUDENT_APPLICATIONS_UI = {
   },
   COLUMNS: {
     JOB_ENTERPRISE: 'Job Title & Enterprise',
+    PHASE: 'Internship Phase',
     APPLIED_DATE: 'Applied Date',
     SOURCE: 'Source',
     STATUS: 'Status',
@@ -49,6 +50,7 @@ export const STUDENT_APPLICATIONS_UI = {
     WITHDRAW_ERROR: 'Failed to withdraw application. Please try again.',
     HIDE_ERROR: 'Failed to hide application. Please try again.',
     REJECT_REASON_TITLE: 'Rejection Reason:',
+    PENDING_DEFAULT: 'Your application has been sent. You will be notified of any updates.',
   },
   ACTIONS: {
     VIEW_DETAILS: 'View Details',
@@ -81,5 +83,20 @@ export const STUDENT_APPLICATIONS_UI = {
     DATE_ARROW: ' → ',
     N_A: '—',
     UPDATED: 'Updated',
+    UPDATING: 'Updating...',
+    REPLICATE_CV: '{name}_CV_{year}.pdf',
+    FILE_FORMAT: '{size} • {format}',
+  },
+  STATS: {
+    TOTAL: 'Total Applications',
+    PROCESSING: 'Processing',
+    PLACED: 'Accepted',
+    UNI_PENDING: 'Waiting for Uni',
+    PARTICIPATING_PHASE: 'Participating Internship Phase',
+    APPLIED_DATE: 'Applied Date',
+    OTHER_INFO: 'Other Information',
+    SUBMITTED_DOCS: 'Submitted Documents',
+    UPDATE_HISTORY: 'Update History',
+    WITHDRAW_REGISTRATION: 'Withdraw Registration',
   },
 };

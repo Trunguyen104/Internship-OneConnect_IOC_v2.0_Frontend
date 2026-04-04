@@ -216,10 +216,20 @@ export default function AppSidebar() {
 
   const menuItems = useMemo(() => getRoutes(role), [role, getRoutes]);
   const selectedKeys = useMemo(() => {
-    const active = menuItems.find(
+    // Collect all matching items
+    const matches = menuItems.filter(
       (item) => item.key && (pathname === item.key || pathname.startsWith(item.key + '/'))
     );
-    return active ? [active.key] : [];
+
+    if (matches.length === 0) return [];
+
+    // Prefer the longest match to ensure sub-routes (like /profile/change-password)
+    // are highlighted instead of generic parent routes (like /profile)
+    const longestMatch = matches.reduce((prev, curr) =>
+      curr.key.length > prev.key.length ? curr : prev
+    );
+
+    return [longestMatch.key];
   }, [pathname, menuItems]);
 
   const handleMenuClick = useCallback(
@@ -227,7 +237,7 @@ export default function AppSidebar() {
       if (info.key === 'back-to-app') return router.push(getDashboardHref(role));
       if (info.key === 'back-to-terms') return router.push('/school/terms');
       if (info.key === 'back-to-phases') return router.push('/company/phases');
-      if (info.key === 'back-to-home') router.push('/student/home');
+      if (info.key === 'back-to-home') return router.push(getDashboardHref(role));
       if (info.key) router.push(info.key);
     },
     [role, router, getDashboardHref]

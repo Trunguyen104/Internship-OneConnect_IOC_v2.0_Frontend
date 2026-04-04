@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { useAuthStore } from '@/store/useAuthStore';
+
 import { NotificationService } from '../services/notification.service';
 
 /**
@@ -9,13 +11,17 @@ import { NotificationService } from '../services/notification.service';
  */
 export const useNotifications = () => {
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+  const userId = user?.id || user?.sub || user?.email;
 
   // 1. Fetch unread count (cached/invalidated on changes)
   const { data: unreadData, refetch: refreshUnreadCount } = useQuery({
-    queryKey: ['notifications', 'unread-count'],
+    queryKey: ['notifications', userId, 'unread-count'],
     queryFn: () => NotificationService.getUnreadCount(),
-    // Keep count relatively fresh
-    staleTime: 30 * 1000,
+    enabled: !!userId,
+    // Keep count relatively fresh via polling (AC-01/02 legacy)
+    staleTime: 15 * 1000,
+    refetchInterval: 30 * 1000, // Poll every 30 seconds (replaces SignalR)
   });
 
   const unreadCount = useMemo(() => unreadData?.data?.unreadCount || 0, [unreadData]);
@@ -29,15 +35,17 @@ export const useNotifications = () => {
     isLoading: loading,
     refetch: fetchNotifications,
   } = useInfiniteQuery({
-    queryKey: ['notifications', 'list'],
+    queryKey: ['notifications', userId, 'list'],
     queryFn: ({ pageParam = 1 }) =>
       NotificationService.getNotifications({ pageIndex: pageParam, pageSize: 15 }),
+    enabled: !!userId,
     getNextPageParam: (lastPage) => {
       const { pageIndex, totalPages } = lastPage?.data || {};
       return pageIndex < totalPages ? pageIndex + 1 : undefined;
     },
     initialPageParam: 1,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000, // Background refresh the list every 60 seconds
   });
 
   const notifications = useMemo(() => {

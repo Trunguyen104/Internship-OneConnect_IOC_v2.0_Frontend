@@ -75,7 +75,7 @@ export const InternPhaseService = {
     try {
       const res = await httpClient.httpGet(`${BASE_URL}/${phaseId}/job-postings`, params);
       return res?.data || res;
-    } catch (error) {
+    } catch {
       // Fallback: This endpoint might not exist yet, DetailView uses initialData from getById
       return { data: [], totalCount: 0 };
     }
@@ -94,7 +94,7 @@ export const InternPhaseService = {
         items: items,
         totalCount: responseData?.totalCount || items.length || 0,
       };
-    } catch (error) {
+    } catch {
       return { items: [], totalCount: 0 };
     }
   },
@@ -114,7 +114,7 @@ export const InternPhaseService = {
         };
       }
       throw new Error(INTERN_PHASE_MANAGEMENT.MESSAGES.ERROR_NO_STUDENTS);
-    } catch (error) {
+    } catch {
       // Fallback: If specific endpoint fails, try to get from phase detail
       const phase = await this.getById(phaseId);
       const students = phase?.placedStudents || [];

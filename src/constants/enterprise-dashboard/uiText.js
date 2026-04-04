@@ -1,0 +1,36 @@
+export const ENTERPRISE_DASHBOARD_UI = {
+  TITLE: 'Enterprise Dashboard',
+  SUBTITLE: 'Welcome back! View your organization summary and recent activities.',
+  STATS: {
+    TOTAL_INTERNS: 'Total Interns',
+    ACTIVE_PROJECTS: 'Active Projects',
+    PENDING_APPLICATIONS: 'Pending Applications',
+    UPCOMING_INTERVIEWS: 'Upcoming Interviews',
+  },
+  CHARTS: {
+    INTERN_PERFORMANCE: 'Intern Performance Overview',
+    APPLICATION_TRENDS: 'Application Trends',
+    CHART_PLACEHOLDER: 'Performance charts will be displayed here soon.',
+    CONNECTING: 'Connecting to data sources...',
+  },
+  PHASES_STATUS: {
+    TITLE: 'Intern Status by Phases',
+    SLOTS: 'Slots',
+    EMPTY: 'No internship phases available for this organization.',
+  },
+  APPLICATIONS: {
+    TITLE: 'Applications',
+    SELF_APPLY: 'Self-Apply',
+    UNI_ASSIGN: 'University-Assigned',
+    VIEW_ALL: 'View All Applications',
+    NO_CANDIDATES: 'No candidates yet',
+    SEPARATOR: '•',
+    SV: 'SV',
+    PLACED: 'Placed',
+    ENROLLMENT_STATUS: 'Enrollment Status',
+    ARROW: '→',
+  },
+  TOTAL: 'Total',
+  WELCOME_MESSAGE: 'Welcome to your enterprise workspace',
+  LOADING_ANALYZING: 'Analyzing dashboard data...',
+};

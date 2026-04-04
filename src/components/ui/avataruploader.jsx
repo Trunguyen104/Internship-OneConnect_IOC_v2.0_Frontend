@@ -6,6 +6,7 @@ import ImgCrop from 'antd-img-crop';
 
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 export default function AvatarUploader({ value, onChange, size = 116, fullName }) {
   const toast = useToast();
@@ -34,7 +35,8 @@ export default function AvatarUploader({ value, onChange, size = 116, fullName }
     return false;
   };
 
-  const displayImage = value instanceof File ? URL.createObjectURL(value) : value;
+  const displayImage =
+    value instanceof File ? URL.createObjectURL(value) : resolveResourceUrl(value);
 
   return (
     <ImgCrop rotationSlider aspect={1}>

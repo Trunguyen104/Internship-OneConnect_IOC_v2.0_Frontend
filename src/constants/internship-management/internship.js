@@ -46,6 +46,7 @@ export const INTERNSHIP_UI = {
     ATTENTION: 'ATTENTION',
     RECOMMENDATION: 'RECOMMENDATION',
     ACTIVE_APPLICATION: 'ACTIVE APPLICATION',
+    PROCESSING_ASSIGNMENT: 'Processing Assignment',
   },
 
   MESSAGES: {
@@ -54,5 +55,6 @@ export const INTERNSHIP_UI = {
     APPLY_PROMPT: 'Please apply for positions to find an internship company',
     UNPLACED_ACTIVE_ALERT:
       'You have not been placed in a company, please contact Uni Admin for support.',
+    WAITING_FOR_HR: 'Waiting for HR to assign your group...',
   },
 };

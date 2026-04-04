@@ -58,13 +58,6 @@ export default function JobPostingDetail() {
     return { applicationsSummary: summary, totalApplications: total };
   }, [job]);
 
-  const activeAppCount = useMemo(() => {
-    if (!job) return 0;
-    return (job.applicationStatusCounts || [])
-      .filter((item) => [1, 2, 3].includes(item.status)) // Applied, Interviewing, Offered
-      .reduce((sum, item) => sum + item.count, 0);
-  }, [job]);
-
   // Lookup Phase Info from the list if not provided in the detail object
   const phaseInfo = useMemo(() => {
     if (!job?.internshipPhaseId || !phases) return null;

@@ -39,13 +39,22 @@ export const INTERNSHIP_STATUS_CONFIG = {
   },
 };
 
-export const INTERNSHIP_STEPS = [
+export const SELF_APPLY_STEPS = [
   { key: 'registration', label: 'Registration' },
   { key: 'interviewing', label: 'Interview' },
   { key: 'offered', label: 'Offer' },
   { key: 'placed', label: 'Placement' },
   { key: 'finalizing', label: 'Finalize' },
 ];
+
+export const UNI_ASSIGN_STEPS = [
+  { key: 'pending', label: 'Pending Review' },
+  { key: 'placed', label: 'Placement' },
+  { key: 'finalizing', label: 'Finalize' },
+];
+
+// Fallback for older code
+export const INTERNSHIP_STEPS = SELF_APPLY_STEPS;
 
 export const getStepStatus = (stepIndex, currentStatus) => {
   if (currentStatus == INTERNSHIP_STATUS.CLOSED) {

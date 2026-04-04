@@ -164,10 +164,14 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
 
           <Form.Item
             name="name"
-            label={ENTERPRISE_PROFILE_UI.ENTERPRISE.COMPANY_NAME_PLACEHOLDER}
+            label={UI_TEXT.ENTERPRISES.NAME}
             rules={[{ required: true, message: ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.NAME }]}
           >
-            <Input size="large" autoComplete="organization" />
+            <Input
+              size="large"
+              autoComplete="organization"
+              placeholder={UI_TEXT.ENTERPRISES.NAME_PLACEHOLDER}
+            />
           </Form.Item>
 
           <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
@@ -188,20 +192,24 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
                 type="url"
                 inputMode="url"
                 autoComplete="url"
-                placeholder={ENTERPRISE_PROFILE_UI.ENTERPRISE.WEBSITE_PLACEHOLDER}
+                placeholder={UI_TEXT.ENTERPRISES.WEBSITE_PLACEHOLDER}
               />
             </Form.Item>
 
-            <Form.Item name="industry" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.INDUSTRY}>
-              <Input size="large" />
+            <Form.Item name="industry" label={UI_TEXT.ENTERPRISES.INDUSTRY_COLUMN}>
+              <Input size="large" placeholder={UI_TEXT.ENTERPRISES.INDUSTRY_PLACEHOLDER} />
             </Form.Item>
 
             <Form.Item name="taxCode" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.TAX_CODE}>
-              <Input size="large" />
+              <Input size="large" placeholder={UI_TEXT.ENTERPRISES.TAX_CODE_PLACEHOLDER} />
             </Form.Item>
 
             <Form.Item name="address" label={ENTERPRISE_PROFILE_UI.ENTERPRISE.ADDRESS}>
-              <Input size="large" autoComplete="street-address" />
+              <Input
+                size="large"
+                autoComplete="street-address"
+                placeholder={UI_TEXT.ENTERPRISES.ADDRESS_PLACEHOLDER}
+              />
             </Form.Item>
 
             <Form.Item
@@ -223,7 +231,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
             rules={[{ max: 2000, message: ENTERPRISE_PROFILE_UI.ENTERPRISE.ERRORS.DESCRIPTION }]}
           >
             <Input.TextArea
-              placeholder={ENTERPRISE_PROFILE_UI.ENTERPRISE.DESCRIPTION_PLACEHOLDER}
+              placeholder={UI_TEXT.ENTERPRISES.OVERVIEW_PLACEHOLDER}
               autoComplete="off"
               maxLength={2000}
               showCount
@@ -241,7 +249,7 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
         <Button
           type="button"
           variant="ghost"
-          className="h-11 rounded-full bg-slate-50 px-8 font-bold text-slate-500 hover:bg-slate-100"
+          className="h-9 rounded-full bg-slate-50 px-5 text-sm font-semibold text-slate-500 hover:bg-slate-100"
           onClick={() => onCancel?.()}
         >
           {UI_TEXT.BUTTON.CANCEL}
@@ -250,10 +258,10 @@ export default function EnterprisesForm({ enterprise, onSuccess, onCancel }) {
           type="button"
           disabled={loading}
           onClick={handleSubmit}
-          className="bg-primary hover:bg-primary/90 shadow-primary/20 h-11 min-w-[160px] rounded-full px-8 font-bold text-white shadow-lg transition-all"
+          className="bg-primary hover:bg-primary/90 shadow-primary/10 h-9 min-w-[120px] rounded-full px-6 text-sm font-bold text-white shadow-md transition-all active:scale-95"
         >
           {loading ? (
-            <Spinner className="mr-2" />
+            <Spinner className="mr-2 h-4 w-4" />
           ) : isHttpUrl(enterprise?.website) ? (
             UI_TEXT.BUTTON.SAVE_CHANGES
           ) : (

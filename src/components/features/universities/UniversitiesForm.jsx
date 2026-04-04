@@ -79,18 +79,11 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-      <div className="flex flex-col items-center gap-6">
-        <LogoUploader
-          value={logoUrl}
-          onChange={setLogoUrl}
-          size={120}
-          label={UI_TEXT.UNIVERSITIES.LOGO_LABEL}
-          folder="Universities"
-        />
-        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted/40 text-center">
-          {UI_TEXT.UNIVERSITIES.IDENTITY}
-        </p>
-      </div>
+      {isEdit && (
+        <div className="flex flex-col items-center gap-6">
+          <LogoUploader value={logoUrl} onChange={setLogoUrl} size={120} folder="Universities" />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
         <div className="md:col-span-2 space-y-2">
@@ -158,7 +151,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
         <Button
           type="button"
           variant="ghost"
-          className="h-12 rounded-full px-8 font-black uppercase tracking-widest text-[11px] text-muted transition-all hover:bg-gray-100"
+          className="h-9 rounded-full px-5 font-semibold text-sm text-muted/60 transition-all hover:bg-gray-100"
           onClick={() => onCancel?.()}
         >
           {UI_TEXT.BUTTON.CANCEL}
@@ -166,7 +159,7 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
         <Button
           type="submit"
           disabled={loading}
-          className="bg-primary/90 h-12 min-w-[160px] rounded-full px-10 text-[11px] font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-primary active:scale-[0.98] disabled:opacity-50"
+          className="bg-primary hover:bg-primary/90 h-9 min-w-[120px] rounded-full px-6 text-sm font-bold text-white shadow-md transition-all active:scale-95 disabled:opacity-50"
         >
           {loading ? (
             <Spinner className="size-4" />

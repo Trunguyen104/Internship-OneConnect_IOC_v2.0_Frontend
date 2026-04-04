@@ -60,6 +60,7 @@ export default function BacklogBoard() {
     openUpdateSprint,
     setOpenUpdateSprint,
     handleDragEnd,
+    members,
   } = useBacklogBoard();
 
   const sensors = useSensors(
@@ -163,6 +164,7 @@ export default function BacklogBoard() {
         selectedSprintAction={selectedSprintAction}
         activeSprintForTask={activeSprintForTask}
         setActiveSprintForTask={setActiveSprintForTask}
+        members={members}
       />
     </div>
   );
