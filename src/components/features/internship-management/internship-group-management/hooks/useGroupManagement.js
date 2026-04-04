@@ -31,7 +31,13 @@ export const useGroupManagement = () => {
       try {
         const res = await userService.getMe();
         const data = res?.data || res;
-        return data?.enterpriseId || data?.enterprise_id || data?.enterpriseID;
+        return (
+          data?.enterpriseId ||
+          data?.enterprise_id ||
+          data?.enterpriseID ||
+          data?.enterprise?.id ||
+          data?.enterprise?.enterpriseId
+        );
       } catch {
         return null;
       }
@@ -51,35 +57,27 @@ export const useGroupManagement = () => {
 
   // 3. Fetch Mentors - Aligned with Backend (Self-identifies enterprise via HR login)
   const { data: mentors = [], isLoading: loadingMentors } = useQuery({
-    queryKey: ['enterprise-mentors'],
+    queryKey: ['enterprise-mentors-final-revert', enterpriseId],
     queryFn: async () => {
       try {
-        const roles = [6]; // Using Role 6 as standard for Mentors
-        const results = await Promise.allSettled(
-          roles.map((r) =>
-            EnterpriseMentorService.getMentors({
-              Role: r,
-              PageSize: 100,
-            })
-          )
-        );
+        // Reverting to the exact call that worked at 10:27 AM
+        const res = await EnterpriseMentorService.getMentors({});
+        const data = res?.data || res;
+        const allItems = data?.items || data?.Items || (Array.isArray(data) ? data : []);
+        console.log('>>> [DIAGNOSIS] Raw users from server:', allItems.length);
 
-        const allItems = results
-          .filter((r) => r.status === 'fulfilled')
-          .flatMap((r) => {
-            const res = r.value;
-            const data = res?.data || res;
-            return data?.items || data?.Items || (Array.isArray(data) ? data : []);
-          });
+        const identified = allItems.filter((m) => String(m.role || m.Role) === '6');
 
-        return Array.from(
-          new Map(allItems.map((item) => [item?.userId || item?.UserId || item?.id, item])).values()
-        ).filter(Boolean);
-      } catch {
+        return identified.map((m) => ({
+          label: `${m.fullName || m.name}`,
+          value: m.userId || m.UserId,
+          ...m,
+        }));
+      } catch (error) {
         return [];
       }
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   const [assignModal, setAssignModal] = useState({ open: false, group: null });
@@ -224,36 +222,62 @@ export const useGroupManagement = () => {
 
   const handleCreateGroup = useCallback(
     async (payload) => {
-      let targetPhaseId = groupFilters.phaseId;
-
-      if (targetPhaseId === 'ALL_VISIBLE' || !targetPhaseId) {
-        targetPhaseId = payload.phaseId || payload.termId;
-      }
-
-      if (!targetPhaseId && payload.students?.[0]?.studentId) {
-        const firstStudentId = payload.students[0].studentId;
-        const studentInfo = (unassignedStudents || []).find(
-          (s) => String(s.studentId || s.id || s.applicationId) === String(firstStudentId)
-        );
-        targetPhaseId = studentInfo?.phaseId || studentInfo?.termId;
-      }
-
       const safeOptions = Array.isArray(groupFilters.phaseOptions) ? groupFilters.phaseOptions : [];
+      let targetPhaseId = payload.phaseId || groupFilters.phaseId;
+
+      const firstStudentId = payload.students?.[0]?.studentId;
+      const studentInfo = (unassignedStudents || []).find(
+        (s) =>
+          String(s.studentId || s.id || s.applicationId || s.StudentId) === String(firstStudentId)
+      );
+
+      // Nếu không chọn phase cụ thể, ưu tiên lấy từ sinh viên
+      if (targetPhaseId === 'ALL_VISIBLE' || !targetPhaseId) {
+        targetPhaseId =
+          studentInfo?.phaseId ||
+          studentInfo?.termId ||
+          studentInfo?.internshipPhaseId ||
+          safeOptions.find((p) => p.status === 1)?.value;
+      }
+
       const selectedPhase = safeOptions.find(
         (p) => String(p.value).toLowerCase() === String(targetPhaseId).toLowerCase()
       );
 
-      await createGroup({
-        ...payload,
+      const currentEnterpriseId =
+        enterpriseId ||
+        studentInfo?.enterpriseId ||
+        studentInfo?.unitId ||
+        selectedPhase?.enterpriseId;
+
+      const formatISO = (dateStr) => {
+        if (!dateStr) return null;
+        try {
+          return new Date(dateStr).toISOString();
+        } catch {
+          return null;
+        }
+      };
+
+      const finalPayload = {
         phaseId: targetPhaseId,
-        internshipPhaseId: targetPhaseId,
-        enterpriseId: enterpriseId || selectedPhase?.enterpriseId,
-        startDate: payload.startDate || selectedPhase?.startDate,
-        endDate: payload.endDate || selectedPhase?.endDate,
-      });
+        groupName: payload.groupName,
+        description: payload.description || null,
+        enterpriseId: currentEnterpriseId,
+        mentorId: payload.mentorId || null,
+        startDate: formatISO(
+          payload.startDate || studentInfo?.phaseStartDate || selectedPhase?.startDate
+        ),
+        endDate: formatISO(payload.endDate || studentInfo?.phaseEndDate || selectedPhase?.endDate),
+        students: payload.students || [],
+      };
+
+      console.log('>>> DEBUG Payload (Post ISO):', JSON.stringify(finalPayload, null, 2));
+
+      await createGroup(finalPayload);
       setCreateModal({ open: false, group: null });
     },
-    [createGroup, groupFilters.phaseId, groupFilters.phaseOptions, enterpriseId, unassignedStudents]
+    [createGroup, groupFilters.phaseId, groupFilters.phaseOptions, enterpriseId, toast]
   );
 
   const handleUpdateGroup = useCallback(
@@ -310,15 +334,20 @@ export const useGroupManagement = () => {
             (p) => String(p.value).toLowerCase() === String(targetPhaseId).toLowerCase()
           );
 
+          const currentEnterpriseId =
+            enterpriseId || group.enterpriseId || selectedPhase?.enterpriseId;
+
           await updateGroup(groupId, {
-            groupName: values.groupName,
-            description: values.description,
-            mentorId: values.mentorId,
-            enterpriseId: enterpriseId || group.enterpriseId || selectedPhase?.enterpriseId,
-            startDate: values.startDate || group.startDate || selectedPhase?.startDate,
-            endDate: values.endDate || group.endDate || selectedPhase?.endDate,
             phaseId: targetPhaseId,
-            internshipPhaseId: targetPhaseId,
+            groupName: values.groupName,
+            description: values.description || null,
+            enterpriseId: currentEnterpriseId,
+            mentorId: values.mentorId || null,
+            startDate: values.startDate || group.startDate || selectedPhase?.startDate || null,
+            endDate: values.endDate || group.endDate || selectedPhase?.endDate || null,
+            // For updates, the student list might be handled by separate calls if needed,
+            // but matching the schema:
+            students: values.students || undefined,
           });
         }
 
@@ -334,6 +363,7 @@ export const useGroupManagement = () => {
       removeStudents,
       enterpriseId,
       groupFilters.phaseOptions,
+      unassignedStudents,
     ]
   );
 

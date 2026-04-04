@@ -28,6 +28,12 @@ async function handler(req, { params }) {
       headers.set('Content-Type', contentType);
     }
 
+    // Forward standard headers for backend compatibility
+    const pathString = path.join('/');
+    if (pathString.includes('user-management')) {
+      headers.set('accept', 'text/plain, application/json, */*');
+    }
+
     // Extract accessToken from HttpOnly cookies securely on the server
     const accessToken = req.cookies.get('accessToken')?.value;
     if (accessToken) {

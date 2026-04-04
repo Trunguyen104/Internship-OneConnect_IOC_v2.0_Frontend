@@ -92,24 +92,22 @@ export const CreateGroupModal = memo(
         return sid === String(firstId);
       });
 
-      const phaseId =
-        values.phaseId ||
+      const studentPhaseId =
         studentWithPhase?.phaseId ||
         studentWithPhase?.termId ||
         studentWithPhase?.internshipPhaseId;
 
       const payload = {
         ...values,
-        phaseId,
-        termId: phaseId,
+        phaseId: studentPhaseId, // Ưu tiên phaseId của sinh viên
         students: !isEdit
           ? studentIds.map((id) => {
               const studentObj = combinedStudentList.find(
-                (s) => String(s.id || s.studentId || s.applicationId) === String(id)
+                (s) => String(s.studentId || s.id || s.applicationId || s.StudentId) === String(id)
               );
               const roleValue = studentObj?.role || studentObj?.Role || 1;
               const roleInt = roleValue === 'Leader' || roleValue === 2 ? 2 : 1;
-              return { studentId: id, role: roleInt };
+              return { studentId: studentObj?.studentId || id, role: roleInt };
             })
           : undefined,
       };
