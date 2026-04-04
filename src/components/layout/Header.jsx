@@ -2,7 +2,6 @@
 
 import {
   BankOutlined,
-  FileTextOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -18,6 +17,7 @@ import { clearAuth } from '@/components/features/auth/lib/auth-storage';
 import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
@@ -55,6 +55,9 @@ export default function Header() {
       router.push('/login');
     }
   };
+
+  const userRoleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
+
   const avatarMenu = {
     items: [
       {
@@ -71,10 +74,11 @@ export default function Header() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
-      ...([4, 5, 6].includes(userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role))
+      ...(userRoleId === USER_ROLE.ENTERPRISE_ADMIN ||
+      userRoleId === USER_ROLE.HR ||
+      userRoleId === USER_ROLE.MENTOR
         ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
         : []),
-      { key: 'my-applications', icon: <FileTextOutlined />, label: 'My Applications' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
@@ -85,9 +89,6 @@ export default function Header() {
         router.push(`/profile${query}`);
       }
       if (key === 'my-company') router.push('/company/my-company');
-      if (key === 'my-applications') router.push('/my-applications');
-      if (key === 'settings') router.push('/settings');
-
       if (key === 'logout') handleLogout();
     },
   };

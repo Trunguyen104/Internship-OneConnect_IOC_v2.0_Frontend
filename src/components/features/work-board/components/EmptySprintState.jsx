@@ -16,7 +16,7 @@ export function EmptySprintState() {
     : '/internship-groups/backlog';
 
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border border-gray-100 bg-white p-12 shadow-sm">
+    <div className="flex flex-1 min-h-[600px] flex-col items-center justify-center rounded-[40px] border border-gray-100 bg-white p-12 shadow-sm">
       <Empty
         image={
           <div className="bg-primary-surface text-primary mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full">
@@ -41,10 +41,8 @@ export function EmptySprintState() {
         }
         description={
           <div className="flex flex-col items-center">
-            <h3 className="text-text mb-2 text-xl font-bold text-gray-900">
-              {WORK_BOARD_UI.NO_ACTIVE_SPRINT}
-            </h3>
-            <p className="text-muted max-w-md text-sm leading-relaxed text-gray-500">
+            <h3 className="text-text mb-2 text-xl font-bold">{WORK_BOARD_UI.NO_ACTIVE_SPRINT}</h3>
+            <p className="text-muted max-w-md text-sm leading-relaxed">
               {WORK_BOARD_UI.START_SPRINT_DESC}
             </p>
           </div>

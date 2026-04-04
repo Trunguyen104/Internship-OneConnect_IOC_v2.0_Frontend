@@ -142,11 +142,11 @@ const InternshipDashboard = () => {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-12 px-6 py-12">
       <header className="relative">
-        <div className="absolute -left-12 top-0 h-24 w-1 bg-indigo-600 rounded-full hidden lg:block" />
+        <div className="absolute -left-12 top-0 h-24 w-1 bg-primary rounded-full hidden lg:block" />
         <h1 className="text-4xl font-black tracking-tight text-slate-900 leading-[1.1]">
           {INTERNSHIP_UI.TITLE.replace(INTERNSHIP_UI.JOURNEY_HIGHLIGHT, '')}
-          <span className="bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-            {INTERNSHIP_UI.JOURNEY_HIGHLIGHT}
+          <span className="bg-gradient-to-r from-primary to-rose-500 bg-clip-text text-transparent">
+            {userInfo?.fullName || userInfo?.FullName || INTERNSHIP_UI.JOURNEY_HIGHLIGHT}
           </span>
         </h1>
         <p className="mt-3 text-base font-bold text-slate-400 max-w-2xl">
@@ -157,8 +157,11 @@ const InternshipDashboard = () => {
       <div className="flex flex-col gap-10">
         {/* Term Section */}
         {(() => {
+          const extractPhaseId = (p) =>
+            String(p.internshipPhaseId || p.phaseId || p.internshipId || p.id || '');
+
           // Consolidate phases from explicit phases and applications
-          const seenPhaseIds = new Set(phases.map((p) => String(p.id)));
+          const seenPhaseIds = new Set(phases.map((p) => extractPhaseId(p)).filter(Boolean));
           const allPhases = [...phases];
 
           studentApps.forEach((app) => {
@@ -174,13 +177,7 @@ const InternshipDashboard = () => {
 
             if (!isActiveStatus) return;
 
-            const phaseIdCandidate = String(
-              app.internshipPhaseId ||
-                app.phaseId ||
-                app.internshipPhase?.id ||
-                app.internshipId ||
-                ''
-            );
+            const phaseIdCandidate = extractPhaseId(app);
             if (phaseIdCandidate && !seenPhaseIds.has(phaseIdCandidate)) {
               seenPhaseIds.add(phaseIdCandidate);
               allPhases.push({
@@ -200,15 +197,15 @@ const InternshipDashboard = () => {
           // NEW LOGIC: If there are multiple phases, but some have groups and some don't,
           // prioritize the ones with groups to prevent duplicate "ghost" cards from old applications.
           const phasesWithGroupMeta = allPhases.map((phase) => {
-            const currentPhaseId = String(phase.id || phase.phaseId || '');
+            const currentPhaseId = extractPhaseId(phase);
             const hasGroupAssign = groups.some((g) => {
-              const gid = String(g.internshipPhaseId || g.phaseId || g.internshipId || g.id || '');
+              const gid = extractPhaseId(g);
               return gid && (gid === currentPhaseId || currentPhaseId === 'fallback-stage');
             });
 
             // Also check if any application for this phase already has a groupName
             const hasAppGroup = studentApps.some((a) => {
-              const aid = String(a.internshipPhaseId || a.phaseId || a.internshipId || a.id || '');
+              const aid = extractPhaseId(a);
               return aid === currentPhaseId && (a.groupName || a.internshipGroupId);
             });
 
@@ -216,9 +213,22 @@ const InternshipDashboard = () => {
           });
 
           const someHaveGroups = phasesWithGroupMeta.some((p) => p.hasActualGroup);
-          const finalPhasesToRender = someHaveGroups
+          const rawPhasesToRender = someHaveGroups
             ? phasesWithGroupMeta.filter((p) => p.hasActualGroup)
             : phasesWithGroupMeta;
+
+          // ULTIMATE DEDUP: Ensure each unique ID only appears once in the final list
+          const finalPhasesToRender = [];
+          const dedupSet = new Set();
+          rawPhasesToRender.forEach((p) => {
+            const pid = extractPhaseId(p);
+            if (pid && !dedupSet.has(pid)) {
+              dedupSet.add(pid);
+              finalPhasesToRender.push(p);
+            } else if (!pid) {
+              finalPhasesToRender.push(p);
+            }
+          });
 
           return (
             <section className="space-y-6">
@@ -234,21 +244,23 @@ const InternshipDashboard = () => {
 
                   const groupFromService = groups.find((g) => {
                     const gid = String(
-                      g.internshipPhaseId || g.phaseId || g.internshipId || g.id || ''
+                      g.internshipPhaseId || g.phaseId || g.internshipGroupId || g.id || ''
                     );
-                    return gid && (gid === currentPhaseId || currentPhaseId === 'fallback-stage');
+                    const pid = String(phase.internshipPhaseId || phase.phaseId || phase.id || '');
+                    return (gid && pid && gid === pid) || currentPhaseId === 'fallback-stage';
                   });
 
                   const appForPhase = studentApps.find((a) => {
-                    if (currentPhaseId === 'fallback-stage') return true; // Just pick the first for fallback
-                    const aid = String(
-                      a.internshipPhaseId || a.phaseId || a.internshipId || a.id || ''
-                    );
-                    return aid && aid === currentPhaseId;
+                    if (currentPhaseId === 'fallback-stage') return true;
+                    const aid = String(a.internshipPhaseId || a.phaseId || a.id || '');
+                    const pid = String(phase.internshipPhaseId || phase.phaseId || phase.id || '');
+                    return (aid && pid && aid === pid) || (aid && aid === currentPhaseId);
                   });
 
                   // Prioritize explicit group object, then application with group data
-                  const group = groupFromService || (appForPhase?.groupName ? appForPhase : null);
+                  const group =
+                    groupFromService ||
+                    (appForPhase?.groupName || appForPhase?.internshipGroupId ? appForPhase : null);
 
                   // Calculate Journey Step and Choose Stepper configuration
                   const isUniAssign =
@@ -317,7 +329,17 @@ const InternshipDashboard = () => {
                           <InternshipCard.Info
                             mentor={group.mentorName}
                             enterprise={group.enterpriseName}
-                            project={group.projectName}
+                            project={
+                              group.projectName ||
+                              (typeof group.project === 'string'
+                                ? group.project
+                                : group.project?.name) ||
+                              group.projectTitle ||
+                              group.ProjectName ||
+                              group.project?.projectName ||
+                              group.nameProject ||
+                              group.project_name
+                            }
                           />
                           <InternshipCard.Action
                             onDetailClick={() => {
@@ -365,41 +387,57 @@ const InternshipDashboard = () => {
           );
         })()}
 
-        {/* Dynamic Status Section */}
-        <section className="space-y-8">
-          <div className="flex items-center gap-4">
-            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
-              {INTERNSHIP_UI.SECTIONS.ACTION_CENTER}
-            </h2>
-            <div className="h-px flex-1 bg-slate-100" />
-          </div>
+        {/* Dynamic Action Center Section — Only shows if there are actionable items */}
+        {(() => {
+          const showActionCenter =
+            !hasCv ||
+            (!hasGroup && activeApp) ||
+            isPlacedButNoGroup ||
+            (!hasGroup && !activeApp && !placedApp && hasCv);
 
-          <div className="grid grid-cols-1 gap-8">
-            {!hasCv && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <CVUploadBanner variant="urgent" />
-              </div>
-            )}
+          if (!showActionCenter) return null;
 
-            {!hasGroup && activeApp && (
-              <div className="animate-in fade-in slide-in-from-bottom-6 duration-600">
-                <ApplicationStatusCard app={activeApp} />
+          return (
+            <section className="space-y-8">
+              <div className="flex items-center gap-4">
+                <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
+                  {INTERNSHIP_UI.SECTIONS.ACTION_CENTER}
+                </h2>
+                <div className="h-px flex-1 bg-slate-100" />
               </div>
-            )}
 
-            {isPlacedButNoGroup && (
-              <div className="animate-in fade-in slide-in-from-bottom-6 duration-600">
-                <PlacementInfoCard enterpriseName={placedApp.enterpriseName} />
-              </div>
-            )}
+              <div className="grid grid-cols-1 gap-8">
+                {/* Urgent: Missing CV */}
+                {!hasCv && (
+                  <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <CVUploadBanner variant="urgent" />
+                  </div>
+                )}
 
-            {!hasGroup && !activeApp && !placedApp && hasCv && (
-              <div className="animate-in zoom-in duration-700">
-                <SearchJobsCTA />
+                {/* Status: Application pending or assigned but not grouped */}
+                {!hasGroup && activeApp && (
+                  <div className="animate-in fade-in slide-in-from-bottom-6 duration-600">
+                    <ApplicationStatusCard app={activeApp} />
+                  </div>
+                )}
+
+                {/* Congratulations: Placed but waiting for group creation */}
+                {isPlacedButNoGroup && (
+                  <div className="animate-in fade-in slide-in-from-bottom-6 duration-600">
+                    <PlacementInfoCard enterpriseName={placedApp.enterpriseName} />
+                  </div>
+                )}
+
+                {/* Gợi ý: Has CV but no application yet */}
+                {!hasGroup && !activeApp && !placedApp && hasCv && (
+                  <div className="animate-in zoom-in duration-700">
+                    <SearchJobsCTA />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </section>
+            </section>
+          );
+        })()}
       </div>
     </div>
   );

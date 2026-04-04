@@ -103,23 +103,23 @@ export const BacklogModals = ({
         onSubmit={(payload) => actions.handleCompleteSprint(selectedSprintAction, payload)}
       />
 
-      <CreateTaskModal
-        open={openCreateTask}
-        epics={epics}
-        sprints={sprints}
-        initialSprintId={activeSprintForTask}
-        onClose={() => {
-          setOpenCreateTask(false);
-          setActiveSprintForTask(null);
-        }}
-        onSubmit={(payload) => actions.handleCreateTask(payload, activeSprintForTask)}
-        members={members}
-      />
+      {openCreateTask ? (
+        <CreateTaskModal
+          open={openCreateTask}
+          epics={epics}
+          initialSprintId={activeSprintForTask}
+          onClose={() => {
+            setOpenCreateTask(false);
+            setActiveSprintForTask(null);
+          }}
+          onSubmit={(payload) => actions.handleCreateTask(payload, activeSprintForTask)}
+          members={members}
+        />
+      ) : null}
 
       <UpdateTaskModal
         open={openUpdateTask}
         epics={epics}
-        sprints={sprints}
         initialData={selectedTask}
         onClose={() => {
           setOpenUpdateTask(false);

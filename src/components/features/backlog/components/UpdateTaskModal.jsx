@@ -16,7 +16,6 @@ export default function UpdateTaskModal({
   onClose,
   onSubmit,
   epics = [],
-  sprints = [],
   initialData = null,
   members = [],
 }) {
@@ -70,20 +69,7 @@ export default function UpdateTaskModal({
       setEpic(initialData.parentId || '');
 
       // Determine sprintId
-      let sid = initialData.sprintId;
-      if (!sid) {
-        for (const sp of sprints) {
-          if (
-            sp.items?.find(
-              (i) => (i.workItemId || i.id) === (initialData.workItemId || initialData.id)
-            )
-          ) {
-            sid = sp.sprintId;
-            break;
-          }
-        }
-      }
-      setSprintId(sid || '');
+      setSprintId(initialData.sprintId || '');
 
       if (initialData.dueDate) {
         const date = new Date(initialData.dueDate);
@@ -104,7 +90,7 @@ export default function UpdateTaskModal({
       );
       /* eslint-enable react-hooks/set-state-in-effect */
     }
-  }, [open, initialData, sprints]);
+  }, [open, initialData]);
 
   const canSubmit = useMemo(
     () => summary.trim() && type && status && priority,
@@ -184,9 +170,6 @@ export default function UpdateTaskModal({
               epic={epic}
               setEpic={setEpic}
               epics={epics}
-              sprintId={sprintId}
-              setSprintId={setSprintId}
-              sprints={sprints}
               assignee={assignee}
               setAssignee={setAssignee}
               priority={priority}

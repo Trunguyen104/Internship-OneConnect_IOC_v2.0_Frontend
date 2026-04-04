@@ -28,6 +28,7 @@ export function useBacklogActions({
 
   const handleSyncBoard = () => {
     queryClient.invalidateQueries({ queryKey: ['work-board-data', projectId] });
+    queryClient.invalidateQueries({ queryKey: ['all-tasks-history'] });
   };
 
   const formatToDateOnly = (dateString) => {
@@ -185,7 +186,11 @@ export function useBacklogActions({
 
   const handleCreateTask = async (payload, activeSprintForTask) => {
     try {
-      const targetSprintId = payload.sprintId || activeSprintForTask;
+      // Prioritize the sprint selected in the modal.
+      // If none selected (empty string), it should go to backlog.
+      // We only use activeSprintForTask if the payload.sprintId is not explicitly set.
+      const targetSprintId =
+        payload.sprintId !== undefined ? payload.sprintId : activeSprintForTask;
       const apiPayload = {
         projectId,
         title: payload.summary,
@@ -263,13 +268,15 @@ export function useBacklogActions({
         status: payload.status,
         priority: payload.priority,
         parentId: payload.epic || null,
+        epicId: payload.epic || null, // Alternative name
+        parentWorkItemId: payload.epic || null, // Alternative name
         assigneeId: payload.assignee || null,
         dueDate: formatToDateOnly(payload.dueDate),
         storyPoint: payload.points,
+        sprintId: payload.sprintId || null,
+        workItemId: payload.id, // Some APIs require ID in body too
       };
 
-      const currentSprintId = selectedTask?.sprintId;
-      const newSprintId = payload.sprintId;
       const workItemId = payload.id;
 
       const resUpdate = await productBacklogService.updateWorkItem(
@@ -279,17 +286,24 @@ export function useBacklogActions({
       );
       if (!resUpdate || resUpdate.isSuccess === false) throw new Error('Update failed');
 
-      if (currentSprintId !== newSprintId) {
-        if (!newSprintId) await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
-        else await productBacklogService.moveWorkItemToSprint(projectId, workItemId, newSprintId);
+      const currentSid = selectedTask?.sprintId || null;
+      const newSid = payload.sprintId || null;
+
+      if (String(currentSid) !== String(newSid)) {
+        if (!newSid) await productBacklogService.moveWorkItemToBacklog(projectId, workItemId);
+        else await productBacklogService.moveWorkItemToSprint(projectId, workItemId, newSid);
       }
 
       toast.success(BACKLOG_UI.SUCCESS_UPDATE_TASK || 'Task updated successfully!');
       ui.setOpenUpdateTask(false);
       ui.setSelectedTask(null);
-      fetchData(projectId, false);
+
+      // Aggressively refresh data
+      queryClient.invalidateQueries({ queryKey: ['backlog-board-data', projectId] });
+      await fetchData(projectId, false);
       handleSyncBoard();
-    } catch {
+    } catch (err) {
+      console.error('Update Error:', err);
       toast.error(BACKLOG_UI.ERROR_UPDATE_TASK || 'Error updating task');
     }
   };

@@ -8,7 +8,7 @@ export const BoardHeader = ({ searchText, setSearchText }) => {
         value={searchText}
         onChange={setSearchText}
         placeholder={BACKLOG_UI.SEARCH_PLACEHOLDER}
-        showFilter
+        showFilter={false}
         width="w-[360px]"
       />
     </div>

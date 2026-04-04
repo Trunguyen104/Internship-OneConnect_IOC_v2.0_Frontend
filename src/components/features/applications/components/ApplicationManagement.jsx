@@ -5,7 +5,7 @@ import { App } from 'antd';
 import { CheckCircle2, Clock, LayoutList, UserCheck } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
-import { EnterprisePhaseService } from '@/components/features/internship-student-management/services/enterprise-phase.service';
+import { applicationPhaseService } from '@/components/features/applications/services/application-phase.service';
 import { StatCard } from '@/components/ui/atoms';
 import PageLayout from '@/components/ui/pagelayout';
 import {
@@ -58,8 +58,8 @@ export default function ApplicationManagement({ internshipPhaseId }) {
   }, [activeTab, effectiveFilters]);
 
   const { data: phasesRes, isLoading: isLoadingPhases } = useQuery({
-    queryKey: ['internship-phases', 'me'],
-    queryFn: () => EnterprisePhaseService.getMyPhases(),
+    queryKey: ['internship-phases', 'applications'],
+    queryFn: () => applicationPhaseService.getPhases(),
     staleTime: 1000 * 60 * 5,
   });
 

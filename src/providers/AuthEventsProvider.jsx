@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { useAuthStore } from '@/store/useAuthStore';
+
 export function AuthEventsProvider({ children }) {
   const router = useRouter();
 
@@ -18,6 +20,16 @@ export function AuthEventsProvider({ children }) {
     const onForbidden = () => {
       if (typeof window === 'undefined') return;
       if (window.location.pathname === '/unauthorized') return;
+
+      // RACE CONDITION FIX: Avoid redirecting if the user role is still being loaded
+      // or if we just hot-reloaded and the store is temporarily empty.
+      const currentUser = useAuthStore.getState().user;
+      if (!currentUser || !currentUser.role) {
+        console.warn(
+          '[AuthEventsProvider] 403 received but user role is unknown. Skipping global redirect to avoid false positives during load.'
+        );
+        return;
+      }
 
       const returnTo = `${window.location.pathname}${window.location.search || ''}`;
       router.replace(`/unauthorized?returnTo=${encodeURIComponent(returnTo)}`);
