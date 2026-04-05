@@ -8,14 +8,12 @@ import {
   Building2,
   Calendar,
   CheckCircle2,
-  ChevronRight,
   Clock,
   Download,
   Eye,
   FileText,
   Info,
   LogOut,
-  MapPin,
   Trash2,
   X,
   XCircle,
@@ -179,21 +177,8 @@ export const StudentApplicationDetailModal = ({ open, onCancel, applicationId })
       }}
     >
       <div className="flex flex-col">
-        {/* Header Section (Minimal) */}
-        <div className="flex items-start justify-between p-8 pb-4">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden p-2">
-            {app?.enterpriseLogoUrl || app?.enterpriseLogo ? (
-              <img
-                src={app.enterpriseLogoUrl || app.enterpriseLogo}
-                alt=""
-                className="h-full w-full object-contain"
-              />
-            ) : (
-              <span className="text-2xl font-black text-slate-300">
-                {app?.enterpriseName?.charAt(0) || 'E'}
-              </span>
-            )}
-          </div>
+        {/* Top Control Bar */}
+        <div className="flex justify-end p-4">
           <button
             onClick={onCancel}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-all hover:bg-slate-100"
@@ -202,14 +187,13 @@ export const StudentApplicationDetailModal = ({ open, onCancel, applicationId })
           </button>
         </div>
 
-        {/* Content Section */}
-        <div className="space-y-8 px-8 pb-8">
-          {/* Header Info */}
-          <div className="flex flex-col gap-4">
+        {/* Header Section */}
+        <div className="relative bg-slate-50/50 p-8 pb-10">
+          <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Badge
                 variant="secondary"
-                className="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400"
+                className="bg-white px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 shadow-sm ring-1 ring-slate-100"
               >
                 {isUniAssign
                   ? STUDENT_APPLICATIONS_UI.SOURCE.UNI_ASSIGN
@@ -220,38 +204,48 @@ export const StudentApplicationDetailModal = ({ open, onCancel, applicationId })
                 label={statusUI?.label}
                 showDot={statusUI?.showDot}
                 className={cn(
-                  'h-6 px-3 text-[10px] font-black tracking-widest uppercase',
+                  'h-6 px-4 text-[10px] font-black tracking-widest uppercase shadow-sm',
                   statusUI?.className
                 )}
               />
             </div>
-            <div>
-              <h2 className="text-2xl font-black tracking-tight text-slate-800">
+          </div>
+
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-8">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border-4 border-white bg-white shadow-xl overflow-hidden p-3 transition-transform hover:scale-105">
+              {app?.enterpriseLogoUrl || app?.enterpriseLogo ? (
+                <img
+                  src={app.enterpriseLogoUrl || app.enterpriseLogo}
+                  alt=""
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <span className="text-3xl font-black text-slate-300">
+                  {app?.enterpriseName?.charAt(0) || 'E'}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-3xl font-black leading-tight tracking-tight text-slate-900 sm:text-4xl">
                 {app?.jobTitle ||
                   app?.jobPostingTitle ||
                   STUDENT_APPLICATIONS_UI.COMMON.GENERAL_APP}
               </h2>
-              <div className="mt-1 flex items-center gap-3 text-sm font-bold text-slate-400">
-                <div className="flex items-center gap-1">
-                  <Building2 className="size-4" />
-                  {app?.enterpriseName}
-                </div>
-                <div className="size-1 rounded-full bg-slate-200" />
-                <div className="flex items-center gap-1">
-                  <MapPin className="size-4" />
-                  {app?.enterpriseAddress || 'N/A'}
-                </div>
+              <div className="flex items-center gap-2 text-lg font-bold text-blue-600">
+                <Building2 className="size-5" />
+                <span>{app?.enterpriseName}</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Status Message */}
+        {/* Body Content */}
+        <div className="space-y-8 p-8">
           {renderStatusBanner()}
 
-          {/* Cards Section */}
           <div className="space-y-4">
             {/* Internship Phase Card */}
-            <div className="flex flex-col gap-3 rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm">
+            <div className="flex flex-col gap-3 rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-indigo-100 hover:shadow-md">
               <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                 <Calendar className="size-3" />
                 {STUDENT_APPLICATIONS_UI.STATS.PARTICIPATING_PHASE}
@@ -281,17 +275,24 @@ export const StudentApplicationDetailModal = ({ open, onCancel, applicationId })
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <DetailBox
                 icon={<Calendar className="size-3" />}
                 label={STUDENT_APPLICATIONS_UI.STATS.APPLIED_DATE}
                 value={dayjs(app?.appliedAt || app?.createdAt).format('DD/MM/YYYY')}
               />
+              <DetailBox
+                icon={<Clock className="size-3" />}
+                label={STUDENT_APPLICATIONS_UI.STATS.UPDATE_HISTORY}
+                value={dayjs(sortedHistories[0]?.changedAt || app?.appliedAt).format(
+                  'DD/MM/YYYY HH:mm'
+                )}
+              />
             </div>
 
             {/* Submitted Document Card */}
             {!isUniAssign && app?.cvUrl && (
-              <div className="flex flex-col gap-4 rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm">
+              <div className="flex flex-col gap-4 rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm transition-all hover:border-rose-100 hover:shadow-md">
                 <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   <FileText className="size-3" />
                   {STUDENT_APPLICATIONS_UI.STATS.SUBMITTED_DOCS}
@@ -332,38 +333,14 @@ export const StudentApplicationDetailModal = ({ open, onCancel, applicationId })
                 </div>
               </div>
             )}
-
-            {/* History Card */}
-            <div className="flex flex-col gap-4 rounded-[24px] border border-slate-100 bg-white p-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                  <Clock className="size-3" />
-                  {STUDENT_APPLICATIONS_UI.STATS.UPDATE_HISTORY}
-                </div>
-                <ChevronRight className="size-4 text-slate-300" />
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-                  <CheckCircle2 className="size-4" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-black text-slate-700">{statusUI?.label}</span>
-                  <span className="text-[11px] font-bold text-slate-400">
-                    {dayjs(sortedHistories[0]?.changedAt || app?.appliedAt).format(
-                      'DD/MM/YYYY HH:mm'
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Footer Actions */}
-          <div className="pt-4">
+          {/* Action Buttons */}
+          <div className="flex flex-col gap-4 pt-4">
             {!isUniAssign && app?.status === APPLICATION_STATUS.APPLIED && (
               <button
                 onClick={onWithdrawClick}
-                className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-rose-50/50 py-4 text-sm font-black uppercase tracking-widest text-rose-600 ring-1 ring-rose-100 transition-all hover:bg-rose-50 hover:text-rose-700"
+                className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-rose-50 py-4 text-sm font-black uppercase tracking-widest text-rose-600 transition-all hover:bg-rose-100"
               >
                 <LogOut className="size-4" />
                 {STUDENT_APPLICATIONS_UI.STATS.WITHDRAW_REGISTRATION}
@@ -373,7 +350,7 @@ export const StudentApplicationDetailModal = ({ open, onCancel, applicationId })
               app?.status === APPLICATION_STATUS.WITHDRAWN) && (
               <button
                 onClick={onHideClick}
-                className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-slate-50 py-4 text-sm font-black uppercase tracking-widest text-slate-600 ring-1 ring-slate-100 transition-all hover:bg-slate-100"
+                className="flex w-full items-center justify-center gap-2 rounded-[20px] bg-slate-50 py-4 text-sm font-black uppercase tracking-widest text-slate-600 transition-all hover:bg-slate-100"
               >
                 <Trash2 className="size-4" />
                 {STUDENT_APPLICATIONS_UI.ACTIONS.HIDE}

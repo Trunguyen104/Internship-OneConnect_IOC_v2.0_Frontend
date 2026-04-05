@@ -6,6 +6,7 @@ export const INTERNSHIP_UI = {
   SECTIONS: {
     CURRENT_PHASE: 'Current Phase',
     ACTION_CENTER: 'Action Center',
+    JOURNEY_TRACKING: 'Internship Progress',
   },
 
   EMPTY_STATE: {
@@ -47,6 +48,8 @@ export const INTERNSHIP_UI = {
     RECOMMENDATION: 'RECOMMENDATION',
     ACTIVE_APPLICATION: 'ACTIVE APPLICATION',
     PROCESSING_ASSIGNMENT: 'Processing Assignment',
+    TERM: 'Term',
+    UNIVERSITY: 'University',
   },
 
   MESSAGES: {
@@ -56,5 +59,13 @@ export const INTERNSHIP_UI = {
     UNPLACED_ACTIVE_ALERT:
       'You have not been placed in a company, please contact Uni Admin for support.',
     WAITING_FOR_HR: 'Waiting for HR to assign your group...',
+    NO_PLACEMENT_TITLE: 'No Official Internship Yet',
+    NO_PLACEMENT_DESC:
+      "You haven't been officially placed in an internship group. Track your active applications in the Action Center below.",
+    JOURNEY_PROGRESS: 'Your Journey',
+    CAREER_LAUNCH: 'Career Launch Progress',
+    IN_REVIEW: 'In Review',
+    JOB_APP_TRACKING: 'Job Application Tracking',
+    JOB_APP_DESC: 'Track your progress as you apply for internship positions.',
   },
 };

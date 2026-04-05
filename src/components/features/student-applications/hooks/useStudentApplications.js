@@ -36,7 +36,7 @@ export const useStudentApplicationActions = (id) => {
   };
 
   const withdrawMutation = useMutation({
-    mutationFn: () => studentApplicationService.withdraw(id),
+    mutationFn: (targetId) => studentApplicationService.withdraw(targetId || id),
     onSuccess: () => {
       toast.success(STUDENT_APPLICATIONS_UI.MESSAGES.WITHDRAW_SUCCESS);
       invalidate();
@@ -45,7 +45,7 @@ export const useStudentApplicationActions = (id) => {
   });
 
   const hideMutation = useMutation({
-    mutationFn: () => studentApplicationService.hide(id),
+    mutationFn: (targetId) => studentApplicationService.hide(targetId || id),
     onSuccess: () => {
       toast.success(STUDENT_APPLICATIONS_UI.MESSAGES.HIDE_SUCCESS);
       invalidate();
@@ -54,9 +54,9 @@ export const useStudentApplicationActions = (id) => {
   });
 
   return {
-    withdraw: withdrawMutation.mutate,
+    withdraw: (targetId) => withdrawMutation.mutate(targetId || id),
     isWithdrawing: withdrawMutation.isPending,
-    hide: hideMutation.mutate,
+    hide: (targetId) => hideMutation.mutate(targetId || id),
     isHiding: hideMutation.isPending,
   };
 };

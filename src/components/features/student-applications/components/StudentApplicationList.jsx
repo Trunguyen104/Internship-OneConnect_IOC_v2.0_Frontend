@@ -7,14 +7,13 @@ import {
   CheckCircle2,
   GraduationCap,
   Info,
-  Search,
   TrendingUp,
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/emptystate';
-import { Input } from '@/components/ui/input';
+import SearchBar from '@/components/ui/searchbar';
 import { Skeleton } from '@/components/ui/skeleton';
 import StatusBadge from '@/components/ui/status-badge';
 import {
@@ -50,11 +49,14 @@ const StudentApplicationList = () => {
 
   const { data: res, isLoading } = useMyApplications(filters);
   const applications = useMemo(() => res?.data?.items || res?.data || [], [res]);
-  const actionHandlers = useStudentApplicationActions();
-
   const handleViewDetail = (id) => {
     setSelectedAppId(id);
     setIsDetailOpen(true);
+  };
+
+  const applicationActions = {
+    ...useStudentApplicationActions(),
+    viewDetail: handleViewDetail,
   };
 
   const filteredApplications = useMemo(() => {
@@ -77,24 +79,27 @@ const StudentApplicationList = () => {
     });
   }, [applications, filters.search, filters.includeTerminal]);
 
-  const stats = {
-    total: filteredApplications.length,
-    processing: filteredApplications.filter((app) =>
-      [
-        APPLICATION_STATUS.APPLIED,
-        APPLICATION_STATUS.INTERVIEWING,
-        APPLICATION_STATUS.OFFERED,
-        APPLICATION_STATUS.PENDING_ASSIGNMENT,
-      ].includes(app.status)
-    ).length,
-    placed: filteredApplications.filter((app) => app.status === APPLICATION_STATUS.PLACED).length,
-    uniPending: filteredApplications.filter(
-      (app) =>
-        app.status === APPLICATION_STATUS.PENDING_ASSIGNMENT &&
-        (app.source === APPLICATION_SOURCE.UNI_ASSIGN ||
-          app.sourceLabel?.toLowerCase().includes('uni'))
-    ).length,
-  };
+  // Calculate statistics from the FULL list (before terminal filtering)
+  const stats = useMemo(() => {
+    return {
+      total: applications.length,
+      processing: applications.filter((app) =>
+        [
+          APPLICATION_STATUS.APPLIED,
+          APPLICATION_STATUS.INTERVIEWING,
+          APPLICATION_STATUS.OFFERED,
+          APPLICATION_STATUS.PENDING_ASSIGNMENT,
+        ].includes(app.status)
+      ).length,
+      placed: applications.filter((app) => app.status === APPLICATION_STATUS.PLACED).length,
+      uniPending: applications.filter(
+        (app) =>
+          app.status === APPLICATION_STATUS.PENDING_ASSIGNMENT &&
+          (app.source === APPLICATION_SOURCE.UNI_ASSIGN ||
+            app.sourceLabel?.toLowerCase().includes('uni'))
+      ).length,
+    };
+  }, [applications]);
 
   const renderApplicationRow = (app) => {
     const statusConfig = STUDENT_APPLICATION_STATUS_UI[app.status] || {
@@ -125,7 +130,7 @@ const StudentApplicationList = () => {
               <span className="text-[13px] font-black tracking-tight text-slate-800 transition-colors">
                 {app.jobTitle || app.jobPostingTitle || STUDENT_APPLICATIONS_UI.COMMON.GENERAL_APP}
               </span>
-              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600">
                 <Building2 className="size-3" />
                 {app.enterpriseName}
               </div>
@@ -170,7 +175,7 @@ const StudentApplicationList = () => {
               app.source === APPLICATION_SOURCE.UNI_ASSIGN ||
               app.sourceLabel?.toLowerCase().includes('uni')
                 ? 'warning-soft'
-                : 'indigo-soft'
+                : 'info-soft'
             }
             className="px-3 py-1 text-[10px] font-black tracking-widest uppercase"
           >
@@ -186,8 +191,10 @@ const StudentApplicationList = () => {
             {statusConfig.label}
           </StatusBadge>
         </TableCell>
-        <TableCell className="text-center">
-          <TableRowDropdown application={app} handlers={actionHandlers} modal={modal} />
+        <TableCell className="pr-6">
+          <div className="flex justify-center">
+            <TableRowDropdown application={app} handlers={applicationActions} modal={modal} />
+          </div>
         </TableCell>
       </TableRow>
     );
@@ -224,24 +231,28 @@ const StudentApplicationList = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="flex flex-col gap-4 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-2xl">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-          <Input
+      <div className="flex flex-col gap-6 rounded-4xl border border-slate-100 bg-white p-4 shadow-sm transition-all hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1 max-w-2xl">
+          <SearchBar
             placeholder={STUDENT_APPLICATIONS_UI.SEARCH_PLACEHOLDER}
-            className="h-12 rounded-2xl border-slate-100 bg-slate-50/50 pl-11 ring-offset-0 focus:bg-white focus:ring-2 focus:ring-indigo-100"
             value={filters.search}
-            onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+            onChange={(val) => setFilters((prev) => ({ ...prev, search: val }))}
+            width="w-full"
           />
         </div>
-        <div className="flex items-center gap-4 px-4 sm:border-l sm:border-slate-100">
-          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-            {STUDENT_APPLICATIONS_UI.INCLUDE_TERMINAL}
-          </span>
+        <div className="flex items-center gap-6 px-6 py-1 sm:border-l sm:border-slate-100">
+          <div className="flex flex-col">
+            <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+              {STUDENT_APPLICATIONS_UI.INCLUDE_TERMINAL}
+            </span>
+            <span className="text-[10px] font-bold text-slate-300">
+              {STUDENT_APPLICATIONS_UI.INCLUDE_TERMINAL_SUB}
+            </span>
+          </div>
           <Switch
             checked={filters.includeTerminal}
             onChange={(checked) => setFilters((prev) => ({ ...prev, includeTerminal: checked }))}
-            className="bg-slate-200 data-[state=checked]:bg-indigo-500"
+            className="h-6 w-11 transition-colors data-[state=checked]:bg-indigo-600 data-[state=unchecked]:bg-slate-200"
           />
         </div>
       </div>
@@ -252,37 +263,37 @@ const StudentApplicationList = () => {
           <TableHeader className="bg-slate-50/30">
             <TableRow className="border-slate-100/50 hover:bg-transparent">
               <TableHead className="h-16 pl-6 text-left text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-start gap-3">
                   <Briefcase className="size-3.5" />
                   {STUDENT_APPLICATIONS_UI.COLUMNS.JOB_ENTERPRISE}
                 </div>
               </TableHead>
               <TableHead className="h-16 text-left text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-start gap-3">
                   <GraduationCap className="size-3" />
                   {STUDENT_APPLICATIONS_UI.COLUMNS.PHASE}
                 </div>
               </TableHead>
               <TableHead className="h-16 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-3">
                   <Calendar className="size-3.5" />
                   {STUDENT_APPLICATIONS_UI.COLUMNS.APPLIED_DATE}
                 </div>
               </TableHead>
               <TableHead className="h-16 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-3">
                   <Info className="size-3.5" />
                   {STUDENT_APPLICATIONS_UI.COLUMNS.SOURCE}
                 </div>
               </TableHead>
               <TableHead className="h-16 text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-3">
                   <TrendingUp className="size-3.5" />
                   {STUDENT_APPLICATIONS_UI.COLUMNS.STATUS}
                 </div>
               </TableHead>
               <TableHead className="h-16 w-[100px] text-center text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">
-                {STUDENT_APPLICATIONS_UI.COLUMNS.ACTIONS}
+                <div className="flex justify-center">{STUDENT_APPLICATIONS_UI.COLUMNS.ACTIONS}</div>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -344,9 +355,7 @@ const StatCard = ({ icon, label, value, variant }) => {
           {icon}
         </div>
         <div className="space-y-0.5">
-          <p className="text-[11px] font-black uppercase tracking-[0.1em] text-slate-400">
-            {label}
-          </p>
+          <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">{label}</p>
           <h3 className="text-2xl font-black text-slate-800 tracking-tight">{value}</h3>
         </div>
       </div>

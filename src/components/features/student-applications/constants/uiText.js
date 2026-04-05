@@ -3,6 +3,7 @@ export const STUDENT_APPLICATIONS_UI = {
   SUBTITLE: 'Track your internship applications and manage your current placements in one place.',
   SEARCH_PLACEHOLDER: 'Search job title, enterprise...',
   INCLUDE_TERMINAL: 'Include Terminal:',
+  INCLUDE_TERMINAL_SUB: 'Show history & results',
   EMPTY_STATE: {
     TITLE: 'No Applications Found',
     DESCRIPTION: "You haven't applied to any internships yet.",
@@ -25,11 +26,12 @@ export const STUDENT_APPLICATIONS_UI = {
     WITHDRAW_TITLE: 'Withdraw Application',
     WITHDRAW_CONTENT:
       'Are you sure you want to withdraw your application at {enterpriseName}? This action cannot be undone.',
-    HIDE_TITLE: 'Hide Application',
-    HIDE_CONTENT: 'Hide this application from your list?',
+    HIDE_TITLE: 'Delete Record',
+    HIDE_CONTENT:
+      'Are you sure you want to delete this application record? This will hide it from your display forever.',
     CANCEL: 'Cancel',
     WITHDRAW: 'Confirm Withdrawal',
-    HIDE: 'Hide Record',
+    HIDE: 'Delete Record',
     CLOSE: 'Close',
   },
   MESSAGES: {
@@ -46,16 +48,16 @@ export const STUDENT_APPLICATIONS_UI = {
     PENDING_ASSIGNMENT_UNI:
       'The school has assigned you to intern at {enterpriseName}. Your application is waiting for enterprise review.',
     WITHDRAW_SUCCESS: 'Application withdrawn successfully.',
-    HIDE_SUCCESS: 'Application hidden from list.',
+    HIDE_SUCCESS: 'Application record deleted successfully.',
     WITHDRAW_ERROR: 'Failed to withdraw application. Please try again.',
-    HIDE_ERROR: 'Failed to hide application. Please try again.',
+    HIDE_ERROR: 'Failed to delete record. Please try again.',
     REJECT_REASON_TITLE: 'Rejection Reason:',
     PENDING_DEFAULT: 'Your application has been sent. You will be notified of any updates.',
   },
   ACTIONS: {
     VIEW_DETAILS: 'View Details',
     WITHDRAW: 'Withdraw Application',
-    HIDE: 'Hide Record',
+    HIDE: 'Delete Record',
     NO_ACTIONS: 'No Actions',
   },
   SOURCE: {
