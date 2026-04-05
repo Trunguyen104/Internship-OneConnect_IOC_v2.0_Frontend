@@ -63,8 +63,9 @@ export default function UniversitiesForm({ university, onSuccess, onCancel }) {
       useUniversitiesStore.increment();
       onSuccess?.();
     } catch (err) {
-      if (err?.data?.errors && typeof err.data.errors === 'object') {
-        const fieldErrors = Object.entries(err.data.errors).map(([field, messages]) => {
+      const validationErrors = err?.data?.validationErrors;
+      if (validationErrors && typeof validationErrors === 'object') {
+        const fieldErrors = Object.entries(validationErrors).map(([field, messages]) => {
           const formField = field.charAt(0).toLowerCase() + field.slice(1);
           return {
             name: formField,

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 export default function MoreMenuButton({
-  items = [{ label: 'Xóa', value: 'delete', tone: 'danger' }],
+  items = [{ label: 'Delete', value: 'delete', tone: 'danger' }],
   onSelect,
   align = 'right',
 }) {

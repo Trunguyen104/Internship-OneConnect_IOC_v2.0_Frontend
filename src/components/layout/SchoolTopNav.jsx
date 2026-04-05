@@ -42,7 +42,7 @@ export default function SchoolTopNav() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+              {userInfo?.fullName || userInfo?.FullName || 'User'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>

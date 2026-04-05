@@ -313,8 +313,8 @@ export const PROJECT_MANAGEMENT = {
     ERROR_INACTIVE_GROUP: 'Cannot save project for a finished or archived group.',
     ERROR_PUBLISH_NO_GROUP:
       'Project must be assigned to an intern group before it can be published.',
-    ERROR_PUBLISH_NO_GROUP_VN: 'chưa được gắn với nhóm thực tập',
-    ERROR_ALREADY_PUBLISHED_VN: 'Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp',
+    ERROR_PUBLISH_NO_GROUP_VN: 'not assigned to any intern group',
+    ERROR_ALREADY_PUBLISHED_VN: 'Only projects in Draft status can be published',
     ERROR_FETCH_DETAIL: 'Failed to fetch project details',
     ERROR_FETCH_GROUPS: 'Failed to fetch supporting data',
     ERROR_UPDATE_PREVALIDATE: 'Failed to pre-validate project save',
