@@ -162,7 +162,8 @@ export function WorkItem({ it, itemOrder, onClick, onDelete }) {
                     <span>{BACKLOG_UI.DELETE || 'Delete'}</span>
                   </div>
                 ),
-                onClick: () => {
+                onClick: (e) => {
+                  if (e.domEvent) e.domEvent.stopPropagation();
                   showDeleteConfirm({
                     title: 'Delete Work Item',
                     content:

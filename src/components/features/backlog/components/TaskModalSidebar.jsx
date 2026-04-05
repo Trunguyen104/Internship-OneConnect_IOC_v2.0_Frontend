@@ -30,6 +30,31 @@ export function TaskModalSidebar({
   setPoints,
   members = [],
 }) {
+  const getStatusLabel = (s) => {
+    if (s === WORK_ITEM_STATUS.TODO) return BACKLOG_UI.STATUS_TODO;
+    if (s === WORK_ITEM_STATUS.IN_PROGRESS) return BACKLOG_UI.STATUS_IN_PROGRESS;
+    if (s === WORK_ITEM_STATUS.REVIEW) return BACKLOG_UI.STATUS_REVIEW;
+    if (s === WORK_ITEM_STATUS.DONE) return BACKLOG_UI.STATUS_DONE;
+    if (s === WORK_ITEM_STATUS.CANCELLED) return BACKLOG_UI.STATUS_CANCELLED;
+    return s;
+  };
+
+  const getTypeLabel = (t) => {
+    if (t === WORK_ITEM_TYPE.EPIC) return BACKLOG_UI.TYPE_EPIC;
+    if (t === WORK_ITEM_TYPE.USER_STORY) return BACKLOG_UI.TYPE_USER_STORY;
+    if (t === WORK_ITEM_TYPE.TASK) return BACKLOG_UI.TYPE_TASK;
+    if (t === WORK_ITEM_TYPE.SUBTASK) return BACKLOG_UI.TYPE_SUBTASK;
+    return t;
+  };
+
+  const getPriorityLabel = (p) => {
+    if (p === WORK_ITEM_PRIORITY.LOW) return BACKLOG_UI.PRIORITY_LOW;
+    if (p === WORK_ITEM_PRIORITY.MEDIUM) return BACKLOG_UI.PRIORITY_MEDIUM;
+    if (p === WORK_ITEM_PRIORITY.HIGH) return BACKLOG_UI.PRIORITY_HIGH;
+    if (p === WORK_ITEM_PRIORITY.CRITICAL) return BACKLOG_UI.PRIORITY_CRITICAL;
+    return p;
+  };
+
   return (
     <div className="flex w-full shrink-0 flex-col lg:w-[360px]">
       <div className="rounded-3xl border border-gray-100 bg-gray-50/20 p-6 shadow-sm ring-1 ring-white/50 backdrop-blur-sm">
@@ -52,7 +77,7 @@ export function TaskModalSidebar({
                   .filter((s) => s !== WORK_ITEM_STATUS.CANCELLED)
                   .map((s) => ({
                     value: s,
-                    label: Object.keys(WORK_ITEM_STATUS).find((key) => WORK_ITEM_STATUS[key] === s),
+                    label: getStatusLabel(s),
                   }))}
               />
             </div>
@@ -70,7 +95,7 @@ export function TaskModalSidebar({
                 onChange={setType}
                 options={Object.values(WORK_ITEM_TYPE).map((t) => ({
                   value: t,
-                  label: Object.keys(WORK_ITEM_TYPE).find((key) => WORK_ITEM_TYPE[key] === t),
+                  label: getTypeLabel(t),
                 }))}
               />
             </div>
@@ -129,9 +154,7 @@ export function TaskModalSidebar({
                 onChange={setPriority}
                 options={Object.values(WORK_ITEM_PRIORITY).map((p) => ({
                   value: p,
-                  label: Object.keys(WORK_ITEM_PRIORITY).find(
-                    (key) => WORK_ITEM_PRIORITY[key] === p
-                  ),
+                  label: getPriorityLabel(p),
                 }))}
               />
             </div>

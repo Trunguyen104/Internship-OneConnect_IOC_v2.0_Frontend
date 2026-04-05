@@ -36,11 +36,26 @@ function Button({
   size = 'default',
   type = 'button',
   loading = false,
+  asChild = false,
   children,
   ...props
 }) {
   const antdProps = VARIANT_MAP[variant] || VARIANT_MAP.default;
   const antdSize = SIZE_MAP[size] || 'middle';
+
+  const mergedClassName = cn(
+    'font-bold transition-all shadow-sm flex items-center justify-center',
+    size === 'icon' && 'h-9 w-9 p-0',
+    TAILWIND_SIZES[size] || '',
+    className
+  );
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      className: cn(mergedClassName, children.props.className),
+      ...props,
+    });
+  }
 
   return (
     <AntdButton
@@ -50,12 +65,7 @@ function Button({
       danger={antdProps.danger}
       size={antdSize}
       loading={loading}
-      className={cn(
-        'font-bold transition-all shadow-sm',
-        size === 'icon' && 'h-9 w-9 p-0 flex items-center justify-center',
-        TAILWIND_SIZES[size] || '',
-        className
-      )}
+      className={mergedClassName}
     >
       {children}
     </AntdButton>

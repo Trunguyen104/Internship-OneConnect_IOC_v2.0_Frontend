@@ -7,7 +7,6 @@ import React, { createContext, useContext } from 'react';
 
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship.js';
 
-import { INTERNSHIP_STATUS, INTERNSHIP_STATUS_CONFIG } from '../constants/internshipStatus.js';
 import ProgressStepper from './ProgressStepper';
 
 const InternshipCardContext = createContext(null);
@@ -27,7 +26,7 @@ const InternshipCard = ({ data, children, className = '' }) => {
   return (
     <InternshipCardContext.Provider value={data}>
       <div
-        className={`bg-surface border-gray-100 transition-all duration-300 hover:shadow-xl ${className} overflow-hidden rounded-[32px] border p-8 shadow-sm`}
+        className={`bg-surface border-gray-100 transition-all duration-300 hover:shadow-xl ${className} overflow-hidden rounded-[32px] border p-6 shadow-sm`}
       >
         {children}
       </div>
@@ -39,17 +38,10 @@ const InternshipCard = ({ data, children, className = '' }) => {
  * InternshipCard Sub-components
  */
 const Header = ({ title, isCurrent = false }) => {
-  const { status, isPlaced } = useInternshipCard();
-  const config =
-    INTERNSHIP_STATUS_CONFIG[status] || INTERNSHIP_STATUS_CONFIG[INTERNSHIP_STATUS.IN_PROGRESS];
-
   return (
     <div className="mb-6 flex items-start justify-between">
       <div className="space-y-1">
         <div className="flex items-center gap-3">
-          <span className="text-muted text-[10px] font-bold tracking-widest uppercase">
-            {INTERNSHIP_UI.LABELS.CYCLE}
-          </span>
           {isCurrent && (
             <Tag
               color="green"
@@ -58,29 +50,8 @@ const Header = ({ title, isCurrent = false }) => {
               {INTERNSHIP_UI.LABELS.CURRENT}
             </Tag>
           )}
-          {!isPlaced &&
-            (status === INTERNSHIP_STATUS.OPEN || status === INTERNSHIP_STATUS.DRAFT) && (
-              <Tag
-                color="error"
-                className="bg-danger-surface text-danger border-none px-3 py-1 font-sans text-[10px] font-bold"
-              >
-                {INTERNSHIP_UI.LABELS.UNPLACED_WARNING}
-              </Tag>
-            )}
         </div>
-        <h2 className="text-text text-3xl font-black tracking-tight">{title}</h2>
-      </div>
-
-      <div className="flex flex-col items-end gap-2">
-        <span className="text-muted text-[10px] font-bold tracking-widest uppercase">
-          {INTERNSHIP_UI.LABELS.STATUS}
-        </span>
-        <Tag
-          color={config.tagColor}
-          className="m-0 border-none px-5 py-1.5 text-xs font-bold uppercase transition-all"
-        >
-          {config.label}
-        </Tag>
+        <h2 className="text-text text-2xl font-black tracking-tight">{title}</h2>
       </div>
     </div>
   );
@@ -93,12 +64,10 @@ const Stepper = () => {
 };
 
 const BodyTitle = ({ title, href = null }) => {
-  const { status, isPlaced } = useInternshipCard();
-  const config =
-    INTERNSHIP_STATUS_CONFIG[status] || INTERNSHIP_STATUS_CONFIG[INTERNSHIP_STATUS.IN_PROGRESS];
+  const { isPlaced } = useInternshipCard();
 
   return (
-    <div className="border-border mt-8 mb-6 border-t pt-8">
+    <div className="border-border mt-6 mb-4 border-t pt-6">
       <div className="flex items-center gap-3">
         {isPlaced && href ? (
           <Link
@@ -113,14 +82,6 @@ const BodyTitle = ({ title, href = null }) => {
             {title ||
               (isPlaced ? INTERNSHIP_UI.LABELS.PLACED_SUCCESS : INTERNSHIP_UI.LABELS.NO_GROUP)}
           </h3>
-        )}
-        {isPlaced && (
-          <Tag
-            color="red"
-            className="bg-primary-surface text-primary border-none px-4 py-1 text-[10px] font-bold uppercase"
-          >
-            {config.label}
-          </Tag>
         )}
       </div>
     </div>
@@ -219,11 +180,11 @@ const Action = ({ onDetailClick }) => {
       <Button
         type="primary"
         size="large"
-        icon={<ExternalLink size={20} />}
-        className="group bg-primary shadow-primary/20 h-16 rounded-[24px] px-12 font-black text-white shadow-2xl transition-all hover:scale-105 active:scale-95"
+        icon={<ExternalLink size={18} />}
+        className="group bg-primary shadow-primary/20 h-14 rounded-[20px] px-10 font-black text-white shadow-2xl transition-all hover:scale-105 active:scale-95"
         onClick={onDetailClick}
       >
-        <span className="flex items-center gap-3 text-lg font-black uppercase tracking-tight">
+        <span className="flex items-center gap-3 text-base font-black uppercase tracking-tight">
           {INTERNSHIP_UI.LABELS.VIEW_DETAIL}
         </span>
       </Button>

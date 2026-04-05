@@ -33,7 +33,6 @@ export function BacklogSection({
       }`}
     >
       <div className="mb-6 flex items-center pr-1 pl-2">
-        <div className="mr-4 h-4 w-4 shrink-0 rounded border border-slate-300" />
         <h3 className="text-[16px] font-bold text-slate-900">{BACKLOG_UI.BACKLOG_TITLE}</h3>
         <div className="flex-1" />
         <div className="flex items-center gap-3">
