@@ -1,6 +1,6 @@
 export const PLACEMENT_STATUS = {
   UNPLACED: 0,
-  PENDING_ASSIGNMENT: 9,
+  PENDING_ASSIGNMENT: 4,
   PLACED: 1,
 };
 
@@ -17,7 +17,7 @@ export const PLACEMENT_STATUS_VARIANTS = {
 };
 
 export const APPLICATION_STATUS = {
-  PENDING_ASSIGNMENT: 9,
+  PENDING_ASSIGNMENT: 4,
   WITHDRAWN: 5,
 };
 
@@ -42,6 +42,7 @@ export const PLACEMENT_UI_TEXT = {
     ACTION_ASSIGN: 'Assign',
     ACTION_CHANGE: 'Change',
     ACTION_CANCEL: 'Cancel Placement',
+    SELECTED: 'Selected',
   },
   PAGE: {
     TITLE: 'Placement Management',
@@ -50,11 +51,19 @@ export const PLACEMENT_UI_TEXT = {
     INITIALIZING: 'Initializing placement data...',
     SELECT_TERM_PLACEHOLDER: 'Select a term...',
     ACTIVE_SUFFIX: '(Active)',
+    EMPTY_STATE: {
+      ICON: '📭',
+      TITLE: 'No Semester Selected',
+      DESC: 'Please select an active internship semester from the dropdown to manage placements.',
+    },
   },
   POPOVER: {
     QUICK_ASSIGNMENT: 'Quick Assignment',
     CANCEL: 'Cancel',
     ASSIGN: 'Assign',
+    CONFLICT_TITLE: 'Self-Apply Conflict',
+    CONFLICT_DESC:
+      'Student is currently applying to this enterprise. Assignment is blocked (AC-11).',
   },
   ACTIONS: {
     ASSIGN_TITLE: 'Assign Enterprise',
@@ -70,6 +79,9 @@ export const PLACEMENT_UI_TEXT = {
       STUDENTS_LABEL: 'STUDENT RECIPIENTS',
       CONFIRM: 'Confirm',
       CANCEL: 'Cancel',
+      CAPACITY_ERROR: (remaining) => `Capacity Exceeded: Phase only has ${remaining} slots left.`,
+      CONFLICT_MSG: (count) => `${count} students have active self-apply at this enterprise.`,
+      CONFLICT_DESC: 'Uni Admin assignment is blocked for these students per AC-11.',
     },
     BULK_REASSIGN: {
       TITLE: 'Bulk Change Enterprise',

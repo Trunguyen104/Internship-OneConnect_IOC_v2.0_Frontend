@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { message, Popover, Space } from 'antd';
+import { Alert, message, Popover, Space } from 'antd';
 import React, { useState } from 'react';
 
 import Button from '@/components/ui/button';
@@ -13,7 +13,11 @@ import EnterprisePhaseSelect from './EnterprisePhaseSelect';
 /**
  * AC-01: Assign Enterprise Nhanh Cho 1 Sinh Viên (Inline popover).
  */
-const AssignEnterprisePopover = ({ studentId, semesterId, children }) => {
+const AssignEnterprisePopover = ({ student, children, termName, termId }) => {
+  // AC-01 Fix: studentId must be a GUID, not studentCode (ST000...).
+  // enrollment record usually has 'studentId' as the GUID.
+  const studentGuid = student.studentId || (student.id?.length > 20 ? student.id : null);
+
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [popoverVisible, setPopoverVisible] = useState(false);
   const UI = PLACEMENT_UI_TEXT.POPOVER;
@@ -27,7 +31,8 @@ const AssignEnterprisePopover = ({ studentId, semesterId, children }) => {
       } else {
         message.success('Assignment sent. Waiting for enterprise confirmation.');
         setPopoverVisible(false);
-        queryClient.invalidateQueries(['semester-students', semesterId]);
+        queryClient.invalidateQueries(['semester-students']);
+        queryClient.invalidateQueries(['uni-assign-applications']);
       }
     },
     onError: (err) => {
@@ -35,12 +40,26 @@ const AssignEnterprisePopover = ({ studentId, semesterId, children }) => {
     },
   });
 
+  const hasConflict =
+    selectedPhase && student.activeSelfApplyEnterpriseIds?.includes(selectedPhase.enterpriseId);
+
   const handleConfirm = () => {
     if (!selectedPhase) {
       message.warning('Please select an enterprise and phase.');
       return;
     }
-    mutation.mutate({ studentId, internPhaseId: selectedPhase });
+    if (hasConflict) {
+      message.error(`${student.fullName} has an active self-apply at this enterprise.`);
+      return;
+    }
+    // Matching QuickEnterpriseAssignmentCommand (UniAssignRequest) fields:
+    // Need studentId, termId, enterpriseId, internPhaseId (all GUIDs)
+    mutation.mutate({
+      studentId: studentGuid,
+      termId: termId,
+      enterpriseId: selectedPhase.enterpriseId,
+      internPhaseId: selectedPhase.internPhaseId || selectedPhase.id,
+    });
   };
 
   const content = (
@@ -48,15 +67,31 @@ const AssignEnterprisePopover = ({ studentId, semesterId, children }) => {
       <Space direction="vertical" className="w-full" size={12}>
         <div className="text-sm font-semibold text-slate-700">{UI.QUICK_ASSIGNMENT}</div>
         <EnterprisePhaseSelect
-          semesterId={semesterId}
-          value={selectedPhase}
-          onChange={setSelectedPhase}
+          value={selectedPhase?.internPhaseId || selectedPhase?.id}
+          onChange={(id, phase) => setSelectedPhase(phase)}
+          termName={termName}
         />
+
+        {hasConflict && (
+          <Alert
+            type="error"
+            showIcon
+            message={<span className="text-[11px] font-bold">{UI.CONFLICT_TITLE}</span>}
+            description={<span className="text-[10px]">{UI.CONFLICT_DESC}</span>}
+          />
+        )}
+
         <div className="flex justify-end gap-2 pt-1">
           <Button variant="muted" size="sm" onClick={() => setPopoverVisible(false)}>
             {UI.CANCEL}
           </Button>
-          <Button variant="primary" size="sm" loading={mutation.isLoading} onClick={handleConfirm}>
+          <Button
+            variant="primary"
+            size="sm"
+            loading={mutation.isLoading}
+            onClick={handleConfirm}
+            disabled={!selectedPhase || hasConflict}
+          >
             {UI.ASSIGN}
           </Button>
         </div>

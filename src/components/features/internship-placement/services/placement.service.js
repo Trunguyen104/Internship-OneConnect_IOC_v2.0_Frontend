@@ -6,46 +6,49 @@ import { httpGet, httpPost } from '@/services/http-client.service';
  */
 export const PlacementService = {
   /**
-   * Get list of students in the current internship semester with their placement status.
+   * Get list of students in the current internship semester (term) with their placement status.
+   * Path: /api/v1/terms/{termId}/enrollments
+   * Note: Using Enrollment endpoint as it is the standard for student lists in a term.
    */
-  getSemesterStudents(semesterId, params = {}) {
-    return httpGet(`/semesters/${semesterId}/students`, params);
+  /**
+   * Fetch all Uni Admin Assignment applications (pending/history).
+   * Path: /applications/uni-assign
+   */
+  getUniAssignApplications(params = {}) {
+    return httpGet('/applications/uni-assign', params);
   },
 
   /**
    * Fetch eligible (Enterprise + Intern Phase) pairs for assignment.
-   * Logic: Overlap with semester, Published/Closed jobs, Capacity > 0.
+   * Path: /api/v1/uniassigns/enterprise-interphase
    */
-  getEligiblePhases(semesterId, params = {}) {
-    return httpGet(`/semesters/${semesterId}/eligible-phases`, params);
+  getEligiblePhases(params = {}) {
+    return httpGet('/uniassigns/enterprise-interphase', params);
   },
 
   /**
-   * AC-01: Assign Enterprise Nhanh Cho 1 Sinh Viên (Inline)
+   * AC-01: Uni Admin quick assign: create a PendingAssignment for a single student (inline).
+   * Path: /api/v1/uniassigns/uni-assign
    */
-  assignStudent({ studentId, internPhaseId }) {
-    return httpPost('/internship-applications/assign', { studentId, internPhaseId });
+  assignStudent(command) {
+    return httpPost('/uniassigns/uni-assign', command);
   },
 
   /**
-   * AC-02: Bulk Assign — Nhiều SV Vào Cùng 1 Enterprise
+   * AC-06: Uni Admin unassign: withdraw a pending or placed uni-assign.
+   * Path: /api/v1/uniassigns/unassign-single
+   * Body: { applicationId: string }
    */
-  bulkAssign({ studentIds, internPhaseId }) {
-    return httpPost('/internship-applications/bulk-assign', { studentIds, internPhaseId });
+  unassignSingle(applicationId) {
+    return httpPost('/uniassigns/unassign-single', { applicationId });
   },
 
   /**
-   * AC-03 & AC-05: Re-assign / Bulk Re-assign
+   * AC-05: Uni Admin reassign: change enterprise for a student's uni-assign.
+   * Path: /api/v1/uniassigns/reassign-single
    */
-  reassignStudent({ studentIds, internPhaseId }) {
-    return httpPost('/internship-applications/reassign', { studentIds, internPhaseId });
-  },
-
-  /**
-   * AC-04 & AC-06: Unassign / Bulk Unassign
-   */
-  unassignStudents({ studentIds }) {
-    return httpPost('/internship-applications/bulk-unassign', { studentIds });
+  reassignSingle(command) {
+    return httpPost('/uniassigns/reassign-single', command);
   },
 
   /**

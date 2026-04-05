@@ -5,6 +5,7 @@ import {
   EditOutlined,
   EyeOutlined,
   InboxOutlined,
+  ProjectOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -69,7 +70,6 @@ const GroupTable = memo(function GroupTable({
 
           return (
             <div className="flex flex-col leading-tight grow overflow-hidden">
-              <span className={`${TABLE_CELL.meta} truncate font-bold`}>{name}</span>
               {(start || end) && (
                 <div className="text-muted text-[10px] font-medium opacity-60 flex items-center gap-1 mt-0.5">
                   <span className="truncate">{start ? dayjs(start).format('MMM DD') : '??'}</span>
@@ -124,6 +124,28 @@ const GroupTable = memo(function GroupTable({
             </span>
           );
         },
+      },
+      {
+        title: TABLE.COLUMNS.PROJECT,
+        dataIndex: 'projectName',
+        key: 'projectName',
+        width: 220,
+        render: (text, record) => (
+          <div className="flex items-center gap-2 max-w-[200px]">
+            <ProjectOutlined className="text-primary/40 shrink-0" />
+            <span
+              className={`${TABLE_CELL.secondary} truncate text-xs font-bold text-slate-600`}
+              title={text}
+            >
+              {text || 'N/A'}
+            </span>
+            {record.projectCount > 1 && (
+              <span className="bg-primary/10 text-primary text-[10px] px-1.5 py-0.5 rounded-full border border-primary/20 whitespace-nowrap shrink-0">
+                +{record.projectCount - 1} {GROUP_MANAGEMENT.TABLE.MORE}
+              </span>
+            )}
+          </div>
+        ),
       },
       {
         title: TABLE.COLUMNS.MEMBERS,

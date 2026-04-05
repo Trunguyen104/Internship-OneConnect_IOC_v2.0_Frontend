@@ -13,20 +13,40 @@ import { PlacementService } from '../services/placement.service';
  * AC-01: Displays Enterprise, Phase, Majors, and Capacity.
  */
 const EnterprisePhaseSelect = ({
-  semesterId,
   value,
   onChange,
   placeholder = PLACEMENT_UI_TEXT.SELECT.PHASE_PLACEHOLDER,
   className = '',
+  searchTerm = '',
+  termName,
 }) => {
   const { data: res, isLoading } = useQuery({
-    queryKey: ['eligible-phases', semesterId],
-    queryFn: () => PlacementService.getEligiblePhases(semesterId),
-    enabled: !!semesterId,
+    queryKey: ['eligible-phases', searchTerm],
+    queryFn: () => PlacementService.getEligiblePhases({ searchTerm }),
   });
 
   const UI = PLACEMENT_UI_TEXT.SELECT;
-  const phases = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+  let phases = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+
+  // AC-01: Filter phases by current term name to avoid showing phases from other terms (e.g. show Spring 2026 only)
+  if (termName) {
+    // Robust cleaning: remove "(Active)", "(Ended)", etc. and trim
+    const cleanTermName = termName
+      .toLowerCase()
+      .replace(/\(.*\)/g, '')
+      .trim();
+    const termYear = cleanTermName.match(/\d{4}/)?.[0];
+
+    phases = phases.filter((phase) => {
+      const pName = (phase.internPhaseName || phase.phaseName || '').toLowerCase();
+      // Match if phase name contains the term name (e.g. "spring 2026")
+      const matchesFullName = pName.includes(cleanTermName);
+      // Fallback: match if it contains the year (e.g. "2026") to be safe but helpful
+      const matchesYear = termYear && pName.includes(termYear);
+
+      return matchesFullName || matchesYear;
+    });
+  }
 
   // Group phases by enterprise
   const groupedPhases = phases.reduce((acc, phase) => {
@@ -46,46 +66,88 @@ const EnterprisePhaseSelect = ({
       showSearch
       loading={isLoading}
       value={value}
-      onChange={onChange}
+      onChange={(id) => {
+        const selected = phases.find((p) => (p.internPhaseId || p.id) === id);
+        onChange(id, selected);
+      }}
       placeholder={placeholder}
       className={`w-full ${className}`}
       optionLabelProp="label"
       filterOption={(input, option) => {
-        const searchStr =
-          `${option.children.props.enterpriseName} ${option.children.props.phaseName}`.toLowerCase();
-        return searchStr.includes(input.toLowerCase());
+        const enterpriseName = option.enterpriseName || '';
+        const phaseName = option.phaseName || '';
+        return (
+          enterpriseName.toLowerCase().includes(input.toLowerCase()) ||
+          phaseName.toLowerCase().includes(input.toLowerCase())
+        );
       }}
     >
       {Object.entries(groupedPhases).map(([entId, group]) => (
-        <Select.OptGroup key={entId} label={group.enterpriseName}>
-          {group.phases.map((phase) => (
-            <Select.Option
-              key={phase.internPhaseId || phase.id}
-              value={phase.internPhaseId || phase.id}
-              label={`${group.enterpriseName} — ${phase.phaseName}`}
-            >
-              <div
-                className="flex flex-col py-1"
+        <Select.OptGroup
+          key={entId}
+          label={
+            <div className="flex items-center gap-2 py-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+              <span className="text-[11px] font-black tracking-widest text-slate-400 uppercase">
+                {group.enterpriseName}
+              </span>
+            </div>
+          }
+        >
+          {group.phases.map((phase) => {
+            const phaseName = phase.internPhaseName || phase.phaseName;
+            const total = phase.capacity || phase.totalCapacity;
+            const remaining = phase.remainingCapacity;
+            const majors =
+              typeof phase.majorFields === 'string'
+                ? phase.majorFields.split(',').map((m) => m.trim())
+                : Array.isArray(phase.majorFields)
+                  ? phase.majorFields
+                  : ['All'];
+
+            return (
+              <Select.Option
+                key={phase.internPhaseId || phase.id}
+                value={phase.internPhaseId || phase.id}
+                label={`${group.enterpriseName} — ${phaseName}`}
                 enterpriseName={group.enterpriseName}
-                phaseName={phase.phaseName}
+                phaseName={phaseName}
               >
-                <div className="flex justify-between font-medium">
-                  <span>{phase.phaseName}</span>
-                  <span
-                    className={`text-xs ${
-                      phase.remainingCapacity <= 2 ? 'text-red-500 font-bold' : 'text-slate-500'
-                    }`}
-                  >
-                    {phase.remainingCapacity}/{phase.totalCapacity} {UI.LEFT}
-                  </span>
+                <div className="flex flex-col py-1.5 px-0.5 group/opt">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-bold text-slate-700 group-hover/opt:text-primary transition-colors">
+                      {phaseName}
+                    </span>
+                    <div
+                      className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        remaining <= 2
+                          ? 'bg-red-50 text-red-500 ring-1 ring-red-100'
+                          : 'bg-slate-50 text-slate-500 ring-1 ring-slate-100'
+                      }`}
+                    >
+                      <span className="w-1 h-1 rounded-full bg-current opacity-40" />
+                      {remaining}/{total} {UI.LEFT}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-semibold text-slate-300 uppercase tracking-tighter">
+                      {UI.MAJORS}
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {majors.map((major, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[10px] text-slate-400 bg-slate-100/50 px-1.5 py-0 rounded border border-slate-200/50"
+                        >
+                          {major}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-[10px] text-slate-400 truncate">
-                  {UI.MAJORS}{' '}
-                  {Array.isArray(phase.majorFields) ? phase.majorFields.join(', ') : 'All'}
-                </div>
-              </div>
-            </Select.Option>
-          ))}
+              </Select.Option>
+            );
+          })}
         </Select.OptGroup>
       ))}
     </Select>

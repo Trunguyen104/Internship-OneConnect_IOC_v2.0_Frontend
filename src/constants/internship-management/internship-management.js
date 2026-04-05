@@ -94,6 +94,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         GROUP_NAME: 'GROUP NAME',
         PHASE: 'PHASE',
         MENTOR: 'MENTOR',
+        PROJECT: 'PROJECT',
         MEMBERS: 'MEMBERS',
         STATUS: 'STATUS',
         ACTION: 'ACTION',

@@ -63,7 +63,7 @@ export const AssignMentorModal = ({
         className: 'bg-primary hover:bg-primary-hover border-none font-bold min-w-[100px]',
       }}
       cancelButtonProps={{ className: 'font-semibold' }}
-      destroyOnClose
+      destroyOnHidden
       centered
       width={480}
       className="custom-modal"

@@ -16,8 +16,8 @@ import EnterprisePhaseSelect from './EnterprisePhaseSelect';
  * AC-02: Bulk Assign Modal.
  * handles capacity validation and student preview.
  */
-export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId }) => {
-  const [selectedPhaseId, setSelectedPhaseId] = useState(null);
+export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId, termName }) => {
+  const [selectedPhase, setSelectedPhase] = useState(null);
   const UI = PLACEMENT_UI_TEXT.MODALS.BULK_ASSIGN;
   const queryClient = useQueryClient();
 
@@ -30,16 +30,32 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
         message.success(`Assignment requested for ${selectedStudents.length} students.`);
         onClose();
         queryClient.invalidateQueries(['semester-students', semesterId]);
+        queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
       }
     },
     onError: (err) => message.error(err?.message || 'Failed to bulk assign.'),
   });
 
+  const conflicts = useMemo(() => {
+    if (!selectedPhase) return [];
+    return selectedStudents.filter((s) =>
+      s.activeSelfApplyEnterpriseIds?.includes(selectedPhase.enterpriseId)
+    );
+  }, [selectedPhase, selectedStudents]);
+
+  const isOverCapacity = selectedPhase && selectedStudents.length > selectedPhase.remainingCapacity;
+
   const handleConfirm = () => {
-    if (!selectedPhaseId) return message.warning('Please select a phase.');
+    if (!selectedPhase) return message.warning('Please select a phase.');
+    if (isOverCapacity) {
+      return message.error('Phase capacity exceeded.');
+    }
+    if (conflicts.length > 0) {
+      return message.error('Some students have active self-apply conflicts with this enterprise.');
+    }
     mutation.mutate({
       studentIds: selectedStudents.map((s) => s.id),
-      internPhaseId: selectedPhaseId,
+      internPhaseId: selectedPhase.internPhaseId || selectedPhase.id,
     });
   };
 
@@ -48,7 +64,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
       title={<span className="text-lg font-bold">{UI.TITLE(selectedStudents.length)}</span>}
       open={visible}
       onCancel={onClose}
-      destroyOnClose
+      destroyOnHidden
       width={560}
       footer={[
         <Button key="cancel" variant="muted" onClick={onClose} className="mr-2">
@@ -59,6 +75,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
           variant="primary"
           loading={mutation.isLoading}
           onClick={handleConfirm}
+          disabled={!selectedPhase || isOverCapacity || conflicts.length > 0}
         >
           {UI.CONFIRM}
         </Button>,
@@ -71,10 +88,34 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
           </label>
           <EnterprisePhaseSelect
             semesterId={semesterId}
-            value={selectedPhaseId}
-            onChange={setSelectedPhaseId}
+            value={selectedPhase?.internPhaseId || selectedPhase?.id}
+            onChange={(id, phase) => setSelectedPhase(phase)}
+            termName={termName}
           />
         </div>
+
+        {isOverCapacity && (
+          <Alert
+            type="error"
+            showIcon
+            message={
+              <span className="text-xs font-semibold">
+                {UI.CAPACITY_ERROR(selectedPhase.remainingCapacity)}
+              </span>
+            }
+          />
+        )}
+
+        {conflicts.length > 0 && (
+          <Alert
+            type="warning"
+            showIcon
+            message={
+              <span className="text-xs font-semibold">{UI.CONFLICT_MSG(conflicts.length)}</span>
+            }
+            description={<span className="text-[10px]">{UI.CONFLICT_DESC}</span>}
+          />
+        )}
 
         <Divider plain>
           <span className="text-xs text-slate-400">{UI.STUDENTS_LABEL}</span>
@@ -83,23 +124,36 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
           <List
             size="small"
             dataSource={selectedStudents}
-            renderItem={(student) => (
-              <List.Item className="border-none py-1.5 px-3 hover:bg-white rounded transition-colors group">
-                <div className="flex justify-between w-full items-center">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-700">{student.fullName}</span>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {student.studentCode || student.studentId}
-                    </span>
+            renderItem={(student) => {
+              const hasConflict = conflicts.some((c) => c.id === student.id);
+              return (
+                <List.Item
+                  className={`border-none py-1.5 px-3 rounded transition-colors group ${
+                    hasConflict ? 'bg-amber-50/50' : 'hover:bg-white'
+                  }`}
+                >
+                  <div className="flex justify-between w-full items-center">
+                    <div className="flex flex-col">
+                      <span
+                        className={`text-sm font-medium ${
+                          hasConflict ? 'text-amber-700' : 'text-slate-700'
+                        }`}
+                      >
+                        {student.fullName}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {student.studentCode || student.studentId}
+                      </span>
+                    </div>
+                    {hasConflict && (
+                      <Tooltip title={`Active self-apply at ${selectedPhase.enterpriseName}`}>
+                        <ExclamationCircleOutlined className="text-amber-500" />
+                      </Tooltip>
+                    )}
                   </div>
-                  {student.hasConflict && (
-                    <Tooltip title="Has active self-apply at same company">
-                      <ExclamationCircleOutlined className="text-amber-500" />
-                    </Tooltip>
-                  )}
-                </div>
-              </List.Item>
-            )}
+                </List.Item>
+              );
+            }}
           />
         </div>
       </div>
@@ -111,7 +165,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
  * AC-03: Bulk Reassign Modal.
  * handles filtering of eligible vs blocked students.
  */
-export const BulkReassignModal = ({ visible, onClose, selectedStudents, semesterId }) => {
+export const BulkReassignModal = ({ visible, onClose, selectedStudents, semesterId, termName }) => {
   const [selectedPhaseId, setSelectedPhaseId] = useState(null);
   const UI = PLACEMENT_UI_TEXT.MODALS.BULK_REASSIGN;
   const queryClient = useQueryClient();
@@ -131,6 +185,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
       message.success(`Re-assigned ${eligibleStudents.length} students.`);
       onClose();
       queryClient.invalidateQueries(['semester-students', semesterId]);
+      queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
     },
     onError: (err) => message.error(err?.message || 'Failed to re-assign.'),
   });
@@ -149,7 +204,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
       title={<span className="text-lg font-bold text-slate-800">{UI.TITLE}</span>}
       open={visible}
       onCancel={onClose}
-      destroyOnClose
+      destroyOnHidden
       width={640}
       footer={[
         <Button key="cancel" variant="muted" onClick={onClose} className="mr-2">
@@ -183,6 +238,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
             semesterId={semesterId}
             value={selectedPhaseId}
             onChange={setSelectedPhaseId}
+            termName={termName}
           />
         </div>
 
@@ -256,6 +312,7 @@ export const BulkUnassignModal = ({ visible, onClose, selectedStudents, semester
       message.success(`Canceled placements for ${eligibleStudents.length} students.`);
       onClose();
       queryClient.invalidateQueries(['semester-students', semesterId]);
+      queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
     },
     onError: (err) => message.error(err?.message || 'Failed to cancel placement.'),
   });
@@ -270,7 +327,7 @@ export const BulkUnassignModal = ({ visible, onClose, selectedStudents, semester
       title={<span className="text-lg font-bold text-danger">{UI.TITLE}</span>}
       open={visible}
       onCancel={onClose}
-      destroyOnClose
+      destroyOnHidden
       width={520}
       footer={[
         <Button key="cancel" variant="muted" onClick={onClose} className="mr-2">
