@@ -1,4 +1,5 @@
 import JobDetail from '@/components/features/explore-jobs/components/JobDetail';
+import StudentTopNav from '@/components/layout/StudentTopNav';
 
 export const metadata = {
   title: 'Job Details | OneConnect',
@@ -6,5 +7,12 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <JobDetail />;
+  return (
+    <div className="flex h-full flex-col overflow-hidden">
+      <StudentTopNav />
+      <main className="flex-1 overflow-auto bg-gray-50">
+        <JobDetail />
+      </main>
+    </div>
+  );
 }

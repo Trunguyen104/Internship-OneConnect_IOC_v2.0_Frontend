@@ -37,7 +37,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.MENTOR}
             </h4>
-            <div className="flex items-center gap-2">
+            <div className="flex min-h-[32px] items-center gap-2">
               <Avatar
                 size="small"
                 src={currentProject?.mentorAvatar}
@@ -55,7 +55,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.FIELD}
             </h4>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-h-[32px] items-center">
               <Badge variant="primary-soft" size="sm">
                 {currentProject?.field || FORM.LABEL.N_A}
               </Badge>
@@ -65,7 +65,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.TIMELINE}
             </h4>
-            <div className="text-sm font-bold text-slate-700 flex items-center whitespace-nowrap">
+            <div className="flex min-h-[32px] items-center whitespace-nowrap text-sm font-bold text-slate-700">
               {currentProject?.startDate
                 ? dayjs(currentProject.startDate).format('DD/MM/YYYY')
                 : DETAIL.GROUP.TBA}
@@ -181,7 +181,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 <Button
                   size="sm"
                   variant="danger"
-                  className="mt-1 font-bold uppercase tracking-wider"
+                  className="mt-2 font-bold uppercase tracking-wider w-fit ml-[52px] shadow-sm hover:shadow-md transition-all"
                   onClick={() => onAssign(currentProject)}
                   icon={<UsergroupAddOutlined />}
                 >

@@ -31,12 +31,4 @@ export const ExploreJobsService = {
   applyJob(jobId, data = {}) {
     return httpPost(`/jobs/${jobId}/apply`, data);
   },
-
-  /**
-   * Check if student can apply for a specific job
-   */
-  checkEligibility(jobId) {
-    // If backend has this endpoint, use it. Otherwise, this might need fallback
-    return httpGet(`/jobs/${jobId}/eligibility`);
-  },
 };

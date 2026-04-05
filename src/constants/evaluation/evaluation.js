@@ -47,7 +47,6 @@ export const EVALUATION_UI = {
     CONFIDENTIAL: 'Score is confidential',
     NOT_PUBLISHED: 'Scorecard not published yet',
     AWAITING_RESULTS: 'Awaiting results',
-    VIEW_REPORT: 'View Report',
     CHOOSE_GROUP: 'Choose internship group:',
     NO_ASSIGNED_GROUP: 'You have not been assigned to manage any internship groups.',
     CYCLE_NAME: 'Cycle Name',

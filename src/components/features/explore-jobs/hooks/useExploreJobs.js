@@ -3,15 +3,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { studentApplicationService } from '@/components/features/student-applications/services/student-application.service';
 import { useProfile } from '@/components/features/user/hooks/useProfile';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 import { ExploreJobsService } from '../services/explore-jobs.service';
-
-const MOCK_JOBS = [
-  // ... (keeping MOCK_JOBS as internal reference or dev fallback)
-];
 
 /**
  * Maps API job object to Frontend job object
@@ -62,6 +59,19 @@ export function useExploreJobs() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // 0. Fetch student's own applications for eligibility context (AC-03)
+  const myAppsQuery = useQuery({
+    queryKey: ['my-applications-eligible'],
+    queryFn: () => studentApplicationService.getMyApplications().then((res) => res?.data || res),
+    enabled: !loadingUser && !!userInfo,
+    staleTime: 10000,
+  });
+
+  const myAppsData = myAppsQuery.data || [];
+  const myApps = Array.isArray(myAppsData)
+    ? myAppsData
+    : myAppsData?.items || myAppsData?.data || [];
 
   // 1. Fetch available jobs from real API
   const exploreQuery = useQuery({
@@ -117,26 +127,11 @@ export function useExploreJobs() {
       select: (data) => mapJob(data),
     });
 
-  // 3. Check Eligibility Query (AC-03 requirement)
-  const useEligibility = (jobId) =>
-    useQuery({
-      queryKey: ['job-eligibility', jobId],
-      queryFn: async () => {
-        try {
-          const res = await ExploreJobsService.checkEligibility(jobId);
-          return res?.data || res;
-        } catch (err) {
-          return { eligible: true };
-        }
-      },
-      enabled: !!jobId && !loadingUser && !userInfo?.isPlaced && !!cvUrl,
-    });
-
   // 4. Apply mutation
   const applyMutation = useMutation({
     mutationFn: ({ jobId, data }) => ExploreJobsService.applyJob(jobId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['job-eligibility'] });
+      queryClient.invalidateQueries({ queryKey: ['my-applications-eligible'] });
       toast.success(
         EXPLORE_JOBS_UI.APPLY_MODAL.SUCCESS_TITLE,
         EXPLORE_JOBS_UI.APPLY_MODAL.SUCCESS_CONTENT
@@ -168,46 +163,26 @@ export function useExploreJobs() {
     searchTerm,
     setSearchTerm,
     useJobDetail,
-    useEligibility,
     applyJob: applyMutation.mutateAsync,
     isApplying: applyMutation.isPending,
-    getEligibility: (id, serverEligibility = null) => {
+    getEligibility: (id) => {
       if (isPlaced) return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.PLACED };
       if (!hasCV) return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV };
 
-      if (serverEligibility) {
-        if (serverEligibility.eligible === false || serverEligibility.success === false) {
-          const errorList = serverEligibility.errors || [];
-          const errorMsgStr = errorList.join(' ');
+      // 1. Specific check for THIS job (to show "APPLIED" label)
+      const existingAppForThisJob = myApps.find((app) => app.jobSlotId === id || app.jobId === id);
+      const isActuallyAppliedToThis =
+        existingAppForThisJob && ![4, 5, 6].includes(existingAppForThisJob.status);
 
-          const reasonKey =
-            serverEligibility.errorCode || serverEligibility.reasonCode || 'GENERAL';
-          const reasons = {
-            'JobPosting.AlreadyHaveActiveApplication':
-              EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS,
-            'JobPosting.ApplicationDeadlinePassed': EXPLORE_JOBS_UI.ELIGIBILITY.EXPIRED,
-            'JobPosting.CannotApplyWhenPlaced': EXPLORE_JOBS_UI.ELIGIBILITY.PLACED,
-            'JobPosting.UploadCVRequired': EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV,
-            'JobPosting.NoActiveInternshipPeriod': EXPLORE_JOBS_UI.ELIGIBILITY.NO_ACTIVE_PHASE,
-            // Legacy/Mapping fallbacks
-            ACTIVE_APP_EXISTS: EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS,
-            EXPIRED: EXPLORE_JOBS_UI.ELIGIBILITY.EXPIRED,
-          };
+      if (isActuallyAppliedToThis) {
+        return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS };
+      }
 
-          // Priority 1: Direct key mapping
-          if (reasons[reasonKey]) return { eligible: false, reason: reasons[reasonKey] };
-
-          // Priority 2: String matching in errors array (per Swagger feedback)
-          if (errorMsgStr.toLowerCase().includes('no active internship period')) {
-            return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.NO_ACTIVE_PHASE };
-          }
-
-          return {
-            eligible: false,
-            reason:
-              serverEligibility.message || errorList[0] || EXPLORE_JOBS_UI.ELIGIBILITY.NOT_ELIGIBLE,
-          };
-        }
+      // 2. Global check: Has ANY active application? (AC-03 requirement)
+      // If student has an active app anywhere, they cannot apply for another job.
+      const hasAnyActiveApp = myApps.some((app) => ![4, 5, 6].includes(app.status));
+      if (hasAnyActiveApp) {
+        return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS };
       }
 
       return { eligible: true };

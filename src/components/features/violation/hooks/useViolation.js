@@ -7,7 +7,7 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 
 import { violationReportService } from '../services/violation-report.service';
 
-export function useViolation() {
+export function useViolation(groupId) {
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -36,13 +36,14 @@ export function useViolation() {
     isLoading: loading,
     refetch: refresh,
   } = useQuery({
-    queryKey: ['violation-reports', page, pageSize, debouncedSearch, dateRange, sortOrder],
+    queryKey: ['violation-reports', groupId, page, pageSize, debouncedSearch, dateRange, sortOrder],
     queryFn: async () => {
       try {
         const params = {
           PageNumber: page,
           PageSize: pageSize,
           SearchTerm: debouncedSearch || undefined,
+          GroupId: groupId || undefined,
           OccurredFrom: dateRange[0]
             ? dateRange[0].format(VIOLATION_REPORT.DATE_FORMATS.API)
             : undefined,

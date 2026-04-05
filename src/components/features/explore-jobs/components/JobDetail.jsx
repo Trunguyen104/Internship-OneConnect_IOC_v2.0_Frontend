@@ -25,12 +25,10 @@ export default function JobDetail() {
   const { id } = useParams();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { useJobDetail, useEligibility, getEligibility, isApplying, applyJob, cvUrl, hasCV } =
-    useExploreJobs();
+  const { useJobDetail, getEligibility, isApplying, applyJob, cvUrl, hasCV } = useExploreJobs();
   const { data: job, isLoading: isJobLoading } = useJobDetail(id);
-  const { data: serverEligibility, isLoading: isEligibilityLoading } = useEligibility(id);
 
-  const isLoading = isJobLoading || isEligibilityLoading;
+  const isLoading = isJobLoading;
 
   if (isLoading) {
     return (
@@ -65,7 +63,7 @@ export default function JobDetail() {
 
   if (!job) return null;
 
-  const eligibility = getEligibility(job.jobId, serverEligibility);
+  const eligibility = getEligibility(job.jobId);
 
   return (
     <PageLayout className="animate-in slide-in-from-bottom duration-700 pb-20 bg-[#f8f9fa]">
@@ -262,12 +260,16 @@ export default function JobDetail() {
                     className={`w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-lg transition-all duration-300 ${
                       eligibility.eligible
                         ? 'bg-primary hover:bg-primary-hover shadow-primary/10 active:scale-[0.98]'
-                        : 'bg-muted/30 cursor-not-allowed'
+                        : eligibility.reason === EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS
+                          ? 'bg-success/20 text-success border border-success/30 cursor-default'
+                          : 'bg-muted/30 cursor-not-allowed'
                     }`}
                   >
                     {isApplying
                       ? EXPLORE_JOBS_UI.DETAIL.SIDEBAR.PROCESSING
-                      : EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLY_NOW}
+                      : eligibility.reason === EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS
+                        ? EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLIED
+                        : EXPLORE_JOBS_UI.DETAIL.SIDEBAR.APPLY_NOW}
                   </button>
                 </div>
               </Tooltip>

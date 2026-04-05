@@ -10,6 +10,7 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 import { cn } from '@/lib/cn';
 
 import { useGroupManagement } from '../hooks/useGroupManagement';
+import { AssignMentorModal } from './AssignMentorModal';
 import { CreateGroupModal } from './CreateGroupModal';
 import GroupGeneralInfo from './GroupGeneralInfo';
 import GroupTable from './GroupTable';
@@ -22,6 +23,8 @@ export default function GroupManagement({ onDetailMode }) {
     search,
     setSearch,
     setAssignModal,
+    assignModal,
+    handleAssignSubmit,
     createModal,
     setCreateModal,
     editModal,
@@ -75,6 +78,7 @@ export default function GroupManagement({ onDetailMode }) {
           onBack={() => setSelectedGroupDetail(null)}
           onRemoveStudent={handleRemoveStudentFromGroup}
           onAddStudent={() => onAddStudents(selectedGroupDetail)}
+          onAssignMentor={setAssignModal}
         />
       ) : (
         <>
@@ -175,6 +179,15 @@ export default function GroupManagement({ onDetailMode }) {
         isAddingStudents={editModal.isAddingStudents}
         onCancel={() => setEditModal({ open: false, group: null, isAddingStudents: false })}
         onFinish={handleUpdateGroup}
+      />
+
+      <AssignMentorModal
+        open={assignModal.open}
+        group={assignModal.group}
+        mentors={mentors}
+        loading={loadingMentors}
+        onCancel={() => setAssignModal({ open: false, group: null })}
+        onConfirm={handleAssignSubmit}
       />
     </>
   );

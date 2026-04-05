@@ -4,11 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { App } from 'antd';
 import dayjs from 'dayjs';
 
-import {
-  getOperationalStatus,
-  OPERATIONAL_STATUS,
-  PROJECT_MANAGEMENT,
-} from '@/constants/project-management/project-management';
+import { PROJECT_MANAGEMENT } from '@/constants/project-management/project-management';
 import { useToast } from '@/providers/ToastProvider';
 
 import { ProjectService } from '../services/project.service';
@@ -51,11 +47,6 @@ export const useProjectActions = ({
         const newGroupId = values.internshipGroupId;
         const isAssigning =
           newGroupId && (!oldGroupId || oldGroupId === '00000000-0000-0000-0000-000000000000');
-        const isSwapping =
-          newGroupId &&
-          oldGroupId &&
-          oldGroupId !== '00000000-0000-0000-0000-000000000000' &&
-          oldGroupId !== newGroupId;
 
         const updateForm = new FormData();
         updateForm.append('ProjectName', values.name || '');
@@ -255,13 +246,8 @@ export const useProjectActions = ({
         return;
       }
 
-      const opStatus = getOperationalStatus(
-        editingRecord?.operationalStatus ?? editingRecord?.status
-      );
-      const isOperationalActive = opStatus === OPERATIONAL_STATUS.ACTIVE;
-
       return saveMutation.mutateAsync({ values, isDraft });
-    } catch (err) {
+    } catch (_err) {
       toast.error(MESSAGES.ERROR_UPDATE_PREVALIDATE);
     }
   };
@@ -272,6 +258,7 @@ export const useProjectActions = ({
       content: 'Once published, you can assign students and track progress. Proceed?',
       okText: 'Publish',
       cancelText: 'Cancel',
+      centered: true,
       onOk: () => publishMutation.mutateAsync(id),
     });
   };
@@ -308,7 +295,7 @@ export const useProjectActions = ({
           const groupRes = await ProjectService.getStudentsByGroup(groupId);
           const groupDetail = groupRes?.data || groupRes;
           phaseEndDate = groupDetail.endDate || groupDetail.internPhaseEnd;
-        } catch (gErr) {
+        } catch (_gErr) {
           // Silent catch for secondary group data
         }
       }
@@ -329,6 +316,7 @@ export const useProjectActions = ({
         content,
         okText: 'Confirm',
         cancelText: 'Cancel',
+        centered: true,
         onOk: () => completeMutation.mutateAsync(id),
       });
     } catch (err) {
@@ -361,6 +349,7 @@ export const useProjectActions = ({
           title: PROJECT_MANAGEMENT.MODALS?.DELETE_UNABLE_TITLE,
           content: MESSAGES.ERROR_ASSIGNED_STU,
           okText: 'Got it',
+          centered: true,
         });
         return;
       }
@@ -371,6 +360,7 @@ export const useProjectActions = ({
         okText: 'Delete',
         okType: 'danger',
         cancelText: 'Cancel',
+        centered: true,
         onOk: () => deleteMutation.mutateAsync(id),
       });
     } catch (err) {
@@ -385,6 +375,7 @@ export const useProjectActions = ({
         'The project will be moved back to Draft and will no longer be visible to students. Proceed?',
       okText: 'Unpublish',
       cancelText: 'Cancel',
+      centered: true,
       onOk: () => unpublishMutation.mutateAsync(id),
     });
   };
@@ -395,6 +386,7 @@ export const useProjectActions = ({
       content: 'Archived projects are hidden by default and cannot be edited. Proceed?',
       okText: 'Archive',
       cancelText: 'Cancel',
+      centered: true,
       onOk: () => archiveMutation.mutateAsync(id),
     });
   };
@@ -412,7 +404,7 @@ export const useProjectActions = ({
       await assignGroupMutation.mutateAsync({ assigningProject, selectedGroupId });
       if (closeLocalModal) closeLocalModal();
       return true;
-    } catch (e) {
+    } catch {
       if (closeLocalModal) closeLocalModal();
       return true;
     } finally {

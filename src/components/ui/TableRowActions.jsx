@@ -31,7 +31,7 @@ export function enrichTableMenuItems(items = []) {
   return items.map((item) => {
     if (!item || item.type === 'divider') return item;
 
-    const { key, label, icon, danger, onClick, disabled } = item;
+    const { key, label, icon, onClick, disabled } = item;
 
     if (label != null && typeof label !== 'string' && typeof label !== 'number') {
       return { ...item };
@@ -42,7 +42,6 @@ export function enrichTableMenuItems(items = []) {
 
     return {
       key,
-      danger: !!danger,
       onClick,
       disabled,
       label: (

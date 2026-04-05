@@ -17,6 +17,9 @@ export const PROJECT_UI = {
 
   LABELS: {
     NAME: 'Project Name',
+    CODE: 'Project Code',
+    FIELD: 'Field',
+    GROUP: 'Internship Group',
     STATUS: 'Status',
     TIMELINE: 'Timeline',
     DESCRIPTION: 'Project Description',

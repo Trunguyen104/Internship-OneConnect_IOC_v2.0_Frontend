@@ -1,11 +1,8 @@
 'use client';
 
-import { DeleteOutlined } from '@ant-design/icons';
 import React, { useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
-import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
-import TableRowDropdown from '@/components/ui/TableRowActions';
 import { STUDENT_LIST_UI } from '@/constants/studentList/uiText';
 import { TABLE_CELL } from '@/lib/tableStyles';
 
@@ -63,39 +60,8 @@ export default function StudentTable({ data, loading, onDelete }) {
           </span>
         ),
       },
-      {
-        title: '',
-        key: 'actions',
-        align: 'right',
-        width: '48px',
-        render: (_, record) => {
-          const items = [
-            {
-              key: 'remove',
-              label: STUDENT_LIST_UI.ACTION.REMOVE_STUDENT,
-              icon: <DeleteOutlined />,
-              danger: true,
-              disabled: !record.studentId,
-              onClick: () => {
-                if (!record.studentId) return;
-                showDeleteConfirm({
-                  title: STUDENT_LIST_UI.CONFIRM.REMOVE_TITLE,
-                  content: STUDENT_LIST_UI.CONFIRM.REMOVE_DESC,
-                  onOk: () => onDelete(record.studentId),
-                });
-              },
-            },
-          ];
-
-          return (
-            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
-              <TableRowDropdown items={items} />
-            </div>
-          );
-        },
-      },
     ],
-    [onDelete]
+    []
   );
 
   return (

@@ -88,6 +88,7 @@ const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {
         confirmText={FORM.CLOSE}
         showConfirm={true}
         showCancel={false}
+        className="mt-[-20px]"
       />
     </>
   );
@@ -95,7 +96,7 @@ const ViolationModalBody = ({ initialValues, onCancel, loading, viewOnly }) => {
 
 const ViolationModal = ({ visible, onCancel, ...props }) => {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnClose closable={false}>
+    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnHidden closable={false}>
       {visible && <ViolationModalBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );

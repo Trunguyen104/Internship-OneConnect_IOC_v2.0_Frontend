@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { DashboardService } from './dashboard-stats.service';
 
-export const useUniAdminDashboard = () => {
+export const useUniAdminDashboard = (termId = null) => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState({
@@ -25,7 +25,7 @@ export const useUniAdminDashboard = () => {
     try {
       const [profileRes, dashboardData] = await Promise.all([
         DashboardService.getProfile(),
-        DashboardService.getStats(),
+        DashboardService.getStats(termId),
       ]);
 
       const profileData = profileRes?.data || profileRes;
@@ -40,11 +40,11 @@ export const useUniAdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [termId]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, termId]);
 
   return {
     loading,
