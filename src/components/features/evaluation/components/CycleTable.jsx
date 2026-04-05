@@ -4,63 +4,57 @@ import { EyeOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import dayjs from 'dayjs';
 
+import StatusBadge from '@/components/ui/status-badge';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const STATUS_CONFIG = {
   1: {
     label: EVALUATION_UI.STATUS.PENDING,
-    bg: 'bg-warning-surface',
-    text: 'text-warning-text',
-    border: 'border-warning-border',
+    variant: 'warning',
   },
   2: {
     label: EVALUATION_UI.STATUS.DRAFT,
-    bg: 'bg-info-surface',
-    text: 'text-info',
-    border: 'border-info/20',
+    variant: 'warning',
   },
   3: {
     label: EVALUATION_UI.STATUS.SUBMITTED,
-    bg: 'bg-info-surface',
-    text: 'text-info',
-    border: 'border-info/20',
+    variant: 'info',
   },
   4: {
     label: EVALUATION_UI.STATUS.PUBLISHED,
-    bg: 'bg-success-surface',
-    text: 'text-success',
-    border: 'border-success/20',
+    variant: 'success',
   },
   PENDING: {
     label: EVALUATION_UI.STATUS.PENDING,
-    bg: 'bg-warning-surface',
-    text: 'text-warning-text',
-    border: 'border-warning-border',
+    variant: 'warning',
   },
   DRAFT: {
     label: EVALUATION_UI.STATUS.DRAFT,
-    bg: 'bg-info-surface',
-    text: 'text-info',
-    border: 'border-info/20',
+    variant: 'warning',
   },
   SUBMITTED: {
     label: EVALUATION_UI.STATUS.SUBMITTED,
-    bg: 'bg-info-surface',
-    text: 'text-info',
-    border: 'border-info/20',
+    variant: 'info',
   },
   PUBLISHED: {
     label: EVALUATION_UI.STATUS.PUBLISHED,
-    bg: 'bg-success-surface',
-    text: 'text-success',
-    border: 'border-success/20',
+    variant: 'success',
   },
   COMPLETED: {
     label: EVALUATION_UI.STATUS.PUBLISHED,
-    bg: 'bg-success-surface',
-    text: 'text-success',
-    border: 'border-success/20',
+    variant: 'success',
   },
+};
+
+const getTimelineStatus = (start, end) => {
+  if (!start || !end) return null;
+  const now = dayjs();
+  const s = dayjs(start);
+  const e = dayjs(end);
+
+  if (now.isBefore(s)) return { label: EVALUATION_UI.STATUS.UPCOMING, variant: 'neutral' };
+  if (now.isAfter(e)) return { label: EVALUATION_UI.STATUS.COMPLETED, variant: 'success' };
+  return { label: EVALUATION_UI.STATUS.ONGOING, variant: 'primary' };
 };
 
 export default function CycleTable({ data, page, pageSize, onDetail }) {
@@ -92,14 +86,14 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
           </thead>
           <tbody className="divide-border/50 divide-y">
             {data.map((record, index) => {
+              const timeline = getTimelineStatus(record.startDate, record.endDate);
               const status = record.status;
               const normalized = status ? String(status).toUpperCase() : '';
-              const cfg = STATUS_CONFIG[normalized] ||
+              const cfg = timeline ||
+                STATUS_CONFIG[normalized] ||
                 STATUS_CONFIG[status] || {
                   label: status || 'Unknown',
-                  bg: 'bg-bg',
-                  text: 'text-muted',
-                  icon: null,
+                  variant: 'neutral',
                 };
 
               return (
@@ -121,12 +115,7 @@ export default function CycleTable({ data, page, pageSize, onDetail }) {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${cfg.bg} ${cfg.text} ${cfg.border || 'border-transparent'}`}
-                    >
-                      {cfg.icon}
-                      {cfg.label}
-                    </span>
+                    <StatusBadge variant={cfg.variant} label={cfg.label} />
                   </td>
                   <td className="px-6 py-4 text-right">
                     <Button

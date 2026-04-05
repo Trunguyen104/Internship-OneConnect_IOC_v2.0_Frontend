@@ -12,7 +12,7 @@ const CompoundModal = ({
   open,
   onCancel,
   width = 440,
-  destroyOnClose = true,
+  destroyOnHidden = true,
   ...props
 }) => {
   return (
@@ -21,7 +21,7 @@ const CompoundModal = ({
       onCancel={onCancel}
       centered
       width={width}
-      destroyOnHidden={destroyOnClose}
+      destroyOnHidden={destroyOnHidden}
       footer={null}
       closeIcon={
         <div className="mt-1">
@@ -41,7 +41,7 @@ CompoundModal.propTypes = {
   open: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired,
   width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  destroyOnClose: PropTypes.bool,
+  destroyOnHidden: PropTypes.bool,
 };
 
 const Header = ({ icon, title, subtitle, type = 'default' }) => {

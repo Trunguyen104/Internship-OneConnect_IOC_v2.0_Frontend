@@ -1,7 +1,6 @@
 'use client';
 
 import { FileText, Send, Share2, Sparkles, X } from 'lucide-react';
-import Link from 'next/link';
 import React from 'react';
 
 import { Modal } from '@/components/ui/modal';
@@ -80,12 +79,9 @@ export default function ApplyModal({ open, onCancel, onConfirm, job, cvUrl, isAp
               </div>
 
               <div className="mt-4 pt-4 border-t border-border/40 flex items-center justify-between relative z-10">
-                <Link
-                  href="/student/profile"
-                  className="text-primary text-xs font-bold hover:underline underline-offset-4"
-                >
-                  {EXPLORE_JOBS_UI.APPLY_MODAL.UPDATE_CV_LINK}
-                </Link>
+                <p className="text-[11px] text-muted-deep font-medium italic">
+                  {EXPLORE_JOBS_UI.APPLY_MODAL.FOOTER_NOTE}
+                </p>
                 <div className="flex gap-2 opacity-30">
                   <Share2 className="h-4 w-4" />
                 </div>
@@ -117,12 +113,12 @@ export default function ApplyModal({ open, onCancel, onConfirm, job, cvUrl, isAp
                   : EXPLORE_JOBS_UI.APPLY_MODAL.SUBMIT_BUTTON}
               </button>
             ) : (
-              <Link
-                href="/student/profile"
-                className="w-full py-3 bg-warning hover:bg-warning-hover text-white rounded-xl font-bold shadow-lg shadow-warning/20 transition-all active:scale-[0.98] flex items-center justify-center text-[13px]"
+              <button
+                onClick={onCancel}
+                className="w-full py-3 bg-muted/10 text-muted rounded-xl font-bold transition-all active:scale-[0.98] flex items-center justify-center text-[13px]"
               >
-                {EXPLORE_JOBS_UI.APPLY_MODAL.UPDATE_CV_NOW}
-              </Link>
+                {EXPLORE_JOBS_UI.APPLY_MODAL.CANCEL_BUTTON}
+              </button>
             )}
             <button
               onClick={onCancel}
@@ -131,10 +127,6 @@ export default function ApplyModal({ open, onCancel, onConfirm, job, cvUrl, isAp
               {EXPLORE_JOBS_UI.APPLY_MODAL.CANCEL_BUTTON}
             </button>
           </div>
-
-          <p className="mt-6 text-[11px] text-muted leading-relaxed italic">
-            {EXPLORE_JOBS_UI.APPLY_MODAL.FOOTER_NOTE}
-          </p>
         </div>
       </div>
     </Modal>

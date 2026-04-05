@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { ProjectService } from '@/components/features/project-management/services/project.service';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -57,8 +58,35 @@ export const useEnterpriseGroups = ({
           SortOrder: sort?.order,
         };
 
-        const response = await EnterpriseGroupService.getGroups(params);
+        const [response, projectsRes] = await Promise.all([
+          EnterpriseGroupService.getGroups(params),
+          ProjectService.getAll({ pageSize: 100 }).catch(() => null),
+        ]);
+
         const items = response?.data?.items || response?.items || [];
+        const projectItems = projectsRes?.data?.items || projectsRes?.items || [];
+
+        // Create a map for quick lookup: { normalizedGroupId: [projectName1, projectName2, ...] }
+        const projectMap = (Array.isArray(projectItems) ? projectItems : []).reduce((acc, p) => {
+          // Check all potential ID fields from the project object
+          const gid =
+            p.internshipId ||
+            p.InternshipId ||
+            p.internshipGroupId ||
+            p.groupId ||
+            p.InternshipGroupId ||
+            p.GroupId ||
+            p.projectId ||
+            p.ProjectId;
+
+          if (gid) {
+            const key = String(gid).toLowerCase();
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(p.projectName || p.ProjectName || p.name || p.Name);
+          }
+          return acc;
+        }, {});
+
         const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
 
         const mapped = Array.isArray(items)
@@ -68,9 +96,21 @@ export const useEnterpriseGroups = ({
                 (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
               );
 
+              // Determine group ID with specific priority
+              const finalGroupId =
+                item.internshipGroupId ||
+                item.InternshipGroupId ||
+                item.groupId ||
+                item.GroupId ||
+                item.id ||
+                item.internshipId ||
+                item.InternshipId;
+
+              const normalizedKey = String(finalGroupId || '').toLowerCase();
+
               return {
                 ...item,
-                id: item.internshipId || item.groupId || item.internshipGroupId || item.id,
+                id: finalGroupId,
                 name: item.groupName || item.GroupName || item.name || item.Name,
                 memberCount: item.numberOfMembers ?? item.memberCount ?? 0,
                 mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
@@ -83,6 +123,8 @@ export const useEnterpriseGroups = ({
                   '-',
                 startDate: item.startDate || item.phaseStartDate || phaseMatch?.startDate,
                 endDate: item.endDate || item.phaseEndDate || phaseMatch?.endDate,
+                projectName: projectMap[normalizedKey]?.[0] || 'N/A',
+                projectCount: projectMap[normalizedKey]?.length || 0,
               };
             })
           : [];

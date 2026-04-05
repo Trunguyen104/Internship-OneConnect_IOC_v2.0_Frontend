@@ -123,15 +123,8 @@ export function useStakeholderTab() {
   };
 
   const handleSaveStakeholder = async () => {
-    if (!editingStakeholderId) {
-      if (!validateForm()) {
-        return;
-      }
-    } else {
-      if (!stakeholderForm.name || !stakeholderForm.email) {
-        toast.warning(STAKEHOLDER_MESSAGES.REQUIRED_FIELDS.GENERAL);
-        return;
-      }
+    if (!validateForm()) {
+      return;
     }
 
     if (!internshipId) {
@@ -192,17 +185,27 @@ export function useStakeholderTab() {
       console.error('Error saving stakeholder:', err);
 
       const errorData = err.data;
-      const errorMsg =
-        errorData?.errors?.[0] ||
-        errorData?.message ||
-        err.message ||
-        STAKEHOLDER_MESSAGES.SAVE_FAILED;
+      const valErrors = errorData?.validationErrors;
 
-      if (err.status === 409) {
+      if (valErrors) {
+        const mappedErrors = {};
+        Object.keys(valErrors).forEach((key) => {
+          // Map backend key to frontend field name (lowercase first letter usually)
+          const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
+          mappedErrors[fieldName] = valErrors[key][0];
+        });
+        setErrors(mappedErrors);
+        toast.error(errorData?.message || STAKEHOLDER_MESSAGES.SAVE_FAILED);
+      } else if (err.status === 409) {
         toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
       } else if (err.status === 403) {
         toast.error(STAKEHOLDER_MESSAGES.FORBIDDEN);
       } else {
+        const errorMsg =
+          errorData?.errors?.[0] ||
+          errorData?.message ||
+          err.message ||
+          STAKEHOLDER_MESSAGES.SAVE_FAILED;
         toast.error(errorMsg);
       }
     }

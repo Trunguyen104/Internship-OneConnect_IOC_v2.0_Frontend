@@ -288,7 +288,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
 
 const ViolationFormModal = ({ visible, onCancel, ...props }) => {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnClose closable={false}>
+    <CompoundModal open={visible} onCancel={onCancel} width={520} destroyOnHidden closable={false}>
       {visible && <ViolationFormBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );

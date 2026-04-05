@@ -241,7 +241,7 @@ export const PROJECT_MANAGEMENT = {
       NO_LINKS: 'No external links available.',
       TEMPLATE_PREFIX: 'Template: ',
       NA: 'N/A',
-      TBA: 'TBA',
+      TBA: '-',
     },
     RESOURCES: {
       ACCESS: 'Open/Download',
@@ -260,7 +260,7 @@ export const PROJECT_MANAGEMENT = {
       MANAGE_LINK: 'Manage Group',
       ARCHIVED_LABEL: 'Group Archived',
       ARCHIVED_VALUE: 'Archived',
-      TBA: 'TBA',
+      TBA: '-',
       ASSIGN_BTN: 'Assign Group',
     },
     STUDENTS: {

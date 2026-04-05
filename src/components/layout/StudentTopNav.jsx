@@ -32,10 +32,7 @@ export default function StudentTopNav() {
   const navTabs = useMemo(() => {
     const tabs = [{ key: '/student/home', label: 'Home', icon: Home }];
 
-    // Logic: Explore Jobs visible if Enrolled AND has CV AND NOT placed
-    if (isEnrolled && hasCv && !isPlaced) {
-      tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
-    }
+    tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
 
     // Logic: My Applications (Student Only)
     // Sidebar logic: isEnrolled && (hasActiveApp || isPlaced)

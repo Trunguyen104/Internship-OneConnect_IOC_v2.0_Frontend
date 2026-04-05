@@ -3,7 +3,6 @@
 import {
   DeleteOutlined,
   EditOutlined,
-  EyeOutlined,
   FilterOutlined,
   LoginOutlined,
   StopOutlined,
@@ -154,16 +153,9 @@ export default function InternshipTermManagement() {
           const items = [
             {
               key: 'manage',
-              label: 'Quản lý', // or UI_TEXT.COMMON.MANAGE
+              label: 'Manage',
               icon: <LoginOutlined />,
               onClick: () => router.push(`/school/terms/${record.termId}/overview`),
-            },
-            { type: 'divider' },
-            {
-              key: 'view',
-              label: ACTIONS.VIEW,
-              icon: <EyeOutlined />,
-              onClick: () => handleView(record),
             },
           ];
 

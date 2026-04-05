@@ -29,7 +29,7 @@ export default function InternshipManagementContainer() {
         }`}
       >
         <div
-          className={`bg-muted/5 border-border mb-6 flex w-fit items-center gap-2 rounded-2xl p-1 shrink-0 ${isDetail ? 'opacity-50 pointer-events-none' : ''}`}
+          className={`bg-muted/5 border-border mb-6 flex w-fit items-center gap-2 rounded-2xl p-1 shrink-0 ${isDetail ? 'opacity-100 pointer-events-none' : ''}`}
         >
           <button
             onClick={() => setTab('students')}

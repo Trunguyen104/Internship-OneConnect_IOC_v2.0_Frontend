@@ -28,6 +28,7 @@ export default function GroupGeneralInfo({
   onBack = null,
   onRemoveStudent = null,
   onAddStudent = null,
+  onAssignMentor = null,
 }) {
   const { info, loading } = useGroupDetail(groupId);
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,15 +89,15 @@ export default function GroupGeneralInfo({
         </Button>
       </div>
 
-      <GroupDetailOverview info={info} VIEW={VIEW} GROUP_MANAGEMENT={GROUP_MANAGEMENT} />
+      <GroupDetailOverview
+        info={info}
+        VIEW={VIEW}
+        GROUP_MANAGEMENT={GROUP_MANAGEMENT}
+        onAssignMentor={onAssignMentor}
+      />
 
       <Card className="!p-6 border-none shadow-sm flex flex-col gap-6">
         <div className="flex items-center justify-between border-b border-slate-50 pb-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-extrabold uppercase tracking-widest text-text/80 mb-0">
-              {VIEW.MEMBERS}
-            </h3>
-          </div>
           <div className="ml-5 flex flex-1">
             <Input
               placeholder="Search students..."
