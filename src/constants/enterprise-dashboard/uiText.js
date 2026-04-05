@@ -40,4 +40,16 @@ export const ENTERPRISE_DASHBOARD_UI = {
     EMOJI: '👋',
     EXCLAMATION: '!',
   },
+  MENTOR_GROUPS: {
+    TITLE: 'Internship Groups Management',
+    SUBTITLE: 'Manage and monitor your assigned internship groups.',
+    SEARCH_PLACEHOLDER: 'Search by group name or project...',
+    ID_PREFIX: 'ID: ',
+    EMPTY_STATE: 'No internship groups assigned yet.',
+    EMPTY_STATE_DESC: 'Try adjusting your search query or contact your administrator.',
+    STUDENTS: 'Students',
+    VIEW_DETAILS: 'View Details',
+    CHIP_ACTIVE: 'Active',
+    CHIP_ARCHIVED: 'Archived',
+  },
 };
