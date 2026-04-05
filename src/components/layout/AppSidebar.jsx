@@ -64,7 +64,7 @@ export default function AppSidebar() {
           { type: 'divider' },
           { key: `${p}/overview`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
           { key: `${p}/enrollments`, icon: <Users className="size-4" />, label: 'Students' },
-          { key: `${p}/groups`, icon: <Briefcase className="size-4" />, label: 'Groups' },
+          // { key: `${p}/groups`, icon: <Briefcase className="size-4" />, label: 'Groups' },
         ];
       }
 
@@ -127,11 +127,11 @@ export default function AppSidebar() {
             icon: <ClipboardCheck className="size-4" />,
             label: 'Evaluations',
           },
-          // {
-          //   key: `${p}/violations`,
-          //   icon: <AlertOctagon className="size-4" />,
-          //   label: 'Violation Reports',
-          // },
+          {
+            key: `/company/public-holidays`,
+            icon: <CalendarCheck className="size-4" />,
+            label: 'Public Holidays',
+          },
         ];
       }
 
@@ -206,6 +206,26 @@ export default function AppSidebar() {
             label: 'Enterprises',
           },
           { key: '/admin/users', icon: <Users className="size-4" />, label: 'Users' },
+        ];
+      }
+
+      if (nRole === USER_ROLE.HR || nRole === USER_ROLE.ENTERPRISE_ADMIN) {
+        return [
+          {
+            key: '/company/home',
+            icon: <LayoutDashboard className="size-4" />,
+            label: 'Dashboard',
+          },
+          {
+            key: '/company/phases',
+            icon: <Briefcase className="size-4" />,
+            label: 'Internship Phases',
+          },
+          {
+            key: '/company/public-holidays',
+            icon: <CalendarCheck className="size-4" />,
+            label: 'Public Holidays',
+          },
         ];
       }
 

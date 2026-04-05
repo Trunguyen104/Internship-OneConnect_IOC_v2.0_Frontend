@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Select } from 'antd';
 import React from 'react';
 
-import { PLACEMENT_UI_TEXT } from '../constants/placement.constants';
+import { PLACEMENT_UI_TEXT } from '@/constants/internship-placement/placement.constants';
+
 import { PlacementService } from '../services/placement.service';
 
 /**

@@ -3,11 +3,10 @@
 import React from 'react';
 
 import Badge from '@/components/ui/badge';
-
 import {
   PLACEMENT_STATUS_LABELS,
   PLACEMENT_STATUS_VARIANTS,
-} from '../constants/placement.constants';
+} from '@/constants/internship-placement/placement.constants';
 
 /**
  * Renders the placement status badge for a student.

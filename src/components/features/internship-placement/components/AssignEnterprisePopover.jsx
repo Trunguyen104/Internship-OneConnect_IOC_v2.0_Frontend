@@ -5,9 +5,8 @@ import { message, Popover, Space } from 'antd';
 import React, { useState } from 'react';
 
 import Button from '@/components/ui/button';
-import Button from '@/components/ui/button';
+import { PLACEMENT_UI_TEXT } from '@/constants/internship-placement/placement.constants';
 
-import { PLACEMENT_UI_TEXT } from '../constants/placement.constants';
 import { PlacementService } from '../services/placement.service';
 import EnterprisePhaseSelect from './EnterprisePhaseSelect';
 

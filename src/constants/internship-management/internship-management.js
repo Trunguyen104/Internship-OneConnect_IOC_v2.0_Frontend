@@ -882,6 +882,14 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         GENERATING_STATS: 'Generating system analytics...',
         GENERATE_SUCCESS: 'Analytics report generated successfully!',
       },
+      TERM_WORKSPACE: {
+        ROADMAP_TITLE: 'Term Roadmap',
+        ROADMAP_SUBTITLE: 'Timeline and key milestones',
+        PROGRAM_CATEGORY: 'Program Category',
+        PLACEMENT_STATUS: 'Placement Status',
+        IMPORT_STUDENTS: 'Import Students',
+        PROGRESS_TITLE: 'TERM PROGRESS',
+      },
     },
   },
 

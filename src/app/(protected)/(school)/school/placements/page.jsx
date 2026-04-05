@@ -6,15 +6,15 @@ import { Card, Select, Space, Spin } from 'antd';
 import React, { useState } from 'react';
 
 import StudentInternshipTable from '@/components/features/internship-placement/components/StudentInternshipTable';
+import { TermService } from '@/components/features/internship-term-management/services/term.service';
+import SchoolTopNav from '@/components/layout/SchoolTopNav';
 import {
   PLACEMENT_UI_TEXT,
   SEMESTER_STATUS,
-} from '@/components/features/internship-placement/constants/placement.constants';
-import { TermService } from '@/components/features/internship-term-management/services/term.service';
-import SchoolTopNav from '@/components/layout/SchoolTopNav';
+} from '@/constants/internship-placement/placement.constants';
 
 export default function PlacementPage() {
-  const [selectedTermId, setSelectedTermId] = useState(null);
+  const [selectedTermId, setSelectedTermId] = useState(undefined);
   const UI = PLACEMENT_UI_TEXT.PAGE;
 
   // Fetch all terms to let Admin select which one to manage placements for
@@ -29,7 +29,7 @@ export default function PlacementPage() {
   const defaultTermId =
     terms.length > 0
       ? (terms.find((t) => t.status === SEMESTER_STATUS.ACTIVE) || terms[0]).id
-      : null;
+      : undefined;
 
   const currentTermId = selectedTermId || defaultTermId;
   const currentTerm = terms.find((t) => t.id === currentTermId);
@@ -48,7 +48,7 @@ export default function PlacementPage() {
             </div>
 
             <Card size="small" className="shadow-sm border-slate-200 min-w-[280px]">
-              <Space direction="vertical" size={2} className="w-full">
+              <Space orientation="vertical" size={2} className="w-full">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   {UI.TERM_LABEL}
                 </span>

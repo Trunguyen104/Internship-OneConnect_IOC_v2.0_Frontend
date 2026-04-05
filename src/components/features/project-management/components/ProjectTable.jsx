@@ -35,11 +35,9 @@ export default function ProjectTable({
   pagination,
   groups = [],
   isMentor = true, // Default to true for backward compatibility
-  onChange: _onChange,
   onEdit,
   onView,
   onAssign,
-  onPublish,
   onComplete,
   onDelete,
   onArchive,
@@ -150,16 +148,19 @@ export default function ProjectTable({
           );
         },
       },
-      // {
-      //   title: TABLE.COLUMNS.FIELD,
-      //   key: 'field',
-      //   width: 120,
-      //   render: (text) => (
-      //     <span className="text-xs font-medium text-slate-600 truncate block max-w-[120px]" title={text}>
-      //       {text || PROJECT_MANAGEMENT.COMMON.N_A}
-      //     </span>
-      //   ),
-      // },
+      {
+        title: TABLE.COLUMNS.FIELD,
+        key: 'field',
+        width: 120,
+        render: (text) => (
+          <span
+            className="text-xs font-medium text-slate-600 truncate block max-w-[120px]"
+            title={text}
+          >
+            {text || PROJECT_MANAGEMENT.COMMON.N_A}
+          </span>
+        ),
+      },
       {
         title: TABLE.COLUMNS.TIMELINE,
         key: 'timeline',
@@ -346,7 +347,6 @@ export default function ProjectTable({
       isMentor,
       onView,
       onEdit,
-      onPublish,
       onComplete,
       onDelete,
       onArchive,

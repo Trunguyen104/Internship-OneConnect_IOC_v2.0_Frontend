@@ -3,7 +3,7 @@
 import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import dayjs from 'dayjs';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { LogBookService } from '@/components/features/logbook/services/log-book.service';
 import PageLayout from '@/components/ui/pagelayout';
@@ -16,6 +16,7 @@ import { useLogbook } from '../hooks/useLogbook';
 import LogbookDetailModal from './LogbookDetailModal';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookTable from './LogbookTable';
+import MissingLogbookModal from './MissingLogbookModal';
 
 /**
  * Daily Report / Logbook — same shell as SuperAdmin User Management:
@@ -38,6 +39,8 @@ export default function LogbookPage() {
     handleDelete,
     internshipId,
     userProfile,
+    missingDatesData,
+    missingLoading,
   } = useLogbook();
 
   const toast = useToast();
@@ -48,6 +51,25 @@ export default function LogbookPage() {
   const [viewRecord, setViewRecord] = useState(null);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
+  const [hasCheckedMissing, setHasCheckedMissing] = useState(false);
+
+  // Auto-trigger missing dates modal
+  const missingDates = React.useMemo(
+    () => missingDatesData?.missingDates || [],
+    [missingDatesData]
+  );
+  const totalMissing = missingDates.length;
+
+  React.useEffect(() => {
+    if (!missingLoading && !hasCheckedMissing) {
+      console.log('DEBUG: Checked Missing Logbook', { totalMissing, missingDates });
+      if (totalMissing > 0) {
+        setIsMissingModalOpen(true);
+      }
+      setHasCheckedMissing(true);
+    }
+  }, [missingLoading, hasCheckedMissing, totalMissing, missingDates]);
 
   const handleCreateOrUpdate = async (values) => {
     setSubmitting(true);
@@ -121,7 +143,7 @@ export default function LogbookPage() {
   };
 
   const openFormModal = async (record = null) => {
-    if (record) {
+    if (record && record.logbookId) {
       try {
         setSubmitting(true);
         const res = await LogBookService.getById(record.logbookId);
@@ -141,7 +163,7 @@ export default function LogbookPage() {
       }
     } else {
       setEditingId(null);
-      setCurrentRecord(null);
+      setCurrentRecord(record);
     }
     setIsFormModalOpen(true);
   };
@@ -253,6 +275,15 @@ export default function LogbookPage() {
         visible={isDetailModalOpen}
         record={viewRecord}
         onClose={closeDetailModal}
+      />
+
+      <MissingLogbookModal
+        visible={isMissingModalOpen}
+        missingDates={missingDates}
+        onClose={() => setIsMissingModalOpen(false)}
+        onCreateReport={(date) => {
+          openFormModal({ dateReport: date });
+        }}
       />
     </PageLayout>
   );

@@ -7,8 +7,8 @@ import React, { useMemo, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
+import { PLACEMENT_UI_TEXT } from '@/constants/internship-placement/placement.constants';
 
-import { PLACEMENT_UI_TEXT } from '../constants/placement.constants';
 import { PlacementService } from '../services/placement.service';
 import EnterprisePhaseSelect from './EnterprisePhaseSelect';
 

@@ -7,8 +7,11 @@ import React, { useState } from 'react';
 
 import Button from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
+import {
+  PLACEMENT_STATUS,
+  SEMESTER_STATUS,
+} from '@/constants/internship-placement/placement.constants';
 
-import { PLACEMENT_STATUS, SEMESTER_STATUS } from '../constants/placement.constants';
 import { PlacementService } from '../services/placement.service';
 import { BulkAssignModal, BulkReassignModal, BulkUnassignModal } from './BulkPlacementModals';
 import PlacementStatusBadge from './PlacementStatusBadge';

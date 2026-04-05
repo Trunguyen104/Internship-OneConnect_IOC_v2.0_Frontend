@@ -5,8 +5,11 @@ import { Space, Tooltip } from 'antd';
 import React from 'react';
 
 import Button from '@/components/ui/button';
+import {
+  PLACEMENT_STATUS,
+  SEMESTER_STATUS,
+} from '@/constants/internship-placement/placement.constants';
 
-import { PLACEMENT_STATUS, SEMESTER_STATUS } from '../constants/placement.constants';
 import AssignEnterprisePopover from './AssignEnterprisePopover';
 
 /**
