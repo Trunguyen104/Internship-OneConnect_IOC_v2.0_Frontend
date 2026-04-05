@@ -6,6 +6,7 @@ import ImgCrop from 'antd-img-crop';
 
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { validateImageFile } from '@/utils/fileValidation';
 import { resolveResourceUrl } from '@/utils/resolveUrl';
 
 export default function AvatarUploader({
@@ -24,27 +25,11 @@ export default function AvatarUploader({
     return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
   };
 
+  const beforeCrop = (file) => {
+    return validateImageFile(file, { onError: toast.error });
+  };
+
   const beforeUpload = (file) => {
-    const isImage = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/webp',
-      'image/svg+xml',
-      'image/gif',
-    ].includes(file.type);
-
-    if (!isImage) {
-      toast.error('Only JPG, PNG, WebP, SVG, GIF formats are supported');
-      return false;
-    }
-
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      toast.error('Image must be less than 5MB');
-      return false;
-    }
-
     onChange?.(file);
     return false;
   };
@@ -98,7 +83,7 @@ export default function AvatarUploader({
   if (disabled) return content;
 
   return (
-    <ImgCrop rotationSlider aspect={1}>
+    <ImgCrop rotationSlider aspect={1} beforeCrop={beforeCrop}>
       <Upload showUploadList={false} beforeUpload={beforeUpload}>
         {content}
       </Upload>

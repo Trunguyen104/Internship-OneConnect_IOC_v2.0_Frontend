@@ -20,6 +20,7 @@ import {
   USER_STATUS_LABEL,
 } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
+import { REGEX } from '@/lib/validators';
 import { useToast } from '@/providers/ToastProvider';
 import { mediaService } from '@/services/media.service';
 import { userManagementService } from '@/services/user-management.service';
@@ -67,7 +68,12 @@ function CreateForm({ onSuccess, onCancel }) {
   }
 
   return (
-    <form id="user-create-form" onSubmit={handleSubmit} className="flex flex-col gap-8 h-full">
+    <form
+      id="user-create-form"
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-8 h-full"
+      noValidate
+    >
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 flex-1 content-start">
         <div className="space-y-2 md:col-span-2">
           <label
@@ -96,7 +102,8 @@ function CreateForm({ onSuccess, onCancel }) {
           <Input
             id="email"
             name="email"
-            type="email"
+            type="text"
+            inputMode="email"
             required
             placeholder={UI_TEXT.USER_MANAGEMENT.EMAIL_PLACEHOLDER}
             className="rounded-2xl border-gray-100 h-12"
@@ -280,11 +287,14 @@ function UpdateForm({ userId, onSuccess, onCancel }) {
     if (e) e.preventDefault();
     const nextErrors = {};
     if (!editForm.fullName.trim()) nextErrors.fullName = UI_TEXT.USER_MANAGEMENT.ERR_FULL_NAME_REQ;
-    if (editForm.dateOfBirth && !/^\d{4}-\d{2}-\d{2}$/.test(editForm.dateOfBirth.trim()))
+    if (editForm.fullName && !REGEX.NAME.test(editForm.fullName.trim())) {
+      nextErrors.fullName = 'Name must only contain letters and spaces';
+    }
+    if (editForm.dateOfBirth && !REGEX.DATE.test(editForm.dateOfBirth.trim()))
       nextErrors.dateOfBirth = UI_TEXT.USER_MANAGEMENT.ERR_DOB_FORMAT;
     if (editForm.studentGpa !== '' && Number.isNaN(Number(editForm.studentGpa)))
       nextErrors.studentGpa = UI_TEXT.USER_MANAGEMENT.ERR_GPA_NUMBER;
-    if (editForm.phoneNumber && !/^0[0-9]{9,10}$/.test(editForm.phoneNumber.trim()))
+    if (editForm.phoneNumber && !REGEX.PHONE.test(editForm.phoneNumber.trim()))
       nextErrors.phoneNumber = UI_TEXT.USER_MANAGEMENT.ERR_PHONE_INVALID;
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;

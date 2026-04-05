@@ -6,6 +6,7 @@ import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/user-management/enums';
 import { getErrorMessage } from '@/lib/error';
 import { UI_TEXT } from '@/lib/UI_Text';
+import { REGEX } from '@/lib/validators';
 import { useToast } from '@/providers/ToastProvider';
 import { enterpriseService } from '@/services/enterprise.service';
 import { httpGet } from '@/services/http-client.service';
@@ -27,7 +28,6 @@ export function unitRequired(role) {
 
 const ROLE_MAP = {
   SuperAdmin: 1,
-  Moderator: 2,
   SchoolAdmin: 3,
   EnterpriseAdmin: 4,
   HR: 5,
@@ -72,7 +72,7 @@ export function useUserManagementForm(onSuccess) {
         let uniData = [];
         let entData = [];
 
-        if (meRole === USER_ROLE.SUPER_ADMIN || meRole === USER_ROLE.MODERATOR) {
+        if (meRole === USER_ROLE.SUPER_ADMIN) {
           const [uniRes, entRes] = await Promise.all([
             universityService.getAll({ PageNumber: 1, PageSize: 1000 }),
             enterpriseService.getAll({ PageNumber: 1, PageSize: 1000 }),
@@ -94,7 +94,7 @@ export function useUserManagementForm(onSuccess) {
           setUnitId(
             meData.enterpriseId || meData.EnterpriseId || meData.unitId || meData.UnitId || ''
           );
-        } else if (meRole === USER_ROLE.SUPER_ADMIN || meRole === USER_ROLE.MODERATOR) {
+        } else if (meRole === USER_ROLE.SUPER_ADMIN) {
           setRole(USER_ROLE.STUDENT);
           setUnitId('');
         } else {
@@ -142,7 +142,7 @@ export function useUserManagementForm(onSuccess) {
     if (!currentUser) return [];
     const currRole = parseRole(currentUser.role || currentUser.Role);
 
-    if (currRole === USER_ROLE.SUPER_ADMIN || currRole === USER_ROLE.MODERATOR) {
+    if (currRole === USER_ROLE.SUPER_ADMIN) {
       return Object.values(USER_ROLE).filter((v) => typeof v === 'number');
     }
     if (currRole === USER_ROLE.SCHOOL_ADMIN) {
@@ -174,11 +174,14 @@ export function useUserManagementForm(onSuccess) {
     (payload) => {
       const nextErrors = {};
       if (!payload.fullName) nextErrors.fullName = UI_TEXT.USER_MANAGEMENT.ERR_FULL_NAME_REQ;
+      if (payload.fullName && !REGEX.NAME.test(payload.fullName)) {
+        nextErrors.fullName = 'Name must only contain letters and spaces';
+      }
       if (!payload.email) nextErrors.email = UI_TEXT.USER_MANAGEMENT.ERR_EMAIL_REQ;
-      if (payload.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+      if (payload.email && !REGEX.EMAIL.test(payload.email)) {
         nextErrors.email = UI_TEXT.USER_MANAGEMENT.ERR_INVALID_EMAIL;
       }
-      if (payload.phoneNumber && !/^0[0-9]{9,10}$/.test(payload.phoneNumber)) {
+      if (payload.phoneNumber && !REGEX.PHONE.test(payload.phoneNumber)) {
         nextErrors.phoneNumber = UI_TEXT.USER_MANAGEMENT.ERR_PHONE_INVALID;
       }
       if (!payload.role) {

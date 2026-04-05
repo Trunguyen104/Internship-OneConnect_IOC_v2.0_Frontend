@@ -71,7 +71,7 @@ export default function UserManagementTable({ users = [], loading = false, curre
         width: '140px',
         render: (role) => {
           let variant = 'default';
-          if (role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.MODERATOR) {
+          if (role === USER_ROLE.SUPER_ADMIN) {
             variant = 'primary-soft';
           } else if (role === USER_ROLE.SCHOOL_ADMIN || role === USER_ROLE.STUDENT) {
             variant = 'success-soft';

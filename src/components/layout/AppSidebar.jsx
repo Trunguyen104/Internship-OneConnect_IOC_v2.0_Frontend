@@ -166,7 +166,7 @@ export default function AppSidebar() {
       }
 
       const nRole = Number(userRole);
-      if (nRole === USER_ROLE.SUPER_ADMIN || nRole === USER_ROLE.MODERATOR) {
+      if (nRole === USER_ROLE.SUPER_ADMIN) {
         return [
           {
             key: '/admin/dashboard',

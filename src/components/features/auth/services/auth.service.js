@@ -37,7 +37,7 @@ export async function refreshToken() {
     credentials: 'include',
   });
 
-  if (!res.ok) throw new Error('Refresh failed');
+  if (!res.ok) return { success: false };
 
   // /api/auth refresh returns basic auth context; tokens remain in HttpOnly cookies.
   return await res.json();

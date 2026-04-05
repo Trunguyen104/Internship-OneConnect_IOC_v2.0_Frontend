@@ -79,7 +79,7 @@ export default function LoginPage() {
       });
 
       const role = Number(auth?.role);
-      if (role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.MODERATOR) {
+      if (role === USER_ROLE.SUPER_ADMIN) {
         router.push('/admin/dashboard');
       } else if (role === USER_ROLE.SCHOOL_ADMIN) {
         router.push('/school/home');

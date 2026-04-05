@@ -56,12 +56,7 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
     roleValue === USER_ROLE.SCHOOL_ADMIN || 3 === roleValue || roleStr === 'schooladmin';
 
   const isInternal =
-    roleValue === USER_ROLE.SUPER_ADMIN ||
-    roleValue === USER_ROLE.MODERATOR ||
-    roleStr === 'superadmin' ||
-    roleStr === 'moderator' ||
-    1 === roleValue ||
-    2 === roleValue;
+    roleValue === USER_ROLE.SUPER_ADMIN || roleStr === 'superadmin' || 1 === roleValue;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">

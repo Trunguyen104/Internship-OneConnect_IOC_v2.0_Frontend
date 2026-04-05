@@ -10,12 +10,12 @@ import { USER_ROLE } from '@/constants/user-management/enums';
 const { Content } = Layout;
 
 /**
- * AdminLayout — SuperAdmin + Moderator.
+ * AdminLayout — SuperAdmin.
  * Pattern: AppSidebar (role-based menu) + Header + Content.
  */
 export default function AdminLayout({ children }) {
   return (
-    <AuthGuard allowedRoles={[USER_ROLE.SUPER_ADMIN, USER_ROLE.MODERATOR]}>
+    <AuthGuard allowedRoles={[USER_ROLE.SUPER_ADMIN]}>
       <Layout className="h-screen overflow-hidden">
         <AppSidebar />
         <Layout className="flex h-full flex-1 flex-col overflow-hidden">

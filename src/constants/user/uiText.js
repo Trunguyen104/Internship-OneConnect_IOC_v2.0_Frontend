@@ -104,7 +104,6 @@ export const PROFILE_UI = {
   },
   ROLE_LABELS: {
     1: 'Super Admin',
-    2: 'Moderator',
     3: 'University Admin',
     4: 'Enterprise Admin',
     5: 'Human Resources (HR)',

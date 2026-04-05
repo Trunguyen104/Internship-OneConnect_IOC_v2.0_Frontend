@@ -53,6 +53,17 @@ export const UI_TEXT = {
     VERIFY_SESSION: 'Verifying secure session...',
     COLON: ':',
     BAR: '|',
+    STATUS_ACTIVE: 'Active',
+    STATUS_INACTIVE: 'Inactive',
+    DEACTIVATE_CONFIRM_TITLE: 'Confirm Deactivation?',
+    DEACTIVATE_CONFIRM_MSG: 'You are setting this organization to Inactive.',
+    DEACTIVATE_CONFIRM_UNIVERSITY:
+      'All associated staff and students belonging to this university will be locked immediately.',
+    DEACTIVATE_CONFIRM_ENTERPRISE:
+      'All associated HR and Mentors belonging to this enterprise will be locked immediately.',
+    DEACTIVATE_CONFIRM_HINT_1: 'They will no longer be able to access the system.',
+    DEACTIVATE_CONFIRM_HINT_2: 'Existing data will be preserved but access is "frozen".',
+    CONFIRM_LOCK: 'Confirm Lock',
   },
   USER_MANAGEMENT: {
     TITLE: 'User Management',
@@ -190,7 +201,7 @@ export const UI_TEXT = {
       'If there are students currently interning under this enterprise, the system will reject deletion.',
     INDUSTRY_PREFIX: 'Industry',
     ADD_ENTERPRISE: 'Add Enterprise',
-    EDIT_ENTERPRISE: 'Edit',
+    EDIT_ENTERPRISE: 'Edit Enterprise',
     NAME_PLACEHOLDER: 'Company Name',
     WEBSITE_PLACEHOLDER: 'Website',
     INDUSTRY_PLACEHOLDER: 'Industry',

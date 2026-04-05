@@ -130,7 +130,9 @@ const TermFormBody = ({
           layout="vertical"
           disabled={viewOnly || loading}
           requiredMark={!viewOnly}
+          validateTrigger={['onChange', 'onBlur']}
           className="premium-form"
+          noValidate
         >
           <Form.Item
             name="name"
