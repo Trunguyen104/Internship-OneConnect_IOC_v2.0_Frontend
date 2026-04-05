@@ -90,7 +90,7 @@ export const UniAssignTable = ({ data = [], loading = false, pagination, onActio
       title: APPLICATIONS_UI.COLUMNS.ACTIONS,
       key: 'action',
       width: '100px',
-      align: 'right',
+      align: 'center',
       render: (_, record) => {
         const getMenuItems = () => {
           const items = [{ key: 'details', label: 'View Details', icon: <EyeOutlined /> }];

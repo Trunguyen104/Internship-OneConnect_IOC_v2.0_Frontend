@@ -4,9 +4,9 @@ import { SaveOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Input, InputNumber } from 'antd';
 import React, { useEffect, useState } from 'react';
 
-import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import CompoundModal from '@/components/ui/CompoundModal';
+import StatusBadge from '@/components/ui/status-badge';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
@@ -116,21 +116,16 @@ export default function IndividualGrading({
             </span>
             {(() => {
               const statusMap = {
-                Pending: { label: STATUS.PENDING, variant: 'secondary' },
+                Pending: { label: STATUS.PENDING, variant: 'neutral' },
                 Draft: { label: STATUS.DRAFT, variant: 'warning' },
-                Submitted: { label: STATUS.SUBMITTED, variant: 'primary' },
+                Submitted: { label: STATUS.SUBMITTED, variant: 'info' },
                 Published: { label: STATUS.PUBLISHED, variant: 'success' },
               };
 
-              const statusInfo = statusMap[student?.status] || statusMap['Pending'];
-              return (
-                <Badge
-                  variant={statusInfo.variant}
-                  className="rounded-full px-4 h-6 text-[10px] font-black uppercase tracking-widest"
-                >
-                  {statusInfo.label}
-                </Badge>
-              );
+              const currentStatus = student?.evaluationStatus || student?.status || 'Pending';
+              const statusInfo = statusMap[currentStatus] || statusMap['Pending'];
+
+              return <StatusBadge variant={statusInfo.variant} label={statusInfo.label} />;
             })()}
           </div>
           <div className="flex gap-3">

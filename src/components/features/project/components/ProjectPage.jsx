@@ -56,7 +56,7 @@ export default function ProjectPage({ projectId: manualProjectId = null }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-8 pb-8">
-        <PageLayout.Card className="shrink-0 transition-all duration-500 hover:shadow-md">
+        <PageLayout.Card className="flex-none h-fit transition-all duration-500 hover:shadow-md">
           {loading && !projectInfo ? (
             <div className="space-y-6 py-4">
               <Skeleton className="h-20 w-full rounded-2xl" />

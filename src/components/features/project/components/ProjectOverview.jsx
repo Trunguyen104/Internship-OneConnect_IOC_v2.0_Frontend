@@ -4,11 +4,11 @@ import dayjs from 'dayjs';
 import React from 'react';
 
 import { EmptyState } from '@/components/ui/atoms';
-import Badge from '@/components/ui/badge';
+import StatusBadge from '@/components/ui/status-badge';
 import { PROJECT_UI } from '@/constants/project/uiText';
 
 const STATUS_PROJECT_CONFIG = {
-  1: { label: PROJECT_UI.STATUS_LABELS.PLANNING, variant: 'info' },
+  1: { label: PROJECT_UI.STATUS_LABELS.PLANNING, variant: 'primary' },
   2: { label: PROJECT_UI.STATUS_LABELS.IN_PROGRESS, variant: 'warning' },
   3: { label: PROJECT_UI.STATUS_LABELS.DONE, variant: 'success' },
   4: { label: PROJECT_UI.STATUS_LABELS.CANCELLED, variant: 'danger' },
@@ -23,15 +23,17 @@ export default function ProjectOverview({ project }) {
     );
   }
 
-  const statusInfo = STATUS_PROJECT_CONFIG[project.status] || {
-    label: project.status,
+  const statusValue = project.operationalStatus || project.status;
+  const statusInfo = STATUS_PROJECT_CONFIG[statusValue] || {
+    label: statusValue || 'N/A',
     variant: 'default',
   };
 
   return (
     <div className="animate-in fade-in space-y-12 duration-700">
       <div className="w-full overflow-x-auto pb-4 custom-scrollbar">
-        <div className="grid min-w-[600px] grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid min-w-[600px] grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Main Info */}
           <div className="col-span-1 border-gray-100 bg-white p-8 rounded-[32px] sm:col-span-2 shadow-sm border transition-all duration-500 hover:shadow-lg">
             <span className="mb-3 block text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase">
               {PROJECT_UI.LABELS.NAME}
@@ -48,13 +50,12 @@ export default function ProjectOverview({ project }) {
             <span className="mb-4 block text-[10px] font-black tracking-[0.2em] text-gray-400 uppercase">
               {PROJECT_UI.LABELS.STATUS}
             </span>
-            <Badge
+            <StatusBadge
               variant={statusInfo.variant}
-              size="lg"
-              className="w-full justify-center py-2 rounded-2xl shadow-sm border-0 font-black"
-            >
-              {statusInfo.label}
-            </Badge>
+              label={statusInfo.label}
+              variantType="boxed"
+              className="w-full justify-center py-2"
+            />
           </div>
 
           <div className="border-gray-100 bg-white p-8 rounded-[32px] shadow-sm border transition-all duration-500 hover:shadow-lg">
@@ -73,13 +74,40 @@ export default function ProjectOverview({ project }) {
               </span>
             </div>
           </div>
+
+          {/* Metadata Row */}
+          <div className="border-gray-50 bg-gray-50/20 p-6 rounded-[28px] border transition-all duration-500 hover:bg-white hover:shadow-md">
+            <span className="mb-2 block text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase">
+              {PROJECT_UI.LABELS.CODE}
+            </span>
+            <span className="text-gray-700 block truncate text-sm font-bold tracking-tight">
+              {project?.projectCode || '—'}
+            </span>
+          </div>
+
+          <div className="border-gray-50 bg-gray-50/20 p-6 rounded-[28px] border transition-all duration-500 hover:bg-white hover:shadow-md">
+            <span className="mb-2 block text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase">
+              {PROJECT_UI.LABELS.FIELD}
+            </span>
+            <span className="text-gray-700 block truncate text-sm font-bold tracking-tight">
+              {project?.field || '—'}
+            </span>
+          </div>
+
+          <div className="col-span-1 border-gray-50 bg-gray-50/20 p-6 rounded-[28px] border sm:col-span-2 transition-all duration-500 hover:bg-white hover:shadow-md">
+            <span className="mb-2 block text-[9px] font-bold tracking-[0.15em] text-gray-400 uppercase">
+              {PROJECT_UI.LABELS.GROUP}
+            </span>
+            <span className="text-gray-700 block truncate text-sm font-bold tracking-tight">
+              {project?.groupName || '—'}
+            </span>
+          </div>
         </div>
       </div>
 
       <div className="space-y-6">
         <section className="border-gray-50 bg-gray-50/30 p-8 rounded-[32px] border transition-all duration-700 hover:bg-white hover:shadow-xl hover:border-gray-100">
           <div className="mb-6 flex items-center gap-4">
-            <div className="bg-primary/10 h-2 w-2 rounded-full" />
             <h3 className="text-gray-900 m-0 text-xl font-black tracking-tight">
               {PROJECT_UI.LABELS.DESCRIPTION}
             </h3>

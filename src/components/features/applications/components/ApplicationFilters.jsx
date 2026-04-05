@@ -16,14 +16,16 @@ import { APPLICATIONS_UI } from '@/constants/applications/uiText';
 
 /**
  * Filter bar for Applications.
- * Supports Search, Status filter, Job filter, School filter, Month-Year, and Toggle for Terminal statuses.
+ * Supports Search, Phase filter, Status filter, Job filter, School filter, and Toggle for Terminal statuses.
  */
 export const ApplicationFilters = ({
   filters,
   onFilterChange,
-  jobs = [],
   schools = [],
+  phases = [],
   isLoadingOptions = false,
+  isPhaseLocked = false,
+  showAudience = true,
 }) => {
   // Dynamically filter status options based on the Terminal toggle
   // This avoids showing "Applied" in a "Terminal Only" view which would result in 0 results.
@@ -40,15 +42,24 @@ export const ApplicationFilters = ({
       value: Number(value),
     }));
 
-  const jobOptions = jobs.map((job) => ({
-    label: job.name || job.jobPostingTitle || job.title,
-    value: job.id || job.projectId || job.jobId,
-  }));
-
   const schoolOptions = schools.map((school) => ({
     label: school.universityName || school.name,
     value: school.id || school.universityId,
   }));
+
+  const phaseOptions = phases
+    .map((phase) => ({
+      label: phase.name || phase.phaseName,
+      value: phase.id || phase.phaseId,
+    }))
+    .filter((opt) => opt.value);
+
+  const audienceOptions = [
+    { label: 'Public', value: 1 },
+    { label: 'Targeted', value: 2 },
+  ];
+
+  const gridColsClass = showAudience ? 'lg:grid-cols-5' : 'lg:grid-cols-4';
 
   return (
     <div className="flex flex-col gap-4 py-4">
@@ -77,7 +88,7 @@ export const ApplicationFilters = ({
       </div>
 
       {/* Select Filters Row */}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
+      <div className={`grid grid-cols-1 gap-3 md:grid-cols-2 ${gridColsClass}`}>
         <Select
           placeholder={APPLICATIONS_UI.ALL_STATUSES}
           className="rounded-2xl!"
@@ -85,20 +96,6 @@ export const ApplicationFilters = ({
           value={filters.status}
           options={statusOptions}
           onChange={(val) => onFilterChange({ status: val })}
-        />
-
-        <Select
-          placeholder={APPLICATIONS_UI.ALL_POSITIONS}
-          className="rounded-2xl!"
-          allowClear
-          loading={isLoadingOptions}
-          value={filters.jobId}
-          options={jobOptions}
-          onChange={(val) => onFilterChange({ jobId: val })}
-          showSearch
-          filterOption={(input, option) =>
-            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-          }
         />
 
         <Select
@@ -115,11 +112,37 @@ export const ApplicationFilters = ({
           }
         />
 
+        <Select
+          placeholder={APPLICATIONS_UI.ALL_PHASES}
+          className="rounded-2xl!"
+          disabled={isPhaseLocked}
+          allowClear={!isPhaseLocked}
+          loading={isLoadingOptions}
+          value={filters.internshipPhaseId}
+          options={phaseOptions}
+          onChange={(val) => onFilterChange({ internshipPhaseId: val })}
+          showSearch
+          filterOption={(input, option) =>
+            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+          }
+        />
+
+        {showAudience ? (
+          <Select
+            placeholder={APPLICATIONS_UI.ALL_AUDIENCES}
+            className="rounded-2xl!"
+            allowClear
+            value={filters.audience}
+            options={audienceOptions}
+            onChange={(val) => onFilterChange({ audience: val })}
+          />
+        ) : null}
+
         <DatePicker
           picker="month"
           placeholder={APPLICATIONS_UI.PERIOD_PLACEHOLDER}
           className="rounded-2xl border-slate-200"
-          onChange={(date, dateString) => onFilterChange({ period: dateString })}
+          onChange={(date, dateString) => onFilterChange({ period: dateString || undefined })}
         />
       </div>
     </div>

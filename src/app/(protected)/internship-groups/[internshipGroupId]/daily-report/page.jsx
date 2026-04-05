@@ -3,7 +3,7 @@ import LogbookPage from '@/components/features/logbook/components/LogbookPage';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Daily Report | IOCv2',
+  title: 'Logbook | IOCv2',
   description: 'Manage and submit your daily internship logbook.',
 };
 

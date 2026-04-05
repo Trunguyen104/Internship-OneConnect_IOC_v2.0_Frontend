@@ -4,6 +4,7 @@ export const PROFILE_UI = {
     TITLE: 'Profile Picture',
     HINT: 'JPG, PNG formats, size under 2MB. Standard size: 1200x1200px',
     DEFAULT_NAME: 'User',
+    UPLOAD_NEW: 'Upload New Photo',
   },
   BUTTONS: {
     EDIT: 'Edit Information',
@@ -27,10 +28,16 @@ export const PROFILE_UI = {
     REQUIRED_FULL_NAME: 'Please enter your full name',
     PHONE_DIGITS: 'Phone number must only contain digits',
     PHONE_MAX: 'Phone number cannot exceed 15 characters',
+    INVALID_URL: 'Please enter a valid URL (e.g. https://github.com/...)',
+    REQUIRED_MAJOR: 'Major is required',
+    REQUIRED_CLASS: 'Class name is required',
+    DOB_FUTURE_ERROR: 'Date of birth cannot be in the future',
+    PHONE_INVALID: 'Invalid phone format (0xxxxxxxxx)',
   },
   PLACEHOLDERS: {
     PHONE: 'Enter your phone number',
     ADDRESS: 'House number, street name, district, city/province',
+    PASSWORD: '••••••••',
   },
   LABELS: {
     FULL_NAME: 'Full Name',
@@ -93,10 +100,10 @@ export const PROFILE_UI = {
   UPDATE_ERROR: 'Failed to update profile',
   EMPTY: {
     NO_DATA: 'No profile data found.',
+    NOT_AVAILABLE: '—',
   },
   ROLE_LABELS: {
     1: 'Super Admin',
-    2: 'Moderator',
     3: 'University Admin',
     4: 'Enterprise Admin',
     5: 'Human Resources (HR)',

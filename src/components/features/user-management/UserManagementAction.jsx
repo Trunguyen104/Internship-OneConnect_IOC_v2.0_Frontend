@@ -1,11 +1,10 @@
 'use client';
 
-import { Drawer, Dropdown } from 'antd';
-import { AlertTriangle, LockKeyhole, MoreVertical, Trash2, UserPen } from 'lucide-react';
+import { Drawer, Dropdown, Modal } from 'antd';
+import { LockKeyhole, MoreVertical, Trash2, UserPen } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { UI_TEXT } from '@/lib/UI_Text';
@@ -42,7 +41,7 @@ function ResetPasswordDrawer({ open, userId, email, onClose }) {
       useAdminUsersStore.increment();
       onClose();
     } catch (err) {
-      toast.error(err?.message || UI_TEXT.USER_MANAGEMENT.RESET_FAILED);
+      toast.error(err?.data?.message || err?.message || UI_TEXT.USER_MANAGEMENT.RESET_FAILED);
     } finally {
       setBusy(false);
     }
@@ -62,9 +61,11 @@ function ResetPasswordDrawer({ open, userId, email, onClose }) {
       }
       open={open}
       onClose={onClose}
-      width={480}
-      headerStyle={{ borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' }}
-      bodyStyle={{ padding: '24px' }}
+      size={480}
+      styles={{
+        header: { borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' },
+        body: { padding: '24px' },
+      }}
       footer={
         <div className="flex justify-end gap-3 border-t border-gray-50 p-6 bg-white">
           <Button
@@ -112,14 +113,12 @@ function ResetPasswordDrawer({ open, userId, email, onClose }) {
   );
 }
 
-function DeleteDrawer({ open, userId, label, onClose }) {
+function DeleteModal({ open, userId, label, onClose }) {
   const toast = useToast();
-  const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setConfirmed(false);
       setBusy(false);
     }
   }, [open]);
@@ -132,86 +131,53 @@ function DeleteDrawer({ open, userId, label, onClose }) {
       useAdminUsersStore.increment();
       onClose();
     } catch (err) {
-      toast.error(err?.message || UI_TEXT.COMMON.ERROR);
+      toast.error(err?.data?.message || err?.message || UI_TEXT.COMMON.ERROR);
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <Drawer
+    <Modal
       title={
-        <div className="flex flex-col gap-1">
-          <span className="text-lg font-black tracking-tight text-rose-600">
-            {UI_TEXT.USER_MANAGEMENT.DELETE_SURE || UI_TEXT.BUTTON.DELETE}
-          </span>
-          <span className="text-xs font-medium text-slate-400">
-            {UI_TEXT.USER_MANAGEMENT.DELETE_IRREVERSIBLE}
+        <div className="flex items-center gap-3">
+          <div className="rounded-full bg-rose-100 p-2">
+            <Trash2 className="size-5 text-rose-600" />
+          </div>
+          <span className="text-lg font-black tracking-tight text-slate-800">
+            {UI_TEXT.USER_MANAGEMENT.CONFIRM_DELETE || 'Confirm Delete'}
           </span>
         </div>
       }
       open={open}
-      onClose={onClose}
-      width={480}
-      headerStyle={{ borderBottom: '1px solid var(--slate-100, #f1f5f9)', padding: '24px' }}
-      bodyStyle={{ padding: '24px' }}
+      onCancel={onClose}
+      centered
+      width={440}
       footer={
-        <div className="flex justify-end gap-3 border-t border-gray-50 p-6 bg-white">
-          <Button
-            variant="ghost"
-            className="rounded-full h-11 px-6 font-bold text-muted/60 hover:text-text transition-colors"
-            onClick={onClose}
-          >
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="ghost" className="h-9 px-4 rounded-full font-semibold" onClick={onClose}>
             {UI_TEXT.BUTTON.CANCEL}
           </Button>
           <Button
             onClick={doDelete}
-            disabled={!confirmed || busy}
-            className="bg-rose-500 hover:bg-rose-600 min-w-[140px] rounded-full h-11 font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-white disabled:opacity-50"
+            disabled={busy}
+            className="h-9 px-6 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold transition-all active:scale-95"
           >
-            {busy ? <Spinner className="mr-2 h-4 w-4" /> : UI_TEXT.BUTTON.DELETE}
+            {busy ? <Spinner className="size-4" /> : UI_TEXT.BUTTON.DELETE}
           </Button>
         </div>
       }
-      destroyOnClose
     >
-      <div className="space-y-6 flex flex-col h-full">
-        <div className="flex flex-col gap-2 p-4 bg-gray-50/50 rounded-2xl border border-gray-100">
-          <span className="text-[11px] font-black uppercase tracking-widest text-muted/60">
-            {UI_TEXT.USER_MANAGEMENT.USER}
-          </span>
-          <span className="text-sm font-bold text-slate-800">{label || UI_TEXT.COMMON.MINUS}</span>
-        </div>
-
-        <div className="rounded-2xl border border-rose-100 bg-rose-50/30 p-4 text-[13px] font-medium leading-relaxed text-rose-900/80 flex gap-3">
-          <AlertTriangle className="size-5 text-rose-500 shrink-0 mt-0.5" />
-          <span>
-            {UI_TEXT.USER_MANAGEMENT.DELETE_CONFIRM}{' '}
-            <span className="font-black text-rose-600">{label}</span>
-            {UI_TEXT.COMMON.QUESTION}
-          </span>
-        </div>
-
-        <div className="flex-1" />
-
-        <div
-          className={`group flex cursor-pointer items-start gap-4 p-4 rounded-2xl border transition-all duration-300 ${confirmed ? 'border-rose-200 bg-rose-50/50 shadow-sm' : 'border-gray-100 bg-gray-50/50 hover:bg-white'}`}
-          onClick={() => setConfirmed(!confirmed)}
-        >
-          <div className="mt-0.5">
-            <Checkbox checked={confirmed} onCheckedChange={setConfirmed} />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[13px] font-black tracking-tight text-text">
-              {UI_TEXT.USER_MANAGEMENT.CONFIRM_ACCOUNT_DELETE}
-            </span>
-            <p className="text-[11px] font-medium leading-relaxed text-muted/60">
-              {UI_TEXT.USER_MANAGEMENT.CONFIRM_DELETE_TEXT}
-            </p>
-          </div>
-        </div>
+      <div className="py-6 space-y-3">
+        <p className="text-[15px] leading-relaxed text-slate-600">
+          {UI_TEXT.USER_MANAGEMENT.DELETE_CONFIRM_MSG}{' '}
+          <span className="font-bold text-slate-900 border-b-2 border-rose-100">{label}</span>?
+        </p>
+        <p className="text-xs font-medium text-slate-400">
+          {UI_TEXT.USER_MANAGEMENT.DELETE_IRREVERSIBLE}
+        </p>
       </div>
-    </Drawer>
+    </Modal>
   );
 }
 
@@ -304,7 +270,7 @@ export default function UserManagementAction({ user, currentUserId }) {
         userId={user?.userId || user?.UserId}
         email={user?.email || user?.Email}
       />
-      <DeleteDrawer
+      <DeleteModal
         open={open.isOpen && open.modal === 'delete'}
         onClose={closeAll}
         userId={user?.userId || user?.UserId}

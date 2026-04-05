@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
@@ -11,6 +12,7 @@ import { useBacklogUI } from './useBacklogUI';
  */
 export function useBacklogBoard() {
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   // 1. Data Logic
   const data = useBacklogData();
@@ -101,9 +103,11 @@ export function useBacklogBoard() {
 
       toast.success('Work item deleted successfully');
       fetchData(projectId, false);
+      queryClient.invalidateQueries({ queryKey: ['all-tasks-history'] });
     } catch {
       toast.error('Server error while deleting work item');
       fetchData(projectId, false);
+      queryClient.invalidateQueries({ queryKey: ['all-tasks-history'] });
     }
   };
 
@@ -170,6 +174,7 @@ export function useBacklogBoard() {
             throw new Error(res.message || 'Unable to move to backlog');
           }
           toast.success('Moved item to backlog');
+          queryClient.invalidateQueries({ queryKey: ['work-board-data', projectId] });
         } catch (err) {
           toast.error(err.message || 'Error moving to backlog');
           fetchData(projectId, false);
@@ -216,13 +221,14 @@ export function useBacklogBoard() {
             throw new Error(res.message || 'Unable to move to sprint');
           }
           toast.success('Moved item to sprint');
+          queryClient.invalidateQueries({ queryKey: ['work-board-data', projectId] });
         } catch (err) {
           toast.error(err.message || 'Error moving to sprint');
           fetchData(projectId, false);
         }
       }
     },
-    [projectId, sprints, backlogItems, setSprints, setBacklogItems, fetchData, toast]
+    [projectId, sprints, backlogItems, setSprints, setBacklogItems, fetchData, toast, queryClient]
   );
 
   return {

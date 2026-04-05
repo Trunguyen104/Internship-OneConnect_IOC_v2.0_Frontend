@@ -11,6 +11,8 @@ export const DatePicker = ({ className, ...props }) => {
   return (
     <AntdDatePicker
       className={`h-11 w-full rounded-2xl border-border hover:border-primary focus:border-primary ${className || ''}`}
+      getPopupContainer={(trigger) => trigger.closest('.ant-drawer-body') || document.body}
+      placement="bottomLeft"
       {...props}
     />
   );

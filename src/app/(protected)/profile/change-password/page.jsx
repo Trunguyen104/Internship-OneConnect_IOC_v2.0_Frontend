@@ -1,5 +1,5 @@
-import ChangePasswordRoute from '@/components/features/user/routes/ChangePasswordRoute';
+import ChangePass from '@/components/features/user/components/ChangePass';
 
 export default function Page() {
-  return <ChangePasswordRoute />;
+  return <ChangePass />;
 }

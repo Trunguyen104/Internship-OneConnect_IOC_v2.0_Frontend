@@ -1,32 +1,63 @@
 'use client';
 
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { BankOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Briefcase, ChevronDown, FolderGit2, GraduationCap, Home, Layers } from 'lucide-react';
+import {
+  AlertOctagon,
+  Briefcase,
+  ChevronDown,
+  FileText,
+  FolderGit2,
+  GraduationCap,
+  Home,
+  Layers,
+  Users,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
-import { useToast } from '@/providers/ToastProvider';
+import { useLogout } from '@/hooks/useLogout';
 
-const NAV_TABS = [
+const ALL_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
   { key: '/company/phases', label: 'Phases', icon: Layers },
-  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/internships', label: 'Internships', icon: Users },
   { key: '/company/universities', label: 'Universities', icon: GraduationCap },
   { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
+];
+
+const MENTOR_NAV_TABS = [
+  { key: '/company/home', label: 'Home', icon: Home },
+  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/violation', label: 'Violations', icon: AlertOctagon },
 ];
 
 export default function CompanyTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const [userInfo, setUserInfo] = useState(null);
+
+  const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
+  const isMentor = roleId === 6;
+  const isEnterpriseManager = [4, 5, 6].includes(roleId);
+
+  const navTabs = useMemo(() => {
+    if (isMentor) return MENTOR_NAV_TABS;
+
+    const tabs = [...ALL_NAV_TABS];
+    if ([4, 5].includes(roleId)) {
+      tabs.push({
+        key: '/company/applications',
+        label: 'Applications',
+        icon: FileText,
+      });
+    }
+    return tabs;
+  }, [isMentor, roleId]);
 
   useEffect(() => {
     userService
@@ -37,15 +68,7 @@ export default function CompanyTopNav() {
       });
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const avatarMenu = {
     items: [
@@ -54,7 +77,7 @@ export default function CompanyTopNav() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+              {userInfo?.fullName || userInfo?.FullName || 'User'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>
@@ -63,12 +86,16 @@ export default function CompanyTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      ...(isEnterpriseManager
+        ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
+        : []),
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
+      if (key === 'my-company') router.push('/company/my-company');
       if (key === 'settings') router.push('/settings');
       if (key === 'logout') handleLogout();
     },
@@ -78,7 +105,7 @@ export default function CompanyTopNav() {
   const isPhaseWorkspace = /^\/company\/phases\/[^/]+/.test(pathname);
 
   return (
-    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
+    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
       {/* LEFT — Logo + Tabs */}
       <div className="flex items-center gap-8">
         <Link href="/company/home" className="relative flex h-8 w-28 items-center">
@@ -93,7 +120,7 @@ export default function CompanyTopNav() {
 
         {!isPhaseWorkspace && (
           <nav className="flex items-center gap-1">
-            {NAV_TABS.map(({ key, label, icon: Icon }) => {
+            {navTabs.map(({ key, label, icon: Icon }) => {
               const isActive = pathname === key || pathname.startsWith(key + '/');
               return (
                 <Link
@@ -105,7 +132,7 @@ export default function CompanyTopNav() {
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="size-4" />
+                  {Icon ? <Icon className="size-4" /> : null}
                   {label}
                 </Link>
               );

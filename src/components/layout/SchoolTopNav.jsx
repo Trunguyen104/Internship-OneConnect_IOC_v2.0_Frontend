@@ -2,28 +2,26 @@
 
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Building2, CalendarDays, ChevronDown, Home } from 'lucide-react';
+import { Activity, CalendarDays, ChevronDown, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
-import { useToast } from '@/providers/ToastProvider';
+import { useLogout } from '@/hooks/useLogout';
 
 const NAV_TABS = [
   { key: '/school/home', label: 'Home', icon: Home },
   { key: '/school/terms', label: 'Terms', icon: CalendarDays },
-  { key: '/school/enterprises', label: 'Enterprises', icon: Building2 },
+  { key: '/school/activity', label: 'Activity', icon: Activity },
+  // { key: '/school/enterprises', label: 'Enterprises', icon: Building2 },
 ];
 
 export default function SchoolTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
@@ -35,15 +33,7 @@ export default function SchoolTopNav() {
       });
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const avatarMenu = {
     items: [
@@ -52,7 +42,7 @@ export default function SchoolTopNav() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+              {userInfo?.fullName || userInfo?.FullName || 'User'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>

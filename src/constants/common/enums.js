@@ -53,7 +53,6 @@ export const MOVING_INCOMPLETE_ITEMS_OPTION_MAP = Object.fromEntries(
 
 export const USER_ROLE = {
   SUPER_ADMIN: 1,
-  MODERATOR: 2,
   SCHOOL_ADMIN: 3,
   ENTERPRISE_ADMIN: 4,
   HR: 5,

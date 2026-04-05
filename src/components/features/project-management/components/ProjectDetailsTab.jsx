@@ -17,7 +17,6 @@ import Card from '@/components/ui/card';
 import {
   getOperationalStatus,
   OPERATIONAL_STATUS,
-  PROJECT_MANAGEMENT,
 } from '@/constants/project-management/project-management';
 
 export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, onAssign }) {
@@ -38,7 +37,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.MENTOR}
             </h4>
-            <div className="flex items-center gap-2">
+            <div className="flex min-h-[32px] items-center gap-2">
               <Avatar
                 size="small"
                 src={currentProject?.mentorAvatar}
@@ -56,7 +55,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.FIELD}
             </h4>
-            <div className="flex flex-col gap-1">
+            <div className="flex min-h-[32px] items-center">
               <Badge variant="primary-soft" size="sm">
                 {currentProject?.field || FORM.LABEL.N_A}
               </Badge>
@@ -66,7 +65,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
             <h4 className="mb-2 font-bold text-slate-400 text-[9px] uppercase tracking-widest">
               {DETAIL.SECTIONS?.TIMELINE}
             </h4>
-            <div className="text-sm font-bold text-slate-700 flex items-center whitespace-nowrap">
+            <div className="flex min-h-[32px] items-center whitespace-nowrap text-sm font-bold text-slate-700">
               {currentProject?.startDate
                 ? dayjs(currentProject.startDate).format('DD/MM/YYYY')
                 : DETAIL.GROUP.TBA}
@@ -154,26 +153,6 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 </div>
               </div>
             </div>
-
-            {/* AC-05: Change Group button when project is already assigned */}
-            {!isHR &&
-              onAssign &&
-              getOperationalStatus(currentProject?.operationalStatus) !==
-                OPERATIONAL_STATUS.COMPLETED &&
-              getOperationalStatus(currentProject?.operationalStatus) !==
-                OPERATIONAL_STATUS.ARCHIVED && (
-                <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
-                  <Button
-                    size="xs"
-                    variant="ghost"
-                    className="text-primary hover:bg-primary/5 font-bold text-[10px] h-7 px-3 shadow-none border border-primary/10"
-                    onClick={() => onAssign(currentProject)}
-                    icon={<ArrowRightOutlined className="rotate-180 text-[9px]" />}
-                  >
-                    {PROJECT_MANAGEMENT.TABLE.ACTIONS_LABEL.CHANGE_GROUP}
-                  </Button>
-                </div>
-              )}
           </div>
         ) : (
           <div className="flex flex-col gap-3 p-5 bg-red-50/50 rounded-xl border border-red-100">
@@ -202,7 +181,7 @@ export default function ProjectDetailsTab({ currentProject, DETAIL, FORM, isHR, 
                 <Button
                   size="sm"
                   variant="danger"
-                  className="mt-1 font-bold uppercase tracking-wider"
+                  className="mt-2 font-bold uppercase tracking-wider w-fit ml-[52px] shadow-sm hover:shadow-md transition-all"
                   onClick={() => onAssign(currentProject)}
                   icon={<UsergroupAddOutlined />}
                 >

@@ -16,14 +16,20 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
     {
       title: TABLE.COLUMNS.NAME,
       key: 'fullName',
+      dataIndex: 'fullName',
       width: '180px',
       render: (text) => <span className="font-semibold text-slate-800">{text}</span>,
     },
     {
       title: TABLE.COLUMNS.UNIVERSITY,
       key: 'universityName',
+      dataIndex: 'universityName',
       width: '150px',
-      render: (text) => <span className="text-slate-600 italic text-xs">{text || '-'}</span>,
+      render: (text) => (
+        <span className="text-slate-600 italic text-xs">
+          {text && text.trim() ? text : INTERN_PHASE_MANAGEMENT.MESSAGES.DASH}
+        </span>
+      ),
     },
     {
       title: TABLE.COLUMNS.SOURCE,
@@ -31,13 +37,9 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
       width: '120px',
       align: 'center',
       render: (source) => {
-        const sourceMap = {
-          1: 'Self-apply',
-          2: 'Uni-assign',
-        };
-        const displaySource = sourceMap[source] || source;
-        const variant = TABLE.SOURCE_VARIANTS[displaySource] || 'default';
-        const label = TABLE.SOURCE_LABELS[displaySource] || displaySource || '-';
+        const variant = TABLE.SOURCE_VARIANTS[source] || 'default';
+        const label =
+          TABLE.SOURCE_LABELS[source] || source || INTERN_PHASE_MANAGEMENT.MESSAGES.DASH;
 
         return (
           <Badge variant={variant} size="xs">
@@ -49,8 +51,10 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
     {
       title: TABLE.COLUMNS.PLACED_DATE,
       key: 'placedAt',
+      dataIndex: 'placedAt',
       width: '120px',
-      render: (text) => (text ? dayjs(text).format('DD/MM/YYYY') : '-'),
+      render: (text) =>
+        text ? dayjs(text).format('DD/MM/YYYY') : INTERN_PHASE_MANAGEMENT.MESSAGES.DASH,
     },
   ];
 
@@ -75,7 +79,7 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
       <DataTable
         columns={columns}
         data={data}
-        rowKey="id"
+        rowKey={(record) => record.studentId || record.id}
         minWidth="500px"
         size="small"
         className="mt-0"

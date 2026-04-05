@@ -1,5 +1,5 @@
 export const DAILY_REPORT_UI = {
-  TITLE: 'Daily Report',
+  TITLE: 'Logbook',
   DESCRIPTION: 'Manage and submit your daily internship logbook',
 
   CREATE_BUTTON: 'Create Report',
@@ -70,7 +70,7 @@ export const DAILY_REPORT_UI = {
 
   EMPTY: {
     NO_PROJECT: 'You have not been assigned to any project.',
-    NO_LOGBOOK: 'No logbook found in this group',
+    NO_LOGBOOK: 'No daily reports found in this group',
     DESCRIPTION: 'Keep track of your learning journey! Start by adding your first daily report.',
   },
 
@@ -88,5 +88,16 @@ export const DAILY_REPORT_UI = {
     CONTENT: 'Are you sure you want to delete this logbook?',
     CONFIRM: 'Confirm Delete',
     CANCEL: 'Cancel',
+  },
+
+  MISSING_MODAL: {
+    TITLE: 'Missing Logbook Entries',
+    DESCRIPTION:
+      'You have missed some daily reports. Please submit them to keep your internship progress up to date.',
+    LIST_TITLE: 'Missing Dates:',
+    CREATE_NOW: 'Create Report Now',
+    LATER: 'Remind Me Later',
+    ALL_CAUGHT_UP: "You're all caught up!",
+    DAYS_SUFFIX: 'days',
   },
 };

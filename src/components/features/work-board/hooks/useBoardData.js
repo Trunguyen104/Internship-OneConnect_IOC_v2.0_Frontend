@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
@@ -34,19 +35,25 @@ export function useBoardData() {
   // Local state for items to support smooth DND
   const [items, setItems] = useState([]);
 
+  const { internshipGroupId } = useParams();
+
   // 1. Fetch Project ID
-  const { data: projectId = null } = useQuery({
-    queryKey: ['work-board-project-init'],
+  const { data: projectId = null, isLoading: loadingProjectId } = useQuery({
+    queryKey: ['work-board-project-init', internshipGroupId],
     queryFn: async () => {
+      if (!internshipGroupId) return null;
       try {
-        const res = await ProjectService.getAll({ PageNumber: 1, PageSize: 1 });
-        return res?.data?.items?.[0]?.projectId || null;
+        const res = await ProjectService.getByInternshipGroup(internshipGroupId);
+        const data = res?.data || res;
+        const items = data?.items || (Array.isArray(data) ? data : []);
+        return items?.[0]?.projectId || null;
       } catch {
         toast.error(WORK_BOARD_UI.ERROR_FETCH_PROJECT);
         return null;
       }
     },
-    staleTime: Infinity,
+    enabled: !!internshipGroupId,
+    staleTime: 5 * 60 * 1000,
   });
 
   // 2. Fetch Board Data
@@ -164,6 +171,7 @@ export function useBoardData() {
     sprints: boardResult?.sprints || [],
     activeSprint: boardResult?.activeSprint || null,
     loading,
+    loadingProjectId,
     byColumn,
     fetchBoardData: refetch,
   };

@@ -12,6 +12,8 @@ import { memo } from 'react';
 
 import AvatarUploader from '@/components/ui/avataruploader';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
+import { useToast } from '@/providers/ToastProvider';
+import { validateImageFile } from '@/utils/fileValidation';
 
 export const ProfileSummaryCard = memo(function ProfileSummaryCard({
   profile,
@@ -20,6 +22,7 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
   onBannerChange,
 }) {
   const { token } = theme.useToken();
+  const toast = useToast();
   const screens = Grid.useBreakpoint();
 
   const isMobile = !screens.md;
@@ -39,6 +42,10 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
         background: `linear-gradient(135deg, ${token.colorPrimary} 0%, ${token.colorPurple} 100%)`,
       };
 
+  const beforeBannerCrop = (file) => {
+    return validateImageFile(file, { onError: toast.error });
+  };
+
   const beforeBannerUpload = (file) => {
     onBannerChange?.(file);
     return false;
@@ -56,7 +63,7 @@ export const ProfileSummaryCard = memo(function ProfileSummaryCard({
         {/* Change Banner Hover Control */}
         {onBannerChange && (
           <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-all duration-500 group-hover/banner:opacity-100">
-            <ImgCrop rotationSlider aspect={4 / 1}>
+            <ImgCrop rotationSlider aspect={4 / 1} beforeCrop={beforeBannerCrop}>
               <Upload showUploadList={false} beforeUpload={beforeBannerUpload}>
                 <button className="flex items-center gap-2 rounded-full bg-white/90 px-6 py-3 font-black text-text shadow-xl backdrop-blur-md transition-all hover:bg-white hover:scale-105 active:scale-95">
                   <CameraOutlined className="text-lg" />

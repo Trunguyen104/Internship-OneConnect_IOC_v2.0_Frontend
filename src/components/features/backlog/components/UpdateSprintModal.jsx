@@ -34,8 +34,8 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
   return (
     <CompoundModal open={open} onCancel={onClose} width={600}>
       <CompoundModal.Header
-        title={BACKLOG_UI.EDIT_SPRINT || 'Chỉnh sửa Sprint'}
-        subtitle="Cập nhật tên gọi và mục tiêu trọng tâm cho chu kỳ làm việc hiện tại"
+        title={BACKLOG_UI.EDIT_SPRINT || 'Edit Sprint'}
+        subtitle={BACKLOG_UI.MODAL_UPDATE_SPRINT_SUBTITLE}
         icon={<EditOutlined />}
       />
 

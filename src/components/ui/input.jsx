@@ -24,7 +24,7 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, ...pro
         id={inputId}
         type={type}
         ref={ref}
-        status={error ? 'error' : ''}
+        status={error ? 'error' : props.status}
         className={cn(
           'h-10 w-full rounded-md border-slate-200 bg-white px-3 py-2 text-sm text-slate-900',
           'placeholder:text-slate-400',

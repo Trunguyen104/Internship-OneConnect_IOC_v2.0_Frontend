@@ -29,7 +29,7 @@ export const INTERNSHIP_STATUS_CONFIG = {
     label: 'In Progress',
     color: 'processing',
     badge: 'processing',
-    tagColor: 'blue',
+    tagColor: 'volcano',
   },
   [INTERNSHIP_STATUS.CLOSED]: {
     label: 'Closed',
@@ -39,7 +39,7 @@ export const INTERNSHIP_STATUS_CONFIG = {
   },
 };
 
-export const INTERNSHIP_STEPS = [
+export const SELF_APPLY_STEPS = [
   { key: 'registration', label: 'Registration' },
   { key: 'interviewing', label: 'Interview' },
   { key: 'offered', label: 'Offer' },
@@ -47,19 +47,30 @@ export const INTERNSHIP_STEPS = [
   { key: 'finalizing', label: 'Finalize' },
 ];
 
+export const UNI_ASSIGN_STEPS = [
+  { key: 'pending', label: 'Pending Review' },
+  { key: 'placed', label: 'Placement' },
+  { key: 'finalizing', label: 'Finalize' },
+];
+
+// Fallback for older code
+export const INTERNSHIP_STEPS = SELF_APPLY_STEPS;
+
 export const getStepStatus = (stepIndex, currentStatus) => {
-  if (currentStatus === INTERNSHIP_STATUS.CLOSED) {
+  if (currentStatus == INTERNSHIP_STATUS.CLOSED) {
     return 'completed';
   }
 
-  if (currentStatus === INTERNSHIP_STATUS.DRAFT || currentStatus === INTERNSHIP_STATUS.OPEN) {
+  // Common logic for active/open phases
+  if (currentStatus == INTERNSHIP_STATUS.DRAFT || currentStatus == INTERNSHIP_STATUS.OPEN) {
     return stepIndex === 0 ? 'current' : 'upcoming';
   }
 
-  if (currentStatus === INTERNSHIP_STATUS.IN_PROGRESS) {
-    // For In Progress status, we assume items are moving through (simplified for now)
-    if (stepIndex < 3) return 'completed';
-    if (stepIndex === 3) return 'current';
+  if (currentStatus == INTERNSHIP_STATUS.IN_PROGRESS) {
+    // If we only know the phase is in progress but have no group data yet,
+    // we assume the student is at least in the Registration/Interviewing phase.
+    if (stepIndex === 0) return 'completed';
+    if (stepIndex === 1) return 'current';
     return 'upcoming';
   }
 

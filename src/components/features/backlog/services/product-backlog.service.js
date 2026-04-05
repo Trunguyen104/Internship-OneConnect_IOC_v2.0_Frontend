@@ -23,6 +23,9 @@ export const productBacklogService = {
   getWorkItemsBacklog(projectId) {
     return httpGet('/work-items/backlog', { projectId });
   },
+  getWorkItems(projectId) {
+    return httpGet('/work-items', { projectId });
+  },
   getWorkItemById(projectId, workItemId) {
     return httpGet(`/work-items/${workItemId}`, { projectId });
   },

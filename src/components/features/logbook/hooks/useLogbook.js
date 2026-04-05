@@ -41,7 +41,7 @@ export function useLogbook() {
       try {
         const res = await userService.getMe();
         return res?.data || null;
-      } catch (err) {
+      } catch {
         return null;
       }
     },
@@ -55,7 +55,7 @@ export function useLogbook() {
       try {
         const res = await InternshipGroupService.getAll();
         return res?.data?.items || res?.data || [];
-      } catch (err) {
+      } catch {
         return [];
       }
     },
@@ -129,16 +129,48 @@ export function useLogbook() {
         }
 
         const res = await LogBookService.getAll(internshipId, params);
+        const weeks = res?.data?.weeks || [];
+        const allItems = weeks.flatMap((w) => w.items || []);
+
         return {
-          items: res?.data?.items || [],
+          items: allItems,
           totalCount: res?.data?.totalCount || 0,
         };
-      } catch (err) {
+      } catch {
         return { items: [], totalCount: 0 };
       }
     },
     enabled: !!internshipId,
     staleTime: 2 * 60 * 1000,
+  });
+
+  // 5. Fetch Missing Logbook Dates (Student only)
+  const {
+    data: missingDatesData = { missingDates: [] },
+    isLoading: missingLoading,
+    refetch: refetchMissingDates,
+  } = useQuery({
+    queryKey: ['missing-logbook-dates', userProfile?.studentId],
+    queryFn: async () => {
+      // Only students have missing dates calculated this way
+      if (!userProfile) return { missingDates: [] };
+      try {
+        console.log('Diagnostic: User Profile for Missing Dates:', userProfile);
+        const targetId = userProfile.studentId || userProfile.id;
+        const res = await LogBookService.getMissingDates(targetId);
+        console.log('Missing Logbook Dates API Response:', res);
+        return res?.data || { missingDates: [] };
+      } catch (error) {
+        console.error('Error fetching missing logbook dates:', error);
+        // Only show toast if it's a real error (not 401/403 handled elsewhere)
+        if (error.status && error.status !== 401 && error.status !== 403) {
+          toast.error(`Could not check missing dates: ${error.message || 'Server Error'}`);
+        }
+        return { missingDates: [] };
+      }
+    },
+    enabled: !!userProfile,
+    staleTime: 10 * 60 * 1000,
   });
 
   const handleDelete = async (id) => {
@@ -158,7 +190,7 @@ export function useLogbook() {
         toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.DELETE_FAILED);
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error(DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
       return false;
     }
@@ -182,5 +214,8 @@ export function useLogbook() {
     handleDelete,
     internshipId,
     userProfile,
+    missingDatesData,
+    missingLoading,
+    refetchMissingDates,
   };
 }

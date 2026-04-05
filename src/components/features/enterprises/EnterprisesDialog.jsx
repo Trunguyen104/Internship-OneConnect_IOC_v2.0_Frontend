@@ -22,12 +22,12 @@ export default function EnterprisesDialog({
       title={
         <div className="flex flex-col gap-1">
           <span className="text-lg font-black tracking-tight text-slate-900">
-            {isEdit ? UI_TEXT.USER_MANAGEMENT.UPDATE_PROFILE : UI_TEXT.USER_MANAGEMENT.CREATE_TITLE}
+            {isEdit ? UI_TEXT.ENTERPRISES.EDIT_ENTERPRISE : UI_TEXT.ENTERPRISES.ADD_ENTERPRISE}
           </span>
           <span className="text-xs font-medium text-slate-400">
             {isEdit
-              ? `Editing enterprise profile for ${enterprise?.name || 'enterprise'}.`
-              : 'Create a new enterprise account and metadata.'}
+              ? `Edit enterprise profile for ${enterprise?.name || 'enterprise'}.`
+              : 'Add a new enterprise to the ecosystem.'}
           </span>
         </div>
       }

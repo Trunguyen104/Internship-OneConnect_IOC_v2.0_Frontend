@@ -4,13 +4,12 @@ import { useState } from 'react';
 
 import { changePassword } from '@/components/features/auth/services/auth.service';
 import Button from '@/components/ui/button';
-import Card from '@/components/ui/card';
 import { Field, FieldGroup } from '@/components/ui/field';
 import Input from '@/components/ui/input';
 import { PROFILE_UI } from '@/constants/user/uiText';
 import { useToast } from '@/providers/ToastProvider';
 
-export default function ChangePass() {
+export default function ChangePass({ onClose }) {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -65,7 +64,6 @@ export default function ChangePass() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -79,11 +77,7 @@ export default function ChangePass() {
     try {
       await changePassword(form);
       toast.success(PROFILE_UI.CHANGE_PASSWORD.SUCCESS);
-      setForm({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-      });
+      if (onClose) onClose();
     } catch (data) {
       if (data.validationErrors) {
         const backendErrors = {};
@@ -100,64 +94,71 @@ export default function ChangePass() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">{PROFILE_UI.CHANGE_PASSWORD.TITLE}</h1>
-        <p className="mt-1 text-sm text-slate-500">{PROFILE_UI.CHANGE_PASSWORD.HINT}</p>
-      </div>
+    <div className="w-full">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <FieldGroup>
+          <Field>
+            <Input
+              label={PROFILE_UI.CHANGE_PASSWORD.CURRENT_PASSWORD}
+              name="currentPassword"
+              type="password"
+              value={form.currentPassword}
+              onChange={handleChange}
+              error={errors.currentPassword}
+              required
+              placeholder={PROFILE_UI.PLACEHOLDERS.PASSWORD}
+              className="h-12 bg-slate-50/50 border-slate-200 focus:bg-white transition-all rounded-xl"
+            />
+          </Field>
 
-      <Card className="min-h-0">
-        <form onSubmit={handleSubmit}>
-          <Card.Content className="p-6">
-            <FieldGroup>
-              <Field>
-                <Input
-                  label={PROFILE_UI.CHANGE_PASSWORD.CURRENT_PASSWORD}
-                  name="currentPassword"
-                  type="password"
-                  value={form.currentPassword}
-                  onChange={handleChange}
-                  error={errors.currentPassword}
-                  required
-                  placeholder="********"
-                />
-              </Field>
+          <Field>
+            <Input
+              label={PROFILE_UI.CHANGE_PASSWORD.NEW_PASSWORD}
+              name="newPassword"
+              type="password"
+              value={form.newPassword}
+              onChange={handleChange}
+              error={errors.newPassword}
+              required
+              placeholder={PROFILE_UI.PLACEHOLDERS.PASSWORD}
+              className="h-12 bg-slate-50/50 border-slate-200 focus:bg-white transition-all rounded-xl"
+            />
+          </Field>
 
-              <Field>
-                <Input
-                  label={PROFILE_UI.CHANGE_PASSWORD.NEW_PASSWORD}
-                  name="newPassword"
-                  type="password"
-                  value={form.newPassword}
-                  onChange={handleChange}
-                  error={errors.newPassword}
-                  required
-                  placeholder="********"
-                />
-              </Field>
+          <Field>
+            <Input
+              label={PROFILE_UI.CHANGE_PASSWORD.CONFIRM_PASSWORD}
+              name="confirmPassword"
+              type="password"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              error={errors.confirmPassword}
+              required
+              placeholder={PROFILE_UI.PLACEHOLDERS.PASSWORD}
+              className="h-12 bg-slate-50/50 border-slate-200 focus:bg-white transition-all rounded-xl"
+            />
+          </Field>
+        </FieldGroup>
 
-              <Field>
-                <Input
-                  label={PROFILE_UI.CHANGE_PASSWORD.CONFIRM_PASSWORD}
-                  name="confirmPassword"
-                  type="password"
-                  value={form.confirmPassword}
-                  onChange={handleChange}
-                  error={errors.confirmPassword}
-                  required
-                  placeholder="********"
-                />
-              </Field>
-            </FieldGroup>
-          </Card.Content>
-
-          <Card.Footer className="border-t border-slate-100 p-6">
-            <Button type="submit" variant="destructive" loading={loading} className="px-8">
-              {PROFILE_UI.CHANGE_PASSWORD.SUBMIT}
-            </Button>
-          </Card.Footer>
-        </form>
-      </Card>
+        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="rounded-xl h-12 px-6 font-bold text-slate-500 hover:text-slate-700"
+          >
+            {PROFILE_UI.BUTTONS.CANCEL}
+          </Button>
+          <Button
+            type="submit"
+            variant="default"
+            loading={loading}
+            className="px-10 h-12 rounded-xl font-bold shadow-lg shadow-primary/20"
+          >
+            {PROFILE_UI.CHANGE_PASSWORD.SUBMIT}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

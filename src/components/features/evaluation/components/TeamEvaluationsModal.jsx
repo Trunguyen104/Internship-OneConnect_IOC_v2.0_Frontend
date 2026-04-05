@@ -1,9 +1,10 @@
 'use client';
 
-import { ClockCircleFilled, EyeOutlined, LockOutlined, TeamOutlined } from '@ant-design/icons';
-import { Button, Modal, Space, Tag, Tooltip, Typography } from 'antd';
+import { EyeOutlined, LockOutlined, TeamOutlined } from '@ant-design/icons';
+import { Button, Modal, Space, Tooltip, Typography } from 'antd';
 
 import AppTable from '@/components/ui/apptable';
+import StatusBadge from '@/components/ui/status-badge';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
 const { Text, Title } = Typography;
@@ -14,18 +15,18 @@ const getEvalStatusText = (evalStatus) => {
   switch (status) {
     case 1:
     case 'PENDING':
-      return { label: EVALUATION_UI.STATUS.PENDING, color: 'default' };
+      return { label: EVALUATION_UI.STATUS.PENDING, variant: 'neutral' };
     case 2:
     case 'DRAFT':
-      return { label: EVALUATION_UI.STATUS.DRAFT, color: 'warning' };
+      return { label: EVALUATION_UI.STATUS.DRAFT, variant: 'warning' };
     case 3:
     case 'SUBMITTED':
-      return { label: EVALUATION_UI.STATUS.SUBMITTED, color: 'processing' };
+      return { label: EVALUATION_UI.STATUS.SUBMITTED, variant: 'info' };
     case 4:
     case 'PUBLISHED':
-      return { label: EVALUATION_UI.STATUS.PUBLISHED, color: 'success' };
+      return { label: EVALUATION_UI.STATUS.PUBLISHED, variant: 'success' };
     default:
-      return { label: evalStatus || EVALUATION_UI.STATUS.UNKNOWN, color: 'default' };
+      return { label: evalStatus || EVALUATION_UI.STATUS.UNKNOWN, variant: 'neutral' };
   }
 };
 
@@ -43,11 +44,17 @@ export default function TeamEvaluationsModal({
     {
       title: EVALUATION_UI.TABLE_COLUMNS.FULL_NAME,
       dataIndex: 'fullName',
-      render: (text, record) => (
-        <Text strong type={record.studentId === myStudentId ? 'danger' : undefined}>
-          {text}
-        </Text>
-      ),
+      render: (text, record) => {
+        const isMe =
+          record.studentId?.toLowerCase() === myStudentId?.toLowerCase() ||
+          record.studentId === myStudentId;
+
+        return (
+          <Text strong type={isMe ? 'danger' : undefined}>
+            {text}
+          </Text>
+        );
+      },
     },
     {
       title: EVALUATION_UI.TABLE_COLUMNS.STUDENT_CODE,
@@ -60,11 +67,11 @@ export default function TeamEvaluationsModal({
     },
     {
       title: EVALUATION_UI.TABLE_COLUMNS.STATUS,
-      dataIndex: 'status',
+      dataIndex: 'evaluationStatus',
       align: 'center',
       render: (status) => {
         const conf = getEvalStatusText(status);
-        return <Tag color={conf.color}>{conf.label}</Tag>;
+        return <StatusBadge variant={conf.variant} label={conf.label} />;
       },
     },
     {
@@ -72,7 +79,11 @@ export default function TeamEvaluationsModal({
       dataIndex: 'totalScore',
       align: 'center',
       render: (score, record) => {
-        const status = record.status;
+        const isMe =
+          record.studentId?.toLowerCase() === myStudentId?.toLowerCase() ||
+          record.studentId === myStudentId;
+
+        const status = record.status || record.evaluationStatus;
         const isPublished =
           status === 4 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
 
@@ -80,36 +91,37 @@ export default function TeamEvaluationsModal({
           return <Text type="secondary">--</Text>;
         }
 
-        if (record.studentId !== myStudentId) {
+        if (!isMe) {
           return (
             <Tooltip title={EVALUATION_UI.LABELS.CONFIDENTIAL}>
-              <Tag icon={<LockOutlined />}>***</Tag>
+              <div className="flex justify-center">
+                <span className="flex items-center gap-1.5 rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold text-slate-400">
+                  <LockOutlined className="text-[10px]" />
+                  ***
+                </span>
+              </div>
             </Tooltip>
           );
         }
 
-        return <Tag color="error">{Number(score).toFixed(1)}</Tag>;
+        return (
+          <div className="flex justify-center">
+            <span className="rounded-full border border-rose-100 bg-rose-50 px-2.5 py-0.5 text-[11px] font-black text-rose-600 shadow-sm">
+              {Number(score).toFixed(1)}
+            </span>
+          </div>
+        );
       },
     },
     {
       title: EVALUATION_UI.TABLE_COLUMNS.ACTIONS,
       align: 'right',
       render: (_, record) => {
-        if (record.studentId !== myStudentId) return null;
+        const isMe =
+          record.studentId?.toLowerCase() === myStudentId?.toLowerCase() ||
+          record.studentId === myStudentId;
 
-        const status = record.status;
-        const isPublished =
-          status === 4 || (typeof status === 'string' && status.toUpperCase() === 'PUBLISHED');
-
-        if (!isPublished) {
-          return (
-            <Tooltip title={EVALUATION_UI.LABELS.NOT_PUBLISHED}>
-              <Button type="text" disabled icon={<ClockCircleFilled />}>
-                {EVALUATION_UI.LABELS.AWAITING_RESULTS}
-              </Button>
-            </Tooltip>
-          );
-        }
+        if (!isMe) return null;
 
         return (
           <Button

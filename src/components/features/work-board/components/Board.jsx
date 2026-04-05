@@ -13,7 +13,9 @@ import React from 'react';
 import UpdateTaskModal from '@/components/features/backlog/components/UpdateTaskModal';
 import StudentPageHeader from '@/components/layout/StudentPageHeader';
 import StudentTabs from '@/components/layout/StudentTabs';
+import { EmptyState } from '@/components/ui/emptystate';
 import SearchBar from '@/components/ui/searchbar';
+import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import { WORK_BOARD_UI } from '@/constants/work-board/uiText';
 
 import { COLUMNS, useBoard } from '../hooks/useBoard';
@@ -25,6 +27,8 @@ export default function Board() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
 
   const {
+    projectId,
+    loadingProjectId,
     query,
     setQuery,
     byColumn,
@@ -61,7 +65,15 @@ export default function Board() {
         )}
       </div>
 
-      {!activeSprint && !loading ? (
+      {!loadingProjectId && !projectId ? (
+        <div className="flex flex-1 w-full items-center justify-center p-14 bg-white rounded-[40px] border border-slate-100 shadow-sm shadow-slate-100/30 overflow-hidden min-h-[600px]">
+          <EmptyState
+            title={BACKLOG_UI.NO_PROJECT_TITLE}
+            description={BACKLOG_UI.NO_PROJECT_DESC}
+            className="py-10"
+          />
+        </div>
+      ) : !activeSprint && !loading ? (
         <EmptySprintState />
       ) : (
         <DndContext

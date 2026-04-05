@@ -6,24 +6,16 @@ import ImgCrop from 'antd-img-crop';
 
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { validateImageFile } from '@/utils/fileValidation';
 
 export default function BannerUploader({ value, onChange }) {
   const toast = useToast();
 
+  const beforeCrop = (file) => {
+    return validateImageFile(file, { onError: toast.error });
+  };
+
   const beforeUpload = (file) => {
-    const isImage =
-      file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp';
-    if (!isImage) {
-      toast.error('Only JPG / PNG / WEBP is supported');
-      return false;
-    }
-
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      toast.error('Image must be less than 5MB');
-      return false;
-    }
-
     onChange?.(file);
     return false;
   };
@@ -31,7 +23,7 @@ export default function BannerUploader({ value, onChange }) {
   const displayImage = value instanceof File ? URL.createObjectURL(value) : value;
 
   return (
-    <ImgCrop rotationSlider aspect={4.5 / 1}>
+    <ImgCrop rotationSlider aspect={4.5 / 1} beforeCrop={beforeCrop}>
       <Upload
         showUploadList={false}
         beforeUpload={beforeUpload}

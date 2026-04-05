@@ -78,7 +78,6 @@ export const STATUS_VARIANTS = {
 export const PROJECT_MANAGEMENT = {
   TITLE: 'Project Management',
   CREATE_BTN: 'Create Project',
-  NO_UNSTARTED_PROJECTS: '* No unstarted projects available to assign to {groupName}.',
   SEARCH_PLACEHOLDER: 'Search projects by name or code...',
   COMMON: {
     N_A: '-',
@@ -121,7 +120,6 @@ export const PROJECT_MANAGEMENT = {
       ARCHIVE: 'Archive',
       DELETE: 'Delete Project',
       ASSIGN_GROUP: 'Assign Group',
-      CHANGE_GROUP: 'Change Group',
     },
   },
   FILTERS: {
@@ -243,7 +241,7 @@ export const PROJECT_MANAGEMENT = {
       NO_LINKS: 'No external links available.',
       TEMPLATE_PREFIX: 'Template: ',
       NA: 'N/A',
-      TBA: 'TBA',
+      TBA: '-',
     },
     RESOURCES: {
       ACCESS: 'Open/Download',
@@ -262,7 +260,7 @@ export const PROJECT_MANAGEMENT = {
       MANAGE_LINK: 'Manage Group',
       ARCHIVED_LABEL: 'Group Archived',
       ARCHIVED_VALUE: 'Archived',
-      TBA: 'TBA',
+      TBA: '-',
       ASSIGN_BTN: 'Assign Group',
     },
     STUDENTS: {
@@ -315,8 +313,8 @@ export const PROJECT_MANAGEMENT = {
     ERROR_INACTIVE_GROUP: 'Cannot save project for a finished or archived group.',
     ERROR_PUBLISH_NO_GROUP:
       'Project must be assigned to an intern group before it can be published.',
-    ERROR_PUBLISH_NO_GROUP_VN: 'chưa được gắn với nhóm thực tập',
-    ERROR_ALREADY_PUBLISHED_VN: 'Chỉ có thể phát hành dự án đang ở trạng thái Bản nháp',
+    ERROR_PUBLISH_NO_GROUP_VN: 'not assigned to any intern group',
+    ERROR_ALREADY_PUBLISHED_VN: 'Only projects in Draft status can be published',
     ERROR_FETCH_DETAIL: 'Failed to fetch project details',
     ERROR_FETCH_GROUPS: 'Failed to fetch supporting data',
     ERROR_UPDATE_PREVALIDATE: 'Failed to pre-validate project save',
@@ -338,23 +336,12 @@ export const PROJECT_MANAGEMENT = {
     DELETE_UNABLE_TITLE: 'Cannot Delete Project',
     DELETE_OWNERSHIP_ERROR: 'You can only delete projects you created.',
     ASSIGN_GROUP: {
-      TITLE: 'Assign / Change Intern Group',
+      TITLE: 'Assign Intern Group',
       DESC: 'Select an active Intern Group to assign to project <b>{name}</b>:',
       PLACEHOLDER: 'Select an Intern Group',
       CURRENT_GROUP: 'Current Group',
       CONFIRM: 'Confirm Assignment',
       SUCCESS_ASSIGN: 'Group assigned successfully.',
-      SUCCESS_CHANGE: 'Group changed successfully.',
-      ERROR_NO_CHANGE: 'Cannot Change Group',
-      ERROR_HAS_DATA:
-        'Project has student interaction data (logbook/eval/violation) and cannot change group. Please mark as completed instead.',
-      CONFIRM_CHANGE_TITLE: 'Confirm Group Change',
-      CONFIRM_CHANGE_DESC:
-        'Are you sure you want to change the group? Existing students will lose access to this project.',
-      SWAP_WARNING:
-        'Project <b>{projectName}</b> is currently assigned to <b>{groupName}</b>. Moving it will leave <b>{groupName}</b> without a project. Please select a replacement project for them below:',
-      REPLACEMENT_LABEL: 'Replacement Project for {groupName}',
-      REPLACEMENT_PLACEHOLDER: 'Select a replacement project (Unstarted only)',
       ERROR_BACKEND: 'Backend error during assignment',
       ERROR_FAILED: 'Assignment failed: ',
     },

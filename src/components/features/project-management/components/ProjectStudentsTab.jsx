@@ -1,18 +1,13 @@
 'use client';
 
-import {
-  ArrowRightOutlined,
-  SearchOutlined,
-  UsergroupAddOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { ArrowRightOutlined, UsergroupAddOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
 import Link from 'next/link';
 import React from 'react';
 
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
-import Input from '@/components/ui/input';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 
 export default function ProjectStudentsTab({
   loading,
@@ -87,14 +82,14 @@ export default function ProjectStudentsTab({
   return (
     <div className="pt-2">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
-        <div className="flex min-w-[320px] items-center gap-3">
-          <Input
-            placeholder={DETAIL.STUDENTS?.SEARCH_PLACEHOLDER}
-            icon={<SearchOutlined />}
-            className="flex-1"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <DataTableToolbar.Search
+          placeholder={DETAIL.STUDENTS?.SEARCH_PLACEHOLDER}
+          className="flex-1 sm:w-80"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        <div className="flex items-center gap-3">
           <Badge
             variant="primary-soft"
             className="h-9 px-3 font-bold whitespace-nowrap bg-blue-50/50 border-blue-100/50 text-[10px] flex items-center gap-1.5 rounded-lg border"
@@ -102,16 +97,16 @@ export default function ProjectStudentsTab({
             <UsergroupAddOutlined className="text-[12px]" />
             {assignedStudents.length} {DETAIL.GROUP?.STUDENTS_SUFFIX}
           </Badge>
-        </div>
 
-        {isHR && (currentProject?.internshipId || currentProject?.groupInfo?.internshipId) && (
-          <Link
-            href={`/internship-management?groupId=${currentProject?.groupInfo?.internshipId || currentProject?.internshipId}`}
-            className="flex items-center gap-1.5 text-[10px] font-bold text-primary hover:text-primary-hover bg-primary/5 px-3 py-2 rounded-lg transition-all uppercase tracking-wide border border-primary/10 hover:bg-primary/10 shadow-sm"
-          >
-            <ArrowRightOutlined className="rotate-180" /> {DETAIL.GROUP?.MANAGE_LINK}
-          </Link>
-        )}
+          {isHR && (currentProject?.internshipId || currentProject?.groupInfo?.internshipId) && (
+            <Link
+              href={`/internship-management?groupId=${currentProject?.groupInfo?.internshipId || currentProject?.internshipId}`}
+              className="flex items-center gap-1.5 text-[10px] font-bold text-primary hover:text-primary-hover bg-primary/5 px-3 py-2 rounded-lg transition-all uppercase tracking-wide border border-primary/10 hover:bg-primary/10 shadow-sm"
+            >
+              <ArrowRightOutlined className="rotate-180" /> {DETAIL.GROUP?.MANAGE_LINK}
+            </Link>
+          )}
+        </div>
       </div>
 
       <DataTable

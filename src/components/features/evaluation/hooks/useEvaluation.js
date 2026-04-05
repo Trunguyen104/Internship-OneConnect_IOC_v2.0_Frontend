@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
+import { userService } from '@/components/features/user/services/user.service';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../services/evaluation.service';
@@ -22,8 +23,10 @@ export function useEvaluation() {
 
   // Helper normalize data
   const normalizeArray = (res) => {
-    const data = res?.data ?? res ?? [];
-    return Array.isArray(data) ? data : [];
+    if (Array.isArray(res?.data?.items)) return res.data.items;
+    if (Array.isArray(res?.items)) return res.items;
+    if (Array.isArray(res?.data)) return res.data;
+    return Array.isArray(res) ? res : [];
   };
 
   // 1. Fetch Internship Enrollment
@@ -37,7 +40,8 @@ export function useEvaluation() {
           toast.warning('You are not currently enrolled in any internship.');
           return { id: null, studentId: null };
         }
-        const active = items.find((it) => it.status !== 'Failed') || items[0];
+        // Use the first active internship
+        const active = items.find((it) => it.status !== 3) || items[0];
         return {
           id: active.internshipId || active.id,
           studentId: active.studentId,
@@ -50,8 +54,15 @@ export function useEvaluation() {
     staleTime: Infinity,
   });
 
+  // 5. Fetch Current User Profile (for accurate Identity)
+  const { data: userInfo = null } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => userService.getMe().then((res) => res?.data || res),
+    staleTime: Infinity,
+  });
+
   const internshipId = internshipContext.id;
-  const myStudentId = internshipContext.studentId;
+  const myStudentId = userInfo?.studentId || userInfo?.id || internshipContext.studentId;
 
   // 2. Fetch Evaluation Cycles
   const { data: cycles = [], isLoading: loadingCycles } = useQuery({
