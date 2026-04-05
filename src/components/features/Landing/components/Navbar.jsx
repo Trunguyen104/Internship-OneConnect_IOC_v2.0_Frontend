@@ -2,16 +2,25 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 import { USER_ROLE } from '@/constants/common/enums';
 import { LANDING_UI } from '@/constants/landing/uiText';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function Navbar() {
-  const { user } = useAuthStore();
+  const { user, clearUser } = useAuthStore();
 
-  // useAuthStore uses persist middleware, so the user state is automatically loaded from localStorage.
-  // No need for an explicit fetchUser call on mount in the Navbar.
+  // On mount, if we have a user from localStorage, verify it once to avoid ghost sessions
+  useEffect(() => {
+    if (user) {
+      userService.getMe().catch((err) => {
+        if (err?.status === 401) {
+          clearUser();
+        }
+      });
+    }
+  }, []); // Only check once on mount
 
   const handleLogout = async () => {
     try {

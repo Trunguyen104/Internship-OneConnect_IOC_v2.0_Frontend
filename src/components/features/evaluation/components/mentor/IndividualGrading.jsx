@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import CompoundModal from '@/components/ui/CompoundModal';
 import StatusBadge from '@/components/ui/status-badge';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../../services/evaluation.service';
@@ -169,7 +168,7 @@ export default function IndividualGrading({
                   <div className="flex items-start justify-between gap-6">
                     <div className="flex flex-col gap-1 flex-1">
                       <span className="text-[9px] font-black text-primary/40 uppercase tracking-widest">
-                        {UI_TEXT.EVALUATION.CRITERIA}
+                        {LABELS.CRITERIA_NAME}
                       </span>
                       <h4
                         className="line-clamp-2 text-sm font-black text-text tracking-tight h-10 overflow-hidden leading-tight"

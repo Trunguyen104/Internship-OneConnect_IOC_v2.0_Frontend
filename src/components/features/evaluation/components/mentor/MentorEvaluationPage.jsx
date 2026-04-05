@@ -5,6 +5,7 @@ import { Select, Spin } from 'antd';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
@@ -16,11 +17,11 @@ import CycleList from './CycleList';
 export default function MentorEvaluationPage({
   internshipId,
   groupName,
-  termId,
+  phaseId,
   termDates,
-  terms,
-  selectedTerm,
-  setSelectedTerm,
+  phases,
+  selectedPhase,
+  setSelectedPhase,
   groups,
   selectedGroup,
   setSelectedGroup,
@@ -37,7 +38,7 @@ export default function MentorEvaluationPage({
     handleDeleteCycle,
     handleSaveEvaluations,
     handlePublish,
-  } = useMentorEvaluation(internshipId, termId);
+  } = useMentorEvaluation(internshipId, phaseId);
 
   const [view, setView] = useState('list'); // 'list' | 'grading'
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -110,40 +111,38 @@ export default function MentorEvaluationPage({
   }, [termDates]);
 
   return (
-    <PageLayout>
+    <>
       <PageLayout.Header {...headerProps} className="pb-10" />
 
-      <div className="rounded-[40px] border border-gray-100/50 bg-white/80 backdrop-blur-md shadow-sm overflow-hidden flex flex-col min-h-0 flex-1 transition-all duration-300">
-        <div className="p-8 pb-4">
-          {/* Unified Filter & Action Bar */}
-          <div className="flex flex-col items-stretch gap-6 lg:flex-row lg:items-center">
-            {/* Term Select */}
-            <div className="flex items-center gap-4 min-w-[220px]">
-              <div className="flex flex-col gap-1 flex-1">
+      <PageLayout.Card className="flex flex-col min-h-0 flex-1 overflow-hidden !p-0">
+        {/* Toolbar: Filters + Action */}
+        <div className="px-6 pt-6 pb-2 flex-shrink-0">
+          <DataTableToolbar>
+            <DataTableToolbar.Filters>
+              {/* Phase Select */}
+              <div className="flex flex-col gap-1 min-w-[200px]">
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
-                  {LABELS.TERM}
+                  {LABELS.PHASE}
                 </span>
                 <Select
-                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-11 [&_.ant-select-selection-item]:!leading-[44px] hover:[&_.ant-select-selector]:!bg-gray-100 transition-all font-bold"
-                  value={selectedTerm?.id}
-                  onChange={(val) => setSelectedTerm(terms.find((t) => t.id === val))}
-                  options={terms.map((t) => ({
-                    label: t.name,
-                    value: t.id,
+                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-10 [&_.ant-select-selection-item]:!leading-[40px] hover:[&_.ant-select-selector]:!bg-gray-100 transition-all font-bold"
+                  value={selectedPhase?.id}
+                  onChange={(val) => setSelectedPhase(phases.find((p) => p.id === val))}
+                  options={phases.map((p) => ({
+                    label: p.name,
+                    value: p.id,
                   }))}
-                  placeholder={LABELS.SELECT_TERM_PLACEHOLDER}
+                  placeholder={LABELS.SELECT_PHASE_PLACEHOLDER}
                 />
               </div>
-            </div>
 
-            {/* Group Select */}
-            <div className="flex items-center gap-4 flex-1 lg:max-w-md">
-              <div className="flex flex-col gap-1 flex-1">
+              {/* Group Select */}
+              <div className="flex flex-col gap-1 min-w-[220px] max-w-md flex-1">
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
                   {LABELS.GROUP}
                 </span>
                 <Select
-                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-11 [&_.ant-select-selection-item]:!leading-[44px] hover:[&_.ant-select-selector]:!bg-gray-100 transition-all font-bold"
+                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-10 [&_.ant-select-selection-item]:!leading-[40px] hover:[&_.ant-select-selector]:!bg-gray-100 transition-all font-bold"
                   value={selectedGroup?.internshipId || selectedGroup?.id}
                   onChange={(val) =>
                     setSelectedGroup(groups.find((g) => (g.internshipId || g.id) === val))
@@ -157,68 +156,68 @@ export default function MentorEvaluationPage({
                   loading={loadingGroups && groups.length > 0}
                 />
               </div>
-            </div>
 
-            {loadingGroups && <Spin size="small" className="hidden xl:block" />}
+              {loadingGroups && <Spin size="small" />}
+            </DataTableToolbar.Filters>
 
-            {/* Actions */}
-            <div className="flex justify-end lg:ml-auto pt-5">
-              {view === 'list' && (
+            {/* Create Cycle Action */}
+            {view === 'list' && (
+              <DataTableToolbar.Actions className="ml-auto">
                 <Button
                   variant="primary"
                   onClick={handleOpenCreate}
                   disabled={!isTermOngoing}
-                  className="rounded-full h-11 px-8 font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all w-full lg:w-auto flex items-center justify-center gap-2"
+                  className="rounded-full h-10 px-6 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
                 >
                   <PlusOutlined /> {BUTTONS.CREATE_CYCLE}
                 </Button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col flex-1 min-h-0 overflow-hidden px-8 pb-8">
-          {view === 'grading' && (
-            <div className="mb-6">
-              <PageLayout.Toolbar
-                className="!p-0 !border-0"
-                leftContent={
-                  <Button
-                    variant="primary"
-                    onClick={handleBackToList}
-                    className="rounded-full h-11 px-10 font-black uppercase tracking-widest text-[11px] flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all group"
-                  >
-                    <ArrowLeftOutlined className="group-hover:-translate-x-1 transition-transform" />{' '}
-                    {BUTTONS.BACK_TO_LIST}
-                  </Button>
-                }
-              />
-            </div>
-          )}
-
-          <div className="flex-1 min-h-0 overflow-auto">
-            {view === 'list' ? (
-              <CycleList
-                cycles={cycles}
-                loading={loadingCycles}
-                onOpenGrading={handleOpenGrading}
-                onEdit={handleOpenEdit}
-                onDelete={handleDeleteCycle}
-                isTermOngoing={isTermOngoing}
-                isTermPast={isTermPast}
-              />
-            ) : (
-              <BatchGrading
-                cycle={selectedCycle}
-                internshipId={internshipId}
-                onBatchGrade={handleSaveEvaluations}
-                onPublish={handlePublish}
-                isTermOngoing={isTermOngoing}
-              />
+              </DataTableToolbar.Actions>
             )}
-          </div>
+          </DataTableToolbar>
         </div>
-      </div>
+
+        {/* Back to List Toolbar (grading view only) */}
+        {view === 'grading' && (
+          <div className="px-6 pb-2 flex-shrink-0">
+            <PageLayout.Toolbar
+              className="!p-0 !border-0"
+              leftContent={
+                <Button
+                  variant="primary"
+                  onClick={handleBackToList}
+                  className="rounded-full h-10 px-8 font-black uppercase tracking-widest text-[11px] flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all group"
+                >
+                  <ArrowLeftOutlined className="group-hover:-translate-x-1 transition-transform" />{' '}
+                  {BUTTONS.BACK_TO_LIST}
+                </Button>
+              }
+            />
+          </div>
+        )}
+
+        {/* Content */}
+        <PageLayout.Content className="px-6 pb-6">
+          {view === 'list' ? (
+            <CycleList
+              cycles={cycles}
+              loading={loadingCycles}
+              onOpenGrading={handleOpenGrading}
+              onEdit={handleOpenEdit}
+              onDelete={handleDeleteCycle}
+              isTermOngoing={isTermOngoing}
+              isTermPast={isTermPast}
+            />
+          ) : (
+            <BatchGrading
+              cycle={selectedCycle}
+              internshipId={internshipId}
+              onBatchGrade={handleSaveEvaluations}
+              onPublish={handlePublish}
+              isTermOngoing={isTermOngoing}
+            />
+          )}
+        </PageLayout.Content>
+      </PageLayout.Card>
 
       <CycleDialog
         key={editingCycle?.cycleId || 'new'}
@@ -228,6 +227,6 @@ export default function MentorEvaluationPage({
         initialData={editingCycle}
         termDates={termDates}
       />
-    </PageLayout>
+    </>
   );
 }

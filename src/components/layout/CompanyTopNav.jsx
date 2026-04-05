@@ -6,6 +6,7 @@ import {
   AlertOctagon,
   Briefcase,
   ChevronDown,
+  ClipboardCheck,
   FileText,
   FolderGit2,
   GraduationCap,
@@ -33,6 +34,7 @@ const ALL_NAV_TABS = [
 const MENTOR_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
   { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/evaluation', label: 'Evaluation', icon: ClipboardCheck },
   { key: '/company/violation', label: 'Violations', icon: AlertOctagon },
 ];
 

@@ -11,6 +11,10 @@ export function AuthEventsProvider({ children }) {
   useEffect(() => {
     const onUnauthorized = () => {
       if (typeof window === 'undefined') return;
+
+      // Clear the local store immediately to keep UI in sync with server 401
+      useAuthStore.getState().clearUser();
+
       if (window.location.pathname === '/login') return;
 
       const returnTo = `${window.location.pathname}${window.location.search || ''}`;

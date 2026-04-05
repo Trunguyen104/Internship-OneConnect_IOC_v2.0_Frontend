@@ -5,6 +5,7 @@ import { Empty, InputNumber, Table } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import SkeletonTable from '@/components/ui/SkeletonTable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
@@ -249,41 +250,44 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
   ];
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-white/50">
+    <div className="flex flex-1 flex-col overflow-hidden">
       {/* SaaS Toolbar */}
-      <div className="bg-gray-50/30 backdrop-blur-md px-8 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100">
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-[10px] font-black text-muted/50 uppercase tracking-[0.2em] leading-none">
-              {TABLE_COLUMNS.GRADING_BOARD}
-            </h3>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-black text-text tracking-tighter leading-none">
-                {data.students.length}
-              </span>
-              <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest">
-                {LABELS.TOTAL_STUDENT}
-              </span>
+      <DataTableToolbar
+        className="mb-6 !bg-transparent !p-0"
+        leftContent={
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-[10px] font-black text-muted/50 uppercase tracking-[0.2em] leading-none">
+                {TABLE_COLUMNS.GRADING_BOARD}
+              </h3>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black text-text tracking-tighter leading-none">
+                  {data.students.length}
+                </span>
+                <span className="text-[10px] font-bold text-muted/60 uppercase tracking-widest">
+                  {LABELS.TOTAL_STUDENT}
+                </span>
+              </div>
             </div>
+
+            {hasChanges && (
+              <div className="flex items-center gap-3 rounded-[20px] bg-amber-50 px-5 py-2.5 border border-amber-100/50 shadow-sm animate-in slide-in-from-left-4 transition-all duration-500">
+                <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse ring-4 ring-amber-500/20" />
+                <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest">
+                  {MESSAGES.UNSAVED_CHANGES}
+                </span>
+              </div>
+            )}
           </div>
-
-          {hasChanges && (
-            <div className="flex items-center gap-3 rounded-[20px] bg-amber-50 px-5 py-2.5 border border-amber-100/50 shadow-sm animate-in slide-in-from-left-4 transition-all duration-500">
-              <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse ring-4 ring-amber-500/20" />
-              <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest">
-                {MESSAGES.UNSAVED_CHANGES}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
+        }
+      >
+        <DataTableToolbar.Actions className="ml-auto">
           {hasChanges && (
             <Button
               variant="outline"
               size="lg"
               onClick={handleCancelEdits}
-              className="rounded-full px-8 h-12 text-[11px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95"
+              className="h-11 rounded-full px-8 text-[11px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95"
             >
               {BUTTONS.CANCEL}
             </Button>
@@ -294,14 +298,14 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             onClick={handleSubmitBatch}
             loading={sending}
             disabled={(!hasChanges && !sending) || !isTermOngoing || cycle.status !== 1}
-            className="rounded-full px-10 h-12 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+            className="h-11 rounded-full px-10 text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
           >
             <SaveOutlined className="text-lg" /> {BUTTONS.SAVE_ALL}
           </Button>
-        </div>
-      </div>
+        </DataTableToolbar.Actions>
+      </DataTableToolbar>
 
-      <div className="flex-1 overflow-hidden p-8">
+      <div className="flex-1 overflow-hidden">
         <div className="rounded-[32px] border border-gray-100 bg-white shadow-sm overflow-hidden h-full">
           <Table
             columns={columns}

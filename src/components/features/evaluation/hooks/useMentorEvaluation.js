@@ -8,7 +8,7 @@ import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../services/evaluation.service';
 
-export function useMentorEvaluation(internshipId, termId) {
+export function useMentorEvaluation(internshipId, phaseId) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { MESSAGES } = EVALUATION_UI;
@@ -21,17 +21,17 @@ export function useMentorEvaluation(internshipId, termId) {
     isLoading: loadingCycles,
     refetch: refetchCycles,
   } = useQuery({
-    queryKey: ['evaluation-cycles-mentor', termId],
+    queryKey: ['evaluation-cycles-mentor', phaseId],
     queryFn: async () => {
       try {
-        const res = await EvaluationService.getCycles(termId);
+        const res = await EvaluationService.getCycles(phaseId);
         return res?.data?.items || res?.data || [];
       } catch (err) {
         toast.error(MESSAGES.FETCH_ERROR);
         throw err;
       }
     },
-    enabled: !!termId,
+    enabled: !!phaseId,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -83,7 +83,7 @@ export function useMentorEvaluation(internshipId, termId) {
     try {
       await EvaluationService.createCycle({
         ...data,
-        termId,
+        phaseId,
       });
       toast.success(MESSAGES.CREATE_SUCCESS);
       refetchCycles();

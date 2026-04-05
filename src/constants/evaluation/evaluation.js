@@ -67,8 +67,9 @@ export const EVALUATION_UI = {
     SELECT_GROUP_PLACEHOLDER: 'Chọn nhóm thực tập...',
     SELECT_GROUP_PROMPT: 'Vui lòng chọn một nhóm thực tập từ danh sách trên để xem đánh giá.',
     SELECT_GROUP_PROMPT_DETAIL:
-      'Please select a term and an internship group from the sidebar or filters to begin evaluating students.',
+      'Please select a phase and an internship group from the sidebar or filters to begin evaluating students.',
     NO_GROUPS: 'Không tìm thấy nhóm nào trong giai đoạn này.',
+    NO_PHASE_ASSIGNED: 'Bạn chưa được phân công quản lý giai đoạn thực tập nào.',
     MAX_LABEL: 'Max:',
     DETAIL: 'Detail',
     POINTS: 'Points',
@@ -78,7 +79,7 @@ export const EVALUATION_UI = {
   },
 
   BUTTONS: {
-    CREATE_CYCLE: 'Create New Cycle',
+    CREATE_CYCLE: 'Create Cycle',
     QUICK_GRADE: 'Grade',
     CRITERIA: 'Criteria',
     PUBLISH: 'Publish Scores',

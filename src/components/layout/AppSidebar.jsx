@@ -124,7 +124,9 @@ export default function AppSidebar() {
       const groupWorkspaceMatch = pathname.match(/^\/internship-groups\/([^/]+)/);
       if (groupWorkspaceMatch) {
         const p = `/internship-groups/${groupWorkspaceMatch[1]}`;
-        return [
+        const isMentor = Number(userRole) === USER_ROLE.MENTOR;
+
+        const baseRoutes = [
           { key: 'back-to-home', icon: <ArrowLeft className="size-4" />, label: 'Back to Home' },
           { type: 'divider' },
           { key: `${p}/space`, icon: <LayoutDashboard className="size-4" />, label: 'Space' },
@@ -148,6 +150,11 @@ export default function AppSidebar() {
           },
           { key: `${p}/violation`, icon: <AlertOctagon className="size-4" />, label: 'Violations' },
         ];
+
+        if (isMentor) {
+          return baseRoutes.filter((r) => r.key !== `${p}/evaluate`);
+        }
+        return baseRoutes;
       }
 
       // ══════════════════════════════════════════════════════
