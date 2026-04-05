@@ -124,7 +124,9 @@ export default function AppSidebar() {
       const groupWorkspaceMatch = pathname.match(/^\/internship-groups\/([^/]+)/);
       if (groupWorkspaceMatch) {
         const p = `/internship-groups/${groupWorkspaceMatch[1]}`;
-        const isMentor = Number(userRole) === USER_ROLE.MENTOR;
+        const isManagement = [USER_ROLE.MENTOR, USER_ROLE.HR, USER_ROLE.ENTERPRISE_ADMIN].includes(
+          Number(userRole)
+        );
 
         const baseRoutes = [
           { key: 'back-to-home', icon: <ArrowLeft className="size-4" />, label: 'Back to Home' },
@@ -148,12 +150,13 @@ export default function AppSidebar() {
             icon: <UserCircle className="size-4" />,
             label: 'Stakeholders',
           },
-          { key: `${p}/violation`, icon: <AlertOctagon className="size-4" />, label: 'Violations' },
+          {
+            key: `${p}/violation`,
+            icon: <AlertOctagon className="size-4" />,
+            label: isManagement ? 'Violation Reports' : 'Violations',
+          },
         ];
 
-        if (isMentor) {
-          return baseRoutes.filter((r) => r.key !== `${p}/evaluate`);
-        }
         return baseRoutes;
       }
 

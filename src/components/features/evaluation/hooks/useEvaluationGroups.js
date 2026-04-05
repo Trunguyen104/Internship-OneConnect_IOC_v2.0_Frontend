@@ -7,9 +7,18 @@ import { InternshipGroupService } from '@/components/features/internship/service
  * Hook to manage phase and group selection for evaluation.
  * Updated to use Internship Phases instead of Academic Terms.
  */
-export default function useEvaluationGroups() {
+export default function useEvaluationGroups(targetGroupId = null) {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [selectedGroup, setSelectedGroup] = useState(null);
+  const [hasInitializedTarget, setHasInitializedTarget] = useState(false);
+
+  // 0. Fetch Target Group Info (if targetGroupId is provided and not initialized)
+  const { data: targetGroupInfo } = useQuery({
+    queryKey: ['target-group-info', targetGroupId],
+    queryFn: () => InternshipGroupService.getById(targetGroupId),
+    enabled: !!targetGroupId && !hasInitializedTarget,
+    staleTime: Infinity,
+  });
 
   // 1. Fetch Phases
   const { data: phases = [], isLoading: loadingPhases } = useQuery({
@@ -40,6 +49,18 @@ export default function useEvaluationGroups() {
   // 2. Auto-select phase once phases are loaded
   useEffect(() => {
     if (phases.length > 0 && !selectedPhase) {
+      // 2a. Priority: Target Group's Phase
+      const targetPhaseId = targetGroupInfo?.data?.internshipPhaseId || targetGroupInfo?.data?.id;
+
+      if (targetPhaseId) {
+        const found = phases.find((p) => p.id === targetPhaseId);
+        if (found) {
+          setTimeout(() => setSelectedPhase(found), 0);
+          return;
+        }
+      }
+
+      // 2b. Fallback: Ongoing Phase or First Phase
       const now = new Date();
       let ongoing = phases.find((p) => {
         if (!p.startDate || !p.endDate) return false;
@@ -54,7 +75,7 @@ export default function useEvaluationGroups() {
       const target = ongoing;
       setTimeout(() => setSelectedPhase(target), 0);
     }
-  }, [phases, selectedPhase]);
+  }, [phases, selectedPhase, targetGroupInfo]);
 
   // 3. Fetch Groups for Selected Phase
   const { data: groups = [], isLoading: loadingGroups } = useQuery({
@@ -78,7 +99,20 @@ export default function useEvaluationGroups() {
   useEffect(() => {
     if (!loadingGroups) {
       if (groups.length > 0) {
-        // If no group selected OR current selected group does not belong to the new groups list
+        // 4a. Priority: Target Group
+        if (targetGroupId && !hasInitializedTarget) {
+          const found = groups.find((g) => (g.internshipId || g.id) === targetGroupId);
+          if (found) {
+            const grp = found;
+            setTimeout(() => {
+              setSelectedGroup(grp);
+              setHasInitializedTarget(true);
+            }, 0);
+            return;
+          }
+        }
+
+        // 4b. If no group selected OR current selected group does not belong to the new groups list
         const currentGroupId = selectedGroup?.internshipId || selectedGroup?.id;
         const isCurrentInList = groups.some((g) => (g.internshipId || g.id) === currentGroupId);
 
@@ -90,7 +124,7 @@ export default function useEvaluationGroups() {
         setTimeout(() => setSelectedGroup(null), 0);
       }
     }
-  }, [groups, loadingGroups, selectedGroup]);
+  }, [groups, loadingGroups, selectedGroup, targetGroupId, hasInitializedTarget]);
 
   return {
     phases,
