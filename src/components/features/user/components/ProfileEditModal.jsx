@@ -1,7 +1,7 @@
 'use client';
 
 import { UploadOutlined } from '@ant-design/icons';
-import { DatePicker, Drawer, Form, message, Select, Upload } from 'antd';
+import { DatePicker, Drawer, Form, Select, Upload } from 'antd';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +24,10 @@ export default function ProfileEditModal({
   const [form] = Form.useForm();
   const [tempAvatar, setTempAvatar] = useState(null);
   const [cvFile, setCvFile] = useState(null);
+  const [cvError, setCvError] = useState(null);
+
+  // Watch all form fields for reactive UI updates (like the Save button state)
+  const watchedValues = Form.useWatch([], form);
 
   // Deriving initial avatar from props
   const persistedAvatar = userInfo?.avatarUrl || userInfo?.AvatarUrl;
@@ -57,15 +61,79 @@ export default function ProfileEditModal({
     }
   }, [open, userInfo, form]);
 
+  // Logic to determine if any data has changed semantically
+  const hasChanges = (() => {
+    if (!open || !userInfo) return false;
+
+    // Check files first
+    if (tempAvatar instanceof File) return true;
+    if (cvFile !== null) return true;
+
+    // Check form fields
+    const currentValues = form.getFieldsValue();
+    const fields = Object.keys(currentValues);
+
+    return fields.some((key) => {
+      let current = currentValues[key];
+      let original = userInfo?.[key] ?? userInfo?.[key.charAt(0).toUpperCase() + key.slice(1)];
+
+      if (key === 'dateOfBirth') {
+        const currentStr = current ? dayjs(current).format('YYYY-MM-DD') : null;
+        const originalStr = original ? dayjs(original).format('YYYY-MM-DD') : null;
+        return currentStr !== originalStr;
+      }
+
+      // Normalize comparison (treat null, undefined, and empty string as the same)
+      const normCurrent = current?.toString().trim() || '';
+      const normOriginal = original?.toString().trim() || '';
+      return normCurrent !== normOriginal;
+    });
+  })();
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+
+      // Normalize portfolioUrl: if empty/null, set as empty string to clear on backend
+      const normalizedPortfolioUrl = values.portfolioUrl?.trim() || '';
+
       const formattedValues = {
         ...values,
+        portfolioUrl: normalizedPortfolioUrl,
         dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format('YYYY-MM-DD') : null,
         avatarFile: tempAvatar instanceof File ? tempAvatar : undefined,
         cvFile: cvFile,
       };
+
+      // Semantic change detection
+      const hasFieldChanges = Object.keys(values).some((key) => {
+        let current = values[key];
+        let original = userInfo?.[key] ?? userInfo?.[key.charAt(0).toUpperCase() + key.slice(1)];
+
+        if (key === 'dateOfBirth') {
+          const currentStr = current ? current.format('YYYY-MM-DD') : null;
+          const originalStr = original ? dayjs(original).format('YYYY-MM-DD') : null;
+          return currentStr !== originalStr;
+        }
+
+        if (key === 'portfolioUrl') {
+          current = normalizedPortfolioUrl;
+        }
+
+        // Normalize comparison: treat null, undefined, and empty string as ""
+        const normCurrent = current?.toString().trim() || '';
+        const normOriginal = original?.toString().trim() || '';
+
+        return normCurrent !== normOriginal;
+      });
+
+      const hasFileChanges = tempAvatar instanceof File || cvFile !== null;
+
+      if (!hasFieldChanges && !hasFileChanges) {
+        onCancel();
+        return;
+      }
+
       const success = await onSave(formattedValues);
       if (success) onCancel();
     } catch (error) {
@@ -84,19 +152,23 @@ export default function ProfileEditModal({
         file.type === 'application/msword' ||
         file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
       if (!isPdf && !isDoc) {
-        message.error(PROFILE_UI.CV_HELPER.UPLOAD_ERROR);
+        setCvError(PROFILE_UI.CV_HELPER.UPLOAD_ERROR);
         return Upload.LIST_IGNORE;
       }
       const isLt10M = file.size / 1024 / 1024 < 10;
       if (!isLt10M) {
-        message.error(PROFILE_UI.CV_HELPER.SIZE_ERROR);
+        setCvError(PROFILE_UI.CV_HELPER.SIZE_ERROR);
         return Upload.LIST_IGNORE;
       }
+      setCvError(null);
       setCvFile(file);
       return false;
     },
     maxCount: 1,
-    onRemove: () => setCvFile(null),
+    onRemove: () => {
+      setCvFile(null);
+      setCvError(null);
+    },
   };
 
   const renderRoleSpecificFields = () => {
@@ -131,7 +203,11 @@ export default function ProfileEditModal({
           >
             <Input placeholder="https://github.com/..." className="h-11" />
           </Form.Item>
-          <Form.Item label={PROFILE_UI.LABELS.CV}>
+          <Form.Item
+            label={PROFILE_UI.LABELS.CV}
+            validateStatus={cvError ? 'error' : ''}
+            help={cvError}
+          >
             <Upload {...cvUploadProps} showUploadList={true}>
               <Button variant="outline" className="rounded-xl w-full flex justify-start gap-2 h-11">
                 <UploadOutlined /> {PROFILE_UI.BUTTONS.UPLOAD_CV}
@@ -232,8 +308,8 @@ export default function ProfileEditModal({
             key="save"
             variant="default"
             onClick={handleSubmit}
-            className="rounded-xl px-10 h-10 font-bold bg-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-white"
-            disabled={loading}
+            className="rounded-xl px-10 h-10 font-bold bg-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-white disabled:opacity-50 disabled:grayscale disabled:scale-100 disabled:shadow-none"
+            disabled={loading || !hasChanges}
           >
             {loading ? (
               <div className="flex items-center gap-2">

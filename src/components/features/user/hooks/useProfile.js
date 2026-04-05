@@ -52,10 +52,13 @@ export function useProfile() {
         if (
           key !== 'avatarFile' &&
           key !== 'cvFile' &&
+          key !== 'cvUrl' &&
           data[key] !== undefined &&
           data[key] !== null
         ) {
-          formData.append(key, data[key]);
+          // Backend expects PascalCase for FormData fields
+          const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
+          formData.append(pascalKey, data[key]);
         }
       });
 
@@ -65,7 +68,7 @@ export function useProfile() {
           const uploadRes = await mediaService.uploadImage(fileToUpload, 'Users');
           const newUrl = uploadRes?.data ?? (typeof uploadRes === 'string' ? uploadRes : null);
           if (newUrl) {
-            formData.set('avatarUrl', newUrl);
+            formData.set('AvatarUrl', newUrl);
             if (avatarUrl instanceof File) setAvatarUrl(newUrl);
           }
         } catch (uploadErr) {
@@ -76,9 +79,9 @@ export function useProfile() {
       }
 
       if (data.cvFile instanceof File) {
-        formData.append('cvFile', data.cvFile);
-      } else if (data.cvUrl) {
-        formData.append('cvUrl', data.cvUrl);
+        formData.append('CvFile', data.cvFile);
+      } else if (data.cvUrl !== undefined && data.cvUrl !== null) {
+        formData.append('CvUrl', data.cvUrl);
       }
 
       await userService.updateMe(formData);
