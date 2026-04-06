@@ -19,7 +19,7 @@ export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { logout: handleLogout } = useLogout();
-  const { isEnrolled, isPlaced, hasCv, hasActiveApp } = useInternshipStatus();
+  const { isEnrolled, isPlaced, hasActiveApp, apps = [] } = useInternshipStatus();
 
   const { data: userInfo } = useQuery({
     queryKey: ['me'],
@@ -27,21 +27,23 @@ export default function StudentTopNav() {
     staleTime: 0, // Always verify user identity on mount
   });
 
-  const userRoleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
+  const userRoleId = userInfo?.roleId || userInfo?.roleID || userInfo?.role;
+  const isStudent =
+    Number(userRoleId) === USER_ROLE.STUDENT || String(userRoleId).toLowerCase() === 'student';
 
   const navTabs = useMemo(() => {
     const tabs = [{ key: '/student/home', label: 'Home', icon: Home }];
 
     tabs.push({ key: '/student/jobs', label: 'Jobs', icon: Briefcase });
 
-    // Logic: My Applications (Student Only)
-    // Sidebar logic: isEnrolled && (hasActiveApp || isPlaced)
-    if (userRoleId === USER_ROLE.STUDENT && isEnrolled && (hasActiveApp || isPlaced)) {
+    // Logic: My Applications (Show if student has ANY application history)
+    const hasAnyApp = apps.length > 0;
+    if (isStudent && (isEnrolled || hasAnyApp)) {
       tabs.push({ key: '/my-applications', label: 'My Applications', icon: FileText });
     }
 
     return tabs;
-  }, [isEnrolled, isPlaced, hasCv, hasActiveApp, userRoleId]);
+  }, [isEnrolled, isPlaced, hasActiveApp, isStudent, apps.length]);
 
   const avatarMenu = {
     items: [
