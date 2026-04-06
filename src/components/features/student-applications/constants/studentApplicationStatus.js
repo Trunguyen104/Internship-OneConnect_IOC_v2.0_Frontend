@@ -6,7 +6,7 @@ import { APPLICATION_STATUS } from '@/constants/applications/application.constan
  */
 export const STUDENT_APPLICATION_STATUS_UI = {
   [APPLICATION_STATUS.APPLIED]: {
-    variant: 'info-soft',
+    variant: 'info',
     label: 'APPLIED',
     showDot: true,
     className: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -32,8 +32,8 @@ export const STUDENT_APPLICATION_STATUS_UI = {
     },
   },
   [APPLICATION_STATUS.PENDING_ASSIGNMENT]: {
-    variant: 'warning-soft',
-    label: 'Pending',
+    variant: 'amber',
+    label: 'PENDING',
     showDot: true,
     className: 'bg-violet-50 text-violet-700 border-violet-200',
     banner: {
@@ -62,9 +62,10 @@ export const STUDENT_APPLICATION_STATUS_UI = {
     },
   },
   [APPLICATION_STATUS.WITHDRAWN]: {
-    variant: 'neutral',
+    variant: 'amber',
     label: 'WITHDRAWN',
-    className: 'bg-slate-50 text-slate-500 border-slate-200',
+    showDot: true,
+    className: 'bg-amber-50 text-amber-700 border-amber-200',
   },
 };
 

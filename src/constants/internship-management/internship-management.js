@@ -820,7 +820,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           EMAIL: 'Email',
           TERM: 'Term',
           UNPLACED: 'Unplaced',
-          DIRECT_APPLY: 'Direct Apply — không qua duyệt trường',
+          DIRECT_APPLY: 'Direct Apply — without school approval',
           LOGBOOK_SUBMITTED: 'Missing: {z} / Submitted: {x}',
           LOGBOOK_PROGRESS: '{p}% Completed',
           NO_EVALUATION: 'No evaluations published yet.',
@@ -840,10 +840,10 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
     },
     STUDENT_ACTIVITY_STATUS: {
-      INTERNING: { label: 'Đang thực tập', variant: 'success-soft', value: 'INTERNING' },
-      NO_GROUP: { label: 'Chưa có nhóm', variant: 'warning-soft', value: 'NO_GROUP' },
-      COMPLETED: { label: 'Hoàn tất', variant: 'default', value: 'COMPLETED' },
-      PENDING: { label: 'Chờ xác nhận', variant: 'info-soft', value: 'PENDING' },
+      INTERNING: { label: 'Interning', variant: 'success-soft', value: 'INTERNING' },
+      NO_GROUP: { label: 'No Group', variant: 'warning-soft', value: 'NO_GROUP' },
+      COMPLETED: { label: 'Completed', variant: 'default', value: 'COMPLETED' },
+      PENDING: { label: 'Pending', variant: 'info-soft', value: 'PENDING' },
       UNPLACED: { label: 'Unplaced', variant: 'danger-soft', value: 'UNPLACED' },
     },
     DASHBOARD: {

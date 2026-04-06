@@ -26,7 +26,7 @@ const IssueFormModal = memo(function IssueFormModal({
     <CompoundModal open={isOpen} onCancel={onClose} width={560}>
       <CompoundModal.Header
         title={FORM.ADD_TITLE}
-        subtitle={ISSUE_UI.SUBTITLE || 'Ghi nhận và quản lý các vấn đề phát sinh từ bên liên quan'}
+        subtitle={ISSUE_UI.SUBTITLE}
         icon={<PlusCircleOutlined />}
       />
 

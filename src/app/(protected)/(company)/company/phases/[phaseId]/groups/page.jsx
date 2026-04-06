@@ -8,11 +8,6 @@ import InternPhaseGroupTab from '@/components/features/intern-phase-management/c
 import { InternPhaseService } from '@/components/features/intern-phase-management/services/intern-phase.service';
 import PageLayout from '@/components/ui/pagelayout';
 
-const COPY = {
-  TITLE: 'Internship Groups',
-  SUB: 'All internship groups assigned within this phase.',
-};
-
 export default function PhaseGroupsPage() {
   const { phaseId } = useParams();
 

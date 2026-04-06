@@ -7,7 +7,6 @@ import React from 'react';
 
 import { STUDENT_APPLICATIONS_UI } from '@/components/features/student-applications/constants/uiText';
 import { Button } from '@/components/ui/button';
-import StatusBadge from '@/components/ui/status-badge';
 import { INTERNSHIP_UI } from '@/constants/internship-management/internship';
 import { cn } from '@/lib/cn';
 
@@ -96,86 +95,66 @@ export const CVUploadBanner = ({ variant = 'prepare' }) => (
 );
 
 // AC-03 Application Status Card (Premium Layout)
-export const ApplicationStatusCard = ({ app }) => {
-  const statusMap = {
-    1: {
-      label: INTERNSHIP_UI.LABELS.APPLIED,
-      variant: 'warning-soft',
-      className: 'bg-amber-100/50 text-amber-700 border-amber-200',
-    },
-    2: {
-      label: INTERNSHIP_UI.LABELS.INTERVIEWING,
-      variant: 'blue',
-      className: 'bg-blue-100/50 text-blue-700 border-blue-200',
-    },
-    3: {
-      label: INTERNSHIP_UI.LABELS.OFFERED,
-      variant: 'success',
-      className: 'bg-green-100/50 text-green-700 border-green-200',
-    },
-    4: {
-      label: INTERNSHIP_UI.LABELS.PENDING_ASSIGNMENT,
-      variant: 'primary-soft',
-      className: 'bg-primary-100/50 text-primary-700 border-primary-200',
-    },
-  };
-  const config = statusMap[app.status] || {
-    label: INTERNSHIP_UI.LABELS.UNKNOWN,
-    variant: 'neutral',
-  };
-
+export const ApplicationStatusCard = ({ app, isFlat = true }) => {
   return (
-    <div className="group relative overflow-hidden rounded-[32px] border border-slate-100 bg-white p-2 shadow-2xl shadow-slate-200/40 transition-all duration-300 hover:shadow-primary-100">
-      <div className="flex flex-col gap-1 p-6 pb-2">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-            {INTERNSHIP_UI.LABELS.ACTIVE_APPLICATION}
-          </span>
-          <StatusBadge
-            variant={config.variant}
-            label={config.label}
-            className={cn('font-black text-[10px] h-6 px-3', config.className)}
-          />
+    <div
+      className={cn(
+        'group relative flex flex-col gap-4 lg:flex-row lg:items-center justify-between overflow-hidden transition-all duration-300',
+        isFlat
+          ? 'bg-slate-50/50 rounded-[24px] border border-slate-100 p-6 hover:bg-slate-50 shadow-xs'
+          : 'rounded-[32px] border border-slate-100 bg-white p-6 shadow-2xl shadow-slate-200/40 hover:shadow-primary-100'
+      )}
+    >
+      <div className="flex flex-1 items-center gap-6">
+        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[20px] border border-white bg-white p-1.5 shadow-sm transition-transform group-hover:scale-105">
+          {app.enterpriseLogo ? (
+            <img
+              src={app.enterpriseLogo}
+              alt=""
+              className="h-full w-full object-contain rounded-[14px]"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-slate-50">
+              <Building2 className="size-9 text-slate-200" />
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-5">
-          <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-50 bg-white p-1 shadow-inner transition-transform group-hover:scale-105">
-            {app.enterpriseLogo ? (
-              <img
-                src={app.enterpriseLogo}
-                alt=""
-                className="h-full w-full object-contain rounded-xl"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-slate-50">
-                <Building2 className="size-8 text-slate-200" />
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <h4 className="truncate text-xl font-black tracking-tight text-slate-800">
-              {app.jobPostingTitle || STUDENT_APPLICATIONS_UI.COMMON.GENERAL_APP}
-            </h4>
+        <div className="flex flex-col min-w-0 gap-1">
+          <div className="flex items-center gap-3">
+            <span className="text-[9px] font-black tracking-[0.2em] text-slate-300">
+              {INTERNSHIP_UI.LABELS.ACTIVE_APPLICATION}
+            </span>
+            <div className="h-1 w-1 rounded-full bg-slate-200" />
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-400">{app.enterpriseName}</span>
-              <div className="h-1 w-1 rounded-full bg-slate-200" />
-              <span className="text-xs font-bold text-slate-300">
-                {INTERNSHIP_UI.LABELS.APPLIED} {dayjs(app.appliedAt).format('DD MMM')}
+              <div className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span className="text-[9px] font-black text-amber-600 tracking-widest capitalize">
+                {INTERNSHIP_UI.LABELS.IN_PROGRESS}
               </span>
             </div>
+          </div>
+          <h4 className="truncate text-xl font-black tracking-tight text-slate-800 leading-none">
+            {app.jobPostingTitle || STUDENT_APPLICATIONS_UI.COMMON.GENERAL_APP}
+          </h4>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-bold text-slate-500">{app.enterpriseName}</span>
+            <div className="h-1 w-1 rounded-full bg-slate-300" />
+            <span className="text-xs font-bold text-slate-400">
+              {INTERNSHIP_UI.LABELS.APPLIED} {dayjs(app.appliedAt).format('DD MMM, YYYY')}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-50 bg-slate-50/50 p-2">
+      <div className="shrink-0 lg:pl-6">
         <Button
           asChild
-          variant="ghost"
-          className="h-12 w-full rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] text-slate-600 transition-all hover:bg-white hover:text-primary hover:shadow-sm active:scale-95"
+          variant="outline"
+          className="h-12 rounded-[18px] border-slate-200 px-8 font-black tracking-[0.15em] text-[10px] text-slate-500 shadow-sm transition-all hover:bg-slate-900 hover:text-white hover:border-slate-900 hover:shadow-xl hover:shadow-slate-200 active:scale-95 group"
         >
-          <Link href="/my-applications" className="flex items-center justify-center gap-2">
-            {INTERNSHIP_UI.LABELS.VIEW_DETAIL}
-            <ChevronRight className="size-4" />
+          <Link href="/my-applications" className="flex items-center gap-2.5">
+            <span className="capitalize">{INTERNSHIP_UI.LABELS.VIEW_DETAIL}</span>
+            <ChevronRight className="size-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>
       </div>

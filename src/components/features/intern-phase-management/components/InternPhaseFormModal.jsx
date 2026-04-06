@@ -75,7 +75,7 @@ export default function InternPhaseFormModal({
         majorFields: FORM.DEFAULT_MAJORS,
       });
     }
-  }, [visible, editingRecord, form]);
+  }, [visible, editingRecord, form, FORM.DEFAULT_MAJORS]);
 
   const handleSubmit = async () => {
     try {

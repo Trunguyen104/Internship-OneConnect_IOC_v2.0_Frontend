@@ -1,5 +1,6 @@
 export const ISSUE_UI = {
   SEARCH_PLACEHOLDER: 'Search issue...',
+  SUBTITLE: 'Record and manage issues arising from stakeholders',
   ADD_BUTTON: 'Add Issue',
 
   TABLE: {

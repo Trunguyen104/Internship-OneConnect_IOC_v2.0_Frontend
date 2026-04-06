@@ -258,28 +258,34 @@ export default function AllIssuesView() {
                 </div>
               </div>
             ) : (
-              paginatedTasks.map((it) => (
-                <WorkItem
-                  key={it.workItemId || it.id}
-                  it={it}
-                  itemOrder={itemOrders[it.workItemId || it.id]}
-                  onDelete={() => handleDeleteWorkItem?.(it.workItemId || it.id)}
-                  onClick={async (task) => {
-                    try {
-                      const targetProjId = task.projectId || projects[0]?.projectId;
-                      const res = await productBacklogService.getWorkItemById(
-                        targetProjId,
-                        task.workItemId || task.id
-                      );
-                      setSelectedTask(res?.data ? { ...task, ...res.data } : task);
-                    } catch (e) {
-                      console.error(e);
-                      setSelectedTask(task);
-                    }
-                    setOpenUpdateTask(true);
-                  }}
-                />
-              ))
+              paginatedTasks.map((it, idx) => {
+                const startIndex = (currentPage - 1) * pageSize;
+                const dynamicOrder = startIndex + idx + 1;
+                const orderToUse = itemOrders[it.workItemId || it.id] || dynamicOrder;
+
+                return (
+                  <WorkItem
+                    key={it.workItemId || it.id}
+                    it={it}
+                    itemOrder={orderToUse}
+                    onDelete={() => handleDeleteWorkItem?.(it.workItemId || it.id)}
+                    onClick={async (task) => {
+                      try {
+                        const targetProjId = task.projectId || projects[0]?.projectId;
+                        const res = await productBacklogService.getWorkItemById(
+                          targetProjId,
+                          task.workItemId || task.id
+                        );
+                        setSelectedTask(res?.data ? { ...task, ...res.data } : task);
+                      } catch (e) {
+                        console.error(e);
+                        setSelectedTask(task);
+                      }
+                      setOpenUpdateTask(true);
+                    }}
+                  />
+                );
+              })
             )}
           </div>
 

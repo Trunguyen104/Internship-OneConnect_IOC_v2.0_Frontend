@@ -49,7 +49,7 @@ const StakeholderFormModal = memo(function StakeholderFormModal({
     <CompoundModal open={isOpen} onCancel={onClose} width={560}>
       <CompoundModal.Header
         title={editingId ? MODAL_EDIT : MODAL_ADD}
-        subtitle={STAKEHOLDER_UI.SUBTITLE || 'Quản lý thông tin bên liên quan trong dự án'}
+        subtitle={STAKEHOLDER_UI.SUBTITLE}
         icon={<UserOutlined />}
       />
 

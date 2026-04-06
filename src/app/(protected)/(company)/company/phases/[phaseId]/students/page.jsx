@@ -9,11 +9,6 @@ import { InternPhaseService } from '@/components/features/intern-phase-managemen
 import PageLayout from '@/components/ui/pagelayout';
 import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 
-const COPY = {
-  TITLE: 'Students',
-  SUB: 'All students participating in this internship phase.',
-};
-
 export default function PhaseStudentsPage() {
   const { phaseId } = useParams();
   const { DETAILS } = INTERN_PHASE_MANAGEMENT;
