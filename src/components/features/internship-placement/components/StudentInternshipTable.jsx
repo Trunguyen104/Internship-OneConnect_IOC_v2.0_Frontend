@@ -17,6 +17,9 @@ import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
 import {
+  PLACEMENT_STATUS,
+  PLACEMENT_STATUS_LABELS,
+  PLACEMENT_STATUS_VARIANTS,
   PLACEMENT_UI_TEXT,
   SEMESTER_STATUS,
 } from '@/constants/internship-placement/placement.constants';
@@ -73,20 +76,43 @@ const StudentInternshipTable = ({
       // AC-11 Sync: Match StudentStatus Enum (1-6)
       let rawStatus = s.displayStatus || s.placementStatus;
 
-      // Map based on StudentStatus Enum
-      // 1: NO_INTERNSHIP, 2: APPLIED, 3: IN_PROGRESS, 4: COMPLETED, 5: UNPLACED, 6: PLACED
-      if (rawStatus === 1 || rawStatus === 5 || rawStatus === 'UNPLACED') rawStatus = 5;
-      if (rawStatus === 3 || rawStatus === 6 || rawStatus === 'PLACED') rawStatus = 6;
-      if (rawStatus === 2 || rawStatus === 'PENDING_ASSIGNMENT' || rawStatus === 'PENDING')
-        rawStatus = 4;
+      // AC-11 Sync: Handle Legacy API (0, 1) and New Enums (4, 5, 6)
+      if (
+        rawStatus === 0 ||
+        rawStatus === PLACEMENT_STATUS.UNPLACED ||
+        rawStatus === 'UNPLACED' ||
+        rawStatus === 'Unplaced'
+      ) {
+        rawStatus = PLACEMENT_STATUS.UNPLACED; // Map to 5
+      } else if (
+        rawStatus === PLACEMENT_STATUS.PLACED ||
+        rawStatus === 'PLACED' ||
+        rawStatus === 'Placed' ||
+        (rawStatus === 1 && s.enterpriseName && s.enterpriseName !== '— Unassigned —')
+      ) {
+        rawStatus = PLACEMENT_STATUS.PLACED; // Map to 6
+      } else if (
+        rawStatus === 1 ||
+        rawStatus === PLACEMENT_STATUS.NO_INTERNSHIP ||
+        rawStatus === 'NO_INTERNSHIP'
+      ) {
+        rawStatus = PLACEMENT_STATUS.UNPLACED; // Also treat as Unplaced in this view
+      } else if (
+        rawStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT ||
+        rawStatus === 'PENDING_ASSIGNMENT' ||
+        rawStatus === 'PendingAssignment' ||
+        rawStatus === 'PENDING' ||
+        rawStatus === 'PENDING ASSIGNMENT'
+      ) {
+        rawStatus = PLACEMENT_STATUS.PENDING_ASSIGNMENT; // Map to 4
+      }
 
-      const isPending = rawStatus === 4;
-      const isPlaced = rawStatus === 6;
+      const isPending = rawStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT;
+      const isPlaced = rawStatus === PLACEMENT_STATUS.PLACED;
       let displayStatus = rawStatus;
       let activeEnterprise = s.enterpriseName;
 
       if (isPending) {
-        displayStatus = 4; // PENDING_ASSIGNMENT
         if (!activeEnterprise || activeEnterprise === '— Unassigned —') {
           activeEnterprise = 'Assigning...';
         }
@@ -206,19 +232,11 @@ const StudentInternshipTable = ({
       width: 160,
       align: 'center',
       render: (status) => {
-        const variants = {
-          0: 'info',
-          5: 'success',
-          1: 'success',
-          4: 'warning',
-        };
-        const labels = {
-          0: 'UNPLACED',
-          5: 'PLACED',
-          1: 'PLACED',
-          4: 'PENDING',
-        };
-        return <Badge variant={variants[status] || 'default'}>{labels[status] || 'UNKNOWN'}</Badge>;
+        return (
+          <Badge variant={PLACEMENT_STATUS_VARIANTS[status] || 'default'}>
+            {PLACEMENT_STATUS_LABELS[status] || 'UNKNOWN'}
+          </Badge>
+        );
       },
     },
     {
@@ -279,9 +297,9 @@ const StudentInternshipTable = ({
               className="!h-11 min-w-[140px] !border-0 focus:!ring-0"
               variant="borderless"
               options={[
-                { label: 'Unplaced', value: 0 },
-                { label: 'Pending', value: 4 },
-                { label: 'Placed', value: 5 },
+                { label: 'Unplaced', value: PLACEMENT_STATUS.UNPLACED },
+                { label: 'Pending', value: PLACEMENT_STATUS.PENDING_ASSIGNMENT },
+                { label: 'Placed', value: PLACEMENT_STATUS.PLACED },
               ]}
               suffixIcon={<FilterOutlined className="text-muted/40" />}
             />

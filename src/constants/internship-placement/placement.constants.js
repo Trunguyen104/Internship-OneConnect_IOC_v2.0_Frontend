@@ -14,13 +14,16 @@ export const PLACEMENT_STATUS = {
 export const PLACEMENT_STATUS_LABELS = {
   [PLACEMENT_STATUS.NO_INTERNSHIP]: 'No Internship',
   [PLACEMENT_STATUS.APPLIED]: 'Applied',
-  [PLACEMENT_STATUS.INTERVIEWING]: 'Interviewing', // Fallback for conflict
-  [PLACEMENT_STATUS.OFFERED]: 'Offered', // Fallback for conflict
+  [PLACEMENT_STATUS.INTERVIEWING]: 'Interviewing',
+  [PLACEMENT_STATUS.OFFERED]: 'Offered',
   [PLACEMENT_STATUS.INTERNSHIP_IN_PROGRESS]: 'In Progress',
   [PLACEMENT_STATUS.COMPLETED]: 'Completed',
   [PLACEMENT_STATUS.UNPLACED]: 'Unplaced',
   [PLACEMENT_STATUS.PLACED]: 'Placed',
   [PLACEMENT_STATUS.PENDING_ASSIGNMENT]: 'Pending Assignment',
+  // Legacy support for API values 0 and 1
+  0: 'Unplaced',
+  1: 'Placed',
 };
 
 export const PLACEMENT_STATUS_VARIANTS = {
@@ -31,6 +34,9 @@ export const PLACEMENT_STATUS_VARIANTS = {
   [PLACEMENT_STATUS.PLACED]: 'success-soft',
   [PLACEMENT_STATUS.COMPLETED]: 'secondary',
   [PLACEMENT_STATUS.PENDING_ASSIGNMENT]: 'warning-soft',
+  // Legacy support for API values 0 and 1
+  0: 'muted',
+  1: 'success-soft',
   2: 'info-soft', // Interviewing fallback
   3: 'warning-soft', // Offered fallback
 };

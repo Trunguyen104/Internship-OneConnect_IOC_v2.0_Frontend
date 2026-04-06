@@ -576,15 +576,12 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       STATUS_FILTER: 'Status: All',
       MAJOR_FILTER: 'Major: All',
       STATUS_OPTIONS: [
-        { label: 'Placed', value: 'PLACED' },
-        { label: 'Unplaced', value: 'UNPLACED' },
-        { label: 'Deleted', value: 'WITHDRAWN' },
+        { label: 'Active', value: 'ACTIVE' },
+        { label: 'Withdrawn', value: 'WITHDRAWN' },
       ],
       STATUS_LABELS: {
         ACTIVE: 'Active',
-        PLACED: 'Placed',
-        UNPLACED: 'Unplaced',
-        WITHDRAWN: 'Deleted',
+        WITHDRAWN: 'Withdrawn',
       },
       PLACEMENT_LABELS: {
         PLACED: 'Placed',

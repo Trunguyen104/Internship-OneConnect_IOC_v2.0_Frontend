@@ -5,7 +5,11 @@ import { Alert, message, Popover, Space } from 'antd';
 import React, { useState } from 'react';
 
 import Button from '@/components/ui/button';
-import { PLACEMENT_UI_TEXT } from '@/constants/internship-placement/placement.constants';
+import {
+  APPLICATION_STATUS,
+  PLACEMENT_STATUS,
+  PLACEMENT_UI_TEXT,
+} from '@/constants/internship-placement/placement.constants';
 
 import { PlacementService } from '../services/placement.service';
 import EnterprisePhaseSelect from './EnterprisePhaseSelect';
@@ -66,7 +70,11 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
     const conflictApp = student.selfApplyApplications?.find(
       (app) =>
         app.enterpriseId === selectedPhase.enterpriseId &&
-        ([1, 2, 3].includes(app.status) ||
+        ([
+          APPLICATION_STATUS.APPLIED,
+          APPLICATION_STATUS.INTERVIEWING,
+          APPLICATION_STATUS.OFFERED,
+        ].includes(app.status) ||
           ['Applied', 'Interviewing', 'Offered'].includes(app.statusLabel))
     );
 
@@ -89,7 +97,9 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
     }
 
     const isReassign =
-      (student.displayStatus === 5 || student.displayStatus === 4) && student.applicationId;
+      (student.displayStatus === PLACEMENT_STATUS.PLACED ||
+        student.displayStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT) &&
+      student.applicationId;
     const newEntName = selectedPhase.enterpriseName;
     const oldEntName = student.enterpriseName || 'Doanh nghiệp cũ';
 

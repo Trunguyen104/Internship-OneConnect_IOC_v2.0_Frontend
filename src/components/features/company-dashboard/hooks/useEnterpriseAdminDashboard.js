@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 import { EnterpriseGroupService } from '../../internship-management/internship-group-management/services/enterprise-group.service';
 import { EnterpriseMentorService } from '../../internship-student-management/services/enterprise-mentor.service';
+import { violationReportService } from '../../violation-reports/services/violation-report.service';
 import { DashboardService } from '../services/dashboard.service';
 
 const formatISO = (dateStr) => {
@@ -28,16 +29,6 @@ export const useEnterpriseAdminDashboard = () => {
 
   const [assignModal, setAssignModal] = useState({ open: false, group: null });
   const [isAssigning, setIsAssigning] = useState(false);
-
-  const {
-    data: dashboardData,
-    isLoading: loadingDash,
-    refetch,
-  } = useQuery({
-    queryKey: ['enterprise-admin-dashboard'],
-    queryFn: () => DashboardService.getAdminDashboard(),
-    enabled: isEnabled,
-  });
 
   const { data: phasesListData, isLoading: loadingPhases } = useQuery({
     queryKey: ['enterprise-admin-all-phases'], // Đổi key để buộc refetch dữ liệu mới
@@ -69,6 +60,14 @@ export const useEnterpriseAdminDashboard = () => {
     enabled: isEnabled,
   });
 
+  // Fetch Violations from last 30 days for accurate count and list
+  const thirtyDaysAgo = dayjs().subtract(30, 'day').format('YYYY-MM-DD');
+  const { data: violationsData } = useQuery({
+    queryKey: ['enterprise-admin-violations-30d'],
+    queryFn: () => violationReportService.getReports({ OccurredFrom: thirtyDaysAgo, PageSize: 10 }),
+    enabled: isEnabled,
+  });
+
   const enterpriseId = user?.enterpriseId || user?.unitId;
 
   // Fetch Mentors for the modal
@@ -92,13 +91,6 @@ export const useEnterpriseAdminDashboard = () => {
     enabled: isEnabled && !!enterpriseId,
   });
 
-  const raw = dashboardData?.data || {
-    summary_cards: {},
-    groups_without_mentor: [],
-    recent_violations: [],
-    intern_phase_overview: [],
-  };
-
   const activePhases = phasesListData?.data?.items || [];
   const totalRemaining = activePhases
     .filter((p) => [1, 2].includes(p.status))
@@ -113,19 +105,14 @@ export const useEnterpriseAdminDashboard = () => {
   }).length;
 
   const stats = {
-    internPhasesActive:
-      activePhases.filter((p) => p.status === 2).length ||
-      raw.summary_cards?.active_phases_count ||
-      0,
+    internPhasesActive: activePhases.filter((p) => p.status === 2).length || 0,
     remainingCapacity: totalRemaining,
     pendingApps:
       (pendingSelfAppsData?.data?.totalCount || 0) + (pendingUniAppsData?.data?.totalCount || 0),
-    placedStudents:
-      placedStudentsData?.data?.totalCount || raw.summary_cards?.placed_students_count || 0,
-    activeGroups:
-      activeGroupsData?.data?.totalCount || raw.summary_cards?.active_internship_groups_count || 0,
-    nearEndPhases: nearEndPhasesCount || raw.summary_cards?.near_end_phases_count || 0,
-    unresolvedViolations: raw.summary_cards?.unresolved_violations_count || 0,
+    placedStudents: placedStudentsData?.data?.totalCount || 0,
+    activeGroups: activeGroupsData?.data?.totalCount || 0,
+    nearEndPhases: nearEndPhasesCount || 0,
+    unresolvedViolations: violationsData?.data?.totalCount || violationsData?.totalCount || 0,
   };
 
   const activeGroupsList = activeGroupsData?.data?.items || [];
@@ -175,7 +162,9 @@ export const useEnterpriseAdminDashboard = () => {
 
         // Refresh data
         queryClient.invalidateQueries({ queryKey: ['enterprise-admin-active-groups'] });
-        queryClient.invalidateQueries({ queryKey: ['enterprise-admin-dashboard'] });
+        queryClient.invalidateQueries({
+          queryKey: ['enterprise-admin-violations-30d'],
+        });
 
         setAssignModal({ open: false, group: null });
       } catch (error) {
@@ -188,7 +177,7 @@ export const useEnterpriseAdminDashboard = () => {
     [assignModal, enterpriseId, queryClient, toast]
   );
 
-  const recentViolations = raw.recent_violations || [];
+  const recentViolations = violationsData?.data?.items || violationsData?.items || [];
 
   // Sử dụng dữ liệu từ phasesListData (API internship-phases) thay vì raw.intern_phase_overview (đang bị 404)
   const phaseOverview = (phasesListData?.data?.items || [])
@@ -210,8 +199,7 @@ export const useEnterpriseAdminDashboard = () => {
     mentors,
     loadingMentors: loadingMentors || isAssigning,
     handleAssignMentorSubmit,
-    loading:
-      loadingDash || loadingPhases || loadingSelf || loadingUni || loadingPlaced || loadingGroups,
+    loading: loadingPhases || loadingSelf || loadingUni || loadingPlaced || loadingGroups,
     role: user?.role,
   };
 };

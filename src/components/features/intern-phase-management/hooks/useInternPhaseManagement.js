@@ -27,7 +27,7 @@ export const useInternPhaseManagement = () => {
       const params = {
         PageNumber: pagination.current,
         PageSize: pagination.pageSize,
-        Search: search,
+        SearchTerm: search,
         IncludeEnded: includeEnded,
         Status: statusFilter,
         EnterpriseId: enterpriseId,

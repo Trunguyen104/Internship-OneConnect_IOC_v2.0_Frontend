@@ -17,9 +17,7 @@ export const useStudentColumns = ({
   PLACEMENT_LABELS,
 }) => {
   const STATUS_VARIANTS = {
-    PLACED: 'success',
     ACTIVE: 'success',
-    UNPLACED: 'warning',
     WITHDRAWN: 'danger',
   };
 

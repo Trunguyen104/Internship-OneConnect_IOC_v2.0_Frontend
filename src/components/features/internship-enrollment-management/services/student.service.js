@@ -36,6 +36,30 @@ const cleanPayload = (obj) => {
 
 const mapStudent = (item) => {
   const student = item.student || item;
+  const rawPlacementStatus = item.placementStatus ?? student.placementStatus;
+  const entName = item.enterpriseName || student.enterpriseName;
+
+  // Intelligently map placement status based on code and presence of enterprise
+  let finalPlacementStatus = 'UNPLACED';
+
+  if (
+    rawPlacementStatus === 6 ||
+    rawPlacementStatus === 'PLACED' ||
+    rawPlacementStatus === 'Placed'
+  ) {
+    finalPlacementStatus = 'PLACED';
+  } else if (rawPlacementStatus === 1) {
+    // Current API uses 1 for placed, but check if there's actually an enterprise assigned
+    finalPlacementStatus = entName && entName !== '— Unassigned —' ? 'PLACED' : 'UNPLACED';
+  } else if (
+    rawPlacementStatus === 4 ||
+    rawPlacementStatus === 'PENDING_ASSIGNMENT' ||
+    rawPlacementStatus === 'Pending'
+  ) {
+    finalPlacementStatus = 'PENDING_ASSIGNMENT';
+  } else if (rawPlacementStatus === 5 || rawPlacementStatus === 'UNPLACED') {
+    finalPlacementStatus = 'UNPLACED';
+  }
 
   return {
     ...item,
@@ -52,14 +76,10 @@ const mapStudent = (item) => {
       item.enrollmentStatus === ENROLLMENT_STATUS.WITHDRAWN ||
       student.enrollmentStatus === ENROLLMENT_STATUS.WITHDRAWN
         ? 'WITHDRAWN'
-        : item.placementStatus === PLACEMENT_STATUS.PLACED ||
-            student.placementStatus === PLACEMENT_STATUS.PLACED
-          ? 'PLACED'
-          : 'UNPLACED',
-    placementStatus:
-      PLACEMENT_STATUS_MAP[item.placementStatus || student.placementStatus] || 'UNPLACED',
+        : 'ACTIVE',
+    placementStatus: finalPlacementStatus,
     enterpriseId: item.enterpriseId || student.enterpriseId,
-    enterpriseName: item.enterpriseName || student.enterpriseName,
+    enterpriseName: entName,
     enrollmentDate: item.enrollmentDate || student.enrollmentDate,
     enrollmentNote: item.enrollmentNote || student.enrollmentNote,
     dateOfBirth: item.dateOfBirth || student.dateOfBirth || item.dob || student.dob,

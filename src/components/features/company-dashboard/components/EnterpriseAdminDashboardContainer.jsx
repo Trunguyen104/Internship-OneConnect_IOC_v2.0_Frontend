@@ -14,7 +14,6 @@ import {
   INTERN_PHASE_STATUS,
   INTERN_PHASE_STATUS_LABELS,
 } from '@/constants/intern-phase-management/intern-phase';
-import { formatRelativeTime } from '@/utils/date-utils';
 
 import { AssignMentorModal } from '../../internship-management/internship-group-management/components/AssignMentorModal';
 import { useEnterpriseAdminDashboard } from '../hooks/useEnterpriseAdminDashboard';
@@ -172,7 +171,7 @@ export default function EnterpriseAdminDashboardContainer() {
         <StatCard
           title={ADMIN_DASHBOARD_UI.STATS.UNRESOLVED_VIOLATIONS}
           value={stats.unresolvedViolations}
-          subtitle="30 days"
+          subtitle={ADMIN_DASHBOARD_UI.STATS.UNRESOLVED_VIOLATIONS_SUBTITLE || '30 days'}
           icon={ShieldAlert}
           colorClass="bg-rose-50 text-rose-500"
           href="/violation-reports"
@@ -356,8 +355,7 @@ export default function EnterpriseAdminDashboardContainer() {
                           {v.studentName}
                         </span>
                         <span className="text-[10px] text-slate-400 font-medium">
-                          {v.internshipGroupName} {ADMIN_DASHBOARD_UI.SYMBOL_ALERT}{' '}
-                          {formatRelativeTime(v.createdAt)}
+                          {v.internshipGroupName}
                         </span>
                       </div>
                     </div>

@@ -7,7 +7,11 @@ import React, { useMemo, useState } from 'react';
 
 import Badge from '@/components/ui/badge';
 import Button from '@/components/ui/button';
-import { PLACEMENT_UI_TEXT } from '@/constants/internship-placement/placement.constants';
+import {
+  APPLICATION_STATUS,
+  PLACEMENT_STATUS,
+  PLACEMENT_UI_TEXT,
+} from '@/constants/internship-placement/placement.constants';
 
 import { PlacementService } from '../services/placement.service';
 import EnterprisePhaseSelect from './EnterprisePhaseSelect';
@@ -38,7 +42,11 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
       const conflictApp = student.selfApplyApplications?.find(
         (app) =>
           app.enterpriseId === selectedPhase.enterpriseId &&
-          ([1, 2, 3].includes(app.status) ||
+          ([
+            APPLICATION_STATUS.APPLIED,
+            APPLICATION_STATUS.INTERVIEWING,
+            APPLICATION_STATUS.OFFERED,
+          ].includes(app.status) ||
             ['Applied', 'Interviewing', 'Offered'].includes(app.statusLabel))
       );
 
@@ -55,7 +63,9 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
   const reassignCount = useMemo(
     () =>
       eligibleStudents.filter(
-        (s) => s.placementStatus === 4 || s.placementStatus === 5 || s.placementStatus === 1
+        (s) =>
+          s.placementStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT ||
+          s.placementStatus === PLACEMENT_STATUS.PLACED
       ).length,
     [eligibleStudents]
   );
@@ -186,12 +196,12 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
                       <span className="text-[10px] text-slate-400">{s.email}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {(s.placementStatus === 5 || s.placementStatus === 1) && (
+                      {s.placementStatus === PLACEMENT_STATUS.PLACED && (
                         <Badge variant="success-soft" size="xs">
                           {s.enterpriseName || 'Placed'}
                         </Badge>
                       )}
-                      {s.placementStatus === 4 && (
+                      {s.placementStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT && (
                         <Badge variant="warning-soft" size="xs">
                           {PLACEMENT_UI_TEXT.STATUS_LABELS.PENDING}
                         </Badge>
@@ -468,7 +478,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
 
   // AC-04: Exclude already unplaced students from calculations
   const studentsWithPlacements = useMemo(
-    () => selectedStudents.filter((s) => s.placementStatus !== 0),
+    () => selectedStudents.filter((s) => s.placementStatus !== PLACEMENT_STATUS.UNPLACED),
     [selectedStudents]
   );
 
