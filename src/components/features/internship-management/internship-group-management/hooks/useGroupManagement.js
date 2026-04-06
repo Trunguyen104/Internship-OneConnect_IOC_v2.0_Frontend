@@ -344,7 +344,12 @@ export const useGroupManagement = () => {
             oldMembers.map((m) => String(m.studentId || m.id || m.applicationId))
           );
 
-          const newIds = (values.studentIds || []).filter((id) => !oldIds.has(String(id)));
+          // Extract IDs from objects if necessary, as AddStudentsTable emits full student objects
+          const selectedIds = (values.studentIds || []).map((s) =>
+            typeof s === 'object' ? s.studentId || s.id || s.applicationId : s
+          );
+
+          const newIds = selectedIds.filter((id) => id && !oldIds.has(String(id)));
 
           if (newIds.length > 0) {
             const studentsToUpdate = newIds.map((id) => ({

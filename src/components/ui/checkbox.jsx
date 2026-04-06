@@ -7,8 +7,17 @@ import React from 'react';
 /**
  * Custom Checkbox bọc từ Ant Design.
  */
-export const Checkbox = ({ children, ...props }) => {
-  return <AntdCheckbox {...props}>{children}</AntdCheckbox>;
+export const Checkbox = ({ children, onCheckedChange, onChange, ...props }) => {
+  const handleChange = (e) => {
+    if (onChange) onChange(e);
+    if (onCheckedChange) onCheckedChange(e.target.checked);
+  };
+
+  return (
+    <AntdCheckbox {...props} onChange={handleChange}>
+      {children}
+    </AntdCheckbox>
+  );
 };
 
 Checkbox.propTypes = {

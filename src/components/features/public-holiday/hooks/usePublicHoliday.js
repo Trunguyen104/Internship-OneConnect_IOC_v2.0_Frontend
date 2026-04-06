@@ -1,78 +1,99 @@
-'use client';
-
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { PUBLIC_HOLIDAY_UI } from '@/constants/publicHoliday/uiText';
 import { useToast } from '@/providers/ToastProvider';
 
 import { PublicHolidayService } from '../services/public-holiday.service';
 
-export function usePublicHoliday() {
+/**
+ * Hook for managing public holidays (fetching, syncing, adding, deleting).
+ * @param {number} initialYear - The year to fetch holidays for.
+ */
+export const usePublicHoliday = (initialYear = new Date().getFullYear()) => {
+  const [year, setYear] = useState(initialYear);
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [year, setYear] = useState(new Date().getFullYear());
 
   // 1. Fetch holidays
-  const { data: holidays = [], isLoading: loading } = useQuery({
+  const { data: holidaysData, isLoading: loading } = useQuery({
     queryKey: ['public-holidays', year],
-    queryFn: async () => {
-      try {
-        const res = await PublicHolidayService.getAll(year);
-        return res?.data || [];
-      } catch {
-        return [];
-      }
-    },
+    queryFn: () => PublicHolidayService.getAll(year),
+    select: (res) => res?.data || [],
   });
 
   // 2. Sync holidays
   const syncMutation = useMutation({
-    mutationFn: (syncYear) => PublicHolidayService.sync(syncYear),
+    mutationFn: (syncParams) => PublicHolidayService.sync(syncParams),
     onSuccess: (res) => {
-      const syncedCount = res?.data?.syncedCount || 0;
-      toast.success(PUBLIC_HOLIDAY_UI.SUCCESS.SYNC.replace('{count}', syncedCount.toString()));
-      queryClient.invalidateQueries({ queryKey: ['public-holidays'] });
+      if (res?.isSuccess !== false) {
+        toast.success('Public holidays synced successfully.');
+        queryClient.invalidateQueries(['public-holidays', year]);
+      } else {
+        toast.error(res?.message || 'Failed to sync holidays.');
+      }
     },
     onError: (err) => {
-      toast.error(err?.message || PUBLIC_HOLIDAY_UI.MODAL.SYNC_ERROR);
+      const errorMsg =
+        err?.response?.data?.errors?.[0] ||
+        err?.response?.data?.message ||
+        err?.message ||
+        'Sync operation failed.';
+      toast.error(errorMsg);
     },
   });
 
   // 3. Create holiday
   const createMutation = useMutation({
-    mutationFn: (payload) => PublicHolidayService.create(payload),
-    onSuccess: () => {
-      toast.success(PUBLIC_HOLIDAY_UI.SUCCESS.CREATE);
-      queryClient.invalidateQueries({ queryKey: ['public-holidays'] });
+    mutationFn: (data) => PublicHolidayService.create(data),
+    onSuccess: (res) => {
+      if (res?.isSuccess !== false) {
+        toast.success('Holiday added successfully.');
+        queryClient.invalidateQueries(['public-holidays', year]);
+      } else {
+        toast.error(res?.message || 'Failed to add holiday.');
+      }
     },
     onError: (err) => {
-      toast.error(err?.message || 'Failed to create holiday');
+      const errorMsg =
+        err?.response?.data?.errors?.[0] ||
+        err?.response?.data?.message ||
+        err?.message ||
+        'Failed to add holiday.';
+      toast.error(errorMsg);
     },
   });
 
   // 4. Delete holiday
   const deleteMutation = useMutation({
     mutationFn: (id) => PublicHolidayService.delete(id),
-    onSuccess: () => {
-      toast.success(PUBLIC_HOLIDAY_UI.SUCCESS.DELETE);
-      queryClient.invalidateQueries({ queryKey: ['public-holidays'] });
+    onSuccess: (res) => {
+      if (res?.isSuccess !== false) {
+        toast.success('Holiday deleted successfully.');
+        queryClient.invalidateQueries(['public-holidays', year]);
+      } else {
+        toast.error(res?.message || 'Failed to delete holiday.');
+      }
     },
     onError: (err) => {
-      toast.error(err?.message || 'Failed to delete holiday');
+      const errorMsg =
+        err?.response?.data?.errors?.[0] ||
+        err?.response?.data?.message ||
+        err?.message ||
+        'Failed to delete holiday.';
+      toast.error(errorMsg);
     },
   });
 
   return {
-    holidays,
+    holidays: holidaysData || [],
     loading,
+    syncing: syncMutation.isPending,
+    creating: createMutation.isPending,
+    deleting: deleteMutation.isPending,
     year,
     setYear,
-    syncHolidays: syncMutation.mutate,
-    syncing: syncMutation.isPending,
-    createHoliday: createMutation.mutateAsync,
-    creating: createMutation.isPending,
+    syncHolidays: (syncYear) => syncMutation.mutate({ year: syncYear, countryCode: 'VN' }),
+    createHoliday: createMutation.mutateAsync, // Using mutateAsync to allow await in the form
     deleteHoliday: deleteMutation.mutate,
-    deleting: deleteMutation.isPending,
   };
-}
+};

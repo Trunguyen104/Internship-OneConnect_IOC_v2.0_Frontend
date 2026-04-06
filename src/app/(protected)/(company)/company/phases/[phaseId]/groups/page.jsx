@@ -6,6 +6,7 @@ import React from 'react';
 
 import InternPhaseGroupTab from '@/components/features/intern-phase-management/components/InternPhaseGroupTab';
 import { InternPhaseService } from '@/components/features/intern-phase-management/services/intern-phase.service';
+import PageLayout from '@/components/ui/pagelayout';
 
 export default function PhaseGroupsPage() {
   const { phaseId } = useParams();
@@ -17,13 +18,16 @@ export default function PhaseGroupsPage() {
   });
 
   return (
-    <div className="flex-1 overflow-auto p-4 2xl:p-8 flex flex-col">
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white rounded-[32px] border border-slate-100 p-6 shadow-sm flex-1 flex flex-col">
-        <InternPhaseGroupTab
-          data={groups?.items || groups?.data?.items || (Array.isArray(groups) ? groups : [])}
-          loading={isLoading}
-        />
-      </div>
-    </div>
+    <PageLayout>
+      <PageLayout.Header title={COPY.TITLE} subtitle={COPY.SUB} />
+      <PageLayout.Card className="flex flex-col overflow-hidden p-6 py-4">
+        <PageLayout.Content className="flex flex-col max-h-[450px] overflow-hidden px-0">
+          <InternPhaseGroupTab
+            data={groups?.items || groups?.data?.items || (Array.isArray(groups) ? groups : [])}
+            loading={isLoading}
+          />
+        </PageLayout.Content>
+      </PageLayout.Card>
+    </PageLayout>
   );
 }

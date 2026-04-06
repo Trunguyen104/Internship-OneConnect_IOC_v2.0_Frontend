@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
@@ -12,8 +12,8 @@ import { useToast } from '@/providers/ToastProvider';
 export function useStudentList() {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const searchParams = useSearchParams();
-  const internshipIdFromUrl = searchParams.get('id');
+  const { internshipGroupId } = useParams();
+  const internshipIdFromUrl = internshipGroupId;
 
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1);

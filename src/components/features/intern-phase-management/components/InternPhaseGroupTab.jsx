@@ -18,7 +18,7 @@ export default function InternPhaseGroupTab({ data, loading }) {
       title: TABLE.COLUMNS.NAME,
       dataIndex: 'groupName',
       key: 'groupName',
-      width: '180px',
+      width: '35%',
       render: (text) => (
         <span className={`${TABLE_CELL.primary} font-semibold text-slate-800 truncate block`}>
           {text || TABLE.NOT_ASSIGNED}
@@ -29,9 +29,9 @@ export default function InternPhaseGroupTab({ data, loading }) {
       title: TABLE.COLUMNS.MENTOR,
       dataIndex: 'mentorName',
       key: 'mentorName',
-      width: '150px',
+      width: '30%',
       render: (text) => (
-        <span className="text-slate-600 text-xs font-medium">
+        <span className="text-slate-600 font-medium">
           {text && text !== INTERN_PHASE_MANAGEMENT.MESSAGES.DASH ? (
             text
           ) : (
@@ -43,12 +43,12 @@ export default function InternPhaseGroupTab({ data, loading }) {
     {
       title: TABLE.COLUMNS.MEMBERS,
       key: 'numberOfMembers',
-      width: '100px',
+      width: '15%',
       align: 'center',
       render: (_, record) => (
         <div className="flex items-center justify-center gap-2">
-          <UserOutlined className="text-slate-400 text-xs" />
-          <span className="text-slate-600 text-xs font-bold">{record.numberOfMembers ?? 0}</span>
+          <UserOutlined className="text-slate-400" />
+          <span className="text-slate-600 font-bold">{record.numberOfMembers ?? 0}</span>
         </div>
       ),
     },
@@ -56,14 +56,14 @@ export default function InternPhaseGroupTab({ data, loading }) {
       title: TABLE.COLUMNS.STATUS,
       dataIndex: 'status',
       key: 'status',
-      width: '120px',
+      width: '20%',
       align: 'center',
       render: (status) => {
         const label =
           TABLE.STATUS_LABELS[status] || status || INTERN_PHASE_MANAGEMENT.MESSAGES.DASH;
         const variant = TABLE.STATUS_VARIANTS[status] || 'default';
         return (
-          <Badge variant={variant} size="xs">
+          <Badge variant={variant} size="sm">
             {label}
           </Badge>
         );
@@ -73,15 +73,15 @@ export default function InternPhaseGroupTab({ data, loading }) {
 
   if (loading) {
     return (
-      <div className="p-8">
-        <Skeleton active paragraph={{ rows: 6 }} />
+      <div className="flex flex-1 flex-col overflow-hidden p-8">
+        <Skeleton active paragraph={{ rows: 6 }} className="w-full" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 bg-slate-50/30 rounded-3xl border border-dashed border-slate-200">
+      <div className="flex flex-1 flex-col items-center justify-center py-20 bg-slate-50/30 rounded-3xl border border-dashed border-slate-200">
         <Empty
           description={
             <span className="text-slate-400 font-medium">
@@ -95,14 +95,7 @@ export default function InternPhaseGroupTab({ data, loading }) {
 
   return (
     <div className="flex-1 flex flex-col">
-      <DataTable
-        columns={columns}
-        data={data}
-        rowKey="id"
-        minWidth="600px"
-        size="small"
-        className="mt-0"
-      />
+      <DataTable columns={columns} data={data} rowKey="id" minWidth="600px" className="mt-0" />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   AlertOctagon,
   Briefcase,
   ChevronDown,
+  ClipboardCheck,
   FileText,
   FolderGit2,
   GraduationCap,
@@ -33,6 +34,7 @@ const ALL_NAV_TABS = [
 const MENTOR_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
   { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/evaluation', label: 'Evaluation', icon: ClipboardCheck },
   { key: '/company/violation', label: 'Violations', icon: AlertOctagon },
 ];
 
@@ -48,7 +50,15 @@ export default function CompanyTopNav() {
   const navTabs = useMemo(() => {
     if (isMentor) return MENTOR_NAV_TABS;
 
-    const tabs = [...ALL_NAV_TABS];
+    // Filter out 'Universities' as per request
+    // Filter out 'Jobs' for adminhr (roleId === 4)
+    const baseTabs = ALL_NAV_TABS.filter((tab) => {
+      if (tab.key === '/company/universities') return false;
+      if (tab.key === '/company/jobs' && roleId === 4) return false;
+      return true;
+    });
+
+    const tabs = [...baseTabs];
     if ([4, 5].includes(roleId)) {
       tabs.push({
         key: '/company/applications',

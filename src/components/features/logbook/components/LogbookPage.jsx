@@ -9,8 +9,10 @@ import { LogBookService } from '@/components/features/logbook/services/log-book.
 import PageLayout from '@/components/ui/pagelayout';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { useAuthStore } from '@/store/useAuthStore';
 
 import { useLogbook } from '../hooks/useLogbook';
 import LogbookDetailModal from './LogbookDetailModal';
@@ -41,7 +43,12 @@ export default function LogbookPage() {
     userProfile,
     missingDatesData,
     missingLoading,
+    refetchMissingDates,
   } = useLogbook();
+
+  const user = useAuthStore((state) => state.user);
+  const role = Number(user?.role);
+  const isStudent = role === USER_ROLE.STUDENT;
 
   const toast = useToast();
 
@@ -62,14 +69,11 @@ export default function LogbookPage() {
   const totalMissing = missingDates.length;
 
   React.useEffect(() => {
-    if (!missingLoading && !hasCheckedMissing) {
-      console.log('DEBUG: Checked Missing Logbook', { totalMissing, missingDates });
-      if (totalMissing > 0) {
-        setIsMissingModalOpen(true);
-      }
+    if (totalMissing > 0 && !hasCheckedMissing) {
+      setIsMissingModalOpen(true);
       setHasCheckedMissing(true);
     }
-  }, [missingLoading, hasCheckedMissing, totalMissing, missingDates]);
+  }, [totalMissing, hasCheckedMissing]);
 
   const handleCreateOrUpdate = async (values) => {
     setSubmitting(true);
@@ -115,6 +119,9 @@ export default function LogbookPage() {
           setPageNumber(1);
         }
         fetchLogbooks();
+        if (isStudent && refetchMissingDates) {
+          refetchMissingDates();
+        }
         closeFormModal();
       } else {
         let errorMsg =
@@ -210,10 +217,14 @@ export default function LogbookPage() {
             onChange: (e) => setSearch(e.target.value),
             className: 'max-w-md',
           }}
-          actionProps={{
-            label: DAILY_REPORT_UI.CREATE_BUTTON,
-            onClick: () => openFormModal(),
-          }}
+          actionProps={
+            isStudent
+              ? {
+                  label: DAILY_REPORT_UI.CREATE_BUTTON,
+                  onClick: () => openFormModal(),
+                }
+              : undefined
+          }
           filterContent={
             <Select
               allowClear

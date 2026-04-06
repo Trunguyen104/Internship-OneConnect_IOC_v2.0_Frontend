@@ -34,6 +34,7 @@ export const ENROLLMENT_STATUS = {
 export const PLACEMENT_STATUS = {
   UNPLACED: 0,
   PLACED: 1,
+  PENDING_ASSIGNMENT: 9,
 };
 
 export const GROUP_STATUS = {
@@ -575,15 +576,12 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       STATUS_FILTER: 'Status: All',
       MAJOR_FILTER: 'Major: All',
       STATUS_OPTIONS: [
-        { label: 'Placed', value: 'PLACED' },
-        { label: 'Unplaced', value: 'UNPLACED' },
-        { label: 'Deleted', value: 'WITHDRAWN' },
+        { label: 'Active', value: 'ACTIVE' },
+        { label: 'Withdrawn', value: 'WITHDRAWN' },
       ],
       STATUS_LABELS: {
         ACTIVE: 'Active',
-        PLACED: 'Placed',
-        UNPLACED: 'Unplaced',
-        WITHDRAWN: 'Deleted',
+        WITHDRAWN: 'Withdrawn',
       },
       PLACEMENT_LABELS: {
         PLACED: 'Placed',
@@ -631,6 +629,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           ID_LABEL: 'Student ID',
           ID_PLACEHOLDER: 'Ex: ST2024001',
           ID_REQUIRED: 'Please enter student ID',
+          ID_INVALID: 'Invalid Student ID. Use only lowercase letters, numbers, and ".", "_", "-".',
           ID_EDIT_INFO: 'Student ID cannot be changed once enrolled.',
 
           EMAIL_LABEL: 'Student Email',
