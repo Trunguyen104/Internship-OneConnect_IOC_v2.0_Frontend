@@ -7,11 +7,6 @@ import React from 'react';
 import InternPhaseGroupTab from '@/components/features/intern-phase-management/components/InternPhaseGroupTab';
 import { InternPhaseService } from '@/components/features/intern-phase-management/services/intern-phase.service';
 
-const COPY = {
-  TITLE: 'Internship Groups',
-  SUB: 'All internship groups assigned within this phase.',
-};
-
 export default function PhaseGroupsPage() {
   const { phaseId } = useParams();
 

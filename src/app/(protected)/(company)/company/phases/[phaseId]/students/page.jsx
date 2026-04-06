@@ -8,11 +8,6 @@ import InternPhaseStudentTab from '@/components/features/intern-phase-management
 import { InternPhaseService } from '@/components/features/intern-phase-management/services/intern-phase.service';
 import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 
-const COPY = {
-  TITLE: 'Students',
-  SUB: 'All students participating in this internship phase.',
-};
-
 export default function PhaseStudentsPage() {
   const { phaseId } = useParams();
   const { DETAILS } = INTERN_PHASE_MANAGEMENT;

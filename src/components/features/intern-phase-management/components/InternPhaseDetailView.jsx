@@ -19,7 +19,7 @@ import { InternPhaseService } from '../services/intern-phase.service';
 import InternPhaseJobPostingTab from './InternPhaseJobPostingTab';
 import InternPhaseStudentTab from './InternPhaseStudentTab';
 
-export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
+export default function InternPhaseDetailView({ phase }) {
   const { FORM, DETAILS } = INTERN_PHASE_MANAGEMENT;
   const { METADATA } = DETAILS;
   const [activeKey, setActiveKey] = useState('1');
