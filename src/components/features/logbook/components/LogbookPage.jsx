@@ -43,6 +43,7 @@ export default function LogbookPage() {
     userProfile,
     missingDatesData,
     missingLoading,
+    refetchMissingDates,
   } = useLogbook();
 
   const user = useAuthStore((state) => state.user);
@@ -68,13 +69,11 @@ export default function LogbookPage() {
   const totalMissing = missingDates.length;
 
   React.useEffect(() => {
-    if (!missingLoading && !hasCheckedMissing) {
-      if (totalMissing > 0) {
-        setIsMissingModalOpen(true);
-      }
+    if (totalMissing > 0 && !hasCheckedMissing) {
+      setIsMissingModalOpen(true);
       setHasCheckedMissing(true);
     }
-  }, [missingLoading, hasCheckedMissing, totalMissing, missingDates]);
+  }, [totalMissing, hasCheckedMissing]);
 
   const handleCreateOrUpdate = async (values) => {
     setSubmitting(true);
@@ -120,6 +119,9 @@ export default function LogbookPage() {
           setPageNumber(1);
         }
         fetchLogbooks();
+        if (isStudent && refetchMissingDates) {
+          refetchMissingDates();
+        }
         closeFormModal();
       } else {
         let errorMsg =

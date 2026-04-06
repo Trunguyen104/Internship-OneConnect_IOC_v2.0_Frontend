@@ -50,7 +50,7 @@ const LogbookFormModal = memo(function LogbookFormModal({
     <CompoundModal
       open={visible}
       onCancel={handleCancel}
-      width={600}
+      width={500}
       title={editingId ? MODAL.EDIT_TITLE : MODAL.CREATE_TITLE}
       description={editingId ? MODAL.EDIT_DESC : MODAL.CREATE_DESC}
       icon={editingId ? <EditOutlined /> : <PlusCircleOutlined />}
@@ -59,13 +59,13 @@ const LogbookFormModal = memo(function LogbookFormModal({
         form={form}
         layout="vertical"
         onFinish={onSubmit}
-        className="mt-2 space-y-6"
+        className="mt-2 space-y-3"
         requiredMark="optional"
       >
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-3">
           <Form.Item
             label={
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                 {FORM.REPORT_DATE}
               </span>
             }
@@ -83,7 +83,7 @@ const LogbookFormModal = memo(function LogbookFormModal({
 
           <Form.Item
             label={
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                 {FORM.SUMMARY}
               </span>
             }
@@ -95,16 +95,16 @@ const LogbookFormModal = memo(function LogbookFormModal({
             ]}
           >
             <TextArea
-              rows={4}
+              rows={2}
               placeholder={FORM.PLACEHOLDER_SUMMARY}
               className="rounded-2xl border-gray-100 font-bold p-4 shadow-sm transition-all hover:border-primary focus:border-primary"
             />
           </Form.Item>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-3">
             <Form.Item
               label={
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   {FORM.ISSUE}
                 </span>
               }
@@ -112,7 +112,7 @@ const LogbookFormModal = memo(function LogbookFormModal({
               rules={[{ max: 500, message: FORM.VALIDATION.ISSUE_MAX }]}
             >
               <TextArea
-                rows={3}
+                rows={2}
                 placeholder={FORM.PLACEHOLDER_ISSUE}
                 className="rounded-2xl border-gray-100 font-bold p-4 shadow-sm transition-all hover:border-primary focus:border-primary"
               />
@@ -120,7 +120,7 @@ const LogbookFormModal = memo(function LogbookFormModal({
 
             <Form.Item
               label={
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted/50">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                   {FORM.PLAN}
                 </span>
               }
@@ -131,7 +131,7 @@ const LogbookFormModal = memo(function LogbookFormModal({
               ]}
             >
               <TextArea
-                rows={3}
+                rows={2}
                 placeholder={FORM.PLACEHOLDER_PLAN}
                 className="rounded-2xl border-gray-100 font-bold p-4 shadow-sm transition-all hover:border-primary focus:border-primary"
               />
@@ -139,11 +139,11 @@ const LogbookFormModal = memo(function LogbookFormModal({
           </div>
         </div>
 
-        <div className="mt-10 flex justify-end gap-3 pt-6 border-t border-gray-50">
+        <div className="mt-10 flex justify-end gap-3 mt-[-2] border-t border-gray-50">
           <Button
             variant="ghost"
             onClick={handleCancel}
-            className="px-8 h-12 rounded-full font-black uppercase tracking-widest text-[11px] hover:bg-gray-100 transition-all"
+            className="px-8 h-9 rounded-full font-black uppercase tracking-widest text-[11px] hover:bg-gray-100 transition-all"
           >
             {DAILY_REPORT_UI.MODAL.CANCEL}
           </Button>
@@ -151,7 +151,7 @@ const LogbookFormModal = memo(function LogbookFormModal({
             variant="primary"
             type="submit"
             loading={submitting}
-            className="rounded-full h-12 px-10 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+            className="rounded-full h-9 px-10 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
           >
             {editingId ? DAILY_REPORT_UI.MODAL.SAVE : DAILY_REPORT_UI.MODAL.SUBMIT}
           </Button>

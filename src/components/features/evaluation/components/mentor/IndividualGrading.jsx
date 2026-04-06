@@ -1,6 +1,5 @@
 'use client';
 
-import { SaveOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { Input, InputNumber } from 'antd';
 import React, { useEffect, useState } from 'react';
 
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import CompoundModal from '@/components/ui/CompoundModal';
 import StatusBadge from '@/components/ui/status-badge';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
+import { cn } from '@/lib/cn';
 import { useToast } from '@/providers/ToastProvider';
 
 import { EvaluationService } from '../../services/evaluation.service';
@@ -106,7 +106,7 @@ export default function IndividualGrading({
       }
       open={open}
       onCancel={onCancel}
-      width={800}
+      width={720}
       footer={
         <div className="flex flex-col sm:flex-row w-full items-center justify-between gap-4 bg-gray-50/50 p-4 rounded-[24px] border border-gray-100/50 backdrop-blur-sm m-1">
           <div className="flex items-center gap-3">
@@ -133,29 +133,33 @@ export default function IndividualGrading({
               onClick={onCancel}
               className="rounded-full h-10 px-6 font-black uppercase tracking-widest active:scale-95 transition-all text-[10px]"
             >
-              {BUTTONS.CANCEL}
+              {cycle.status === 2 ? BUTTONS.CLOSE || 'Close' : BUTTONS.CANCEL}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleSave()}
-              loading={loading}
-              className="rounded-full h-10 px-6 font-black uppercase tracking-widest active:scale-95 transition-all text-[10px] flex items-center gap-2"
-            >
-              <SaveOutlined /> {BUTTONS.SAVE_DRAFT}
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => handleSave('publish')}
-              loading={loading}
-              className="rounded-full h-10 px-6 font-black uppercase tracking-widest active:scale-95 transition-all text-[10px] flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200"
-            >
-              <ThunderboltOutlined /> {BUTTONS.PUBLISH_NOW}
-            </Button>
+            {cycle.status !== 2 && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => handleSave()}
+                  loading={loading}
+                  className="rounded-full h-10 px-8 font-black uppercase tracking-widest active:scale-95 transition-all text-[10px]"
+                >
+                  {BUTTONS.SAVE_DRAFT}
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => handleSave('publish')}
+                  loading={loading}
+                  className="rounded-full h-10 px-8 font-black uppercase tracking-widest active:scale-95 transition-all text-[10px] bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-200"
+                >
+                  {BUTTONS.PUBLISH_NOW}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       }
     >
-      <div className="max-h-[70vh] overflow-y-auto px-4 space-y-4 py-4 custom-scrollbar-minimal">
+      <div className="max-h-[60vh] overflow-y-auto px-4 space-y-4 py-3 custom-scrollbar-minimal">
         {/* Student Info Card */}
         <div className="flex items-center gap-4 p-4 rounded-[24px] bg-slate-900 text-white shadow-xl shadow-slate-200/50">
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[16px] bg-white/10 border border-white/20 text-xl font-black">
@@ -226,7 +230,11 @@ export default function IndividualGrading({
                         precision={2}
                         value={s.score}
                         onChange={(val) => handleScoreChange(s.criteriaId, 'score', val)}
-                        className="w-20 rounded-xl border-2! border-white! bg-white shadow-sm font-black text-base h-10 [&_.ant-input-number-input]:text-center [&_.ant-input-number-input]:h-10 [&_.ant-input-number-input]:leading-[40px] focus:ring-4 focus:ring-primary/5 focus:border-primary/20! transition-all"
+                        readOnly={cycle.status === 2}
+                        className={cn(
+                          'w-20 rounded-xl border-2! border-white! bg-white shadow-sm font-black text-base h-10 [&_.ant-input-number-input]:text-center [&_.ant-input-number-input]:h-10 [&_.ant-input-number-input]:leading-[40px] focus:ring-4 focus:ring-primary/5 focus:border-primary/20! transition-all',
+                          cycle.status === 2 && 'bg-slate-50/50 cursor-default opacity-100'
+                        )}
                         placeholder="0.0"
                         controls={false}
                       />
@@ -239,7 +247,11 @@ export default function IndividualGrading({
                     placeholder={LABELS.COMMENT}
                     value={s.comment}
                     onChange={(e) => handleScoreChange(s.criteriaId, 'comment', e.target.value)}
-                    className="rounded-xl border-none! bg-gray-100/40 p-3 text-[11px] font-semibold text-slate-700 placeholder:text-slate-300 transition-all hover:bg-white hover:shadow-sm focus:bg-white focus:shadow-sm"
+                    readOnly={cycle.status === 2}
+                    className={cn(
+                      'rounded-xl border-none! bg-gray-100/40 p-3 text-[11px] font-semibold text-slate-700 placeholder:text-slate-300 transition-all hover:bg-white hover:shadow-sm focus:bg-white focus:shadow-sm',
+                      cycle.status === 2 && 'bg-gray-100/20 cursor-default text-slate-900'
+                    )}
                     rows={1}
                   />
                 </div>
@@ -260,8 +272,12 @@ export default function IndividualGrading({
             placeholder={LABELS.GENERAL_COMMENT}
             value={formData.generalComment}
             onChange={(e) => setFormData({ ...formData, generalComment: e.target.value })}
+            readOnly={cycle.status === 2}
             rows={3}
-            className="rounded-[24px] border-none! bg-gray-50/50 p-4 text-xs font-semibold text-slate-700 placeholder:text-slate-400 transition-all hover:bg-gray-50 focus:bg-white focus:shadow-xl focus:shadow-gray-100/50"
+            className={cn(
+              'rounded-[24px] border-none! bg-gray-50/50 p-4 text-xs font-semibold text-slate-700 placeholder:text-slate-400 transition-all hover:bg-gray-50 focus:bg-white focus:shadow-xl focus:shadow-gray-100/50',
+              cycle.status === 2 && 'bg-slate-50/30 cursor-default text-slate-900'
+            )}
           />
         </div>
       </div>

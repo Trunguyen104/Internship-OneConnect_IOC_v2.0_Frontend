@@ -20,27 +20,26 @@ export const PlacementService = {
 
   /**
    * Fetch eligible (Enterprise + Intern Phase) pairs for assignment.
-   * Path: /api/v1/uniassigns/enterprise-interphase
+   * Path: /api/v1/uniassigns/enterprise-interphases
    */
   getEligiblePhases(params = {}) {
-    return httpGet('/uniassigns/enterprise-interphase', params);
+    return httpGet('/uniassigns/enterprise-interphases', params);
   },
 
   /**
    * AC-01: Uni Admin quick assign: create a PendingAssignment for a single student (inline).
-   * Path: /api/v1/uniassigns/uni-assign
+   * Path: /api/v1/uniassigns/quick-enterprise-assignment
    */
   assignStudent(command) {
-    return httpPost('/uniassigns/uni-assign', command);
+    return httpPost('/uniassigns/quick-enterprise-assignment', command);
   },
 
   /**
    * AC-06: Uni Admin unassign: withdraw a pending or placed uni-assign.
    * Path: /api/v1/uniassigns/unassign-single
-   * Body: { applicationId: string }
    */
-  unassignSingle(applicationId) {
-    return httpPost('/uniassigns/unassign-single', { applicationId });
+  unassignSingle(command) {
+    return httpPost('/uniassigns/unassign-single', command);
   },
 
   /**
@@ -52,9 +51,26 @@ export const PlacementService = {
   },
 
   /**
-   * Check if student has any internship data (logbook, sprint, evaluation)
+   * AC-02: Bulk assign multiple students to the same enterprise/phase.
+   * Path: /api/v1/uniassigns/bulk-enterprise-assignment
    */
-  checkInternshipData(studentId, semesterId) {
-    return httpGet(`/students/${studentId}/semesters/${semesterId}/has-data`);
+  bulkAssign(command) {
+    return httpPost('/uniassigns/bulk-enterprise-assignment', command);
+  },
+
+  /**
+   * AC-03: Bulk re-assign multiple students to a new enterprise/phase.
+   * Path: /api/v1/uniassigns/bulk-reassign-enterprise
+   */
+  reassignStudents(command) {
+    return httpPost('/uniassigns/bulk-reassign-enterprise', command);
+  },
+
+  /**
+   * AC-04: Bulk unassign/withdraw placement for multiple students.
+   * Path: /api/v1/uniassigns/bulk-unassign
+   */
+  unassignStudents(command) {
+    return httpPost('/uniassigns/bulk-unassign', command);
   },
 };

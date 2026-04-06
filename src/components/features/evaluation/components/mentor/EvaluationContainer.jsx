@@ -143,152 +143,157 @@ export default function EvaluationContainer({ targetGroupId = null }) {
     <PageLayout>
       <PageLayout.Header {...headerProps} className="pb-6" />
 
-      <PageLayout.Card className="flex flex-col min-h-[700px] !p-0 mb-10 overflow-visible translate-y-[-1px]">
-        {/* Universal Filter Toolbar - Always Visible */}
-        <div className="px-6 pt-4 pb-2 flex-shrink-0 border-b border-gray-50">
-          <DataTableToolbar>
-            <DataTableToolbar.Filters>
-              {/* Phase Select */}
-              <div className="flex flex-col gap-1 min-w-[200px]">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
-                  {LABELS.PHASE}
-                </span>
-                <Select
-                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none! [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-10 [&_.ant-select-selection-item]:!leading-[40px] hover:[&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!shadow-none! focus:[&_.ant-select-selector]:!border-none! focus:[&_.ant-select-selector]:!shadow-none! transition-all font-bold"
-                  value={selectedPhase?.id}
-                  onChange={(val) => {
-                    const phase = phases.find((p) => p.id === val);
-                    setSelectedPhase(phase);
-                  }}
-                  options={phases.map((p) => ({
-                    label: p.name,
-                    value: p.id,
-                  }))}
-                  placeholder={LABELS.SELECT_PHASE_PLACEHOLDER}
-                  style={{
-                    '--antd-wave-shadow-color': 'transparent',
-                  }}
-                  dropdownStyle={{ borderRadius: '16px' }}
-                />
-              </div>
+      <PageLayout.Card className="flex flex-col overflow-hidden">
+        <PageLayout.Content className="px-0 overflow-y-auto custom-scrollbar-minimal">
+          {/* Universal Filter Toolbar - Standardized Padding */}
+          <div className="px-2 pt-2 pb-2 flex-shrink-0 border-b border-gray-50">
+            <DataTableToolbar>
+              <DataTableToolbar.Filters>
+                {/* Phase Select */}
+                <div className="flex flex-col gap-1 min-w-[200px]">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
+                    {LABELS.PHASE}
+                  </span>
+                  <Select
+                    className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none! [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-10 [&_.ant-select-selection-item]:!leading-[40px] hover:[&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!shadow-none! focus:[&_.ant-select-selector]:!border-none! focus:[&_.ant-select-selector]:!shadow-none! transition-all font-bold"
+                    value={selectedPhase?.id}
+                    onChange={(val) => {
+                      const phase = phases.find((p) => p.id === val);
+                      setSelectedPhase(phase);
+                    }}
+                    options={phases.map((p) => ({
+                      label: p.name,
+                      value: p.id,
+                    }))}
+                    placeholder={LABELS.SELECT_PHASE_PLACEHOLDER}
+                    style={{
+                      '--antd-wave-shadow-color': 'transparent',
+                    }}
+                    styles={{ popup: { root: { borderRadius: '16px' } } }}
+                  />
+                </div>
 
-              {/* Group Select */}
-              <div className="flex flex-col gap-1 min-w-[220px] max-w-md flex-1">
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
-                  {LABELS.GROUP}
-                </span>
-                <Select
-                  className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none! [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-10 [&_.ant-select-selection-item]:!leading-[40px] hover:[&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!shadow-none! focus:[&_.ant-select-selector]:!border-none! focus:[&_.ant-select-selector]:!shadow-none! transition-all font-bold"
-                  value={selectedGroup?.internshipId || selectedGroup?.id}
-                  onChange={(val) => {
-                    const group = groups.find((g) => (g.internshipId || g.id) === val);
-                    setSelectedGroup(group);
-                  }}
-                  options={groups.map((g) => ({
-                    label: g.groupName,
-                    value: g.internshipId || g.id,
-                  }))}
-                  placeholder={LABELS.SELECT_GROUP_PLACEHOLDER}
-                  disabled={groups.length === 0}
-                  loading={loadingGroups && groups.length > 0}
-                  // Fix: Force no border on focus/active to prevent red outline
-                  style={{
-                    '--antd-wave-shadow-color': 'transparent',
-                  }}
-                  dropdownStyle={{ borderRadius: '16px' }}
-                />
-              </div>
+                {/* Group Select */}
+                <div className="flex flex-col gap-1 min-w-[220px] max-w-md flex-1">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-muted/50 ml-1">
+                    {LABELS.GROUP}
+                  </span>
+                  <Select
+                    className="w-full !rounded-3xl [&_.ant-select-selector]:!rounded-2xl [&_.ant-select-selector]:!border-none! [&_.ant-select-selector]:!bg-gray-50/50 [&_.ant-select-selector]:!h-10 [&_.ant-select-selection-item]:!leading-[40px] hover:[&_.ant-select-selector]:!bg-gray-100 [&_.ant-select-selector]:!shadow-none! focus:[&_.ant-select-selector]:!border-none! focus:[&_.ant-select-selector]:!shadow-none! transition-all font-bold"
+                    value={selectedGroup?.internshipId || selectedGroup?.id}
+                    onChange={(val) => {
+                      const group = groups.find((g) => (g.internshipId || g.id) === val);
+                      setSelectedGroup(group);
+                    }}
+                    options={groups.map((g) => ({
+                      label: g.groupName,
+                      value: g.internshipId || g.id,
+                    }))}
+                    placeholder={LABELS.SELECT_GROUP_PLACEHOLDER}
+                    disabled={groups.length === 0}
+                    loading={loadingGroups && groups.length > 0}
+                    // Fix: Force no border on focus/active to prevent red outline
+                    style={{
+                      '--antd-wave-shadow-color': 'transparent',
+                    }}
+                    styles={{ popup: { root: { borderRadius: '16px' } } }}
+                  />
+                </div>
 
-              {loadingGroups && groups.length > 0 && <Spin size="small" className="ml-2" />}
-            </DataTableToolbar.Filters>
+                {loadingGroups && groups.length > 0 && <Spin size="small" className="ml-2" />}
+              </DataTableToolbar.Filters>
 
-            {/* Universal Actions (e.g., Create Cycle) - Unified row! */}
-            {view === 'list' && selectedGroup && (
-              <DataTableToolbar.Actions className="ml-auto">
-                <Button
-                  variant="primary"
-                  onClick={handleOpenCreate}
-                  disabled={!isTermOngoing}
-                  className="rounded-full h-10 px-6 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-                >
-                  <PlusOutlined /> {BUTTONS.CREATE_CYCLE}
-                </Button>
-              </DataTableToolbar.Actions>
-            )}
-          </DataTableToolbar>
-        </div>
-
-        {/* Back to List Toolbar (grading view only) */}
-        {view === 'grading' && (
-          <div className="px-6 py-3 flex-shrink-0 bg-gray-50/30 border-b border-gray-100/50">
-            <PageLayout.Toolbar
-              className="!p-0 !border-0"
-              leftContent={
-                <Button
-                  variant="primary"
-                  onClick={handleBackToList}
-                  className="rounded-full h-9 px-5 font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all group"
-                >
-                  <ArrowLeftOutlined className="group-hover:-translate-x-0.5 transition-transform" />{' '}
-                  {BUTTONS.BACK_TO_LIST}
-                </Button>
-              }
-            />
-          </div>
-        )}
-
-        {/* Conditional Content Below Toolbar */}
-        <div className="flex-1 flex flex-col">
-          {loadingGroups && groups.length === 0 ? (
-            <div className="flex flex-col h-96 items-center justify-center gap-4">
-              <Spin size="large" />
-              <span className="text-sm font-bold text-muted/60 animate-pulse uppercase tracking-widest">
-                {MESSAGES.LOADING}
-              </span>
-            </div>
-          ) : !selectedGroup ? (
-            <div className="flex h-[500px] flex-col items-center justify-center text-center">
-              <div className="mb-6 rounded-[32px] bg-gray-50/50 p-10 ring-8 ring-gray-50/20 transition-transform hover:scale-105">
-                <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-              </div>
-              <h3 className="text-xl font-black text-text mb-2 tracking-tight max-w-md">
-                {phases.length === 0
-                  ? LABELS.NO_PHASE_ASSIGNED || LABELS.NO_ASSIGNED_GROUP
-                  : groups.length === 0
-                    ? LABELS.NO_GROUPS
-                    : LABELS.SELECT_GROUP_PROMPT}
-              </h3>
-            </div>
-          ) : (
-            <div className="px-6 pb-6 pt-2 flex-1 flex flex-col">
-              {view === 'list' ? (
-                <CycleList
-                  cycles={cycles}
-                  loading={loadingCycles}
-                  onOpenGrading={handleOpenGrading}
-                  onEdit={handleOpenEdit}
-                  onDelete={handleDeleteCycle}
-                  isTermOngoing={isTermOngoing}
-                  isTermPast={isTermPast}
-                />
-              ) : (
-                <BatchGrading
-                  cycle={selectedCycle}
-                  internshipId={internshipId}
-                  onBatchGrade={handleSaveEvaluations}
-                  onPublish={handlePublish}
-                  isTermOngoing={isTermOngoing}
-                />
+              {/* Universal Actions (e.g., Create Cycle) - Unified row! */}
+              {view === 'list' && selectedGroup && (
+                <DataTableToolbar.Actions className="ml-auto">
+                  <Button
+                    variant="primary"
+                    onClick={handleOpenCreate}
+                    disabled={!isTermOngoing}
+                    className="rounded-full h-10 px-6 font-black uppercase tracking-widest text-[11px] shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+                  >
+                    <PlusOutlined /> {BUTTONS.CREATE_CYCLE}
+                  </Button>
+                </DataTableToolbar.Actions>
               )}
+            </DataTableToolbar>
+          </div>
+
+          {/* Back to List Toolbar (grading view only) */}
+          {view === 'grading' && (
+            <div className="px-2 py-3 flex-shrink-0 bg-gray-50/30 border-b border-gray-100/50">
+              <PageLayout.Toolbar
+                className="!p-0 !border-0"
+                leftContent={
+                  <Button
+                    variant="primary"
+                    onClick={handleBackToList}
+                    className="rounded-full h-9 px-5 font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all group"
+                  >
+                    <ArrowLeftOutlined className="group-hover:-translate-x-0.5 transition-transform" />{' '}
+                    {BUTTONS.BACK_TO_LIST}
+                  </Button>
+                }
+              />
             </div>
           )}
-        </div>
+
+          {/* Conditional Content Below Toolbar */}
+          <div className="flex-1 flex flex-col pt-4">
+            {loadingGroups && groups.length === 0 ? (
+              <div className="flex flex-col h-96 items-center justify-center gap-4">
+                <Spin size="large" />
+                <span className="text-sm font-bold text-muted/60 animate-pulse uppercase tracking-widest">
+                  {MESSAGES.LOADING}
+                </span>
+              </div>
+            ) : !selectedGroup ? (
+              <div className="flex h-[500px] flex-col items-center justify-center text-center">
+                <div className="mb-6 rounded-[32px] bg-gray-50/50 p-10 ring-8 ring-gray-50/20 transition-transform hover:scale-105">
+                  <Empty description={false} image={Empty.PRESENTED_IMAGE_SIMPLE} />
+                </div>
+                <h3 className="text-xl font-black text-text mb-2 tracking-tight max-w-md">
+                  {phases.length === 0
+                    ? LABELS.NO_PHASE_ASSIGNED || LABELS.NO_ASSIGNED_GROUP
+                    : groups.length === 0
+                      ? LABELS.NO_GROUPS
+                      : LABELS.SELECT_GROUP_PROMPT}
+                </h3>
+              </div>
+            ) : (
+              <div className="px-2 pb-6 flex-1 flex flex-col">
+                {view === 'list' ? (
+                  <CycleList
+                    cycles={cycles}
+                    loading={loadingCycles}
+                    onOpenGrading={handleOpenGrading}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleDeleteCycle}
+                    isTermOngoing={isTermOngoing}
+                    isTermPast={isTermPast}
+                  />
+                ) : (
+                  <BatchGrading
+                    cycle={selectedCycle}
+                    internshipId={internshipId}
+                    onBatchGrade={handleSaveEvaluations}
+                    onPublish={handlePublish}
+                    isTermOngoing={isTermOngoing}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </PageLayout.Content>
       </PageLayout.Card>
 
       <CycleDialog
         key={editingCycle?.cycleId || 'new'}
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={(val) => {
+          setIsDialogOpen(val);
+          if (!val) setEditingCycle(null);
+        }}
         onSave={handleSaveCycle}
         initialData={editingCycle}
         termDates={termDates}

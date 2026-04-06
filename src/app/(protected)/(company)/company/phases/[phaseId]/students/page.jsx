@@ -6,6 +6,7 @@ import React from 'react';
 
 import InternPhaseStudentTab from '@/components/features/intern-phase-management/components/InternPhaseStudentTab';
 import { InternPhaseService } from '@/components/features/intern-phase-management/services/intern-phase.service';
+import PageLayout from '@/components/ui/pagelayout';
 import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 
 const COPY = {
@@ -24,14 +25,17 @@ export default function PhaseStudentsPage() {
   });
 
   return (
-    <div className="flex-1 overflow-auto p-4 2xl:p-8 flex flex-col">
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white rounded-[32px] border border-slate-100 p-6 shadow-sm flex-1 flex flex-col">
-        <InternPhaseStudentTab
-          data={students?.data || students?.items || (Array.isArray(students) ? students : [])}
-          loading={isLoading}
-          DETAILS={DETAILS}
-        />
-      </div>
-    </div>
+    <PageLayout>
+      <PageLayout.Header title={COPY.TITLE} subtitle={COPY.SUB} />
+      <PageLayout.Card className="flex flex-col overflow-hidden p-6 py-4">
+        <PageLayout.Content className="flex flex-col max-h-[450px] overflow-hidden px-0">
+          <InternPhaseStudentTab
+            data={students?.data || students?.items || (Array.isArray(students) ? students : [])}
+            loading={isLoading}
+            DETAILS={DETAILS}
+          />
+        </PageLayout.Content>
+      </PageLayout.Card>
+    </PageLayout>
   );
 }

@@ -23,7 +23,6 @@ const PublicHolidayFormModal = memo(function PublicHolidayFormModal({
   };
 
   const handleFinish = async (values) => {
-    // Format DateOnly for backend (YYYY-MM-DD)
     const payload = {
       date: values.date.format('YYYY-MM-DD'),
       description: values.description,

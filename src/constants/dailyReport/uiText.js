@@ -95,7 +95,7 @@ export const DAILY_REPORT_UI = {
     DESCRIPTION:
       'You have missed some daily reports. Please submit them to keep your internship progress up to date.',
     LIST_TITLE: 'Missing Dates:',
-    CREATE_NOW: 'Create Report Now',
+    CREATE_NOW: 'Create Now',
     LATER: 'Remind Me Later',
     ALL_CAUGHT_UP: "You're all caught up!",
     DAYS_SUFFIX: 'days',

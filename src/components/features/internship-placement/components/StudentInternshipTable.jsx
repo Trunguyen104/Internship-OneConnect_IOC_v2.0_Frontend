@@ -17,13 +17,11 @@ import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
 import {
-  PLACEMENT_STATUS,
   PLACEMENT_UI_TEXT,
   SEMESTER_STATUS,
 } from '@/constants/internship-placement/placement.constants';
 import { UI_TEXT } from '@/lib/UI_Text';
 
-import { PlacementService } from '../services/placement.service';
 import { BulkAssignModal, BulkReassignModal, BulkUnassignModal } from './BulkPlacementModals';
 import StudentRowActions from './StudentRowActions';
 
@@ -66,36 +64,31 @@ const StudentInternshipTable = ({
     enabled: !!semesterId,
   });
 
-  // AC-01: Fetch pending uni-assign applications
-  const { data: appsRes, isLoading: isLoadingApps } = useQuery({
-    queryKey: ['uni-assign-applications', semesterId],
-    queryFn: () => PlacementService.getUniAssignApplications({ termId: semesterId }),
-    enabled: !!semesterId,
-  });
-
-  const isLoading = isLoadingStudents || isLoadingApps;
+  const isLoading = isLoadingStudents;
 
   const students = useMemo(() => {
     const rawItems = res?.data?.items || res?.items || [];
-    const applications = appsRes?.data?.items || appsRes?.items || [];
 
     return rawItems.map((s) => {
-      const pendingApp = applications.find(
-        (app) =>
-          (app.studentId === s.studentId ||
-            app.studentId === s.id ||
-            app.studentCode === s.studentCode) &&
-          app.status === PLACEMENT_STATUS.PENDING_ASSIGNMENT
-      );
+      // AC-11 Sync: Match StudentStatus Enum (1-6)
+      let rawStatus = s.displayStatus || s.placementStatus;
 
-      let displayStatus = s.placementStatus;
-      let activeEnterprise = pendingApp?.enterpriseName || s.enterpriseName;
-      const isMissingEnterprise = !activeEnterprise || activeEnterprise === '— Unassigned —';
+      // Map based on StudentStatus Enum
+      // 1: NO_INTERNSHIP, 2: APPLIED, 3: IN_PROGRESS, 4: COMPLETED, 5: UNPLACED, 6: PLACED
+      if (rawStatus === 1 || rawStatus === 5 || rawStatus === 'UNPLACED') rawStatus = 5;
+      if (rawStatus === 3 || rawStatus === 6 || rawStatus === 'PLACED') rawStatus = 6;
+      if (rawStatus === 2 || rawStatus === 'PENDING_ASSIGNMENT' || rawStatus === 'PENDING')
+        rawStatus = 4;
 
-      if (pendingApp || (s.placementStatus === 1 && isMissingEnterprise)) {
-        displayStatus = PLACEMENT_STATUS.PENDING_ASSIGNMENT;
-        if (isMissingEnterprise) {
-          activeEnterprise = 'Assigning (Pending)...';
+      const isPending = rawStatus === 4;
+      const isPlaced = rawStatus === 6;
+      let displayStatus = rawStatus;
+      let activeEnterprise = s.enterpriseName;
+
+      if (isPending) {
+        displayStatus = 4; // PENDING_ASSIGNMENT
+        if (!activeEnterprise || activeEnterprise === '— Unassigned —') {
+          activeEnterprise = 'Assigning...';
         }
       }
 
@@ -104,9 +97,14 @@ const StudentInternshipTable = ({
         enterpriseName: activeEnterprise,
         id: s.studentCode || s.id,
         displayStatus,
+        isPending,
+        isPlaced,
+        // Critical: ensure Metadata is available even if StudentService missed it
+        applicationId: s.applicationId || null,
+        hasInternshipData: s.hasInternshipData || false,
       };
     });
-  }, [res, appsRes]);
+  }, [res]);
 
   const pagination = {
     current: res?.data?.pageNumber || page,
@@ -176,9 +174,15 @@ const StudentInternshipTable = ({
       key: 'enterpriseName',
       width: 220,
       render: (text, record) => {
-        const isPlaced = record.placementStatus === 1;
-        const isPending = record.displayStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT;
-        const displayName = text || '— UNPLACED —';
+        const isPlaced = record.isPlaced;
+        const isPending = record.isPending;
+
+        let displayName = text;
+        if (!displayName || displayName === '— Unassigned —' || displayName === '— UNPLACED —') {
+          if (isPlaced) displayName = 'PLACED';
+          else if (isPending) displayName = 'PENDING';
+          else displayName = '— UNPLACED —';
+        }
 
         return (
           <div className="flex flex-col">
@@ -204,11 +208,13 @@ const StudentInternshipTable = ({
       render: (status) => {
         const variants = {
           0: 'info',
+          5: 'success',
           1: 'success',
           4: 'warning',
         };
         const labels = {
           0: 'UNPLACED',
+          5: 'PLACED',
           1: 'PLACED',
           4: 'PENDING',
         };
@@ -275,7 +281,7 @@ const StudentInternshipTable = ({
               options={[
                 { label: 'Unplaced', value: 0 },
                 { label: 'Pending', value: 4 },
-                { label: 'Placed', value: 1 },
+                { label: 'Placed', value: 5 },
               ]}
               suffixIcon={<FilterOutlined className="text-muted/40" />}
             />
@@ -292,7 +298,7 @@ const StudentInternshipTable = ({
                 {selectedRowKeys.length} {UI.SELECTED}
               </span>
               <div className="w-px h-4 bg-primary/20" />
-              <Tooltip title={UI.ACTION_ASSIGN}>
+              <Tooltip title={isEnded ? PLACEMENT_UI_TEXT.ACTIONS.ENDED_TOOLTIP : UI.ACTION_ASSIGN}>
                 <AntButton
                   type="text"
                   size="small"
@@ -302,7 +308,7 @@ const StudentInternshipTable = ({
                   disabled={isEnded}
                 />
               </Tooltip>
-              <Tooltip title={UI.ACTION_CHANGE}>
+              <Tooltip title={isEnded ? PLACEMENT_UI_TEXT.ACTIONS.ENDED_TOOLTIP : UI.ACTION_CHANGE}>
                 <AntButton
                   type="text"
                   size="small"
@@ -312,16 +318,17 @@ const StudentInternshipTable = ({
                   disabled={isEnded}
                 />
               </Tooltip>
-              <Tooltip title={UI.ACTION_CANCEL}>
-                <AntButton
-                  type="text"
-                  size="small"
-                  className="flex items-center justify-center !text-red-500 hover:!bg-red-50"
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => setModalType('unassign')}
-                  disabled={isEnded}
-                />
-              </Tooltip>
+              {!isEnded && (
+                <Tooltip title={UI.ACTION_CANCEL}>
+                  <AntButton
+                    type="text"
+                    size="small"
+                    className="flex items-center justify-center !text-red-500 hover:!bg-red-50"
+                    icon={<CloseCircleOutlined />}
+                    onClick={() => setModalType('unassign')}
+                  />
+                </Tooltip>
+              )}
             </Space>
           )}
         </DataTableToolbar.Actions>

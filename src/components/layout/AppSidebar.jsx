@@ -106,12 +106,7 @@ export default function AppSidebar() {
           { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
           { key: `${p}/groups`, icon: <FolderKanban className="size-4" />, label: 'Groups' },
           {
-            key: `${p}/evaluation`,
-            icon: <ClipboardCheck className="size-4" />,
-            label: 'Evaluations',
-          },
-          {
-            key: `/company/public-holidays`,
+            key: `${p}/public-holidays`,
             icon: <CalendarCheck className="size-4" />,
             label: 'Public Holidays',
           },

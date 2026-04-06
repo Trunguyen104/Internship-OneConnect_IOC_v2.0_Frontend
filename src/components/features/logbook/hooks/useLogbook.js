@@ -134,11 +134,18 @@ export function useLogbook() {
 
         const res = await LogBookService.getAll(internshipId, params);
         const weeks = res?.data?.weeks || [];
-        const allItems = weeks.flatMap((w) => w.items || []);
+        // Only include actual logbooks (those with a logbookId), exclude reminder placeholders
+        const allItems = weeks
+          .flatMap((w) => w.items || [])
+          .filter((item) => !!(item.logbookId || item.id));
+
+        // Since the backend returns whole weeks/all records, we slice locally
+        const startIndex = (pageNumber - 1) * pageSize;
+        const pagedItems = allItems.slice(startIndex, startIndex + pageSize);
 
         return {
-          items: allItems,
-          totalCount: res?.data?.totalCount || 0,
+          items: pagedItems,
+          totalCount: allItems.length,
         };
       } catch {
         return { items: [], totalCount: 0 };

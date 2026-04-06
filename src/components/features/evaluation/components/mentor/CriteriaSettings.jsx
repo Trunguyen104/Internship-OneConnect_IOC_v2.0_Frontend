@@ -1,7 +1,5 @@
-'use client';
-
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Dropdown, Input, InputNumber } from 'antd';
+import { Dropdown, Form, Input, InputNumber } from 'antd';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -9,21 +7,18 @@ import CompoundModal from '@/components/ui/CompoundModal';
 import DataTable from '@/components/ui/datatable';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { EvaluationService } from '../../services/evaluation.service';
 
 export default function CriteriaSettings({ cycle, open, onClose }) {
   const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
   const toast = useToast();
+  const [form] = Form.useForm();
+  const isCompleted = cycle?.status === 2; // 2 is COMPLETED
   const [criteria, setCriteria] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingItem, setEditingItem] = useState(null); // 'new' | record
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    maxScore: 10,
-    weight: 1,
-  });
 
   const fetchCriteria = useCallback(async () => {
     try {
@@ -41,22 +36,37 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
     if (open && cycle) fetchCriteria();
   }, [open, cycle, fetchCriteria]);
 
-  const handleSave = async () => {
-    if (!formData.name) return toast.error(MESSAGES.NAME_REQUIRED);
-    if (formData.maxScore <= 0) return toast.error(MESSAGES.MAX_SCORE_POSITIVE);
-
-    try {
+  // Sync form values when editingItem changes
+  useEffect(() => {
+    if (editingItem) {
       if (editingItem === 'new') {
-        await EvaluationService.createCriteria(cycle.cycleId, formData);
+        form.resetFields();
+      } else {
+        form.setFieldsValue({
+          name: editingItem.name,
+          description: editingItem.description,
+          maxScore: editingItem.maxScore,
+          weight: editingItem.weight,
+        });
+      }
+    }
+  }, [editingItem, form]);
+
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      if (editingItem === 'new') {
+        await EvaluationService.createCriteria(cycle.cycleId, values);
         toast.success(MESSAGES.CREATE_SUCCESS);
       } else {
-        await EvaluationService.updateCriteria(editingItem.criteriaId, formData);
+        await EvaluationService.updateCriteria(editingItem.criteriaId, values);
         toast.success(MESSAGES.UPDATE_SUCCESS);
       }
       setEditingItem(null);
       fetchCriteria();
     } catch (error) {
-      toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+      if (error.errorFields) return; // AntD internal validation error
+      toast.error(getErrorDetail(error, MESSAGES.VALIDATION_ERROR));
     }
   };
 
@@ -66,7 +76,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
       toast.success(MESSAGES.DELETE_SUCCESS);
       fetchCriteria();
     } catch (error) {
-      toast.error(error.response?.data?.message || MESSAGES.FETCH_ERROR);
+      toast.error(getErrorDetail(error, MESSAGES.FETCH_ERROR));
     }
   };
 
@@ -105,12 +115,6 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
             icon: <EditOutlined className="text-blue-500" />,
             onClick: () => {
               setEditingItem(record);
-              setFormData({
-                name: record.name,
-                description: record.description,
-                maxScore: record.maxScore,
-                weight: record.weight,
-              });
             },
           },
           {
@@ -140,7 +144,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
         );
       },
     },
-  ];
+  ].filter((col) => !isCompleted || col.key !== 'actions');
 
   return (
     <CompoundModal
@@ -155,16 +159,15 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
                 : LABELS.EDIT_CRITERIA}
             </span>
             <h3 className="m-0 text-xl font-black tracking-tighter text-text">
-              {editingItem ? formData.name || 'New Criteria' : 'Evaluation Criteria'}
+              {editingItem ? 'Criteria Configuration' : 'Evaluation Criteria'}
             </h3>
           </div>
-          {!editingItem && (
+          {!editingItem && !isCompleted && (
             <Button
               variant="primary"
               className="rounded-full px-5 h-9 font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-[10px] flex items-center gap-1.5"
               onClick={() => {
                 setEditingItem('new');
-                setFormData({ name: '', description: '', maxScore: 10, weight: 1 });
               }}
             >
               <PlusOutlined className="text-[12px]" /> {LABELS.ADD_NEW}
@@ -180,68 +183,102 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
       <div className="py-2 min-h-[350px]">
         {editingItem ? (
           /* FORM VIEW - Replaces Table */
-          <div className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-500">
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSave}
+            requiredMark={false}
+            initialValues={{ maxScore: 10, weight: 1 }}
+            className="animate-in fade-in slide-in-from-bottom-2 space-y-6 duration-500"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 rounded-2xl border border-gray-100 bg-gray-50/20 p-6 shadow-sm">
-              <div className="col-span-2 space-y-2">
-                <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
-                  <EditOutlined className="text-[12px]" />
-                  {LABELS.CRITERIA_NAME}
-                </span>
+              <Form.Item
+                label={
+                  <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
+                    <EditOutlined className="text-[12px]" />
+                    {LABELS.CRITERIA_NAME}
+                  </span>
+                }
+                name="name"
+                rules={[{ required: true, message: MESSAGES.NAME_REQUIRED }]}
+                className="col-span-2 mb-0"
+              >
                 <Input
                   placeholder={LABELS.CRITERIA_NAME}
                   className="h-11 rounded-xl border-gray-100 bg-white font-bold text-sm transition-all focus:border-primary/30"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
-              </div>
+              </Form.Item>
 
-              <div className="space-y-2">
-                <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
-                  <MoreOutlined className="text-[12px]" />
-                  {LABELS.MAX_SCORE}
-                </span>
+              <Form.Item
+                label={
+                  <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
+                    <MoreOutlined className="text-[12px]" />
+                    {LABELS.MAX_SCORE}
+                  </span>
+                }
+                name="maxScore"
+                rules={[
+                  { required: true, message: MESSAGES.VALIDATION_ERROR },
+                  {
+                    type: 'number',
+                    min: 0.1,
+                    max: 100,
+                    message: 'Max score must be between 0.1 and 100',
+                  },
+                ]}
+                className="mb-0"
+              >
                 <InputNumber
                   className="h-11 w-full rounded-xl border-gray-100 bg-white font-black text-base focus:border-primary/30"
                   min={1}
-                  value={formData.maxScore}
-                  onChange={(val) => setFormData({ ...formData, maxScore: val })}
                   controls={false}
                 />
-              </div>
+              </Form.Item>
 
-              <div className="space-y-2">
-                <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
-                  <MoreOutlined className="text-[12px]" />
-                  {LABELS.WEIGHT}
-                </span>
+              <Form.Item
+                label={
+                  <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
+                    <MoreOutlined className="text-[12px]" />
+                    {LABELS.WEIGHT}
+                  </span>
+                }
+                name="weight"
+                rules={[
+                  { required: true, message: MESSAGES.VALIDATION_ERROR },
+                  { type: 'number', min: 0, max: 100, message: 'Weight must be between 0 and 100' },
+                ]}
+                className="mb-0"
+              >
                 <InputNumber
                   className="h-11 w-full rounded-xl border-gray-100 bg-white font-black text-base focus:border-primary/30"
                   min={0}
                   step={0.1}
-                  value={formData.weight}
-                  onChange={(val) => setFormData({ ...formData, weight: val })}
                   controls={false}
                 />
-              </div>
+              </Form.Item>
 
-              <div className="col-span-2 space-y-2">
-                <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
-                  <MoreOutlined className="text-[12px]" />
-                  {LABELS.DESCRIPTION}
-                </span>
+              <Form.Item
+                label={
+                  <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
+                    <MoreOutlined className="text-[12px]" />
+                    {LABELS.DESCRIPTION}
+                  </span>
+                }
+                name="description"
+                className="col-span-2 mb-0"
+              >
                 <Input.TextArea
                   placeholder={LABELS.DESCRIPTION}
                   className="rounded-xl border-gray-100 bg-white p-3 text-sm font-medium transition-all focus:border-primary/30"
                   rows={3}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
-              </div>
+              </Form.Item>
             </div>
 
             <div className="flex justify-end gap-3 px-1">
               <Button
                 variant="outline"
+                type="button"
                 className="rounded-full h-10 px-6 font-black uppercase tracking-widest text-[10px] border-gray-200"
                 onClick={() => setEditingItem(null)}
               >
@@ -249,13 +286,13 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
               </Button>
               <Button
                 variant="primary"
+                type="submit"
                 className="rounded-full h-10 px-10 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20"
-                onClick={handleSave}
               >
                 {BUTTONS.SAVE}
               </Button>
             </div>
-          </div>
+          </Form>
         ) : (
           /* TABLE VIEW */
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">

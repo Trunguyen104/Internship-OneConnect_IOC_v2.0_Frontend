@@ -1,12 +1,13 @@
 'use client';
 
-import { EyeOutlined } from '@ant-design/icons';
-import { Empty, InputNumber, Table } from 'antd';
+import { EyeOutlined, SendOutlined } from '@ant-design/icons';
+import { Empty, InputNumber, Table, Tooltip } from 'antd';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import SkeletonTable from '@/components/ui/SkeletonTable';
+import StatusBadge from '@/components/ui/status-badge';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
 
@@ -47,14 +48,30 @@ const GRADING_GRID_CSS = `
     border-color: #d52020 !important;
     box-shadow: 0 4px 12px rgba(213, 32, 32, 0.1) !important;
   }
+  .grading-grid .ant-input-number-readonly {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #f1f5f9 !important;
+    cursor: default;
+  }
+  .grading-grid .ant-input-number-readonly:hover {
+    background: #f8fafc !important;
+  }
 `;
 
-export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTermOngoing }) {
-  const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
+export default function BatchGrading({
+  cycle,
+  internshipId,
+  onBatchGrade,
+  onPublish,
+  isTermOngoing,
+}) {
+  const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS, STATUS } = EVALUATION_UI;
   const toast = useToast();
   const [data, setData] = useState({ criteria: [], students: [] });
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [scores, setScores] = useState({});
   const [originalScores, setOriginalScores] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
@@ -136,22 +153,47 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
     }
   };
 
+  const handlePublishAll = async () => {
+    try {
+      setPublishing(true);
+      // Publish for all students who have evaluations
+      const studentIds = data.students.filter((s) => s.isEvaluated).map((s) => s.studentId);
+
+      if (studentIds.length === 0) {
+        toast.warning('No evaluations to publish.');
+        return;
+      }
+
+      const success = await onPublish(cycle.cycleId, { studentIds });
+      if (success) {
+        fetchData();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || MESSAGES.VALIDATION_ERROR);
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   // =========================
   // 📊 Statistics
   // =========================
   const stats = useMemo(() => {
     const total = data.students.length;
-    if (total === 0) return { total: 0, graded: 0, avg: 0 };
+    if (total === 0) return { total: 0, graded: 0, avg: 0, published: 0 };
 
-    const gradedCount = data.students.filter((s) => {
+    const gradedItems = data.students.filter((s) => {
       const studentScores = scores[s.studentId] || {};
       return data.criteria.every((c) => studentScores[c.criteriaId] != null);
-    }).length;
+    });
+    const gradedCount = gradedItems.length;
+
+    const publishedCount = data.students.filter((s) => s.status === 'Published').length;
 
     const totalPoints = data.students.reduce((acc, s) => acc + (parseFloat(s.totalScore) || 0), 0);
     const avg = total > 0 ? (totalPoints / total).toFixed(1) : 0;
 
-    return { total, graded: gradedCount, avg };
+    return { total, graded: gradedCount, avg, published: publishedCount };
   }, [data.students, data.criteria, scores]);
 
   if (loading)
@@ -178,7 +220,6 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
   }
 
   const columns = [
-    // ... (rest of the columns logic stays the same)
     {
       title: LABELS.STUDENT_NAME,
       key: 'student',
@@ -190,9 +231,18 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             {student.fullName?.charAt(0)}
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="font-black text-text tracking-tight text-sm leading-tight transition-colors group-hover:text-primary">
-              {student.fullName}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-black text-text tracking-tight text-sm leading-tight transition-colors group-hover:text-primary">
+                {student.fullName}
+              </span>
+              {student.status && (
+                <StatusBadge
+                  size="sm"
+                  variant={student.status === 'Published' ? 'success' : 'neutral'}
+                  label={student.status}
+                />
+              )}
+            </div>
             <span className="text-[10px] text-muted/50 font-black uppercase tracking-widest">
               {student.studentCode}
             </span>
@@ -223,6 +273,7 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             placeholder="0.0"
             value={scores[student.studentId]?.[crit.criteriaId]}
             onChange={(val) => handleScoreChange(student.studentId, crit.criteriaId, val)}
+            readOnly={cycle.status === 2 || cycle.status === 'Completed'}
             className={`w-full text-center font-black text-sm h-11 rounded-2xl border-2! border-slate-100! bg-slate-50/50 hover:bg-white hover:border-primary/20! focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary/30! transition-all [&_.ant-input-number-input]:text-center [&_.ant-input-number-input]:h-11 [&_.ant-input-number-input]:font-black ${
               scores[student.studentId]?.[crit.criteriaId] > crit.maxScore
                 ? 'text-rose-600'
@@ -268,6 +319,8 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
     },
   ];
 
+  const canPublish = stats.graded > 0 && !hasChanges && !publishing;
+
   return (
     <div className="flex flex-col animate-in fade-in duration-500">
       {/* 📊 Summary Stats Bar - Compacted to save space */}
@@ -294,12 +347,12 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
             </h4>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-black tracking-tighter">
-                {stats.graded}
+                {stats.published}
                 <span className="text-white/30 mx-1">/</span>
                 {stats.total}
               </span>
               <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">
-                {EVALUATION_UI.STATUS.COMPLETED}
+                {STATUS.PUBLISHED}
               </span>
             </div>
           </div>
@@ -328,7 +381,9 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
         leftContent={
           <div className="flex items-center gap-6">
             <div className="flex flex-col gap-1">
-              {MESSAGES.GRADING_BOARD}
+              <span className="text-[10px] font-black text-muted/40 uppercase tracking-widest">
+                {MESSAGES.GRADING_BOARD}
+              </span>
               <span className="text-sm font-bold text-text tracking-tight uppercase tracking-widest">
                 {cycle.name}
               </span>
@@ -347,31 +402,48 @@ export default function BatchGrading({ cycle, internshipId, onBatchGrade, isTerm
           </div>
         }
       >
-        {hasChanges && (
-          <DataTableToolbar.Actions className="ml-auto">
-            <Button
-              variant="outline"
-              size="default"
-              onClick={handleCancelEdits}
-              className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95 min-w-[100px]"
+        <DataTableToolbar.Actions className="ml-auto">
+          {hasChanges ? (
+            <>
+              <Button
+                variant="outline"
+                size="default"
+                onClick={handleCancelEdits}
+                className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95 min-w-[100px]"
+              >
+                {BUTTONS.CANCEL}
+              </Button>
+              <Button
+                variant="primary"
+                size="default"
+                onClick={handleSubmitBatch}
+                loading={sending}
+                disabled={!isTermOngoing || cycle.status === 2 || cycle.status === 'Completed'}
+                className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px]"
+              >
+                {BUTTONS.SAVE}
+              </Button>
+            </>
+          ) : (
+            <Tooltip
+              title={!canPublish ? 'Please grade students and save changes before publishing' : ''}
             >
-              {BUTTONS.CANCEL}
-            </Button>
-            <Button
-              variant="primary"
-              size="default"
-              onClick={handleSubmitBatch}
-              loading={sending}
-              disabled={!isTermOngoing || cycle.status !== 1}
-              className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px]"
-            >
-              {BUTTONS.SAVE}
-            </Button>
-          </DataTableToolbar.Actions>
-        )}
+              <Button
+                variant="primary"
+                size="default"
+                onClick={handlePublishAll}
+                loading={publishing}
+                disabled={!canPublish}
+                className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px] bg-emerald-600 hover:bg-emerald-700 border-none"
+              >
+                <SendOutlined className="mr-2" /> {BUTTONS.PUBLISH}
+              </Button>
+            </Tooltip>
+          )}
+        </DataTableToolbar.Actions>
       </DataTableToolbar>
 
-      <div className="min-h-[600px] mb-8 mt-[-10px]">
+      <div className="flex-1 mb-8 mt-[-10px]">
         <div className="rounded-[32px] border border-gray-100 bg-white shadow-sm overflow-hidden">
           <Table
             columns={columns}

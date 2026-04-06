@@ -20,6 +20,7 @@ import {
   INTERN_PHASE_MANAGEMENT,
   INTERN_PHASE_STATUS,
 } from '@/constants/intern-phase-management/intern-phase';
+import { translateMessage } from '@/utils/errorUtils';
 
 const { TextArea } = Input;
 
@@ -76,13 +77,24 @@ export default function InternPhaseFormModal({
     }
   }, [visible, editingRecord, form]);
 
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        onSave(values);
-      })
-      .catch(() => {});
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      await onSave?.(values);
+    } catch (error) {
+      // 1. Client-side validation
+      if (error.errorFields?.length > 0) return;
+
+      // 2. Server-side validation
+      const errorData = error.data || error.response?.data;
+      if (errorData?.validationErrors) {
+        const fields = Object.keys(errorData.validationErrors).map((key) => ({
+          name: key,
+          errors: errorData.validationErrors[key].map((err) => translateMessage(err)),
+        }));
+        form.setFields(fields);
+      }
+    }
   };
 
   return (
@@ -153,7 +165,20 @@ export default function InternPhaseFormModal({
             <Form.Item
               name="startDate"
               label={FORM.LABEL.START_DATE}
-              rules={[{ required: true, message: FORM.VALIDATION.START_DATE_REQUIRED }]}
+              rules={[
+                { required: true, message: FORM.VALIDATION.START_DATE_REQUIRED },
+                () => ({
+                  validator(_, value) {
+                    if (!value || editingRecord) return Promise.resolve();
+
+                    // AC-02: Prevent selecting past date for NEW phases
+                    if (dayjs(value).isBefore(dayjs().startOf('day'))) {
+                      return Promise.reject(new Error(FORM.VALIDATION.START_DATE_PAST));
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
             >
               <DatePicker
                 format="DD/MM/YYYY"

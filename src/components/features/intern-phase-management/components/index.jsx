@@ -57,7 +57,7 @@ export default function InternPhaseManagementContainer() {
   };
 
   const handleSave = (values) => {
-    saveMutation.mutate(values);
+    return saveMutation.mutateAsync(values);
   };
 
   return (

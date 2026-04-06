@@ -34,6 +34,7 @@ export const ENROLLMENT_STATUS = {
 export const PLACEMENT_STATUS = {
   UNPLACED: 0,
   PLACED: 1,
+  PENDING_ASSIGNMENT: 9,
 };
 
 export const GROUP_STATUS = {
@@ -631,6 +632,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           ID_LABEL: 'Student ID',
           ID_PLACEHOLDER: 'Ex: ST2024001',
           ID_REQUIRED: 'Please enter student ID',
+          ID_INVALID: 'Invalid Student ID. Use only lowercase letters, numbers, and ".", "_", "-".',
           ID_EDIT_INFO: 'Student ID cannot be changed once enrolled.',
 
           EMAIL_LABEL: 'Student Email',

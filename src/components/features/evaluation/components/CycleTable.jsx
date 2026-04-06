@@ -54,7 +54,7 @@ const getTimelineStatus = (start, end) => {
 
   if (now.isBefore(s)) return { label: EVALUATION_UI.STATUS.UPCOMING, variant: 'neutral' };
   if (now.isAfter(e)) return { label: EVALUATION_UI.STATUS.COMPLETED, variant: 'success' };
-  return { label: EVALUATION_UI.STATUS.ONGOING, variant: 'primary' };
+  return { label: EVALUATION_UI.STATUS.ONGOING, variant: 'info' };
 };
 
 export default function CycleTable({ data, page, pageSize, onDetail }) {

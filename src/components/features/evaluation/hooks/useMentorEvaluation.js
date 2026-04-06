@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 import { useToast } from '@/providers/ToastProvider';
+import { getErrorDetail } from '@/utils/errorUtils';
 
 import { EvaluationService } from '../services/evaluation.service';
 
@@ -92,7 +93,7 @@ export function useMentorEvaluation(internshipId, phaseId) {
       if (error.status === 409) {
         toast.error(MESSAGES.CONFLICT_ERROR);
       } else {
-        toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.VALIDATION_ERROR));
       }
       return false;
     }
@@ -108,7 +109,7 @@ export function useMentorEvaluation(internshipId, phaseId) {
       if (error.status === 409) {
         toast.error(MESSAGES.CONFLICT_ERROR);
       } else {
-        toast.error(error.message || MESSAGES.VALIDATION_ERROR);
+        toast.error(getErrorDetail(error, MESSAGES.VALIDATION_ERROR));
       }
       return false;
     }

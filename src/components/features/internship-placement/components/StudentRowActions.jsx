@@ -1,6 +1,7 @@
 'use client';
 
 import { CloseCircleOutlined, SwapOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 import React from 'react';
 
 import TableRowDropdown from '@/components/ui/TableRowActions';
@@ -23,7 +24,20 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
   const isUnplaced = !student.enterpriseName || student.enterpriseName === '— Unassigned —';
   const status = isUnplaced ? PLACEMENT_STATUS.UNPLACED : student.displayStatus;
 
+  const UI = PLACEMENT_UI_TEXT.ACTIONS;
   const LABELS = PLACEMENT_UI_TEXT.TABLE;
+
+  const getDisabledTooltip = () => {
+    if (isEnded) return UI.ENDED_TOOLTIP;
+    if (hasData)
+      return UI.DATA_EXISTS_TOOLTIP(
+        student.fullName,
+        student.enterpriseName || 'Doanh nghiệp hiện tại'
+      );
+    return null;
+  };
+
+  const tooltipText = getDisabledTooltip();
 
   const items = [];
 
@@ -31,9 +45,18 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
     items.push({
       key: 'assign',
       label: (
-        <AssignEnterprisePopover student={student} termName={termName} termId={semesterId}>
-          <div className="w-full text-left">{LABELS.ACTION_ASSIGN}</div>
-        </AssignEnterprisePopover>
+        <Tooltip title={isEnded ? UI.ENDED_TOOLTIP : null}>
+          <div className="w-full">
+            <AssignEnterprisePopover
+              student={student}
+              termName={termName}
+              termId={semesterId}
+              disabled={isEnded}
+            >
+              <div className="w-full text-left">{LABELS.ACTION_ASSIGN}</div>
+            </AssignEnterprisePopover>
+          </div>
+        </Tooltip>
       ),
       icon: <UserAddOutlined />,
       disabled: isEnded,
@@ -44,9 +67,18 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
       items.push({
         key: 'change',
         label: (
-          <AssignEnterprisePopover student={student} termName={termName} termId={semesterId}>
-            <div className="w-full text-left">{LABELS.ACTION_CHANGE}</div>
-          </AssignEnterprisePopover>
+          <Tooltip title={tooltipText}>
+            <div className="w-full">
+              <AssignEnterprisePopover
+                student={student}
+                termName={termName}
+                termId={semesterId}
+                disabled={hasData || isEnded}
+              >
+                <div className="w-full text-left">{LABELS.ACTION_CHANGE}</div>
+              </AssignEnterprisePopover>
+            </div>
+          </Tooltip>
         ),
         icon: <SwapOutlined />,
         disabled: hasData || isEnded,
@@ -56,7 +88,11 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
 
     items.push({
       key: 'cancel',
-      label: LABELS.ACTION_CANCEL,
+      label: (
+        <Tooltip title={tooltipText}>
+          <div className="w-full">{LABELS.ACTION_CANCEL}</div>
+        </Tooltip>
+      ),
       icon: <CloseCircleOutlined />,
       danger: true,
       disabled: hasData || isEnded,
