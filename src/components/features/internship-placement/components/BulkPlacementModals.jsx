@@ -1,17 +1,24 @@
 'use client';
 
-import { CloseOutlined, ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  CloseOutlined,
+  ExclamationCircleOutlined,
+  InfoCircleOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Alert, List, message, Modal } from 'antd';
+import { Alert, List, Modal, Tooltip } from 'antd';
 import React, { useMemo, useState } from 'react';
 
-import Badge from '@/components/ui/badge';
+import { Avatar } from '@/components/ui/avatar';
 import Button from '@/components/ui/button';
+import StatusBadge from '@/components/ui/status-badge';
 import {
   APPLICATION_STATUS,
   PLACEMENT_STATUS,
   PLACEMENT_UI_TEXT,
 } from '@/constants/internship-placement/placement.constants';
+import { useToast } from '@/providers/ToastProvider';
 
 import { PlacementService } from '../services/placement.service';
 import EnterprisePhaseSelect from './EnterprisePhaseSelect';
@@ -26,6 +33,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
 
   const UI = PLACEMENT_UI_TEXT.MODALS.BULK_ASSIGN;
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const activeStudents = useMemo(
     () => selectedStudents.filter((s) => !excludedIds.has(s.id)),
@@ -74,16 +82,16 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
     mutationFn: (data) => PlacementService.bulkAssign(data),
     onSuccess: (res) => {
       if (res?.success === false) {
-        message.error(res?.message || 'Selected phase has insufficient capacity.');
+        toast.error(res?.message || 'Selected phase has insufficient capacity.');
       } else {
         const entName = selectedPhase?.enterpriseName || 'Enterprise';
-        message.success(PLACEMENT_UI_TEXT.POPOVER.SUCCESS(entName, eligibleStudents.length));
+        toast.success(UI.BULK_SUCCESS(entName, eligibleStudents.length));
         onClose();
         queryClient.invalidateQueries(['semester-students', semesterId]);
         queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
       }
     },
-    onError: (err) => message.error(err?.message || 'Failed to bulk assign.'),
+    onError: (err) => toast.error(err?.message || 'Failed to bulk assign.'),
   });
 
   const isOverCapacity =
@@ -109,11 +117,25 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
 
   return (
     <Modal
-      title={<span className="text-lg font-bold">{UI.TITLE(eligibleStudents.length)}</span>}
+      title={
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary-surface flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+            <UserOutlined className="text-xl" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold text-text leading-tight">
+              {UI.TITLE(eligibleStudents.length)}
+            </span>
+            <span className="text-xs font-medium text-muted">{UI.REVIEW_SUBTITLE}</span>
+          </div>
+        </div>
+      }
       open={visible}
       onCancel={onClose}
       destroyOnHidden
-      width={600}
+      width={540}
+      centered
+      className="premium-modal"
       footer={[
         <Button key="cancel" variant="muted" onClick={onClose} className="mr-2">
           {UI.CANCEL}
@@ -129,9 +151,9 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
         </Button>,
       ]}
     >
-      <div className="py-4 space-y-4">
-        <div>
-          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+      <div className="py-2 space-y-3">
+        <div className="bg-bg/50 p-3 rounded-2xl border border-border/50">
+          <label className="block text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2 pl-1">
             {UI.TARGET_LABEL}
           </label>
           <EnterprisePhaseSelect
@@ -145,16 +167,19 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
         {isOverCapacity && (
           <Alert
             type="error"
-            showIcon
-            title={
-              <span className="text-xs font-semibold leading-relaxed">
-                {UI.CAPACITY_ERROR(
-                  selectedPhase.internPhaseName || selectedPhase.phaseName,
-                  selectedPhase.enterpriseName,
-                  selectedPhase.remainingCapacity,
-                  eligibleStudents.length
-                )}
-              </span>
+            className="py-1.5 px-3 rounded-xl border-none bg-danger-surface/50"
+            message={
+              <div className="flex items-center gap-2 text-danger">
+                <ExclamationCircleOutlined className="text-xs" />
+                <span className="text-[11px] font-bold leading-tight">
+                  {UI.CAPACITY_ERROR(
+                    selectedPhase.internPhaseName || selectedPhase.phaseName,
+                    selectedPhase.enterpriseName,
+                    selectedPhase.remainingCapacity,
+                    eligibleStudents.length
+                  )}
+                </span>
+              </div>
             }
           />
         )}
@@ -162,9 +187,12 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
         {reassignCount > 0 && !isOverCapacity && (
           <Alert
             type="warning"
-            showIcon
-            title={
-              <span className="text-xs font-semibold">{UI.REASSIGN_WARNING(reassignCount)}</span>
+            className="py-1.5 px-3 rounded-xl border-none bg-warning-surface/50"
+            message={
+              <div className="flex items-center gap-2 text-warning">
+                <InfoCircleOutlined className="text-xs" />
+                <span className="text-[11px] font-bold">{UI.REASSIGN_WARNING(reassignCount)}</span>
+              </div>
             }
           />
         )}
@@ -183,45 +211,75 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
         )}
 
         <div className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 block pl-1">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-1 block pl-1">
               {UI.ELIGIBLE_LABEL(eligibleStudents.length)}
             </label>
-            <div className="max-h-[220px] overflow-auto border rounded-xl divide-y bg-white">
+            <div className="max-h-[220px] overflow-auto pr-1 custom-scrollbar">
               {eligibleStudents.length > 0 ? (
-                eligibleStudents.map((s) => (
-                  <div key={s.id} className="p-3 flex justify-between items-center text-sm group">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-slate-700">{s.fullName}</span>
-                      <span className="text-[10px] text-slate-400">{s.email}</span>
+                <div className="grid gap-2">
+                  {eligibleStudents.map((s) => (
+                    <div
+                      key={s.id}
+                      className="p-2.5 bg-surface border border-border/50 rounded-xl flex justify-between items-center group transition-all hover:border-primary/40 hover:shadow-sm hover:shadow-primary/10"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Avatar
+                          size={32}
+                          className="bg-muted/10 text-muted border-none text-[11px] font-bold shrink-0"
+                        >
+                          {s.fullName?.charAt(0)}
+                        </Avatar>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[13px] font-bold text-text truncate">
+                            {s.fullName}
+                          </span>
+                          <span className="text-[10px] text-muted truncate tracking-tight">
+                            {s.email}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex flex-col items-end gap-1">
+                          {s.placementStatus === PLACEMENT_STATUS.PLACED && (
+                            <StatusBadge
+                              variant="success"
+                              label={s.enterpriseName || PLACEMENT_UI_TEXT.STATUS_LABELS.PLACED}
+                              variantType="boxed"
+                              className="scale-90 origin-right"
+                            />
+                          )}
+                          {s.placementStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT && (
+                            <StatusBadge
+                              variant="warning"
+                              label={PLACEMENT_UI_TEXT.STATUS_LABELS.PENDING}
+                              variantType="boxed"
+                              className="scale-90 origin-right"
+                            />
+                          )}
+                        </div>
+                        <Tooltip title={UI.EXCLUDE_TOOLTIP}>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            className="h-7 w-7 text-muted/40 hover:text-danger hover:bg-danger-surface rounded-lg transition-colors border-none"
+                            onClick={() => onExclude(s.id)}
+                          >
+                            <CloseOutlined className="text-[10px]" />
+                          </Button>
+                        </Tooltip>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {s.placementStatus === PLACEMENT_STATUS.PLACED && (
-                        <Badge variant="success-soft" size="xs">
-                          {s.enterpriseName || 'Placed'}
-                        </Badge>
-                      )}
-                      {s.placementStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT && (
-                        <Badge variant="warning-soft" size="xs">
-                          {PLACEMENT_UI_TEXT.STATUS_LABELS.PENDING}
-                        </Badge>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => onExclude(s.id)}
-                      >
-                        <CloseOutlined className="text-[10px]" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               ) : (
-                <div className="p-8 text-center text-slate-300 italic text-sm">
-                  {selectedPhase
-                    ? 'No eligible students for this enterprise.'
-                    : 'Select an enterprise to see eligible students.'}
+                <div className="py-12 bg-bg/50 rounded-2xl border border-dashed border-border flex flex-col items-center justify-center text-center px-8">
+                  <div className="w-12 h-12 bg-surface rounded-full shadow-sm flex items-center justify-center mb-4">
+                    <InfoCircleOutlined className="text-xl text-muted/40" />
+                  </div>
+                  <p className="text-muted text-xs font-medium leading-relaxed max-w-[240px]">
+                    {selectedPhase ? UI.EMPTY_ELIGIBLE : UI.PROMPT_SELECT}
+                  </p>
                 </div>
               )}
             </div>
@@ -229,23 +287,25 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
 
           {blockedStudents.length > 0 && (
             <div className="space-y-1">
-              <label className="text-[10px] font-black text-danger/70 uppercase tracking-[0.2em] mb-1 block pl-1">
+              <label className="text-[10px] font-black text-danger uppercase tracking-[0.2em] mb-1 block pl-1">
                 {UI.BLOCKED_LABEL(blockedStudents.length)}
               </label>
-              <div className="max-h-[160px] overflow-auto border border-danger/10 rounded-xl divide-y bg-danger-surface/5">
+              <div className="max-h-[160px] overflow-auto border border-danger/20 rounded-xl divide-y bg-danger-surface/40">
                 {blockedStudents.map((s) => (
                   <div key={s.id} className="p-3 flex justify-between items-center text-sm">
                     <div className="flex flex-col">
-                      <span className="font-semibold text-slate-800 line-through decoration-danger/20">
+                      <span className="font-semibold text-text line-through decoration-danger/30">
                         {s.fullName}
                       </span>
-                      <span className="text-[10px] text-danger font-medium">
+                      <span className="text-[10px] text-danger font-bold">
                         {UI.CONFLICT_REASON(s.conflictStatus)}
                       </span>
                     </div>
-                    <Badge variant="danger-soft" size="xs">
-                      {PLACEMENT_UI_TEXT.STATUS_LABELS.BLOCKED}
-                    </Badge>
+                    <StatusBadge
+                      variant="danger"
+                      label={PLACEMENT_UI_TEXT.STATUS_LABELS.BLOCKED}
+                      variantType="boxed"
+                    />
                   </div>
                 ))}
               </div>
@@ -267,6 +327,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
 
   const UI = PLACEMENT_UI_TEXT.MODALS.BULK_REASSIGN;
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const eligibleStudentsRaw = useMemo(
     () => selectedStudents.filter((s) => !s.hasInternshipData),
@@ -287,16 +348,16 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
     mutationFn: (data) => PlacementService.reassignStudents(data),
     onSuccess: () => {
       const entName = selectedPhase?.enterpriseName || 'Enterprise';
-      message.success(UI.SUCCESS(entName, activeStudents.length));
+      toast.success(UI.SUCCESS(entName, activeStudents.length));
       onClose();
       queryClient.invalidateQueries(['semester-students', semesterId]);
       queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
     },
-    onError: (err) => message.error(err?.message || 'Failed to re-assign.'),
+    onError: (err) => toast.error(err?.message || 'Failed to re-assign.'),
   });
 
   const handleConfirm = () => {
-    if (!selectedPhase) return message.warning('Please select a new phase.');
+    if (!selectedPhase) return toast.warning('Please select a new phase.');
     if (activeStudents.length === 0) return;
     mutation.mutate({
       studentIds: activeStudents.map((s) => s.studentId || s.id),
@@ -319,12 +380,23 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
   return (
     <Modal
       title={
-        <span className="text-lg font-bold text-slate-800">{UI.TITLE(activeStudents.length)}</span>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-warning-surface flex items-center justify-center text-warning">
+            <ExclamationCircleOutlined className="text-xl" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold text-text leading-tight">
+              {UI.TITLE(activeStudents.length)}
+            </span>
+            <span className="text-xs font-medium text-muted">{UI.SUBTITLE}</span>
+          </div>
+        </div>
       }
       open={visible}
       onCancel={onClose}
       destroyOnHidden
-      width={640}
+      width={540}
+      centered
       footer={[
         <Button key="cancel" variant="muted" onClick={onClose} className="mr-2">
           {UI.CANCEL}
@@ -340,27 +412,39 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
         </Button>,
       ]}
     >
-      <div className="py-4 space-y-6">
+      <div className="py-2 space-y-4">
         {isAllBlocked ? (
           <Alert
-            title={<span className="text-sm font-bold text-danger">{UI.ALL_BLOCKED_ERROR}</span>}
-            description={UI.BLOCKED_REASON}
             type="error"
-            showIcon
+            className="py-2 px-3 rounded-xl border-none bg-red-50/50"
+            message={
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 text-danger">
+                  <ExclamationCircleOutlined className="text-xs" />
+                  <span className="text-[11px] font-bold">{UI.ALL_BLOCKED_ERROR}</span>
+                </div>
+                <span className="text-[10px] text-danger/70 mt-0.5 ml-5">{UI.BLOCKED_REASON}</span>
+              </div>
+            }
           />
         ) : (
           <Alert
-            title={<span className="text-sm font-medium">{UI.IMPACT_TITLE}</span>}
-            description={UI.IMPACT_DESC(activeStudents.length)}
             type="info"
-            showIcon
-            className="rounded-lg shadow-sm"
+            className="py-2 px-3 rounded-xl border-none bg-info-surface"
+            message={
+              <div className="flex items-center gap-2 text-info">
+                <InfoCircleOutlined className="text-xs shrink-0" />
+                <span className="text-[11px] font-bold leading-tight">
+                  {UI.REASSIGN_INFO(activeStudents.length)}
+                </span>
+              </div>
+            }
           />
         )}
 
         {!isAllBlocked && (
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+          <div className="bg-bg/50 p-3 rounded-2xl border border-border/50">
+            <label className="block text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2 pl-1">
               {UI.TARGET_LABEL}
             </label>
             <EnterprisePhaseSelect
@@ -375,62 +459,79 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
         <div className="space-y-4">
           {!isAllBlocked && (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-success uppercase tracking-widest pl-1">
+              <div className="flex items-center gap-2 text-[10px] font-black text-success uppercase tracking-[0.2em] pl-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
                 {UI.ELIGIBLE_LABEL(activeStudents.length)}
               </div>
-              <div className="rounded-xl border border-success/10 bg-success-surface/5 p-1 max-h-[160px] overflow-auto">
-                <List
-                  size="small"
-                  dataSource={eligibleStudentsRaw}
-                  renderItem={(s) => {
-                    const isExcluded = excludedIds.has(s.id);
-                    return (
-                      <List.Item
-                        className={`border-none py-2 px-3 rounded-lg transition-all group mb-0.5 ${
-                          isExcluded ? 'opacity-30 grayscale' : 'hover:bg-white'
-                        }`}
-                        actions={[
-                          <Button
-                            key="remove"
-                            variant="muted"
-                            size="icon-xs"
-                            icon={
-                              isExcluded ? (
-                                <InfoCircleOutlined className="text-primary" />
-                              ) : (
-                                <CloseOutlined className="text-muted group-hover:text-red-500" />
-                              )
-                            }
-                            onClick={() => toggleExclude(s.id)}
-                            className="bg-transparent shadow-none"
-                          />,
-                        ]}
-                      >
-                        <div className="flex flex-col flex-1 min-w-0">
+              <div className="grid gap-2 max-h-[240px] overflow-auto pr-1 custom-scrollbar">
+                {eligibleStudentsRaw.map((s) => {
+                  const isExcluded = excludedIds.has(s.id);
+                  return (
+                    <div
+                      key={s.id}
+                      className={`p-2.5 bg-surface border rounded-xl flex justify-between items-center group transition-all ${
+                        isExcluded
+                          ? 'opacity-40 grayscale border-border/50'
+                          : 'border-border/50 hover:border-success/40 hover:shadow-sm hover:shadow-success/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Avatar
+                          size={32}
+                          className={`border-none text-[11px] font-bold shrink-0 ${
+                            isExcluded
+                              ? 'bg-muted/10 text-muted/40'
+                              : 'bg-success-surface text-success'
+                          }`}
+                        >
+                          {s.fullName?.charAt(0)}
+                        </Avatar>
+                        <div className="flex flex-col min-w-0">
                           <span
-                            className={`text-[13px] font-bold ${isExcluded ? 'line-through text-slate-400' : 'text-slate-700'}`}
+                            className={`text-[13px] font-bold truncate ${isExcluded ? 'text-muted/40 line-through' : 'text-text'}`}
                           >
                             {s.fullName}
                           </span>
-                          <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                            <span className="italic truncate max-w-[120px]">
+                          <div className="flex items-center gap-1 text-[10px] text-muted">
+                            <span className="italic truncate max-w-[100px]">
                               {s.enterpriseName || UI.CURRENT_ENTERPRISE_FALLBACK}
                             </span>
                             {!isExcluded && (
-                              <>
-                                <span className="font-bold text-primary/50">{UI.ARROW}</span>
-                                <span className="font-bold text-primary uppercase">
-                                  {PLACEMENT_UI_TEXT.STATUS_LABELS.NEW}
-                                </span>
-                              </>
+                              <div className="flex items-center gap-1 px-1 py-0.5 bg-primary/5 rounded text-[9px] text-primary font-black uppercase tracking-tighter">
+                                <span>{UI.ARROW}</span>
+                                <span>{PLACEMENT_UI_TEXT.STATUS_LABELS.NEW}</span>
+                              </div>
                             )}
                           </div>
                         </div>
-                      </List.Item>
-                    );
-                  }}
-                />
+                      </div>
+                      <Tooltip
+                        title={
+                          isExcluded
+                            ? PLACEMENT_UI_TEXT.MODALS.COMMON.INCLUDE
+                            : PLACEMENT_UI_TEXT.MODALS.COMMON.EXCLUDE
+                        }
+                      >
+                        <Button
+                          variant="ghost"
+                          size="icon-xs"
+                          className={`h-7 w-7 rounded-lg transition-colors border-none ${
+                            isExcluded
+                              ? 'text-primary hover:bg-primary-surface'
+                              : 'text-muted/40 hover:text-danger hover:bg-danger-surface'
+                          }`}
+                          onClick={() => toggleExclude(s.id)}
+                        >
+                          {isExcluded ? (
+                            <InfoCircleOutlined className="text-[10px]" />
+                          ) : (
+                            <CloseOutlined className="text-[10px]" />
+                          )}
+                        </Button>
+                      </Tooltip>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -448,7 +549,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
                   renderItem={(s) => (
                     <List.Item className="border-none py-2 px-3 items-start hover:bg-white/50 rounded-lg transition-all">
                       <div className="flex flex-col">
-                        <span className="text-[11px] font-bold text-slate-600 line-through decoration-danger/20">
+                        <span className="text-[11px] font-bold text-muted line-through decoration-danger/20">
                           {s.fullName}
                         </span>
                         <div className="flex items-center gap-1 mt-0.5">
@@ -475,6 +576,7 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
  */ export const BulkUnassignModal = ({ visible, onClose, selectedStudents, semesterId }) => {
   const UI = PLACEMENT_UI_TEXT.MODALS.BULK_UNASSIGN;
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   // AC-04: Exclude already unplaced students from calculations
   const studentsWithPlacements = useMemo(
@@ -495,12 +597,12 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
   const mutation = useMutation({
     mutationFn: (data) => PlacementService.unassignStudents(data),
     onSuccess: () => {
-      message.success(UI.SUCCESS(eligibleStudents.length));
+      toast.success(UI.SUCCESS(eligibleStudents.length));
       onClose();
       queryClient.invalidateQueries(['semester-students', semesterId]);
       queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
     },
-    onError: (err) => message.error(err?.message || 'Failed to cancel placement.'),
+    onError: (err) => toast.error(err?.message || 'Failed to cancel placement.'),
   });
 
   const handleConfirm = () => {
@@ -514,12 +616,23 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
   return (
     <Modal
       title={
-        <span className="text-lg font-bold text-danger">{UI.TITLE(eligibleStudents.length)}</span>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-danger-surface flex items-center justify-center text-danger">
+            <CloseOutlined className="text-xl" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold text-text leading-tight">
+              {UI.TITLE(eligibleStudents.length)}
+            </span>
+            <span className="text-xs font-medium text-muted">{UI.SUBTITLE}</span>
+          </div>
+        </div>
       }
       open={visible}
       onCancel={onClose}
       destroyOnHidden
-      width={520}
+      width={540}
+      centered
       footer={[
         <Button key="cancel" variant="muted" onClick={onClose} className="mr-2">
           {UI.CANCEL}
@@ -535,48 +648,81 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
         </Button>,
       ]}
     >
-      <div className="py-4 space-y-6">
+      <div className="py-2 space-y-4">
         {!hasPlacements ? (
           <Alert
-            title={
-              <span className="text-sm font-bold text-danger">{UI.EMPTY_PLACEMENTS_ERROR}</span>
-            }
             type="error"
-            showIcon
+            className="py-1.5 px-3 rounded-xl border-none bg-red-50/50"
+            message={
+              <div className="flex items-center gap-2 text-danger">
+                <ExclamationCircleOutlined className="text-xs" />
+                <span className="text-[11px] font-bold">{UI.EMPTY_PLACEMENTS_ERROR}</span>
+              </div>
+            }
           />
         ) : isAllBlocked ? (
           <Alert
-            title={<span className="text-sm font-bold text-danger">{UI.ALL_BLOCKED_ERROR}</span>}
-            description={PLACEMENT_UI_TEXT.MODALS.BULK_REASSIGN.BLOCKED_REASON}
             type="error"
-            showIcon
+            className="py-2 px-3 rounded-xl border-none bg-red-50/50"
+            message={
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 text-danger">
+                  <ExclamationCircleOutlined className="text-xs" />
+                  <span className="text-[11px] font-bold">{UI.ALL_BLOCKED_ERROR}</span>
+                </div>
+                <span className="text-[10px] text-danger/70 mt-0.5 ml-5">{UI.BLOCKED_REASON}</span>
+              </div>
+            }
           />
         ) : (
           <Alert
-            title={<span className="text-sm font-medium">{UI.WARNING_TITLE}</span>}
-            description={UI.WARNING_DESC}
             type="warning"
-            showIcon
-            className="rounded-lg shadow-sm"
+            className="py-1.5 px-3 rounded-xl border-none bg-warning-surface/50"
+            message={
+              <div className="flex items-center gap-2 text-warning">
+                <InfoCircleOutlined className="text-xs" />
+                <span className="text-[11px] font-bold">
+                  {UI.WARNING_TITLE}: {UI.WARNING_DESC}
+                </span>
+              </div>
+            }
           />
         )}
 
         <div className="space-y-4">
           {eligibleStudents.length > 0 && (
-            <div className="space-y-1">
+            <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 block pl-1">
                 {UI.ELIGIBLE_LABEL(eligibleStudents.length)}
               </label>
-              <div className="max-h-[220px] overflow-auto border rounded-xl divide-y bg-white">
+              <div className="grid gap-2 max-h-[240px] overflow-auto pr-1 custom-scrollbar">
                 {eligibleStudents.map((s) => (
                   <div
                     key={s.id}
-                    className="p-3 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors"
+                    className="p-2.5 bg-white border border-slate-100 rounded-xl flex justify-between items-center group hover:border-red-100 hover:shadow-sm hover:shadow-red-50 transition-all"
                   >
-                    <span className="font-semibold text-slate-700">{s.fullName}</span>
-                    <Badge variant="warning-soft" size="xs">
-                      {s.enterpriseName || 'Asigned'}
-                    </Badge>
+                    <div className="flex items-center gap-2.5">
+                      <Avatar
+                        size={32}
+                        className="bg-red-50 text-red-500 border-none text-[11px] font-bold shrink-0"
+                      >
+                        {s.fullName?.charAt(0)}
+                      </Avatar>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[13px] font-bold text-slate-700 truncate">
+                          {s.fullName}
+                        </span>
+                        <span className="text-[10px] text-slate-400 truncate tracking-tight">
+                          {UI.CURRENTLY_AT} {s.enterpriseName || 'assigned enterprise'}
+                        </span>
+                      </div>
+                    </div>
+                    <StatusBadge
+                      variant="danger"
+                      label={UI.TO_UNASSIGN}
+                      variantType="boxed"
+                      className="scale-90 origin-right"
+                    />
                   </div>
                 ))}
               </div>
@@ -588,20 +734,22 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
               <label className="text-[10px] font-black text-danger/60 uppercase tracking-[0.2em] mb-1 block pl-1">
                 {UI.BLOCKED_LABEL(blockedStudents.length)}
               </label>
-              <div className="max-h-[160px] overflow-auto border border-danger/10 rounded-xl divide-y bg-danger-surface/5">
+              <div className="max-h-[160px] overflow-auto border border-danger/10 rounded-xl divide-y bg-danger-surface/40">
                 {blockedStudents.map((s) => (
                   <div key={s.id} className="p-3 flex justify-between items-center text-sm">
                     <div className="flex flex-col">
-                      <span className="font-semibold text-slate-800 line-through decoration-danger/20">
+                      <span className="font-semibold text-text line-through decoration-danger/20">
                         {s.fullName}
                       </span>
                       <span className="text-[9px] text-danger font-bold uppercase tracking-tighter">
                         {PLACEMENT_UI_TEXT.MODALS.BULK_REASSIGN.BLOCKED_REASON}
                       </span>
                     </div>
-                    <Badge variant="danger-soft" size="xs">
-                      {PLACEMENT_UI_TEXT.STATUS_LABELS.BLOCKED_MIXED}
-                    </Badge>
+                    <StatusBadge
+                      variant="danger"
+                      label={PLACEMENT_UI_TEXT.STATUS_LABELS.BLOCKED_MIXED}
+                      variantType="boxed"
+                    />
                   </div>
                 ))}
               </div>

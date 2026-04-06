@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React from 'react';
 
 import StudentInternshipTable from '@/components/features/internship-placement/components/StudentInternshipTable';
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
@@ -11,9 +11,6 @@ import { PLACEMENT_UI_TEXT } from '@/constants/internship-placement/placement.co
 
 export default function TermPlacementsPage() {
   const { termId } = useParams();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState(undefined);
-
   const UI = PLACEMENT_UI_TEXT.PAGE;
 
   // Fetch specific term details
@@ -38,10 +35,6 @@ export default function TermPlacementsPage() {
             semesterId={termId}
             semesterStatus={term?.status}
             termName={term?.name}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
             terms={term ? [term] : []}
             isLoadingTerms={isLoadingTerm}
             hideTermSelect={true}

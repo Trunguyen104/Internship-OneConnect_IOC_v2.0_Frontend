@@ -7,9 +7,16 @@ import React from 'react';
 import InternPhaseGroupTab from '@/components/features/intern-phase-management/components/InternPhaseGroupTab';
 import { InternPhaseService } from '@/components/features/intern-phase-management/services/intern-phase.service';
 import PageLayout from '@/components/ui/pagelayout';
+import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 
 export default function PhaseGroupsPage() {
   const { phaseId } = useParams();
+  const { DETAILS } = INTERN_PHASE_MANAGEMENT;
+
+  const COPY = {
+    TITLE: DETAILS.TABS.GROUPS,
+    SUB: DETAILS.METADATA.TITLE,
+  };
 
   const { data: groups, isLoading } = useQuery({
     queryKey: ['phase-groups', phaseId],

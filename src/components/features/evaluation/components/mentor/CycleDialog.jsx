@@ -16,7 +16,7 @@ export default function CycleDialog({
   termDates = null,
 }) {
   const [form] = Form.useForm();
-  const { LABELS, BUTTONS, MESSAGES } = EVALUATION_UI;
+  const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
 
   // Reset form data when dialog opens
   React.useEffect(() => {
@@ -117,56 +117,66 @@ export default function CycleDialog({
         </Form.Item>
 
         {/* Date Range Section */}
-        <div className="grid grid-cols-2 gap-4">
-          <Form.Item
-            label={
-              <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
-                {LABELS.START_DATE}
-              </span>
-            }
-            name="startDate"
-            rules={[{ required: true, message: MESSAGES.VALIDATION_ERROR }]}
-          >
-            <DatePicker
-              className="w-full h-12 rounded-xl border-gray-100 bg-gray-50/30 font-bold text-sm transition-all hover:bg-white hover:border-primary/30"
-              disabledDate={disabledStartDate}
-              getPopupContainer={(trigger) => trigger.parentElement}
-              format="DD/MM/YYYY"
-              placeholder={LABELS.PICK_START}
-            />
-          </Form.Item>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <CalendarOutlined className="text-[12px]" />
+              {LABELS.TIME}
+            </span>
+            <div className="h-px flex-1 bg-gray-100" />
+          </div>
 
-          <Form.Item
-            label={
-              <span className="text-[10px] font-black text-muted/60 uppercase tracking-widest ml-1 flex items-center gap-2">
-                {LABELS.END_DATE}
-              </span>
-            }
-            name="endDate"
-            rules={[
-              { required: true, message: MESSAGES.VALIDATION_ERROR },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (
-                    !value ||
-                    !getFieldValue('startDate') ||
-                    value.isAfter(getFieldValue('startDate'))
-                  ) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('End date must be after start date'));
-                },
-              }),
-            ]}
-          >
-            <DatePicker
-              className="w-full h-12 rounded-xl border-gray-100 bg-gray-50/30 font-bold text-sm transition-all hover:bg-white hover:border-primary/30"
-              disabledDate={disabledEndDate}
-              getPopupContainer={(trigger) => trigger.parentElement}
-              format="DD/MM/YYYY"
-              placeholder={LABELS.PICK_END}
-            />
-          </Form.Item>
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              label={
+                <span className="text-[10px] font-bold text-muted/40 uppercase tracking-widest ml-1">
+                  {TABLE_COLUMNS.START_DATE}
+                </span>
+              }
+              name="startDate"
+              rules={[{ required: true, message: MESSAGES.VALIDATION_ERROR }]}
+            >
+              <DatePicker
+                className="w-full h-12 rounded-xl border-gray-100 bg-gray-50/30 font-bold text-sm transition-all hover:bg-white hover:border-primary/30"
+                disabledDate={disabledStartDate}
+                getPopupContainer={(trigger) => trigger.parentElement}
+                format="DD/MM/YYYY"
+                placeholder={LABELS.PICK_START}
+              />
+            </Form.Item>
+
+            <Form.Item
+              label={
+                <span className="text-[10px] font-bold text-muted/40 uppercase tracking-widest ml-1">
+                  {TABLE_COLUMNS.END_DATE}
+                </span>
+              }
+              name="endDate"
+              rules={[
+                { required: true, message: MESSAGES.VALIDATION_ERROR },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (
+                      !value ||
+                      !getFieldValue('startDate') ||
+                      value.isAfter(getFieldValue('startDate'))
+                    ) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('End date must be after start date'));
+                  },
+                }),
+              ]}
+            >
+              <DatePicker
+                className="w-full h-12 rounded-xl border-gray-100 bg-gray-50/30 font-bold text-sm transition-all hover:bg-white hover:border-primary/30"
+                disabledDate={disabledEndDate}
+                getPopupContainer={(trigger) => trigger.parentElement}
+                format="DD/MM/YYYY"
+                placeholder={LABELS.PICK_END}
+              />
+            </Form.Item>
+          </div>
         </div>
       </Form>
 

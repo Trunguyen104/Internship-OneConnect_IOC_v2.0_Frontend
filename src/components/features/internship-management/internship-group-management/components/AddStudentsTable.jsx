@@ -29,7 +29,7 @@ export const AddStudentsTable = ({ students, value, onChange, onSelect, loading 
   if (!students || students.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8 opacity-40 grayscale italic text-xs">
-        <Space direction="vertical" align="center" size={4}>
+        <Space orientation="vertical" align="center" size={4}>
           <UserOutlined className="text-2xl" />
           <Text className="text-[10px]">{UI_TEXT.USER_MANAGEMENT.NO_DATA}</Text>
         </Space>
