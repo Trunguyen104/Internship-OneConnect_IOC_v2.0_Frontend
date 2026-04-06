@@ -1,6 +1,7 @@
 'use client';
 
 import { useDroppable } from '@dnd-kit/core';
+import dayjs from 'dayjs';
 import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 
@@ -40,7 +41,19 @@ export function SprintSection({
     >
       {/* Header */}
       <div className="mb-6 flex items-center pr-1 pl-2">
-        <h3 className="text-[16px] font-bold text-slate-900">{sprint.name || sprint.title}</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-[20px] font-bold text-slate-900 tracking-tight">
+            {sprint.name || sprint.title}
+          </h3>
+          {sprint.startDate && sprint.endDate && (
+            <div className="flex items-center gap-2 text-slate-400 text-[14px] font-medium pt-1">
+              <span>
+                {dayjs(sprint.startDate).format('MMM D')} -{' '}
+                {dayjs(sprint.endDate).format('MMM D, YYYY')}
+              </span>
+            </div>
+          )}
+        </div>
         <div className="flex-1" />
 
         {/* Dynamic Start/Complete Sprint button based on status */}
