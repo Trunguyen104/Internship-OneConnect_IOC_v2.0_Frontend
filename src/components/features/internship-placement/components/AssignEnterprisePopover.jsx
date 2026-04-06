@@ -18,7 +18,7 @@ import EnterprisePhaseSelect from './EnterprisePhaseSelect';
 /**
  * AC-01: Assign Enterprise Nhanh Cho 1 Sinh Viên (Inline popover).
  */
-const AssignEnterprisePopover = ({ student, children, termName, termId, disabled = false }) => {
+const AssignEnterprisePopover = ({ student, children, termId, disabled = false }) => {
   // AC-01 Fix: studentId must be a GUID, not studentCode (ST000...).
   // enrollment record usually has 'studentId' as the GUID.
   const studentGuid = student.studentId || (student.id?.length > 20 ? student.id : null);
@@ -151,7 +151,7 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
         <EnterprisePhaseSelect
           value={selectedPhase?.internPhaseId || selectedPhase?.id}
           onChange={(id, phase) => setSelectedPhase(phase)}
-          termName={termName}
+          termId={termId}
         />
 
         {hasConflict && (

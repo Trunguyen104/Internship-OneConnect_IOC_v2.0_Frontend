@@ -18,35 +18,19 @@ const EnterprisePhaseSelect = ({
   placeholder = PLACEMENT_UI_TEXT.SELECT.PHASE_PLACEHOLDER,
   className = '',
   searchTerm = '',
-  termName,
+  termId,
 }) => {
   const { data: res, isLoading } = useQuery({
-    queryKey: ['eligible-phases', searchTerm],
-    queryFn: () => PlacementService.getEligiblePhases({ searchTerm }),
+    queryKey: ['eligible-phases', searchTerm, termId],
+    queryFn: () => PlacementService.getEligiblePhases({ searchTerm, termId: termId || undefined }),
   });
 
   const UI = PLACEMENT_UI_TEXT.SELECT;
   let phases = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
 
-  // AC-01: Filter phases by current term name to avoid showing phases from other terms (e.g. show Spring 2026 only)
-  if (termName) {
-    // Robust cleaning: remove "(Active)", "(Ended)", etc. and trim
-    const cleanTermName = termName
-      .toLowerCase()
-      .replace(/\(.*\)/g, '')
-      .trim();
-    const termYear = cleanTermName.match(/\d{4}/)?.[0];
-
-    phases = phases.filter((phase) => {
-      const pName = (phase.internPhaseName || phase.phaseName || '').toLowerCase();
-      // Match if phase name contains the term name (e.g. "spring 2026")
-      const matchesFullName = pName.includes(cleanTermName);
-      // Fallback: match if it contains the year (e.g. "2026") to be safe but helpful
-      const matchesYear = termYear && pName.includes(termYear);
-
-      return matchesFullName || matchesYear;
-    });
-  }
+  // AC-01: Removed aggressive string-based termName filtering.
+  // We now trust the backend to return phases for the specific termId.
+  // This allows custom phase names (like "Phase Của Đức") to appear correctly.
 
   // Group phases by enterprise
   const groupedPhases = phases.reduce((acc, phase) => {
