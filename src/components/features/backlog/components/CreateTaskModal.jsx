@@ -1,7 +1,8 @@
 'use client';
 
 import { PlusCircleOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
@@ -18,6 +19,7 @@ export default function CreateTaskModal({
   epics = [],
   initialSprintId = '',
   members = [],
+  sprints = [],
 }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
@@ -74,6 +76,20 @@ export default function CreateTaskModal({
     handleClose();
   }
 
+  const dueDateWarning = useMemo(() => {
+    if (!dueDate || !sprintId || !sprints.length) return false;
+    const selectedSprint = sprints.find(
+      (s) => (s.id || s.sprintId) === sprintId || s.id === sprintId
+    );
+    if (!selectedSprint || !selectedSprint.startDate || !selectedSprint.endDate) return false;
+
+    const d = dayjs(dueDate);
+    const start = dayjs(selectedSprint.startDate);
+    const end = dayjs(selectedSprint.endDate);
+
+    return d.isBefore(start, 'day') || d.isAfter(end, 'day');
+  }, [dueDate, sprintId, sprints]);
+
   const canSubmit = !!(summary?.trim() && type && status && priority);
 
   return (
@@ -128,6 +144,7 @@ export default function CreateTaskModal({
               setPriority={setPriority}
               dueDate={dueDate}
               setDueDate={setDueDate}
+              dueDateWarning={dueDateWarning}
               points={points}
               setPoints={setPoints}
               members={members}

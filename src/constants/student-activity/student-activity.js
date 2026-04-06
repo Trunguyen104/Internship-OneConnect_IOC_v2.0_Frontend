@@ -20,9 +20,9 @@ export const STUDENT_ACTIVITY_UI = {
   },
   STATS: {
     TOTAL: 'Total System Students',
-    PLACED: 'Students in Internship',
+    PLACED: 'Placed Students',
     UNPLACED: 'Unplaced Students',
-    NO_MENTOR: 'No Mentor Assigned',
+    NO_MENTOR: 'No Group',
     STUDENTS_LABEL: 'Students',
   },
   FILTERS: {

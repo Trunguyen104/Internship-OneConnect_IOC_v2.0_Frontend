@@ -10,7 +10,7 @@ import React from 'react';
  */
 export const Select = ({ className, error, ...props }) => {
   return (
-    <div className="flex w-full flex-col gap-1.5">
+    <div className="flex w-full flex-col gap-1.5 overflow-hidden">
       <AntdSelect
         className={`h-11 w-full ${className || ''}`}
         status={error ? 'error' : undefined}

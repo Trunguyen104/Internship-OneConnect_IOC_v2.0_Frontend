@@ -13,8 +13,9 @@ export default function PhaseGroupsPage() {
   const { phaseId } = useParams();
   const { DETAILS } = INTERN_PHASE_MANAGEMENT;
 
+  // Cấu hình Header cho trang danh sách nhóm thực tập
   const COPY = {
-    TITLE: DETAILS.TABS.GROUPS,
+    TITLE: 'Internship Groups',
     SUB: DETAILS.METADATA.TITLE,
   };
 
