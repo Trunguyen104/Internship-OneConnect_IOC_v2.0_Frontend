@@ -177,7 +177,7 @@ export default function CriteriaSettings({ cycle, open, onClose }) {
       }
       open={open}
       onCancel={onClose}
-      width={720}
+      width={540}
       className="premium-modal"
     >
       <div className="py-2 min-h-[350px]">

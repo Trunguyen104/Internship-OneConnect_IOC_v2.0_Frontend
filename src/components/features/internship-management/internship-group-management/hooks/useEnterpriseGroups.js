@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { ProjectService } from '@/components/features/project-management/services/project.service';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
@@ -41,7 +41,8 @@ export const useEnterpriseGroups = ({
   } = useQuery({
     queryKey,
     queryFn: async () => {
-      if (phaseId === undefined || phaseId === null) return { items: [], total: 0 };
+      if (phaseId === undefined || phaseId === null)
+        return { items: [], total: 0, projectItems: [] };
 
       try {
         const isBulkPhase = phaseId === 'ALL_VISIBLE';
@@ -66,81 +67,81 @@ export const useEnterpriseGroups = ({
         const items = response?.data?.items || response?.items || [];
         const projectItems = projectsRes?.data?.items || projectsRes?.items || [];
 
-        // Create a map for quick lookup: { normalizedGroupId: [projectName1, projectName2, ...] }
-        const projectMap = (Array.isArray(projectItems) ? projectItems : []).reduce((acc, p) => {
-          // Check all potential ID fields from the project object
-          const gid =
-            p.internshipId ||
-            p.InternshipId ||
-            p.internshipGroupId ||
-            p.groupId ||
-            p.InternshipGroupId ||
-            p.GroupId ||
-            p.projectId ||
-            p.ProjectId;
-
-          if (gid) {
-            const key = String(gid).toLowerCase();
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(p.projectName || p.ProjectName || p.name || p.Name);
-          }
-          return acc;
-        }, {});
-
-        const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
-
-        const mapped = Array.isArray(items)
-          ? items.map((item) => {
-              const itemPhaseId = item.phaseId || item.termId || item.internshipPhaseId;
-              const phaseMatch = safePhaseOptions.find(
-                (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
-              );
-
-              // Determine group ID with specific priority
-              const finalGroupId =
-                item.internshipGroupId ||
-                item.InternshipGroupId ||
-                item.groupId ||
-                item.GroupId ||
-                item.id ||
-                item.internshipId ||
-                item.InternshipId;
-
-              const normalizedKey = String(finalGroupId || '').toLowerCase();
-
-              return {
-                ...item,
-                id: finalGroupId,
-                name: item.groupName || item.GroupName || item.name || item.Name,
-                memberCount: item.numberOfMembers ?? item.memberCount ?? 0,
-                mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
-                phaseName:
-                  item.phaseName ||
-                  item.phase?.name ||
-                  item.termName ||
-                  phaseMatch?.label ||
-                  phaseMatch?.name ||
-                  '-',
-                startDate: item.startDate || item.phaseStartDate || phaseMatch?.startDate,
-                endDate: item.endDate || item.phaseEndDate || phaseMatch?.endDate,
-                projectName: projectMap[normalizedKey]?.[0] || 'N/A',
-                projectCount: projectMap[normalizedKey]?.length || 0,
-              };
-            })
-          : [];
-
         return {
-          items: mapped,
-          total: isBulkPhase ? mapped.length : response?.data?.total || mapped.length,
+          items,
+          total: isBulkPhase ? items.length : response?.data?.total || items.length,
+          projectItems,
         };
       } catch (error) {
         toast.error(GROUP_MANAGEMENT.MESSAGES.ERROR);
-        return { items: [], total: 0 };
+        return { items: [], total: 0, projectItems: [] };
       }
     },
     enabled: phaseId !== undefined && phaseId !== null,
     staleTime: 5 * 60 * 1000,
   });
+
+  const mappedData = useMemo(() => {
+    const { items = [], projectItems = [] } = queryResult || {};
+    const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
+
+    // Create a map for quick lookup: { normalizedGroupId: [projectName1, projectName2, ...] }
+    const projectMap = (Array.isArray(projectItems) ? projectItems : []).reduce((acc, p) => {
+      const gid =
+        p.internshipId ||
+        p.InternshipId ||
+        p.internshipGroupId ||
+        p.groupId ||
+        p.InternshipGroupId ||
+        p.GroupId ||
+        p.projectId ||
+        p.ProjectId;
+
+      if (gid) {
+        const key = String(gid).toLowerCase();
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(p.projectName || p.ProjectName || p.name || p.Name);
+      }
+      return acc;
+    }, {});
+
+    return items.map((item) => {
+      const itemPhaseId = item.phaseId || item.termId || item.internshipPhaseId;
+      const phaseMatch = safePhaseOptions.find(
+        (opt) => String(opt.value).toLowerCase() === String(itemPhaseId).toLowerCase()
+      );
+
+      const finalGroupId =
+        item.internshipGroupId ||
+        item.InternshipGroupId ||
+        item.groupId ||
+        item.GroupId ||
+        item.id ||
+        item.internshipId ||
+        item.InternshipId;
+
+      const normalizedKey = String(finalGroupId || '').toLowerCase();
+
+      return {
+        ...item,
+        id: finalGroupId,
+        name: item.groupName || item.GroupName || item.name || item.Name,
+        memberCount: item.numberOfMembers ?? item.memberCount ?? 0,
+        mentorName: item.mentorName || item.MentorName || item.mentor?.fullName || '-',
+        phaseName:
+          item.phaseName ||
+          item.phase?.name ||
+          item.termName ||
+          phaseMatch?.label ||
+          phaseMatch?.name ||
+          '-',
+        startDate: item.startDate || item.phaseStartDate || phaseMatch?.startDate,
+        endDate: item.endDate || item.phaseEndDate || phaseMatch?.endDate,
+        projectName: projectMap[normalizedKey]?.[0] || 'N/A',
+        projectCount: projectMap[normalizedKey]?.length || 0,
+      };
+    });
+  }, [queryResult, phaseOptions]);
 
   useEffect(() => {
     const handleRefresh = () => {
@@ -155,7 +156,7 @@ export const useEnterpriseGroups = ({
   }, [refetch, GROUP_MANAGEMENT.REFRESH_EVENT]);
 
   return {
-    data: queryResult?.items || [],
+    data: mappedData,
     total: queryResult?.total || 0,
     loading: isLoading,
     refetch,

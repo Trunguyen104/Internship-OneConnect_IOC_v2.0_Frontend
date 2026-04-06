@@ -4,8 +4,8 @@ export const universityService = {
   getAll(params = { PageNumber: 1, PageSize: 100 }) {
     return httpGet('/universities', params);
   },
-  getById(id) {
-    return httpGet(`/universities/${id}`);
+  getById(id, options = {}) {
+    return httpGet(`/universities/${id}`, {}, options);
   },
   create(payload) {
     return httpPost('/universities', payload);

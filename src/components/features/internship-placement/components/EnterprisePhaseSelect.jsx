@@ -86,7 +86,7 @@ const EnterprisePhaseSelect = ({
           label={
             <div className="flex items-center gap-2 py-1">
               <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-              <span className="text-[11px] font-black tracking-widest text-slate-400 uppercase">
+              <span className="text-[11px] font-black tracking-widest text-muted uppercase">
                 {group.enterpriseName}
               </span>
             </div>
@@ -101,7 +101,7 @@ const EnterprisePhaseSelect = ({
                 ? phase.majorFields.split(',').map((m) => m.trim())
                 : Array.isArray(phase.majorFields)
                   ? phase.majorFields
-                  : ['All'];
+                  : [UI.ALL];
 
             return (
               <Select.Option
@@ -113,35 +113,43 @@ const EnterprisePhaseSelect = ({
                 // Custom prop for filtering
                 searchString={`${group.enterpriseName} ${phaseName}`.toLowerCase()}
               >
-                <div className="flex flex-col py-1.5 px-0.5 group/opt">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm font-bold text-slate-700 group-hover/opt:text-primary transition-colors">
+                <div className="flex flex-col py-2 px-1 group/opt transition-all">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-sm font-bold text-text group-hover/opt:text-primary transition-colors">
                       {phaseName}
                     </span>
                     <div
-                      className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-tighter transition-all ${
                         remaining <= 2
-                          ? 'bg-red-50 text-red-500 ring-1 ring-red-100'
-                          : 'bg-slate-50 text-slate-500 ring-1 ring-slate-100'
+                          ? 'bg-danger-surface text-danger ring-1 ring-danger/20'
+                          : remaining < total * 0.5
+                            ? 'bg-warning-surface text-warning ring-1 ring-warning/20'
+                            : 'bg-success-surface text-success ring-1 ring-success/20'
                       }`}
                     >
-                      <span className="w-1 h-1 rounded-full bg-current opacity-40" />
-                      {UI.SLOT_LABEL} {remaining}/{total} {UI.LEFT}
+                      {remaining}/{total} {UI.SLOTS}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-semibold text-slate-300 uppercase tracking-tighter">
-                      {UI.MAJORS}
-                    </span>
-                    <div className="flex flex-wrap gap-1 max-w-[180px]">
-                      {majors.map((major, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[9px] text-slate-500 bg-white px-1.5 py-0 rounded border border-slate-200"
-                        >
-                          {major}
-                        </span>
-                      ))}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                      <span className="text-[9px] font-black text-muted/40 uppercase tracking-widest shrink-0">
+                        {UI.MAJORS}:
+                      </span>
+                      <div className="flex flex-wrap gap-1 items-center min-w-0">
+                        {majors.slice(0, 3).map((m, idx) => (
+                          <span
+                            key={idx}
+                            className="text-[9px] font-bold text-muted bg-bg px-1.5 py-0 rounded border border-border/50 whitespace-nowrap"
+                          >
+                            {m}
+                          </span>
+                        ))}
+                        {majors.length > 3 && (
+                          <span className="text-[9px] text-muted font-bold">
+                            +{majors.length - 3} {UI.MORE}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

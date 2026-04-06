@@ -1,29 +1,25 @@
 'use client';
 
 import {
-  DeleteOutlined,
   DownloadOutlined,
-  EditOutlined,
-  EyeOutlined,
   FilterOutlined,
   PlusOutlined,
   UserDeleteOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, Select, Space, Tooltip } from 'antd';
+import { Button, Dropdown, Select, Space } from 'antd';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import { TermService } from '@/components/features/internship-term-management/services/term.service';
-import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
-import TableRowDropdown from '@/components/ui/TableRowActions';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
 import ImportModal from './ImportModal';
+import { getStudentColumns } from './student-columns';
 import StudentFormModal from './StudentFormModal';
 
 export default function TermStudentManagement() {
@@ -79,145 +75,20 @@ export default function TermStudentManagement() {
 
   const { TABLE, ACTIONS: ACTION_LABELS, STATUS_LABELS, PLACEMENT_LABELS } = ENROLLMENT_MANAGEMENT;
 
-  const STATUS_VARIANTS = {
-    PLACED: 'success',
-    ACTIVE: 'success',
-    UNPLACED: 'info',
-    WITHDRAWN: 'danger',
-  };
-
   const columns = React.useMemo(
-    () => [
-      {
-        title: '#',
-        key: 'index',
-        width: 80,
-        align: 'center',
-        render: (_, __, index) => (
-          <span className="text-muted font-mono text-xs font-bold">
-            {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
-          </span>
-        ),
-      },
-      {
-        title: TABLE.COLUMNS.FULL_NAME,
-        dataIndex: 'name',
-        key: 'name',
-        sorter: true,
-        sortKey: 'FullName',
-        render: (name) => (
-          <span className="text-text text-sm font-bold tracking-tight">{name}</span>
-        ),
-      },
-      {
-        title: TABLE.COLUMNS.STUDENT_ID,
-        dataIndex: 'id',
-        key: 'id',
-        width: 140,
-        sorter: true,
-        sortKey: 'StudentId',
-        render: (id) => <span className="text-muted font-mono text-xs font-semibold">{id}</span>,
-      },
-      {
-        title: TABLE.COLUMNS.MAJOR,
-        dataIndex: 'major',
-        key: 'major',
-        render: (major) => (
-          <Tooltip title={major}>
-            <span className="text-text block max-w-[150px] truncate text-xs font-medium whitespace-nowrap">
-              {major}
-            </span>
-          </Tooltip>
-        ),
-      },
-      {
-        title: TABLE.COLUMNS.PLACEMENT,
-        key: 'placement',
-        width: 200,
-        render: (_, record) => {
-          const isPlaced = record.placementStatus === 'PLACED';
-          return (
-            <div className="flex flex-col gap-0.5">
-              <Tooltip
-                title={
-                  isPlaced
-                    ? record.enterpriseName || PLACEMENT_LABELS.PLACED
-                    : PLACEMENT_LABELS.UNPLACED
-                }
-              >
-                <span
-                  className={`block truncate text-[11px] font-bold uppercase tracking-wider whitespace-nowrap ${
-                    isPlaced ? 'text-text max-w-[180px]' : 'text-muted'
-                  }`}
-                >
-                  {isPlaced
-                    ? record.enterpriseName || PLACEMENT_LABELS.PLACED
-                    : PLACEMENT_LABELS.UNPLACED}
-                </span>
-              </Tooltip>
-            </div>
-          );
-        },
-      },
-      {
-        title: TABLE.COLUMNS.STATUS,
-        dataIndex: 'status',
-        key: 'status',
-        width: 140,
-        align: 'center',
-        render: (status) => {
-          const variant = STATUS_VARIANTS[status] || 'default';
-          const label = STATUS_LABELS[status] || status;
-          return <Badge variant={variant}>{label}</Badge>;
-        },
-      },
-      {
-        title: '',
-        key: 'actions',
-        width: 48,
-        align: 'right',
-        render: (_, record) => {
-          const isWithdrawn = record.status === 'WITHDRAWN';
-
-          const items = [
-            {
-              key: 'view',
-              label: ACTION_LABELS.VIEW,
-              icon: <EyeOutlined />,
-              onClick: () => handleView(record),
-            },
-          ];
-
-          if (!isClosed) {
-            if (!isWithdrawn) {
-              items.push(
-                { type: 'divider' },
-                {
-                  key: 'edit',
-                  label: ACTION_LABELS.EDIT,
-                  icon: <EditOutlined />,
-                  onClick: () => handleEdit(record),
-                },
-                {
-                  key: 'delete',
-                  label: ACTION_LABELS.DELETE,
-                  icon: <DeleteOutlined />,
-                  danger: true,
-                  onClick: () => handleDelete(record),
-                }
-              );
-            }
-          }
-
-          return (
-            <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
-              <TableRowDropdown items={items} />
-            </div>
-          );
-        },
-      },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () =>
+      getStudentColumns({
+        pagination,
+        isClosed,
+        handleView,
+        handleEdit,
+        handleDelete,
+        handleBulkWithdraw,
+        TABLE,
+        ACTION_LABELS,
+        STATUS_LABELS,
+        PLACEMENT_LABELS,
+      }),
     [pagination.current, pagination.pageSize, isClosed, STATUS_LABELS, PLACEMENT_LABELS, TABLE]
   );
 
@@ -251,7 +122,7 @@ export default function TermStudentManagement() {
         subtitle={ENROLLMENT_MANAGEMENT.PAGE_SUBTITLE}
       />
 
-      <PageLayout.Card className="flex flex-1 flex-col overflow-hidden min-h-[500px] max-h-[calc(100vh-160px)]">
+      <PageLayout.Card className="flex flex-1 flex-col overflow-hidden min-h-[500px]">
         <DataTableToolbar className="mb-4 !border-0 !p-0">
           <DataTableToolbar.Search
             placeholder={SEARCH.PLACEHOLDER}
@@ -332,14 +203,14 @@ export default function TermStudentManagement() {
           </DataTableToolbar.Actions>
         </DataTableToolbar>
 
-        <PageLayout.Content className="px-0">
+        <PageLayout.Content className="px-0 flex-1 flex flex-col min-h-0 overflow-hidden">
           <DataTable
             columns={columns}
             data={students}
             loading={loading}
             rowKey="studentTermId"
             size="small"
-            minWidth="800px"
+            minWidth="1000px"
             sortBy={sortBy}
             sortOrder={sortOrder}
             onSort={handleSortChange}

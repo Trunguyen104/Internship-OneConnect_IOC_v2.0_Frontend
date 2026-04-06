@@ -35,7 +35,7 @@ function SheetContent({
       onClose={() => onOpenChange?.(false)}
       placement={side}
       closable={showCloseButton}
-      destroyOnClose
+      destroyOnHidden
       size={size || 'default'}
       className={cn('premium-drawer', className)}
       styles={{
