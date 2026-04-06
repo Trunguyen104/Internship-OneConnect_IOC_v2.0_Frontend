@@ -30,10 +30,6 @@ export const AssignMentorModal = ({
         <span className="text-sm font-bold text-slate-700">{m.fullName || m.name}</span>
         <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
           <span className="truncate">{m.email}</span>
-          <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
-          <span className="text-primary/70">
-            {UI.MANAGING_PREFIX} {m.group_count || m.groupCount || 0} {UI.GROUPS_SUFFIX}
-          </span>
         </div>
       </div>
     ),

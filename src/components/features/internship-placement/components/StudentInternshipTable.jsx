@@ -11,7 +11,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Button as AntButton, Select, Space, Tooltip } from 'antd';
 import React, { useMemo, useState } from 'react';
 
-import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
@@ -25,6 +24,7 @@ import {
 } from '@/constants/internship-placement/placement.constants';
 import { UI_TEXT } from '@/lib/UI_Text';
 
+import { PlacementService } from '../services/placement.service';
 import { BulkAssignModal, BulkReassignModal, BulkUnassignModal } from './BulkPlacementModals';
 import StudentRowActions from './StudentRowActions';
 
@@ -58,11 +58,10 @@ const StudentInternshipTable = ({
   const { data: res, isLoading: isLoadingStudents } = useQuery({
     queryKey: ['semester-students', semesterId, page, pageSize, searchTerm, statusFilter],
     queryFn: () =>
-      StudentService.getAll(semesterId, {
+      PlacementService.getStudentsByTerm({
+        termId: semesterId,
         pageNumber: page,
         pageSize,
-        searchTerm,
-        placementStatus: statusFilter,
       }),
     enabled: !!semesterId,
   });
@@ -70,64 +69,36 @@ const StudentInternshipTable = ({
   const isLoading = isLoadingStudents;
 
   const students = useMemo(() => {
-    const rawItems = res?.data?.items || res?.items || [];
+    // The new API returns { items: [ { termId, students: [...] } ] }
+    const termData = res?.data?.items?.[0] || {};
+    const rawItems = termData.students || [];
 
     return rawItems.map((s) => {
-      // AC-11 Sync: Match StudentStatus Enum (1-6)
-      let rawStatus = s.displayStatus || s.placementStatus;
+      // Direct mapping from internshipApplicationStatus (AC-11 standard)
+      const rawStatus = s.internshipApplicationStatus;
 
-      // AC-11 Sync: Handle Legacy API (0, 1) and New Enums (4, 5, 6)
-      if (
-        rawStatus === 0 ||
-        rawStatus === PLACEMENT_STATUS.UNPLACED ||
-        rawStatus === 'UNPLACED' ||
-        rawStatus === 'Unplaced'
-      ) {
-        rawStatus = PLACEMENT_STATUS.UNPLACED; // Map to 5
-      } else if (
-        rawStatus === PLACEMENT_STATUS.PLACED ||
-        rawStatus === 'PLACED' ||
-        rawStatus === 'Placed' ||
-        (rawStatus === 1 && s.enterpriseName && s.enterpriseName !== '— Unassigned —')
-      ) {
-        rawStatus = PLACEMENT_STATUS.PLACED; // Map to 6
-      } else if (
-        rawStatus === 1 ||
-        rawStatus === PLACEMENT_STATUS.NO_INTERNSHIP ||
-        rawStatus === 'NO_INTERNSHIP'
-      ) {
-        rawStatus = PLACEMENT_STATUS.UNPLACED; // Also treat as Unplaced in this view
-      } else if (
-        rawStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT ||
-        rawStatus === 'PENDING_ASSIGNMENT' ||
-        rawStatus === 'PendingAssignment' ||
-        rawStatus === 'PENDING' ||
-        rawStatus === 'PENDING ASSIGNMENT'
-      ) {
-        rawStatus = PLACEMENT_STATUS.PENDING_ASSIGNMENT; // Map to 4
-      }
+      // Map ApplicationStatus to PLACED/UNPLACED/PENDING
+      // Based on APPLICATION_STATUS constants:
+      // 4: PENDING_ASSIGNMENT
+      // 5: PLACED
+      // 1, 2, 3, 6, 7: Generally treated as UNPLACED in this specific view
+      const displayStatus = rawStatus;
 
-      const isPending = rawStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT;
-      const isPlaced = rawStatus === PLACEMENT_STATUS.PLACED;
-      let displayStatus = rawStatus;
-      let activeEnterprise = s.enterpriseName;
-
-      if (isPending) {
-        if (!activeEnterprise || activeEnterprise === '— Unassigned —') {
-          activeEnterprise = 'Assigning...';
-        }
-      }
+      const isPending = rawStatus === 4;
+      const isPlaced = rawStatus === 5;
 
       return {
         ...s,
-        enterpriseName: activeEnterprise,
-        id: s.studentCode || s.id,
+        fullName: s.studentName,
+        id: s.studentId,
+        studentTermId: s.studentId, // IDs for bulk actions
         displayStatus,
         isPending,
         isPlaced,
-        // Critical: ensure Metadata is available even if StudentService missed it
-        applicationId: s.applicationId || null,
-        hasInternshipData: s.hasInternshipData || false,
+        // AC-11 Extension: required for BulkReassignModal filtering
+        hasInternshipData: isPlaced || isPending,
+        email: s.email || '', // Modal uses this for list display
+        enterpriseName: s.enterpriseName || (isPlaced ? 'Placed' : isPending ? 'Pending' : ''),
       };
     });
   }, [res]);
@@ -162,24 +133,23 @@ const StudentInternshipTable = ({
       title: UI.FULL_NAME,
       dataIndex: 'fullName',
       key: 'fullName',
+      width: 200,
       render: (text, record) => (
         <div className="flex flex-col gap-0.5">
           <span className="text-text text-sm font-bold tracking-tight">{text}</span>
           <span className="text-muted font-mono text-[10px] font-semibold opacity-70">
-            {record.studentCode || record.studentId}
+            {record.studentCode || record.studentId?.split('-')[0] || 'ST_NEW'}
           </span>
         </div>
       ),
     },
     {
-      title: 'STUDENT ID',
-      dataIndex: 'studentCode',
-      key: 'studentCode',
-      width: 140,
-      render: (code, record) => (
-        <span className="text-muted font-mono text-xs font-semibold">
-          {code || record.studentId}
-        </span>
+      title: 'CLASS',
+      dataIndex: 'className',
+      key: 'className',
+      width: 100,
+      render: (text) => (
+        <span className="text-muted font-mono text-[11px] font-bold uppercase">{text || '—'}</span>
       ),
     },
     {
@@ -206,7 +176,7 @@ const StudentInternshipTable = ({
         let displayName = text;
         if (!displayName || displayName === '— Unassigned —' || displayName === '— UNPLACED —') {
           if (isPlaced) displayName = 'PLACED';
-          else if (isPending) displayName = 'PENDING';
+          else if (isPending) displayName = 'PENDING ASSIGNMENT';
           else displayName = '— UNPLACED —';
         }
 

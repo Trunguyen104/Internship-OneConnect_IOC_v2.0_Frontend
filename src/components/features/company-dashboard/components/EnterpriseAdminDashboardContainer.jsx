@@ -174,7 +174,6 @@ export default function EnterpriseAdminDashboardContainer() {
           subtitle={ADMIN_DASHBOARD_UI.STATS.UNRESOLVED_VIOLATIONS_SUBTITLE || '30 days'}
           icon={ShieldAlert}
           colorClass="bg-rose-50 text-rose-500"
-          href="/violation-reports"
         />
       </div>
 

@@ -1,3 +1,13 @@
+export const APPLICATION_STATUS = {
+  APPLIED: 1,
+  INTERVIEWING: 2,
+  OFFERED: 3,
+  PENDING_ASSIGNMENT: 4,
+  PLACED: 5,
+  REJECTED: 6,
+  WITHDRAWN: 7,
+};
+
 export const PLACEMENT_STATUS = {
   // Overall Student Status (StudentStatus Enum)
   NO_INTERNSHIP: 1,
@@ -12,43 +22,31 @@ export const PLACEMENT_STATUS = {
 };
 
 export const PLACEMENT_STATUS_LABELS = {
-  [PLACEMENT_STATUS.NO_INTERNSHIP]: 'No Internship',
-  [PLACEMENT_STATUS.APPLIED]: 'Applied',
-  [PLACEMENT_STATUS.INTERVIEWING]: 'Interviewing',
-  [PLACEMENT_STATUS.OFFERED]: 'Offered',
-  [PLACEMENT_STATUS.INTERNSHIP_IN_PROGRESS]: 'In Progress',
-  [PLACEMENT_STATUS.COMPLETED]: 'Completed',
-  [PLACEMENT_STATUS.UNPLACED]: 'Unplaced',
-  [PLACEMENT_STATUS.PLACED]: 'Placed',
-  [PLACEMENT_STATUS.PENDING_ASSIGNMENT]: 'Pending Assignment',
+  // AC-11 Standardized (InternshipApplicationStatus Enum)
+  [APPLICATION_STATUS.APPLIED]: 'Applied',
+  [APPLICATION_STATUS.INTERVIEWING]: 'Interviewing',
+  [APPLICATION_STATUS.OFFERED]: 'Offered',
+  [APPLICATION_STATUS.PENDING_ASSIGNMENT]: 'Pending Assignment',
+  [APPLICATION_STATUS.PLACED]: 'Placed',
+  [APPLICATION_STATUS.REJECTED]: 'Rejected',
+  [APPLICATION_STATUS.WITHDRAWN]: 'Withdrawn',
   // Legacy support for API values 0 and 1
   0: 'Unplaced',
   1: 'Placed',
 };
 
 export const PLACEMENT_STATUS_VARIANTS = {
-  [PLACEMENT_STATUS.NO_INTERNSHIP]: 'muted',
-  [PLACEMENT_STATUS.UNPLACED]: 'muted',
-  [PLACEMENT_STATUS.APPLIED]: 'info-soft',
-  [PLACEMENT_STATUS.INTERNSHIP_IN_PROGRESS]: 'success-soft',
-  [PLACEMENT_STATUS.PLACED]: 'success-soft',
-  [PLACEMENT_STATUS.COMPLETED]: 'secondary',
-  [PLACEMENT_STATUS.PENDING_ASSIGNMENT]: 'warning-soft',
+  // AC-11 Standardized (InternshipApplicationStatus Enum)
+  [APPLICATION_STATUS.APPLIED]: 'info-soft',
+  [APPLICATION_STATUS.INTERVIEWING]: 'info-soft',
+  [APPLICATION_STATUS.OFFERED]: 'warning-soft',
+  [APPLICATION_STATUS.PENDING_ASSIGNMENT]: 'warning-soft',
+  [APPLICATION_STATUS.PLACED]: 'success-soft',
+  [APPLICATION_STATUS.REJECTED]: 'error-soft',
+  [APPLICATION_STATUS.WITHDRAWN]: 'muted',
   // Legacy support for API values 0 and 1
   0: 'muted',
   1: 'success-soft',
-  2: 'info-soft', // Interviewing fallback
-  3: 'warning-soft', // Offered fallback
-};
-
-export const APPLICATION_STATUS = {
-  APPLIED: 1,
-  INTERVIEWING: 2,
-  OFFERED: 3,
-  PENDING_ASSIGNMENT: 4,
-  PLACED: 5,
-  REJECTED: 6,
-  WITHDRAWN: 7,
 };
 
 export const SEMESTER_STATUS = {

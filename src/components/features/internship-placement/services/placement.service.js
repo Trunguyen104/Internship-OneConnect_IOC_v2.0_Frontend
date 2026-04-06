@@ -19,6 +19,19 @@ export const PlacementService = {
   },
 
   /**
+   * Get students with precise placement status grouped by term.
+   * Path: /api/v1/uniassigns/students-by-term
+   */
+  getStudentsByTerm(params = {}) {
+    const { termId, pageNumber, pageSize } = params;
+    return httpGet('/uniassigns/students-by-term', {
+      TermId: termId,
+      PageNumber: pageNumber || 1,
+      PageSize: pageSize || 10,
+    });
+  },
+
+  /**
    * Fetch eligible (Enterprise + Intern Phase) pairs for assignment.
    * Path: /api/v1/uniassigns/enterprise-interphases
    */
