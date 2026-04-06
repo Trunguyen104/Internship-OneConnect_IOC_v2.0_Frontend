@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Home,
   Layers,
+  UserCog,
   Users,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -20,7 +21,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { useLogout } from '@/hooks/useLogout';
+import { UI_TEXT } from '@/lib/UI_Text';
 
 const ALL_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
@@ -42,14 +45,38 @@ export default function CompanyTopNav() {
   const [userInfo, setUserInfo] = useState(null);
 
   const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
-  const isMentor = roleId === 6;
-  const isEnterpriseManager = [4, 5, 6].includes(roleId);
+  const isMentor = roleId === USER_ROLE.MENTOR;
+  const showEnterpriseStaffNav = [
+    USER_ROLE.ENTERPRISE_ADMIN,
+    USER_ROLE.HR,
+    USER_ROLE.MENTOR,
+  ].includes(roleId);
+  const isEnterpriseManager = [USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR, USER_ROLE.MENTOR].includes(
+    roleId
+  );
 
   const navTabs = useMemo(() => {
-    if (isMentor) return MENTOR_NAV_TABS;
+    if (isMentor) {
+      const tabs = [...MENTOR_NAV_TABS];
+      if (showEnterpriseStaffNav) {
+        tabs.push({
+          key: '/company/staff',
+          label: UI_TEXT.USER_MANAGEMENT.STAFF_TITLE,
+          icon: UserCog,
+        });
+      }
+      return tabs;
+    }
 
     const tabs = [...ALL_NAV_TABS];
-    if ([4, 5].includes(roleId)) {
+    if (showEnterpriseStaffNav) {
+      tabs.push({
+        key: '/company/staff',
+        label: UI_TEXT.USER_MANAGEMENT.STAFF_TITLE,
+        icon: UserCog,
+      });
+    }
+    if ([USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR].includes(roleId)) {
       tabs.push({
         key: '/company/applications',
         label: 'Applications',
@@ -57,7 +84,7 @@ export default function CompanyTopNav() {
       });
     }
     return tabs;
-  }, [isMentor, roleId]);
+  }, [isMentor, roleId, showEnterpriseStaffNav]);
 
   useEffect(() => {
     userService

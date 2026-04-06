@@ -1,3 +1,5 @@
+import { dispatchSessionRefreshed } from '@/lib/auth/session-events';
+
 const API_BASE = '/api/proxy/v1';
 
 /**
@@ -94,6 +96,7 @@ async function request(path, options = {}) {
         });
 
         if (refreshRes.ok) {
+          dispatchSessionRefreshed();
           // Retry logic without client-side token attachment
           const retryRes = await fetch(`${API_BASE}${path}`, fetchOptions);
 

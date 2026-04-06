@@ -2,29 +2,26 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { USER_ROLE } from '@/constants/common/enums';
 import { LANDING_UI } from '@/constants/landing/uiText';
+import { useLogout } from '@/hooks/useLogout';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const { user } = useAuthStore();
+  const { logout } = useLogout();
 
-  // useAuthStore uses persist middleware, so the user state is automatically loaded from localStorage.
-  // No need for an explicit fetchUser call on mount in the Navbar.
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLogout = async () => {
-    try {
-      const { logout } = await import('@/components/features/auth/services/auth.service');
-      await logout();
-      useAuthStore.getState().clearUser();
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Fallback: clear store even if API fails
-      useAuthStore.getState().clearUser();
-      window.location.href = '/';
-    }
+    // useLogout hook handles API call, store clearing, toast, and redirection.
+    await logout('Logged out successfully');
   };
 
   const dashboardHref = user
@@ -60,30 +57,35 @@ export function Navbar() {
             {LANDING_UI.NAVBAR.HOME}
           </Link>
 
-          {user ? (
-            <div className="flex items-center gap-4">
-              <Link
-                href={dashboardHref}
-                className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover"
-              >
-                {LANDING_UI.NAVBAR.DASHBOARD}
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
-              >
-                {LANDING_UI.NAVBAR.LOGOUT}
-              </button>
-            </div>
+          {mounted ? (
+            user ? (
+              <div className="flex items-center gap-4">
+                <Link
+                  href={dashboardHref}
+                  className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover"
+                >
+                  {LANDING_UI.NAVBAR.DASHBOARD}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
+                >
+                  {LANDING_UI.NAVBAR.LOGOUT}
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/login"
+                  className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover"
+                >
+                  {LANDING_UI.NAVBAR.LOGIN}
+                </Link>
+              </div>
+            )
           ) : (
-            <div className="flex items-center gap-4">
-              <Link
-                href="/login"
-                className="rounded-lg bg-primary px-6 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-hover"
-              >
-                {LANDING_UI.NAVBAR.LOGIN}
-              </Link>
-            </div>
+            // Skeleton while hydrating to prevent flickering
+            <div className="h-10 w-24 animate-pulse rounded-lg bg-slate-100" />
           )}
         </div>
       </div>

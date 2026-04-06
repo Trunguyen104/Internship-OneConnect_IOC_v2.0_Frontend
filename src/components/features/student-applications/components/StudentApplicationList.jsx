@@ -1,3 +1,5 @@
+'use client';
+
 import { App, Switch } from 'antd';
 import dayjs from 'dayjs';
 import {

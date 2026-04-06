@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 
+import { AUTH_COOKIE_REFRESH } from './lib/auth/cookie-names.js';
+
 export function proxy(request) {
-  const refreshToken = request.cookies.get('refreshToken')?.value;
+  const refreshToken = request.cookies.get(AUTH_COOKIE_REFRESH)?.value;
   const pathname = request.nextUrl.pathname;
 
   // REMOVE the forced redirect to /internship-groups when hitting /login with a token

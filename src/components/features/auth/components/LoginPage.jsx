@@ -1,14 +1,16 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 
 import { login } from '@/components/features/auth/services/auth.service';
 import Input from '@/components/ui/input';
 import { AUTH_MESSAGES, AUTH_UI } from '@/constants/auth/uiText';
 import { USER_ROLE } from '@/constants/common/enums';
+import { AUTH_SESSION_QUERY_KEY } from '@/hooks/useSession';
 import { useToast } from '@/providers/ToastProvider';
 import { useAuthStore } from '@/store/useAuthStore';
 import { validateLogin } from '@/validators/auth';
@@ -20,7 +22,9 @@ import { validateLogin } from '@/validators/auth';
  */
 export default function LoginPage() {
   const toast = useToast();
+  const queryClient = useQueryClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // --- Login Logic ---
   const [form, setForm] = useState(() => {
@@ -77,6 +81,14 @@ export default function LoginPage() {
         role: auth?.role,
         unitId: auth?.unitId,
       });
+
+      await queryClient.invalidateQueries({ queryKey: AUTH_SESSION_QUERY_KEY });
+
+      const returnTo = searchParams.get('returnTo');
+      if (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('/login')) {
+        router.push(returnTo);
+        return;
+      }
 
       const role = Number(auth?.role);
       if (role === USER_ROLE.SUPER_ADMIN) {

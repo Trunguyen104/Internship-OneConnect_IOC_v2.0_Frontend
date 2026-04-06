@@ -24,7 +24,10 @@ export const useNotificationSignalR = () => {
     const connectHub = async () => {
       try {
         // Step 1: Fetch short-lived token for query-string auth (AC-02)
-        const resToken = await fetch('/api/auth/token');
+        const resToken = await fetch('/api/auth/token', {
+          method: 'POST',
+          credentials: 'include',
+        });
         if (!resToken.ok) throw new Error('Failed to get notification token');
         const { accessToken } = await resToken.json();
 

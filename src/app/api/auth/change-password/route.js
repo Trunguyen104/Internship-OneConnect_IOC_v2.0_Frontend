@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { API_MESSAGES } from '@/constants/auth/uiText';
+import { AUTH_COOKIE_ACCESS } from '@/lib/auth/cookie-names';
 import { resolveAuthBaseUrl } from '@/lib/server/backend-url';
 
 const BE_URL = resolveAuthBaseUrl();
@@ -14,7 +15,7 @@ export async function POST(req) {
       return NextResponse.json({ message: API_MESSAGES.ERROR.INVALID_PAYLOAD }, { status: 400 });
     }
 
-    const accessToken = req.cookies.get('accessToken')?.value;
+    const accessToken = req.cookies.get(AUTH_COOKIE_ACCESS)?.value;
 
     if (!accessToken) {
       return NextResponse.json({ message: 'Missing access token' }, { status: 401 });

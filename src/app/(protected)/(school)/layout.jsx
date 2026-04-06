@@ -1,19 +1,15 @@
-'use client';
-
-import AuthGuard from '@/components/shared/AuthGuard';
 import { USER_ROLE } from '@/constants/user-management/enums';
+import { requireServerAuth } from '@/lib/server/auth-session';
 
 /**
  * SchoolLayout — UniAdmin only.
- * Chỉ enforce AuthGuard. Layout chrome (TopNav / Sidebar)
+ * Enforce server-side RBAC at layout level.
  * được inject tuỳ context:
  *   - Home pages        → dùng SchoolTopNav trực tiếp trong page/component
  *   - Term workspace    → layout.jsx riêng tại /school/terms/[termId]/
  */
-export default function SchoolLayout({ children }) {
-  return (
-    <AuthGuard allowedRoles={[USER_ROLE.SCHOOL_ADMIN]}>
-      <div className="h-screen overflow-hidden bg-gray-50">{children}</div>
-    </AuthGuard>
-  );
+export default async function SchoolLayout({ children }) {
+  await requireServerAuth([USER_ROLE.SCHOOL_ADMIN]);
+
+  return <div className="h-screen overflow-hidden bg-gray-50">{children}</div>;
 }

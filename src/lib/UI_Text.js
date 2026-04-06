@@ -164,6 +164,9 @@ export const UI_TEXT = {
     TERM_PLACEHOLDER_LOADING: 'Loading terms...',
     TERM_PLACEHOLDER_SELECT: 'Select internship term',
     TERM_PLACEHOLDER_NONE: 'No terms available',
+    STAFF_VIEW_ONLY_TITLE: 'View only',
+    STAFF_VIEW_ONLY_BANNER:
+      'You can browse HR and Mentor accounts in your organization. Only an Enterprise Admin can add, edit, or remove staff.',
   },
   ENTERPRISES: {
     TITLE: 'Enterprise Ecosystem',
@@ -322,9 +325,18 @@ export const UI_TEXT = {
   DASHBOARD: {
     OVERVIEW_TITLE: 'Dashboard Overview',
     OVERVIEW_SUBTITLE:
-      'Monitor platform performance, growth metrics, and recent administrative activities.',
-    RECENT_ACTIVITY: 'Recent Activity',
-    LATEST_SYSTEM_EVENTS: 'Latest system events',
+      'Key platform counts, health signals, and the latest audit trail (who did what, on which record).',
+    RECENT_ACTIVITY: 'Audit trail',
+    LATEST_SYSTEM_EVENTS:
+      'Recent changes recorded in the system log — action, target entity, actor, and timestamps.',
+    ACTIVITY_FOOTNOTE:
+      'Showing the 15 most recent audit events. Times are relative; exact UTC time is shown below each row.',
+    ACTOR_LABEL: 'Actor',
+    ACTION_LABEL: 'Action',
+    ENTITY_ID_LABEL: 'Entity ID',
+    AT_UTC: 'Recorded (UTC)',
+    RELATIVE: 'Relative',
+    SYSTEM_ACTOR: 'System / actor not recorded',
     VIEW_ALL: 'View all',
     LOADING_ACTIVITIES: 'Loading activities...',
     NO_ACTIVITIES: 'No recent activity detected.',
@@ -340,6 +352,7 @@ export const UI_TEXT = {
     STAT_STUDENTS: 'Total Students',
     STAT_TERMS: 'Active Terms',
     STAT_PENDING_APPS: 'Pending Apps',
+    STAT_JOBS: 'Job Postings',
     ERR_STATS_LOAD: 'Failed to load dashboard statistics.',
     ACTION_ADD_UNI: 'Add University',
     ACTION_ADD_ENT: 'Add Enterprise',
