@@ -13,6 +13,11 @@ export default function PhaseStudentsPage() {
   const { phaseId } = useParams();
   const { DETAILS } = INTERN_PHASE_MANAGEMENT;
 
+  const COPY = {
+    TITLE: DETAILS.TABS.STUDENTS,
+    SUB: DETAILS.METADATA.TITLE,
+  };
+
   const { data: students, isLoading } = useQuery({
     queryKey: ['phase-students', phaseId],
     queryFn: () => InternPhaseService.getStudents(phaseId),

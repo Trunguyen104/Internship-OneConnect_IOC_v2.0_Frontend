@@ -179,7 +179,7 @@ const StudentFormBody = memo(function StudentFormBody({
 
 const StudentFormModal = memo(function StudentFormModal({ visible, onCancel, ...props }) {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={480} destroyOnClose>
+    <CompoundModal open={visible} onCancel={onCancel} width={480} destroyOnHidden>
       {visible && <StudentFormBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );

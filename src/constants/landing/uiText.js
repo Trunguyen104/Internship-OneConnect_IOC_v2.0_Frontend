@@ -23,7 +23,7 @@ export const LANDING_UI = {
       },
       {
         title: 'Progress Management',
-        desc: 'Track daily reports, evaluate progress, and approve internship results online.',
+        desc: 'Track log book, evaluate progress, and approve internship results online.',
       },
       {
         title: '360° Evaluation',

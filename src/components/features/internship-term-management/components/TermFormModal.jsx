@@ -240,7 +240,7 @@ const TermFormBody = ({
 
 const TermFormModal = ({ visible, onCancel, ...props }) => {
   return (
-    <CompoundModal open={visible} onCancel={onCancel} width={640} destroyOnClose>
+    <CompoundModal open={visible} onCancel={onCancel} width={640} destroyOnHidden>
       {visible && <TermFormBody onCancel={onCancel} {...props} />}
     </CompoundModal>
   );
