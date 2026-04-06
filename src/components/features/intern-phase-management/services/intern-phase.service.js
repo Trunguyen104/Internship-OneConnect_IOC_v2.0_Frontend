@@ -16,7 +16,6 @@ const mapPhase = (item) => {
       (item.capacity !== undefined && item.remainingCapacity !== undefined
         ? item.capacity - item.remainingCapacity
         : 0),
-    // Add other mappings if necessary in the future
   };
 };
 
