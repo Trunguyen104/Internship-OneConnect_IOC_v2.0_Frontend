@@ -17,16 +17,16 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
       title: TABLE.COLUMNS.NAME,
       key: 'fullName',
       dataIndex: 'fullName',
-      width: '180px',
+      width: '30%',
       render: (text) => <span className="font-semibold text-slate-800">{text}</span>,
     },
     {
       title: TABLE.COLUMNS.UNIVERSITY,
       key: 'universityName',
       dataIndex: 'universityName',
-      width: '150px',
+      width: '35%',
       render: (text) => (
-        <span className="text-slate-600 italic text-xs">
+        <span className="text-slate-600 italic text-sm">
           {text && text.trim() ? text : INTERN_PHASE_MANAGEMENT.MESSAGES.DASH}
         </span>
       ),
@@ -34,7 +34,7 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
     {
       title: TABLE.COLUMNS.SOURCE,
       key: 'source',
-      width: '120px',
+      width: '15%',
       align: 'center',
       render: (source) => {
         const variant = TABLE.SOURCE_VARIANTS[source] || 'default';
@@ -42,7 +42,7 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
           TABLE.SOURCE_LABELS[source] || source || INTERN_PHASE_MANAGEMENT.MESSAGES.DASH;
 
         return (
-          <Badge variant={variant} size="xs">
+          <Badge variant={variant} size="sm">
             {label}
           </Badge>
         );
@@ -52,7 +52,7 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
       title: TABLE.COLUMNS.PLACED_DATE,
       key: 'placedAt',
       dataIndex: 'placedAt',
-      width: '120px',
+      width: '20%',
       render: (text) =>
         text ? dayjs(text).format('DD/MM/YYYY') : INTERN_PHASE_MANAGEMENT.MESSAGES.DASH,
     },
@@ -60,28 +60,27 @@ export default function InternPhaseStudentTab({ data, loading, DETAILS }) {
 
   if (loading) {
     return (
-      <div className="h-[400px] flex items-center justify-center">
-        <Skeleton active paragraph={{ rows: 8 }} />
+      <div className="flex-1 flex items-center justify-center">
+        <Skeleton active paragraph={{ rows: 8 }} className="w-full" />
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-[400px] flex-col items-center justify-center py-10">
+      <div className="flex flex-1 flex-col items-center justify-center py-10">
         <Empty description={DETAILS.EMPTY_STUDENTS} />
       </div>
     );
   }
 
   return (
-    <div className="h-[400px] overflow-hidden flex flex-col">
+    <div className="flex flex-1 flex-col overflow-hidden">
       <DataTable
         columns={columns}
         data={data}
         rowKey={(record) => record.studentId || record.id}
         minWidth="500px"
-        size="small"
         className="mt-0"
       />
     </div>

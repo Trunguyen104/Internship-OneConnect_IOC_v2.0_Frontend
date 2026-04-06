@@ -2,8 +2,8 @@ import { httpDelete, httpGet, httpPatch, httpPost, httpPut } from '@/services/ht
 
 export const EvaluationService = {
   // --- CYCLES ---
-  getCycles(termId) {
-    return httpGet('/evaluations/cycles', { termId });
+  getCycles(phaseId) {
+    return httpGet('/evaluations/cycles', { phaseId });
   },
 
   createCycle(data) {

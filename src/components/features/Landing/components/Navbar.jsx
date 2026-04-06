@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/common/enums';
 import { LANDING_UI } from '@/constants/landing/uiText';
 import { useLogout } from '@/hooks/useLogout';
@@ -11,13 +12,25 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
-  const { user } = useAuthStore();
+  const { user, clearUser } = useAuthStore();
   const { logout } = useLogout();
 
   useEffect(() => {
+    // 1. Mark as mounted to prevent hydration mismatches
+
     const timer = setTimeout(() => setMounted(true), 0);
+
+    // 2. On mount, if we have a user in store, verify session one time to avoid ghost sessions
+    if (user) {
+      userService.getMe().catch((err) => {
+        if (err?.status === 401 || err?.Response?.status === 401) {
+          clearUser();
+        }
+      });
+    }
+
     return () => clearTimeout(timer);
-  }, []);
+  }, []); // Only once on component mount
 
   const handleLogout = async () => {
     // useLogout hook handles API call, store clearing, toast, and redirection.

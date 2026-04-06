@@ -6,6 +6,7 @@ import {
   AlertOctagon,
   Briefcase,
   ChevronDown,
+  ClipboardCheck,
   FileText,
   FolderGit2,
   GraduationCap,
@@ -36,6 +37,7 @@ const ALL_NAV_TABS = [
 const MENTOR_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
   { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/evaluation', label: 'Evaluation', icon: ClipboardCheck },
   { key: '/company/violation', label: 'Violations', icon: AlertOctagon },
 ];
 
@@ -68,7 +70,15 @@ export default function CompanyTopNav() {
       return tabs;
     }
 
-    const tabs = [...ALL_NAV_TABS];
+    // Filter out 'Universities' as per incoming request logic
+    // Filter out 'Jobs' for EntAdmin (4) as per incoming request logic
+    const baseTabs = ALL_NAV_TABS.filter((tab) => {
+      if (tab.key === '/company/universities') return false;
+      if (tab.key === '/company/jobs' && roleId === USER_ROLE.ENTERPRISE_ADMIN) return false;
+      return true;
+    });
+
+    const tabs = [...baseTabs];
     if (showEnterpriseStaffNav) {
       tabs.push({
         key: '/company/staff',
@@ -76,6 +86,7 @@ export default function CompanyTopNav() {
         icon: UserCog,
       });
     }
+
     if ([USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR].includes(roleId)) {
       tabs.push({
         key: '/company/applications',

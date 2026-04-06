@@ -7,18 +7,46 @@ export const ImportPreviewTable = ({ previewData, IMPORT }) => {
     if (record.isValid) return false;
     const errors = record.errors || [];
     const fieldKeywords = {
-      studentCode: ['ID', 'Code', 'MSSV'],
-      fullName: ['Name'],
+      studentCode: ['ID', 'Code', 'MSSV', 'mã'],
+      fullName: ['Name', 'tên'],
       email: ['Email'],
-      phone: ['Phone'],
-      dateOfBirth: ['Birth'],
-      major: ['Major'],
+      phone: ['Phone', 'thoại'],
+      dateOfBirth: ['Birth', 'Ngày sinh'],
+      major: ['Major', 'ngành'],
     };
     const keywords = fieldKeywords[field] || [];
     return errors.some((err) =>
       keywords.some((kw) => err.toLowerCase().includes(kw.toLowerCase()))
     );
   };
+
+  const translateError = (error) => {
+    if (!error) return error;
+    const mappings = {
+      'Sinh viên với mã này đã được ghi danh vào kỳ thực tập hiện tại':
+        'This student ID is already enrolled in the current term',
+      'Mỗi sinh viên chỉ được đăng ký một lần trong cùng một kỳ':
+        'Each student can only be registered once per term',
+      'Sinh viên có email này đã được ghi danh vào kỳ thực tập hiện tại':
+        'This email is already registered in the current term',
+      'Mỗi email chỉ được đăng ký một lần trong cùng một kỳ':
+        'Each email can only be registered once per term',
+      'Email sinh viên không đúng định dạng': 'Invalid email format',
+      'Mã sinh viên không được để trống': 'Student ID cannot be empty',
+      'Họ tên không được để trống': 'Full name cannot be empty',
+      'Không tìm thấy ngành': 'Major not found',
+      'Định dạng ngày sinh không hợp lệ': 'Invalid date of birth format',
+    };
+
+    // Try exact or substring match
+    return Object.entries(mappings).reduce((acc, [vn, en]) => {
+      if (acc === vn) return en;
+      // Partial replace for joined strings
+      return acc.replace(vn, en);
+    }, error);
+  };
+  // ... rest of the logic ...
+  // ... rest of the logic should map errors ...
 
   const columns = [
     {
@@ -123,7 +151,7 @@ export const ImportPreviewTable = ({ previewData, IMPORT }) => {
             <CheckCircleOutlined style={{ color: 'var(--color-success)' }} className="text-xl" />
           </Tooltip>
         ) : (
-          <Tooltip title={r.errors?.join(', ')}>
+          <Tooltip title={r.errors?.map(translateError).join(', ')}>
             <ExclamationCircleOutlined
               style={{ color: 'var(--color-danger)' }}
               className="text-xl"

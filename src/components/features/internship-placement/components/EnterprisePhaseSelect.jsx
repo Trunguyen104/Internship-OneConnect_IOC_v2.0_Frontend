@@ -73,13 +73,11 @@ const EnterprisePhaseSelect = ({
       placeholder={placeholder}
       className={`w-full ${className}`}
       optionLabelProp="label"
+      notFoundContent={
+        <span className="text-muted text-[11px] p-4 text-center block italic">{UI.EMPTY}</span>
+      }
       filterOption={(input, option) => {
-        const enterpriseName = option.enterpriseName || '';
-        const phaseName = option.phaseName || '';
-        return (
-          enterpriseName.toLowerCase().includes(input.toLowerCase()) ||
-          phaseName.toLowerCase().includes(input.toLowerCase())
-        );
+        return (option.searchString || '').includes(input.toLowerCase());
       }}
     >
       {Object.entries(groupedPhases).map(([entId, group]) => (
@@ -112,6 +110,8 @@ const EnterprisePhaseSelect = ({
                 label={`${group.enterpriseName} — ${phaseName}`}
                 enterpriseName={group.enterpriseName}
                 phaseName={phaseName}
+                // Custom prop for filtering
+                searchString={`${group.enterpriseName} ${phaseName}`.toLowerCase()}
               >
                 <div className="flex flex-col py-1.5 px-0.5 group/opt">
                   <div className="flex justify-between items-center mb-1">
@@ -126,18 +126,18 @@ const EnterprisePhaseSelect = ({
                       }`}
                     >
                       <span className="w-1 h-1 rounded-full bg-current opacity-40" />
-                      {remaining}/{total} {UI.LEFT}
+                      {UI.SLOT_LABEL} {remaining}/{total} {UI.LEFT}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px] font-semibold text-slate-300 uppercase tracking-tighter">
                       {UI.MAJORS}
                     </span>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 max-w-[180px]">
                       {majors.map((major, idx) => (
                         <span
                           key={idx}
-                          className="text-[10px] text-slate-400 bg-slate-100/50 px-1.5 py-0 rounded border border-slate-200/50"
+                          className="text-[9px] text-slate-500 bg-white px-1.5 py-0 rounded border border-slate-200"
                         >
                           {major}
                         </span>

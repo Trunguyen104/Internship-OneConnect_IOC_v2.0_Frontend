@@ -72,6 +72,7 @@ export const INTERN_PHASE_MANAGEMENT = {
     VALIDATION: {
       NAME_REQUIRED: 'Phase name is required.',
       START_DATE_REQUIRED: 'Start date is required.',
+      START_DATE_PAST: 'Start date cannot be in the past.',
       END_DATE_REQUIRED: 'End date is required.',
       MAJORS_REQUIRED: 'At least one major field is required.',
       CAPACITY_REQUIRED: 'Capacity is required.',
@@ -267,6 +268,7 @@ export const INTERN_PHASE_MANAGEMENT = {
     VALIDATION: {
       NAME_REQUIRED: 'Phase name is required.',
       START_DATE_REQUIRED: 'Start date is required.',
+      START_DATE_PAST: 'Start date cannot be in the past.',
       END_DATE_REQUIRED: 'End date is required.',
       MAJORS_REQUIRED: 'At least one major field is required.',
       CAPACITY_REQUIRED: 'Capacity is required.',

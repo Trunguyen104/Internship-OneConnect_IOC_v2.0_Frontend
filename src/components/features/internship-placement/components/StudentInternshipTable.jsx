@@ -11,13 +11,14 @@ import { useQuery } from '@tanstack/react-query';
 import { Button as AntButton, Select, Space, Tooltip } from 'antd';
 import React, { useMemo, useState } from 'react';
 
-import { StudentService } from '@/components/features/internship-enrollment-management/services/student.service';
 import Badge from '@/components/ui/badge';
 import DataTable from '@/components/ui/datatable';
 import DataTableToolbar from '@/components/ui/datatabletoolbar';
 import PageLayout from '@/components/ui/pagelayout';
 import {
   PLACEMENT_STATUS,
+  PLACEMENT_STATUS_LABELS,
+  PLACEMENT_STATUS_VARIANTS,
   PLACEMENT_UI_TEXT,
   SEMESTER_STATUS,
 } from '@/constants/internship-placement/placement.constants';
@@ -57,56 +58,50 @@ const StudentInternshipTable = ({
   const { data: res, isLoading: isLoadingStudents } = useQuery({
     queryKey: ['semester-students', semesterId, page, pageSize, searchTerm, statusFilter],
     queryFn: () =>
-      StudentService.getAll(semesterId, {
+      PlacementService.getStudentsByTerm({
+        termId: semesterId,
         pageNumber: page,
         pageSize,
-        searchTerm,
-        placementStatus: statusFilter,
       }),
     enabled: !!semesterId,
   });
 
-  // AC-01: Fetch pending uni-assign applications
-  const { data: appsRes, isLoading: isLoadingApps } = useQuery({
-    queryKey: ['uni-assign-applications', semesterId],
-    queryFn: () => PlacementService.getUniAssignApplications({ termId: semesterId }),
-    enabled: !!semesterId,
-  });
-
-  const isLoading = isLoadingStudents || isLoadingApps;
+  const isLoading = isLoadingStudents;
 
   const students = useMemo(() => {
-    const rawItems = res?.data?.items || res?.items || [];
-    const applications = appsRes?.data?.items || appsRes?.items || [];
+    // The new API returns { items: [ { termId, students: [...] } ] }
+    const termData = res?.data?.items?.[0] || {};
+    const rawItems = termData.students || [];
 
     return rawItems.map((s) => {
-      const pendingApp = applications.find(
-        (app) =>
-          (app.studentId === s.studentId ||
-            app.studentId === s.id ||
-            app.studentCode === s.studentCode) &&
-          app.status === PLACEMENT_STATUS.PENDING_ASSIGNMENT
-      );
+      // Direct mapping from internshipApplicationStatus (AC-11 standard)
+      const rawStatus = s.internshipApplicationStatus;
 
-      let displayStatus = s.placementStatus;
-      let activeEnterprise = pendingApp?.enterpriseName || s.enterpriseName;
-      const isMissingEnterprise = !activeEnterprise || activeEnterprise === '— Unassigned —';
+      // Map ApplicationStatus to PLACED/UNPLACED/PENDING
+      // Based on APPLICATION_STATUS constants:
+      // 4: PENDING_ASSIGNMENT
+      // 5: PLACED
+      // 1, 2, 3, 6, 7: Generally treated as UNPLACED in this specific view
+      const displayStatus = rawStatus;
 
-      if (pendingApp || (s.placementStatus === 1 && isMissingEnterprise)) {
-        displayStatus = PLACEMENT_STATUS.PENDING_ASSIGNMENT;
-        if (isMissingEnterprise) {
-          activeEnterprise = 'Assigning (Pending)...';
-        }
-      }
+      const isPending = rawStatus === 4;
+      const isPlaced = rawStatus === 5;
 
       return {
         ...s,
-        enterpriseName: activeEnterprise,
-        id: s.studentCode || s.id,
+        fullName: s.studentName,
+        id: s.studentId,
+        studentTermId: s.studentId, // IDs for bulk actions
         displayStatus,
+        isPending,
+        isPlaced,
+        // AC-11 Extension: required for BulkReassignModal filtering
+        hasInternshipData: isPlaced || isPending,
+        email: s.email || '', // Modal uses this for list display
+        enterpriseName: s.enterpriseName || (isPlaced ? 'Placed' : isPending ? 'Pending' : ''),
       };
     });
-  }, [res, appsRes]);
+  }, [res]);
 
   const pagination = {
     current: res?.data?.pageNumber || page,
@@ -138,24 +133,23 @@ const StudentInternshipTable = ({
       title: UI.FULL_NAME,
       dataIndex: 'fullName',
       key: 'fullName',
+      width: 200,
       render: (text, record) => (
         <div className="flex flex-col gap-0.5">
           <span className="text-text text-sm font-bold tracking-tight">{text}</span>
           <span className="text-muted font-mono text-[10px] font-semibold opacity-70">
-            {record.studentCode || record.studentId}
+            {record.studentCode || record.studentId?.split('-')[0] || 'ST_NEW'}
           </span>
         </div>
       ),
     },
     {
-      title: 'STUDENT ID',
-      dataIndex: 'studentCode',
-      key: 'studentCode',
-      width: 140,
-      render: (code, record) => (
-        <span className="text-muted font-mono text-xs font-semibold">
-          {code || record.studentId}
-        </span>
+      title: 'CLASS',
+      dataIndex: 'className',
+      key: 'className',
+      width: 100,
+      render: (text) => (
+        <span className="text-muted font-mono text-[11px] font-bold uppercase">{text || '—'}</span>
       ),
     },
     {
@@ -176,9 +170,15 @@ const StudentInternshipTable = ({
       key: 'enterpriseName',
       width: 220,
       render: (text, record) => {
-        const isPlaced = record.placementStatus === 1;
-        const isPending = record.displayStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT;
-        const displayName = text || '— UNPLACED —';
+        const isPlaced = record.isPlaced;
+        const isPending = record.isPending;
+
+        let displayName = text;
+        if (!displayName || displayName === '— Unassigned —' || displayName === '— UNPLACED —') {
+          if (isPlaced) displayName = 'PLACED';
+          else if (isPending) displayName = 'PENDING ASSIGNMENT';
+          else displayName = '— UNPLACED —';
+        }
 
         return (
           <div className="flex flex-col">
@@ -202,17 +202,11 @@ const StudentInternshipTable = ({
       width: 160,
       align: 'center',
       render: (status) => {
-        const variants = {
-          0: 'info',
-          1: 'success',
-          4: 'warning',
-        };
-        const labels = {
-          0: 'UNPLACED',
-          1: 'PLACED',
-          4: 'PENDING',
-        };
-        return <Badge variant={variants[status] || 'default'}>{labels[status] || 'UNKNOWN'}</Badge>;
+        return (
+          <Badge variant={PLACEMENT_STATUS_VARIANTS[status] || 'default'}>
+            {PLACEMENT_STATUS_LABELS[status] || 'UNKNOWN'}
+          </Badge>
+        );
       },
     },
     {
@@ -273,9 +267,9 @@ const StudentInternshipTable = ({
               className="!h-11 min-w-[140px] !border-0 focus:!ring-0"
               variant="borderless"
               options={[
-                { label: 'Unplaced', value: 0 },
-                { label: 'Pending', value: 4 },
-                { label: 'Placed', value: 1 },
+                { label: 'Unplaced', value: PLACEMENT_STATUS.UNPLACED },
+                { label: 'Pending', value: PLACEMENT_STATUS.PENDING_ASSIGNMENT },
+                { label: 'Placed', value: PLACEMENT_STATUS.PLACED },
               ]}
               suffixIcon={<FilterOutlined className="text-muted/40" />}
             />
@@ -292,7 +286,7 @@ const StudentInternshipTable = ({
                 {selectedRowKeys.length} {UI.SELECTED}
               </span>
               <div className="w-px h-4 bg-primary/20" />
-              <Tooltip title={UI.ACTION_ASSIGN}>
+              <Tooltip title={isEnded ? PLACEMENT_UI_TEXT.ACTIONS.ENDED_TOOLTIP : UI.ACTION_ASSIGN}>
                 <AntButton
                   type="text"
                   size="small"
@@ -302,7 +296,7 @@ const StudentInternshipTable = ({
                   disabled={isEnded}
                 />
               </Tooltip>
-              <Tooltip title={UI.ACTION_CHANGE}>
+              <Tooltip title={isEnded ? PLACEMENT_UI_TEXT.ACTIONS.ENDED_TOOLTIP : UI.ACTION_CHANGE}>
                 <AntButton
                   type="text"
                   size="small"
@@ -312,16 +306,17 @@ const StudentInternshipTable = ({
                   disabled={isEnded}
                 />
               </Tooltip>
-              <Tooltip title={UI.ACTION_CANCEL}>
-                <AntButton
-                  type="text"
-                  size="small"
-                  className="flex items-center justify-center !text-red-500 hover:!bg-red-50"
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => setModalType('unassign')}
-                  disabled={isEnded}
-                />
-              </Tooltip>
+              {!isEnded && (
+                <Tooltip title={UI.ACTION_CANCEL}>
+                  <AntButton
+                    type="text"
+                    size="small"
+                    className="flex items-center justify-center !text-red-500 hover:!bg-red-50"
+                    icon={<CloseCircleOutlined />}
+                    onClick={() => setModalType('unassign')}
+                  />
+                </Tooltip>
+              )}
             </Space>
           )}
         </DataTableToolbar.Actions>

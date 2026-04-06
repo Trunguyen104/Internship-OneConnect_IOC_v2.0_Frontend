@@ -62,15 +62,20 @@ export default function CycleList({
       align: 'center',
       width: '140px',
       render: (status) => {
-        const labels = [STATUS.UPCOMING, STATUS.ONGOING, STATUS.COMPLETED];
-        const variants = ['info', 'primary', 'success'];
+        // Handle both numeric (0,1,2) and string ("Pending", "Grading", "Completed") statuses
+        const statusMap = {
+          0: { label: STATUS.UPCOMING, variant: 'neutral' },
+          Pending: { label: STATUS.UPCOMING, variant: 'neutral' },
+          1: { label: STATUS.ONGOING, variant: 'info' },
+          Grading: { label: STATUS.ONGOING, variant: 'info' },
+          Ongoing: { label: STATUS.ONGOING, variant: 'info' },
+          2: { label: STATUS.COMPLETED, variant: 'success' },
+          Completed: { label: STATUS.COMPLETED, variant: 'success' },
+        };
 
-        return (
-          <StatusBadge
-            variant={variants[status] || 'neutral'}
-            label={labels[status] || STATUS.UNKNOWN}
-          />
-        );
+        const config = statusMap[status] || { label: STATUS.UNKNOWN, variant: 'neutral' };
+
+        return <StatusBadge variant={config.variant} label={config.label} />;
       },
     },
     {
@@ -88,7 +93,7 @@ export default function CycleList({
             variant="primary"
             size="sm"
             onClick={() => onOpenGrading(record)}
-            disabled={record.status !== 1 || !isTermOngoing}
+            disabled={record.status === 0 || (record.status === 1 && !isTermOngoing)}
             className="rounded-full h-9 px-6 font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:hover:scale-100"
           >
             <ThunderboltOutlined className="text-xs" /> {BUTTONS.QUICK_GRADE}
@@ -114,12 +119,17 @@ export default function CycleList({
       align: 'center',
       width: '60px',
       render: (_, record) => {
+        const isCompleted = record.status === 2;
+        const isDisabled = isTermPast || isCompleted;
+
+        // Hide action menu entirely if everything is disabled
+        if (isDisabled) return null;
+
         const menuItems = [
           {
             key: 'edit',
             label: BUTTONS.EDIT,
             icon: <EditOutlined />,
-            disabled: isTermPast,
             onClick: () => onEdit(record),
           },
           {
@@ -127,7 +137,6 @@ export default function CycleList({
             label: BUTTONS.DELETE,
             icon: <DeleteOutlined />,
             danger: true,
-            disabled: isTermPast,
             onClick: () => onDelete(record.cycleId),
           },
         ];

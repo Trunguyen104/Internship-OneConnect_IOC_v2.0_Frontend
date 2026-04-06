@@ -106,12 +106,7 @@ export default function AppSidebar() {
           { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
           { key: `${p}/groups`, icon: <FolderKanban className="size-4" />, label: 'Groups' },
           {
-            key: `${p}/evaluation`,
-            icon: <ClipboardCheck className="size-4" />,
-            label: 'Evaluations',
-          },
-          {
-            key: `/company/public-holidays`,
+            key: `${p}/public-holidays`,
             icon: <CalendarCheck className="size-4" />,
             label: 'Public Holidays',
           },
@@ -124,7 +119,11 @@ export default function AppSidebar() {
       const groupWorkspaceMatch = pathname.match(/^\/internship-groups\/([^/]+)/);
       if (groupWorkspaceMatch) {
         const p = `/internship-groups/${groupWorkspaceMatch[1]}`;
-        return [
+        const isManagement = [USER_ROLE.MENTOR, USER_ROLE.HR, USER_ROLE.ENTERPRISE_ADMIN].includes(
+          Number(userRole)
+        );
+
+        const baseRoutes = [
           { key: 'back-to-home', icon: <ArrowLeft className="size-4" />, label: 'Back to Home' },
           { type: 'divider' },
           { key: `${p}/space`, icon: <LayoutDashboard className="size-4" />, label: 'Space' },
@@ -146,8 +145,14 @@ export default function AppSidebar() {
             icon: <UserCircle className="size-4" />,
             label: 'Stakeholders',
           },
-          { key: `${p}/violation`, icon: <AlertOctagon className="size-4" />, label: 'Violations' },
+          {
+            key: `${p}/violation`,
+            icon: <AlertOctagon className="size-4" />,
+            label: isManagement ? 'Violation Reports' : 'Violations',
+          },
         ];
+
+        return baseRoutes;
       }
 
       // ══════════════════════════════════════════════════════

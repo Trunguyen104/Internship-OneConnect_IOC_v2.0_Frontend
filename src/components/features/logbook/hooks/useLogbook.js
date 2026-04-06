@@ -1,24 +1,26 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { LogBookService } from '@/components/features/logbook/services/log-book.service';
 import { userService } from '@/components/features/user/services/user.service';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useLogbook() {
   const toast = useToast();
   const searchParams = useSearchParams();
+  const { internshipGroupId } = useParams();
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
   // Route Synchronization
-  const urlInternshipId = searchParams.get('internshipId');
+  const urlInternshipId = internshipGroupId || searchParams.get('internshipId');
   const [internshipId, setInternshipIdState] = useState(urlInternshipId);
 
   // Filter & Pagination States
@@ -47,6 +49,8 @@ export function useLogbook() {
     },
     staleTime: Infinity,
   });
+
+  const isStudent = Number(userProfile?.role) === USER_ROLE.STUDENT;
 
   // 2. Fetch Available Internships
   const { data: internships = [] } = useQuery({
@@ -130,11 +134,18 @@ export function useLogbook() {
 
         const res = await LogBookService.getAll(internshipId, params);
         const weeks = res?.data?.weeks || [];
-        const allItems = weeks.flatMap((w) => w.items || []);
+        // Only include actual logbooks (those with a logbookId), exclude reminder placeholders
+        const allItems = weeks
+          .flatMap((w) => w.items || [])
+          .filter((item) => !!(item.logbookId || item.id));
+
+        // Since the backend returns whole weeks/all records, we slice locally
+        const startIndex = (pageNumber - 1) * pageSize;
+        const pagedItems = allItems.slice(startIndex, startIndex + pageSize);
 
         return {
-          items: allItems,
-          totalCount: res?.data?.totalCount || 0,
+          items: pagedItems,
+          totalCount: allItems.length,
         };
       } catch {
         return { items: [], totalCount: 0 };
@@ -153,23 +164,20 @@ export function useLogbook() {
     queryKey: ['missing-logbook-dates', userProfile?.studentId],
     queryFn: async () => {
       // Only students have missing dates calculated this way
-      if (!userProfile) return { missingDates: [] };
+      if (!userProfile || !isStudent) return { missingDates: [] };
       try {
-        console.log('Diagnostic: User Profile for Missing Dates:', userProfile);
         const targetId = userProfile.studentId || userProfile.id;
         const res = await LogBookService.getMissingDates(targetId);
-        console.log('Missing Logbook Dates API Response:', res);
         return res?.data || { missingDates: [] };
       } catch (error) {
-        console.error('Error fetching missing logbook dates:', error);
-        // Only show toast if it's a real error (not 401/403 handled elsewhere)
+        // Only show toast if it's a real error
         if (error.status && error.status !== 401 && error.status !== 403) {
           toast.error(`Could not check missing dates: ${error.message || 'Server Error'}`);
         }
         return { missingDates: [] };
       }
     },
-    enabled: !!userProfile,
+    enabled: !!userProfile && isStudent,
     staleTime: 10 * 60 * 1000,
   });
 

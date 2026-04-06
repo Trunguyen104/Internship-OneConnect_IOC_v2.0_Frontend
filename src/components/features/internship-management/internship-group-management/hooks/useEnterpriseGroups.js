@@ -51,7 +51,7 @@ export const useEnterpriseGroups = ({
           TermId: isBulkPhase ? undefined : phaseId,
           PageIndex: isBulkPhase ? 1 : pagination?.current || 1,
           PageSize: isBulkPhase ? 1000 : pagination?.pageSize || 10,
-          Search: search || undefined,
+          SearchTerm: search || undefined,
           Status: filters?.status,
           IncludeArchived: filters?.includeArchived,
           SortColumn: sort?.column,
