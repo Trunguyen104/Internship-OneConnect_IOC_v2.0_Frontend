@@ -33,8 +33,8 @@ export function ToastProvider({ children }) {
       const opt = isObject ? description : options;
       const desc = isObject ? undefined : description;
 
-      notificationApi?.success({
-        title,
+      return notificationApi?.success({
+        title: title,
         description: desc,
         showProgress: true,
         duration: 5,
@@ -49,8 +49,8 @@ export function ToastProvider({ children }) {
       const opt = isObject ? description : options;
       const desc = isObject ? undefined : description;
 
-      notificationApi?.error({
-        title,
+      return notificationApi?.error({
+        title: title,
         description: desc,
         showProgress: true,
         ...opt,
@@ -64,8 +64,8 @@ export function ToastProvider({ children }) {
       const opt = isObject ? description : options;
       const desc = isObject ? undefined : description;
 
-      notificationApi?.info({
-        title,
+      return notificationApi?.info({
+        title: title,
         description: desc,
         showProgress: true,
         ...opt,
@@ -79,12 +79,19 @@ export function ToastProvider({ children }) {
       const opt = isObject ? description : options;
       const desc = isObject ? undefined : description;
 
-      notificationApi?.warning({
-        title,
+      return notificationApi?.warning({
+        title: title,
         description: desc,
         showProgress: true,
         ...opt,
       });
+    },
+    dismiss: (key) => {
+      if (key) {
+        notificationApi?.destroy(key);
+      } else {
+        notificationApi?.destroy();
+      }
     },
   };
 

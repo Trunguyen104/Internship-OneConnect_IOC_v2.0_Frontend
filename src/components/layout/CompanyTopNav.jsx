@@ -1,32 +1,101 @@
 'use client';
 
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { BankOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Briefcase, ChevronDown, FolderGit2, GraduationCap, Home, Layers } from 'lucide-react';
+import {
+  AlertOctagon,
+  Briefcase,
+  ChevronDown,
+  ClipboardCheck,
+  FileText,
+  FolderGit2,
+  GraduationCap,
+  Home,
+  Layers,
+  UserCog,
+  Users,
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
-import { useToast } from '@/providers/ToastProvider';
+import { USER_ROLE } from '@/constants/user-management/enums';
+import { useLogout } from '@/hooks/useLogout';
+import { UI_TEXT } from '@/lib/UI_Text';
 
-const NAV_TABS = [
+const ALL_NAV_TABS = [
   { key: '/company/home', label: 'Home', icon: Home },
   { key: '/company/phases', label: 'Phases', icon: Layers },
-  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/internships', label: 'Internships', icon: Users },
   { key: '/company/universities', label: 'Universities', icon: GraduationCap },
   { key: '/company/jobs', label: 'Jobs', icon: Briefcase },
+];
+
+const MENTOR_NAV_TABS = [
+  { key: '/company/home', label: 'Home', icon: Home },
+  { key: '/company/projects', label: 'Projects', icon: FolderGit2 },
+  { key: '/company/evaluation', label: 'Evaluation', icon: ClipboardCheck },
+  { key: '/company/violation', label: 'Violations', icon: AlertOctagon },
 ];
 
 export default function CompanyTopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const [userInfo, setUserInfo] = useState(null);
+
+  const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
+  const isMentor = roleId === USER_ROLE.MENTOR;
+  const showEnterpriseStaffNav = [
+    USER_ROLE.ENTERPRISE_ADMIN,
+    USER_ROLE.HR,
+    USER_ROLE.MENTOR,
+  ].includes(roleId);
+  const isEnterpriseManager = [USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR, USER_ROLE.MENTOR].includes(
+    roleId
+  );
+
+  const navTabs = useMemo(() => {
+    if (isMentor) {
+      const tabs = [...MENTOR_NAV_TABS];
+      if (showEnterpriseStaffNav) {
+        tabs.push({
+          key: '/company/staff',
+          label: UI_TEXT.USER_MANAGEMENT.STAFF_TITLE,
+          icon: UserCog,
+        });
+      }
+      return tabs;
+    }
+
+    // Filter out 'Universities' as per incoming request logic
+    // Filter out 'Jobs' for EntAdmin (4) as per incoming request logic
+    const baseTabs = ALL_NAV_TABS.filter((tab) => {
+      if (tab.key === '/company/universities') return false;
+      if (tab.key === '/company/jobs' && roleId === USER_ROLE.ENTERPRISE_ADMIN) return false;
+      return true;
+    });
+
+    const tabs = [...baseTabs];
+    if (showEnterpriseStaffNav) {
+      tabs.push({
+        key: '/company/staff',
+        label: UI_TEXT.USER_MANAGEMENT.STAFF_TITLE,
+        icon: UserCog,
+      });
+    }
+
+    if ([USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR].includes(roleId)) {
+      tabs.push({
+        key: '/company/applications',
+        label: 'Applications',
+        icon: FileText,
+      });
+    }
+    return tabs;
+  }, [isMentor, roleId, showEnterpriseStaffNav]);
 
   useEffect(() => {
     userService
@@ -37,15 +106,7 @@ export default function CompanyTopNav() {
       });
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      toast.success('Logout successfully');
-    } finally {
-      router.push('/login');
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const avatarMenu = {
     items: [
@@ -54,7 +115,7 @@ export default function CompanyTopNav() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+              {userInfo?.fullName || userInfo?.FullName || 'User'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>
@@ -63,12 +124,16 @@ export default function CompanyTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+      ...(isEnterpriseManager
+        ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
+        : []),
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
+      if (key === 'my-company') router.push('/company/my-company');
       if (key === 'settings') router.push('/settings');
       if (key === 'logout') handleLogout();
     },
@@ -78,7 +143,7 @@ export default function CompanyTopNav() {
   const isPhaseWorkspace = /^\/company\/phases\/[^/]+/.test(pathname);
 
   return (
-    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
+    <header className="sticky top-0 z-50 flex h-[64px] min-h-[64px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 shadow-sm">
       {/* LEFT — Logo + Tabs */}
       <div className="flex items-center gap-8">
         <Link href="/company/home" className="relative flex h-8 w-28 items-center">
@@ -93,7 +158,7 @@ export default function CompanyTopNav() {
 
         {!isPhaseWorkspace && (
           <nav className="flex items-center gap-1">
-            {NAV_TABS.map(({ key, label, icon: Icon }) => {
+            {navTabs.map(({ key, label, icon: Icon }) => {
               const isActive = pathname === key || pathname.startsWith(key + '/');
               return (
                 <Link
@@ -105,7 +170,7 @@ export default function CompanyTopNav() {
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <Icon className="size-4" />
+                  {Icon ? <Icon className="size-4" /> : null}
                   {label}
                 </Link>
               );

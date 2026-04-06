@@ -27,7 +27,7 @@ const enterpriseMenu = [
   {
     icon: <CalendarOutlined />,
     label: 'Intern Phases',
-    href: '/intern-phase-management',
+    href: '/company/phases',
   },
   {
     icon: <SolutionOutlined />,
@@ -53,8 +53,8 @@ const enterpriseMenu = [
 
   {
     icon: <SolutionOutlined />,
-    label: 'Application',
-    href: '/applications',
+    label: 'Applications',
+    href: '/company/applications',
   },
   {
     icon: <SolutionOutlined />,

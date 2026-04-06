@@ -5,7 +5,6 @@ import { Card, Descriptions, Divider, Drawer, Empty, Progress, Space, Typography
 import dayjs from 'dayjs';
 
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
-import { UI_TEXT } from '@/lib/UI_Text';
 
 const { Text, Paragraph } = Typography;
 
@@ -28,24 +27,25 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
             <Descriptions column={1} size="small">
               <Descriptions.Item label={EVALUATION_UI.LABELS.EVALUATOR}>
                 <Text strong className="text-text">
-                  {evaluationDetail.evaluatorName}
+                  {evaluationDetail.evaluatorName || EVALUATION_UI.LABELS.NOT_ASSIGNED || '-'}
                 </Text>
               </Descriptions.Item>
 
               <Descriptions.Item label={EVALUATION_UI.LABELS.TIME}>
-                <Text className="text-muted-foreground text-xs">
-                  {dayjs(evaluationDetail.gradedAt).format('DD/MM/YYYY HH:mm')}
+                <Text className="text-muted-foreground text-xs italic">
+                  {evaluationDetail.gradedAt
+                    ? dayjs(evaluationDetail.gradedAt).format('DD/MM/YYYY HH:mm')
+                    : EVALUATION_UI.LABELS.NOT_GRADED || 'Not yet graded'}
                 </Text>
               </Descriptions.Item>
 
               <Descriptions.Item label={EVALUATION_UI.LABELS.TOTAL_SCORE}>
                 <div className="flex items-baseline gap-1">
                   <span className="text-primary text-3xl font-black">
-                    {Number(evaluationDetail.totalScore).toFixed(1)}
+                    {evaluationDetail.totalScore !== null
+                      ? Number(evaluationDetail.totalScore).toFixed(1)
+                      : '--'}
                   </span>
-                  <Text type="secondary" className="text-sm">
-                    {UI_TEXT.COMMON.SCORE_DENOMINATOR}
-                  </Text>
                 </div>
               </Descriptions.Item>
             </Descriptions>
@@ -60,7 +60,10 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
               </Space>
             }
           >
-            <Paragraph italic className="text-text/80 mt-2">
+            <Paragraph
+              italic
+              className={`mt-2 ${evaluationDetail.generalComment ? 'text-text/80' : 'text-muted/40'}`}
+            >
               {evaluationDetail.generalComment || EVALUATION_UI.LABELS.NO_COMMENTS}
             </Paragraph>
           </Card>
@@ -76,14 +79,14 @@ export default function ScoreDetailDrawer({ visible, cycle, onClose, evaluationD
           >
             <div className="flex flex-col gap-4">
               {evaluationDetail.criteriaScores?.map((criteria, index) => {
-                const percent = (criteria.score / criteria.maxScore) * 100;
+                const percent = criteria.score ? (criteria.score / criteria.maxScore) * 100 : 0;
 
                 return (
                   <div key={index} className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <Text strong>{criteria.criteriaName}</Text>
-                      <Text>
-                        {criteria.score} / {criteria.maxScore}
+                      <Text className="font-medium">
+                        {criteria.score !== null ? criteria.score : '--'} / {criteria.maxScore}
                       </Text>
                     </div>
 

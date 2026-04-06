@@ -78,4 +78,12 @@ export const ApplicationService = {
   rejectUniAssign(id, data) {
     return httpPatch(`/applications/${id}/reject-uni-assign`, data);
   },
+
+  /**
+   * Get list of applications for the logged-in student.
+   * @param {Object} params - Query parameters (status, search, page, size)
+   */
+  getStudentApplications(params = {}) {
+    return httpGet('/studentapplications/my-applications', params);
+  },
 };

@@ -7,7 +7,6 @@ import {
   EyeOutlined,
   InboxOutlined,
   RollbackOutlined,
-  SwapOutlined,
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Tooltip } from 'antd';
@@ -36,11 +35,9 @@ export default function ProjectTable({
   pagination,
   groups = [],
   isMentor = true, // Default to true for backward compatibility
-  onChange: _onChange,
   onEdit,
   onView,
   onAssign,
-  onPublish,
   onComplete,
   onDelete,
   onArchive,
@@ -151,16 +148,19 @@ export default function ProjectTable({
           );
         },
       },
-      // {
-      //   title: TABLE.COLUMNS.FIELD,
-      //   key: 'field',
-      //   width: 120,
-      //   render: (text) => (
-      //     <span className="text-xs font-medium text-slate-600 truncate block max-w-[120px]" title={text}>
-      //       {text || PROJECT_MANAGEMENT.COMMON.N_A}
-      //     </span>
-      //   ),
-      // },
+      {
+        title: TABLE.COLUMNS.FIELD,
+        key: 'field',
+        width: 120,
+        render: (text) => (
+          <span
+            className="text-xs font-medium text-slate-600 truncate block max-w-[120px]"
+            title={text}
+          >
+            {text || PROJECT_MANAGEMENT.COMMON.N_A}
+          </span>
+        ),
+      },
       {
         title: TABLE.COLUMNS.TIMELINE,
         key: 'timeline',
@@ -277,13 +277,6 @@ export default function ProjectTable({
                 icon: <InboxOutlined />,
                 variant: 'warning',
                 onClick: () => onArchive?.(record.projectId),
-              },
-              {
-                key: 'change-group',
-                label: TABLE.ACTIONS_LABEL.CHANGE_GROUP,
-                icon: <SwapOutlined />,
-                variant: 'neutral',
-                onClick: () => onAssign?.(record),
               }
             );
           } else if (op === OPERATIONAL_STATUS.UNSTARTED || op === OPERATIONAL_STATUS.ACTIVE) {
@@ -307,18 +300,16 @@ export default function ProjectTable({
               });
             }
 
-            // Group Management
-            items.push({
-              key: 'assign',
-              label:
-                op === OPERATIONAL_STATUS.UNSTARTED
-                  ? TABLE.ACTIONS_LABEL.ASSIGN_GROUP
-                  : TABLE.ACTIONS_LABEL.CHANGE_GROUP,
-              icon:
-                op === OPERATIONAL_STATUS.UNSTARTED ? <UsergroupAddOutlined /> : <SwapOutlined />,
-              variant: op === OPERATIONAL_STATUS.UNSTARTED ? 'success' : 'neutral',
-              onClick: () => onAssign?.(record),
-            });
+            // Group Management (Only for Unstarted)
+            if (op === OPERATIONAL_STATUS.UNSTARTED) {
+              items.push({
+                key: 'assign',
+                label: TABLE.ACTIONS_LABEL.ASSIGN_GROUP,
+                icon: <UsergroupAddOutlined />,
+                variant: 'success',
+                onClick: () => onAssign?.(record),
+              });
+            }
 
             // Transition actions
             if (op === OPERATIONAL_STATUS.ACTIVE) {
@@ -356,7 +347,6 @@ export default function ProjectTable({
       isMentor,
       onView,
       onEdit,
-      onPublish,
       onComplete,
       onDelete,
       onArchive,

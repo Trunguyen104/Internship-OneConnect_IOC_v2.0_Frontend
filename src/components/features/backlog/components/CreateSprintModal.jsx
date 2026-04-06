@@ -63,7 +63,7 @@ export default function CreateSprintModal({ open, projectId, onClose, onSubmit }
     <CompoundModal open={open} onCancel={handleClose} width={900}>
       <CompoundModal.Header
         title={BACKLOG_UI.CREATE_SPRINT_NEW}
-        subtitle="Lên kế hoạch cho sprint tiếp theo và lựa chọn các công việc ưu tiên từ backlog"
+        subtitle={BACKLOG_UI.MODAL_CREATE_SPRINT_SUBTITLE}
         icon={<RocketOutlined />}
       />
 

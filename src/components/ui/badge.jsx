@@ -7,11 +7,12 @@ import { cn } from '@/lib/cn';
 
 const VARIANT_MAP = {
   default: 'border-slate-200 bg-slate-100 text-slate-700',
-  primary: 'border-primary bg-primary text-white', // Use solid by default for primary
-  success: 'border-success bg-success text-white', // Use solid by default for success
-  warning: 'border-warning bg-warning text-white', // Use solid by default for warning
-  danger: 'border-error bg-error text-white',
+  primary: 'border-primary bg-primary text-white',
+  success: 'border-success bg-success text-white',
+  warning: 'border-warning bg-warning text-white',
+  danger: 'border-danger bg-danger text-white',
   info: 'border-info bg-info text-white',
+  muted: 'border-slate-200 bg-slate-50 text-slate-500',
   // Soft variants
   'primary-soft': 'border-primary/20 bg-primary-surface text-primary',
   'success-soft': 'border-success/20 bg-success-surface text-success',

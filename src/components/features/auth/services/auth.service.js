@@ -1,3 +1,5 @@
+import { dispatchSessionRefreshed } from '@/lib/auth/session-events';
+
 export async function login(data) {
   const payload = {
     email: data?.email,
@@ -31,13 +33,32 @@ export async function logout() {
   if (!res.ok) throw new Error('Logout failed');
 }
 
+/**
+ * Reads current session via BFF (GET /api/auth). HttpOnly cookies only; no tokens in JS.
+ */
+export async function getSession() {
+  const res = await fetch('/api/auth', {
+    method: 'GET',
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  const data = await res.json().catch(() => ({ authenticated: false }));
+  if (!res.ok) {
+    return { authenticated: false, ...data };
+  }
+  return data;
+}
+
 export async function refreshToken() {
   const res = await fetch('/api/auth', {
     method: 'PUT',
     credentials: 'include',
   });
 
-  if (!res.ok) throw new Error('Refresh failed');
+  if (!res.ok) return { success: false };
+
+  dispatchSessionRefreshed();
 
   // /api/auth refresh returns basic auth context; tokens remain in HttpOnly cookies.
   return await res.json();

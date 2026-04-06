@@ -1,15 +1,8 @@
 'use client';
 
-import {
-  ArrowLeftOutlined,
-  CalendarOutlined,
-  ExportOutlined,
-  PlusOutlined,
-  ProjectOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
+import { CalendarOutlined, ExportOutlined, ProjectOutlined, TeamOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Progress, Tabs } from 'antd';
+import { Progress, Tabs } from 'antd';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
 
@@ -19,13 +12,14 @@ import {
   INTERN_PHASE_MANAGEMENT,
   INTERN_PHASE_STATUS,
   INTERN_PHASE_STATUS_LABELS,
+  INTERN_PHASE_STATUS_VARIANTS,
 } from '@/constants/intern-phase-management/intern-phase';
 
 import { InternPhaseService } from '../services/intern-phase.service';
 import InternPhaseJobPostingTab from './InternPhaseJobPostingTab';
 import InternPhaseStudentTab from './InternPhaseStudentTab';
 
-export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
+export default function InternPhaseDetailView({ phase }) {
   const { FORM, DETAILS } = INTERN_PHASE_MANAGEMENT;
   const { METADATA } = DETAILS;
   const [activeKey, setActiveKey] = useState('1');
@@ -73,30 +67,14 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
         <div className="relative flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button
-                ghost
-                size="small"
-                icon={<ArrowLeftOutlined />}
-                onClick={onBack}
-                className="border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white h-7 px-2"
-              >
-                {METADATA.BACK}
-              </Button>
-              <div className="h-3 w-px bg-slate-800" />
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">
                 {METADATA.TITLE}
               </span>
             </div>
             <StatusBadge
-              variant={
-                phase?.computedStatus === INTERN_PHASE_STATUS.ACTIVE
-                  ? 'success'
-                  : phase?.computedStatus === INTERN_PHASE_STATUS.UPCOMING
-                    ? 'warning'
-                    : 'neutral'
-              }
-              label={INTERN_PHASE_STATUS_LABELS[phase?.computedStatus]}
-              pulseDot={phase?.computedStatus === INTERN_PHASE_STATUS.ACTIVE}
+              variant={INTERN_PHASE_STATUS_VARIANTS[phase?.status]}
+              label={INTERN_PHASE_STATUS_LABELS[phase?.status]}
+              pulseDot={phase?.status === INTERN_PHASE_STATUS.ACTIVE}
             />
           </div>
 
@@ -195,7 +173,9 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
                 <div className="flex flex-col">
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-slate-800">{used}</span>
-                    <span className="text-lg font-bold text-slate-300">/ {total}</span>
+                    <span className="text-lg font-bold text-slate-300">
+                      {INTERN_PHASE_MANAGEMENT.MESSAGES.SLASH} {total}
+                    </span>
                   </div>
                   <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 mt-1">
                     {remaining} {METADATA.LEFT} {METADATA.APPLICATIONS_REMAINING}
@@ -259,25 +239,12 @@ export default function InternPhaseDetailView({ phase, onBack, onAddPosting }) {
             </div>
           </div>
 
-          {/* Detailed Content Tabs */}
           <div className="pt-4 pb-12">
             <Tabs
               activeKey={activeKey}
               onChange={setActiveKey}
               className="modern-page-tabs"
               size="large"
-              tabBarExtraContent={
-                activeKey === '1' ? (
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={onAddPosting}
-                    className="bg-primary hover:opacity-90 shadow-sm rounded-lg h-9 px-4 flex items-center font-semibold text-xs uppercase tracking-wider"
-                  >
-                    {DETAILS.CREATE_POSTING}
-                  </Button>
-                ) : null
-              }
               items={[
                 {
                   key: '1',

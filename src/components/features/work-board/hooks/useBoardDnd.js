@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { productBacklogService } from '@/components/features/backlog/services/product-backlog.service';
@@ -14,6 +15,7 @@ import { COLUMNS } from './useBoardData';
  */
 export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setActiveId }) {
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const onDragStart = useCallback(
     (event) => {
@@ -93,6 +95,7 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
           );
 
           if (updateRes?.isSuccess || updateRes?.status === 200 || updateRes?.data) {
+            queryClient.invalidateQueries({ queryKey: ['backlog-board-data', projectId] });
             fetchBoardData(false);
           } else {
             toast.error(WORK_BOARD_UI.ERROR_SAVE_STATUS);
@@ -104,7 +107,7 @@ export function useBoardDnd({ projectId, items, setItems, fetchBoardData, setAct
         fetchBoardData(false);
       }
     },
-    [projectId, items, fetchBoardData, setActiveId, toast]
+    [projectId, items, fetchBoardData, setActiveId, toast, queryClient]
   );
 
   return { onDragStart, onDragOver, onDragEnd };

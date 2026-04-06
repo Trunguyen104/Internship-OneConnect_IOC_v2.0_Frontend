@@ -22,4 +22,9 @@ export const LogBookService = {
   delete: (id) => {
     return httpDelete(`/logbook/${id}`);
   },
+
+  getMissingDates: (studentId) => {
+    const params = studentId ? { studentId } : {};
+    return httpGet('/logbook/missing-dates', params);
+  },
 };

@@ -2,6 +2,7 @@ import UniAdminDashboard from '@/components/features/dashboard/components/UniAdm
 
 export const metadata = { title: 'Term Overview | School' };
 
-export default function TermOverviewPage() {
-  return <UniAdminDashboard />;
+export default async function TermOverviewPage({ params }) {
+  const { termId } = await params;
+  return <UniAdminDashboard termId={termId} />;
 }

@@ -15,13 +15,18 @@ import { UI_TEXT } from '@/lib/UI_Text';
 
 import UserManagementAction from './UserManagementAction';
 
-export default function UserManagementTable({ users = [], loading = false, currentUserId = null }) {
+export default function UserManagementTable({
+  users = [],
+  loading = false,
+  currentUserId = null,
+  canMutateUsers = true,
+}) {
   const getRoleLabel = (role) => USER_ROLE_LABEL[role] || role || UI_TEXT.COMMON.NULL;
   const isActive = (status) => status === USER_STATUS.ACTIVE;
   const getStatusLabel = (status) => USER_STATUS_LABEL[status] || status || UI_TEXT.COMMON.NULL;
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const base = [
       {
         title: UI_TEXT.USER_MANAGEMENT.CODE,
         key: 'userCode',
@@ -71,7 +76,7 @@ export default function UserManagementTable({ users = [], loading = false, curre
         width: '140px',
         render: (role) => {
           let variant = 'default';
-          if (role === USER_ROLE.SUPER_ADMIN || role === USER_ROLE.MODERATOR) {
+          if (role === USER_ROLE.SUPER_ADMIN) {
             variant = 'primary-soft';
           } else if (role === USER_ROLE.SCHOOL_ADMIN || role === USER_ROLE.STUDENT) {
             variant = 'success-soft';
@@ -105,6 +110,14 @@ export default function UserManagementTable({ users = [], loading = false, curre
           );
         },
       },
+    ];
+
+    if (!canMutateUsers) {
+      return base;
+    }
+
+    return [
+      ...base,
       {
         title: '',
         key: 'action',
@@ -112,9 +125,8 @@ export default function UserManagementTable({ users = [], loading = false, curre
         width: '48px',
         render: (_, record) => <UserManagementAction user={record} currentUserId={currentUserId} />,
       },
-    ],
-    [currentUserId]
-  );
+    ];
+  }, [canMutateUsers, currentUserId]);
 
   return (
     <div className="flex flex-1 flex-col min-h-0">
@@ -134,4 +146,5 @@ UserManagementTable.propTypes = {
   users: PropTypes.arrayOf(PropTypes.object),
   loading: PropTypes.bool,
   currentUserId: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  canMutateUsers: PropTypes.bool,
 };

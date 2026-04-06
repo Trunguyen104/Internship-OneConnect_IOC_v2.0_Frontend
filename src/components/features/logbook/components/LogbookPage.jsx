@@ -3,19 +3,22 @@
 import { FilterOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 import dayjs from 'dayjs';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { LogBookService } from '@/components/features/logbook/services/log-book.service';
 import PageLayout from '@/components/ui/pagelayout';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
 import { DAILY_REPORT_UI } from '@/constants/dailyReport/uiText';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 import { useToast } from '@/providers/ToastProvider';
+import { useAuthStore } from '@/store/useAuthStore';
 
 import { useLogbook } from '../hooks/useLogbook';
 import LogbookDetailModal from './LogbookDetailModal';
 import LogbookFormModal from './LogbookFormModal';
 import LogbookTable from './LogbookTable';
+import MissingLogbookModal from './MissingLogbookModal';
 
 /**
  * Daily Report / Logbook — same shell as SuperAdmin User Management:
@@ -38,7 +41,14 @@ export default function LogbookPage() {
     handleDelete,
     internshipId,
     userProfile,
+    missingDatesData,
+    missingLoading,
+    refetchMissingDates,
   } = useLogbook();
+
+  const user = useAuthStore((state) => state.user);
+  const role = Number(user?.role);
+  const isStudent = role === USER_ROLE.STUDENT;
 
   const toast = useToast();
 
@@ -48,6 +58,22 @@ export default function LogbookPage() {
   const [viewRecord, setViewRecord] = useState(null);
   const [currentRecord, setCurrentRecord] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isMissingModalOpen, setIsMissingModalOpen] = useState(false);
+  const [hasCheckedMissing, setHasCheckedMissing] = useState(false);
+
+  // Auto-trigger missing dates modal
+  const missingDates = React.useMemo(
+    () => missingDatesData?.missingDates || [],
+    [missingDatesData]
+  );
+  const totalMissing = missingDates.length;
+
+  React.useEffect(() => {
+    if (totalMissing > 0 && !hasCheckedMissing) {
+      setIsMissingModalOpen(true);
+      setHasCheckedMissing(true);
+    }
+  }, [totalMissing, hasCheckedMissing]);
 
   const handleCreateOrUpdate = async (values) => {
     setSubmitting(true);
@@ -93,6 +119,9 @@ export default function LogbookPage() {
           setPageNumber(1);
         }
         fetchLogbooks();
+        if (isStudent && refetchMissingDates) {
+          refetchMissingDates();
+        }
         closeFormModal();
       } else {
         let errorMsg =
@@ -121,7 +150,7 @@ export default function LogbookPage() {
   };
 
   const openFormModal = async (record = null) => {
-    if (record) {
+    if (record && record.logbookId) {
       try {
         setSubmitting(true);
         const res = await LogBookService.getById(record.logbookId);
@@ -141,7 +170,7 @@ export default function LogbookPage() {
       }
     } else {
       setEditingId(null);
-      setCurrentRecord(null);
+      setCurrentRecord(record);
     }
     setIsFormModalOpen(true);
   };
@@ -156,7 +185,12 @@ export default function LogbookPage() {
     try {
       setSubmitting(true);
       const res = await LogBookService.getById(record.logbookId);
-      setViewRecord(res?.data || record);
+      const detailData = res?.data || {};
+      setViewRecord({
+        ...record,
+        ...detailData,
+        dateReport: detailData.dateReport || record.dateReport,
+      });
       setIsDetailModalOpen(true);
     } catch {
       setViewRecord(record);
@@ -183,10 +217,14 @@ export default function LogbookPage() {
             onChange: (e) => setSearch(e.target.value),
             className: 'max-w-md',
           }}
-          actionProps={{
-            label: DAILY_REPORT_UI.CREATE_BUTTON,
-            onClick: () => openFormModal(),
-          }}
+          actionProps={
+            isStudent
+              ? {
+                  label: DAILY_REPORT_UI.CREATE_BUTTON,
+                  onClick: () => openFormModal(),
+                }
+              : undefined
+          }
           filterContent={
             <Select
               allowClear
@@ -200,9 +238,8 @@ export default function LogbookPage() {
               rootClassName="premium-select"
               suffixIcon={<FilterOutlined className="text-primary" />}
               options={[
-                { value: 0, label: DAILY_REPORT_UI.STATUS.SUBMITTED },
-                { value: 3, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
-                { value: 4, label: DAILY_REPORT_UI.STATUS.LATE },
+                { value: 4, label: DAILY_REPORT_UI.STATUS.PUNCTUAL },
+                { value: 5, label: DAILY_REPORT_UI.STATUS.LATE },
               ]}
             />
           }
@@ -249,6 +286,15 @@ export default function LogbookPage() {
         visible={isDetailModalOpen}
         record={viewRecord}
         onClose={closeDetailModal}
+      />
+
+      <MissingLogbookModal
+        visible={isMissingModalOpen}
+        missingDates={missingDates}
+        onClose={() => setIsMissingModalOpen(false)}
+        onCreateReport={(date) => {
+          openFormModal({ dateReport: date });
+        }}
       />
     </PageLayout>
   );

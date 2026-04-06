@@ -17,7 +17,7 @@ export default function UserManagementSelectRole() {
       <Select
         name="role"
         required
-        defaultValue={String(USER_ROLE.MODERATOR)}
+        defaultValue={String(USER_ROLE.SUPER_ADMIN)}
         options={options}
         className="!rounded-xl"
         placeholder={UI_TEXT.ROLE.TITLE}

@@ -1,15 +1,13 @@
 import { httpGet } from '@/services/http-client.service';
 
 const BASE_URL = '/user-management';
-const MENTOR_ROLE = 6;
 
 export const EnterpriseMentorService = {
   async getMentors(params = {}) {
-    // Aligned with user-management API
+    // Reverting to /user-management to avoid 404, but fetching all to find mentors locally
     return httpGet(BASE_URL, {
-      Role: MENTOR_ROLE, // Default to 6
       PageNumber: 1,
-      PageSize: 100,
+      PageSize: 1000,
       ...params,
     });
   },

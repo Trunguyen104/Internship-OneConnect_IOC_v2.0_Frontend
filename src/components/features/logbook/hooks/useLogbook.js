@@ -1,24 +1,26 @@
 'use client';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { InternshipGroupService } from '@/components/features/internship/services/internship-group.service';
 import { LogBookService } from '@/components/features/logbook/services/log-book.service';
 import { userService } from '@/components/features/user/services/user.service';
 import { DAILY_REPORT_MESSAGES } from '@/constants/dailyReport/messages';
+import { USER_ROLE } from '@/constants/user-management/enums';
 import { useToast } from '@/providers/ToastProvider';
 
 export function useLogbook() {
   const toast = useToast();
   const searchParams = useSearchParams();
+  const { internshipGroupId } = useParams();
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
   // Route Synchronization
-  const urlInternshipId = searchParams.get('internshipId');
+  const urlInternshipId = internshipGroupId || searchParams.get('internshipId');
   const [internshipId, setInternshipIdState] = useState(urlInternshipId);
 
   // Filter & Pagination States
@@ -41,12 +43,14 @@ export function useLogbook() {
       try {
         const res = await userService.getMe();
         return res?.data || null;
-      } catch (err) {
+      } catch {
         return null;
       }
     },
     staleTime: Infinity,
   });
+
+  const isStudent = Number(userProfile?.role) === USER_ROLE.STUDENT;
 
   // 2. Fetch Available Internships
   const { data: internships = [] } = useQuery({
@@ -55,7 +59,7 @@ export function useLogbook() {
       try {
         const res = await InternshipGroupService.getAll();
         return res?.data?.items || res?.data || [];
-      } catch (err) {
+      } catch {
         return [];
       }
     },
@@ -129,16 +133,52 @@ export function useLogbook() {
         }
 
         const res = await LogBookService.getAll(internshipId, params);
+        const weeks = res?.data?.weeks || [];
+        // Only include actual logbooks (those with a logbookId), exclude reminder placeholders
+        const allItems = weeks
+          .flatMap((w) => w.items || [])
+          .filter((item) => !!(item.logbookId || item.id));
+
+        // Since the backend returns whole weeks/all records, we slice locally
+        const startIndex = (pageNumber - 1) * pageSize;
+        const pagedItems = allItems.slice(startIndex, startIndex + pageSize);
+
         return {
-          items: res?.data?.items || [],
-          totalCount: res?.data?.totalCount || 0,
+          items: pagedItems,
+          totalCount: allItems.length,
         };
-      } catch (err) {
+      } catch {
         return { items: [], totalCount: 0 };
       }
     },
     enabled: !!internshipId,
     staleTime: 2 * 60 * 1000,
+  });
+
+  // 5. Fetch Missing Logbook Dates (Student only)
+  const {
+    data: missingDatesData = { missingDates: [] },
+    isLoading: missingLoading,
+    refetch: refetchMissingDates,
+  } = useQuery({
+    queryKey: ['missing-logbook-dates', userProfile?.studentId],
+    queryFn: async () => {
+      // Only students have missing dates calculated this way
+      if (!userProfile || !isStudent) return { missingDates: [] };
+      try {
+        const targetId = userProfile.studentId || userProfile.id;
+        const res = await LogBookService.getMissingDates(targetId);
+        return res?.data || { missingDates: [] };
+      } catch (error) {
+        // Only show toast if it's a real error
+        if (error.status && error.status !== 401 && error.status !== 403) {
+          toast.error(`Could not check missing dates: ${error.message || 'Server Error'}`);
+        }
+        return { missingDates: [] };
+      }
+    },
+    enabled: !!userProfile && isStudent,
+    staleTime: 10 * 60 * 1000,
   });
 
   const handleDelete = async (id) => {
@@ -158,7 +198,7 @@ export function useLogbook() {
         toast.error(res?.message || DAILY_REPORT_MESSAGES.ERROR.DELETE_FAILED);
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error(DAILY_REPORT_MESSAGES.ERROR.DELETE_ERROR);
       return false;
     }
@@ -182,5 +222,8 @@ export function useLogbook() {
     handleDelete,
     internshipId,
     userProfile,
+    missingDatesData,
+    missingLoading,
+    refetchMissingDates,
   };
 }

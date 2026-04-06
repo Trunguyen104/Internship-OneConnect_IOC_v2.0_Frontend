@@ -176,21 +176,12 @@ export const useStudentEnrollment = () => {
   });
 
   const { mutate: withdrawStudent, isPending: withdrawLoading } = useMutation({
-    mutationFn: (studentTermId) => StudentService.withdraw(studentTermId),
-    onSuccess: () => {
-      toast.success(MESSAGES.DELETE_SUCCESS);
+    mutationFn: ({ termId, studentTermId }) => StudentService.withdraw(termId, studentTermId),
+    onSuccess: (response) => {
+      toast.success(response?.message || MESSAGES.DELETE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
     },
     onError: (error) => toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR)),
-  });
-
-  const { mutate: restoreStudent, isPending: restoreLoading } = useMutation({
-    mutationFn: (studentTermId) => StudentService.restore(studentTermId),
-    onSuccess: () => {
-      toast.success(MESSAGES.RESTORE_SUCCESS);
-      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
-    },
-    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.RESTORE_ERROR)),
   });
 
   const { mutate: importConfirm, isPending: importLoading } = useMutation({
@@ -207,20 +198,8 @@ export const useStudentEnrollment = () => {
 
   const { mutate: bulkWithdraw, isPending: bulkWithdrawLoading } = useMutation({
     mutationFn: ({ studentTermIds }) => StudentService.bulkWithdraw(termId, studentTermIds),
-    onSuccess: (_, variables) => {
-      const { unplacedCount, placedCount } = variables;
-      const { BULK_WITHDRAW } = MESSAGES;
-
-      if (placedCount === 0) {
-        toast.success(BULK_WITHDRAW.SUCCESS_ALL_UNPLACED.replace('{count}', unplacedCount));
-      } else {
-        toast.success(
-          BULK_WITHDRAW.SUCCESS_MIXED.replace('{unplacedCount}', unplacedCount).replace(
-            '{placedCount}',
-            placedCount
-          )
-        );
-      }
+    onSuccess: (response) => {
+      toast.success(response?.message || MESSAGES.BULK_WITHDRAW_SUCCESS);
       setSelectedIds([]);
       queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
     },
@@ -242,10 +221,10 @@ export const useStudentEnrollment = () => {
       showDeleteConfirm({
         title: MESSAGES.DELETE_CONFIRM_TITLE,
         content: MESSAGES.DELETE_CONFIRM_TEXT.replace('{name}', student.name),
-        onOk: () => withdrawStudent(student.studentTermId),
+        onOk: () => withdrawStudent({ termId, studentTermId: student.studentTermId }),
       });
     },
-    [withdrawStudent, MESSAGES, toast]
+    [withdrawStudent, termId, MESSAGES, toast]
   );
 
   const handleBulkWithdraw = useCallback(() => {
@@ -307,11 +286,25 @@ export const useStudentEnrollment = () => {
     addLoading ||
     updateLoading ||
     withdrawLoading ||
-    restoreLoading ||
     importLoading ||
     bulkWithdrawLoading ||
     previewLoading;
+  const handleUpdateStudent = useCallback((values) => updateStudent(values), [updateStudent]);
 
+  const handleAddStudent = useCallback((values) => addStudent(values), [addStudent]);
+
+  const handleImportPreview = useCallback(
+    async (file) => {
+      const response = await importPreview(file);
+      return response?.data;
+    },
+    [importPreview]
+  );
+
+  const handleImportConfirm = useCallback(
+    (validRecords) => importConfirm(validRecords),
+    [importConfirm]
+  );
   return {
     termId,
     searchTerm,
@@ -342,23 +335,23 @@ export const useStudentEnrollment = () => {
     handleView,
     handleEdit: handleOpenEdit,
     handleDelete,
-    handleRestore: useCallback(
-      (student) => restoreStudent(student.studentTermId),
-      [restoreStudent]
-    ),
-    handleUpdateStudent: useCallback((values) => updateStudent(values), [updateStudent]),
-    handleAddStudent: useCallback((values) => addStudent(values), [addStudent]),
-    handleImportPreview: useCallback(
-      async (file) => {
-        const response = await importPreview(file);
-        return response?.data;
-      },
-      [importPreview]
-    ),
-    handleImportConfirm: useCallback(
-      (validRecords) => importConfirm(validRecords),
-      [importConfirm]
-    ),
+    // handleUpdateStudent: useCallback((values) => updateStudent(values), [updateStudent]),
+    // handleAddStudent: useCallback((values) => addStudent(values), [addStudent]),
+    // handleImportPreview: useCallback(
+    //   async (file) => {
+    //     const response = await importPreview(file);
+    //     return response?.data;
+    //   },
+    //   [importPreview]
+    // ),
+    // handleImportConfirm: useCallback(
+    //   (validRecords) => importConfirm(validRecords),
+    //   [importConfirm]
+    // ),
+    handleUpdateStudent,
+    handleAddStudent,
+    handleImportPreview,
+    handleImportConfirm,
     handleBulkWithdraw,
     handleDownloadTemplate,
     sortBy,

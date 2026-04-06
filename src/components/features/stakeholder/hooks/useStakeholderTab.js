@@ -33,7 +33,7 @@ export function useStakeholderTab() {
           };
         }
         return null;
-      } catch (err) {
+      } catch {
         toast.error(STAKEHOLDER_MESSAGES.PROJECT_NOT_FOUND);
         return null;
       }
@@ -65,7 +65,7 @@ export function useStakeholderTab() {
           total: res?.data?.totalCount || 0,
           totalPages: res?.data?.totalPages || 1,
         };
-      } catch (err) {
+      } catch {
         toast.error(STAKEHOLDER_MESSAGES.LOAD_FAILED);
         return { items: [], total: 0, totalPages: 1 };
       }
@@ -112,11 +112,9 @@ export function useStakeholderTab() {
     }
 
     if (stakeholderForm.phoneNumber) {
-      const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+      const phoneRegex = /^0[0-9]{9,10}$/;
       if (!phoneRegex.test(stakeholderForm.phoneNumber)) {
         newErrors.phoneNumber = STAKEHOLDER_MESSAGES.REQUIRED_FIELDS.PHONE_INVALID;
-      } else if (stakeholderForm.phoneNumber.length > 15) {
-        newErrors.phoneNumber = STAKEHOLDER_MESSAGES.REQUIRED_FIELDS.PHONE_MAX_LENGTH;
       }
     }
 
@@ -125,15 +123,8 @@ export function useStakeholderTab() {
   };
 
   const handleSaveStakeholder = async () => {
-    if (!editingStakeholderId) {
-      if (!validateForm()) {
-        return;
-      }
-    } else {
-      if (!stakeholderForm.name || !stakeholderForm.email) {
-        toast.warning(STAKEHOLDER_MESSAGES.REQUIRED_FIELDS.GENERAL);
-        return;
-      }
+    if (!validateForm()) {
+      return;
     }
 
     if (!internshipId) {
@@ -154,7 +145,14 @@ export function useStakeholderTab() {
         res = await StakeholderService.create(payload);
       }
 
-      if (res && res.isSuccess !== false && res.statusCode !== 403) {
+      const isSuccess =
+        res &&
+        res.isSuccess !== false &&
+        res.statusCode !== 403 &&
+        res.statusCode !== 400 &&
+        res.statusCode !== 409;
+
+      if (isSuccess) {
         toast.success(
           editingStakeholderId
             ? STAKEHOLDER_MESSAGES.UPDATE_SUCCESS
@@ -173,23 +171,43 @@ export function useStakeholderTab() {
         setErrors({});
         fetchStakeholders();
       } else {
+        // Handle 200 responses with error body
         const errorMsg =
           res?.data?.errors?.[0] ||
           res?.errors?.[0] ||
           res?.message ||
           STAKEHOLDER_MESSAGES.SAVE_FAILED;
 
-        if (res?.status === 403 || res?.statusCode === 403) {
-          toast.error(errorMsg || STAKEHOLDER_MESSAGES.FORBIDDEN);
-        } else if (res?.status === 409 || res?.statusCode === 409) {
-          toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
-        } else {
-          toast.error(errorMsg);
-        }
+        toast.error(errorMsg);
       }
     } catch (err) {
+      // Handle non-2xx responses thrown by httpClient
       console.error('Error saving stakeholder:', err);
-      toast.error(STAKEHOLDER_MESSAGES.SAVE_FAILED);
+
+      const errorData = err.data;
+      const valErrors = errorData?.validationErrors;
+
+      if (valErrors) {
+        const mappedErrors = {};
+        Object.keys(valErrors).forEach((key) => {
+          // Map backend key to frontend field name (lowercase first letter usually)
+          const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
+          mappedErrors[fieldName] = valErrors[key][0];
+        });
+        setErrors(mappedErrors);
+        toast.error(errorData?.message || STAKEHOLDER_MESSAGES.SAVE_FAILED);
+      } else if (err.status === 409) {
+        toast.warning(STAKEHOLDER_MESSAGES.EMAIL_EXIST);
+      } else if (err.status === 403) {
+        toast.error(STAKEHOLDER_MESSAGES.FORBIDDEN);
+      } else {
+        const errorMsg =
+          errorData?.errors?.[0] ||
+          errorData?.message ||
+          err.message ||
+          STAKEHOLDER_MESSAGES.SAVE_FAILED;
+        toast.error(errorMsg);
+      }
     }
   };
 

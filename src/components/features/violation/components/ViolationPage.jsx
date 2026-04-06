@@ -1,6 +1,7 @@
 'use client';
 
 import { DatePicker } from 'antd';
+import { useParams } from 'next/navigation';
 import React, { useState } from 'react';
 
 import PageLayout from '@/components/ui/pagelayout';
@@ -14,6 +15,7 @@ import ViolationTable from './ViolationTable';
 const { RangePicker } = DatePicker;
 
 export default function ViolationPage() {
+  const { internshipGroupId } = useParams();
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
 
   const {
@@ -28,7 +30,7 @@ export default function ViolationPage() {
     loading,
     dateRange,
     handleDateRangeChange,
-  } = useViolation();
+  } = useViolation(internshipGroupId);
 
   const [dateError, setDateError] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);

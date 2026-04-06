@@ -1,14 +1,15 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { useCallback, useEffect } from 'react';
 
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { USER_ROLE } from '@/constants/user-management/enums';
 import { useToast } from '@/providers/ToastProvider';
+import { useAuthStore } from '@/store/useAuthStore';
 import { getErrorDetail } from '@/utils/errorUtils';
 
-import { userService } from '../../user/services/user.service';
 import { ViolationService } from '../services/violation.service';
 import { useViolationFilters } from './useViolationFilters';
 import { useViolationModals } from './useViolationModals';
@@ -16,6 +17,7 @@ import { useViolationModals } from './useViolationModals';
 export const useViolationManagement = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { phaseId } = useParams();
   const { VIOLATION_REPORT } = INTERNSHIP_MANAGEMENT_UI.ENTERPRISE;
 
   const {
@@ -28,6 +30,7 @@ export const useViolationManagement = () => {
     setTermId,
     termOptions,
     setTermOptions,
+    fetchingTerms,
     setFetchingTerms,
     setPagination,
     handleSearchChange,
@@ -35,7 +38,7 @@ export const useViolationManagement = () => {
     handleDateRangeChange,
     handleTableChange,
     resetFilters,
-  } = useViolationFilters();
+  } = useViolationFilters(phaseId);
 
   const {
     modalVisible,
@@ -49,56 +52,55 @@ export const useViolationManagement = () => {
     handleRequestDelete,
   } = useViolationModals();
 
-  // 1. Fetch User Profile (Me)
-  const { data: me = null } = useQuery({
-    queryKey: ['me'],
-    queryFn: async () => {
-      const res = await userService.getMe();
-      return res?.data || res;
-    },
-    staleTime: Infinity,
-  });
+  // 1. Get User Profile from Store (Instant)
+  const user = useAuthStore((state) => state.user);
 
-  // 2. Initial Data: Fetch Groups to extract Term Options
-  useQuery({
-    queryKey: ['violation-initial-groups'],
+  const { data: initialGroupsData } = useQuery({
+    queryKey: ['violation-initial-groups', user?.userId || user?.id],
     queryFn: async () => {
+      setFetchingTerms(true);
       try {
-        setFetchingTerms(true);
         const groupsRes = await ViolationService.getGroups({ pageSize: 100 });
-        const groupsData = groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || [];
-
-        const termMap = new Map();
-        groupsData.forEach((g) => {
-          const tId = g.termId || g.internshipTermId || g.internshipId;
-          const tName = g.term || g.termName || g.internshipTermName || g.groupName;
-          if (tId && !termMap.has(tId)) {
-            termMap.set(tId, tName || `${VIOLATION_REPORT.FILTERS.TERM} ${termMap.size + 1}`);
-          }
-        });
-
-        const extractedTerms = Array.from(termMap.entries())
-          .map(([value, label]) => ({ value, label }))
-          .sort((a, b) => b.label.localeCompare(a.label));
-
-        setTermOptions(extractedTerms);
-        if (extractedTerms.length > 0 && !termId) {
-          setTermId(extractedTerms[0].value);
-        }
-        return groupsData;
+        return groupsRes?.data?.items || groupsRes?.items || groupsRes?.data || [];
       } finally {
         setFetchingTerms(false);
       }
     },
+    enabled: !!user,
     staleTime: 30 * 60 * 1000,
   });
+
+  // AC: Robustly initialize terms and the first selected term even if data is from cache
+  useEffect(() => {
+    if (initialGroupsData && Array.isArray(initialGroupsData) && initialGroupsData.length > 0) {
+      const termMap = new Map();
+      initialGroupsData.forEach((g) => {
+        const tId = g.termId || g.internshipTermId || g.internshipId;
+        const tName = g.term || g.termName || g.internshipTermName || g.groupName;
+        if (tId && !termMap.has(tId)) {
+          termMap.set(tId, tName || `${VIOLATION_REPORT.FILTERS.TERM} ${termMap.size + 1}`);
+        }
+      });
+
+      const extractedTerms = Array.from(termMap.entries())
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => b.label.localeCompare(a.label));
+
+      setTermOptions(extractedTerms);
+
+      // Auto-select the first term if none is selected
+      if (extractedTerms.length > 0 && !termId) {
+        setTermId(extractedTerms[0].value);
+      }
+    }
+  }, [initialGroupsData, termId, setTermId, setTermOptions, VIOLATION_REPORT]);
 
   // 3. Supporting Data: Fetch Groups and Students for the selected Term
   const { data: supportingData = { groups: [], students: [] }, isLoading: loadingSupporting } =
     useQuery({
-      queryKey: ['violation-supporting-data', termId, me?.userId],
+      queryKey: ['violation-supporting-data', termId, user?.userId || user?.id],
       queryFn: async () => {
-        if (!termId || !me) return { groups: [], students: [] };
+        if (!termId || !user) return { groups: [], students: [] };
 
         const groupsRes = await ViolationService.getGroups({ termId, pageSize: 100 });
         const groupsData = (
@@ -149,7 +151,7 @@ export const useViolationManagement = () => {
 
         return { groups: groupsData, students: allMembers };
       },
-      enabled: !!termId && !!me,
+      enabled: !!termId && !!user,
       staleTime: 5 * 60 * 1000,
     });
 
@@ -318,13 +320,13 @@ export const useViolationManagement = () => {
     termId,
     setTermId,
     termOptions,
-    fetchingTerms: false,
+    fetchingTerms,
     studentOptions,
     isMentor: (() => {
-      const rawRole = me?.roleId || me?.RoleId || me?.role || me?.Role;
+      const rawRole = user?.roleId || user?.RoleId || user?.role || user?.Role;
       const roleId = rawRole ? Number(rawRole) : null;
       const roleName = String(
-        me?.roleName || me?.RoleName || me?.role || me?.Role || ''
+        user?.roleName || user?.RoleName || user?.role || user?.Role || ''
       ).toLowerCase();
 
       // Check numeric IDs

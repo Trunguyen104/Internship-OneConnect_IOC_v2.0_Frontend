@@ -39,23 +39,13 @@ export function HeroSection() {
         </p>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          {user ? (
-            <Link
-              href={dashboardHref}
-              className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-bold text-white shadow-md transition-all hover:bg-primary-hover active:scale-95"
-            >
-              {LANDING_UI.HERO.BUTTON_DASHBOARD}
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="flex items-center gap-2 rounded-lg bg-primary px-10 py-4 text-lg font-bold text-white shadow-md transition-all hover:bg-primary-hover active:scale-95"
-            >
-              {LANDING_UI.HERO.BUTTON_JOIN}
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          )}
+          <Link
+            href={dashboardHref}
+            className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-bold text-white shadow-md transition-all hover:bg-primary-hover active:scale-95"
+          >
+            {LANDING_UI.HERO.BUTTON_DASHBOARD}
+            <ArrowRight className="h-5 w-5" />
+          </Link>
         </div>
       </div>
     </section>

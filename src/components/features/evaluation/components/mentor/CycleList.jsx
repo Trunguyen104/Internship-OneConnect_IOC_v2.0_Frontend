@@ -8,9 +8,9 @@ import {
 } from '@ant-design/icons';
 import React, { useState } from 'react';
 
-import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import DataTable from '@/components/ui/datatable';
+import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown from '@/components/ui/TableRowActions';
 import { EVALUATION_UI } from '@/constants/evaluation/evaluation';
 
@@ -62,22 +62,20 @@ export default function CycleList({
       align: 'center',
       width: '140px',
       render: (status) => {
-        const labels = [STATUS.UPCOMING, STATUS.ONGOING, STATUS.COMPLETED];
-        const variants = ['secondary', 'primary', 'success'];
-        const colors = [
-          'bg-blue-50 text-blue-600 border-blue-100',
-          'bg-rose-50 text-rose-600 border-rose-100',
-          'bg-emerald-50 text-emerald-600 border-emerald-100',
-        ];
+        // Handle both numeric (0,1,2) and string ("Pending", "Grading", "Completed") statuses
+        const statusMap = {
+          0: { label: STATUS.UPCOMING, variant: 'neutral' },
+          Pending: { label: STATUS.UPCOMING, variant: 'neutral' },
+          1: { label: STATUS.ONGOING, variant: 'info' },
+          Grading: { label: STATUS.ONGOING, variant: 'info' },
+          Ongoing: { label: STATUS.ONGOING, variant: 'info' },
+          2: { label: STATUS.COMPLETED, variant: 'success' },
+          Completed: { label: STATUS.COMPLETED, variant: 'success' },
+        };
 
-        return (
-          <Badge
-            variant={variants[status]}
-            className={`rounded-full px-4 h-6 text-[10px] font-black uppercase tracking-[0.15em] border ${colors[status] || 'bg-gray-50 text-gray-500 border-gray-100'}`}
-          >
-            {labels[status] || STATUS.UNKNOWN}
-          </Badge>
-        );
+        const config = statusMap[status] || { label: STATUS.UNKNOWN, variant: 'neutral' };
+
+        return <StatusBadge variant={config.variant} label={config.label} />;
       },
     },
     {
@@ -95,7 +93,7 @@ export default function CycleList({
             variant="primary"
             size="sm"
             onClick={() => onOpenGrading(record)}
-            disabled={record.status !== 1 || !isTermOngoing}
+            disabled={record.status === 0 || (record.status === 1 && !isTermOngoing)}
             className="rounded-full h-9 px-6 font-black uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-30 disabled:hover:scale-100"
           >
             <ThunderboltOutlined className="text-xs" /> {BUTTONS.QUICK_GRADE}
@@ -121,12 +119,17 @@ export default function CycleList({
       align: 'center',
       width: '60px',
       render: (_, record) => {
+        const isCompleted = record.status === 2;
+        const isDisabled = isTermPast || isCompleted;
+
+        // Hide action menu entirely if everything is disabled
+        if (isDisabled) return null;
+
         const menuItems = [
           {
             key: 'edit',
             label: BUTTONS.EDIT,
             icon: <EditOutlined />,
-            disabled: isTermPast,
             onClick: () => onEdit(record),
           },
           {
@@ -134,7 +137,6 @@ export default function CycleList({
             label: BUTTONS.DELETE,
             icon: <DeleteOutlined />,
             danger: true,
-            disabled: isTermPast,
             onClick: () => onDelete(record.cycleId),
           },
         ];

@@ -1,27 +1,25 @@
 'use client';
 
-import { Layout } from 'antd';
-
 import AppSidebar from '@/components/layout/AppSidebar';
 import Header from '@/components/layout/Header';
-
-const { Content } = Layout;
 
 /**
  * PhaseWorkspaceLayout
  * Sidebar + Header layout, rendered when HR/Mentor/EntAdmin enters a specific Phase.
- * AppSidebar auto-detects /company/phases/[phaseId]/* and shows phase menu.
+ * Switched to standard HTML tags to improve stability within Next.js layout trees.
  */
 export default function PhaseWorkspaceLayout({ children }) {
   return (
-    <Layout className="h-full overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden bg-white">
       <AppSidebar />
-      <Layout className="flex h-full flex-1 flex-col overflow-hidden">
+
+      <div className="flex h-full flex-1 flex-col overflow-hidden">
         <Header />
-        <Content className="flex flex-1 flex-col overflow-hidden bg-gray-50 p-4 2xl:p-6">
-          <div className="flex w-full flex-1 flex-col overflow-hidden">{children}</div>
-        </Content>
-      </Layout>
-    </Layout>
+
+        <main className="flex flex-1 flex-col overflow-auto bg-gray-50 p-4 2xl:p-6">
+          <div className="flex w-full flex-1 flex-col">{children}</div>
+        </main>
+      </div>
+    </div>
   );
 }

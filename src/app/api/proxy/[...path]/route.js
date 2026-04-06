@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { AUTH_COOKIE_ACCESS } from '@/lib/auth/cookie-names';
 import { resolveApiRoot } from '@/lib/server/backend-url';
 
 export const dynamic = 'force-dynamic';
@@ -28,17 +29,16 @@ async function handler(req, { params }) {
       headers.set('Content-Type', contentType);
     }
 
+    // Forward standard headers for backend compatibility
+    const pathString = path.join('/');
+    if (pathString.includes('user-management')) {
+      headers.set('accept', 'text/plain, application/json, */*');
+    }
+
     // Extract accessToken from HttpOnly cookies securely on the server
-    const accessToken = req.cookies.get('accessToken')?.value;
+    const accessToken = req.cookies.get(AUTH_COOKIE_ACCESS)?.value;
     if (accessToken) {
       headers.set('Authorization', `Bearer ${accessToken}`);
-    } else {
-      // Fallback to client-provided header if absolutely necessary,
-      // but ideally we rely on the cookie we just set.
-      const authorization = req.headers.get('authorization');
-      if (authorization) {
-        headers.set('Authorization', authorization);
-      }
     }
 
     const requestOptions = {

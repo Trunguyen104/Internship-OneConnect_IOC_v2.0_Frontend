@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
+import { USER_STATUS, USER_STATUS_LABEL } from '@/constants/user-management/enums';
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import EnterprisesAction from './EnterprisesAction';
@@ -32,10 +33,14 @@ export default function EnterprisesTable({ enterprises = [], loading = false }) 
       },
       {
         title: UI_TEXT.USER_MANAGEMENT.EMAIL_ADDRESS,
-        key: 'email',
+        key: 'contactEmail',
         render: (email, record) => (
           <span className="text-[12px] text-slate-500 font-medium">
-            {email || record.Email || record.email || UI_TEXT.COMMON.MINUS}
+            {email ||
+              record.contactEmail ||
+              record.contact_email ||
+              record.Email ||
+              UI_TEXT.COMMON.MINUS}
           </span>
         ),
       },
@@ -46,6 +51,21 @@ export default function EnterprisesTable({ enterprises = [], loading = false }) 
         render: (industry) => (
           <span className="text-[12px] font-medium text-primary">{industry || 'General'}</span>
         ),
+      },
+      {
+        title: UI_TEXT.USER_MANAGEMENT.STATUS,
+        key: 'status',
+        width: '120px',
+        render: (status) => {
+          const active = status === USER_STATUS.ACTIVE;
+          return (
+            <span
+              className={`text-[12px] font-semibold ${active ? 'text-emerald-600' : 'text-red-500'}`}
+            >
+              {USER_STATUS_LABEL[status] || status || UI_TEXT.COMMON.MINUS}
+            </span>
+          );
+        },
       },
       {
         title: '',

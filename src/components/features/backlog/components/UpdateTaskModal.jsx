@@ -16,8 +16,8 @@ export default function UpdateTaskModal({
   onClose,
   onSubmit,
   epics = [],
-  sprints = [],
   initialData = null,
+  members = [],
 }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
@@ -69,20 +69,7 @@ export default function UpdateTaskModal({
       setEpic(initialData.parentId || '');
 
       // Determine sprintId
-      let sid = initialData.sprintId;
-      if (!sid) {
-        for (const sp of sprints) {
-          if (
-            sp.items?.find(
-              (i) => (i.workItemId || i.id) === (initialData.workItemId || initialData.id)
-            )
-          ) {
-            sid = sp.sprintId;
-            break;
-          }
-        }
-      }
-      setSprintId(sid || '');
+      setSprintId(initialData.sprintId || '');
 
       if (initialData.dueDate) {
         const date = new Date(initialData.dueDate);
@@ -103,7 +90,7 @@ export default function UpdateTaskModal({
       );
       /* eslint-enable react-hooks/set-state-in-effect */
     }
-  }, [open, initialData, sprints]);
+  }, [open, initialData]);
 
   const canSubmit = useMemo(
     () => summary.trim() && type && status && priority,
@@ -135,8 +122,11 @@ export default function UpdateTaskModal({
   return (
     <CompoundModal open={open} onCancel={handleClose} width={1200}>
       <CompoundModal.Header
-        title={BACKLOG_UI.UPDATE_TASK || 'Cập nhật công việc'}
-        subtitle="Chỉnh sửa chi tiết công việc, trạng thái và lộ trình thực hiện trong dự án"
+        title={BACKLOG_UI.UPDATE_TASK || 'Update Task'}
+        subtitle={
+          BACKLOG_UI.UPDATE_TASK_SUBTITLE ||
+          'Refine task details, status, and progression for your team'
+        }
         icon={<EditOutlined />}
       />
 
@@ -180,9 +170,6 @@ export default function UpdateTaskModal({
               epic={epic}
               setEpic={setEpic}
               epics={epics}
-              sprintId={sprintId}
-              setSprintId={setSprintId}
-              sprints={sprints}
               assignee={assignee}
               setAssignee={setAssignee}
               priority={priority}
@@ -191,6 +178,7 @@ export default function UpdateTaskModal({
               setDueDate={setDueDate}
               points={points}
               setPoints={setPoints}
+              members={members}
             />
           </div>
         </div>

@@ -1,10 +1,10 @@
 'use client';
 
 import {
+  BankOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SettingOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
@@ -12,12 +12,11 @@ import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
+import { USER_ROLE } from '@/constants/user-management/enums';
+import { useLogout } from '@/hooks/useLogout';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
-import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
 
 export default function Header() {
@@ -25,8 +24,8 @@ export default function Header() {
   const router = useRouter();
   const params = useParams();
   const groupId = params?.groupId || params?.internshipGroupId;
-  const toast = useToast();
   const { isSidebarCollapsed } = useLayoutStore();
+  const { logout: doLogout } = useLogout();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -42,15 +41,11 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      toast.success('Logout successfully');
-    } finally {
-      router.refresh();
-      router.push('/login');
-    }
+    await doLogout('Logout successfully');
   };
+
+  const userRoleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
+
   const avatarMenu = {
     items: [
       {
@@ -58,7 +53,7 @@ export default function Header() {
         label: (
           <div className="flex flex-col px-1 pb-1">
             <span className="text-sm font-bold text-slate-800">
-              {userInfo?.fullName || userInfo?.FullName || 'Người dùng'}
+              {userInfo?.fullName || userInfo?.FullName || 'User'}
             </span>
             <span className="text-xs text-slate-500">{userInfo?.email || userInfo?.Email}</span>
           </div>
@@ -67,7 +62,11 @@ export default function Header() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
-      { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
+      ...(userRoleId === USER_ROLE.ENTERPRISE_ADMIN ||
+      userRoleId === USER_ROLE.HR ||
+      userRoleId === USER_ROLE.MENTOR
+        ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
+        : []),
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
@@ -77,8 +76,7 @@ export default function Header() {
         const query = returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '';
         router.push(`/profile${query}`);
       }
-      if (key === 'settings') router.push('/settings');
-
+      if (key === 'my-company') router.push('/company/my-company');
       if (key === 'logout') handleLogout();
     },
   };

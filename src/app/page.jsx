@@ -1,8 +1,8 @@
 import { LandingPage as LandingPageClient } from '@/components/features/Landing/LandingPage';
 
 export const metadata = {
-  title: 'Internship OneConnect | Nền tảng kết nối',
-  description: 'Kết nối sinh viên và doanh nghiệp cho kỳ thực tập OJT hiện đại.',
+  title: 'Internship OneConnect | Connection Platform',
+  description: 'Connecting students and enterprises for modern OJT internship programs.',
 };
 
 export default function Page() {

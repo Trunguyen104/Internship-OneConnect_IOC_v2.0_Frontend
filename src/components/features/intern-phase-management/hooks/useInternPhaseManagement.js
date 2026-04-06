@@ -1,23 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
-
-import { INTERN_PHASE_STATUS } from '@/constants/intern-phase-management/intern-phase';
 
 import { InternPhaseService } from '../services/intern-phase.service';
 import { usePhaseEnterprise } from './usePhaseEnterprise';
-
-export const calculatePhaseStatus = (start, end) => {
-  const today = dayjs().startOf('day');
-  const startDate = dayjs(start).startOf('day');
-  const endDate = dayjs(end).startOf('day');
-
-  if (startDate.isAfter(today)) return INTERN_PHASE_STATUS.UPCOMING;
-  if (endDate.isBefore(today)) return INTERN_PHASE_STATUS.ENDED;
-  return INTERN_PHASE_STATUS.ACTIVE;
-};
 
 export const useInternPhaseManagement = () => {
   const { enterpriseId, isLoading: isUserLoading } = usePhaseEnterprise();
@@ -40,7 +27,7 @@ export const useInternPhaseManagement = () => {
       const params = {
         PageNumber: pagination.current,
         PageSize: pagination.pageSize,
-        Search: search,
+        SearchTerm: search,
         IncludeEnded: includeEnded,
         Status: statusFilter,
         EnterpriseId: enterpriseId,
@@ -48,19 +35,8 @@ export const useInternPhaseManagement = () => {
 
       const res = await InternPhaseService.getAll(params);
       const items = (res?.items || []).map((item) => {
-        // Favor backend status (Enum) if available
-        let status;
-        if (item.status !== undefined) {
-          if (item.status === 0) status = INTERN_PHASE_STATUS.UPCOMING;
-          else if (item.status === 1) status = INTERN_PHASE_STATUS.ACTIVE;
-          else status = INTERN_PHASE_STATUS.ENDED;
-        } else {
-          status = calculatePhaseStatus(item.startDate, item.endDate);
-        }
-
         return {
           ...item,
-          computedStatus: status,
           remainingCapacity: item.remainingCapacity ?? item.capacity - (item.placedCount || 0),
         };
       });

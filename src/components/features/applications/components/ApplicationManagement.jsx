@@ -1,9 +1,11 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { App } from 'antd';
 import { CheckCircle2, Clock, LayoutList, UserCheck } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 
+import { applicationPhaseService } from '@/components/features/applications/services/application-phase.service';
 import { StatCard } from '@/components/ui/atoms';
 import PageLayout from '@/components/ui/pagelayout';
 import {
@@ -24,19 +26,41 @@ import UniAssignTable from './UniAssignTable';
 /**
  * Main logical container for HR Application Management.
  */
-export default function ApplicationManagement() {
+export default function ApplicationManagement({ internshipPhaseId }) {
   const { modal: modalApi } = App.useApp();
   const [activeTab, setActiveTab] = useState('1'); // 1 = Self-apply, 2 = Uni-assign
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     status: undefined,
-    jobId: undefined,
     schoolId: undefined,
+    internshipPhaseId: internshipPhaseId || undefined,
+    audience: undefined,
     period: undefined,
     includeTerminal: false,
     page: 1,
     size: 10,
+  });
+
+  const effectiveFilters = useMemo(() => {
+    return {
+      ...filters,
+      internshipPhaseId: internshipPhaseId || filters.internshipPhaseId,
+    };
+  }, [filters, internshipPhaseId]);
+
+  const requestFilters = useMemo(() => {
+    // Audience filter applies to Self-apply only.
+    if (activeTab !== '1') {
+      return { ...effectiveFilters, audience: undefined };
+    }
+    return effectiveFilters;
+  }, [activeTab, effectiveFilters]);
+
+  const { data: phasesRes, isLoading: isLoadingPhases } = useQuery({
+    queryKey: ['internship-phases', 'applications'],
+    queryFn: () => applicationPhaseService.getPhases(),
+    staleTime: 1000 * 60 * 5,
   });
 
   // Data fetching
@@ -44,7 +68,40 @@ export default function ApplicationManagement() {
     applications: rawApplications,
     totalCount: rawTotalCount,
     isLoading,
-  } = useApplications(activeTab === '1' ? 'self-apply' : 'uni-assign', filters);
+  } = useApplications(activeTab === '1' ? 'self-apply' : 'uni-assign', requestFilters);
+
+  const phases = useMemo(() => {
+    const byId = new Map();
+
+    const apiItems = phasesRes?.data?.items || phasesRes?.data || [];
+    if (Array.isArray(apiItems)) {
+      apiItems.forEach((p) => {
+        const id = p.phaseId || p.id;
+        if (!id) return;
+        byId.set(String(id), {
+          id,
+          name: p.name || p.phaseName,
+          startDate: p.startDate,
+          endDate: p.endDate,
+        });
+      });
+    }
+
+    // Fallback/merge: build phase options from returned applications if phases API shape changes.
+    rawApplications.forEach((app) => {
+      const id = app.internshipPhaseId || app.phaseId;
+      if (!id) return;
+      if (byId.has(String(id))) return;
+      byId.set(String(id), {
+        id,
+        name: app.internPhaseName || app.internshipPhaseName || app.phaseName || 'Internship Phase',
+        startDate: app.internPhaseStartDate || app.startDate,
+        endDate: app.internPhaseEndDate || app.endDate,
+      });
+    });
+
+    return Array.from(byId.values());
+  }, [phasesRes, rawApplications]);
 
   // Exclusive View Logic based on user feedback
   // IncludeTerminal OFF: Show only Active/Initial statuses
@@ -62,23 +119,6 @@ export default function ApplicationManagement() {
       totalCount: filters.includeTerminal ? list.length : rawTotalCount,
     };
   }, [rawApplications, rawTotalCount, filters.includeTerminal]);
-
-  // Derive filter options from current applications
-  const jobs = useMemo(() => {
-    const unique = new Map();
-    applications.forEach((app) => {
-      if (app.jobPostingId || app.jobPostingTitle) {
-        const id = app.jobPostingId || app.jobPostingTitle;
-        if (!unique.has(id)) {
-          unique.set(id, {
-            projectId: app.projectId || app.jobPostingId,
-            name: app.jobPostingTitle || 'Unknown Job',
-          });
-        }
-      }
-    });
-    return Array.from(unique.values());
-  }, [applications]);
 
   const schools = useMemo(() => {
     const unique = new Map();
@@ -105,10 +145,14 @@ export default function ApplicationManagement() {
         newFilters.includeTerminal !== undefined &&
         newFilters.includeTerminal !== prev.includeTerminal;
 
+      const safeNewFilters = internshipPhaseId
+        ? { ...newFilters, internshipPhaseId: prev.internshipPhaseId }
+        : newFilters;
+
       return {
         ...prev,
-        ...newFilters,
-        status: shouldResetStatus ? undefined : (newFilters.status ?? prev.status),
+        ...safeNewFilters,
+        status: shouldResetStatus ? undefined : (safeNewFilters.status ?? prev.status),
         page: 1,
       };
     });
@@ -283,10 +327,13 @@ export default function ApplicationManagement() {
 
       <div className="flex flex-col gap-6">
         <ApplicationFilters
-          filters={filters}
+          filters={effectiveFilters}
           onFilterChange={handleFilterChange}
-          jobs={jobs}
           schools={schools}
+          phases={phases}
+          isPhaseLocked={!!internshipPhaseId}
+          isLoadingOptions={isLoading || isLoadingPhases}
+          showAudience={activeTab === '1'}
         />
 
         <PageLayout.Card className="flex flex-col overflow-hidden p-0! shadow-sm border border-slate-100">

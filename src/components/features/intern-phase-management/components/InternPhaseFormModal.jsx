@@ -16,7 +16,11 @@ import {
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo } from 'react';
 
-import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
+import {
+  INTERN_PHASE_MANAGEMENT,
+  INTERN_PHASE_STATUS,
+} from '@/constants/intern-phase-management/intern-phase';
+import { translateMessage } from '@/utils/errorUtils';
 
 const { TextArea } = Input;
 
@@ -68,18 +72,29 @@ export default function InternPhaseFormModal({
     } else if (visible) {
       form.resetFields();
       form.setFieldsValue({
-        majorFields: ['Software Engineering'],
+        majorFields: FORM.DEFAULT_MAJORS,
       });
     }
-  }, [visible, editingRecord, form]);
+  }, [visible, editingRecord, form, FORM.DEFAULT_MAJORS]);
 
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        onSave(values);
-      })
-      .catch(() => {});
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      await onSave?.(values);
+    } catch (error) {
+      // 1. Client-side validation
+      if (error.errorFields?.length > 0) return;
+
+      // 2. Server-side validation
+      const errorData = error.data || error.response?.data;
+      if (errorData?.validationErrors) {
+        const fields = Object.keys(errorData.validationErrors).map((key) => ({
+          name: key,
+          errors: errorData.validationErrors[key].map((err) => translateMessage(err)),
+        }));
+        form.setFields(fields);
+      }
+    }
   };
 
   return (
@@ -116,7 +131,7 @@ export default function InternPhaseFormModal({
       <Form
         form={form}
         layout="vertical"
-        disabled={loading || editingRecord?.computedStatus === 'ENDED'}
+        disabled={loading || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
         className="px-2"
         requiredMark={true}
       >
@@ -150,13 +165,26 @@ export default function InternPhaseFormModal({
             <Form.Item
               name="startDate"
               label={FORM.LABEL.START_DATE}
-              rules={[{ required: true, message: FORM.VALIDATION.START_DATE_REQUIRED }]}
+              rules={[
+                { required: true, message: FORM.VALIDATION.START_DATE_REQUIRED },
+                () => ({
+                  validator(_, value) {
+                    if (!value || editingRecord) return Promise.resolve();
+
+                    // AC-02: Prevent selecting past date for NEW phases
+                    if (dayjs(value).isBefore(dayjs().startOf('day'))) {
+                      return Promise.reject(new Error(FORM.VALIDATION.START_DATE_PAST));
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
             >
               <DatePicker
                 format="DD/MM/YYYY"
                 className="w-full h-10 rounded-lg"
                 placeholder={FORM.PLACEHOLDER.DATE}
-                disabled={isBlocked || editingRecord?.computedStatus === 'ENDED'}
+                disabled={isBlocked || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
                 onChange={() => {
                   if (endDateValue) form.validateFields(['endDate']);
                 }}
@@ -197,7 +225,7 @@ export default function InternPhaseFormModal({
                 format="DD/MM/YYYY"
                 className="w-full h-10 rounded-lg"
                 placeholder={FORM.PLACEHOLDER.DATE}
-                disabled={isBlocked || editingRecord?.computedStatus === 'ENDED'}
+                disabled={isBlocked || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
               />
             </Form.Item>
           </Col>
@@ -213,7 +241,7 @@ export default function InternPhaseFormModal({
               <InputNumber
                 className="w-full h-10 flex items-center rounded-lg"
                 placeholder={FORM.PLACEHOLDER.CAPACITY}
-                disabled={isBlocked || editingRecord?.computedStatus === 'ENDED'}
+                disabled={isBlocked || editingRecord?.status === INTERN_PHASE_STATUS.ENDED}
                 min={1}
               />
             </Form.Item>

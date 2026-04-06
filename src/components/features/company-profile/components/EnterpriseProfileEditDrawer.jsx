@@ -7,11 +7,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import AvatarUploader from '@/components/ui/avataruploader';
 import BannerUploader from '@/components/ui/banneruploader';
 import { ENTERPRISE_PROFILE_UI } from '@/constants/company-profile/uiText';
-
-function isHttpUrl(value) {
-  if (!value) return true;
-  return /^https?:\/\/.+/i.test(value);
-}
+import { isHttpUrl } from '@/lib/validators';
 
 function normalizeProfileToForm(profile) {
   const taxCodeValue =
@@ -83,7 +79,7 @@ export default function EnterpriseProfileEditDrawer({ open, saving, profile, onC
         </div>
       }
     >
-      <Form form={form} layout="vertical" requiredMark={false}>
+      <Form form={form} layout="vertical" requiredMark={false} noValidate>
         <div className="space-y-6 p-1">
           <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6 shadow-sm">
             <Row gutter={[48, 24]} align="top" justify="center">
@@ -119,9 +115,6 @@ export default function EnterpriseProfileEditDrawer({ open, saving, profile, onC
                 </div>
               </Col>
             </Row>
-            <div className="mt-8 text-center text-xs font-medium text-slate-400 italic">
-              {ENTERPRISE_PROFILE_UI.EDIT_DRAWER.LOGO_OVERLAP_HINT}
-            </div>
           </div>
 
           <Form.Item
@@ -147,7 +140,7 @@ export default function EnterpriseProfileEditDrawer({ open, saving, profile, onC
             >
               <Input
                 size="large"
-                type="url"
+                type="text"
                 inputMode="url"
                 autoComplete="url"
                 placeholder={ENTERPRISE_PROFILE_UI.ENTERPRISE.WEBSITE_PLACEHOLDER}
