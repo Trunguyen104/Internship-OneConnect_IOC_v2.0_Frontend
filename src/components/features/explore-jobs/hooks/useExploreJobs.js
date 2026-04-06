@@ -132,6 +132,7 @@ export function useExploreJobs() {
     mutationFn: ({ jobId, data }) => ExploreJobsService.applyJob(jobId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-applications-eligible'] });
+      queryClient.invalidateQueries({ queryKey: ['student-applications'] });
       toast.success(
         EXPLORE_JOBS_UI.APPLY_MODAL.SUCCESS_TITLE,
         EXPLORE_JOBS_UI.APPLY_MODAL.SUCCESS_CONTENT
