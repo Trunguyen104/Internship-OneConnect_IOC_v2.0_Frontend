@@ -66,7 +66,7 @@ function DialogContent({ className = '', children, showCloseButton = true, ...pr
       open={open}
       onCancel={() => onOpenChange?.(false)}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       centered
       closable={showCloseButton}
       className={cn('premium-modal', className)}

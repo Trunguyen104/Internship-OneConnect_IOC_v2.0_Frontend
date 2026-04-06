@@ -1,6 +1,6 @@
 'use client';
 
-import { EyeOutlined, SendOutlined } from '@ant-design/icons';
+import { EyeOutlined } from '@ant-design/icons';
 import { Empty, InputNumber, Table, Tooltip } from 'antd';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -66,6 +66,7 @@ export default function BatchGrading({
   onPublish,
   isTermOngoing,
 }) {
+  const isCompleted = cycle?.status === 2 || cycle?.status === 'Completed';
   const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS, STATUS } = EVALUATION_UI;
   const toast = useToast();
   const [data, setData] = useState({ criteria: [], students: [] });
@@ -235,7 +236,7 @@ export default function BatchGrading({
               <span className="font-black text-text tracking-tight text-sm leading-tight transition-colors group-hover:text-primary">
                 {student.fullName}
               </span>
-              {student.status && (
+              {student.status && !isCompleted && (
                 <StatusBadge
                   size="sm"
                   variant={student.status === 'Published' ? 'success' : 'neutral'}
@@ -324,7 +325,9 @@ export default function BatchGrading({
   return (
     <div className="flex flex-col animate-in fade-in duration-500">
       {/* 📊 Summary Stats Bar - Compacted to save space */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4 text-white shrink-0">
+      <div
+        className={`grid grid-cols-1 ${isCompleted ? 'sm:grid-cols-2' : 'sm:grid-cols-3'} gap-4 mb-4 text-white shrink-0`}
+      >
         <div className="relative overflow-hidden p-4 rounded-[24px] bg-slate-900 shadow-xl shadow-slate-200/50 group transition-all hover:-translate-y-1">
           <div className="relative z-10">
             <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">
@@ -340,24 +343,26 @@ export default function BatchGrading({
           <div className="absolute top-0 right-0 h-full w-24 bg-white/5 skew-x-[-20deg] translate-x-12" />
         </div>
 
-        <div className="relative overflow-hidden p-4 rounded-[24px] bg-primary shadow-xl shadow-primary/20 group transition-all hover:-translate-y-1">
-          <div className="relative z-10">
-            <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">
-              {TABLE_COLUMNS.STATUS}
-            </h4>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-black tracking-tighter">
-                {stats.published}
-                <span className="text-white/30 mx-1">/</span>
-                {stats.total}
-              </span>
-              <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">
-                {STATUS.PUBLISHED}
-              </span>
+        {!isCompleted && (
+          <div className="relative overflow-hidden p-4 rounded-[24px] bg-primary shadow-xl shadow-primary/20 group transition-all hover:-translate-y-1">
+            <div className="relative z-10">
+              <h4 className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 mb-2">
+                {TABLE_COLUMNS.STATUS}
+              </h4>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black tracking-tighter">
+                  {stats.published}
+                  <span className="text-white/30 mx-1">/</span>
+                  {stats.total}
+                </span>
+                <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">
+                  {STATUS.PUBLISHED}
+                </span>
+              </div>
             </div>
+            <div className="absolute bottom-0 right-0 h-16 w-16 bg-white/10 rounded-full translate-x-4 translate-y-4" />
           </div>
-          <div className="absolute bottom-0 right-0 h-16 w-16 bg-white/10 rounded-full translate-x-4 translate-y-4" />
-        </div>
+        )}
 
         <div className="relative overflow-hidden p-4 rounded-[24px] bg-emerald-600 shadow-xl shadow-emerald-200/50 group transition-all hover:-translate-y-1">
           <div className="relative z-10">
@@ -402,45 +407,51 @@ export default function BatchGrading({
           </div>
         }
       >
-        <DataTableToolbar.Actions className="ml-auto">
-          {hasChanges ? (
-            <>
-              <Button
-                variant="outline"
-                size="default"
-                onClick={handleCancelEdits}
-                className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95 min-w-[100px]"
-              >
-                {BUTTONS.CANCEL}
-              </Button>
-              <Button
-                variant="primary"
-                size="default"
-                onClick={handleSubmitBatch}
-                loading={sending}
-                disabled={!isTermOngoing || cycle.status === 2 || cycle.status === 'Completed'}
-                className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px]"
-              >
-                {BUTTONS.SAVE}
-              </Button>
-            </>
-          ) : (
-            <Tooltip
-              title={!canPublish ? 'Please grade students and save changes before publishing' : ''}
-            >
-              <Button
-                variant="primary"
-                size="default"
-                onClick={handlePublishAll}
-                loading={publishing}
-                disabled={!canPublish}
-                className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px] bg-emerald-600 hover:bg-emerald-700 border-none"
-              >
-                <SendOutlined className="mr-2" /> {BUTTONS.PUBLISH}
-              </Button>
-            </Tooltip>
-          )}
-        </DataTableToolbar.Actions>
+        {(hasChanges || !isCompleted) && (
+          <DataTableToolbar.Actions className="ml-auto">
+            {hasChanges ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={handleCancelEdits}
+                  className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest border-gray-200 transition-all hover:bg-white active:scale-95 min-w-[100px]"
+                >
+                  {BUTTONS.CANCEL}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="default"
+                  onClick={handleSubmitBatch}
+                  loading={sending}
+                  disabled={!isTermOngoing || isCompleted}
+                  className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px]"
+                >
+                  {BUTTONS.SAVE_DRAFT}
+                </Button>
+              </>
+            ) : (
+              !isCompleted && (
+                <Tooltip
+                  title={
+                    !canPublish ? 'Please grade students and save changes before publishing' : ''
+                  }
+                >
+                  <Button
+                    variant="primary"
+                    size="default"
+                    onClick={handlePublishAll}
+                    loading={publishing}
+                    disabled={!canPublish}
+                    className="h-10 rounded-full px-8 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all min-w-[100px] bg-emerald-600 hover:bg-emerald-700 border-none"
+                  >
+                    {BUTTONS.PUBLISH}
+                  </Button>
+                </Tooltip>
+              )
+            )}
+          </DataTableToolbar.Actions>
+        )}
       </DataTableToolbar>
 
       <div className="flex-1 mb-8 mt-[-10px]">
