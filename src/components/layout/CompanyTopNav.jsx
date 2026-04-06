@@ -1,6 +1,12 @@
 'use client';
 
-import { BankOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  LogoutOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import {
   AlertOctagon,
@@ -48,11 +54,7 @@ export default function CompanyTopNav() {
 
   const roleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);
   const isMentor = roleId === USER_ROLE.MENTOR;
-  const showEnterpriseStaffNav = [
-    USER_ROLE.ENTERPRISE_ADMIN,
-    USER_ROLE.HR,
-    USER_ROLE.MENTOR,
-  ].includes(roleId);
+  const showEnterpriseStaffNav = [USER_ROLE.ENTERPRISE_ADMIN].includes(roleId);
   const isEnterpriseManager = [USER_ROLE.ENTERPRISE_ADMIN, USER_ROLE.HR, USER_ROLE.MENTOR].includes(
     roleId
   );
@@ -127,6 +129,9 @@ export default function CompanyTopNav() {
       ...(isEnterpriseManager
         ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
         : []),
+      ...(roleId === USER_ROLE.ENTERPRISE_ADMIN
+        ? [{ key: 'staff-management', icon: <TeamOutlined />, label: 'Staff Management' }]
+        : []),
       { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
@@ -134,6 +139,7 @@ export default function CompanyTopNav() {
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
       if (key === 'my-company') router.push('/company/my-company');
+      if (key === 'staff-management') router.push('/staff-management');
       if (key === 'settings') router.push('/settings');
       if (key === 'logout') handleLogout();
     },

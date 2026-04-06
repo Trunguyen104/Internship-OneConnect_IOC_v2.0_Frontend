@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Bell, BookOpen, Briefcase, Building2, GraduationCap, Users } from 'lucide-react';
+import { Activity, BookOpen, Briefcase, Building2, GraduationCap, Users } from 'lucide-react';
 import React, { useEffect } from 'react';
 
 import PageLayout from '@/components/ui/pagelayout';
@@ -93,22 +93,6 @@ export default function SuperAdminDashboard() {
       bgColor: 'bg-amber-50',
       borderColor: 'border-amber-100',
     },
-    {
-      title: DASHBOARD.STAT_TERMS,
-      value: isLoading ? '—' : (statsRaw?.activeTerms ?? 0).toLocaleString(),
-      icon: Bell,
-      iconColor: 'text-sky-600',
-      bgColor: 'bg-sky-50',
-      borderColor: 'border-sky-100',
-    },
-    {
-      title: DASHBOARD.STAT_PENDING_APPS,
-      value: isLoading ? '—' : (statsRaw?.pendingApplications ?? 0).toLocaleString(),
-      icon: Activity,
-      iconColor: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-100',
-    },
   ];
 
   const recentActivities = statsRaw?.recentActivities ?? [];
@@ -119,7 +103,7 @@ export default function SuperAdminDashboard() {
       <PageLayout.Header title={DASHBOARD.OVERVIEW_TITLE} subtitle={DASHBOARD.OVERVIEW_SUBTITLE} />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-6">
         {isLoading
           ? Array.from({ length: stats.length }).map((_, i) => <StatCard key={i} loading />)
           : stats.map((stat, i) => <StatCard key={i} {...stat} />)}

@@ -77,7 +77,7 @@ export default function RecentActivity({ activities = [], loading = false }) {
   const { DASHBOARD } = UI_TEXT;
 
   return (
-    <Card className="col-span-1 flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-2">
+    <Card className="col-span-1 flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm lg:col-span-2">
       <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h3 className="text-[15px] font-black tracking-tight text-slate-800">
@@ -89,7 +89,7 @@ export default function RecentActivity({ activities = [], loading = false }) {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col divide-y divide-gray-100">
+      <div className="custom-scrollbar flex max-h-[500px] flex-1 flex-col divide-y divide-gray-100 overflow-y-auto pr-2">
         {loading ? (
           <div className="animate-pulse py-6 text-center text-sm text-slate-500">
             {DASHBOARD.LOADING_ACTIVITIES}
