@@ -1,7 +1,7 @@
 export const INTERN_PHASE_STATUS = {
-  UPCOMING: 0,
-  ACTIVE: 1,
-  ENDED: 2,
+  UPCOMING: 1,
+  ACTIVE: 2,
+  ENDED: 3,
 };
 
 export const INTERN_PHASE_STATUS_LABELS = {
