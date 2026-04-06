@@ -2,6 +2,15 @@
 
 html {
   scrollbar-gutter: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, and Opera */
 }
 
 @font-face {
@@ -34,8 +43,10 @@ html {
 
 :root {
   /* Base */
-  --background: #ffffff; /* White */
-  --foreground: #111827; /* Gray 900 */
+  --background: #ffffff;
+  /* White */
+  --foreground: #111827;
+  /* Gray 900 */
 
   /* Primary (Red scale) */
   --primary-50: #fff2f2;
@@ -279,15 +290,20 @@ body {
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #e2e8f0; /* slate-200 */
+  background: #e2e8f0;
+  /* slate-200 */
   border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #cbd5e1; /* slate-300 */
+  background: #cbd5e1;
+  /* slate-300 */
 }
 
 /* Ant Design Table Premium Customization */
@@ -295,17 +311,17 @@ body {
   background: transparent !important;
 }
 
-.premium-table .ant-table-thead > tr > th {
+.premium-table .ant-table-thead>tr>th {
   background: transparent !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
 }
 
-.premium-table .ant-table-tbody > tr > td {
+.premium-table .ant-table-tbody>tr>td {
   border-bottom: 1px solid rgba(0, 0, 0, 0.02) !important;
   padding: 16px 8px !important;
 }
 
-.premium-table .ant-table-tbody > tr:hover > td {
+.premium-table .ant-table-tbody>tr:hover>td {
   background: rgba(0, 0, 0, 0.01) !important;
 }
 
