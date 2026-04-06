@@ -178,7 +178,7 @@ export default function InternPhaseDetailView({ phase }) {
                     </span>
                   </div>
                   <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 mt-1">
-                    {remaining} {METADATA.LEFT} {METADATA.APPLICATIONS_REMAINING}
+                    {remaining} {METADATA.REMAINING} {METADATA.CAPACITY}
                   </span>
                 </div>
               </div>

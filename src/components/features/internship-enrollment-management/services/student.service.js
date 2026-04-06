@@ -39,25 +39,22 @@ const mapStudent = (item) => {
   const rawPlacementStatus = item.placementStatus ?? student.placementStatus;
   const entName = item.enterpriseName || student.enterpriseName;
 
-  // Intelligently map placement status based on code and presence of enterprise
+  // Backend Enum: Unplaced = 0, Placed = 1
   let finalPlacementStatus = 'UNPLACED';
 
   if (
-    rawPlacementStatus === 6 ||
+    rawPlacementStatus === 1 ||
     rawPlacementStatus === 'PLACED' ||
     rawPlacementStatus === 'Placed'
   ) {
     finalPlacementStatus = 'PLACED';
-  } else if (rawPlacementStatus === 1) {
-    // Current API uses 1 for placed, but check if there's actually an enterprise assigned
-    finalPlacementStatus = entName && entName !== '— Unassigned —' ? 'PLACED' : 'UNPLACED';
   } else if (
-    rawPlacementStatus === 4 ||
+    rawPlacementStatus === 9 ||
     rawPlacementStatus === 'PENDING_ASSIGNMENT' ||
     rawPlacementStatus === 'Pending'
   ) {
     finalPlacementStatus = 'PENDING_ASSIGNMENT';
-  } else if (rawPlacementStatus === 5 || rawPlacementStatus === 'UNPLACED') {
+  } else {
     finalPlacementStatus = 'UNPLACED';
   }
 

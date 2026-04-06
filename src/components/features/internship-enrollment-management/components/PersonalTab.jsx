@@ -99,11 +99,23 @@ export const PersonalTab = ({ viewOnly, initialValues, ADD_EDIT }) => {
           )}
         </Col>
         <Col span={12}>
-          <Form.Item label={ADD_EDIT.PHONE_LABEL} name="phone" hidden={viewOnly}>
+          <Form.Item
+            label={ADD_EDIT.PHONE_LABEL}
+            name="phone"
+            hidden={viewOnly}
+            rules={[
+              { required: true, message: ADD_EDIT.PHONE_REQUIRED },
+              { pattern: /^\d{10}$/, message: ADD_EDIT.PHONE_INVALID },
+            ]}
+          >
             <Input
               prefix={<PhoneOutlined className="text-muted/60 ml-0.5" />}
               placeholder={ADD_EDIT.PHONE_PLACEHOLDER}
               className="!h-10 !rounded-xl"
+              maxLength={10}
+              onInput={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+              }}
             />
           </Form.Item>
           {viewOnly && (
