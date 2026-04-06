@@ -1,7 +1,7 @@
 'use client';
 
 import { Progress as AntdProgress } from 'antd';
-import { Briefcase, Calendar, FileText, Layers, Search, Users } from 'lucide-react';
+import { Calendar, FileText, Layers, Search, Users } from 'lucide-react';
 import React, { useState } from 'react';
 
 import Card from '@/components/ui/card';
@@ -71,26 +71,13 @@ export default function EnterpriseDashboardContainer() {
 
   return (
     <PageLayout className="gap-6 animate-in fade-in duration-700">
-      <div className="flex flex-col gap-1 px-1">
-        <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
-          {ENTERPRISE_DASHBOARD_UI.TITLE}
-        </h2>
-        <p className="text-sm font-medium text-slate-500">{ENTERPRISE_DASHBOARD_UI.SUBTITLE}</p>
-      </div>
-
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           title={ENTERPRISE_DASHBOARD_UI.STATS.TOTAL_INTERNS}
           value={stats.totalInterns}
           icon={Users}
           colorClass="bg-blue-50 text-blue-600"
-        />
-        <StatCard
-          title={ENTERPRISE_DASHBOARD_UI.STATS.ACTIVE_PROJECTS}
-          value={stats.activeProjects}
-          icon={Briefcase}
-          colorClass="bg-purple-50 text-purple-600"
         />
         <StatCard
           title={ENTERPRISE_DASHBOARD_UI.STATS.PENDING_APPLICATIONS}
