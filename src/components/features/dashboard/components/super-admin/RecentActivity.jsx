@@ -89,7 +89,7 @@ export default function RecentActivity({ activities = [], loading = false }) {
         </div>
       </div>
 
-      <div className="custom-scrollbar flex max-h-[500px] flex-1 flex-col divide-y divide-gray-100 overflow-y-auto pr-2">
+      <div className="flex flex-1 flex-col divide-y divide-gray-100 pr-2">
         {loading ? (
           <div className="animate-pulse py-6 text-center text-sm text-slate-500">
             {DASHBOARD.LOADING_ACTIVITIES}

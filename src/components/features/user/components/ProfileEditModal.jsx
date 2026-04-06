@@ -324,8 +324,8 @@ export default function ProfileEditModal({
       }
       size={600}
       styles={{
-        header: { borderBottom: '1px solid #f8fafc', padding: '24px 32px' },
-        body: { padding: '32px' },
+        header: { borderBottom: '1px solid #f8fafc', padding: '16px 24px' },
+        body: { padding: '24px' },
         footer: { padding: 0 },
       }}
       destroyOnClose
