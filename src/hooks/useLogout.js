@@ -1,7 +1,6 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 
 import { clearAuth } from '@/components/features/auth/lib/auth-storage';
 import { logout as authLogout } from '@/components/features/auth/services/auth.service';
@@ -12,7 +11,6 @@ import { useToast } from '@/providers/ToastProvider';
  * local auth storage, and TanStack Query cache.
  */
 export const useLogout = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const toast = useToast();
 
@@ -36,8 +34,8 @@ export const useLogout = () => {
       clearAuth();
       queryClient.clear();
     } finally {
-      // 4. Redirect to login
-      router.push('/login');
+      // 4. Redirect to login with a full page reload to ensure all memory state (Zustand, Query, etc.) is truly gone.
+      window.location.href = '/login';
     }
   };
 

@@ -49,6 +49,7 @@ const enterpriseMenu = [
     icon: <TeamOutlined />,
     label: 'Staff Management',
     href: '/staff-management',
+    role: [USER_ROLE.ENTERPRISE_ADMIN],
   },
 
   {

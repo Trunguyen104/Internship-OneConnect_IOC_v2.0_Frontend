@@ -1,12 +1,26 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { clearAuth } from '@/components/features/auth/lib/auth-storage';
+import { AUTH_SESSION_QUERY_KEY } from '@/hooks/useSession';
+import { AUTH_SESSION_REFRESHED_EVENT } from '@/lib/auth/session-events';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function AuthEventsProvider({ children }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const onSessionRefreshed = () => {
+      queryClient.invalidateQueries({ queryKey: AUTH_SESSION_QUERY_KEY });
+    };
+
+    window.addEventListener(AUTH_SESSION_REFRESHED_EVENT, onSessionRefreshed);
+    return () => window.removeEventListener(AUTH_SESSION_REFRESHED_EVENT, onSessionRefreshed);
+  }, [queryClient]);
 
   useEffect(() => {
     const onUnauthorized = () => {
@@ -17,6 +31,8 @@ export function AuthEventsProvider({ children }) {
 
       if (window.location.pathname === '/login') return;
 
+      clearAuth();
+      queryClient.removeQueries({ queryKey: AUTH_SESSION_QUERY_KEY });
       const returnTo = `${window.location.pathname}${window.location.search || ''}`;
       router.replace(`/login?returnTo=${encodeURIComponent(returnTo)}`);
     };
@@ -45,7 +61,7 @@ export function AuthEventsProvider({ children }) {
       window.removeEventListener('auth:unauthorized', onUnauthorized);
       window.removeEventListener('auth:forbidden', onForbidden);
     };
-  }, [router]);
+  }, [router, queryClient]);
 
   return children;
 }

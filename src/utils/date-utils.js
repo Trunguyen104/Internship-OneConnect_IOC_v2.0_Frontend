@@ -18,3 +18,26 @@ export function formatRelativeTime(dateString) {
   const diffInDays = Math.floor(diffInHours / 24);
   return `${diffInDays} days ago`;
 }
+
+/**
+ * Absolute UTC timestamp for admin dashboards and audit trails.
+ * @param {string|Date} dateInput
+ * @returns {string}
+ */
+export function formatAbsoluteDateTimeUtc(dateInput) {
+  if (!dateInput) return '';
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) return '';
+  return (
+    date.toLocaleString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+      timeZone: 'UTC',
+    }) + ' UTC'
+  );
+}

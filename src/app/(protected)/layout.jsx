@@ -1,6 +1,4 @@
-'use client';
-
-import AuthGuard from '@/components/shared/AuthGuard';
+import { requireServerAuth } from '@/lib/server/auth-session';
 
 /**
  * ProtectedLayout — Root guard for all authenticated routes.
@@ -8,6 +6,7 @@ import AuthGuard from '@/components/shared/AuthGuard';
  * Provides defense-in-depth: any unauthenticated user hitting any /protected/* URL
  * will be redirected to /login before reaching a role-specific guard.
  */
-export default function ProtectedLayout({ children }) {
-  return <AuthGuard allowedRoles={[]}>{children}</AuthGuard>;
+export default async function ProtectedLayout({ children }) {
+  await requireServerAuth();
+  return children;
 }

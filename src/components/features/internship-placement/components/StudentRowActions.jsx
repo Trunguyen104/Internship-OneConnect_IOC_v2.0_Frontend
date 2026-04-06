@@ -21,18 +21,18 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
     semesterStatus === SEMESTER_STATUS.ENDED || semesterStatus === SEMESTER_STATUS.CLOSED;
   const hasData = student.hasInternshipData;
 
-  const isUnplaced = !student.enterpriseName || student.enterpriseName === '— Unassigned —';
-  const status = isUnplaced ? PLACEMENT_STATUS.UNPLACED : student.displayStatus;
-
-  const UI = PLACEMENT_UI_TEXT.ACTIONS;
   const LABELS = PLACEMENT_UI_TEXT.TABLE;
+  const UI = PLACEMENT_UI_TEXT.ACTIONS;
+
+  const isUnplaced = !student.enterpriseName || student.enterpriseName === LABELS.UNASSIGNED;
+  const status = isUnplaced ? PLACEMENT_STATUS.UNPLACED : student.displayStatus;
 
   const getDisabledTooltip = () => {
     if (isEnded) return UI.ENDED_TOOLTIP;
     if (hasData)
       return UI.DATA_EXISTS_TOOLTIP(
         student.fullName,
-        student.enterpriseName || 'Doanh nghiệp hiện tại'
+        student.enterpriseName || PLACEMENT_UI_TEXT.POPOVER.FALLBACK_OLD_ENT
       );
     return null;
   };

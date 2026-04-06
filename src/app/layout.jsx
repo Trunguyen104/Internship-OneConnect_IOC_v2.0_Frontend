@@ -4,6 +4,7 @@ import { AntdConfigProvider } from '../providers/AntdConfigProvider';
 import { AuthEventsProvider } from '../providers/AuthEventsProvider';
 import { PageHeaderProvider } from '../providers/PageHeaderProvider';
 import { ReactQueryProvider } from '../providers/ReactQueryProvider';
+import { SessionProvider } from '../providers/SessionProvider';
 import { ToastProvider } from '../providers/ToastProvider';
 
 export const metadata = {
@@ -19,13 +20,15 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning={true}>
       <body className="antialiased">
         <ReactQueryProvider>
-          <PageHeaderProvider>
-            <AuthEventsProvider>
-              <AntdConfigProvider>
-                <ToastProvider>{children}</ToastProvider>
-              </AntdConfigProvider>
-            </AuthEventsProvider>
-          </PageHeaderProvider>
+          <SessionProvider>
+            <PageHeaderProvider>
+              <AuthEventsProvider>
+                <AntdConfigProvider>
+                  <ToastProvider>{children}</ToastProvider>
+                </AntdConfigProvider>
+              </AuthEventsProvider>
+            </PageHeaderProvider>
+          </SessionProvider>
         </ReactQueryProvider>
       </body>
     </html>

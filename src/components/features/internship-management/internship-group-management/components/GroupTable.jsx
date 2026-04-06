@@ -70,8 +70,14 @@ const GroupTable = memo(function GroupTable({
 
           return (
             <div className="flex flex-col leading-tight grow overflow-hidden">
+              <span
+                className={`${TABLE_CELL.secondary} truncate text-xs font-bold mb-0.5`}
+                title={name}
+              >
+                {name}
+              </span>
               {(start || end) && (
-                <div className="text-muted text-[10px] font-medium opacity-60 flex items-center gap-1 mt-0.5">
+                <div className="text-muted text-[10px] font-medium opacity-60 flex items-center gap-1">
                   <span className="truncate">{start ? dayjs(start).format('MMM DD') : '??'}</span>
                   <span>-</span>
                   <span className="truncate">{end ? dayjs(end).format('MMM DD, YYYY') : '??'}</span>

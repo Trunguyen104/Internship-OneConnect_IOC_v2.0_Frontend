@@ -75,7 +75,7 @@ export const useTermManagement = () => {
 
             if (uniId && !uniName) {
               try {
-                const res = await universityService.getById(uniId);
+                const res = await universityService.getById(uniId, { silent: true });
                 if (res?.data?.name) userUniversity.name = res.data.name;
               } catch (err) {}
             }

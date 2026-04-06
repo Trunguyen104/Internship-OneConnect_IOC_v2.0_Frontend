@@ -11,6 +11,12 @@ import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/int
 
 export default function PhaseGroupsPage() {
   const { phaseId } = useParams();
+  const { DETAILS } = INTERN_PHASE_MANAGEMENT;
+
+  const COPY = {
+    TITLE: DETAILS.TABS.GROUPS,
+    SUB: DETAILS.METADATA.TITLE,
+  };
 
   // Cấu hình Header cho trang danh sách nhóm thực tập
   const COPY = {

@@ -7,19 +7,16 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useQueryClient } from '@tanstack/react-query';
 import { Avatar, Dropdown } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { clearAuth } from '@/components/features/auth/lib/auth-storage';
-import { logout } from '@/components/features/auth/services/auth.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/user-management/enums';
+import { useLogout } from '@/hooks/useLogout';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
-import { useToast } from '@/providers/ToastProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
 
 export default function Header() {
@@ -27,9 +24,8 @@ export default function Header() {
   const router = useRouter();
   const params = useParams();
   const groupId = params?.groupId || params?.internshipGroupId;
-  const toast = useToast();
   const { isSidebarCollapsed } = useLayoutStore();
-  const queryClient = useQueryClient();
+  const { logout: doLogout } = useLogout();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,15 +41,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      clearAuth();
-      queryClient.clear();
-      toast.success('Logout successfully');
-    } finally {
-      router.refresh();
-      router.push('/login');
-    }
+    await doLogout('Logout successfully');
   };
 
   const userRoleId = userInfo?.roleId || userInfo?.roleID || Number(userInfo?.role);

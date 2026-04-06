@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Alert, message, Popover, Space } from 'antd';
+import { Alert, Modal, Popover, Space } from 'antd';
 import React, { useState } from 'react';
 
 import Button from '@/components/ui/button';
@@ -10,6 +10,7 @@ import {
   PLACEMENT_STATUS,
   PLACEMENT_UI_TEXT,
 } from '@/constants/internship-placement/placement.constants';
+import { useToast } from '@/providers/ToastProvider';
 
 import { PlacementService } from '../services/placement.service';
 import EnterprisePhaseSelect from './EnterprisePhaseSelect';
@@ -26,6 +27,7 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
   const [popoverVisible, setPopoverVisible] = useState(false);
   const UI = PLACEMENT_UI_TEXT.POPOVER;
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const mutation = useMutation({
     mutationFn: (data) => {
@@ -42,17 +44,17 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
     },
     onSuccess: (res) => {
       if (res?.success === false) {
-        message.error(res?.message || 'Race condition: Phase might be full.');
+        toast.error(res?.message || 'Phase might be full.');
       } else {
         const entName = selectedPhase?.enterpriseName || 'Enterprise';
         const stuName = student.fullName || 'Student';
-        message.success(UI.SUCCESS(entName, stuName));
+        toast.success(UI.SUCCESS(entName, stuName));
         setPopoverVisible(false);
         queryClient.invalidateQueries(['semester-students']);
       }
     },
     onError: (err) => {
-      message.error(err?.message || 'Failed to assign enterprise.');
+      toast.error(err?.message || 'Failed to assign enterprise.');
     },
   });
 
@@ -62,7 +64,7 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
   const handleConfirm = () => {
     if (disabled) return;
     if (!selectedPhase) {
-      message.warning('Please select an enterprise and phase.');
+      toast.warning(PLACEMENT_UI_TEXT.MODALS.BULK_REASSIGN.SELECT_PHASE_PROMPT);
       return;
     }
 
@@ -82,7 +84,7 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
       Modal.error({
         title: <span className="font-bold text-danger">{UI.CONFLICT_TITLE}</span>,
         content: (
-          <div className="text-sm text-slate-600 leading-relaxed py-2">
+          <div className="text-sm text-muted leading-relaxed py-2">
             {UI.CONFLICT_ERROR(
               student.fullName,
               selectedPhase.enterpriseName,
@@ -101,7 +103,7 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
         student.displayStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT) &&
       student.applicationId;
     const newEntName = selectedPhase.enterpriseName;
-    const oldEntName = student.enterpriseName || 'Doanh nghiệp cũ';
+    const oldEntName = student.enterpriseName || UI.FALLBACK_OLD_ENT;
 
     const execute = () => {
       const command = {
@@ -126,9 +128,9 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
 
     if (isReassign) {
       Modal.confirm({
-        title: <span className="font-bold text-slate-800">{UI.REASSIGN_TITLE}</span>,
+        title: <span className="font-bold text-text">{UI.REASSIGN_TITLE}</span>,
         content: (
-          <div className="text-sm text-slate-600 leading-relaxed py-2">
+          <div className="text-sm text-muted leading-relaxed py-2">
             {UI.REASSIGN_CONFIRM(student.fullName, oldEntName, newEntName)}
           </div>
         ),
@@ -144,8 +146,8 @@ const AssignEnterprisePopover = ({ student, children, termName, termId, disabled
 
   const content = (
     <div className="w-[320px] p-1">
-      <Space direction="vertical" className="w-full" size={12}>
-        <div className="text-sm font-semibold text-slate-700">{UI.QUICK_ASSIGNMENT}</div>
+      <Space orientation="vertical" className="w-full" size={12}>
+        <div className="text-sm font-semibold text-text">{UI.QUICK_ASSIGNMENT}</div>
         <EnterprisePhaseSelect
           value={selectedPhase?.internPhaseId || selectedPhase?.id}
           onChange={(id, phase) => setSelectedPhase(phase)}

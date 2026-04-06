@@ -156,6 +156,7 @@ export const INTERN_PHASE_MANAGEMENT = {
     TABS: {
       POSTINGS: 'Job Postings',
       STUDENTS: 'Students',
+      GROUPS: 'Internship Groups',
     },
     EMPTY_POSTINGS: 'No job postings yet. Create a job posting to start receiving candidates.',
     CREATE_POSTING: 'Create Job Posting',

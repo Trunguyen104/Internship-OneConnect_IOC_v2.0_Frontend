@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+import { AUTH_COOKIE_ACCESS, AUTH_COOKIE_REFRESH } from '@/lib/auth/cookie-names';
+import { applySessionCookies, clearSessionCookies } from '@/lib/server/auth-cookies';
 import { resolveAuthBaseUrl } from '@/lib/server/backend-url';
 
 const BE_URL = resolveAuthBaseUrl();
@@ -32,6 +34,50 @@ function parseTokensFromHeaders(headers) {
   return tokens;
 }
 
+async function parseUpstreamJson(res) {
+  const rawBody = await res.text();
+  try {
+    return rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    return { message: rawBody || 'Unexpected upstream response' };
+  }
+}
+
+async function fetchMe(accessToken) {
+  if (!accessToken) return null;
+
+  const res = await fetch(`${BE_URL}/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (!res.ok) return null;
+  const data = await parseUpstreamJson(res);
+  return data?.data ?? null;
+}
+
+async function refreshSession(refreshToken) {
+  if (!refreshToken) {
+    return { ok: false, status: 401, data: { message: 'No refresh token' } };
+  }
+
+  const res = await fetch(`${BE_URL}/tokens/refresh`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Cookie: `refreshToken=${refreshToken}`,
+    },
+    cache: 'no-store',
+  });
+
+  const data = await parseUpstreamJson(res);
+  const tokens = parseTokensFromHeaders(res.headers);
+  return { ok: res.ok, status: res.status, data, tokens };
+}
+
 /**
  * LOGIN
  * POST /api/auth
@@ -59,13 +105,7 @@ export async function POST(req) {
       return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
     }
 
-    const rawBody = await res.text();
-    let data = {};
-    try {
-      data = rawBody ? JSON.parse(rawBody) : {};
-    } catch {
-      data = { message: rawBody || 'Unexpected upstream response' };
-    }
+    const data = await parseUpstreamJson(res);
 
     if (!res.ok) {
       return NextResponse.json(data, { status: res.status });
@@ -81,29 +121,9 @@ export async function POST(req) {
       refreshTokenExpiresIn: data.data?.refreshTokenExpiresIn,
     });
 
-    const isProd = process.env.NODE_ENV === 'production';
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      path: '/',
-    };
-
-    if (accessToken) {
-      const accessMaxAge = data.data?.expiresIn || 60 * 60 * 24;
-      response.cookies.set('accessToken', accessToken, {
-        ...cookieOptions,
-        maxAge: accessMaxAge,
-      });
-    }
-
-    if (refreshToken) {
-      const refreshMaxAge = data.data?.refreshTokenExpiresIn || 60 * 60 * 24 * 7;
-      response.cookies.set('refreshToken', refreshToken, {
-        ...cookieOptions,
-        maxAge: refreshMaxAge,
-      });
-    }
+    const accessMaxAge = data.data?.expiresIn || 60 * 60 * 24;
+    const refreshMaxAge = data.data?.refreshTokenExpiresIn || 60 * 60 * 24 * 7;
+    applySessionCookies(response, accessToken, refreshToken, accessMaxAge, refreshMaxAge);
 
     return response;
   } catch (err) {
@@ -118,31 +138,27 @@ export async function POST(req) {
  */
 export async function DELETE(req) {
   try {
-    const refreshToken = req.cookies.get('refreshToken')?.value;
+    const refreshToken = req.cookies.get(AUTH_COOKIE_REFRESH)?.value;
 
     if (refreshToken) {
-      fetch(`${BE_URL}/logout`, {
+      await fetch(`${BE_URL}/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken }),
-      }).catch((e) => console.error('Backend logout failed', e));
+      });
     }
 
     const response = NextResponse.json({ message: 'Logged out' });
-
-    const clearOptions = {
-      httpOnly: true,
-      path: '/',
-      maxAge: 0,
-    };
-
-    response.cookies.set('accessToken', '', clearOptions);
-    response.cookies.set('refreshToken', '', clearOptions);
+    clearSessionCookies(response);
 
     return response;
   } catch (err) {
     console.error('LOGOUT ERROR:', err);
-    return NextResponse.json({ message: 'Logout failed' }, { status: 500 });
+    const response = NextResponse.json({
+      message: 'Logout failed upstream, local session cleared',
+    });
+    clearSessionCookies(response);
+    return response;
   }
 }
 
@@ -152,72 +168,73 @@ export async function DELETE(req) {
  */
 export async function PUT(req) {
   try {
-    const oldRefreshToken = req.cookies.get('refreshToken')?.value;
-
-    if (!oldRefreshToken) {
-      return NextResponse.json({ message: 'No refresh token' }, { status: 401 });
+    const oldRefreshToken = req.cookies.get(AUTH_COOKIE_REFRESH)?.value;
+    const refreshed = await refreshSession(oldRefreshToken);
+    if (!refreshed.ok) {
+      return NextResponse.json(refreshed.data, { status: refreshed.status });
     }
-
-    const refreshUrl = `${BE_URL}/tokens/refresh`;
-    let res;
-
-    try {
-      res = await fetch(refreshUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: `refreshToken=${oldRefreshToken}`,
-        },
-      });
-    } catch (upstreamError) {
-      console.error('REFRESH UPSTREAM ERROR:', upstreamError);
-      return NextResponse.json({ message: 'Authentication service unavailable' }, { status: 502 });
-    }
-
-    const rawBody = await res.text();
-    let data = {};
-    try {
-      data = rawBody ? JSON.parse(rawBody) : {};
-    } catch {
-      data = { message: rawBody || 'Unexpected upstream response' };
-    }
-
-    if (!res.ok) {
-      return NextResponse.json(data, { status: res.status });
-    }
-
-    const { accessToken, refreshToken } = parseTokensFromHeaders(res.headers);
 
     const response = NextResponse.json({
       success: true,
-      role: data.data?.role,
+      role: refreshed.data?.data?.role,
     });
-
-    const isProd = process.env.NODE_ENV === 'production';
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      path: '/',
-    };
-
-    if (accessToken) {
-      response.cookies.set('accessToken', accessToken, {
-        ...cookieOptions,
-        maxAge: 60 * 60 * 24,
-      });
-    }
-
-    if (refreshToken) {
-      response.cookies.set('refreshToken', refreshToken, {
-        ...cookieOptions,
-        maxAge: 60 * 60 * 24 * 7,
-      });
-    }
+    applySessionCookies(
+      response,
+      refreshed.tokens.accessToken,
+      refreshed.tokens.refreshToken,
+      refreshed.data?.data?.expiresIn || 60 * 60 * 24,
+      refreshed.data?.data?.refreshTokenExpiresIn || 60 * 60 * 24 * 7
+    );
 
     return response;
   } catch (err) {
     console.error('REFRESH ERROR:', err);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
+  }
+}
+
+/**
+ * SESSION
+ * GET /api/auth
+ */
+export async function GET(req) {
+  try {
+    const accessToken = req.cookies.get(AUTH_COOKIE_ACCESS)?.value;
+    const refreshToken = req.cookies.get(AUTH_COOKIE_REFRESH)?.value;
+
+    let me = await fetchMe(accessToken);
+    if (me) {
+      return NextResponse.json({
+        authenticated: true,
+        role: me.roleId ?? me.roleID ?? me.role,
+        email: me.email ?? me.Email,
+        unitId: me.unitId ?? me.unitID,
+      });
+    }
+
+    const refreshed = await refreshSession(refreshToken);
+    if (!refreshed.ok) {
+      return NextResponse.json({ authenticated: false }, { status: 401 });
+    }
+
+    const response = NextResponse.json({
+      authenticated: true,
+      role: refreshed.data?.data?.role,
+      email: refreshed.data?.data?.email,
+      unitId: refreshed.data?.data?.unitId,
+    });
+
+    applySessionCookies(
+      response,
+      refreshed.tokens.accessToken,
+      refreshed.tokens.refreshToken,
+      refreshed.data?.data?.expiresIn || 60 * 60 * 24,
+      refreshed.data?.data?.refreshTokenExpiresIn || 60 * 60 * 24 * 7
+    );
+
+    return response;
+  } catch (err) {
+    console.error('SESSION ERROR:', err);
+    return NextResponse.json({ authenticated: false }, { status: 500 });
   }
 }
