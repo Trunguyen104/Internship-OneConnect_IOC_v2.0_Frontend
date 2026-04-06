@@ -1,6 +1,7 @@
 'use client';
 
 import { EditOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
@@ -18,6 +19,7 @@ export default function UpdateTaskModal({
   epics = [],
   initialData = null,
   members = [],
+  sprints = [],
 }) {
   const [summary, setSummary] = useState('');
   const [desc, setDesc] = useState('');
@@ -91,6 +93,20 @@ export default function UpdateTaskModal({
       /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [open, initialData]);
+
+  const dueDateWarning = useMemo(() => {
+    if (!dueDate || !sprintId || !sprints.length) return false;
+    const selectedSprint = sprints.find(
+      (s) => (s.id || s.sprintId) === sprintId || s.id === sprintId
+    );
+    if (!selectedSprint || !selectedSprint.startDate || !selectedSprint.endDate) return false;
+
+    const d = dayjs(dueDate);
+    const start = dayjs(selectedSprint.startDate);
+    const end = dayjs(selectedSprint.endDate);
+
+    return d.isBefore(start, 'day') || d.isAfter(end, 'day');
+  }, [dueDate, sprintId, sprints]);
 
   const canSubmit = useMemo(
     () => summary.trim() && type && status && priority,
@@ -176,6 +192,7 @@ export default function UpdateTaskModal({
               setPriority={setPriority}
               dueDate={dueDate}
               setDueDate={setDueDate}
+              dueDateWarning={dueDateWarning}
               points={points}
               setPoints={setPoints}
               members={members}

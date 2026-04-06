@@ -115,6 +115,8 @@ export function SprintSection({
             it={it}
             itemOrder={itemOrders[it.workItemId || it.id]}
             onDelete={() => handleDeleteWorkItem?.(it.workItemId || it.id)}
+            sprintStartDate={sprint.startDate}
+            sprintEndDate={sprint.endDate}
             onClick={async (task) => {
               try {
                 const res = await productBacklogService.getWorkItemById(

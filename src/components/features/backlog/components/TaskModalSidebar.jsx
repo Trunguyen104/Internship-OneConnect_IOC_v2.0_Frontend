@@ -1,6 +1,5 @@
-'use client';
-
 import dayjs from 'dayjs';
+import { AlertCircle } from 'lucide-react';
 import React from 'react';
 
 import { DatePicker } from '@/components/ui/datepicker';
@@ -26,6 +25,7 @@ export function TaskModalSidebar({
   setPriority,
   dueDate,
   setDueDate,
+  dueDateWarning,
   points,
   setPoints,
   members = [],
@@ -69,7 +69,7 @@ export function TaskModalSidebar({
               {BACKLOG_UI.FIELD_STATUS}
               <span className="text-danger"> *</span>
             </span>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <Select
                 value={status}
                 onChange={setStatus}
@@ -89,7 +89,7 @@ export function TaskModalSidebar({
               {BACKLOG_UI.FIELD_TYPE}
               <span className="text-danger"> *</span>
             </span>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <Select
                 value={type}
                 onChange={setType}
@@ -106,7 +106,7 @@ export function TaskModalSidebar({
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_EPIC || 'Epic'}
             </span>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <Select
                 value={epic}
                 onChange={setEpic}
@@ -127,7 +127,7 @@ export function TaskModalSidebar({
             <span className="min-w-[130px] text-sm font-medium text-gray-500">
               {BACKLOG_UI.FIELD_ASSIGNEE}
             </span>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <Select
                 value={assignee}
                 onChange={setAssignee}
@@ -161,18 +161,28 @@ export function TaskModalSidebar({
           </div>
 
           {/* Due Date */}
-          <div className="flex items-center justify-between gap-4">
-            <span className="min-w-[130px] text-sm font-medium text-gray-500">
-              {BACKLOG_UI.FIELD_DUE_DATE}
-            </span>
-            <div className="flex-1">
-              <DatePicker
-                value={dueDate ? dayjs(dueDate) : null}
-                onChange={(date) => setDueDate(date ? date.toISOString() : null)}
-                placeholder="Select date"
-                className="w-full rounded-2xl h-10"
-              />
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center justify-between gap-4">
+              <span className="min-w-[130px] text-sm font-medium text-gray-500">
+                {BACKLOG_UI.FIELD_DUE_DATE}
+              </span>
+              <div className="flex-1">
+                <DatePicker
+                  value={dueDate ? dayjs(dueDate) : null}
+                  onChange={(date) => setDueDate(date ? date.toISOString() : null)}
+                  placeholder="Select date"
+                  className={`w-full rounded-2xl h-10 transition-all ${
+                    dueDateWarning ? 'border-red-400 bg-red-50/30' : ''
+                  }`}
+                />
+              </div>
             </div>
+            {dueDateWarning && (
+              <span className="ml-[134px] flex items-center gap-1.5 text-[12px] font-medium text-red-500 animate-in fade-in slide-in-from-top-1 duration-200">
+                <AlertCircle className="size-3.5" />
+                {BACKLOG_UI.DUE_DATE_OUTSIDE_SPRINT}
+              </span>
+            )}
           </div>
 
           {/* Story Points */}

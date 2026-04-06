@@ -105,12 +105,12 @@ export default function AppSidebar() {
           },
           { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
           { key: `${p}/groups`, icon: <FolderKanban className="size-4" />, label: 'Groups' },
-          {
+          Number(userRole) !== USER_ROLE.ENTERPRISE_ADMIN && {
             key: `${p}/public-holidays`,
             icon: <CalendarCheck className="size-4" />,
             label: 'Public Holidays',
           },
-        ];
+        ].filter(Boolean);
       }
 
       // ══════════════════════════════════════════════════════
@@ -204,12 +204,12 @@ export default function AppSidebar() {
             icon: <Briefcase className="size-4" />,
             label: 'Internship Phases',
           },
-          {
+          nRole !== USER_ROLE.ENTERPRISE_ADMIN && {
             key: '/company/public-holidays',
             icon: <CalendarCheck className="size-4" />,
             label: 'Public Holidays',
           },
-        ];
+        ].filter(Boolean);
       }
 
       return [];
