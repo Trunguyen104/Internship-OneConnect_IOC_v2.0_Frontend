@@ -37,16 +37,18 @@ export default function StatCard({
       className={`relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${borderColor}`}
     >
       <div className="flex items-start justify-between">
-        <div className={`rounded-xl ${bgColor} p-2.5`}>
-          <Icon className={`h-4.5 w-4.5 ${iconColor}`} />
+        <div className={`rounded-lg ${bgColor} p-2`}>
+          <Icon className={`h-4 w-4 ${iconColor}`} />
         </div>
-        <ArrowUpRight className="h-3.5 w-3.5 text-slate-200" />
+        <ArrowUpRight className="h-3 w-3 text-slate-200" />
       </div>
-      <div className="mt-3">
-        <span className="block text-xl font-black tracking-tight text-slate-800">
+      <div className="mt-2">
+        <span className="block text-lg font-black tracking-tight text-slate-800">
           {value || '0'}
         </span>
-        <span className="mt-0.5 block truncate text-[11px] font-bold text-slate-400">{title}</span>
+        <span className="mt-0.5 block truncate text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+          {title}
+        </span>
       </div>
     </Card>
   );

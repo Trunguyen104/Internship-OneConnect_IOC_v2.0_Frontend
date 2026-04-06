@@ -103,19 +103,19 @@ export default function SuperAdminDashboard() {
       <PageLayout.Header title={DASHBOARD.OVERVIEW_TITLE} subtitle={DASHBOARD.OVERVIEW_SUBTITLE} />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {isLoading
           ? Array.from({ length: stats.length }).map((_, i) => <StatCard key={i} loading />)
           : stats.map((stat, i) => <StatCard key={i} {...stat} />)}
       </div>
 
       {/* Main Content Layout */}
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
+      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-3 lg:items-start">
         {/* Left/Middle Column: Activity */}
         <RecentActivity activities={recentActivities} loading={isLoading} />
 
         {/* Right Column: Health & Actions */}
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 lg:col-span-1">
           <SystemHealth healthData={systemHealthData} loading={isLoading} />
           <QuickActions />
         </div>
