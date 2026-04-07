@@ -9,16 +9,11 @@ export const APPLICATION_STATUS = {
 };
 
 export const PLACEMENT_STATUS = {
-  // Overall Student Status (StudentStatus Enum)
-  NO_INTERNSHIP: 1,
-  APPLIED: 2,
-  INTERNSHIP_IN_PROGRESS: 3,
-  COMPLETED: 4,
-  UNPLACED: 5,
-  PLACED: 6,
-
   // Application specific (from InternshipApplicationStatus)
   PENDING_ASSIGNMENT: 4,
+  PLACED: 5,
+  REJECTED: 6,
+  UNPLACED: 0, // Fallback for no assignment
 };
 
 export const PLACEMENT_STATUS_LABELS = {

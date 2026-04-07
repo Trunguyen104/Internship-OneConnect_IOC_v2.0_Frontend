@@ -25,6 +25,7 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
   const UI = PLACEMENT_UI_TEXT.ACTIONS;
 
   const isUnplaced = !student.enterpriseName || student.enterpriseName === LABELS.UNASSIGNED;
+  // If no enterprise, they are Unplaced. Otherwise use display status (4=Pending, 5=Placed, 6=Rejected)
   const status = isUnplaced ? PLACEMENT_STATUS.UNPLACED : student.displayStatus;
 
   const getDisabledTooltip = () => {
@@ -63,7 +64,11 @@ const StudentRowActions = ({ student, semesterId, semesterStatus, onUnassign, te
       variant: 'primary',
     });
   } else {
-    if (status === PLACEMENT_STATUS.PLACED) {
+    // AC-05, AC-06: For both PLACED and PENDING_ASSIGNMENT, allow Change and Cancel
+    const isPlaced = status === PLACEMENT_STATUS.PLACED;
+    const isPending = status === PLACEMENT_STATUS.PENDING_ASSIGNMENT;
+
+    if (isPlaced || isPending) {
       items.push({
         key: 'change',
         label: (
