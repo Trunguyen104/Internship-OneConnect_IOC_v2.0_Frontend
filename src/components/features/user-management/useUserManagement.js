@@ -30,8 +30,8 @@ export function useUserManagement() {
     queryKey: ['users', refreshCount, pageNumber, pageSize, search, currentFilter],
     queryFn: async () => {
       const params = {
-        PageNumber: pageNumber,
-        PageSize: pageSize,
+        PageNumber: Math.max(1, pageNumber || 1),
+        PageSize: Math.max(1, pageSize || 10),
         SearchTerm: search || undefined,
         Role: currentFilter.role === 'all' ? undefined : Number(currentFilter.role),
       };

@@ -74,8 +74,8 @@ export function useUserManagementForm(onSuccess) {
 
         if (meRole === USER_ROLE.SUPER_ADMIN) {
           const [uniRes, entRes] = await Promise.all([
-            universityService.getAll({ PageNumber: 1, PageSize: 1000 }),
-            enterpriseService.getAll({ PageNumber: 1, PageSize: 1000 }),
+            universityService.getAll({ PageNumber: 1, PageSize: 100 }),
+            enterpriseService.getAll({ PageNumber: 1, PageSize: 100 }),
           ]);
           uniData = uniRes?.data?.items ?? uniRes?.items ?? [];
           entData = entRes?.data?.items ?? entRes?.items ?? [];
