@@ -27,9 +27,9 @@ export const DAILY_REPORT_UI = {
     UNKNOWN: 'Unknown',
   },
   LOGBOOK_STATUS: {
-    SUBMITTED: 0,
-    APPROVED: 1,
-    NEEDS_REVISION: 2,
+    SUBMITTED: 1,
+    APPROVED: 2,
+    NEEDS_REVISION: 3,
     PUNCTUAL: 4,
     LATE: 5,
   },
@@ -40,7 +40,7 @@ export const DAILY_REPORT_UI = {
     CREATE_DESC: 'Submit your internship progress',
     EDIT_DESC: 'Update submitted logbook details',
 
-    SUBMIT: 'Submit Log Book',
+    SUBMIT: 'Submit',
     SAVE: 'Save Changes',
     CANCEL: 'Cancel',
   },

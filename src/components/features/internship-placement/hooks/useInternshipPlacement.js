@@ -47,8 +47,13 @@ export const useInternshipPlacement = ({
 
     return rawItems.map((s) => {
       const rawStatus = s.internshipApplicationStatus;
-      const isPending = rawStatus === 4;
+
+      // Standard mapping from Backend Enum:
+      // 4 = PendingAssignment, 5 = Placed, 6 = Rejected
+      // 1, 2, 3 (Applied, Interviewing, Offered) are also technically "Pending" in the Placement Table.
       const isPlaced = rawStatus === 5;
+      const isPending = [1, 2, 3, 4].includes(rawStatus);
+      const isRejected = rawStatus === 6;
 
       return {
         ...s,
@@ -58,9 +63,13 @@ export const useInternshipPlacement = ({
         displayStatus: rawStatus,
         isPending,
         isPlaced,
+        isRejected,
         hasInternshipData: isPlaced || isPending,
         email: s.email || '',
-        enterpriseName: s.enterpriseName || (isPlaced ? 'Placed' : isPending ? 'Pending' : ''),
+        enterpriseName:
+          s.enterpriseName ||
+          s.internPhaseName ||
+          (isPlaced ? 'Placed' : isPending ? 'Pending' : ''),
       };
     });
   }, [res]);

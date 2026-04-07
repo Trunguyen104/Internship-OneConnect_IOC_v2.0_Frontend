@@ -79,7 +79,7 @@ export const useGroupManagement = () => {
           EnterpriseId: String(enterpriseId),
           enterpriseId: String(enterpriseId),
           PhaseId: groupFilters.phaseId !== 'ALL_VISIBLE' ? groupFilters.phaseId : undefined,
-          PageSize: 200,
+          PageSize: 100,
         });
         const data = res?.data || res;
         const allItems = data?.items || data?.Items || (Array.isArray(data) ? data : []);
@@ -116,7 +116,7 @@ export const useGroupManagement = () => {
         const res = await EnterpriseGroupService.getPlacedStudents({
           PhaseId: isAllVisible ? undefined : targetPhaseId,
           PageIndex: 1,
-          PageSize: 1000,
+          PageSize: 100,
         });
 
         const items = res?.data?.items || res.items || [];

@@ -26,7 +26,7 @@ export default function TermStudentManagement() {
   const params = useParams();
   const isTermScoped = !!params?.termId;
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
-  const { MESSAGES, ACTIONS, SEARCH, STATUS_OPTIONS } = ENROLLMENT_MANAGEMENT;
+  const { MESSAGES, ACTIONS, SEARCH } = ENROLLMENT_MANAGEMENT;
 
   const [terms, setTerms] = useState([]);
   const [termsLoading, setTermsLoading] = useState(false);
@@ -34,7 +34,6 @@ export default function TermStudentManagement() {
   const {
     termId,
     searchTerm,
-    statusFilter,
     pagination,
     students,
     loading,
@@ -47,7 +46,6 @@ export default function TermStudentManagement() {
     selectedIds,
     onTermChange,
     onSearchChange,
-    onStatusChange,
     onPageChange,
     onPageSizeChange,
     setImportVisible,
@@ -143,17 +141,6 @@ export default function TermStudentManagement() {
                 options={terms.map((t) => ({ label: t.name, value: t.termId }))}
                 suffixIcon={!isTermScoped && <FilterOutlined className="text-muted/40" />}
               />
-              <div className="bg-border h-6 w-px self-center opacity-50" />
-              <Select
-                allowClear
-                placeholder={ENROLLMENT_MANAGEMENT.STATUS_FILTER}
-                value={statusFilter || undefined}
-                onChange={onStatusChange}
-                className="!h-11 min-w-[140px] !border-0 focus:!ring-0"
-                variant="borderless"
-                options={STATUS_OPTIONS}
-                suffixIcon={<FilterOutlined className="text-muted/40" />}
-              />
             </Space.Compact>
           </DataTableToolbar.Filters>
           <DataTableToolbar.Actions className="ml-auto gap-3">
@@ -221,22 +208,20 @@ export default function TermStudentManagement() {
           />
         </PageLayout.Content>
 
-        {pagination.total > 0 && (
-          <PageLayout.Footer className="flex items-center justify-between">
-            <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
-              {UI_TEXT.COMMON.TOTAL}:{' '}
-              <span className="font-extrabold text-slate-800">{pagination.total}</span>
-            </span>
-            <PageLayout.Pagination
-              total={pagination.total}
-              page={pagination.current}
-              pageSize={pagination.pageSize}
-              onPageChange={onPageChange}
-              onPageSizeChange={onPageSizeChange}
-              className="mt-0 border-t-0 pt-0"
-            />
-          </PageLayout.Footer>
-        )}
+        <PageLayout.Footer className="flex items-center justify-between">
+          <span className="text-[12px] font-bold uppercase tracking-tight text-slate-400">
+            {UI_TEXT.COMMON.TOTAL}:{' '}
+            <span className="font-extrabold text-slate-800">{pagination.total}</span>
+          </span>
+          <PageLayout.Pagination
+            total={pagination.total}
+            page={pagination.current}
+            pageSize={pagination.pageSize}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+            className="mt-0 border-t-0 pt-0"
+          />
+        </PageLayout.Footer>
       </PageLayout.Card>
 
       <ImportModal

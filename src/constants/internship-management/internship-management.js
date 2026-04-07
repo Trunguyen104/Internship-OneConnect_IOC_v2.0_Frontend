@@ -626,11 +626,14 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           NAME_LABEL: 'Full Name',
           NAME_PLACEHOLDER: 'Ex: John Doe',
           NAME_REQUIRED: 'Please enter full name',
+          NAME_INVALID: 'Invalid Full Name. Use only letters and spaces.',
 
           ID_LABEL: 'Student ID',
           ID_PLACEHOLDER: 'Ex: ST2024001',
           ID_REQUIRED: 'Please enter student ID',
-          ID_INVALID: 'Invalid Student ID. Use only lowercase letters, numbers, and ".", "_", "-".',
+          ID_INVALID: 'Need letters & digits',
+          ID_HINT:
+            'Must contain at least one letter and one digit, no special characters (no . _ -).',
           ID_EDIT_INFO: 'Student ID cannot be changed once enrolled.',
 
           EMAIL_LABEL: 'Student Email',
@@ -645,8 +648,9 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           PHONE_LABEL: 'Phone Number',
           PHONE_PLACEHOLDER: 'Ex: 0912345678',
           PHONE_REQUIRED: 'Please enter phone number',
-          PHONE_INVALID: 'Invalid phone number (must be 10 digits)',
+          PHONE_INVALID: 'Invalid phone number (10)',
           DOB_LABEL: 'Date of Birth',
+          DOB_MIN_AGE: 'Student must be at least 18 years old.',
           ENROLL_DATE_LABEL: 'Enrollment Date',
           NOTE_LABEL: 'Enrollment Note',
           NOTE_PLACEHOLDER: 'Enter any notes about this enrollment...',

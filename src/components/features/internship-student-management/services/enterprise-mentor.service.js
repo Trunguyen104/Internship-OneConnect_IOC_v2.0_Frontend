@@ -7,7 +7,7 @@ export const EnterpriseMentorService = {
     // Reverting to /user-management to avoid 404, but fetching all to find mentors locally
     return httpGet(BASE_URL, {
       PageNumber: 1,
-      PageSize: 1000,
+      PageSize: 100,
       ...params,
     });
   },

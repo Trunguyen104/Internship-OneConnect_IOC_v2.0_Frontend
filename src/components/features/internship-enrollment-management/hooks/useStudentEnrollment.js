@@ -4,13 +4,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
 
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
-import {
-  ENROLLMENT_STATUS,
-  INTERNSHIP_MANAGEMENT_UI,
-  PLACEMENT_STATUS,
-} from '@/constants/internship-management/internship-management';
+import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
-import { getErrorDetail } from '@/utils/errorUtils';
+import { getErrorDetail, translateMessage } from '@/utils/errorUtils';
 
 import { StudentService } from '../services/student.service';
 import { useStudentFilters } from './useStudentFilters';
@@ -29,14 +25,12 @@ export const useStudentEnrollment = () => {
     termId,
     searchTerm,
     debouncedSearchTerm,
-    statusFilter,
     sortBy,
     sortOrder,
     pagination,
     setPagination,
     handleTermChange,
     handleSearchChange,
-    handleStatusChange,
     handlePageChange,
     handlePageSizeChange,
     handleSortChange,
@@ -65,7 +59,6 @@ export const useStudentEnrollment = () => {
     current,
     pageSize,
     debouncedSearchTerm,
-    statusFilter,
     sortBy,
     sortOrder,
   ];
@@ -80,13 +73,7 @@ export const useStudentEnrollment = () => {
           pageNumber: current,
           pageSize: pageSize,
           searchTerm: debouncedSearchTerm || undefined,
-          enrollmentStatus: statusFilter === 'WITHDRAWN' ? ENROLLMENT_STATUS.WITHDRAWN : undefined,
-          placementStatus:
-            statusFilter === 'PLACED'
-              ? PLACEMENT_STATUS.PLACED
-              : statusFilter === 'UNPLACED'
-                ? PLACEMENT_STATUS.UNPLACED
-                : undefined,
+          placementStatus: undefined,
           sortBy: sortBy || undefined,
           sortOrder: sortOrder || undefined,
         };
@@ -178,7 +165,7 @@ export const useStudentEnrollment = () => {
   const { mutate: withdrawStudent, isPending: withdrawLoading } = useMutation({
     mutationFn: ({ termId, studentTermId }) => StudentService.withdraw(termId, studentTermId),
     onSuccess: (response) => {
-      toast.success(response?.message || MESSAGES.DELETE_SUCCESS);
+      toast.success(translateMessage(response?.message) || MESSAGES.DELETE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
     },
     onError: (error) => toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR)),
@@ -199,7 +186,7 @@ export const useStudentEnrollment = () => {
   const { mutate: bulkWithdraw, isPending: bulkWithdrawLoading } = useMutation({
     mutationFn: ({ studentTermIds }) => StudentService.bulkWithdraw(termId, studentTermIds),
     onSuccess: (response) => {
-      toast.success(response?.message || MESSAGES.BULK_WITHDRAW_SUCCESS);
+      toast.success(translateMessage(response?.message) || MESSAGES.BULK_WITHDRAW_SUCCESS);
       setSelectedIds([]);
       queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
     },
@@ -308,8 +295,7 @@ export const useStudentEnrollment = () => {
   return {
     termId,
     searchTerm,
-    statusFilter,
-    pagination,
+    pagination: { ...pagination, total: studentData.total },
     importVisible,
     addVisible,
     editVisible,
@@ -322,7 +308,6 @@ export const useStudentEnrollment = () => {
 
     onTermChange: handleTermChange,
     onSearchChange: handleSearchChange,
-    onStatusChange: handleStatusChange,
     onPageChange: handlePageChange,
     onPageSizeChange: handlePageSizeChange,
     setImportVisible,

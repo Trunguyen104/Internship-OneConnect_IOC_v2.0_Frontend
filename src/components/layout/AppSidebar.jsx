@@ -97,11 +97,6 @@ export default function AppSidebar() {
           },
           { type: 'divider' },
           { key: `${p}/overview`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
-          {
-            key: `${p}/applications`,
-            icon: <FileText className="size-4" />,
-            label: 'Applications',
-          },
           { key: `${p}/students`, icon: <Users className="size-4" />, label: 'Students' },
           { key: `${p}/groups`, icon: <FolderKanban className="size-4" />, label: 'Groups' },
           Number(userRole) !== USER_ROLE.ENTERPRISE_ADMIN && {
