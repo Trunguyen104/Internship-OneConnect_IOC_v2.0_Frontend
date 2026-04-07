@@ -595,6 +595,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         ADD: 'Add Student',
         IMPORT: 'Import from Excel',
         EDIT: 'Edit',
+        WITHDRAW: 'Withdraw',
         DELETE: 'Delete',
         VIEW: 'View Details',
       },
