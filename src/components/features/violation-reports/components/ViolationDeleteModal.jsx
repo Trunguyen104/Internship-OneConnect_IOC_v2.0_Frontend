@@ -1,4 +1,3 @@
-import { DeleteOutlined } from '@ant-design/icons';
 import React from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
@@ -25,11 +24,11 @@ const ViolationDeleteModal = ({ open, onCancel, onConfirm, record, loading }) =>
       </CompoundModal.Content>
 
       <CompoundModal.Footer
+        className="mt-[-25px]"
         onCancel={onCancel}
         onConfirm={() => onConfirm()}
         loading={loading}
         danger
-        confirmIcon={<DeleteOutlined />}
         confirmText={CONFIRM.DELETE}
         cancelText={CONFIRM.CANCEL}
       />

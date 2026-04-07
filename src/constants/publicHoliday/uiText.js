@@ -3,7 +3,7 @@ export const PUBLIC_HOLIDAY_UI = {
   DESCRIPTION: 'Manage national public holidays used for system calculations.',
 
   CREATE_BUTTON: 'Add Holiday',
-  SYNC_BUTTON: 'Sync from API',
+  SYNC_BUTTON: 'Import National Holidays',
   SYNC_DESC: 'Automatically import all public holidays for the current year.',
   LOADING: 'Loading holidays...',
 

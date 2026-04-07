@@ -79,8 +79,8 @@ export default function LogbookPage() {
     setSubmitting(true);
     try {
       let res;
-      const SUBMITTED_STATUS = 0;
-      const PUNCTUAL_STATUS = 3;
+      const SUBMITTED_STATUS = DAILY_REPORT_UI.LOGBOOK_STATUS.SUBMITTED;
+      const PUNCTUAL_STATUS = DAILY_REPORT_UI.LOGBOOK_STATUS.PUNCTUAL;
       const effectiveInternshipId = internshipId;
 
       const now = dayjs();

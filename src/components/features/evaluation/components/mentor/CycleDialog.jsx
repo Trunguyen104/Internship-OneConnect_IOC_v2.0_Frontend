@@ -18,7 +18,6 @@ export default function CycleDialog({
   const [form] = Form.useForm();
   const { LABELS, BUTTONS, MESSAGES, TABLE_COLUMNS } = EVALUATION_UI;
 
-  // Reset form data when dialog opens
   React.useEffect(() => {
     if (open) {
       if (initialData) {
@@ -181,6 +180,7 @@ export default function CycleDialog({
       </Form>
 
       <CompoundModal.Footer
+        className="mt-[-25px]"
         onCancel={() => onOpenChange(false)}
         onSubmit={() => form.submit()}
         cancelText={BUTTONS.CANCEL}

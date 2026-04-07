@@ -26,6 +26,9 @@ const VIETNAMESE_TO_ENGLISH_ERRORS = {
   'Tên chu kỳ không được để trống': 'Cycle name is required',
   "'Weight' phải nhỏ hơn hoặc bằng '100'": 'Weight must be less than or equal to 100',
   "'Max Score' phải nhỏ hơn hoặc bằng '100'": 'Max Score must be less than or equal to 100',
+  'Rút hàng loạt sinh viên thành công. Các sinh viên đang có vị trí thực tập (Placed) đã được bỏ qua tự động và không bị ảnh hưởng.':
+    'Bulk withdrawal successful. Placed students were automatically skipped and remains unaffected.',
+  'Rút sinh viên thành công': 'Student withdrawn successfully',
 };
 
 /**

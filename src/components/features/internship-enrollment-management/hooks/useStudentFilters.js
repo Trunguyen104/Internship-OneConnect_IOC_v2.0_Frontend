@@ -15,7 +15,6 @@ export const useStudentFilters = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('FullName');
   const [sortOrder, setSortOrder] = useState('Asc');
   const [pagination, setPagination] = useState({
@@ -56,11 +55,6 @@ export const useStudentFilters = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
   }, []);
 
-  const handleStatusChange = useCallback((value) => {
-    setStatusFilter(value || '');
-    setPagination((prev) => ({ ...prev, current: 1 }));
-  }, []);
-
   const handlePageChange = useCallback((page) => {
     setPagination((prev) => ({ ...prev, current: page }));
   }, []);
@@ -79,14 +73,12 @@ export const useStudentFilters = () => {
     termId,
     searchTerm,
     debouncedSearchTerm,
-    statusFilter,
     sortBy,
     sortOrder,
     pagination,
     setPagination,
     handleTermChange,
     handleSearchChange,
-    handleStatusChange,
     handlePageChange,
     handlePageSizeChange,
     handleSortChange,

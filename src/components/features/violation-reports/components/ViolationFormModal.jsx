@@ -1,6 +1,5 @@
 'use client';
 
-import { SaveOutlined } from '@ant-design/icons';
 import { DatePicker, Form, Input, Select } from 'antd';
 import dayjs from 'dayjs';
 import React, { startTransition, useEffect, useMemo, useState } from 'react';
@@ -106,7 +105,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             <Select
               showSearch
               placeholder={FORM.PLACEHOLDERS.STUDENT}
-              className="h-10 w-full"
+              className={`h-10 w-full ${viewOnly ? '!text-slate-950 font-medium' : ''}`}
               optionFilterProp="label"
               options={studentOptions}
               onChange={handleStudentChange}
@@ -166,7 +165,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
               <div className="grid grid-cols-2 gap-x-4">
                 <Form.Item label={DETAIL.INTERN_GROUP}>
                   <Input
-                    className="h-10 cursor-default bg-bg"
+                    className="h-10 cursor-default !bg-white !text-slate-950 font-medium"
                     value={
                       initialValues?.internshipGroupName || VIOLATION_REPORT.COMMON.EMPTY_VALUE
                     }
@@ -175,7 +174,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
                 </Form.Item>
                 <Form.Item label={DETAIL.CREATED_BY}>
                   <Input
-                    className="h-10 cursor-default bg-bg"
+                    className="h-10 cursor-default !bg-white !text-slate-950 font-medium"
                     value={initialValues?.mentorName || VIOLATION_REPORT.COMMON.EMPTY_VALUE}
                     readOnly
                   />
@@ -219,7 +218,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
               ]}
             >
               <DatePicker
-                className="h-10 w-full"
+                className={`h-10 w-full ${viewOnly ? '!text-slate-950 font-medium' : ''}`}
                 format={VIOLATION_REPORT.DATE_FORMATS.UI}
                 placeholder={FORM.PLACEHOLDERS.INCIDENT_DATE}
                 disabled={viewOnly}
@@ -251,7 +250,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             {viewOnly && (
               <Form.Item label={DETAIL.CREATED_TIME}>
                 <DatePicker
-                  className="h-10 w-full"
+                  className="h-10 w-full !text-slate-950 font-medium"
                   format={VIOLATION_REPORT.DATE_FORMATS.UI}
                   value={initialValues?.createdAt ? dayjs(initialValues.createdAt) : undefined}
                   disabled
@@ -267,7 +266,7 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
             <Input.TextArea
               placeholder={FORM.PLACEHOLDERS.DESCRIPTION}
               rows={4}
-              className="resize-none"
+              className={`resize-none !bg-white !text-slate-950 font-medium ${viewOnly ? 'cursor-default' : ''}`}
               readOnly={viewOnly}
             />
           </Form.Item>
@@ -275,10 +274,11 @@ const ViolationFormBody = ({ initialValues, onSave, onCancel, loading, viewOnly,
       </CompoundModal.Content>
 
       <CompoundModal.Footer
+        className="mt-[-25px]"
         onCancel={onCancel}
         onConfirm={viewOnly ? onCancel : handleSubmit}
         loading={loading}
-        confirmIcon={!viewOnly && <SaveOutlined />}
+        confirmIcon={!viewOnly}
         confirmText={viewOnly ? FORM.CLOSE : FORM.SAVE}
         showCancel={!viewOnly}
       />
