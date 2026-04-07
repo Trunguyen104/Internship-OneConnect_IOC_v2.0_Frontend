@@ -106,6 +106,8 @@ export const BACKLOG_UI = {
   PLACEHOLDER_SPRINT_NAME: 'Enter Sprint name...',
   PLACEHOLDER_SPRINT_GOAL: 'Enter Sprint goal (optional)...',
   PLACEHOLDER_SUMMARY: 'Enter summary...',
+  PLACEHOLDER_START_DATE: 'Select start date',
+  PLACEHOLDER_END_DATE: 'Select end date',
   PLACEHOLDER_SPRINT_OPTIONAL: 'Select Sprint (Optional)',
   FIELD_ASSIGNEE: 'Assignee',
   FIELD_STATUS: 'Status',

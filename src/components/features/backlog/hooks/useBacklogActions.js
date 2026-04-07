@@ -331,6 +331,8 @@ export function useBacklogActions({
       const res = await productBacklogService.updateSprint(projectId, sprintId, {
         projectId,
         ...payload,
+        startDate: formatToDateOnly(payload.startDate),
+        endDate: formatToDateOnly(payload.endDate),
       });
       if (res && res.isSuccess === false) {
         toast.error(res.message || 'Error updating sprint');

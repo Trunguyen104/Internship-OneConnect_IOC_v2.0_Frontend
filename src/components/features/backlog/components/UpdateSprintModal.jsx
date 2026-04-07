@@ -1,9 +1,11 @@
 'use client';
 
 import { EditOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
+import { DatePicker } from '@/components/ui/datepicker';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
@@ -20,14 +22,23 @@ function FieldLabel({ required, children }) {
 export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
   const [name, setName] = useState(() => sprint?.name || sprint?.title || '');
   const [goal, setGoal] = useState(() => sprint?.goal || '');
+  const [startDate, setStartDate] = useState(() =>
+    sprint?.startDate ? dayjs(sprint.startDate) : null
+  );
+  const [endDate, setEndDate] = useState(() => (sprint?.endDate ? dayjs(sprint.endDate) : null));
 
-  const canSubmit = useMemo(() => name.trim() !== '', [name]);
+  const canSubmit = useMemo(
+    () => name.trim() !== '' && !!startDate && !!endDate,
+    [name, startDate, endDate]
+  );
 
   const handleSubmit = () => {
     if (!canSubmit) return;
     onSubmit?.({
       name: name.trim(),
       goal: goal.trim(),
+      startDate: startDate ? startDate.toISOString() : null,
+      endDate: endDate ? endDate.toISOString() : null,
     });
   };
 
@@ -50,6 +61,30 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
               placeholder={BACKLOG_UI.PLACEHOLDER_SPRINT_NAME || 'e.g. Sprint 1'}
               className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md"
             />
+          </div>
+
+          {/* Dates */}
+          <div className="flex gap-4">
+            <div className="flex flex-1 flex-col">
+              <FieldLabel required>{BACKLOG_UI.FIELD_START_DATE}</FieldLabel>
+              <DatePicker
+                value={startDate}
+                onChange={setStartDate}
+                format="YYYY-MM-DD"
+                placeholder={BACKLOG_UI.PLACEHOLDER_START_DATE || 'Select start date'}
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
+              />
+            </div>
+            <div className="flex flex-1 flex-col">
+              <FieldLabel required>{BACKLOG_UI.FIELD_END_DATE}</FieldLabel>
+              <DatePicker
+                value={endDate}
+                onChange={setEndDate}
+                format="YYYY-MM-DD"
+                placeholder={BACKLOG_UI.PLACEHOLDER_END_DATE || 'Select end date'}
+                className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
+              />
+            </div>
           </div>
 
           {/* Sprint Goal */}
