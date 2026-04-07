@@ -67,6 +67,7 @@ export function useInternshipStatus() {
     isPlaced,
     hasActiveApp,
     hasCv,
+    apps,
     isLoading: false,
   };
 }

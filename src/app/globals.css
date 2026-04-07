@@ -1,16 +1,26 @@
 @import 'tailwindcss';
 
 html {
-  scrollbar-gutter: auto;
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE and Edge */
+  scrollbar-gutter: stable;
 }
 
-html::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari, and Opera */
+/* Base Scrollbar Styling (Native-ish feel but consistent) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* slate-300 */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* slate-400 */
 }
 
 @font-face {

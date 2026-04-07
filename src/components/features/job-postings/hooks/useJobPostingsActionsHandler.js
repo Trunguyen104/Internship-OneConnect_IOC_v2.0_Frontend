@@ -66,44 +66,27 @@ export const useJobPostingsActionsHandler = ({ actions }) => {
         });
         break;
       case 'close':
-        showConfirm({
-          title: JOB_POSTING_UI.CONFIRM.CLOSE.TITLE,
-          content: JOB_POSTING_UI.CONFIRM.CLOSE.CONTENT_INACTIVE(title),
-          onOk: async () => {
-            try {
-              // First attempt without force flag
-              await actions.closeJob.mutateAsync({
+        if (activeAppCount > 0) {
+          showConfirm({
+            title: JOB_POSTING_UI.CONFIRM.CLOSE.TITLE,
+            content: JOB_POSTING_UI.CONFIRM.CLOSE.CONTENT_ACTIVE(title, activeAppCount),
+            onOk: () =>
+              actions.closeJob.mutate({
+                id,
+                data: { confirmWhenHasActiveApplications: true },
+              }),
+          });
+        } else {
+          showConfirm({
+            title: JOB_POSTING_UI.CONFIRM.CLOSE.TITLE,
+            content: JOB_POSTING_UI.CONFIRM.CLOSE.CONTENT_INACTIVE(title),
+            onOk: () =>
+              actions.closeJob.mutate({
                 id,
                 data: { confirmWhenHasActiveApplications: false },
-              });
-            } catch (error) {
-              // If backend detects active applicants
-              const statusCode = error.status || error.response?.status;
-              if (statusCode === 409) {
-                const errorData = error.data || error.response?.data || {};
-                showConfirm({
-                  title: JOB_POSTING_UI.CONFIRM.CLOSE.TITLE,
-                  content:
-                    errorData.message ||
-                    error.message ||
-                    JOB_POSTING_UI.CONFIRM.CLOSE.CONTENT_ACTIVE(
-                      title,
-                      activeAppCount || JOB_POSTING_UI.PLACEHOLDERS.DASH_FALLBACK
-                    ),
-                  onOk: () =>
-                    actions.closeJob.mutate({
-                      id,
-                      data: { confirmWhenHasActiveApplications: true },
-                    }),
-                });
-              } else if (statusCode !== 200) {
-                // If it's another error, let the mutation's default handleError do its job
-                // or handle it here if mutateAsync suppressed it
-                console.error('Close failed with status:', statusCode, error);
-              }
-            }
-          },
-        });
+              }),
+          });
+        }
         break;
       case 'delete':
         showConfirm({

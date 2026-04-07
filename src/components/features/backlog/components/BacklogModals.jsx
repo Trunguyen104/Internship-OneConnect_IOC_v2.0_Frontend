@@ -114,6 +114,7 @@ export const BacklogModals = ({
           }}
           onSubmit={(payload) => actions.handleCreateTask(payload, activeSprintForTask)}
           members={members}
+          sprints={sprints}
         />
       ) : null}
 
@@ -127,6 +128,7 @@ export const BacklogModals = ({
         }}
         onSubmit={(payload) => actions.handleUpdateTask(selectedTask, payload)}
         members={members}
+        sprints={sprints}
       />
 
       <CreateSprintModal

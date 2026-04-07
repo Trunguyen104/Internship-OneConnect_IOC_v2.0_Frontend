@@ -90,14 +90,26 @@ export default function ProjectBasicInfoFields({ FORM, groups, userInfo, editing
                   <Select placeholder={FORM.PLACEHOLDER?.GROUP} allowClear>
                     {groups
                       .filter((g) => {
+                        const groupId = g.internshipId || g.id;
                         const gStatus = g.status || g.groupStatus;
                         const isActive = gStatus === INTERN_GROUP_STATUS.ACTIVE;
-                        const isCurrentGroup =
-                          editingRecord?.internshipGroupId === g.id ||
-                          editingRecord?.internshipId === g.id;
 
+                        // 1. Kiểm tra xem đây có phải là nhóm hiện tại của dự án này không
+                        const isCurrentGroup =
+                          editingRecord?.internshipGroupId === groupId ||
+                          editingRecord?.internshipId === groupId ||
+                          editingRecord?.groupId === groupId;
+
+                        // 2. Nếu nhóm không active và cũng không phải nhóm hiện tại -> không hiển thị
                         if (!isActive && !isCurrentGroup) return false;
 
+                        // 3. Quy tắc 1-1: Nhóm chỉ được hiển thị nếu chưa có dự án HOẶC là nhóm hiện tại của dự án này
+                        // (Dựa trên thông tin projectId từ API groups nếu có, hoặc flag hasProject)
+                        const isTakenByOther =
+                          g.projectId && g.projectId !== editingRecord?.projectId;
+                        if (isTakenByOther && !isCurrentGroup) return false;
+
+                        // 4. Lọc theo Mentor nếu là role Mentor
                         const userRoleId = userInfo?.roleId || userInfo?.RoleId;
                         if (userRoleId === USER_ROLE.MENTOR) {
                           const mid = g.mentorId || g.MentorId;

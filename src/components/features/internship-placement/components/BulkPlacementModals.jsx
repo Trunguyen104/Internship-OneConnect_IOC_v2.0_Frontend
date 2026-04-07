@@ -157,10 +157,9 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
             {UI.TARGET_LABEL}
           </label>
           <EnterprisePhaseSelect
-            semesterId={semesterId}
+            termId={semesterId}
             value={selectedPhase?.internPhaseId || selectedPhase?.id}
             onChange={(id, phase) => setSelectedPhase(phase)}
-            termName={termName}
           />
         </div>
 
@@ -448,10 +447,9 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
               {UI.TARGET_LABEL}
             </label>
             <EnterprisePhaseSelect
-              semesterId={semesterId}
+              termId={semesterId}
               value={selectedPhase?.internPhaseId || selectedPhase?.id}
               onChange={(id, phase) => setSelectedPhase(phase)}
-              termName={termName}
             />
           </div>
         )}

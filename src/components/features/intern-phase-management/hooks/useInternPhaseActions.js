@@ -20,6 +20,8 @@ export const useInternPhaseActions = ({ editingRecord, setModalVisible, onSucces
   const onSuccessAction = () => {
     queryClient.invalidateQueries({ queryKey: ['intern-phases'] });
     queryClient.invalidateQueries({ queryKey: ['intern-phase-detail'] });
+    // Sync with Job Postings phase dropdown (AC-01 fix)
+    queryClient.invalidateQueries({ queryKey: ['internship-phases'] });
     onSuccess?.();
   };
 
