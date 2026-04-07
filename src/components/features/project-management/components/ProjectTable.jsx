@@ -138,7 +138,7 @@ export default function ProjectTable({
                 !isReadOnly && 'cursor-pointer hover:text-primary'
               )}
               onClick={(e) => {
-                if (isReadOnly) return;
+                if (isReadOnly || op !== OPERATIONAL_STATUS.UNSTARTED) return;
                 e.stopPropagation();
                 onAssign?.(record);
               }}

@@ -20,8 +20,8 @@ export default async function ProfileLayout({ children }) {
         <Header />
 
         {/* Dynamic Content Area */}
-        <main className="flex flex-1 flex-col overflow-hidden bg-gray-50 p-4 2xl:p-6">
-          <div className="flex w-full flex-1 flex-col overflow-hidden">{children}</div>
+        <main className="flex flex-1 flex-col overflow-y-auto bg-gray-50 p-4 2xl:p-6">
+          <div className="flex w-full flex-1 flex-col">{children}</div>
         </main>
       </div>
     </div>

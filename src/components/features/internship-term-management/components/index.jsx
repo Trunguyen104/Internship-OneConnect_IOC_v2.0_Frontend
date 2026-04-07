@@ -90,7 +90,7 @@ export default function InternshipTermManagement() {
             className="text-primary block max-w-[300px] cursor-pointer truncate text-sm font-bold tracking-tight hover:underline"
             onClick={(e) => {
               e.stopPropagation();
-              router.push(`/school/terms/${record.termId}/overview`);
+              router.push(`/school/terms/${record.termId}/enrollments`);
             }}
           >
             {text}
@@ -155,7 +155,7 @@ export default function InternshipTermManagement() {
               key: 'manage',
               label: 'Manage',
               icon: <LoginOutlined />,
-              onClick: () => router.push(`/school/terms/${record.termId}/overview`),
+              onClick: () => router.push(`/school/terms/${record.termId}/enrollments`),
             },
           ];
 

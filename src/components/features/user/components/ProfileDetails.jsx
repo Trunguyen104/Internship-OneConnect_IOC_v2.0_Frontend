@@ -63,7 +63,7 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
       {/* Main Column: Personal Details */}
       <div className={`space-y-6 ${isInternal ? 'lg:col-span-12' : 'lg:col-span-8'}`}>
         <Card className="rounded-2xl border-none shadow-sm overflow-hidden h-full">
-          <Card.Content className="p-8">
+          <Card.Content className="p-4 sm:p-6 lg:p-8">
             <SectionTitle icon={User}>{PROFILE_UI.PERSONAL_INFO}</SectionTitle>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
@@ -169,7 +169,7 @@ export default function ProfileDetails({ userInfo, loadingUser, onDownloadCV }) 
       {!isInternal && (
         <div className="space-y-6 lg:col-span-4">
           <Card className="rounded-2xl border-none shadow-sm overflow-hidden h-full">
-            <Card.Content className="p-8">
+            <Card.Content className="p-4 sm:p-6 lg:p-8">
               <SectionTitle icon={Building2}>
                 {isStudent || isSchoolAdmin
                   ? PROFILE_UI.LABELS.UNIVERSITY

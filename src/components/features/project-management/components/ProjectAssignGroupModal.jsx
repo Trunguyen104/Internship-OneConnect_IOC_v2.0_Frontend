@@ -50,11 +50,25 @@ export default function ProjectAssignGroupModal({
           onChange={setSelectedGroupId}
           allowClear
         >
-          {groups.map((g) => (
-            <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
-              {g.groupName}
-            </Option>
-          ))}
+          {groups
+            .filter((g) => {
+              const groupId = g.internshipId || g.id;
+              // Quy tắc 1-1: Nhóm chỉ hiển thị nếu chưa có dự án nào khác
+              // (Sử dụng flag projectId hoặc hasProject từ API)
+              const isCurrentGroup =
+                assigningProject?.internshipId === groupId ||
+                assigningProject?.internshipGroupId === groupId ||
+                assigningProject?.groupId === groupId;
+
+              const isTakenByOther = g.projectId && g.projectId !== assigningProject?.projectId;
+
+              return !isTakenByOther || isCurrentGroup;
+            })
+            .map((g) => (
+              <Option key={g.internshipId || g.id} value={g.internshipId || g.id}>
+                {g.groupName}
+              </Option>
+            ))}
         </Select>
       </div>
     </Modal>

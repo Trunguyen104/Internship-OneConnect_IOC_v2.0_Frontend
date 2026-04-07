@@ -85,11 +85,11 @@ export const useProjectActions = ({
             });
         }
 
-        await ProjectService.update(editingRecord.projectId, updateForm);
-
-        if (isAssigning || (newGroupId && newGroupId !== oldGroupId)) {
-          await ProjectService.assignGroup(editingRecord.projectId, newGroupId);
+        if (values.internshipGroupId) {
+          updateForm.append('InternshipGroupId', values.internshipGroupId);
         }
+
+        await ProjectService.update(editingRecord.projectId, updateForm);
 
         const currentVis = Number(editingRecord.visibilityStatus ?? editingRecord.visibility ?? 0);
         if (!isDraft && currentVis === 0) {

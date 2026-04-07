@@ -250,12 +250,14 @@ export default function AppSidebar() {
       trigger={null}
       collapsible
       collapsed={isSidebarCollapsed}
+      breakpoint="lg"
+      collapsedWidth="0"
       theme="light"
       width={260}
       className="border-r border-gray-100 h-screen sticky top-0"
       onCollapse={(collapsed) => useLayoutStore.setSidebarCollapsed(collapsed)}
     >
-      <div className={isSidebarCollapsed ? 'p-4 m-1' : 'p-6 m-1'}>
+      <div className={isSidebarCollapsed ? 'p-4 m-1 sm:hidden' : 'p-6 m-1'}>
         <Image
           src={isSidebarCollapsed ? '/assets/images/logo.png' : '/assets/images/logo.svg'}
           alt="Logo"

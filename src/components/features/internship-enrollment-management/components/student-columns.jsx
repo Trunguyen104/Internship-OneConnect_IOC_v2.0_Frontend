@@ -128,10 +128,10 @@ export const getStudentColumns = ({
               },
               {
                 key: 'withdraw',
-                label: ACTION_LABELS.WITHDRAW,
+                label: ACTION_LABELS.DELETE,
                 icon: <DeleteOutlined />,
                 danger: true,
-                onClick: () => handleBulkWithdraw([record.studentId]),
+                onClick: () => handleDelete(record),
               }
             );
           } else {
