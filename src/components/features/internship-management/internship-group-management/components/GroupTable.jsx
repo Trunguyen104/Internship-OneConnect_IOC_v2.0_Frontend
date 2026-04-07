@@ -147,7 +147,7 @@ const GroupTable = memo(function GroupTable({
             </span>
             {record.projectCount > 1 && (
               <span className="bg-primary/10 text-primary text-[10px] px-1.5 py-0.5 rounded-full border border-primary/20 whitespace-nowrap shrink-0">
-                +{record.projectCount - 1} {GROUP_MANAGEMENT.TABLE.MORE}
+                +{record.projectCount - 1} {TABLE.MORE}
               </span>
             )}
           </div>
