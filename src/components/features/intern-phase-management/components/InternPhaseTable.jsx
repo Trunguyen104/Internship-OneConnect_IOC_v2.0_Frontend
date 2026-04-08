@@ -1,12 +1,13 @@
 'use client';
 
-import { DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined } from '@ant-design/icons';
-import { Badge, Dropdown, Tooltip } from 'antd';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { Badge, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 import DataTable from '@/components/ui/datatable';
 import StatusBadge from '@/components/ui/status-badge';
+import TableRowDropdown from '@/components/ui/TableRowActions';
 import {
   INTERN_PHASE_MANAGEMENT,
   INTERN_PHASE_STATUS,
@@ -188,13 +189,7 @@ export default function InternPhaseTable({ items, loading, onView, onEdit, onDel
             },
           ];
 
-          return (
-            <Dropdown menu={{ items: actionItems }} trigger={['click']} placement="bottomRight">
-              <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full hover:bg-slate-100 italic font-bold text-xl leading-none">
-                <MoreOutlined />
-              </div>
-            </Dropdown>
-          );
+          return <TableRowDropdown items={actionItems} gutter={8} />;
         },
       },
     ],

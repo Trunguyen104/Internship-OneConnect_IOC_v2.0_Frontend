@@ -34,7 +34,7 @@ export const JobPostingsFilters = ({ filters, onFilterChange, onCreate }) => {
           className="!h-9 min-w-[160px] custom-select-toolbar"
           allowClear
           options={[
-            { label: JOB_POSTING_UI.FILTERS.ALL, value: undefined },
+            { label: JOB_POSTING_UI.FILTERS.ALL, value: 'ALL' },
             { label: JOB_POSTING_UI.FILTERS.DRAFT, value: 1 },
             { label: JOB_POSTING_UI.FILTERS.PUBLISHED, value: 2 },
             { label: JOB_POSTING_UI.FILTERS.CLOSED, value: 3 },

@@ -21,7 +21,11 @@ export const useJobPostings = (filters = {}) => {
 
   const query = useQuery({
     queryKey,
-    queryFn: () => JobPostingsService.getList(filters),
+    queryFn: () => {
+      const apiFilters = { ...filters };
+      if (apiFilters.status === 'ALL') delete apiFilters.status;
+      return JobPostingsService.getList(apiFilters);
+    },
     placeholderData: (prev) => prev,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

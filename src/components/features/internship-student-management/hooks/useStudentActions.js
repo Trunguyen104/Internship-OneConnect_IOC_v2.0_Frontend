@@ -104,23 +104,22 @@ export const useStudentActions = ({ refetchStudents, phaseId, enterpriseId }) =>
         }
 
         toast.success(
-          type === 'ADD' ? `Đã thêm ${students.length} sinh viên.` : MESSAGES.GROUP_CHANGE_SUCCESS
+          type === 'ADD'
+            ? MESSAGES.GROUP_ADD_COUNT_SUCCESS.replace('{count}', students.length)
+            : MESSAGES.GROUP_CHANGE_SUCCESS
         );
 
         if (type === 'CHANGE') {
           students.forEach((s) => {
-            toast.info(
-              `Sinh viên ${s.studentFullName} đã được chuyển nhóm. Quyền truy cập dự án cũ đã bị thu hồi và cấp mới cho nhóm mới.`,
-              { duration: 5 }
-            );
+            toast.info(MESSAGES.GROUP_TRANSFER_INFO.replace('{name}', s.studentFullName), {
+              duration: 5,
+            });
           });
         }
       } catch (err) {
         if (err.status === 400 || err.status === 500) {
           const errorMsg =
-            err?.response?.data?.message ||
-            err?.message ||
-            'Sinh viên đã có nhóm khác hoặc dữ liệu không đồng bộ.';
+            err?.response?.data?.message || err?.message || MESSAGES.GROUP_CONFLICT_ERROR;
           toast.warning(errorMsg);
         } else {
           toast.error('Failed to update group');
@@ -143,9 +142,7 @@ export const useStudentActions = ({ refetchStudents, phaseId, enterpriseId }) =>
       const phaseIds = new Set(selectedStudents.map((s) => s.phaseId || s.termId).filter(Boolean));
 
       if (phaseIds.size > 1) {
-        toast.error(
-          'Sinh viên được chọn thuộc nhiều giai đoạn khác nhau. Vui lòng chỉ chọn sinh viên trong cùng một giai đoạn.'
-        );
+        toast.error(MESSAGES.MULTI_PHASE_ERROR);
         return;
       }
 
