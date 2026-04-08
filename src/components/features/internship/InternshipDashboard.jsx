@@ -211,6 +211,20 @@ const InternshipDashboard = () => {
                   <span className="text-xl font-black text-slate-800 tracking-tight">
                     {context.currentTerm.termName}
                   </span>
+                  {context.currentTerm.startDate && context.currentTerm.endDate && (
+                    <span className="mt-0.5 text-xs font-bold text-slate-500">
+                      {new Date(context.currentTerm.startDate).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                      })}{' '}
+                      -{' '}
+                      {new Date(context.currentTerm.endDate).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  )}
                 </div>
               </div>
             )}
