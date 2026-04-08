@@ -1,3 +1,5 @@
+import StudentPageHeader from '@/components/layout/StudentPageHeader';
+
 export const metadata = { title: 'Groups | Term Workspace' };
 
 const COPY = {
@@ -8,6 +10,7 @@ const COPY = {
 export default function TermGroupsPage() {
   return (
     <div className="p-6">
+      <StudentPageHeader title={COPY.TITLE} subtitle={COPY.SUB} />
       <h1 className="mb-2 text-2xl font-bold text-slate-800">{COPY.TITLE}</h1>
       <p className="text-slate-500">{COPY.SUB}</p>
     </div>

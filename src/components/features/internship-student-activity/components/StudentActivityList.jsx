@@ -64,14 +64,14 @@ export default function StudentActivityList({ termId: fixedTermId, hideTitle = f
   };
 
   const columns = [
-    {
-      title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.CLASS,
-      dataIndex: 'className',
-      key: 'className',
-      width: 90,
-      align: 'center',
-      render: (text) => <span className="text-muted font-mono text-xs font-bold">{text}</span>,
-    },
+    // {
+    //   title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.CLASS,
+    //   dataIndex: 'className',
+    //   key: 'className',
+    //   width: 90,
+    //   align: 'center',
+    //   render: (text) => <span className="text-muted font-mono text-xs font-bold">{text}</span>,
+    // },
     {
       title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.STUDENT,
       key: 'fullname',

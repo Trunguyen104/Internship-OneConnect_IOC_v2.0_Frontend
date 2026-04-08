@@ -1,5 +1,5 @@
 export const STUDENT_ACTIVITY_UI = {
-  TITLE: 'Student Activity',
+  TITLE: 'Internship Term Management',
   PAGE_TITLE_SUFFIX: 'INTERNSHIP ACTIVITY TRACKING',
   BACK_TO_LIST: 'BACK TO LIST',
   TABS: {

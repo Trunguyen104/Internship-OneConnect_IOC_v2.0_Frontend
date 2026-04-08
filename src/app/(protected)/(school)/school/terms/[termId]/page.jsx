@@ -8,7 +8,7 @@ export default async function TermIndexPage({ params }) {
 
   return (
     <div className="flex-1 overflow-auto">
-      <StudentActivityList termId={termId} hideTitle />
+      <StudentActivityList termId={termId} />
     </div>
   );
 }

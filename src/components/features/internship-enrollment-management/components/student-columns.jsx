@@ -130,22 +130,22 @@ export const getStudentColumns = ({
         );
       },
     },
-    {
-      title: TABLE.COLUMNS.STATUS,
-      dataIndex: 'status',
-      key: 'status',
-      width: 140,
-      align: 'center',
-      render: (status) => {
-        const variantMap = {
-          ACTIVE: 'success',
-          WITHDRAWN: 'danger',
-        };
-        const variant = variantMap[status] || 'neutral';
-        const label = STATUS_LABELS[status] || status;
-        return <StatusBadge variant={variant} label={label} variantType="minimal" />;
-      },
-    },
+    // {
+    //   title: TABLE.COLUMNS.STATUS,
+    //   dataIndex: 'status',
+    //   key: 'status',
+    //   width: 140,
+    //   align: 'center',
+    //   render: (status) => {
+    //     const variantMap = {
+    //       ACTIVE: 'success',
+    //       WITHDRAWN: 'danger',
+    //     };
+    //     const variant = variantMap[status] || 'neutral';
+    //     const label = STATUS_LABELS[status] || status;
+    //     return <StatusBadge variant={variant} label={label} variantType="minimal" />;
+    //   },
+    // },
     {
       title: '',
       key: 'actions',
