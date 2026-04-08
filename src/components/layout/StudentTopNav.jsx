@@ -19,7 +19,7 @@ export default function StudentTopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { logout: handleLogout } = useLogout();
-  const { isEnrolled, isPlaced, hasActiveApp, apps = [] } = useInternshipStatus();
+  const { isEnrolled, apps = [] } = useInternshipStatus();
 
   const { data: userInfo } = useQuery({
     queryKey: ['me'],
@@ -43,7 +43,7 @@ export default function StudentTopNav() {
     }
 
     return tabs;
-  }, [isEnrolled, isPlaced, hasActiveApp, isStudent, apps.length]);
+  }, [isEnrolled, isStudent, apps.length]);
 
   const avatarMenu = {
     items: [
@@ -90,9 +90,9 @@ export default function StudentTopNav() {
               <Link
                 key={key}
                 href={key}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200 ${
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700'
+                    ? 'bg-red-200! text-red-700! shadow-sm'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
