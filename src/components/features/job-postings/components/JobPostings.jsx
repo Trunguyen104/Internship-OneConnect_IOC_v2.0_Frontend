@@ -1,7 +1,7 @@
 'use client';
 
 import { Archive, Briefcase, FileEdit, Globe } from 'lucide-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { StatCard } from '@/components/ui/atoms';
 import PageLayout from '@/components/ui/pagelayout';
@@ -16,18 +16,31 @@ import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsTable from './JobPostingsTable';
 
 export default function JobPostings() {
+  // State & Filters Logic (Extracted)
+  const { filters, handleFilterChange, handlePageChange } = useJobPostingsFilters();
+
   // Data fetching
   const { jobPostings, totalCount, isLoading } = useJobPostings(filters);
   const { phases } = useInternshipPhases();
   const actions = useJobPostingActions();
 
-  // State & Filters Logic (Extracted)
-  const { filters, statusCounts, handleFilterChange, handlePageChange } =
-    useJobPostingsFilters(jobPostings);
-
   // Action Handling Logic (Extracted)
   const { isDrawerOpen, selectedRecord, onAction, openCreateDrawer, closeDrawer } =
     useJobPostingsActionsHandler({ actions });
+
+  // derived state for StatCards - recalculated based on fresh data
+  const statusCounts = useMemo(() => {
+    const counts = {
+      [JOB_STATUS.DRAFT]: 0,
+      [JOB_STATUS.PUBLISHED]: 0,
+      [JOB_STATUS.CLOSED]: 0,
+      [JOB_STATUS.DELETED]: 0,
+    };
+    jobPostings.forEach((job) => {
+      if (counts[job.status] !== undefined) counts[job.status]++;
+    });
+    return counts;
+  }, [jobPostings]);
 
   return (
     <PageLayout className="animate-in fade-in flex min-h-0 flex-1 flex-col space-y-6 duration-500">
