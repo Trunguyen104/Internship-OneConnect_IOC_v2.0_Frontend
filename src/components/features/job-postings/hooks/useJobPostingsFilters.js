@@ -8,7 +8,7 @@ import { useState } from 'react';
 export const useJobPostingsFilters = () => {
   const [filters, setFilters] = useState({
     search: '',
-    status: undefined,
+    status: 'ALL',
     includeDeleted: false,
     page: 1,
     size: 10,

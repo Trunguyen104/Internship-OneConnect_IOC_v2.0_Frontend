@@ -188,18 +188,8 @@ export default function EnterpriseAdminDashboardContainer() {
           </Card.Header>
           <Card.Content className="p-0 flex flex-col h-full bg-white">
             {groupsWithoutMentor.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <div className="h-12 w-12 rounded-full bg-emerald-50 flex items-center justify-center mb-3">
-                  <span className="text-emerald-500 text-xl font-bold">
-                    {ADMIN_DASHBOARD_UI.SYMBOL_CHECK}
-                  </span>
-                </div>
-                <p className="text-sm font-bold text-slate-600">
-                  {ADMIN_DASHBOARD_UI.GROUPS.ALL_ASSIGNED_MSG}
-                </p>
-                <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">
-                  {ADMIN_DASHBOARD_UI.GROUPS.NO_WARNINGS}
-                </p>
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400 italic text-sm">
+                {ADMIN_DASHBOARD_UI.GROUPS.ALL_ASSIGNED_MSG}
               </div>
             ) : (
               <div className="flex-1 flex flex-col min-h-0">
