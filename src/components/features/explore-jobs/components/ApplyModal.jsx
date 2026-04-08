@@ -7,6 +7,16 @@ import { Modal } from '@/components/ui/modal';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 
+/**
+ * Modal hiển thị xác nhận ứng tuyển công việc.
+ * @param {Object} props - Thuộc tính component.
+ * @param {boolean} props.open - Trạng thái đóng/mở modal.
+ * @param {Function} props.onCancel - Hàm xử lý khi đóng modal.
+ * @param {Function} props.onConfirm - Hàm xử lý khi xác nhận ứng tuyển.
+ * @param {Object} props.job - Dữ liệu công việc đang ứng tuyển.
+ * @param {string} props.cvUrl - URL của CV hiện tại của sinh viên.
+ * @param {boolean} props.isApplying - Trạng thái đang gửi yêu cầu ứng tuyển.
+ */
 export default function ApplyModal({ open, onCancel, onConfirm, job, cvUrl, isApplying }) {
   if (!job) return null;
 

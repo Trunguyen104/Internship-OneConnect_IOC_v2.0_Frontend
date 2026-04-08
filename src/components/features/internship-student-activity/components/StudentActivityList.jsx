@@ -56,11 +56,14 @@ export default function StudentActivityList({ termId: fixedTermId, hideTitle = f
 
   const handleRowClick = (record) => {
     const id = record.studentId || record.id;
-    const url =
-      termId && termId !== 'ALL'
-        ? `/school/activity/${id}?termId=${termId}`
-        : `/school/activity/${id}`;
-    router.push(url);
+
+    // Fix: If we are in a term context, navigate to the nested route to preserve the sidebar layout
+    if (termId && termId !== 'ALL') {
+      return router.push(`/school/terms/${termId}/activity/${id}`);
+    }
+
+    // Fallback for global context
+    router.push(`/school/activity/${id}`);
   };
 
   const columns = [
@@ -258,8 +261,6 @@ export default function StudentActivityList({ termId: fixedTermId, hideTitle = f
           title={STUDENT_ACTIVITY_UI.STATS.TOTAL}
           value={summary.total}
           loading={loading}
-          active={statusFilter === 'ALL'}
-          onClick={() => setStatusFilter('ALL')}
           variant="neutral"
           icon={<TeamOutlined className="opacity-90 mt-0.5" />}
           suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
@@ -268,8 +269,6 @@ export default function StudentActivityList({ termId: fixedTermId, hideTitle = f
           title={STUDENT_ACTIVITY_UI.STATS.PLACED}
           value={summary.interning}
           loading={loading}
-          active={statusFilter === 1 || statusFilter === '1'}
-          onClick={() => setStatusFilter(1)}
           variant="success"
           icon={<CheckCircleFilled className="opacity-90 mt-0.5" />}
           suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
@@ -278,8 +277,6 @@ export default function StudentActivityList({ termId: fixedTermId, hideTitle = f
           title={STUDENT_ACTIVITY_UI.STATS.UNPLACED}
           value={summary.unplaced}
           loading={loading}
-          active={statusFilter === 5 || statusFilter === '5'}
-          onClick={() => setStatusFilter(5)}
           variant="danger"
           icon={<CloseCircleFilled className="opacity-90 mt-0.5" />}
           suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}
@@ -288,8 +285,6 @@ export default function StudentActivityList({ termId: fixedTermId, hideTitle = f
           title={STUDENT_ACTIVITY_UI.STATS.NO_MENTOR}
           value={summary.noMentor}
           loading={loading}
-          active={statusFilter === 2 || statusFilter === '2'}
-          onClick={() => setStatusFilter(2)}
           variant="warning"
           icon={<ExclamationCircleFilled className="opacity-90 mt-0.5" />}
           suffix={STUDENT_ACTIVITY_UI.STATS.STUDENTS_LABEL}

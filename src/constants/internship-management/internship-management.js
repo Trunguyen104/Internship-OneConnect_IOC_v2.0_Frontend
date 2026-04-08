@@ -440,7 +440,13 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       REJECT_SUCCESS: 'Application rejected successfully.',
       ASSIGN_SUCCESS: 'Mentor assigned successfully.',
       GROUP_ADD_SUCCESS: 'Student added to group successfully.',
+      GROUP_ADD_COUNT_SUCCESS: 'Successfully added {count} students.',
       GROUP_CHANGE_SUCCESS: 'Group changed successfully.',
+      GROUP_TRANSFER_INFO:
+        'Student {name} has been moved to the new group. Old project access revoked and new project access granted.',
+      GROUP_CONFLICT_ERROR: 'Student is already in another group or data is out of sync.',
+      MULTI_PHASE_ERROR:
+        'Selected students belong to different internship phases. Please select students within the same phase.',
       ACCEPT_CONFIRM_TITLE: 'Accept Student',
       ACCEPT_CONFIRM_CONTENT: 'Are you sure you want to accept student',
       ACCEPT_CONFIRM_OK: 'Accept',
@@ -599,7 +605,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         WITHDRAW: 'Withdraw',
         DELETE: 'Delete',
         VIEW: 'View Details',
-        BULK_ASSIGN: 'Bulk Assign',
+        BULK_ASSIGN: 'Assign',
       },
       TABLE: {
         COLUMNS: {
@@ -757,11 +763,11 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           ERROR_ALL_PLACED:
             'All selected students are placed. Withdrawing them will cancel their placement records. Confirm to proceed.',
           ERROR_GENERIC: 'An error occurred during withdrawal, please try again',
-          ACTION_LABEL: 'Withdraw students',
+          ACTION_LABEL: 'Delete students',
         },
         BULK_UNASSIGN_SUCCESS: 'Successfully unassigned selected students',
         BULK_UNASSIGN: {
-          ACTION_LABEL: 'Bulk Unassign',
+          ACTION_LABEL: 'Unassign',
           CONFIRM_TEXT:
             'Are you sure you want to cancel placement for {count} selected students? This will return them to Unplaced status.',
         },

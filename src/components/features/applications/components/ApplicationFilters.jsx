@@ -7,12 +7,9 @@ import React from 'react';
 import DatePicker from '@/components/ui/datepicker';
 import Input from '@/components/ui/input';
 import Select from '@/components/ui/select';
-import {
-  ACTIVE_STATUSES,
-  APPLICATION_STATUS_CONFIG,
-  TERMINAL_STATUSES,
-} from '@/constants/applications/application.constants';
 import { APPLICATIONS_UI } from '@/constants/applications/uiText';
+
+import { useApplicationFiltersOptions } from '../hooks/useApplicationFiltersOptions';
 
 /**
  * Filter bar for Applications.
@@ -27,37 +24,8 @@ export const ApplicationFilters = ({
   isPhaseLocked = false,
   showAudience = true,
 }) => {
-  // Dynamically filter status options based on the Terminal toggle
-  // This avoids showing "Applied" in a "Terminal Only" view which would result in 0 results.
-  const statusOptions = Object.entries(APPLICATION_STATUS_CONFIG)
-    .filter(([value]) => {
-      const status = Number(value);
-      if (filters.includeTerminal) {
-        return TERMINAL_STATUSES.includes(status);
-      }
-      return ACTIVE_STATUSES.includes(status);
-    })
-    .map(([value, config]) => ({
-      label: config.label,
-      value: Number(value),
-    }));
-
-  const schoolOptions = schools.map((school) => ({
-    label: school.universityName || school.name,
-    value: school.id || school.universityId,
-  }));
-
-  const phaseOptions = phases
-    .map((phase) => ({
-      label: phase.name || phase.phaseName,
-      value: phase.id || phase.phaseId,
-    }))
-    .filter((opt) => opt.value);
-
-  const audienceOptions = [
-    { label: 'Public', value: 1 },
-    { label: 'Targeted', value: 2 },
-  ];
+  const { statusOptions, schoolOptions, phaseOptions, audienceOptions } =
+    useApplicationFiltersOptions({ filters, schools, phases });
 
   const gridColsClass = showAudience ? 'lg:grid-cols-5' : 'lg:grid-cols-4';
 

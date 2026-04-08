@@ -6,8 +6,9 @@ export const EXPLORE_JOBS_UI = {
     SUBTITLE: 'Browse hundreds of internship positions from top-tier partners.',
     SEARCH_PLACEHOLDER: 'Search by position, company...',
     RESULTS_COUNT: (count) => `Found ${count} results`,
-    NOT_FOUND_TITLE: 'No results found',
-    NOT_FOUND_SUBTITLE: 'Please try different keywords.',
+    NOT_FOUND_TITLE: 'No internship jobs available',
+    NOT_FOUND_SUBTITLE:
+      'There are no positions open for application at this time. Please check back later.',
     FOR_YOU: 'Recommended for you',
   },
   PLACED_STATE: {

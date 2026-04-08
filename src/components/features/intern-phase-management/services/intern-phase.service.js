@@ -1,4 +1,3 @@
-import { INTERN_PHASE_MANAGEMENT } from '@/constants/intern-phase-management/intern-phase';
 import httpClient from '@/services/http-client.service';
 
 const BASE_URL = '/internship-phases';
@@ -98,28 +97,21 @@ export const InternPhaseService = {
     }
   },
 
-  async getStudents(phaseId, params) {
+  async getStudents(phaseId) {
     try {
-      const res = await httpClient.httpGet(`${BASE_URL}/${phaseId}/students`, params);
-      const responseData = res?.data || res;
-      // If backend returns students directly as data property or root
-      const studentsArr =
-        responseData?.data || (Array.isArray(responseData) ? responseData : responseData?.items);
-
-      if (studentsArr) {
-        return {
-          data: studentsArr,
-          totalCount: responseData?.totalCount || studentsArr.length || 0,
-        };
-      }
-      throw new Error(INTERN_PHASE_MANAGEMENT.MESSAGES.ERROR_NO_STUDENTS);
-    } catch {
-      // Fallback: If specific endpoint fails, try to get from phase detail
+      // AC-11 Fix: Backend does NOT have /{phaseId}/students.
+      // Students are included in the placedStudents field of the phase detail.
       const phase = await this.getById(phaseId);
       const students = phase?.placedStudents || [];
+
       return {
         data: students,
         totalCount: students.length || 0,
+      };
+    } catch {
+      return {
+        data: [],
+        totalCount: 0,
       };
     }
   },

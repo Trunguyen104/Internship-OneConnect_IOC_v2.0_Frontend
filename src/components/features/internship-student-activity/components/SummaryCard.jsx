@@ -24,11 +24,8 @@ const SummaryCard = ({
 
   return (
     <div
-      onClick={onClick}
       className={cn(
-        'group relative h-full cursor-pointer overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl',
-        active &&
-          'ring-2 ring-[var(--color-primary)] border-[var(--color-primary)] bg-[var(--color-primary-surface)]'
+        'group relative h-full overflow-hidden rounded-[32px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-sm transition-all duration-500'
       )}
     >
       {/* Animated Background Glow (MetricCard Style) */}

@@ -9,6 +9,17 @@ import { JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
 import { useJobPostingForm } from '../hooks/useJobPostingForm';
 import { JobPostingForm } from './JobPostingForm';
 
+/**
+ * Sidebar drawer for creating or editing job postings.
+ * Uses useJobPostingForm for complex form state management and auto-saving logic.
+ *
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.open - Whether the drawer is visible.
+ * @param {Function} props.onCancel - Callback when the drawer is closed without saving.
+ * @param {Object} props.record - The existing job record to edit (null for creation).
+ * @param {Array} props.phases - List of available internship phases.
+ * @param {Function} props.onSuccess - Callback after a successful save operation.
+ */
 export default function JobPostingDrawer({
   open,
   onCancel,

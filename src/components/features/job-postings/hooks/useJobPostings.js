@@ -11,13 +11,21 @@ import { JobPostingsService } from '../services/job-postings.service';
 
 /**
  * Hook to manage fetching and filtering job postings.
+ * Provides paginated job posting data and total counts for list views.
+ *
+ * @param {Object} filters - Search and filtering parameters (search, status, etc.).
+ * @returns {Object} Data loading state and paginated items.
  */
 export const useJobPostings = (filters = {}) => {
   const queryKey = useMemo(() => ['job-postings', filters], [filters]);
 
   const query = useQuery({
     queryKey,
-    queryFn: () => JobPostingsService.getList(filters),
+    queryFn: () => {
+      const apiFilters = { ...filters };
+      if (apiFilters.status === 'ALL') delete apiFilters.status;
+      return JobPostingsService.getList(apiFilters);
+    },
     placeholderData: (prev) => prev,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -31,7 +39,10 @@ export const useJobPostings = (filters = {}) => {
 };
 
 /**
- * Hook to fetch deep details of a single job posting.
+ * Hook to fetch detailed information for a specific job posting.
+ *
+ * @param {string|number} id - The unique ID of the job posting.
+ * @returns {Object} The job detail object and query states.
  */
 export const useJobPostingDetail = (id) => {
   const query = useQuery({
@@ -47,7 +58,9 @@ export const useJobPostingDetail = (id) => {
 };
 
 /**
- * Hook for fetching available internship phases.
+ * Hook to fetch internship phases available for the current enterprise.
+ *
+ * @returns {Object} List of phases and query states.
  */
 export const useInternshipPhases = () => {
   const query = useQuery({
@@ -66,7 +79,9 @@ export const useInternshipPhases = () => {
 };
 
 /**
- * Hook to fetch all universities for school selection.
+ * Hook to fetch a list of all universities for targeted job posting filters.
+ *
+ * @returns {Object} List of universities and query states.
  */
 export const useUniversities = () => {
   const query = useQuery({
@@ -82,7 +97,11 @@ export const useUniversities = () => {
 };
 
 /**
- * Hook for job posting mutations (Create, Update, Delete, Publish, Close).
+ * Hook providing mutation functions for job posting lifecycle actions.
+ * Includes create, update, delete, publish, close, and save draft functionalities.
+ * Automatically handles standard success toasts and error formatting.
+ *
+ * @returns {Object} Mutation objects for each action and a collective isMutating state.
  */
 export const useJobPostingActions = () => {
   const queryClient = useQueryClient();

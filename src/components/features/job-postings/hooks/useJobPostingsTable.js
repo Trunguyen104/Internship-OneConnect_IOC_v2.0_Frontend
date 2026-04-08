@@ -15,7 +15,14 @@ import JobPostingStatusBadge from '../components/JobPostingStatusBadge';
 import { JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
 
 /**
- * Hook to extract complex column definitions and actions from JobPostingsTable.
+ * Hook to define and manage column configurations for the Job Postings table.
+ * Encapsulates complex rendering logic, index calculation, and contextual action menus.
+ *
+ * @param {Object} props - Hook properties.
+ * @param {number} props.current - Current page index.
+ * @param {number} props.pageSize - Number of items per page.
+ * @param {Function} props.onAction - Handler for triggering actions (View, Edit, etc.).
+ * @returns {Object} Column configuration for Ant Design Table.
  */
 export const useJobPostingsTable = ({ current, pageSize, onAction }) => {
   const columns = useMemo(

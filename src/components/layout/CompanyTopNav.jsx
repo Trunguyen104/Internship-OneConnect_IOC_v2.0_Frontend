@@ -170,9 +170,9 @@ export default function CompanyTopNav() {
                 <Link
                   key={key}
                   href={key}
-                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 ${
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all duration-200 ${
                     isActive
-                      ? 'bg-orange-50 text-orange-700'
+                      ? 'bg-red-100! text-red-700! shadow-sm'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >

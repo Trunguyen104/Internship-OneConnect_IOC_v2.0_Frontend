@@ -1,11 +1,13 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import Textarea from '@/components/ui/textarea';
 import { APPLICATIONS_UI } from '@/constants/applications/uiText';
+
+import { useRejectModalState } from '../hooks/useRejectModalState';
 
 /**
  * Modal to collect rejection reason before processing.
@@ -19,18 +21,10 @@ export const RejectModal = ({
   loading,
   title = APPLICATIONS_UI.MODAL_TITLE.REJECT_STANDARD,
 }) => {
-  const [reason, setReason] = useState('');
-
-  const handleConfirm = () => {
-    if (!reason.trim()) return;
-    onConfirm({ reason: reason.trim() });
-    setReason('');
-  };
-
-  const handleCancel = () => {
-    setReason('');
-    onCancel();
-  };
+  const { reason, setReason, handleConfirm, handleCancel } = useRejectModalState(
+    onConfirm,
+    onCancel
+  );
 
   return (
     <CompoundModal open={open} onCancel={handleCancel} width={480}>
@@ -38,13 +32,13 @@ export const RejectModal = ({
         icon={<AlertTriangle className="size-5" />}
         type="danger"
         title={title}
-        subtitle="This action cannot be undone. Please provide a clear reason for the student."
+        subtitle={APPLICATIONS_UI.MESSAGES.REJECT_SUBTITLE}
       />
 
       <CompoundModal.Content className="space-y-4">
         <div className="space-y-2">
           <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-            {APPLICATIONS_UI.MESSAGES.REJECT_REASON_PLACEHOLDER || 'Rejection Reason'}
+            {APPLICATIONS_UI.MESSAGES.REJECT_REASON_PLACEHOLDER}
           </label>
           <Textarea
             placeholder={APPLICATIONS_UI.MESSAGES.REJECT_REASON_PLACEHOLDER}
@@ -59,7 +53,7 @@ export const RejectModal = ({
       <CompoundModal.Footer
         onCancel={handleCancel}
         onConfirm={handleConfirm}
-        confirmText="Confirm Rejection"
+        confirmText={APPLICATIONS_UI.MESSAGES.REJECT_CONFIRM}
         loading={loading}
         danger={true}
         disabled={!reason.trim()}

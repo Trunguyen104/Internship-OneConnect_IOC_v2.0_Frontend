@@ -37,6 +37,35 @@ export const APPLICATIONS_UI = {
     REJECT_REASON_PLACEHOLDER: 'Enter reason here...',
     REJECT_CONFIRM: 'Confirm Rejection',
     REJECT_CANCEL: 'Cancel',
+    REJECT_SUBTITLE: 'This action cannot be undone. Please provide a clear reason for the student.',
+    SUCCESS: {
+      INTERVIEWING: 'Application moved to Interviewing.',
+      OFFER: 'Offer successfully sent.',
+      PLACED: 'Application marked as Placed!',
+      REJECTED: 'Application rejected.',
+      UNI_APPROVE: 'University assignment approved.',
+      UNI_REJECT: 'University assignment rejected.',
+    },
+    CONFIRM: {
+      INTERVIEW: {
+        TITLE: 'Move to Interviewing?',
+        CONTENT: 'Move this application to Interviewing stage? This will notify the student.',
+      },
+      OFFER: {
+        TITLE: 'Send Offer?',
+        CONTENT: 'Send an offer to the student? Ensure all internship details are correct first.',
+      },
+      PLACED: {
+        TITLE: 'Mark as Placed?',
+        CONTENT: 'Mark this application as Placed? Congratulations!',
+      },
+      UNI_APPROVE: {
+        TITLE: 'Approve Assignment?',
+        CONTENT:
+          'Approve this university assignment? This will confirm the student spot at your company.',
+      },
+      APPROVE_DUPLICATE_TITLE: 'Approve Duplicate Application?',
+    },
   },
   MODAL: {
     DETAIL_TITLE: 'Application Detail',

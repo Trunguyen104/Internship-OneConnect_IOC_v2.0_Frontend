@@ -42,15 +42,16 @@ export const ADMIN_DASHBOARD_UI = {
   GROUPS: {
     TITLE: 'INTERNSHIP GROUPS NEEDING ATTENTION',
     SUBTITLE: 'Groups that have not been assigned a mentor.',
-    NAME: 'Tên nhóm',
+    NAME: 'Group Name',
     PHASE: 'Intern Phase',
     STUDENTS: 'Number of Students',
     START_DATE: 'Start Date',
     ASSIGN_MENTOR: 'Assign Mentor',
-    ALL_ASSIGNED: 'All groups have been assigned mentors. ✓',
-    ALL_ASSIGNED_MSG: 'All groups have been assigned mentors.',
+    ALL_ASSIGNED: 'No groups found needing mentor assignment.',
+    ALL_ASSIGNED_MSG: 'No groups found needing mentor assignment.',
     NO_WARNINGS: 'No warnings',
     VIEW_ALL: 'View All Groups',
+    EMPTY: 'No internship groups created yet.',
   },
   VIOLATIONS: {
     TITLE: 'RECENT VIOLATION REPORTS',
@@ -59,7 +60,7 @@ export const ADMIN_DASHBOARD_UI = {
     GROUP: 'Group Name',
     REPORTER: 'Reported by Mentor',
     CREATED_AT: 'Created At',
-    EMPTY: 'No violation reports in the last 30 days. ✓',
+    EMPTY: 'No violation reports in the last 30 days.',
     VIEW_ALL: 'View All Violations',
   },
 };
