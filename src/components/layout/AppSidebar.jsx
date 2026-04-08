@@ -59,6 +59,7 @@ export default function AppSidebar() {
         return [
           { key: 'back-to-terms', icon: <ArrowLeft className="size-4" />, label: 'Back to Terms' },
           { type: 'divider' },
+          { key: `${p}`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
           { key: `${p}/enrollments`, icon: <Users className="size-4" />, label: 'Students' },
           { key: `${p}/placements`, icon: <Briefcase className="size-4" />, label: 'Placements' },
         ];

@@ -782,6 +782,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
         TABLE: {
           COLUMNS: {
+            CLASS: 'CLASS',
             STUDENT: 'Avatar + Name',
             ENTERPRISE: 'Enterprise',
             MENTOR: 'Mentor',

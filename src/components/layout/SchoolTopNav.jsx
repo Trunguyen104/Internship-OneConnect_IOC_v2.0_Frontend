@@ -2,7 +2,7 @@
 
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
-import { Activity, CalendarDays, ChevronDown, Home } from 'lucide-react';
+import { CalendarDays, ChevronDown, Home } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -15,7 +15,7 @@ import { useLogout } from '@/hooks/useLogout';
 const NAV_TABS = [
   { key: '/school/home', label: 'Home', icon: Home },
   { key: '/school/terms', label: 'Terms', icon: CalendarDays },
-  { key: '/school/activity', label: 'Activity', icon: Activity },
+  // { key: '/school/activity', label: 'Activity', icon: Activity },
   // { key: '/school/enterprises', label: 'Enterprises', icon: Building2 },
 ];
 

@@ -63,6 +63,7 @@ export const PLACEMENT_UI_TEXT = {
     UNPLACED: 'Unplaced',
   },
   TABLE: {
+    CLASS: 'CLASS',
     FULL_NAME: 'FULL NAME',
     EMAIL: 'EMAIL',
     MAJOR: 'MAJOR',

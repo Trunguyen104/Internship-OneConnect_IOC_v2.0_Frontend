@@ -22,9 +22,9 @@ import { useActivityFilters } from '../hooks/useActivityFilters';
 import { useStudentList } from '../hooks/useStudentList';
 import SummaryCard from './SummaryCard';
 
-export default function StudentActivityList() {
+export default function StudentActivityList({ termId: fixedTermId, hideTitle = false }) {
   const router = useRouter();
-  const filters = useActivityFilters();
+  const filters = useActivityFilters(fixedTermId);
   const {
     students,
     loading,
@@ -65,15 +65,12 @@ export default function StudentActivityList() {
 
   const columns = [
     {
-      title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.INDEX,
-      key: 'index',
-      width: 60,
+      title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.CLASS,
+      dataIndex: 'className',
+      key: 'className',
+      width: 90,
       align: 'center',
-      render: (_, __, index) => (
-        <span className="text-muted font-mono text-xs font-bold leading-none">
-          {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
-        </span>
-      ),
+      render: (text) => <span className="text-muted font-mono text-xs font-bold">{text}</span>,
     },
     {
       title: STUDENT_ACTIVITY_UI.LIST_COLUMNS.STUDENT,
@@ -90,7 +87,6 @@ export default function StudentActivityList() {
             <span className="truncate text-sm font-bold text-text leading-tight mb-0.5">
               {record.fullName}
             </span>
-            <span className="truncate text-[10px] font-bold text-muted">{record.className}</span>
           </div>
         </div>
       ),
@@ -255,7 +251,7 @@ export default function StudentActivityList() {
 
   return (
     <PageLayout>
-      <PageLayout.Header title={STUDENT_ACTIVITY_UI.TITLE} />
+      {!hideTitle && <PageLayout.Header title={STUDENT_ACTIVITY_UI.TITLE} />}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <SummaryCard
@@ -311,24 +307,26 @@ export default function StudentActivityList() {
               className="w-full sm:w-56 rounded-full bg-bg/80 hover:bg-[var(--gray-200)]/50 border-transparent focus:bg-surface px-4 py-1.5 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
               allowClear
             />
-            <Select
-              value={termId === 'ALL' ? undefined : termId}
-              onChange={(val) => setTermId(val || 'ALL')}
-              showSearch
-              disabled={terms.length === 0}
-              placeholder={
-                terms.length === 0
-                  ? STUDENT_ACTIVITY_UI.FILTERS.NO_TERM_FOUND
-                  : STUDENT_ACTIVITY_UI.FILTERS.CHOOSE_TERM
-              }
-              className="w-40 min-w-[160px]"
-              optionFilterProp="label"
-              allowClear
-              options={terms.map((term) => ({
-                value: term.termId || term.id,
-                label: term.termName || term.name,
-              }))}
-            />
+            {!fixedTermId && (
+              <Select
+                value={termId === 'ALL' ? undefined : termId}
+                onChange={(val) => setTermId(val || 'ALL')}
+                showSearch
+                disabled={terms.length === 0}
+                placeholder={
+                  terms.length === 0
+                    ? STUDENT_ACTIVITY_UI.FILTERS.NO_TERM_FOUND
+                    : STUDENT_ACTIVITY_UI.FILTERS.CHOOSE_TERM
+                }
+                className="w-40 min-w-[160px]"
+                optionFilterProp="label"
+                allowClear
+                options={terms.map((term) => ({
+                  value: term.termId || term.id,
+                  label: term.termName || term.name,
+                }))}
+              />
+            )}
             <Select
               value={enterpriseId === 'ALL' ? undefined : enterpriseId}
               onChange={(val) => setEnterpriseId(val || 'ALL')}

@@ -19,15 +19,13 @@ export const getStudentColumns = ({
 }) => {
   return [
     {
-      title: '#',
-      key: 'index',
-      width: 80,
-      align: 'center',
-      render: (_, __, index) => (
-        <span className="text-muted font-mono text-xs font-bold">
-          {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
-        </span>
-      ),
+      title: TABLE.COLUMNS.STUDENT_ID,
+      dataIndex: 'id',
+      key: 'id',
+      width: 140,
+      sorter: true,
+      sortKey: 'StudentId',
+      render: (id) => <span className="text-muted font-mono text-xs font-semibold">{id}</span>,
     },
     {
       title: TABLE.COLUMNS.FULL_NAME,
@@ -36,15 +34,6 @@ export const getStudentColumns = ({
       sorter: true,
       sortKey: 'FullName',
       render: (name) => <span className="text-text text-sm font-bold tracking-tight">{name}</span>,
-    },
-    {
-      title: TABLE.COLUMNS.STUDENT_ID,
-      dataIndex: 'id',
-      key: 'id',
-      width: 140,
-      sorter: true,
-      sortKey: 'StudentId',
-      render: (id) => <span className="text-muted font-mono text-xs font-semibold">{id}</span>,
     },
     {
       title: TABLE.COLUMNS.MAJOR,

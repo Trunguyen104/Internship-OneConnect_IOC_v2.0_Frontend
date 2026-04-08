@@ -64,15 +64,12 @@ const StudentInternshipTable = ({
 
   const columns = [
     {
-      title: '#',
-      key: 'index',
-      width: 70,
+      title: UI.CLASS,
+      dataIndex: 'className',
+      key: 'className',
+      width: 100,
       align: 'center',
-      render: (_, __, index) => (
-        <span className="text-muted font-mono text-[11px] font-bold">
-          {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
-        </span>
-      ),
+      render: (text) => <span className="text-muted font-mono text-xs font-bold">{text}</span>,
     },
     {
       title: UI.FULL_NAME,
