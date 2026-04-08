@@ -6,8 +6,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { showDeleteConfirm } from '@/components/ui/deleteconfirm';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
 import { useToast } from '@/providers/ToastProvider';
-import { getErrorDetail, translateMessage } from '@/utils/errorUtils';
+import { getErrorDetail } from '@/utils/errorUtils';
 
+import { PlacementService } from '../../internship-placement/services/placement.service';
 import { StudentService } from '../services/student.service';
 import { useStudentFilters } from './useStudentFilters';
 import { useStudentModals } from './useStudentModals';
@@ -80,8 +81,11 @@ export const useStudentEnrollment = () => {
 
         const response = await StudentService.getAll(termId, params);
         if (response?.data) {
-          const items = (response.data.items || []).map(StudentService.mapStudent);
-          const total = response.data.totalCount || 0;
+          // New nested structure: data.items = [ { termId, students: [...] } ]
+          const termItem = response.data.items?.[0] || {};
+          const studentsRaw = termItem.students || [];
+          const items = studentsRaw.map(StudentService.mapStudent);
+          const total = response.data.totalCount || items.length;
 
           setPagination((prev) => ({ ...prev, total }));
           return { items, total };
@@ -164,11 +168,32 @@ export const useStudentEnrollment = () => {
 
   const { mutate: withdrawStudent, isPending: withdrawLoading } = useMutation({
     mutationFn: ({ termId, studentTermId }) => StudentService.withdraw(termId, studentTermId),
-    onSuccess: (response) => {
-      toast.success(translateMessage(response?.message) || MESSAGES.DELETE_SUCCESS);
+    onSuccess: () => {
+      toast.success(MESSAGES.DELETE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
     },
     onError: (error) => toast.error(getErrorDetail(error, MESSAGES.DELETE_ERROR)),
+  });
+
+  const { mutate: unassignStudent, isPending: unassignLoading } = useMutation({
+    mutationFn: (command) => PlacementService.unassignSingle(command),
+    onSuccess: () => {
+      toast.success(MESSAGES.UNASSIGN_SUCCESS);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+      queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.UNASSIGN_ERROR)),
+  });
+
+  const { mutate: bulkUnassignStudent, isPending: bulkUnassignLoading } = useMutation({
+    mutationFn: (command) => PlacementService.unassignStudents(command),
+    onSuccess: () => {
+      toast.success(MESSAGES.BULK_UNASSIGN_SUCCESS);
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+      queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+    },
+    onError: (error) => toast.error(getErrorDetail(error, 'Bulk unassign failed.')),
   });
 
   const { mutate: importConfirm, isPending: importLoading } = useMutation({
@@ -185,8 +210,8 @@ export const useStudentEnrollment = () => {
 
   const { mutate: bulkWithdraw, isPending: bulkWithdrawLoading } = useMutation({
     mutationFn: ({ studentTermIds }) => StudentService.bulkWithdraw(termId, studentTermIds),
-    onSuccess: (response) => {
-      toast.success(translateMessage(response?.message) || MESSAGES.BULK_WITHDRAW_SUCCESS);
+    onSuccess: () => {
+      toast.success(MESSAGES.BULK_WITHDRAW_SUCCESS);
       setSelectedIds([]);
       queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
     },
@@ -253,6 +278,43 @@ export const useStudentEnrollment = () => {
     setViewId(student.studentTermId);
   }, []);
 
+  const handleUnassign = useCallback(
+    (student) => {
+      showDeleteConfirm({
+        title: 'Cancel Placement',
+        content: `Are you sure you want to cancel the placement for ${student.name}? This will return the student to Unplaced status.`,
+        okText: 'Confirm Cancellation',
+        okType: 'danger',
+        onOk: () =>
+          unassignStudent({
+            studentId: student.studentId,
+            termId: termId,
+          }),
+      });
+    },
+    [unassignStudent, termId]
+  );
+
+  const handleBulkUnassign = useCallback(() => {
+    const eligibleIds = studentData.items
+      .filter((s) => selectedIds.includes(s.studentTermId))
+      .filter((s) => s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT')
+      .map((s) => s.studentId);
+
+    if (eligibleIds.length === 0) return;
+
+    showDeleteConfirm({
+      title: MESSAGES.BULK_UNASSIGN.ACTION_LABEL,
+      content: MESSAGES.BULK_UNASSIGN.CONFIRM_TEXT.replace('{count}', eligibleIds.length),
+      okType: 'danger',
+      onOk: () =>
+        bulkUnassignStudent({
+          studentIds: eligibleIds,
+          termId: termId,
+        }),
+    });
+  }, [selectedIds, studentData.items, bulkUnassignStudent, termId, MESSAGES.BULK_UNASSIGN]);
+
   const handleDownloadTemplate = useCallback(async () => {
     if (!termId) return;
     try {
@@ -273,6 +335,8 @@ export const useStudentEnrollment = () => {
     addLoading ||
     updateLoading ||
     withdrawLoading ||
+    unassignLoading ||
+    bulkUnassignLoading ||
     importLoading ||
     bulkWithdrawLoading ||
     previewLoading;
@@ -320,19 +384,8 @@ export const useStudentEnrollment = () => {
     handleView,
     handleEdit: handleOpenEdit,
     handleDelete,
-    // handleUpdateStudent: useCallback((values) => updateStudent(values), [updateStudent]),
-    // handleAddStudent: useCallback((values) => addStudent(values), [addStudent]),
-    // handleImportPreview: useCallback(
-    //   async (file) => {
-    //     const response = await importPreview(file);
-    //     return response?.data;
-    //   },
-    //   [importPreview]
-    // ),
-    // handleImportConfirm: useCallback(
-    //   (validRecords) => importConfirm(validRecords),
-    //   [importConfirm]
-    // ),
+    handleUnassign,
+    handleBulkUnassign: handleBulkUnassign,
     handleUpdateStudent,
     handleAddStudent,
     handleImportPreview,

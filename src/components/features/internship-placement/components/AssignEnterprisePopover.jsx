@@ -32,11 +32,11 @@ const AssignEnterprisePopover = ({ student, children, termId, disabled = false }
   const mutation = useMutation({
     mutationFn: (data) => {
       if (data.isReassign) {
-        // AC-05: Backend expects applicationId and NEW IDs
+        // Updated to use studentId and prefixed fields as per verification
         const command = {
-          applicationId: data.applicationId,
-          newEnterpriseId: data.enterpriseId,
-          newInternPhaseId: data.internPhaseId,
+          studentId: data.studentId,
+          newEnterpriseId: data.newEnterpriseId,
+          newInternPhaseId: data.newInternPhaseId,
         };
         return PlacementService.reassignSingle(command);
       }
@@ -52,6 +52,7 @@ const AssignEnterprisePopover = ({ student, children, termId, disabled = false }
         setPopoverVisible(false);
         queryClient.invalidateQueries({ queryKey: ['semester-students'] });
         queryClient.invalidateQueries({ queryKey: ['uni-assign-applications'] });
+        queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
       }
     },
     onError: (err) => {
@@ -100,9 +101,8 @@ const AssignEnterprisePopover = ({ student, children, termId, disabled = false }
     }
 
     const isReassign =
-      (student.displayStatus === PLACEMENT_STATUS.PLACED ||
-        student.displayStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT) &&
-      student.applicationId;
+      student.displayStatus === PLACEMENT_STATUS.PLACED ||
+      student.displayStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT;
     const newEntName = selectedPhase.enterpriseName;
     const oldEntName = student.enterpriseName || UI.FALLBACK_OLD_ENT;
 
@@ -116,8 +116,7 @@ const AssignEnterprisePopover = ({ student, children, termId, disabled = false }
 
       if (isReassign) {
         mutation.mutate({
-          ...command,
-          applicationId: student.applicationId,
+          studentId: studentGuid,
           newEnterpriseId: selectedPhase.enterpriseId,
           newInternPhaseId: selectedPhase.internPhaseId || selectedPhase.id,
           isReassign: true,

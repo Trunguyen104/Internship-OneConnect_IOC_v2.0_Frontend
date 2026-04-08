@@ -29,6 +29,10 @@ const VIETNAMESE_TO_ENGLISH_ERRORS = {
   'Rút hàng loạt sinh viên thành công. Các sinh viên đang có vị trí thực tập (Placed) đã được bỏ qua tự động và không bị ảnh hưởng.':
     'Bulk withdrawal successful. Placed students were automatically skipped and remains unaffected.',
   'Rút sinh viên thành công': 'Student withdrawn successfully',
+  'Sinh viên này đã được thêm vào kỳ thực tập thành công.':
+    'This student is already enrolled in the internship term.',
+  'Không thể hủy placement của Đỗ Thị Phương. Sinh viên này đã có dữ liệu thực tập (logbook / sprint / đánh giá) tại FPT Software. Vui lòng liên hệ quản trị viên hệ thống nếu cần xử lý đặc biệt.':
+    'Cannot cancel placement for this student. This student already has internship data (logbook / sprint / evaluation) at FPT Software. Please contact the system administrator if special handling is required.',
 };
 
 /**

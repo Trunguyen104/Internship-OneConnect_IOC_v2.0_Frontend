@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  CloseCircleOutlined,
   DownloadOutlined,
   FilterOutlined,
   PlusOutlined,
@@ -62,7 +63,9 @@ export default function TermStudentManagement() {
     handleImportPreview,
     handleImportConfirm,
     handleBulkWithdraw,
+    handleBulkUnassign,
     handleDownloadTemplate,
+    handleUnassign,
     sortBy,
     sortOrder,
     handleSortChange,
@@ -78,16 +81,28 @@ export default function TermStudentManagement() {
       getStudentColumns({
         pagination,
         isClosed,
+        termId,
+        termName: activeTerm?.name,
         handleView,
         handleEdit,
         handleDelete,
+        handleUnassign,
         handleBulkWithdraw,
         TABLE,
         ACTION_LABELS,
         STATUS_LABELS,
         PLACEMENT_LABELS,
       }),
-    [pagination.current, pagination.pageSize, isClosed, STATUS_LABELS, PLACEMENT_LABELS, TABLE]
+    [
+      pagination.current,
+      pagination.pageSize,
+      isClosed,
+      STATUS_LABELS,
+      PLACEMENT_LABELS,
+      TABLE,
+      termId,
+      activeTerm?.name,
+    ]
   );
 
   useEffect(() => {
@@ -144,6 +159,34 @@ export default function TermStudentManagement() {
             </Space.Compact>
           </DataTableToolbar.Filters>
           <DataTableToolbar.Actions className="ml-auto gap-3">
+            <Button
+              type="primary"
+              icon={<CloseCircleOutlined />}
+              onClick={handleBulkUnassign}
+              disabled={
+                selectedIds.length === 0 ||
+                isClosed ||
+                !students
+                  .filter((s) => selectedIds.includes(s.studentTermId))
+                  .some(
+                    (s) =>
+                      s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT'
+                  )
+              }
+              className="!h-11 !rounded-xl shadow-md !bg-amber-500 hover:!bg-amber-600 !border-amber-500"
+            >
+              {MESSAGES.BULK_UNASSIGN.ACTION_LABEL}
+              {selectedIds.length > 0 &&
+                ` (${
+                  students
+                    .filter((s) => selectedIds.includes(s.studentTermId))
+                    .filter(
+                      (s) =>
+                        s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT'
+                    ).length
+                })`}
+            </Button>
+
             <Button
               danger
               type="primary"

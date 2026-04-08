@@ -61,7 +61,7 @@ export default function AppSidebar() {
           { type: 'divider' },
           { key: `${p}`, icon: <LayoutDashboard className="size-4" />, label: 'Overview' },
           { key: `${p}/enrollments`, icon: <Users className="size-4" />, label: 'Students' },
-          { key: `${p}/placements`, icon: <Briefcase className="size-4" />, label: 'Placements' },
+          // { key: `${p}/placements`, icon: <Briefcase className="size-4" />, label: 'Placements' },
         ];
       }
 
