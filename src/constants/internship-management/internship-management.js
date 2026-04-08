@@ -599,7 +599,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         WITHDRAW: 'Withdraw',
         DELETE: 'Delete',
         VIEW: 'View Details',
-        BULK_ASSIGN: 'Bulk Assign',
+        BULK_ASSIGN: 'Assign',
       },
       TABLE: {
         COLUMNS: {
@@ -757,11 +757,11 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           ERROR_ALL_PLACED:
             'All selected students are placed. Withdrawing them will cancel their placement records. Confirm to proceed.',
           ERROR_GENERIC: 'An error occurred during withdrawal, please try again',
-          ACTION_LABEL: 'Withdraw students',
+          ACTION_LABEL: 'Delete students',
         },
         BULK_UNASSIGN_SUCCESS: 'Successfully unassigned selected students',
         BULK_UNASSIGN: {
-          ACTION_LABEL: 'Bulk Unassign',
+          ACTION_LABEL: 'Unassign',
           CONFIRM_TEXT:
             'Are you sure you want to cancel placement for {count} selected students? This will return them to Unplaced status.',
         },

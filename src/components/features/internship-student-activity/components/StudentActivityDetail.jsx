@@ -31,7 +31,7 @@ export default function StudentActivityDetail() {
   const params = useParams();
   const searchParams = useSearchParams();
   const studentId = params?.studentId;
-  const termIdFromUrl = searchParams.get('termId');
+  const termId = params?.termId || searchParams.get('termId');
   const [activeTab, setActiveTab] = useState('overview');
 
   const {
@@ -41,7 +41,7 @@ export default function StudentActivityDetail() {
     logbookTotal,
     logbookWeekly,
     loading: detailLoading,
-  } = useStudentDetail(studentId, termIdFromUrl);
+  } = useStudentDetail(studentId, termId);
 
   const items = [
     {
