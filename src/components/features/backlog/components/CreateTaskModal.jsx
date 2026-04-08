@@ -7,7 +7,12 @@ import React, { useMemo, useState } from 'react';
 import CompoundModal from '@/components/ui/CompoundModal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
-import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
+import {
+  UNASSIGNED_ID,
+  WORK_ITEM_PRIORITY,
+  WORK_ITEM_STATUS,
+  WORK_ITEM_TYPE,
+} from '@/constants/common/enums';
 
 import { FieldLabel, TextInput } from './TaskFields';
 import { TaskModalSidebar } from './TaskModalSidebar';
@@ -26,10 +31,10 @@ export default function CreateTaskModal({
 
   const [type, setType] = useState(WORK_ITEM_TYPE.USER_STORY);
   const [status, setStatus] = useState(WORK_ITEM_STATUS.TODO);
-  const [assignee, setAssignee] = useState('');
+  const [assignee, setAssignee] = useState(UNASSIGNED_ID);
   const [priority, setPriority] = useState(WORK_ITEM_PRIORITY.MEDIUM);
 
-  const [epic, setEpic] = useState('');
+  const [epic, setEpic] = useState(UNASSIGNED_ID);
   const [sprintId, setSprintId] = useState(initialSprintId || '');
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
@@ -46,9 +51,9 @@ export default function CreateTaskModal({
     setDesc('');
     setType(WORK_ITEM_TYPE.USER_STORY);
     setStatus(WORK_ITEM_STATUS.TODO);
-    setAssignee('');
+    setAssignee(UNASSIGNED_ID);
     setPriority(WORK_ITEM_PRIORITY.MEDIUM);
-    setEpic('');
+    setEpic(UNASSIGNED_ID);
     setSprintId('');
     setDueDate('');
     setPoints('');

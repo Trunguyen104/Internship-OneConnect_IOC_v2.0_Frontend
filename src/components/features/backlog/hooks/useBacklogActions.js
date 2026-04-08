@@ -7,6 +7,7 @@ import { BACKLOG_UI } from '@/constants/backlog/uiText';
 import {
   MOVE_INCOMPLETE_ITEMS_OPTION,
   SPRINT_STATUS,
+  UNASSIGNED_ID,
   WORK_ITEM_STATUS,
 } from '@/constants/common/enums';
 import { useToast } from '@/providers/ToastProvider';
@@ -199,8 +200,8 @@ export function useBacklogActions({
         type: payload.type,
         status: payload.status,
         priority: payload.priority,
-        parentId: payload.epic || null,
-        assigneeId: payload.assignee || null,
+        parentId: payload.epic || UNASSIGNED_ID,
+        assigneeId: payload.assignee || UNASSIGNED_ID,
         dueDate: formatToDateOnly(payload.dueDate),
         storyPoint: payload.points,
         sprintId: targetSprintId || null,
@@ -267,10 +268,10 @@ export function useBacklogActions({
         type: payload.type,
         status: payload.status,
         priority: payload.priority,
-        parentId: payload.epic || null,
-        epicId: payload.epic || null, // Alternative name
-        parentWorkItemId: payload.epic || null, // Alternative name
-        assigneeId: payload.assignee || null,
+        parentId: payload.epic || UNASSIGNED_ID,
+        epicId: payload.epic || UNASSIGNED_ID, // Alternative name
+        parentWorkItemId: payload.epic || UNASSIGNED_ID, // Alternative name
+        assigneeId: payload.assignee || UNASSIGNED_ID,
         dueDate: formatToDateOnly(payload.dueDate),
         storyPoint: payload.points,
         sprintId: payload.sprintId || null,
