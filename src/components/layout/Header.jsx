@@ -18,7 +18,6 @@ import { USER_ROLE } from '@/constants/user-management/enums';
 import { useLogout } from '@/hooks/useLogout';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
-
 export default function Header() {
   const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();

@@ -50,6 +50,21 @@ const mapJob = (job) => {
   };
 };
 
+/**
+ * Hook to fetch job detail independently.
+ */
+export function useJobDetail(id) {
+  return useQuery({
+    queryKey: ['job-detail', id],
+    queryFn: async () => {
+      const res = await ExploreJobsService.getJobById(id);
+      return res?.data || res;
+    },
+    enabled: !!id,
+    select: (data) => mapJob(data),
+  });
+}
+
 export function useExploreJobs() {
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -115,18 +130,6 @@ export function useExploreJobs() {
     staleTime: 5000,
   });
 
-  // 2. Fetch job detail from real API
-  const useJobDetail = (id) =>
-    useQuery({
-      queryKey: ['job-detail', id],
-      queryFn: async () => {
-        const res = await ExploreJobsService.getJobById(id);
-        return res?.data || res;
-      },
-      enabled: !!id,
-      select: (data) => mapJob(data),
-    });
-
   // 4. Apply mutation
   const applyMutation = useMutation({
     mutationFn: ({ jobId, data }) => ExploreJobsService.applyJob(jobId, data),
@@ -163,7 +166,6 @@ export function useExploreJobs() {
     setPageSize,
     searchTerm,
     setSearchTerm,
-    useJobDetail,
     applyJob: applyMutation.mutateAsync,
     isApplying: applyMutation.isPending,
     getEligibility: (id) => {

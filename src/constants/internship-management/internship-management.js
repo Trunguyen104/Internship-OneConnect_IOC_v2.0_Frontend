@@ -585,6 +585,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
       PLACEMENT_LABELS: {
         PLACED: 'Placed',
+        PENDING: 'Pending',
         UNPLACED: 'Unplaced',
       },
       SEARCH: {
@@ -598,6 +599,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         WITHDRAW: 'Withdraw',
         DELETE: 'Delete',
         VIEW: 'View Details',
+        BULK_ASSIGN: 'Bulk Assign',
       },
       TABLE: {
         COLUMNS: {
@@ -734,6 +736,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           'Are you sure you want to withdraw student "{name}"? This will remove them from the enrollment list. This action cannot be undone.',
         DELETE_SUCCESS: 'Student withdrawn successfully',
         DELETE_ERROR: 'Failed to withdraw student',
+        UNASSIGN_SUCCESS: 'Placement cancelled successfully',
+        UNASSIGN_ERROR: 'Failed to cancel placement',
         LOAD_ERROR: 'Failed to load students',
         DOWNLOAD_TEMPLATE_ERROR: 'Failed to download template',
         DETAIL_LOAD_ERROR: 'Failed to load student details',
@@ -754,6 +758,27 @@ export const INTERNSHIP_MANAGEMENT_UI = {
             'All selected students are placed. Withdrawing them will cancel their placement records. Confirm to proceed.',
           ERROR_GENERIC: 'An error occurred during withdrawal, please try again',
           ACTION_LABEL: 'Withdraw students',
+        },
+        BULK_UNASSIGN_SUCCESS: 'Successfully unassigned selected students',
+        BULK_UNASSIGN: {
+          ACTION_LABEL: 'Bulk Unassign',
+          CONFIRM_TEXT:
+            'Are you sure you want to cancel placement for {count} selected students? This will return them to Unplaced status.',
+        },
+        BULK_ASSIGN_SUCCESS: 'Successfully assigned {count} students to {enterprise}.',
+        BULK_ASSIGN: {
+          ACTION_LABEL: 'Bulk Assign',
+          CONFIRM_TEXT:
+            'Are you sure you want to assign {count} selected students to {enterprise} - {phase}?',
+          MODAL_TITLE: 'Bulk Enterprise Assignment',
+          SELECTOR_LABEL: 'Select Enterprise & Intern Phase',
+          FORCE_LABEL: 'Override existing placements',
+          FORCE_DESC:
+            'If checked, this will override any existing placements for the selected students.',
+          ASSIGNING_PREFIX: 'You are assigning',
+          ASSIGNING_SUFFIX: 'student(s) to an enterprise.',
+          SELECT_PHASE_PROMPT: 'Please select an enterprise and phase to continue',
+          ERROR_GENERIC: 'An error occurred during bulk assignment, please try again',
         },
       },
     },
@@ -782,6 +807,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
         TABLE: {
           COLUMNS: {
+            CLASS: 'CLASS',
             STUDENT: 'Avatar + Name',
             ENTERPRISE: 'Enterprise',
             MENTOR: 'Mentor',

@@ -3,12 +3,23 @@
 import { App, ConfigProvider } from 'antd';
 import React, { useMemo } from 'react';
 
+/**
+ * Đọc giá trị của một biến CSS từ document root.
+ * @param {string} name - Tên của biến CSS (ví dụ: '--color-primary').
+ * @returns {string|undefined} - Giá trị của biến hoặc undefined nếu không tìm thấy.
+ */
 const readCssVar = (name) => {
   if (typeof window === 'undefined') return undefined;
   const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return value || undefined;
 };
 
+/**
+ * Chuyển đổi mã màu Hex sang định dạng RGBA.
+ * @param {string} hex - Mã màu hex (ví dụ: '#ffffff').
+ * @param {number} alpha - Độ trong suốt (0 đến 1).
+ * @returns {string|undefined} - Chuỗi màu rgba hoặc undefined nếu mã hex không hợp lệ.
+ */
 const hexToRgba = (hex, alpha = 1) => {
   const normalized = String(hex || '')
     .trim()
@@ -22,6 +33,10 @@ const hexToRgba = (hex, alpha = 1) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
+/**
+ * Đọc các token màu sắc từ CSS Variables để cấu hình cho Ant Design.
+ * @returns {Object|null} - Object chứa các token màu hoặc null nếu đang ở phía server.
+ */
 const readAntdCssTokens = () => {
   if (typeof window === 'undefined') return null;
 

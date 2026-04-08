@@ -36,22 +36,19 @@ const cleanPayload = (obj) => {
 
 const mapStudent = (item) => {
   const student = item.student || item;
-  const rawPlacementStatus = item.placementStatus ?? student.placementStatus;
+  const appStatus = item.internshipApplicationStatus || student.internshipApplicationStatus || 0;
   const entName = item.enterpriseName || student.enterpriseName;
 
-  // Backend Enum: Unplaced = 0, Placed = 1
+  // AC-11 Sync: Source of truth for Backend is InternshipApplicationStatus
+  // 5 = Placed, 4 = PendingAssignment, 1,2,3 = Pending/Applied
   let finalPlacementStatus = 'UNPLACED';
 
-  if (
-    rawPlacementStatus === 1 ||
-    rawPlacementStatus === 'PLACED' ||
-    rawPlacementStatus === 'Placed'
-  ) {
+  if (appStatus === 5 || appStatus === 'PLACED' || appStatus === 'Placed') {
     finalPlacementStatus = 'PLACED';
   } else if (
-    rawPlacementStatus === 9 ||
-    rawPlacementStatus === 'PENDING_ASSIGNMENT' ||
-    rawPlacementStatus === 'Pending'
+    [1, 2, 3, 4].includes(appStatus) ||
+    appStatus === 'Pending' ||
+    appStatus === 'PENDING_ASSIGNMENT'
   ) {
     finalPlacementStatus = 'PENDING_ASSIGNMENT';
   } else {
@@ -60,25 +57,30 @@ const mapStudent = (item) => {
 
   return {
     ...item,
-    id: item.studentCode || student.studentCode,
-    studentCode: item.studentCode || student.studentCode,
+    id: item.studentId || item.id || student.studentId || student.id,
     studentId: item.studentId || student.studentId,
+    studentCode: item.studentCode || student.studentCode,
     studentTermId: item.studentTermId || student.studentTermId,
-    name: item.fullName || student.fullName,
-    fullName: item.fullName || student.fullName,
+    name: item.studentName || item.fullName || student.fullName || student.studentName,
+    fullName: item.studentName || item.fullName || student.fullName || student.studentName,
     email: item.email || student.email,
     phone: item.phone || student.phone,
     major: item.major || student.major,
+    className: item.className || student.className,
     status:
       item.enrollmentStatus === ENROLLMENT_STATUS.WITHDRAWN ||
       student.enrollmentStatus === ENROLLMENT_STATUS.WITHDRAWN
         ? 'WITHDRAWN'
         : 'ACTIVE',
+    displayStatus: item.internshipApplicationStatus || student.internshipApplicationStatus || 0,
+    applicationStatus: item.internshipApplicationStatus || student.internshipApplicationStatus,
+    applicationId: item.applicationId || student.applicationId,
     placementStatus: finalPlacementStatus,
     enterpriseId: item.enterpriseId || student.enterpriseId,
     enterpriseName: entName,
-    enrollmentDate: item.enrollmentDate || student.enrollmentDate,
+    internPhaseName: item.internPhaseName || student.internPhaseName,
     enrollmentNote: item.enrollmentNote || student.enrollmentNote,
+    enrollmentDate: item.enrollmentDate || student.enrollmentDate,
     dateOfBirth: item.dateOfBirth || student.dateOfBirth || item.dob || student.dob,
     midtermFeedback: item.midtermFeedback || student.midtermFeedback || item.midTermFeedback,
     finalFeedback: item.finalFeedback || student.finalFeedback || item.finalTermFeedback,
@@ -122,7 +124,47 @@ const mapStudentForUpdate = (values) => {
 
 export const StudentService = {
   async getAll(termId, params = {}) {
-    return httpGet(`/terms/${termId}/enrollments`, cleanPayload(params));
+    const { pageNumber, pageSize } = params;
+
+    // AC-11 Sync: Combine personal details (from enrollments) and placement details (from uniassigns)
+    // Enrollments API: /terms/{termId}/enrollments (Returns Personal Metadata)
+    // UniAssigns API: /uniassigns/students-by-term (Returns Placement/Enterprise Status)
+    const [uniRes, enrollRes] = await Promise.all([
+      httpGet('/uniassigns/students-by-term', {
+        TermId: termId,
+        PageNumber: pageNumber || 1,
+        PageSize: pageSize || 10,
+      }),
+      httpGet(`/terms/${termId}/enrollments`, cleanPayload(params)),
+    ]);
+
+    const uniData = uniRes?.data || {};
+    const uniStudents = uniData.items?.[0]?.students || [];
+    const enrollItems = enrollRes?.data?.items || [];
+
+    // Merge Logic: Placement data (uni) is the source of truth for the list,
+    // Enrollment data (personal) provides the missing fields like phone, dob, etc.
+    const mergedStudents = uniStudents.map((s) => {
+      const personal = enrollItems.find(
+        (e) => e.studentId === s.studentId || e.studentTermId === s.studentTermId
+      );
+      // Merge s (placement) onto personal (full details)
+      // This ensures personal info is present, but placement status/enterprise info from 's' wins.
+      return { ...personal, ...s };
+    });
+
+    return {
+      ...uniRes,
+      data: {
+        ...uniData,
+        items: [
+          {
+            ...(uniData.items?.[0] || {}),
+            students: mergedStudents,
+          },
+        ],
+      },
+    };
   },
 
   async getById(id) {

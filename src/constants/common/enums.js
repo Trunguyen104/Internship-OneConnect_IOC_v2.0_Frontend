@@ -51,6 +51,8 @@ export const MOVING_INCOMPLETE_ITEMS_OPTION_MAP = Object.fromEntries(
   Object.entries(MOVE_INCOMPLETE_ITEMS_OPTION).map(([k, v]) => [v, k])
 );
 
+export const UNASSIGNED_ID = '00000000-0000-0000-0000-000000000000';
+
 export const USER_ROLE = {
   SUPER_ADMIN: 1,
   SCHOOL_ADMIN: 3,

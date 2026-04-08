@@ -4,7 +4,12 @@ import React from 'react';
 
 import { DatePicker } from '@/components/ui/datepicker';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
-import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
+import {
+  UNASSIGNED_ID,
+  WORK_ITEM_PRIORITY,
+  WORK_ITEM_STATUS,
+  WORK_ITEM_TYPE,
+} from '@/constants/common/enums';
 
 import { Select, TextInput } from './TaskFields';
 
@@ -112,7 +117,7 @@ export function TaskModalSidebar({
                 onChange={setEpic}
                 placeholder="Epic"
                 options={[
-                  { value: '', label: 'None' },
+                  { value: UNASSIGNED_ID, label: BACKLOG_UI.NONE || 'None' },
                   ...epics.map((e) => ({
                     value: e.id || e.workItemId,
                     label: e.summary || e.title,
@@ -132,7 +137,7 @@ export function TaskModalSidebar({
                 value={assignee}
                 onChange={setAssignee}
                 options={[
-                  { value: '', label: 'Unassigned' },
+                  { value: UNASSIGNED_ID, label: BACKLOG_UI.UNASSIGNED || 'Unassigned' },
                   ...members.map((m) => ({
                     value: m.id,
                     label: m.fullName,

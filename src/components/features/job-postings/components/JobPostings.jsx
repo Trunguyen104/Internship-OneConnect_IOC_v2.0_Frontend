@@ -1,7 +1,7 @@
 'use client';
 
 import { Archive, Briefcase, FileEdit, Globe } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 import { StatCard } from '@/components/ui/atoms';
 import PageLayout from '@/components/ui/pagelayout';
@@ -10,18 +10,14 @@ import Pagination from '@/components/ui/pagination';
 import { JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
 import { useInternshipPhases, useJobPostingActions, useJobPostings } from '../hooks/useJobPostings';
 import { useJobPostingsActionsHandler } from '../hooks/useJobPostingsActionsHandler';
+import { useJobPostingsFilters } from '../hooks/useJobPostingsFilters';
 import JobPostingDrawer from './JobPostingDrawer';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsTable from './JobPostingsTable';
 
 export default function JobPostings() {
-  const [filters, setFilters] = useState({
-    search: '',
-    status: undefined,
-    includeDeleted: false,
-    page: 1,
-    size: 10,
-  });
+  // State & Filters Logic (Extracted)
+  const { filters, handleFilterChange, handlePageChange } = useJobPostingsFilters();
 
   // Data fetching
   const { jobPostings, totalCount, isLoading } = useJobPostings(filters);
@@ -32,19 +28,7 @@ export default function JobPostings() {
   const { isDrawerOpen, selectedRecord, onAction, openCreateDrawer, closeDrawer } =
     useJobPostingsActionsHandler({ actions });
 
-  const handleFilterChange = (newFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...newFilters,
-      page: 1,
-    }));
-  };
-
-  const handlePageChange = (page, size) => {
-    setFilters((prev) => ({ ...prev, page, size }));
-  };
-
-  // derived state for StatCards
+  // derived state for StatCards - recalculated based on fresh data
   const statusCounts = useMemo(() => {
     const counts = {
       [JOB_STATUS.DRAFT]: 0,
@@ -115,7 +99,7 @@ export default function JobPostings() {
           />
         </div>
 
-        <div className="border-border/50 mt-auto flex-shrink-0 border-t pt-6 text-muted">
+        <div className="border-border/50 mt-auto shrink-0 border-t pt-6 text-muted">
           <Pagination
             total={totalCount}
             page={filters.page}
