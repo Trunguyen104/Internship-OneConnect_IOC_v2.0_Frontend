@@ -12,6 +12,16 @@ import Textarea from '@/components/ui/textarea';
 
 import { JOB_AUDIENCE, JOB_POSTING_UI } from '../constants/job-postings.constant';
 
+/**
+ * Presentational form component for job posting details.
+ *
+ * @param {Object} props - Component properties.
+ * @param {Object} props.form - Ant Design form instance.
+ * @param {Array} props.phaseOptions - Formatted options for internship phases.
+ * @param {Array} props.schoolOptions - Formatted options for target schools.
+ * @param {string} props.audience - Current selected audience (Public/Targeted).
+ * @param {Function} props.onPhaseChange - Handler called when the phase selection changes.
+ */
 export const JobPostingForm = ({ form, phaseOptions, schoolOptions, audience, onPhaseChange }) => {
   const selectedPhaseId = Form.useWatch('internshipPhaseId', form);
   const selectedPhase = phaseOptions.find((o) => o.value === selectedPhaseId);

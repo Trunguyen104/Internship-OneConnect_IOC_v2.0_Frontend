@@ -13,6 +13,9 @@ import { useJobSelection } from '../hooks/useJobSelection';
 import ApplyModal from './ApplyModal';
 import JobCard from './JobCard';
 
+/**
+ * Component hiển thị danh sách công việc đang tuyển dụng để sinh viên khám phá.
+ */
 export default function ExploreJobs() {
   const router = useRouter();
   const {
@@ -32,9 +35,12 @@ export default function ExploreJobs() {
     getEligibility,
   } = useExploreJobs();
 
-  const { selectedJob, selectedJobId, isModalOpen, setIsModalOpen, handleCardClick } =
+  const { isModalOpen, handleCardClick, closeSelectionModal, selectedJob, selectedJobId } =
     useJobSelection(jobs);
 
+  /**
+   * Trạng thái khi sinh viên đã có nơi thực tập (AC-01 Requirement).
+   */
   if (isPlaced) {
     return (
       <PageLayout className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
@@ -58,9 +64,8 @@ export default function ExploreJobs() {
   return (
     <PageLayout className="animate-in fade-in duration-700 bg-[#f8f9fa]">
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-6 w-full">
-        {/* ... (Header section) ... */}
+        {/* Header Section */}
         <div className="relative overflow-hidden bg-white border border-border/40 rounded-[2.5rem] p-6 md:p-9 mb-8 shadow-sm transition-all hover:shadow-md">
-          {/* Header content unchanged */}
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-primary/5 text-primary text-[9px] font-black px-2.5 py-1 rounded-full mb-4 uppercase tracking-widest leading-none">
               <Sparkles className="h-3 w-3" />
@@ -91,7 +96,7 @@ export default function ExploreJobs() {
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
         </div>
 
-        {/* ... (Grid Header) ... */}
+        {/* Results Info */}
         <div className="flex items-center justify-between mb-5 px-1">
           <div className="flex items-center gap-2.5">
             <div className="bg-primary/10 p-1.5 rounded-lg">
@@ -106,6 +111,7 @@ export default function ExploreJobs() {
           </span>
         </div>
 
+        {/* Jobs Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-pulse">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -135,6 +141,7 @@ export default function ExploreJobs() {
           </div>
         )}
 
+        {/* Pagination */}
         {total > pageSize && (
           <div className="mt-10 pb-20">
             <Pagination
@@ -150,13 +157,13 @@ export default function ExploreJobs() {
 
       <ApplyModal
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={closeSelectionModal}
         job={selectedJob}
         cvUrl={cvUrl}
         isApplying={isApplying}
         onConfirm={async () => {
           await applyJob({ jobId: selectedJobId });
-          setIsModalOpen(false);
+          closeSelectionModal();
         }}
       />
     </PageLayout>

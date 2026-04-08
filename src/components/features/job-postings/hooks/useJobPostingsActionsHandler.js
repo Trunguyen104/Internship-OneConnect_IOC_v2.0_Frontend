@@ -10,6 +10,11 @@ import { JOB_POSTING_UI } from '../constants/job-postings.constant';
 
 /**
  * Hook to handle UI actions and confirmation modals for Job Postings.
+ * Manages drawer state, record selection, and action confirmations (publish, close, delete, etc.).
+ *
+ * @param {Object} props - Hook properties.
+ * @param {Object} props.actions - Mutation actions from useJobPostingActions.
+ * @returns {Object} State and handlers for job posting actions.
  */
 export const useJobPostingsActionsHandler = ({ actions }) => {
   const { modal: modalApi } = App.useApp();

@@ -12,23 +12,32 @@ import {
   Timer,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 
 import { PageLayout } from '@/components/ui/pagelayout';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
-import { useExploreJobs, useJobDetail } from '../hooks/useExploreJobs';
+import { useJobDetailState } from '../hooks/useJobDetailState';
 import ApplyModal from './ApplyModal';
 
+/**
+ * Component hiển thị thông tin chi tiết một công việc.
+ * Cho phép sinh viên xem mô tả, yêu cầu, quyền lợi và thực hiện ứng tuyển.
+ */
 export default function JobDetail() {
-  const { id } = useParams();
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { getEligibility, isApplying, applyJob, cvUrl, hasCV } = useExploreJobs();
-  const { data: job, isLoading: isJobLoading } = useJobDetail(id);
-
-  const isLoading = isJobLoading;
+  const {
+    job,
+    isLoading,
+    isModalOpen,
+    setIsModalOpen,
+    isApplying,
+    cvUrl,
+    hasCV,
+    eligibility,
+    handleApplyConfirm,
+    handleBack,
+    navigateToExplore,
+  } = useJobDetailState();
 
   if (isLoading) {
     return (
@@ -45,14 +54,14 @@ export default function JobDetail() {
     );
   }
 
-  if (!job && !isJobLoading) {
+  if (!job && !isLoading) {
     return (
       <PageLayout className="flex flex-col items-center justify-center min-h-[60vh] bg-[#f8f9fa]">
         <h2 className="text-xl font-bold text-text mb-4">
           {EXPLORE_JOBS_UI.DETAIL.MESSAGES.NOT_FOUND}
         </h2>
         <button
-          onClick={() => router.push('/explore-jobs')}
+          onClick={navigateToExplore}
           className="bg-primary text-white px-6 py-2 rounded-xl font-bold font-sm"
         >
           {EXPLORE_JOBS_UI.DETAIL.MESSAGES.BACK_TO_LIST}
@@ -63,14 +72,12 @@ export default function JobDetail() {
 
   if (!job) return null;
 
-  const eligibility = getEligibility(job.jobId);
-
   return (
     <PageLayout className="animate-in slide-in-from-bottom duration-700 pb-20 bg-[#f8f9fa]">
       <div className="max-w-6xl mx-auto px-6 md:px-8 py-6 w-full">
         {/* Navigation */}
         <button
-          onClick={() => router.back()}
+          onClick={handleBack}
           className="flex items-center gap-2 text-muted hover:text-primary transition-colors mb-5 group"
         >
           <div className="bg-white p-1.5 rounded-lg border border-border/40 group-hover:border-primary/30 shadow-sm">
@@ -284,10 +291,7 @@ export default function JobDetail() {
         job={job}
         cvUrl={cvUrl}
         isApplying={isApplying}
-        onConfirm={async () => {
-          await applyJob({ jobId: job.jobId });
-          setIsModalOpen(false);
-        }}
+        onConfirm={handleApplyConfirm}
       />
     </PageLayout>
   );

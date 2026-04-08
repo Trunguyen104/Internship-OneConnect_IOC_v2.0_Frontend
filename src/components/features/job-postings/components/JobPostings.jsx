@@ -15,6 +15,12 @@ import JobPostingDrawer from './JobPostingDrawer';
 import JobPostingsFilters from './JobPostingsFilters';
 import JobPostingsTable from './JobPostingsTable';
 
+/**
+ * Main management page for Job Postings.
+ * Displays statistics, filters, and a data table for managing internship opportunities.
+ *
+ * @returns {React.ReactElement} The rendered JobPostings page.
+ */
 export default function JobPostings() {
   // State & Filters Logic (Extracted)
   const { filters, handleFilterChange, handlePageChange } = useJobPostingsFilters();

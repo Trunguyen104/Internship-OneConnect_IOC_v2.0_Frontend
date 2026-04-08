@@ -179,6 +179,7 @@ export function TaskModalSidebar({
                   className={`w-full rounded-2xl h-10 transition-all ${
                     dueDateWarning ? 'border-red-400 bg-red-50/30' : ''
                   }`}
+                  placement="bottomLeft"
                 />
               </div>
             </div>

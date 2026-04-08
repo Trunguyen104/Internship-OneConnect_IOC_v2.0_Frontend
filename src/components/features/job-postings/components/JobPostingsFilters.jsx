@@ -8,6 +8,14 @@ import Select from '@/components/ui/select';
 
 import { JOB_POSTING_UI } from '../constants/job-postings.constant';
 
+/**
+ * Toolbar containing search, status filters, and action buttons for the job postings list.
+ *
+ * @param {Object} props - Component properties.
+ * @param {Object} props.filters - Current filter state.
+ * @param {Function} props.onFilterChange - Callback when a filter value is modified.
+ * @param {Function} props.onCreate - Optional callback to trigger the creation flow.
+ */
 export const JobPostingsFilters = ({ filters, onFilterChange, onCreate }) => {
   return (
     <DataTableToolbar className="mb-6">
