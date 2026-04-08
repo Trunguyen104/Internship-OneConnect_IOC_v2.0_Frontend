@@ -36,10 +36,10 @@ export default function JobDetail() {
         <div className="h-10 w-32 bg-surface rounded-xl mb-8" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="h-64 bg-surface rounded-[2rem]" />
-            <div className="h-96 bg-surface rounded-[2rem]" />
+            <div className="h-64 bg-surface rounded-4xl" />
+            <div className="h-96 bg-surface rounded-4xl" />
           </div>
-          <div className="h-96 bg-surface rounded-[2rem]" />
+          <div className="h-96 bg-surface rounded-4xl" />
         </div>
       </PageLayout>
     );
@@ -83,7 +83,7 @@ export default function JobDetail() {
 
         {/* Missing CV Prominent Header - Direct guidance */}
         {!hasCV && (
-          <div className="mb-6 bg-warning/5 border border-warning/20 rounded-[1.5rem] p-4 flex flex-col md:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-500">
+          <div className="mb-6 bg-warning/5 border border-warning/20 rounded-3xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-500">
             <div className="flex items-center gap-3">
               <div className="bg-warning/10 p-2 rounded-xl">
                 <AlertCircle className="h-5 w-5 text-warning" />
@@ -108,7 +108,7 @@ export default function JobDetail() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Hero Header - Compact */}
-            <div className="bg-surface border border-border/40 rounded-[2rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
+            <div className="bg-surface border border-border/40 rounded-4xl p-6 md:p-8 shadow-sm relative overflow-hidden">
               <div className="flex flex-col md:flex-row gap-6 items-start relative z-10">
                 <div className="h-20 w-20 rounded-2xl bg-surface border-2 border-white shadow-lg flex items-center justify-center overflow-hidden shrink-0">
                   {job.enterprise?.logoUrl ? (
@@ -137,6 +137,10 @@ export default function JobDetail() {
                       <Building2 className="h-3.5 w-3.5 opacity-60" />
                       <span>{job.enterprise?.fullName}</span>
                     </div>
+                    <div className="flex items-center gap-1.5 text-primary/80">
+                      <Sparkles className="h-3.5 w-3.5 opacity-60" />
+                      <span>{job.position}</span>
+                    </div>
                     <div className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5 opacity-60" />
                       <span>{job.location}</span>
@@ -145,11 +149,11 @@ export default function JobDetail() {
                 </div>
               </div>
 
-              <div className="absolute top-0 right-0 w-1/4 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+              <div className="absolute top-0 right-0 w-1/4 h-full bg-linear-to-l from-primary/5 to-transparent pointer-events-none" />
             </div>
 
             {/* Details Section */}
-            <div className="bg-surface border border-border/40 rounded-[2rem] p-6 md:p-8 shadow-sm space-y-10">
+            <div className="bg-surface border border-border/40 rounded-4xl p-6 md:p-8 shadow-sm space-y-10">
               <section>
                 <h2 className="text-lg font-extrabold text-text mb-4 flex items-center gap-3">
                   <div className="h-6 w-1 bg-primary rounded-full" />
@@ -184,12 +188,26 @@ export default function JobDetail() {
 
           {/* Sidebar Info */}
           <div className="space-y-6">
-            <div className="bg-surface border border-border/40 rounded-[2rem] p-6 shadow-sm">
+            <div className="bg-surface border border-border/40 rounded-4xl p-6 shadow-sm">
               <h3 className="text-base font-bold text-text mb-6">
                 {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.TITLE}
               </h3>
 
               <div className="space-y-5 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                    <Sparkles className="h-4 w-4 text-indigo-500" />
+                  </div>
+                  <div>
+                    <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-0.5">
+                      {EXPLORE_JOBS_UI.DETAIL.SIDEBAR.POSITION}
+                    </p>
+                    <p className="text-text font-bold text-xs capitalize">
+                      {job.position || EXPLORE_JOBS_UI.DETAIL.ROLE_BADGE_FALLBACK}
+                    </p>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
                     <Calendar className="h-4 w-4 text-primary" />

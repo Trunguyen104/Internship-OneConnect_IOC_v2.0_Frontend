@@ -116,7 +116,7 @@ const InternshipDashboard = () => {
 
   const { phases, groups, studentApps, userInfo, context } = data;
 
-  const isEnrolled = phases.length > 0 || studentApps.length > 0;
+  const isEnrolled = phases.length > 0 || studentApps.length > 0 || !!context?.currentTerm;
   const hasCv = !!(userInfo?.cvUrl || userInfo?.cvLocalPath);
 
   const activeApp = studentApps.find((a) => {
@@ -250,16 +250,14 @@ const InternshipDashboard = () => {
 
       <div className="flex flex-col gap-10">
         {!isPlaced && allPhases.length === 0 && (
-          <section className="animate-in fade-in slide-in-from-top-4 duration-700">
+          <section className="animate-in fade-in slide-in-from-top-4 space-y-8 duration-700">
             <div className="rounded-[40px] border border-slate-100 bg-white p-10 shadow-sm transition-all hover:shadow-md">
               <EmptyState
-                title={INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_TITLE || 'No Official Internship Yet'}
-                description={
-                  INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_DESC ||
-                  "You haven't been officially placed in an internship group. Track your active applications in the Action Center below."
-                }
+                title={INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_TITLE}
+                description={INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_DESC}
               />
             </div>
+            {!hasCv && <CVUploadBanner variant="urgent" />}
           </section>
         )}
 

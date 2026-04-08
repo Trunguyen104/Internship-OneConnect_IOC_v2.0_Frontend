@@ -2,13 +2,19 @@
 
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import React from 'react';
 
 import { USER_ROLE } from '@/constants/common/enums';
 import { LANDING_UI } from '@/constants/landing/uiText';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function HeroSection() {
+  const [mounted, setMounted] = React.useState(false);
   const { user } = useAuthStore();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const dashboardHref = user
     ? user.role === USER_ROLE.SUPER_ADMIN
@@ -39,13 +45,15 @@ export function HeroSection() {
         </p>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link
-            href={dashboardHref}
-            className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-bold text-white shadow-md transition-all hover:bg-primary-hover active:scale-95"
-          >
-            {LANDING_UI.HERO.BUTTON_DASHBOARD}
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+          {mounted && (
+            <Link
+              href={dashboardHref}
+              className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-bold text-white shadow-md transition-all hover:bg-primary-hover active:scale-95"
+            >
+              {user ? LANDING_UI.HERO.BUTTON_DASHBOARD : LANDING_UI.HERO.BUTTON_JOIN}
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          )}
         </div>
       </div>
     </section>

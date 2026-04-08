@@ -11,7 +11,7 @@ export const INTERNSHIP_UI = {
 
   EMPTY_STATE: {
     NOT_ENROLLED_TITLE: "You haven't joined any internship period yet.",
-    NOT_ENROLLED_SUBTITLE: 'Please contact the School Admin to register for an internship period.',
+    NOT_ENROLLED_SUBTITLE: 'Please register for an internship period to start your journey.',
     NO_DATA: 'No internship placement found',
   },
 
@@ -61,7 +61,7 @@ export const INTERNSHIP_UI = {
     WAITING_FOR_HR: 'Waiting for HR to assign your group...',
     NO_PLACEMENT_TITLE: 'No Official Internship Yet',
     NO_PLACEMENT_DESC:
-      "You haven't been officially placed in an internship group. Track your active applications in the Action Center below.",
+      "You don't have any internship phase or group yet. Track your active applications in the Action Center below.",
     JOURNEY_PROGRESS: 'Your Journey',
     CAREER_LAUNCH: 'Career Launch Progress',
     IN_REVIEW: 'In Review',

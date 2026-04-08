@@ -38,6 +38,7 @@ export const EXPLORE_JOBS_UI = {
     BENEFITS_TITLE: 'Student Benefits',
     SIDEBAR: {
       TITLE: 'Application Info',
+      POSITION: 'Job Position',
       DEADLINE: 'Application Deadline',
       DEADLINE_FALLBACK: 'Upcoming',
       DURATION: 'Internship Duration',
