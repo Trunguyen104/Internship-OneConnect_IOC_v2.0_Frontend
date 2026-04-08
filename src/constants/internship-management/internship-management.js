@@ -585,6 +585,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
       },
       PLACEMENT_LABELS: {
         PLACED: 'Placed',
+        PENDING: 'Pending',
         UNPLACED: 'Unplaced',
       },
       SEARCH: {
@@ -734,6 +735,8 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           'Are you sure you want to withdraw student "{name}"? This will remove them from the enrollment list. This action cannot be undone.',
         DELETE_SUCCESS: 'Student withdrawn successfully',
         DELETE_ERROR: 'Failed to withdraw student',
+        UNASSIGN_SUCCESS: 'Placement cancelled successfully',
+        UNASSIGN_ERROR: 'Failed to cancel placement',
         LOAD_ERROR: 'Failed to load students',
         DOWNLOAD_TEMPLATE_ERROR: 'Failed to download template',
         DETAIL_LOAD_ERROR: 'Failed to load student details',
@@ -754,6 +757,12 @@ export const INTERNSHIP_MANAGEMENT_UI = {
             'All selected students are placed. Withdrawing them will cancel their placement records. Confirm to proceed.',
           ERROR_GENERIC: 'An error occurred during withdrawal, please try again',
           ACTION_LABEL: 'Withdraw students',
+        },
+        BULK_UNASSIGN_SUCCESS: 'Successfully unassigned selected students',
+        BULK_UNASSIGN: {
+          ACTION_LABEL: 'Bulk Unassign',
+          CONFIRM_TEXT:
+            'Are you sure you want to cancel placement for {count} selected students? This will return them to Unplaced status.',
         },
       },
     },
@@ -782,6 +791,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         },
         TABLE: {
           COLUMNS: {
+            CLASS: 'CLASS',
             STUDENT: 'Avatar + Name',
             ENTERPRISE: 'Enterprise',
             MENTOR: 'Mentor',

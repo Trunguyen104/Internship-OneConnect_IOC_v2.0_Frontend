@@ -16,11 +16,11 @@ import { useEnterpriseGroupActions } from './useEnterpriseGroupActions';
 import { useEnterpriseGroupFilters } from './useEnterpriseGroupFilters';
 import { useEnterpriseGroups } from './useEnterpriseGroups';
 
-export const useGroupManagement = () => {
+export const useGroupManagement = (initialPhaseId) => {
   const toast = useToast();
   const searchParams = useSearchParams();
   const urlGroupId = searchParams.get('groupId');
-  const groupFilters = useEnterpriseGroupFilters();
+  const groupFilters = useEnterpriseGroupFilters(initialPhaseId);
   const { GROUP_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI;
   const { MESSAGES } = GROUP_MANAGEMENT;
   const formatISO = (dateStr) => {

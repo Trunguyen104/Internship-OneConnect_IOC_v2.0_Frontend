@@ -63,6 +63,7 @@ export const PLACEMENT_UI_TEXT = {
     UNPLACED: 'Unplaced',
   },
   TABLE: {
+    CLASS: 'CLASS',
     FULL_NAME: 'FULL NAME',
     EMAIL: 'EMAIL',
     MAJOR: 'MAJOR',
@@ -194,7 +195,7 @@ export const PLACEMENT_UI_TEXT = {
     },
   },
   SELECT: {
-    PHASE_PLACEHOLDER: 'Select a Phase...',
+    PHASE_PLACEHOLDER: 'Select ...',
     LEFT: 'slots',
     SLOT_LABEL: 'Left',
     MAJORS: 'Accepting majors:',

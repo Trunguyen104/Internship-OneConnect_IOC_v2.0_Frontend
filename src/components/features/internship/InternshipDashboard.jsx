@@ -116,7 +116,7 @@ const InternshipDashboard = () => {
 
   const { phases, groups, studentApps, userInfo, context } = data;
 
-  const isEnrolled = phases.length > 0 || studentApps.length > 0 || !!context?.currentTerm;
+  const isEnrolled = phases.length > 0 || studentApps.length > 0;
   const hasCv = !!(userInfo?.cvUrl || userInfo?.cvLocalPath);
 
   const activeApp = studentApps.find((a) => {
@@ -211,20 +211,6 @@ const InternshipDashboard = () => {
                   <span className="text-xl font-black text-slate-800 tracking-tight">
                     {context.currentTerm.termName}
                   </span>
-                  {context.currentTerm.startDate && context.currentTerm.endDate && (
-                    <span className="mt-0.5 text-xs font-bold text-slate-500">
-                      {new Date(context.currentTerm.startDate).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                      })}{' '}
-                      -{' '}
-                      {new Date(context.currentTerm.endDate).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  )}
                 </div>
               </div>
             )}
@@ -250,14 +236,16 @@ const InternshipDashboard = () => {
 
       <div className="flex flex-col gap-10">
         {!isPlaced && allPhases.length === 0 && (
-          <section className="animate-in fade-in slide-in-from-top-4 space-y-8 duration-700">
+          <section className="animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="rounded-[40px] border border-slate-100 bg-white p-10 shadow-sm transition-all hover:shadow-md">
               <EmptyState
-                title={INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_TITLE}
-                description={INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_DESC}
+                title={INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_TITLE || 'No Official Internship Yet'}
+                description={
+                  INTERNSHIP_UI.MESSAGES?.NO_PLACEMENT_DESC ||
+                  "You haven't been officially placed in an internship group. Track your active applications in the Action Center below."
+                }
               />
             </div>
-            {!hasCv && <CVUploadBanner variant="urgent" />}
           </section>
         )}
 

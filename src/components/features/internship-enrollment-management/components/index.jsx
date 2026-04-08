@@ -1,12 +1,12 @@
 'use client';
 
 import {
+  CloseCircleOutlined,
   DownloadOutlined,
-  FilterOutlined,
   PlusOutlined,
   UserDeleteOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, Select, Space } from 'antd';
+import { Button, Dropdown } from 'antd';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -62,7 +62,9 @@ export default function TermStudentManagement() {
     handleImportPreview,
     handleImportConfirm,
     handleBulkWithdraw,
+    handleBulkUnassign,
     handleDownloadTemplate,
+    handleUnassign,
     sortBy,
     sortOrder,
     handleSortChange,
@@ -78,40 +80,48 @@ export default function TermStudentManagement() {
       getStudentColumns({
         pagination,
         isClosed,
+        termId,
+        termName: activeTerm?.name,
         handleView,
         handleEdit,
         handleDelete,
+        handleUnassign,
         handleBulkWithdraw,
         TABLE,
         ACTION_LABELS,
         STATUS_LABELS,
         PLACEMENT_LABELS,
       }),
-    [pagination.current, pagination.pageSize, isClosed, STATUS_LABELS, PLACEMENT_LABELS, TABLE]
+    [
+      pagination.current,
+      pagination.pageSize,
+      isClosed,
+      STATUS_LABELS,
+      PLACEMENT_LABELS,
+      TABLE,
+      termId,
+      activeTerm?.name,
+    ]
   );
 
   useEffect(() => {
-    const fetchTerms = async () => {
+    const fetchActiveTerm = async () => {
+      if (!termId) return;
       setTermsLoading(true);
       try {
-        const response = await TermService.getAll({ pageSize: 100 });
-        if (response?.data?.items) {
-          const items = response.data.items;
-          setTerms(items);
-          if (!termId && items.length > 0) {
-            onTermChange(items[0].termId);
-          }
+        const response = await TermService.getById(termId);
+        if (response?.data) {
+          setTerms([response.data]);
         }
       } catch (error) {
         if (error?.status === 401 || error?.silent) return;
-        console.error('Fetch terms failed:', error);
+        console.error('Fetch active term failed:', error);
       } finally {
         setTermsLoading(false);
       }
     };
-    fetchTerms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onTermChange]);
+    fetchActiveTerm();
+  }, [termId]);
 
   return (
     <PageLayout>
@@ -128,29 +138,44 @@ export default function TermStudentManagement() {
             onChange={(e) => onSearchChange(e.target.value)}
             className="max-w-md"
           />
-          <DataTableToolbar.Filters className="gap-0">
-            <Space.Compact className="w-full overflow-hidden rounded-xl border border-border shadow-sm sm:w-auto">
-              <Select
-                loading={termsLoading}
-                placeholder={SEARCH.TERM_PLACEHOLDER}
-                value={termId}
-                onChange={onTermChange}
-                disabled={isTermScoped}
-                className="!h-11 min-w-[150px] !border-0 focus:!ring-0 disabled:bg-transparent"
-                variant="borderless"
-                options={terms.map((t) => ({ label: t.name, value: t.termId }))}
-                suffixIcon={!isTermScoped && <FilterOutlined className="text-muted/40" />}
-              />
-            </Space.Compact>
-          </DataTableToolbar.Filters>
+          <DataTableToolbar.Filters className="gap-0" />
           <DataTableToolbar.Actions className="ml-auto gap-3">
+            <Button
+              danger
+              type="primary"
+              icon={<CloseCircleOutlined />}
+              onClick={handleBulkUnassign}
+              disabled={
+                selectedIds.length === 0 ||
+                isClosed ||
+                !students
+                  .filter((s) => selectedIds.includes(s.studentTermId))
+                  .some(
+                    (s) =>
+                      s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT'
+                  )
+              }
+              className="!h-11 !rounded-xl shadow-md !bg-primary-500 hover:!bg-primary-600 !border-primary-500"
+            >
+              {MESSAGES.BULK_UNASSIGN.ACTION_LABEL}
+              {selectedIds.length > 0 &&
+                ` (${
+                  students
+                    .filter((s) => selectedIds.includes(s.studentTermId))
+                    .filter(
+                      (s) =>
+                        s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT'
+                    ).length
+                })`}
+            </Button>
+
             <Button
               danger
               type="primary"
               icon={<UserDeleteOutlined />}
               onClick={handleBulkWithdraw}
               disabled={selectedIds.length === 0 || isClosed}
-              className="!h-11 !rounded-xl shadow-md"
+              className="!h-11 !rounded-xl shadow-md !bg-primary-500 hover:!bg-primary-600 !border-primary-500"
             >
               {MESSAGES.BULK_WITHDRAW.ACTION_LABEL}
               {selectedIds.length > 0 && ` (${selectedIds.length})`}

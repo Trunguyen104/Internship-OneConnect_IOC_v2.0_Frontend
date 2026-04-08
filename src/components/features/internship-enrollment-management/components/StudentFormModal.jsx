@@ -1,13 +1,11 @@
 import { EditOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { Form, Tabs } from 'antd';
-import React, { memo, useEffect, useState } from 'react';
+import { Form } from 'antd';
+import React, { memo, useEffect } from 'react';
 
 import CompoundModal from '@/components/ui/CompoundModal';
 import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/internship-management';
-import { enterpriseService } from '@/services/enterprise.service';
 
 import { PersonalTab } from './PersonalTab';
-import { PlacementTab } from './PlacementTab';
 
 const StudentFormBody = memo(function StudentFormBody({
   initialValues,
@@ -17,29 +15,9 @@ const StudentFormBody = memo(function StudentFormBody({
   viewOnly,
 }) {
   const [form] = Form.useForm();
-  const [activeTab, setActiveTab] = useState('1');
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
-  const { MODALS, PLACEMENT_LABELS } = ENROLLMENT_MANAGEMENT;
+  const { MODALS } = ENROLLMENT_MANAGEMENT;
   const { ADD_EDIT } = MODALS;
-
-  const [enterprises, setEnterprises] = useState([]);
-  const [fetchingEnterprises, setFetchingEnterprises] = useState(false);
-
-  useEffect(() => {
-    const fetchEnterprises = async () => {
-      setFetchingEnterprises(true);
-      try {
-        const res = await enterpriseService.getAll({ PageNumber: 1, PageSize: 100 });
-        const items = res?.data?.items ?? res?.items ?? (Array.isArray(res?.data) ? res.data : []);
-        setEnterprises(items);
-      } catch (error) {
-        console.error('Fetch enterprises failed:', error);
-      } finally {
-        setFetchingEnterprises(false);
-      }
-    };
-    fetchEnterprises();
-  }, []);
 
   useEffect(() => {
     if (initialValues) {
@@ -68,14 +46,7 @@ const StudentFormBody = memo(function StudentFormBody({
       const values = await form.validateFields();
       await onSave?.(values);
     } catch (error) {
-      if (error.errorFields.length > 0) {
-        const firstErrorField = error.errorFields[0].name[0];
-        if (['fullName', 'studentCode', 'email', 'major'].includes(firstErrorField)) {
-          setActiveTab('1');
-        } else {
-          setActiveTab('2');
-        }
-      }
+      console.error('Form validation failed:', error);
     }
   };
 
@@ -90,30 +61,6 @@ const StudentFormBody = memo(function StudentFormBody({
     : initialValues
       ? ADD_EDIT.SUBTITLE_EDIT
       : ADD_EDIT.SUBTITLE_ADD;
-
-  const tabItems = [
-    {
-      key: '1',
-      label: <span className="flex items-center gap-2 px-1">{ADD_EDIT.TABS.GENERAL}</span>,
-      children: (
-        <PersonalTab viewOnly={viewOnly} initialValues={initialValues} ADD_EDIT={ADD_EDIT} />
-      ),
-    },
-    (initialValues || viewOnly) && {
-      key: '2',
-      label: <span className="flex items-center gap-2 px-1">{ADD_EDIT.TABS.PLACEMENT}</span>,
-      children: (
-        <PlacementTab
-          viewOnly={viewOnly}
-          initialValues={initialValues}
-          ADD_EDIT={ADD_EDIT}
-          PLACEMENT_LABELS={PLACEMENT_LABELS}
-          fetchingEnterprises={fetchingEnterprises}
-          enterprises={enterprises}
-        />
-      ),
-    },
-  ].filter(Boolean);
 
   return (
     <>
@@ -137,21 +84,8 @@ const StudentFormBody = memo(function StudentFormBody({
           className="premium-form"
           disabled={loading || viewOnly}
           requiredMark={!viewOnly}
-          onValuesChange={(changedValues) => {
-            if (changedValues.enterpriseId) {
-              form.setFieldsValue({ placementStatus: 'PLACED' });
-            }
-            if (changedValues.placementStatus === 'UNPLACED') {
-              form.setFieldsValue({ enterpriseId: null });
-            }
-          }}
         >
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            items={tabItems}
-            className="premium-tabs"
-          />
+          <PersonalTab viewOnly={viewOnly} initialValues={initialValues} ADD_EDIT={ADD_EDIT} />
         </Form>
       </CompoundModal.Content>
 

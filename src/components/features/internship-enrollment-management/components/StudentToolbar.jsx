@@ -1,4 +1,5 @@
 import {
+  CloseCircleOutlined,
   DownloadOutlined,
   FilterOutlined,
   PlusOutlined,
@@ -19,7 +20,9 @@ export const StudentToolbar = ({
   TERM_PLACEHOLDER,
   SEARCH_PLACEHOLDER,
   handleBulkWithdraw,
+  handleBulkUnassign,
   selectedIds,
+  students = [],
   isClosed,
   MESSAGES,
   ACTIONS,
@@ -34,7 +37,7 @@ export const StudentToolbar = ({
         onChange={(e) => onSearchChange(e.target.value)}
       />
       <DataTableToolbar.Filters className="gap-0">
-        <Space.Compact className="w-full sm:w-auto shadow-sm !rounded-xl overflow-hidden border border-border">
+        <Space.Compact className="w-full overflow-hidden rounded-xl border border-border shadow-sm sm:w-auto">
           <Select
             loading={termsLoading}
             placeholder={TERM_PLACEHOLDER}
@@ -48,6 +51,33 @@ export const StudentToolbar = ({
         </Space.Compact>
       </DataTableToolbar.Filters>
       <DataTableToolbar.Actions className="ml-auto gap-3">
+        <Button
+          type="primary"
+          icon={<CloseCircleOutlined />}
+          onClick={handleBulkUnassign}
+          disabled={
+            selectedIds.length === 0 ||
+            isClosed ||
+            !students
+              .filter((s) => selectedIds.includes(s.studentTermId))
+              .some(
+                (s) => s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT'
+              )
+          }
+          className="!h-10 !rounded-xl shadow-md !bg-primary-500 hover:!bg-primary-600 !border-primary-500"
+        >
+          {MESSAGES.BULK_UNASSIGN.ACTION_LABEL}
+          {selectedIds.length > 0 &&
+            ` (${
+              students
+                .filter((s) => selectedIds.includes(s.studentTermId))
+                .filter(
+                  (s) =>
+                    s.placementStatus === 'PLACED' || s.placementStatus === 'PENDING_ASSIGNMENT'
+                ).length
+            })`}
+        </Button>
+
         <Button
           danger
           type="primary"
@@ -86,7 +116,7 @@ export const StudentToolbar = ({
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            className="!h-10 !rounded-xl shadow-md px-4 font-semibold"
+            className="!h-10 !rounded-xl px-4 font-semibold shadow-md"
           >
             {ACTIONS.ADD}
           </Button>

@@ -52,9 +52,6 @@ export default function JobCard({ job, onClick, eligibility }) {
             <span className="bg-primary/5 text-primary text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
               {type || EXPLORE_JOBS_UI.CARD.TYPE_FALLBACK}
             </span>
-            <span className="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
-              {job.position || EXPLORE_JOBS_UI.DETAIL.ROLE_BADGE_FALLBACK}
-            </span>
             <span className="bg-success/5 text-success text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
               {salary || EXPLORE_JOBS_UI.CARD.SALARY_FALLBACK}
             </span>

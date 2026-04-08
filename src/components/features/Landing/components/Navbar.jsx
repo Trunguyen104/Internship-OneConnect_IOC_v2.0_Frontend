@@ -12,28 +12,25 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
-  const { user, clearUser, setUser } = useAuthStore();
+  const { user, clearUser } = useAuthStore();
   const { logout } = useLogout();
 
   useEffect(() => {
-    // Mark as mounted to prevent hydration mismatches
+    // 1. Mark as mounted to prevent hydration mismatches
+
     const timer = setTimeout(() => setMounted(true), 0);
 
-    // Verify session on mount to sync cookie state with Zustand store
-    userService
-      .getMe()
-      .then((res) => {
-        const userData = res?.data || res;
-        if (userData && (userData.role || userData.email)) {
-          setUser(userData);
+    // 2. On mount, if we have a user in store, verify session one time to avoid ghost sessions
+    if (user) {
+      userService.getMe().catch((err) => {
+        if (err?.status === 401 || err?.Response?.status === 401) {
+          clearUser();
         }
-      })
-      .catch(() => {
-        clearUser();
       });
+    }
 
     return () => clearTimeout(timer);
-  }, [clearUser, setUser]);
+  }, []); // Only once on component mount
 
   const handleLogout = async () => {
     // useLogout hook handles API call, store clearing, toast, and redirection.

@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 
 import { StudentActivityService } from '../services/student-activity.service';
 
-export const useActivityFilters = () => {
-  const [termId, setTermId] = useState(null);
+export const useActivityFilters = (initialTermId = null) => {
+  const [termId, setTermId] = useState(initialTermId);
   const [enterpriseId, setEnterpriseId] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [logbookFilter, setLogbookFilter] = useState('ALL');

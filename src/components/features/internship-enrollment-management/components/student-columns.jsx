@@ -1,32 +1,69 @@
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
+import {
+  CloseCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  SwapOutlined,
+  UserAddOutlined,
+} from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import React from 'react';
 
 import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown from '@/components/ui/TableRowActions';
 
+import AssignEnterprisePopover from '../../internship-placement/components/AssignEnterprisePopover';
+
 export const getStudentColumns = ({
   pagination,
   isClosed,
+  termId,
+  termName,
   handleView,
   handleEdit,
   handleDelete,
+  handleUnassign,
   handleBulkWithdraw,
   TABLE,
   ACTION_LABELS,
   STATUS_LABELS,
   PLACEMENT_LABELS,
 }) => {
+  const renderActionLabel = (label, icon, variant = 'primary') => {
+    const variants = {
+      primary: { box: 'bg-blue-50/50', icon: 'text-blue-600' },
+      warning: { box: 'bg-amber-50/50', icon: 'text-amber-600' },
+      danger: { box: 'bg-rose-50/50', icon: 'text-rose-600' },
+      neutral: { box: 'bg-slate-50/50', icon: 'text-slate-600' },
+    };
+    const v = variants[variant] || variants.primary;
+
+    return (
+      <div className="flex items-center gap-4 pr-8">
+        <div className={`rounded-xl p-2.5 ${v.box}`}>
+          <span className={`flex items-center justify-center text-base leading-none ${v.icon}`}>
+            {icon}
+          </span>
+        </div>
+        <span
+          className={`text-sm font-black tracking-tight ${
+            variant === 'danger' ? 'text-rose-600' : 'text-slate-800'
+          }`}
+        >
+          {label}
+        </span>
+      </div>
+    );
+  };
+
   return [
     {
-      title: '#',
-      key: 'index',
-      width: 80,
-      align: 'center',
-      render: (_, __, index) => (
-        <span className="text-muted font-mono text-xs font-bold">
-          {String((pagination.current - 1) * pagination.pageSize + index + 1).padStart(2, '0')}
-        </span>
+      title: TABLE.COLUMNS.STUDENT_ID,
+      dataIndex: 'studentCode',
+      key: 'studentCode',
+      width: 120,
+      render: (code) => (
+        <span className="text-text/70 text-xs font-bold tracking-tight">{code}</span>
       ),
     },
     {
@@ -37,15 +74,7 @@ export const getStudentColumns = ({
       sortKey: 'FullName',
       render: (name) => <span className="text-text text-sm font-bold tracking-tight">{name}</span>,
     },
-    {
-      title: TABLE.COLUMNS.STUDENT_ID,
-      dataIndex: 'id',
-      key: 'id',
-      width: 140,
-      sorter: true,
-      sortKey: 'StudentId',
-      render: (id) => <span className="text-muted font-mono text-xs font-semibold">{id}</span>,
-    },
+
     {
       title: TABLE.COLUMNS.MAJOR,
       dataIndex: 'major',
@@ -59,18 +88,36 @@ export const getStudentColumns = ({
       ),
     },
     {
+      title: TABLE.COLUMNS.EMAIL,
+      dataIndex: 'email',
+      key: 'email',
+      width: 180,
+      render: (email) => (
+        <Tooltip title={email}>
+          <span className="text-text/80 block max-w-[160px] truncate text-xs font-medium">
+            {email}
+          </span>
+        </Tooltip>
+      ),
+    },
+    {
       title: TABLE.COLUMNS.PLACEMENT,
       key: 'placement',
       width: 200,
       render: (_, record) => {
         const isPlaced = record.placementStatus === 'PLACED';
         const isPending = record.placementStatus === 'PENDING_ASSIGNMENT';
+        const labelText = record.enterpriseName || '';
+
         const variant = isPlaced ? 'success' : isPending ? 'warning' : 'neutral';
-        const label = isPlaced
-          ? record.enterpriseName || PLACEMENT_LABELS.PLACED
-          : isPending
-            ? PLACEMENT_LABELS.PENDING
-            : PLACEMENT_LABELS.UNPLACED;
+
+        const label =
+          labelText ||
+          (isPlaced
+            ? PLACEMENT_LABELS.PLACED
+            : isPending
+              ? PLACEMENT_LABELS.PENDING
+              : PLACEMENT_LABELS.UNPLACED);
 
         return (
           <StatusBadge
@@ -83,22 +130,22 @@ export const getStudentColumns = ({
         );
       },
     },
-    {
-      title: TABLE.COLUMNS.STATUS,
-      dataIndex: 'status',
-      key: 'status',
-      width: 140,
-      align: 'center',
-      render: (status) => {
-        const variantMap = {
-          ACTIVE: 'success',
-          WITHDRAWN: 'danger',
-        };
-        const variant = variantMap[status] || 'neutral';
-        const label = STATUS_LABELS[status] || status;
-        return <StatusBadge variant={variant} label={label} variantType="minimal" />;
-      },
-    },
+    // {
+    //   title: TABLE.COLUMNS.STATUS,
+    //   dataIndex: 'status',
+    //   key: 'status',
+    //   width: 140,
+    //   align: 'center',
+    //   render: (status) => {
+    //     const variantMap = {
+    //       ACTIVE: 'success',
+    //       WITHDRAWN: 'danger',
+    //     };
+    //     const variant = variantMap[status] || 'neutral';
+    //     const label = STATUS_LABELS[status] || status;
+    //     return <StatusBadge variant={variant} label={label} variantType="minimal" />;
+    //   },
+    // },
     {
       title: '',
       key: 'actions',
@@ -106,31 +153,62 @@ export const getStudentColumns = ({
       align: 'right',
       render: (_, record) => {
         const isWithdrawn = record.status === 'WITHDRAWN';
+        const isPlaced = record.placementStatus === 'PLACED';
+        const isPending = record.placementStatus === 'PENDING_ASSIGNMENT';
+        const isUnplaced = !isPlaced && !isPending;
 
         const items = [
           {
             key: 'view',
-            label: ACTION_LABELS.VIEW,
-            icon: <EyeOutlined />,
+            label: renderActionLabel(ACTION_LABELS.VIEW, <EyeOutlined />, 'primary'),
             onClick: () => handleView(record),
           },
         ];
 
         if (!isClosed) {
           if (!isWithdrawn) {
+            items.push({ type: 'divider' });
+
+            // 1. Assign / Change Enterprise
+            items.push({
+              key: 'assign-enterprise',
+              label: (
+                <AssignEnterprisePopover
+                  student={record}
+                  termId={termId}
+                  termName={termName}
+                  disabled={isClosed}
+                >
+                  <div className="w-full text-left">
+                    {renderActionLabel(
+                      isUnplaced ? 'Assign Enterprise' : 'Change Enterprise',
+                      isUnplaced ? <UserAddOutlined /> : <SwapOutlined />,
+                      isUnplaced ? 'primary' : 'warning'
+                    )}
+                  </div>
+                </AssignEnterprisePopover>
+              ),
+              disabled: isClosed,
+            });
+
+            // 2. Cancel Placement (only if placed or pending)
+            if (!isUnplaced) {
+              items.push({
+                key: 'cancel-placement',
+                label: renderActionLabel('Cancel Placement', <CloseCircleOutlined />, 'danger'),
+                onClick: () => handleUnassign(record),
+              });
+            }
+
             items.push(
-              { type: 'divider' },
               {
                 key: 'edit',
-                label: ACTION_LABELS.EDIT,
-                icon: <EditOutlined />,
+                label: renderActionLabel(ACTION_LABELS.EDIT, <EditOutlined />, 'primary'),
                 onClick: () => handleEdit(record),
               },
               {
                 key: 'withdraw',
-                label: ACTION_LABELS.DELETE,
-                icon: <DeleteOutlined />,
-                danger: true,
+                label: renderActionLabel(ACTION_LABELS.DELETE, <DeleteOutlined />, 'danger'),
                 onClick: () => handleDelete(record),
               }
             );
@@ -139,9 +217,7 @@ export const getStudentColumns = ({
               { type: 'divider' },
               {
                 key: 'delete',
-                label: ACTION_LABELS.DELETE,
-                icon: <DeleteOutlined />,
-                danger: true,
+                label: renderActionLabel(ACTION_LABELS.DELETE, <DeleteOutlined />, 'danger'),
                 onClick: () => handleDelete(record),
               }
             );
@@ -150,7 +226,7 @@ export const getStudentColumns = ({
 
         return (
           <div className="flex justify-end pr-1" onClick={(e) => e.stopPropagation()}>
-            <TableRowDropdown items={items} />
+            <TableRowDropdown items={items} enrich={false} />
           </div>
         );
       },
