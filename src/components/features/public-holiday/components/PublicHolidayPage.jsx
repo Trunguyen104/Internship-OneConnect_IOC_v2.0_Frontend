@@ -78,7 +78,7 @@ export default function PublicHolidayPage() {
     <PageLayout>
       <PageLayout.Header title={PUBLIC_HOLIDAY_UI.TITLE} subtitle={PUBLIC_HOLIDAY_UI.DESCRIPTION} />
 
-      <PageLayout.Card className="flex-none overflow-hidden pb-4">
+      <PageLayout.Card className="flex flex-1 max-h-[650px] overflow-hidden">
         <PageLayout.Toolbar
           actionProps={{
             label: PUBLIC_HOLIDAY_UI.CREATE_BUTTON,
@@ -111,7 +111,7 @@ export default function PublicHolidayPage() {
           }
         />
 
-        <PageLayout.Content className="flex-none max-h-[450px] overflow-hidden px-0">
+        <PageLayout.Content className="flex flex-col flex-1 min-h-0 overflow-hidden px-0">
           <DataTable
             columns={columns}
             data={holidays}

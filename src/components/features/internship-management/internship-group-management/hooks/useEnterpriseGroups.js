@@ -50,8 +50,8 @@ export const useEnterpriseGroups = ({
         const params = {
           PhaseId: isBulkPhase ? undefined : phaseId,
           TermId: isBulkPhase ? undefined : phaseId,
-          PageIndex: isBulkPhase ? 1 : pagination?.current || 1,
-          PageSize: isBulkPhase ? 1000 : pagination?.pageSize || 10,
+          PageIndex: isBulkPhase ? 1 : Math.max(1, pagination?.current || 1),
+          PageSize: isBulkPhase ? 100 : Math.max(1, pagination?.pageSize || 10),
           SearchTerm: search || undefined,
           Status: filters?.status,
           IncludeArchived: filters?.includeArchived,

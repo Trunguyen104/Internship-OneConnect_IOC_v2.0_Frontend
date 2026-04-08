@@ -248,22 +248,20 @@ const StudentInternshipTable = ({
         />
       </div>
 
-      {pagination.total > 0 && (
-        <PageLayout.Footer className="flex items-center justify-between border-t border-border mt-4 pt-4">
-          <span className="text-[12px] font-bold uppercase tracking-tight text-muted">
-            {UI_TEXT.COMMON.TOTAL}:{' '}
-            <span className="font-extrabold text-text">{pagination.total}</span>
-          </span>
-          <PageLayout.Pagination
-            total={pagination.total}
-            page={pagination.current}
-            pageSize={pagination.pageSize}
-            onPageChange={setPage}
-            onPageSizeChange={setPageSize}
-            className="mt-0 border-t-0 pt-0"
-          />
-        </PageLayout.Footer>
-      )}
+      <PageLayout.Footer className="flex items-center justify-between border-t border-border mt-4 pt-4">
+        <span className="text-[12px] font-bold uppercase tracking-tight text-muted">
+          {UI_TEXT.COMMON.TOTAL}:{' '}
+          <span className="font-extrabold text-text">{pagination.total}</span>
+        </span>
+        <PageLayout.Pagination
+          total={pagination.total}
+          page={pagination.current}
+          pageSize={pagination.pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+          className="mt-0 border-t-0 pt-0"
+        />
+      </PageLayout.Footer>
 
       {/* Modals */}
       <BulkAssignModal

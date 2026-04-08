@@ -50,7 +50,8 @@ const AssignEnterprisePopover = ({ student, children, termId, disabled = false }
         const stuName = student.fullName || 'Student';
         toast.success(UI.SUCCESS(entName, stuName));
         setPopoverVisible(false);
-        queryClient.invalidateQueries(['semester-students']);
+        queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+        queryClient.invalidateQueries({ queryKey: ['uni-assign-applications'] });
       }
     },
     onError: (err) => {

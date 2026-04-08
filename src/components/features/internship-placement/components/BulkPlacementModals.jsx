@@ -69,12 +69,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
   }, [selectedPhase, activeStudents]);
 
   const reassignCount = useMemo(
-    () =>
-      eligibleStudents.filter(
-        (s) =>
-          s.placementStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT ||
-          s.placementStatus === PLACEMENT_STATUS.PLACED
-      ).length,
+    () => eligibleStudents.filter((s) => s.isPlaced || s.isPending).length,
     [eligibleStudents]
   );
 
@@ -87,8 +82,8 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
         const entName = selectedPhase?.enterpriseName || 'Enterprise';
         toast.success(UI.BULK_SUCCESS(entName, eligibleStudents.length));
         onClose();
-        queryClient.invalidateQueries(['semester-students', semesterId]);
-        queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
+        queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+        queryClient.invalidateQueries({ queryKey: ['uni-assign-applications'] });
       }
     },
     onError: (err) => toast.error(err?.message || 'Failed to bulk assign.'),
@@ -240,7 +235,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <div className="flex flex-col items-end gap-1">
-                          {s.placementStatus === PLACEMENT_STATUS.PLACED && (
+                          {s.isPlaced && (
                             <StatusBadge
                               variant="success"
                               label={s.enterpriseName || PLACEMENT_UI_TEXT.STATUS_LABELS.PLACED}
@@ -248,7 +243,7 @@ export const BulkAssignModal = ({ visible, onClose, selectedStudents, semesterId
                               className="scale-90 origin-right"
                             />
                           )}
-                          {s.placementStatus === PLACEMENT_STATUS.PENDING_ASSIGNMENT && (
+                          {s.isPending && (
                             <StatusBadge
                               variant="warning"
                               label={PLACEMENT_UI_TEXT.STATUS_LABELS.PENDING}
@@ -349,8 +344,8 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
       const entName = selectedPhase?.enterpriseName || 'Enterprise';
       toast.success(UI.SUCCESS(entName, activeStudents.length));
       onClose();
-      queryClient.invalidateQueries(['semester-students', semesterId]);
-      queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
+      queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+      queryClient.invalidateQueries({ queryKey: ['uni-assign-applications'] });
     },
     onError: (err) => toast.error(err?.message || 'Failed to re-assign.'),
   });
@@ -597,8 +592,8 @@ export const BulkReassignModal = ({ visible, onClose, selectedStudents, semester
     onSuccess: () => {
       toast.success(UI.SUCCESS(eligibleStudents.length));
       onClose();
-      queryClient.invalidateQueries(['semester-students', semesterId]);
-      queryClient.invalidateQueries(['uni-assign-applications', semesterId]);
+      queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+      queryClient.invalidateQueries({ queryKey: ['uni-assign-applications'] });
     },
     onError: (err) => toast.error(err?.message || 'Failed to cancel placement.'),
   });

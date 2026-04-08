@@ -138,7 +138,7 @@ export const useStudentData = (filters) => {
         const params = {
           PhaseId: isAllVisible ? undefined : phaseId,
           TermId: isAllVisible ? undefined : phaseId,
-          PageIndex: pagination.current,
+          PageNumber: pagination.current,
           PageSize: pagination.pageSize,
           SearchTerm: search || undefined,
           IsAssignedToGroup:
@@ -160,10 +160,10 @@ export const useStudentData = (filters) => {
 
         const res = await EnterpriseGroupService.getPlacedStudents(params);
         const items = res?.data?.items || res?.items || [];
-        let totalCount = res?.data?.totalCount || res?.totalCount || items.length;
+        const totalCount = res?.data?.totalCount || res?.totalCount || items.length;
 
         const safePhaseOptions = Array.isArray(phaseOptions) ? phaseOptions : [];
-        const rawMappedStudents = (items || []).map((item) => {
+        const mappedStudents = (items || []).map((item) => {
           const mapped = EnterpriseStudentService.mapApplication(item);
           if (mapped.phaseStatus === 0 || mapped.phaseStatus === undefined) {
             const studentPhase = safePhaseOptions.find((o) => o.value === mapped.phaseId);
@@ -176,59 +176,6 @@ export const useStudentData = (filters) => {
           }
           return mapped;
         });
-
-        // Unique deduplication by ID (uniqueId)
-        let mappedStudents = Array.from(new Map(rawMappedStudents.map((s) => [s.id, s])).values());
-
-        // Client-side filtering as fallback for Backend inconsistencies
-        if (groupFilter === 'HAS_GROUP') {
-          mappedStudents = mappedStudents.filter((s) => !!s.groupId);
-        } else if (groupFilter === 'NO_GROUP') {
-          mappedStudents = mappedStudents.filter((s) => !s.groupId);
-        }
-
-        if (['HAS_MENTOR', 'ASSIGNED'].includes(mentorFilter)) {
-          mappedStudents = mappedStudents.filter((s) => !!s.mentorId || !!s.mentorName);
-        } else if (['NO_MENTOR', 'UNASSIGNED'].includes(mentorFilter)) {
-          mappedStudents = mappedStudents.filter((s) => !s.mentorId && !s.mentorName);
-        }
-
-        // Adjust total count if we filtered client-side
-        if (groupFilter !== 'ALL' || mentorFilter !== 'ALL') {
-          totalCount = mappedStudents.length;
-        }
-
-        if (sort?.column) {
-          mappedStudents.sort((a, b) => {
-            let valA, valB;
-            if (sort.column === 'FullName') {
-              const getSortableName = (fullName) => {
-                const nameParts = (fullName || '').trim().split(' ');
-                const firstName = nameParts.pop() || '';
-                const restOfName = nameParts.join(' ');
-                return { firstName, restOfName };
-              };
-              const nameA = getSortableName(a.studentFullName);
-              const nameB = getSortableName(b.studentFullName);
-              const firstCompare = nameA.firstName.localeCompare(nameB.firstName, 'vi', {
-                sensitivity: 'base',
-              });
-              if (firstCompare !== 0) return sort.order === 'Asc' ? firstCompare : -firstCompare;
-              return sort.order === 'Asc'
-                ? nameA.restOfName.localeCompare(nameB.restOfName, 'vi', { sensitivity: 'base' })
-                : -nameA.restOfName.localeCompare(nameB.restOfName, 'vi', { sensitivity: 'base' });
-            } else if (sort.column === 'GroupName') {
-              valA = (a.groupName || '').toLowerCase();
-              valB = (b.groupName || '').toLowerCase();
-            } else {
-              valA = (a[sort.column] || '').toString().toLowerCase();
-              valB = (b[sort.column] || '').toString().toLowerCase();
-            }
-            if (valA < valB) return sort.order === 'Asc' ? -1 : 1;
-            if (valA > valB) return sort.order === 'Asc' ? 1 : -1;
-            return 0;
-          });
-        }
 
         const groupParams = {
           phaseId: isAllVisible ? undefined : phaseId,

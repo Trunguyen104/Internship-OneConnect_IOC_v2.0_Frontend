@@ -90,21 +90,29 @@ export const useEnterpriseGroupFilters = () => {
     setPagination(DEFAULT_PAGINATION);
   }, []);
 
-  const handleTableChange = useCallback((newPagination, newFilters, newSorter) => {
-    setPagination({
-      current: newPagination.current,
-      pageSize: newPagination.pageSize,
-    });
+  const handleTableChange = useCallback(
+    (newPagination, newFilters, newSorter) => {
+      // Support both AntD object {current, pageSize} and primitive number (page)
+      const isObject = typeof newPagination === 'object' && newPagination !== null;
+      const nextCurrent = isObject ? newPagination.current : newPagination;
+      const nextPageSize = isObject ? newPagination.pageSize : pagination.pageSize;
 
-    if (newSorter && newSorter.columnKey) {
-      setSort({
-        column: Array.isArray(newSorter.columnKey) ? newSorter.columnKey[0] : newSorter.columnKey,
-        order: newSorter.order === 'ascend' ? 'asc' : 'desc',
+      setPagination({
+        current: Math.max(1, nextCurrent || 1),
+        pageSize: Math.max(1, nextPageSize || 10),
       });
-    } else if (!newSorter?.columnKey) {
-      setSort({ column: 'CreatedAt', order: 'desc' });
-    }
-  }, []);
+
+      if (newSorter && newSorter.columnKey) {
+        setSort({
+          column: Array.isArray(newSorter.columnKey) ? newSorter.columnKey[0] : newSorter.columnKey,
+          order: newSorter.order === 'ascend' ? 'asc' : 'desc',
+        });
+      } else if (newSorter && !newSorter?.columnKey) {
+        setSort({ column: 'CreatedAt', order: 'desc' });
+      }
+    },
+    [pagination.pageSize]
+  );
 
   return {
     phaseId,

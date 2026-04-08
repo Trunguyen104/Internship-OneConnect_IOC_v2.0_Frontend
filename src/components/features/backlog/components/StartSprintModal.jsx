@@ -95,7 +95,7 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
                 value={startDate}
                 onChange={setStartDate}
                 format="YYYY-MM-DD"
-                placeholder="Chọn ngày bắt đầu"
+                placeholder={BACKLOG_UI.PLACEHOLDER_START_DATE || 'Select start date'}
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
               />
             </div>
@@ -105,7 +105,7 @@ export default function StartSprintModal({ open, sprint, issueCount, onClose, on
                 value={endDate}
                 onChange={setEndDate}
                 format="YYYY-MM-DD"
-                placeholder="Chọn ngày kết thúc"
+                placeholder={BACKLOG_UI.PLACEHOLDER_END_DATE || 'Select end date'}
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
               />
             </div>

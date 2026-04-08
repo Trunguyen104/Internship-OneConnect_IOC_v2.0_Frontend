@@ -16,10 +16,6 @@ export const StudentToolbar = ({
   termsLoading,
   termId,
   onTermChange,
-  statusFilter,
-  onStatusChange,
-  STATUS_OPTIONS,
-  STATUS_FILTER_LABEL,
   TERM_PLACEHOLDER,
   SEARCH_PLACEHOLDER,
   handleBulkWithdraw,
@@ -47,17 +43,6 @@ export const StudentToolbar = ({
             className="!h-10 min-w-[150px] !border-0 focus:!ring-0"
             variant="borderless"
             options={terms.map((t) => ({ label: t.name, value: t.termId }))}
-            suffixIcon={<FilterOutlined className="text-muted/40" />}
-          />
-          <div className="bg-border h-6 w-[1px] self-center opacity-50" />
-          <Select
-            allowClear
-            placeholder={STATUS_FILTER_LABEL}
-            value={statusFilter || undefined}
-            onChange={onStatusChange}
-            className="!h-10 min-w-[140px] !border-0 focus:!ring-0"
-            variant="borderless"
-            options={STATUS_OPTIONS}
             suffixIcon={<FilterOutlined className="text-muted/40" />}
           />
         </Space.Compact>
