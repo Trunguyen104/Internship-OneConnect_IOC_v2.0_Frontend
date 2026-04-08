@@ -195,7 +195,7 @@ export const PLACEMENT_UI_TEXT = {
     },
   },
   SELECT: {
-    PHASE_PLACEHOLDER: 'Select a Phase...',
+    PHASE_PLACEHOLDER: 'Select ...',
     LEFT: 'slots',
     SLOT_LABEL: 'Left',
     MAJORS: 'Accepting majors:',

@@ -12,20 +12,16 @@ import { ChevronDown } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { TermService } from '@/components/features/internship-term-management/services/term.service';
 import NotificationBell from '@/components/features/notifications/components/NotificationBell';
 import { userService } from '@/components/features/user/services/user.service';
 import { USER_ROLE } from '@/constants/user-management/enums';
 import { useLogout } from '@/hooks/useLogout';
 import { usePageHeader } from '@/providers/PageHeaderProvider';
 import { useLayoutStore } from '@/store/useLayoutStore';
-
 export default function Header() {
   const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
   const params = useParams();
-  const { termId } = params || {};
-  const [currentTerm, setCurrentTerm] = useState(null);
   const groupId = params?.groupId || params?.internshipGroupId;
   const { isSidebarCollapsed } = useLayoutStore();
   const { logout: doLogout } = useLogout();
@@ -42,21 +38,6 @@ export default function Header() {
     };
     fetchUser();
   }, []);
-
-  useEffect(() => {
-    if (!termId) return;
-
-    const fetchTerm = async () => {
-      try {
-        const res = await TermService.getById(termId);
-        setCurrentTerm(res?.data || res);
-      } catch (err) {
-        console.error('Fetch term failed:', err);
-      }
-    };
-
-    fetchTerm();
-  }, [termId]);
 
   const handleLogout = async () => {
     await doLogout('Logout successfully');
@@ -123,16 +104,6 @@ export default function Header() {
             <h1 className="text-lg font-black tracking-tight text-slate-900 leading-none">
               {headerConfig.title}
             </h1>
-          </div>
-        )}
-
-        {currentTerm && (
-          <div className="hidden items-center gap-2 border-l border-slate-200 pl-6 sm:flex">
-            <div className="flex h-9 items-center gap-2.5 rounded-xl bg-slate-50 px-4 py-1.5 border border-slate-100 shadow-sm transition-all duration-300">
-              <span className="text-sm font-bold tracking-tight text-slate-800">
-                {currentTerm.name}
-              </span>
-            </div>
           </div>
         )}
       </div>
