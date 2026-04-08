@@ -4,6 +4,7 @@ import {
   CloseCircleOutlined,
   DownloadOutlined,
   PlusOutlined,
+  UserAddOutlined,
   UserDeleteOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
@@ -18,13 +19,13 @@ import { INTERNSHIP_MANAGEMENT_UI } from '@/constants/internship-management/inte
 import { UI_TEXT } from '@/lib/UI_Text';
 
 import { useStudentEnrollment } from '../hooks/useStudentEnrollment';
+import BulkAssignModal from './BulkAssignModal';
 import ImportModal from './ImportModal';
 import { getStudentColumns } from './student-columns';
 import StudentFormModal from './StudentFormModal';
 
 export default function TermStudentManagement() {
   const params = useParams();
-  const isTermScoped = !!params?.termId;
   const { ENROLLMENT_MANAGEMENT } = INTERNSHIP_MANAGEMENT_UI.UNI_ADMIN;
   const { MESSAGES, ACTIONS, SEARCH } = ENROLLMENT_MANAGEMENT;
 
@@ -68,6 +69,9 @@ export default function TermStudentManagement() {
     sortBy,
     sortOrder,
     handleSortChange,
+    bulkAssignVisible,
+    setBulkAssignVisible,
+    handleBulkAssign,
   } = useStudentEnrollment();
 
   const activeTerm = terms.find((t) => t.termId === termId);
@@ -139,7 +143,19 @@ export default function TermStudentManagement() {
             className="max-w-md"
           />
           <DataTableToolbar.Filters className="gap-0" />
-          <DataTableToolbar.Actions className="ml-auto gap-3">
+          <DataTableToolbar.Actions className="ml-auto gap-3 items-center">
+            <Button
+              type="primary"
+              variant="outline"
+              icon={<UserAddOutlined />}
+              onClick={() => setBulkAssignVisible(true)}
+              disabled={selectedIds.length === 0 || isClosed}
+              className="!h-11 !rounded-xl shadow-md border-primary text-primary hover:!bg-primary/5"
+            >
+              {ACTION_LABELS.BULK_ASSIGN}
+              {selectedIds.length > 0 && ` (${selectedIds.length})`}
+            </Button>
+
             <Button
               danger
               type="primary"
@@ -269,6 +285,15 @@ export default function TermStudentManagement() {
         }}
         onSave={editVisible ? handleUpdateStudent : handleAddStudent}
         loading={submitLoading}
+      />
+
+      <BulkAssignModal
+        visible={bulkAssignVisible}
+        onCancel={() => setBulkAssignVisible(false)}
+        onConfirm={handleBulkAssign}
+        loading={submitLoading}
+        selectedCount={selectedIds.length}
+        termId={termId}
       />
     </PageLayout>
   );

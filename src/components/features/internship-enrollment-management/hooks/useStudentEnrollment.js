@@ -21,6 +21,7 @@ export const useStudentEnrollment = () => {
 
   const [selectedIds, setSelectedIds] = useState([]);
   const [viewId, setViewId] = useState(null);
+  const [bulkAssignVisible, setBulkAssignVisible] = useState(false);
 
   const {
     termId,
@@ -218,6 +219,27 @@ export const useStudentEnrollment = () => {
     onError: () => toast.error(MESSAGES.BULK_WITHDRAW.ERROR_GENERIC),
   });
 
+  const { mutate: bulkAssign, isPending: bulkAssignLoading } = useMutation({
+    mutationFn: (command) => PlacementService.bulkAssign(command),
+    onSuccess: (res) => {
+      if (res?.success === false) {
+        toast.error(res?.message || MESSAGES.BULK_ASSIGN.ERROR_GENERIC);
+      } else {
+        toast.success(
+          MESSAGES.BULK_ASSIGN_SUCCESS.replace('{count}', selectedIds.length).replace(
+            '{enterprise}',
+            res?.data?.enterpriseName || 'Enterprise'
+          )
+        );
+        setBulkAssignVisible(false);
+        setSelectedIds([]);
+        queryClient.invalidateQueries({ queryKey: ['students-enrollment'] });
+        queryClient.invalidateQueries({ queryKey: ['semester-students'] });
+      }
+    },
+    onError: (error) => toast.error(getErrorDetail(error, MESSAGES.BULK_ASSIGN.ERROR_GENERIC)),
+  });
+
   const { mutateAsync: importPreview, isPending: previewLoading } = useMutation({
     mutationFn: (file) => StudentService.importPreview(termId, file),
     onError: (error) => toast.error(getErrorDetail(error, MESSAGES.IMPORT_ERROR)),
@@ -315,6 +337,24 @@ export const useStudentEnrollment = () => {
     });
   }, [selectedIds, studentData.items, bulkUnassignStudent, termId, MESSAGES.BULK_UNASSIGN]);
 
+  const handleBulkAssign = useCallback(
+    (values) => {
+      const studentIds = studentData.items
+        .filter((s) => selectedIds.includes(s.studentTermId))
+        .map((s) => s.studentId);
+
+      if (studentIds.length === 0) return;
+
+      bulkAssign({
+        studentIds,
+        enterpriseId: values.enterpriseId,
+        internPhaseId: values.internPhaseId,
+        force: values.force ?? true,
+      });
+    },
+    [selectedIds, studentData.items, bulkAssign]
+  );
+
   const handleDownloadTemplate = useCallback(async () => {
     if (!termId) return;
     try {
@@ -339,7 +379,8 @@ export const useStudentEnrollment = () => {
     bulkUnassignLoading ||
     importLoading ||
     bulkWithdrawLoading ||
-    previewLoading;
+    previewLoading ||
+    bulkAssignLoading;
   const handleUpdateStudent = useCallback((values) => updateStudent(values), [updateStudent]);
 
   const handleAddStudent = useCallback((values) => addStudent(values), [addStudent]);
@@ -369,6 +410,7 @@ export const useStudentEnrollment = () => {
     selectedStudent: selectedRecord,
     students: studentData.items,
     selectedIds,
+    bulkAssignVisible,
 
     onTermChange: handleTermChange,
     onSearchChange: handleSearchChange,
@@ -380,6 +422,7 @@ export const useStudentEnrollment = () => {
     setEditVisible,
     setDetailsVisible,
     setSelectedIds,
+    setBulkAssignVisible,
 
     handleView,
     handleEdit: handleOpenEdit,
@@ -391,6 +434,7 @@ export const useStudentEnrollment = () => {
     handleImportPreview,
     handleImportConfirm,
     handleBulkWithdraw,
+    handleBulkAssign,
     handleDownloadTemplate,
     sortBy,
     sortOrder,
