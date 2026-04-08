@@ -1,18 +1,9 @@
-import {
-  CloseCircleOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  SwapOutlined,
-  UserAddOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import React from 'react';
 
 import StatusBadge from '@/components/ui/status-badge';
 import TableRowDropdown from '@/components/ui/TableRowActions';
-
-import AssignEnterprisePopover from '../../internship-placement/components/AssignEnterprisePopover';
 
 export const getStudentColumns = ({
   pagination,
@@ -169,49 +160,11 @@ export const getStudentColumns = ({
           if (!isWithdrawn) {
             items.push({ type: 'divider' });
 
-            // 1. Assign / Change Enterprise
             items.push({
-              key: 'assign-enterprise',
-              label: (
-                <AssignEnterprisePopover
-                  student={record}
-                  termId={termId}
-                  termName={termName}
-                  disabled={isClosed}
-                >
-                  <div className="w-full text-left">
-                    {renderActionLabel(
-                      isUnplaced ? 'Assign Enterprise' : 'Change Enterprise',
-                      isUnplaced ? <UserAddOutlined /> : <SwapOutlined />,
-                      isUnplaced ? 'primary' : 'warning'
-                    )}
-                  </div>
-                </AssignEnterprisePopover>
-              ),
-              disabled: isClosed,
+              key: 'edit',
+              label: renderActionLabel(ACTION_LABELS.EDIT, <EditOutlined />, 'primary'),
+              onClick: () => handleEdit(record),
             });
-
-            // 2. Cancel Placement (only if placed or pending)
-            if (!isUnplaced) {
-              items.push({
-                key: 'cancel-placement',
-                label: renderActionLabel('Cancel Placement', <CloseCircleOutlined />, 'danger'),
-                onClick: () => handleUnassign(record),
-              });
-            }
-
-            items.push(
-              {
-                key: 'edit',
-                label: renderActionLabel(ACTION_LABELS.EDIT, <EditOutlined />, 'primary'),
-                onClick: () => handleEdit(record),
-              },
-              {
-                key: 'withdraw',
-                label: renderActionLabel(ACTION_LABELS.DELETE, <DeleteOutlined />, 'danger'),
-                onClick: () => handleDelete(record),
-              }
-            );
           } else {
             items.push(
               { type: 'divider' },
