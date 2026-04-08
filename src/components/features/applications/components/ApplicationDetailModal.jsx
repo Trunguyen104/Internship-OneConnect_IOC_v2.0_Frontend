@@ -1,21 +1,16 @@
 'use client';
 
-import { App, Divider, Modal, Skeleton } from 'antd';
+import { Divider, Modal, Skeleton } from 'antd';
 import dayjs from 'dayjs';
 import { Calendar, ExternalLink, FileText, Mail, Phone, School, User } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 
 import Badge from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  ACTIVE_STATUSES,
-  APPLICATION_SOURCE,
-  APPLICATION_STATUS,
-} from '@/constants/applications/application.constants';
+import { APPLICATION_STATUS } from '@/constants/applications/application.constants';
 import { APPLICATIONS_UI } from '@/constants/applications/uiText';
 
-import { useApplicationActions } from '../hooks/useApplicationActions';
-import { useApplicationDetail } from '../hooks/useApplications';
+import { useApplicationDetailState } from '../hooks/useApplicationDetailState';
 import ApplicationStatusBadge from './ApplicationStatusBadge';
 import RejectModal from './RejectModal';
 
@@ -24,66 +19,26 @@ import RejectModal from './RejectModal';
  * Redesigned to be clean, professional, and matching Enterprise Portal standards.
  */
 export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
-  const { modal: modalApi } = App.useApp();
-  const { data: app, isLoading } = useApplicationDetail(applicationId);
-  const actions = useApplicationActions(applicationId);
-  const [rejectModalOpen, setRejectModalOpen] = useState(false);
-
-  const isUniAssign = app?.source === APPLICATION_SOURCE.UNI_ASSIGN;
-  const isSelfApply = app?.source === APPLICATION_SOURCE.SELF_APPLY;
-  const canAct = !isLoading && applicationId && ACTIVE_STATUSES.includes(app?.status);
-
-  const cvUrl = app?.cvSnapshotUrl || app?.cvUrl;
-
-  const phaseName = app?.internPhaseName || app?.internshipPhaseName || app?.phaseName;
-  const phaseStart = app?.internPhaseStartDate || app?.internshipPhaseStartDate || app?.startDate;
-  const phaseEnd = app?.internPhaseEndDate || app?.internshipPhaseEndDate || app?.endDate;
-
-  const audienceDisplay = (() => {
-    if (app?.audienceLabel) return app.audienceLabel;
-    if (app?.audience === null || app?.audience === undefined) return 'Public';
-    if (Array.isArray(app?.audience) && app.audience.length)
-      return `Targeted — ${app.audience.join(', ')}`;
-    if (typeof app?.audience === 'string') return app.audience;
-    return APPLICATIONS_UI.COMMON.EMPTY;
-  })();
-
-  const statusHistories = (Array.isArray(app?.statusHistories) ? app.statusHistories : [])
-    .slice()
-    .sort((a, b) => {
-      const aTime = new Date(a.changedAt || a.createdAt || a.at || 0).getTime();
-      const bTime = new Date(b.changedAt || b.createdAt || b.at || 0).getTime();
-      return aTime - bTime;
-    });
-
-  const showConfirm = (title, content, onOk, okText = 'Confirm') => {
-    modalApi.confirm({
-      title: <span className="text-lg font-black tracking-tight text-slate-800">{title}</span>,
-      content: <p className="mt-2 font-medium text-slate-500">{content}</p>,
-      okText,
-      cancelText: APPLICATIONS_UI.MODAL.CANCEL || 'Cancel',
-      centered: true,
-      width: 460,
-      className: 'premium-confirm-modal',
-      okButtonProps: {
-        className:
-          'bg-slate-900 hover:bg-slate-800 border-none rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px]',
-      },
-      cancelButtonProps: {
-        className:
-          'rounded-xl h-10 px-6 font-bold uppercase tracking-wider text-[11px] border-slate-200 text-slate-500',
-      },
-      onOk,
-    });
-  };
-
-  const onRejectConfirm = (data) => {
-    if (isUniAssign) actions.rejectUniAssign(data);
-    else actions.reject(data);
-    setRejectModalOpen(false);
-  };
-
-  const onRejectClick = () => setRejectModalOpen(true);
+  const {
+    app,
+    isLoading,
+    actions,
+    rejectModalOpen,
+    setRejectModalOpen,
+    isUniAssign,
+    isSelfApply,
+    canAct,
+    cvUrl,
+    phaseName,
+    phaseStart,
+    phaseEnd,
+    audienceDisplay,
+    statusHistories,
+    showConfirm,
+    onRejectConfirm,
+    onRejectClick,
+    handleClose,
+  } = useApplicationDetailState(applicationId, onCancel);
 
   const renderActionButtons = () => {
     if (!canAct) return null;
@@ -220,10 +175,6 @@ export const ApplicationDetailModal = ({ open, onCancel, applicationId }) => {
     }
 
     return null;
-  };
-
-  const handleClose = () => {
-    onCancel();
   };
 
   return (
