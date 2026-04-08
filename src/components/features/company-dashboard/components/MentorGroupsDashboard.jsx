@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Inbox, LayoutGrid, Users } from 'lucide-react';
+import { ArrowRight, Inbox, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -84,10 +84,6 @@ export default function MentorGroupsDashboard() {
                           label={group.status === 2 ? texts.CHIP_ARCHIVED : texts.CHIP_ACTIVE}
                           showDot
                         />
-                        <span className="text-[10px] font-mono text-slate-300">
-                          {texts.ID_PREFIX}
-                          {groupId?.substring(0, 8)}
-                        </span>
                       </div>
                       <Card.Title className="text-xl font-black text-slate-900 transition-colors group-hover:text-primary">
                         {group.groupName}
@@ -95,9 +91,6 @@ export default function MentorGroupsDashboard() {
                       <Card.Description className="font-bold text-slate-400 line-clamp-1">
                         {group.enterpriseName || 'No enterprise assigned'}
                       </Card.Description>
-                    </div>
-                    <div className="flex size-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-400 transition-all duration-500 group-hover:bg-primary group-hover:text-white group-hover:shadow-[0_8px_20px_rgba(var(--primary-rgb),0.3)]">
-                      <LayoutGrid className="size-6" />
                     </div>
                   </Card.Header>
 
@@ -121,10 +114,8 @@ export default function MentorGroupsDashboard() {
 
                   <Card.Footer className="mt-2 border-t border-slate-50 pt-4 transition-colors group-hover:bg-slate-50/50">
                     <span className="flex w-full items-center justify-between font-black text-primary transition-all duration-500">
-                      <span className="translate-x-2 opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:opacity-100">
-                        {texts.VIEW_DETAILS}
-                      </span>
-                      <ArrowRight className="-translate-x-4 transition-all duration-500 group-hover:translate-x-0" />
+                      <span>{texts.VIEW_DETAILS}</span>
+                      <ArrowRight className="size-5 transition-transform duration-500 group-hover:translate-x-1" />
                     </span>
                   </Card.Footer>
                 </Card>
