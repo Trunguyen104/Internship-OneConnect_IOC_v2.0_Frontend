@@ -3,7 +3,9 @@
 import { useState } from 'react';
 
 /**
- * Hook to manage job postings filtering, pagination, and statistics.
+ * Hook to manage job postings filtering and pagination state.
+ *
+ * @returns {Object} Current filters and handlers for changing filters or pages.
  */
 export const useJobPostingsFilters = () => {
   const [filters, setFilters] = useState({

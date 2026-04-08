@@ -11,7 +11,9 @@ import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 import { ExploreJobsService } from '../services/explore-jobs.service';
 
 /**
- * Maps API job object to Frontend job object
+ * Chuyển đổi đối tượng Job từ API sang đối tượng Job cho Frontend.
+ * @param {Object} job - Dữ liệu job từ API.
+ * @returns {Object} Dữ liệu job đã được chuẩn hóa.
  */
 const mapJob = (job) => {
   if (!job) return null;
@@ -28,11 +30,8 @@ const mapJob = (job) => {
         EXPLORE_JOBS_UI.CARD.ENTERPRISE_FALLBACK,
       logoUrl: job.companyLogoUrl || job.enterpriseLogoUrl || job.enterprise?.logoUrl,
     },
-    // Map singular benefit from API to plural expected by UI
     benefits: job.benefit || job.benefits,
-    // Audience mapping
     audienceType: job.audience === 1 ? 'Public' : job.audience === 2 ? 'Targeted' : 'Public',
-    // Standardize dates and handle default '0001-01-01'
     deadline: job.expireDate
       ? new Date(job.expireDate).toLocaleDateString('en-GB')
       : EXPLORE_JOBS_UI.CARD.NOT_AVAILABLE,
@@ -42,7 +41,6 @@ const mapJob = (job) => {
     endDate: isDefaultDate(job.endDate)
       ? EXPLORE_JOBS_UI.CARD.DATE_TBD
       : new Date(job.endDate).toLocaleDateString('en-GB'),
-    // Status mapping (AC-01)
     statusLabel:
       job.status === 2
         ? EXPLORE_JOBS_UI.CARD.STATUS_CLOSING_SOON
@@ -51,7 +49,9 @@ const mapJob = (job) => {
 };
 
 /**
- * Hook to fetch job detail independently.
+ * Hook để lấy chi tiết Công việc một cách độc lập.
+ * @param {string} id - ID của công việc.
+ * @returns {Object} Query result từ react-query.
  */
 export function useJobDetail(id) {
   return useQuery({
@@ -65,6 +65,11 @@ export function useJobDetail(id) {
   });
 }
 
+/**
+ * Hook chính để quản lý logic "Khám phá công việc" cho Sinh viên.
+ * Bao gồm: tìm kiếm, phân trang, kiểm tra điều kiện ứng tuyển, và thực hiện ứng tuyển.
+ * @returns {Object} State và các hàm xử lý cho UI.
+ */
 export function useExploreJobs() {
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -75,7 +80,7 @@ export function useExploreJobs() {
   const [pageSize, setPageSize] = useState(6);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 0. Fetch student's own applications for eligibility context (AC-03)
+  /** Fetch danh sách ứng tuyển của sinh viên để kiểm tra điều kiện (AC-03) */
   const myAppsQuery = useQuery({
     queryKey: ['my-applications-eligible'],
     queryFn: () => studentApplicationService.getMyApplications().then((res) => res?.data || res),
@@ -88,7 +93,7 @@ export function useExploreJobs() {
     ? myAppsData
     : myAppsData?.items || myAppsData?.data || [];
 
-  // 1. Fetch available jobs from real API
+  /** Fetch danh sách các công việc đang mở tuyển */
   const exploreQuery = useQuery({
     queryKey: ['explore-jobs', searchTerm, currentPage, pageSize],
     queryFn: async () => {
@@ -101,11 +106,9 @@ export function useExploreJobs() {
         setErrorIsPlaced(false);
         return res?.data || res;
       } catch (err) {
-        // Handle specialized backend errors (AC-01: Placed state)
         const errorCodes = err?.data?.errors || [];
         if (errorCodes.includes('JobPosting.InternshipInProgress')) {
           setErrorIsPlaced(true);
-          // Return empty structure but the isPlaced will take precedence in UI
           return { items: [], totalCount: 0 };
         }
         setErrorIsPlaced(false);
@@ -130,7 +133,7 @@ export function useExploreJobs() {
     staleTime: 5000,
   });
 
-  // 4. Apply mutation
+  /** Thực hiện hành động ứng tuyển */
   const applyMutation = useMutation({
     mutationFn: ({ jobId, data }) => ExploreJobsService.applyJob(jobId, data),
     onSuccess: () => {
@@ -168,11 +171,11 @@ export function useExploreJobs() {
     setSearchTerm,
     applyJob: applyMutation.mutateAsync,
     isApplying: applyMutation.isPending,
+    /** Kiểm tra xem sinh viên có đủ điều kiện ứng tuyển job này hay không */
     getEligibility: (id) => {
       if (isPlaced) return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.PLACED };
       if (!hasCV) return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.NO_CV };
 
-      // 1. Specific check for THIS job (to show "APPLIED" label)
       const existingAppForThisJob = myApps.find((app) => app.jobSlotId === id || app.jobId === id);
       const isActuallyAppliedToThis =
         existingAppForThisJob && ![4, 5, 6].includes(existingAppForThisJob.status);
@@ -181,8 +184,6 @@ export function useExploreJobs() {
         return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS };
       }
 
-      // 2. Global check: Has ANY active application? (AC-03 requirement)
-      // If student has an active app anywhere, they cannot apply for another job.
       const hasAnyActiveApp = myApps.some((app) => ![4, 5, 6].includes(app.status));
       if (hasAnyActiveApp) {
         return { eligible: false, reason: EXPLORE_JOBS_UI.ELIGIBILITY.ACTIVE_APP_EXISTS };

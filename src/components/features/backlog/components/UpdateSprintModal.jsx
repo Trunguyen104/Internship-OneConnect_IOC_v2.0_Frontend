@@ -73,6 +73,7 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
                 format="YYYY-MM-DD"
                 placeholder={BACKLOG_UI.PLACEHOLDER_START_DATE || 'Select start date'}
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
+                placement="bottomLeft"
               />
             </div>
             <div className="flex flex-1 flex-col">
@@ -83,6 +84,7 @@ export default function UpdateSprintModal({ open, sprint, onClose, onSubmit }) {
                 format="YYYY-MM-DD"
                 placeholder={BACKLOG_UI.PLACEHOLDER_END_DATE || 'Select end date'}
                 className="h-11 rounded-xl border-gray-200 bg-gray-50/30 transition-all focus:bg-white focus:shadow-md w-full"
+                placement="bottomLeft"
               />
             </div>
           </div>

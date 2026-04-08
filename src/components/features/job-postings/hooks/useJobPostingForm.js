@@ -11,7 +11,17 @@ import { JOB_AUDIENCE, JOB_POSTING_UI, JOB_STATUS } from '../constants/job-posti
 import { useJobPostingActions, useUniversities } from '../hooks/useJobPostings';
 
 /**
- * Custom hook to manage Job Posting Form logic (Logic-only).
+ * Hook to manage the complex state and logic for the Job Posting Form.
+ * Handles auto-saving, draft status preservation, phase selection constraints,
+ * and multi-step data submission logic.
+ *
+ * @param {Object} props - Hook properties.
+ * @param {boolean} props.open - Whether the form is currently open.
+ * @param {Object} props.record - The job record being edited (null for new).
+ * @param {Array} props.phases - List of internship phases.
+ * @param {Function} props.onCancel - Callback for closing the form.
+ * @param {Function} props.onSuccess - Callback for successful operations.
+ * @returns {Object} Form control states and event handlers.
  */
 export const useJobPostingForm = ({ open, record, phases, onCancel, onSuccess }) => {
   const { modal: modalApi } = App.useApp();

@@ -19,82 +19,39 @@ import {
   Users,
   XCircle,
 } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { PageLayout } from '@/components/ui/pagelayout';
 
 import { JOB_AUDIENCE, JOB_POSTING_UI, JOB_STATUS } from '../constants/job-postings.constant';
-import { useJobPostingActions, useJobPostingDetail } from '../hooks/useJobPostings';
-import { useInternshipPhases } from '../hooks/useJobPostings';
-import { useJobPostingsActionsHandler } from '../hooks/useJobPostingsActionsHandler';
+import { useJobPostingDetailState } from '../hooks/useJobPostingDetailState';
 import JobPostingDrawer from './JobPostingDrawer';
 import JobPostingStatusBadge from './JobPostingStatusBadge';
 
 /**
- * Premium Detail Page for Job Postings (HR View).
+ * Detailed view for a specific Job Posting.
+ * Allows HR to view application statistics, manage posting status (publish/close), and edit/delete jobs.
+ *
+ * @returns {React.ReactElement} The rendered JobPostingDetail page.
  */
 export default function JobPostingDetail() {
-  const { id } = useParams();
-  const router = useRouter();
-  const { jobDetail: job, isLoading } = useJobPostingDetail(id);
-  const { phases } = useInternshipPhases();
-  const actions = useJobPostingActions();
-  const { isDrawerOpen, selectedRecord, onAction, closeDrawer } = useJobPostingsActionsHandler({
-    actions,
-  });
-
-  const { applicationsSummary, totalApplications } = useMemo(() => {
-    if (!job) return { applicationsSummary: {}, totalApplications: 0 };
-
-    const summary = {};
-    let total = 0;
-
-    (job.applicationStatusCounts || []).forEach((item) => {
-      summary[item.status] = item.count;
-      total += item.count;
-    });
-
-    return { applicationsSummary: summary, totalApplications: total };
-  }, [job]);
-
-  // Lookup Phase Info from the list if not provided in the detail object
-  const phaseInfo = useMemo(() => {
-    if (!job?.internshipPhaseId || !phases) return null;
-    // Ensure case-insensitive or string-based ID comparison
-    return phases.find((p) => {
-      const pId = p.internshipPhaseId || p.phaseId || p.id;
-      return pId?.toString().toLowerCase() === job.internshipPhaseId.toString().toLowerCase();
-    });
-  }, [job?.internshipPhaseId, phases]);
-
-  const { isPhaseFull, placedCount, totalCapacity } = useMemo(() => {
-    if (!phaseInfo) return { isPhaseFull: false, placedCount: 0, totalCapacity: 0 };
-
-    const total = phaseInfo.capacity || 0;
-    const remaining = phaseInfo.remainingCapacity ?? total;
-    const placed = total - remaining;
-
-    return {
-      isPhaseFull: total > 0 && remaining <= 0,
-      placedCount: placed,
-      totalCapacity: total,
-    };
-  }, [phaseInfo]);
-
-  const displayPhaseName = job?.termName || job?.internshipPhaseName || phaseInfo?.name || 'N/A';
-
-  const displayPhaseDates = useMemo(() => {
-    const isInvalid = (d) => !d || dayjs(d).year() <= 1901;
-
-    // Prioritize phaseInfo dates if job dates are default/invalid
-    const start = isInvalid(job?.startDate) ? phaseInfo?.startDate : job?.startDate;
-    const end = isInvalid(job?.endDate) ? phaseInfo?.endDate : job?.endDate;
-
-    if (isInvalid(start) || isInvalid(end)) return null;
-
-    return `${dayjs(start).format('MMM D')} — ${dayjs(end).format('MMM D, YYYY')}`;
-  }, [job?.startDate, job?.endDate, phaseInfo]);
+  const {
+    job,
+    isLoading,
+    router,
+    isDrawerOpen,
+    selectedRecord,
+    closeDrawer,
+    applicationsSummary,
+    totalApplications,
+    isPhaseFull,
+    placedCount,
+    totalCapacity,
+    displayPhaseName,
+    displayPhaseDates,
+    handleAction,
+    phases,
+  } = useJobPostingDetailState();
 
   if (isLoading) {
     return (
@@ -127,10 +84,6 @@ export default function JobPostingDetail() {
       </PageLayout>
     );
   }
-
-  const handleAction = (key) => {
-    onAction(key, job);
-  };
 
   return (
     <PageLayout className="pb-20 bg-[#f8f9fa]">

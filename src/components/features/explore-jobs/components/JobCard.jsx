@@ -6,6 +6,13 @@ import { Card } from '@/components/ui/atoms';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 
+/**
+ * Card hiển thị thông tin tóm tắt của một công việc.
+ * @param {Object} props - Thuộc tính component.
+ * @param {Object} props.job - Dữ liệu công việc.
+ * @param {Function} props.onClick - Hàm xử lý khi nhấn vào card.
+ * @param {Object} props.eligibility - Thông tin về điều kiện ứng tuyển của sinh viên.
+ */
 export default function JobCard({ job, onClick, eligibility }) {
   const { title, enterprise, location, deadline, salary, type } = job;
   const [logoError, setLogoError] = React.useState(false);
