@@ -9,14 +9,12 @@ import Pagination from '@/components/ui/pagination';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
 import { useExploreJobs } from '../hooks/useExploreJobs';
+import { useJobSelection } from '../hooks/useJobSelection';
 import ApplyModal from './ApplyModal';
 import JobCard from './JobCard';
 
 export default function ExploreJobs() {
   const router = useRouter();
-  const [selectedJobId, setSelectedJobId] = React.useState(null);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-
   const {
     jobs,
     total,
@@ -34,19 +32,8 @@ export default function ExploreJobs() {
     getEligibility,
   } = useExploreJobs();
 
-  const handleCardClick = (id, isApplyRequested) => {
-    if (isApplyRequested) {
-      setSelectedJobId(id);
-      setIsModalOpen(true);
-      return;
-    }
-    router.push(`/explore-jobs/${id}`);
-  };
-
-  const selectedJob = React.useMemo(
-    () => jobs.find((j) => (j.jobId || j.id) === selectedJobId),
-    [jobs, selectedJobId]
-  );
+  const { selectedJob, selectedJobId, isModalOpen, setIsModalOpen, handleCardClick } =
+    useJobSelection(jobs);
 
   if (isPlaced) {
     return (

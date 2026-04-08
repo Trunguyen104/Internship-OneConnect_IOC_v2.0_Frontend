@@ -18,14 +18,14 @@ import React from 'react';
 import { PageLayout } from '@/components/ui/pagelayout';
 
 import { EXPLORE_JOBS_UI } from '../constants/explore-jobs.constant';
-import { useExploreJobs } from '../hooks/useExploreJobs';
+import { useExploreJobs, useJobDetail } from '../hooks/useExploreJobs';
 import ApplyModal from './ApplyModal';
 
 export default function JobDetail() {
   const { id } = useParams();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const { useJobDetail, getEligibility, isApplying, applyJob, cvUrl, hasCV } = useExploreJobs();
+  const { getEligibility, isApplying, applyJob, cvUrl, hasCV } = useExploreJobs();
   const { data: job, isLoading: isJobLoading } = useJobDetail(id);
 
   const isLoading = isJobLoading;
