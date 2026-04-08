@@ -56,7 +56,7 @@ export const ApplicationService = {
   /**
    * Universal: Reject an application.
    * @param {string|number} id - Application ID
-   * @param {Object} data - Contains mandatory 'reason' for rejection.
+   * @param {Object} data - Contains mandatory 'rejectReason' for rejection.
    */
   reject(id, data) {
     return httpPatch(`/applications/${id}/reject`, data);
@@ -73,7 +73,7 @@ export const ApplicationService = {
   /**
    * Uni-Assign Flow: HR rejects the assignment.
    * @param {string|number} id - Application ID
-   * @param {Object} data - Contains mandatory 'reason' for rejection.
+   * @param {Object} data - Contains mandatory 'rejectReason' for rejection.
    */
   rejectUniAssign(id, data) {
     return httpPatch(`/applications/${id}/reject-uni-assign`, data);

@@ -23,7 +23,7 @@ export const RejectModal = ({
 
   const handleConfirm = () => {
     if (!reason.trim()) return;
-    onConfirm({ reason: reason.trim() });
+    onConfirm({ rejectReason: reason.trim() });
     setReason('');
   };
 
