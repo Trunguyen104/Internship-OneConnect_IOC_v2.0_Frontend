@@ -1,6 +1,7 @@
 'use client';
 
 import { message } from 'antd';
+import dayjs from 'dayjs';
 import {
   Building2,
   CalendarDays,
@@ -428,6 +429,7 @@ export function ReservationSection() {
                   onChange={(e) => updateField('consultationDate', e.target.value)}
                   required
                   prefix={<CalendarDays className="h-4 w-4 text-slate-400 mr-1" />}
+                  min={dayjs().format('YYYY-MM-DD')}
                 />
 
                 <div className="flex flex-col gap-1.5">
