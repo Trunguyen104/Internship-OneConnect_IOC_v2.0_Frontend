@@ -25,6 +25,7 @@ export default function ProjectAssignGroupModal({
       open={visible}
       onOk={onConfirm}
       onCancel={onCancel}
+      closable={false}
       confirmLoading={loading}
       centered
       zIndex={2000}

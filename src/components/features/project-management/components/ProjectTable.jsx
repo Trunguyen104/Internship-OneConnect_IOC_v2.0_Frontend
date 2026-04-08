@@ -27,7 +27,6 @@ import {
   VISIBILITY_LABELS,
   VISIBILITY_STATUS,
 } from '@/constants/project-management/project-management';
-import { cn } from '@/lib/cn';
 
 export default function ProjectTable({
   data,
@@ -132,18 +131,8 @@ export default function ProjectTable({
             op === OPERATIONAL_STATUS.COMPLETED || op === OPERATIONAL_STATUS.ARCHIVED;
 
           return (
-            <div
-              className={cn(
-                'transition-colors group/cell',
-                !isReadOnly && 'cursor-pointer hover:text-primary'
-              )}
-              onClick={(e) => {
-                if (isReadOnly || op !== OPERATIONAL_STATUS.UNSTARTED) return;
-                e.stopPropagation();
-                onAssign?.(record);
-              }}
-            >
-              <div className={cn(!isReadOnly && 'group-hover/cell:underline')}>{content}</div>
+            <div className="transition-colors group/cell">
+              <div>{content}</div>
             </div>
           );
         },
