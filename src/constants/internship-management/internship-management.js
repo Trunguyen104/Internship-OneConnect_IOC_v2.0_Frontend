@@ -599,6 +599,7 @@ export const INTERNSHIP_MANAGEMENT_UI = {
         WITHDRAW: 'Withdraw',
         DELETE: 'Delete',
         VIEW: 'View Details',
+        BULK_ASSIGN: 'Bulk Assign',
       },
       TABLE: {
         COLUMNS: {
@@ -763,6 +764,21 @@ export const INTERNSHIP_MANAGEMENT_UI = {
           ACTION_LABEL: 'Bulk Unassign',
           CONFIRM_TEXT:
             'Are you sure you want to cancel placement for {count} selected students? This will return them to Unplaced status.',
+        },
+        BULK_ASSIGN_SUCCESS: 'Successfully assigned {count} students to {enterprise}.',
+        BULK_ASSIGN: {
+          ACTION_LABEL: 'Bulk Assign',
+          CONFIRM_TEXT:
+            'Are you sure you want to assign {count} selected students to {enterprise} - {phase}?',
+          MODAL_TITLE: 'Bulk Enterprise Assignment',
+          SELECTOR_LABEL: 'Select Enterprise & Intern Phase',
+          FORCE_LABEL: 'Override existing placements',
+          FORCE_DESC:
+            'If checked, this will override any existing placements for the selected students.',
+          ASSIGNING_PREFIX: 'You are assigning',
+          ASSIGNING_SUFFIX: 'student(s) to an enterprise.',
+          SELECT_PHASE_PROMPT: 'Please select an enterprise and phase to continue',
+          ERROR_GENERIC: 'An error occurred during bulk assignment, please try again',
         },
       },
     },
