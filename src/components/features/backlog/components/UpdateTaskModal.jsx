@@ -7,7 +7,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import CompoundModal from '@/components/ui/CompoundModal';
 import TiptapEditor from '@/components/ui/tiptapeditor';
 import { BACKLOG_UI } from '@/constants/backlog/uiText';
-import { WORK_ITEM_PRIORITY, WORK_ITEM_STATUS, WORK_ITEM_TYPE } from '@/constants/common/enums';
+import {
+  UNASSIGNED_ID,
+  WORK_ITEM_PRIORITY,
+  WORK_ITEM_STATUS,
+  WORK_ITEM_TYPE,
+} from '@/constants/common/enums';
 
 import { FieldLabel, TextInput } from './TaskFields';
 import { TaskModalSidebar } from './TaskModalSidebar';
@@ -26,10 +31,10 @@ export default function UpdateTaskModal({
 
   const [type, setType] = useState(WORK_ITEM_TYPE.USER_STORY);
   const [status, setStatus] = useState(WORK_ITEM_STATUS.TODO);
-  const [assignee, setAssignee] = useState('');
+  const [assignee, setAssignee] = useState(UNASSIGNED_ID);
   const [priority, setPriority] = useState(WORK_ITEM_PRIORITY.MEDIUM);
 
-  const [epic, setEpic] = useState('');
+  const [epic, setEpic] = useState(UNASSIGNED_ID);
   const [sprintId, setSprintId] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
@@ -58,7 +63,7 @@ export default function UpdateTaskModal({
       else if (st === 'CANCELLED') setStatus(WORK_ITEM_STATUS.CANCELLED);
       else setStatus(WORK_ITEM_STATUS.TODO);
 
-      setAssignee(initialData.assigneeId || '');
+      setAssignee(initialData.assigneeId || UNASSIGNED_ID);
 
       const pr = initialData.priority?.name || initialData.priority;
       if (typeof pr === 'number') setPriority(pr);
@@ -68,7 +73,7 @@ export default function UpdateTaskModal({
       else if (pr === 'CRITICAL') setPriority(WORK_ITEM_PRIORITY.CRITICAL);
       else setPriority(WORK_ITEM_PRIORITY.MEDIUM);
 
-      setEpic(initialData.parentId || '');
+      setEpic(initialData.parentId || UNASSIGNED_ID);
 
       // Determine sprintId
       setSprintId(initialData.sprintId || '');

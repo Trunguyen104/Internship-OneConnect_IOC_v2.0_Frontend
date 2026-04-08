@@ -144,4 +144,6 @@ export const BACKLOG_UI = {
   NO_TASK_HISTORY_DESC:
     "We couldn't find any tasks associated with your projects in the system history.",
   DUE_DATE_OUTSIDE_SPRINT: 'Due date is outside the sprint range',
+  UNASSIGNED: 'Unassigned',
+  NONE: 'None',
 };
