@@ -89,14 +89,14 @@ export const useEnterpriseDashboard = () => {
   const applicationLists = {
     selfApply: (selfApplyData?.data?.items || []).map((item) => ({
       id: item.applicationId,
-      name: item.studentName || 'Unknown Student',
+      name: item.studentFullName || item.studentName || 'Unknown Student',
       job: item.jobPostingTitle || 'No Title',
       time: item.createdAt,
       avatarColor: 'bg-blue-100 text-blue-600',
     })),
     uniAssign: (uniAssignData?.data?.items || []).map((item) => ({
       id: item.applicationId,
-      name: item.studentName || 'Unknown Student',
+      name: item.studentFullName || item.studentName || 'Unknown Student',
       job: item.jobPostingTitle || 'No Title',
       time: item.createdAt,
       avatarColor: 'bg-emerald-100 text-emerald-600',
