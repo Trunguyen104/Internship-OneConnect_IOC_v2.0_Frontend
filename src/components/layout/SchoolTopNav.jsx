@@ -1,6 +1,6 @@
 'use client';
 
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import { CalendarDays, ChevronDown, Home } from 'lucide-react';
 import Image from 'next/image';
@@ -51,13 +51,13 @@ export default function SchoolTopNav() {
       },
       { type: 'divider' },
       { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
-      { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
+      // { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
     onClick: ({ key }) => {
       if (key === 'profile') router.push('/profile');
-      if (key === 'settings') router.push('/admin/settings');
+      // if (key === 'settings') router.push('/admin/settings');
       if (key === 'logout') handleLogout();
     },
   };
