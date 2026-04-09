@@ -355,7 +355,7 @@ export default function ProjectTable({
       rowKey="projectId"
       size="small"
       minWidth="100%"
-      className="project-table"
+      className="project-table flex-1 min-h-0"
       emptyText={TABLE.EMPTY_MESSAGE}
     />
   );

@@ -341,7 +341,7 @@ export default function EnterpriseAdminDashboardContainer() {
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-slate-800 leading-tight">
-                          {v.studentName}
+                          {v.studentFullName || v.studentName}
                         </span>
                         <span className="text-[10px] text-slate-400 font-medium">
                           {v.internshipGroupName}
