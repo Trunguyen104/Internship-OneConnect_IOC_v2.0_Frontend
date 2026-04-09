@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  BankOutlined,
-  LogoutOutlined,
-  SettingOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { BankOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Dropdown } from 'antd';
 import {
   AlertOctagon,
@@ -129,10 +123,10 @@ export default function CompanyTopNav() {
       ...(isEnterpriseManager
         ? [{ key: 'my-company', icon: <BankOutlined />, label: 'My Company' }]
         : []),
-      ...(roleId === USER_ROLE.ENTERPRISE_ADMIN
-        ? [{ key: 'staff-management', icon: <TeamOutlined />, label: 'Staff Management' }]
-        : []),
-      { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
+      // ...(roleId === USER_ROLE.ENTERPRISE_ADMIN
+      //   ? [{ key: 'staff-management', icon: <TeamOutlined />, label: 'Staff Management' }]
+      //   : []),
+      // { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
       { type: 'divider' },
       { key: 'logout', icon: <LogoutOutlined />, label: 'Logout', danger: true },
     ],
